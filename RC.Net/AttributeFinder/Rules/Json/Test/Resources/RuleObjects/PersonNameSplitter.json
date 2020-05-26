@@ -1,0 +1,8 @@
+[
+  {
+    "Type": "PersonNameSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": "PersonNameSplitter"
+  }
+]

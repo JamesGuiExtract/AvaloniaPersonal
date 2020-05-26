@@ -1,0 +1,560 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Page",
+    "InsertParentValue": "",
+    "DeepCopyInput": true,
+    "GlobalDocPreprocessor": {
+      "Type": "SetDocumentTags",
+      "Description": "two digit years should not be future dates<Set document tags>",
+      "Enabled": true,
+      "Object": {
+        "SetStringTag": {
+          "TagName": "NoFutureDates",
+          "Generator": "Literal",
+          "SpecifiedValue": "",
+          "ValuesFromTag": "",
+          "AttributeSelector": {
+            "Type": null,
+            "Object": null
+          },
+          "Delimiter": ";"
+        },
+        "SetObjectTag": {
+          "TagName": null,
+          "Generator": "None",
+          "SpecifiedValue": "",
+          "AttributeSelector": {
+            "Type": null,
+            "Object": null
+          }
+        },
+        "NoTagsIfEmpty": false,
+        "GenerateSourceAttributesWithRSDFile": false,
+        "SourceAttributeRSDFile": ""
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "ReplaceStrings",
+            "Description": "Fix bad spacing. (ofJanuary)<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "(\\w)(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)",
+                  "Replacement": "$1 $2"
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          },
+          {
+            "Type": "ReplaceStrings",
+            "Description": "remove spaces in dates like 9 / 2 8 / 07; K:\\Common\\Engineering\\Sample Files\\Trimin\\WI - Outagamie\\Set001\\Images\\AssignmentOfMortgage\\1769210.TIF<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "([-/])\\s*(\\d)\\s*(\\d)\\s*([-/])",
+                  "Replacement": "$1$2$3$4"
+                },
+                {
+                  "Pattern": "(\\d+)\\s*([-/])\\s*(\\d+)\\s*([-/])\\s*(\\d+)\\s*(\\d+)",
+                  "Replacement": "$1$2$3$4$5$6"
+                },
+                {
+                  "Pattern": "(\\d)\\s+(\\d[-/]\\d+[-/]\\d+)",
+                  "Replacement": "$1$2"
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          },
+          {
+            "Type": "ReplaceStrings",
+            "Description": "Fix strings.<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "(\\d{2})1(\\d{2}.(?:19|20)?\\d{2})",
+                  "Replacement": "$1/$2"
+                },
+                {
+                  "Pattern": "(\\d{2}.\\d{2})1((?:19|20)?\\d{2})",
+                  "Replacement": "$1/$2"
+                },
+                {
+                  "Pattern": "(\\d{1,2})\\W(\\d{1,2})\\W((?:19|20)?\\d{2})",
+                  "Replacement": "$1-$2-$3"
+                },
+                {
+                  "Pattern": "-",
+                  "Replacement": "/"
+                },
+                {
+                  "Pattern": "[.:;+']",
+                  "Replacement": " "
+                },
+                {
+                  "Pattern": "(\\b\\d{1,2})((?:19|20)\\d{2}\\b)",
+                  "Replacement": "$1 $2"
+                },
+                {
+                  "Pattern": "\\x20+/\\x20+",
+                  "Replacement": "/"
+                },
+                {
+                  "Pattern": "\\b(\\d)\\x20(\\d)\\b",
+                  "Replacement": "$1$2"
+                },
+                {
+                  "Pattern": "\\b0ct",
+                  "Replacement": "Oct"
+                },
+                {
+                  "Pattern": "(?<![\\s/])((?:19|20)\\d{2}$)",
+                  "Replacement": " $1"
+                },
+                {
+                  "Pattern": "\\b[il]{2}th\\b",
+                  "Replacement": "11th"
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "attempt to find date amidst junk<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "OutputHandlerSequence",
+                "Object": {
+                  "ObjectsVector": [
+                    {
+                      "Type": "ModifyAttributeValueOH",
+                      "Description": "create copy<Modify attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": true,
+                        "AttributeName": "copy",
+                        "SetAttributeName": true,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "%Value%",
+                        "SetAttributeValue": true
+                      }
+                    },
+                    {
+                      "Type": "RunObjectOnAttributes",
+                      "Description": "search copy<Run object on attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "*/copy",
+                        "AttributeSelector": {
+                          "Type": null,
+                          "Object": null
+                        },
+                        "UseAttributeSelector": false,
+                        "Type": "Modifier",
+                        "Object": {
+                          "Type": "RegExprRule",
+                          "Object": {
+                            "IsRegExpFromFile": true,
+                            "RegExpFileName": "<ComponentDataDir>\\ReusableComponents\\Date\\date.dat.etf",
+                            "Pattern": "",
+                            "IsCaseSensitive": false,
+                            "FirstMatchOnly": true,
+                            "CreateSubAttributesFromNamedMatches": false,
+                            "OnlyCreateOneSubAttributePerGroup": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "Type": "RemoveSubAttributes",
+                      "Description": "remove copy if nothing found<Remove attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeSelector": {
+                          "Type": "MultipleCriteriaSelector",
+                          "Object": {
+                            "Selectors": [
+                              {
+                                "Select": "Matching",
+                                "With": {
+                                  "Type": "QueryBasedAS",
+                                  "Description": "*/copy<Query attribute selector>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "QueryText": "*/copy"
+                                  }
+                                }
+                              },
+                              {
+                                "Select": "NonMatching",
+                                "With": {
+                                  "Type": "ValueConditionSelector",
+                                  "Description": "<Value condition selector>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "Condition": {
+                                      "Type": "FindingRuleCondition",
+                                      "Object": {
+                                        "AFRule": {
+                                          "Type": "RegExprRule",
+                                          "Object": {
+                                            "IsRegExpFromFile": false,
+                                            "RegExpFileName": "",
+                                            "Pattern": ".",
+                                            "IsCaseSensitive": false,
+                                            "FirstMatchOnly": true,
+                                            "CreateSubAttributesFromNamedMatches": false,
+                                            "OnlyCreateOneSubAttributePerGroup": false
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ],
+                            "CombineBy": "Chain"
+                          }
+                        },
+                        "ConditionalRemove": false,
+                        "DataScorer": {
+                          "Type": null,
+                          "Description": "",
+                          "Enabled": true,
+                          "Object": null
+                        },
+                        "ScoreCondition": "EQ",
+                        "CompareConditionType": "ValueOf",
+                        "ScoreToCompare": 0
+                      }
+                    },
+                    {
+                      "Type": "MoveAndModifyAttributes",
+                      "Description": "move up if found<Move and modify attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AddAttributeNameToType": false,
+                        "AddRootOrParentAttributeType": false,
+                        "AddSpecifiedAttributeType": false,
+                        "AttributeQuery": "*/copy",
+                        "DeleteRootOrParentIfAllChildrenMoved": true,
+                        "MoveAttributeLevel": "MoveToParent",
+                        "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                        "RetainAttributeType": true,
+                        "SpecifiedAttributeName": "",
+                        "SpecifiedAttributeType": ""
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "check for valid date with Date splitter (formatDate.rsd does not handle like '8th day of May, 2015')<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_",
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*{*}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "UseAttributeSelector": true,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "DateTimeSplitter",
+                "Object": {
+                  "MinimumTwoDigitYear": 1930,
+                  "OutputFormat": "%m/%d/%Y",
+                  "ShowFormattedOutput": true,
+                  "SplitDayOfWeek": false,
+                  "SplitDefaults": false,
+                  "SplitFourDigitYear": true,
+                  "SplitMilitaryTime": false,
+                  "SplitMonthAsName": false,
+                  "TwoDigitYearBeforeCurrent": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "*off* **adds current year if only day+month found** check _ for valid date with formatDate.rsd<Run object on attributes>",
+            "Enabled": false,
+            "Object": {
+              "AttributeQuery": "_",
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*{*}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "UseAttributeSelector": true,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<ComponentDataDir>\\ReusableComponents\\Date\\formatDate.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove _ if no subattribute (did not format)<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "_<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "_"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "_{Formatted}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "_{Formatted}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "set to formatted date<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "a",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%Formatted%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "*off* create spatial subattribute<Modify attributes>",
+            "Enabled": false,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": true,
+              "AttributeName": "spatial",
+              "SetAttributeName": true,
+              "AttributeType": "spatial",
+              "SetAttributeType": false,
+              "AttributeValue": "%Value%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "*off* set to formatted date, keep spatial<Modify attributes>",
+            "Enabled": false,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "a",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%Formatted%¿%spatial%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "ModifySpatialMode",
+            "Description": "*off* convert to hybrid<Modify spatial mode>",
+            "Enabled": false,
+            "Object": {
+              "ModifySpatialModeAction": "DowngradeToHybrid",
+              "ModifyRecursively": false,
+              "ZoneCountCondition": "Single",
+              "UseCondition": false
+            }
+          },
+          {
+            "Type": "ReplaceStrings",
+            "Description": "*off* remove text leftover from spatial sub<Replace strings>",
+            "Enabled": false,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "¿[\\s\\S]*",
+                  "Replacement": ""
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove Formatted, spatial subs<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/*"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

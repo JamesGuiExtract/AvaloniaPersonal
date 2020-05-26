@@ -1,0 +1,2458 @@
+[
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[\\r\\n]+",
+          "Replacement": " "
+        },
+        {
+          "Pattern": "[',.\"]",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bU\\s{0,4}S\\b",
+          "Replacement": "US"
+        },
+        {
+          "Pattern": "^The\\b(?!\\s+Public)",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(Klein)(Bank|Mortgage)",
+          "Replacement": "$1 $2"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "Amount.{0,10}Loan(?!.{0,3}\\d+)",
+          "Replacement": "ReplacedByPreprocessor"
+        },
+        {
+          "Pattern": "Due\\s*D.{0,10}Loan|Date.{0,8}Loan",
+          "Replacement": "ReplacedByPreprocessor"
+        },
+        {
+          "Pattern": "Loan\\s*No.?\\s*x+\\d+",
+          "Replacement": "MaskedLoanNo"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(\\d+\\.\\d{2})\\d+",
+          "Replacement": "$1"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "^\\W*000.+",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\b\\d{2}\\-\\d{7}\\b",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "being\\b[\\s\\S]{0,6}\\bsame\\s{0,4}(?:property|PREMISES)[\\s\\S]{0,7}\\bconveyed\\b[\\s\\S]{0,225}(?:DOCUMENT|BOOK|PAGE|INSTR)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bPLATS?\\b[\\s\\S]{0,5}BOOK",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": ",(\\d\\d)\\b",
+          "Replacement": ".$1"
+        },
+        {
+          "Pattern": "\\.00?\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(\\.\\d)0\\b",
+          "Replacement": "$1"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "file://<RSDFileDir>\\Common\\GeneralReplaceStrings.dat.etf;;",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?~<error=3>Name\\(s\\)\\s*\\(print\\))",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?~<error=2>4a\\.\\sTOTAL\\sACRES)",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?n)(?<=^P\\s?)(C\\)|0)(?=\\s*Box)",
+          "Replacement": "O"
+        },
+        {
+          "Pattern": "^POBox",
+          "Replacement": "PO Box"
+        },
+        {
+          "Pattern": "(?<=^PO\\sBox)\\d",
+          "Replacement": " $0"
+        },
+        {
+          "Pattern": "(?<=P[.\\s]?)0(?=\\s?Box)",
+          "Replacement": "O"
+        },
+        {
+          "Pattern": "^[O0](?=\\s?Box\\b)",
+          "Replacement": "P O"
+        },
+        {
+          "Pattern": "^P(?=\\sBox\\b)",
+          "Replacement": "P O"
+        },
+        {
+          "Pattern": "\\bp(?'p'\\x20*\\.\\x20*)\\w(?'box'\\x20*\\.\\x20*Box)",
+          "Replacement": "P${p}O${box}"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\bname",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "Date[\\s\\S]*",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "Room[\\s\\S]*",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bSex\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bD[O0][BS8]\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\b(Fe)?Male\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\r\\n[\\s\\S]*",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(husband\\s*(?:\\/|\\\\|and)\\s*wife|joint\\s*tenants|.+(?:married|single).+man)[\\r\\n]+(?!(?:married|single).+man).+",
+          "Replacement": "$1"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "SOUTHWEST\\sFINANCIAL\\sSERVICES[\\s\\S]*",
+          "Replacement": "SOUTHWEST FINANCIAL SERVICES,  LTD"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "file://<RSDFileDir>\\trim.dat.etf;¥",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?<xx>\\.\\d)$",
+          "Replacement": "${xx}0"
+        },
+        {
+          "Pattern": "(?<yy>\\A\\d+\\z)",
+          "Replacement": "${yy}.00"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[DO0](?~<>FFENSE\\sDAT)A",
+          "Replacement": "!GetOffMyPage!"
+        },
+        {
+          "Pattern": "\\bUntitled\\b",
+          "Replacement": "!GetOffMyPage!"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?<=[A-Z]{2})\\x20[a-z1]\\z",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\x20I\\x20",
+          "Replacement": "I"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "^.{0,5}(?:D.cm.g.c|.?ocmagic|D.?cmagic|Do.?magic|Doc.?agic|Docm.?gic|Docma.?ic|Docmag.?).*",
+          "Replacement": "Xo% Xo% Xo% Xo% Xo% "
+        },
+        {
+          "Pattern": "(?:\\D|^|\\b)(?:\\d{3}\\x20*[-.,\\x20='\"*_]-?\\x20*\\d{2}\\x20*[-.,\\x20='\"*_]-?\\x20*\\d{4}(?!\\x20*-\\x20*\\d)|\\d{3}\\x20*(?:-\\x20*[\\r\\n]+|[\\r\\n]+\\x20*-\\x20*)\\d{2}\\x20*-\\x20*\\d{4}|\\d{3}\\x20*-\\x20*\\d{2}\\x20*(?:-\\x20*[\\r\\n]+|[\\r\\n]+\\x20*-\\x20*)\\d{4}|X{3}\\s*[-.,='\"*_]-?\\s*X{2}\\s*[-.,='\"*_]-?\\s*\\d{4}|\\d{3}\\s*[-.,='\"*_]-?\\s*\\d{2}\\s*[-.,='\"*_]-?\\s*(?:X{4}|#{4})|#{3}\\s*[-.,='\"*_]-?\\s*#{2}\\s*[-.,='\"*_]-?\\s*\\d{4})(?:\\D|$|\\b)(?=[\\s\\S]{0,20}(?:www[.,]d.c|(?:d.cm.g.c|.?ocmagic|d.?cmagic|do.?magic|doc.?agic|docm.?gic|docma.?ic|docmag.?)))",
+          "Replacement": "Xo% Xo% Xo% Xo% Xo% Xo% Xo% Xo% Xo% "
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[\\s\\S]+[1-9][\\s\\S]+",
+          "Replacement": "Remove"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?x) (?# TestImage029.Tif) (NOTARY \\x20* PUBLIC .* \\s+) (No\\. \\x20* \\d{2}-\\d{7})",
+          "Replacement": "$1 replacedbyPreprocessor"
+        },
+        {
+          "Pattern": "TIN(?![\\s\\S]{0,5}\\d)",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\Aherein[\\s\\S]{0,5}called[\\s\\S]{0,5}trustee[\\s\\S]{0,5}and",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?<=HEREBY\\s*)APPOINTS\\s*AND(?=\\s*SUBSTITUTES)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?<=hereby\\s*)substitute\\b",
+          "Replacement": "substitutes"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(\\bSoc\\W*Sec\\b\\.?)(?!.*#.*\\r)",
+          "Replacement": "$1#"
+        },
+        {
+          "Pattern": "^(?!SOC\\x20*\\.?\\x20*SEC\\x20*\\.?\\x20*#)(?:SOC\\x20*\\.?\\x20*(?:.{1,2}EC|S.{1,2}C|SE.{1,2})|(?:.{1,2}OC|S.{1,2}C|SO.{1,2})\\x20*\\.?\\x20*SEC)\\x20*\\.?\\x20*#",
+          "Replacement": "SOC. SEC. #"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "JR(?!\\.)",
+          "Replacement": "JR."
+        },
+        {
+          "Pattern": "SR(?!\\.)",
+          "Replacement": "SR."
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?:A\\s*/\\s*c|a\\s*/\\s*C|a\\s*/\\s*c)\\b",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "^S\\W+",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "Property\\s*Addre\\S*",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "Lender\\s*L\\S+\\s*#?",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\r\\n\\r\\n[\\s\\S]*(thence|point|beginning|parcel|existing|containing|reference)[\\s\\S]*",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\bINC$",
+          "Replacement": "INC."
+        },
+        {
+          "Pattern": "\\bLLC[^\\.][\\s\\S]*$",
+          "Replacement": "LLC"
+        },
+        {
+          "Pattern": "\\bTHE\\b\\s*([\\s\\S]*)",
+          "Replacement": "$1, The"
+        },
+        {
+          "Pattern": "^[^a-z]+",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "septic\\W+loan\\W+owned\\W+by\\W+",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\bno[tw]\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bbank\\b.{4,8}\\bno\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bno[A-Z]{3,9}",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bnote\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bbankrupt(?:cy)?\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bnone\\b",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[.]",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\r\\nClient[\\s\\S]+\\z",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "^The\\s+(.+)$",
+          "Replacement": "$1, THE"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\A\\W*UNITED\\W*STATES\\W*OF\\W*AMERICA\\W*\\z",
+          "Replacement": "COUNTY OF USA"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\AJR\\z",
+          "Replacement": "JR."
+        },
+        {
+          "Pattern": "\\ASR\\z",
+          "Replacement": "SR."
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[^a-z\\s]+",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?-i)(?<=\\s)[Il](?=\\s+\\w+\\s+\\w+)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?-i)(?<=\\w+\\s+\\w+\\s+)[Il](?=\\s)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?<=\\s)[Il](?=\\s*\\z)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?<=\\A\\s+)[Il](?=\\s)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "[\\S\\s]*\\r\\n\\r\\n[\\S\\s]*",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\s{2,}",
+          "Replacement": " "
+        },
+        {
+          "Pattern": "\\A\\s+|\\s+\\z",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\A\\w+\\z",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?-i)[\\S\\s]*\\b[a-z][\\S\\s]*",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "^(?-i:P)ro(?~<error=2>vider\\x20Name)[:;.,i\\x20]?",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "file://<RSDFileDir>\\FPPhrases.dat.etf;%",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\W*(?~<error=3,method=better_fit>XXX-XX-\\d{4})\\W*",
+          "Replacement": " "
+        },
+        {
+          "Pattern": "\\W*(?~<error=3,method=better_fit>\\d{3}-\\d{2}-\\d{4})\\W*",
+          "Replacement": " "
+        },
+        {
+          "Pattern": "\\W*(?~<error=3,method=better_fit>\\d{2}-\\d{7})\\W*",
+          "Replacement": " "
+        },
+        {
+          "Pattern": "\\W*(?~<error=3,method=better_fit>X{2}-X{3}\\d{4})\\W*",
+          "Replacement": " "
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\ADE\\sLA\\s",
+          "Replacement": "DELA"
+        },
+        {
+          "Pattern": "\\A(A|DE|FITZ|MA?C|SAINT|STA)\\s",
+          "Replacement": "$1"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\b(9\\d{7})\\b",
+          "Replacement": "19$1"
+        },
+        {
+          "Pattern": "((?:19|20)\\d{2})0{1,}(\\d{6})\\b",
+          "Replacement": "$1$2"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\W*\\bd(ate)?\\W*of?\\W*b(irth)?\\W*\\d[-/\\d]+\\W*",
+          "Replacement": ","
+        },
+        {
+          "Pattern": "\\W*\\bd\\W*o\\W*b\\W*(?:Jan|Feb|Mar|Apr|May|Ju[nl]|Aug|Sep|Oct|Nov|Dec)[a-z]*\\W*\\d+,\\W*\\d[-/\\d]+\\W*",
+          "Replacement": ","
+        },
+        {
+          "Pattern": "\\W*born(\\W*on)?\\W*\\d[-/\\d]+\\W*",
+          "Replacement": ","
+        },
+        {
+          "Pattern": "\\W*born(\\W*on)?\\W*(?:Jan|Feb|Mar|Apr|May|Ju[nl]|Aug|Sep|Oct|Nov|Dec)[a-z]*\\W*\\d+,\\W*\\d[-/\\d]+\\W*",
+          "Replacement": ","
+        },
+        {
+          "Pattern": ",\\s*and\\b\\s*",
+          "Replacement": ","
+        },
+        {
+          "Pattern": "\\W+D\\W*O\\W*B\\z",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bbirth\\W*",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bfrom\\W*",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bage\\W*\\d+",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\b(?:infant|child)\\w*\\W*",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "^,$",
+          "Replacement": "_"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": ".+(?:(?:K.{3,10}NANIAN.{1,5}[0O]M.+CAROLINA.+)|(?:K.{0,3}Hovnan.+Carolina.+))",
+          "Replacement": "K HOVNANIAN HOMES OF NORTH CAROLINA, INC"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "Universitt",
+          "Replacement": "Universität"
+        },
+        {
+          "Pattern": "Mnchen",
+          "Replacement": "München"
+        },
+        {
+          "Pattern": "Wrzburg",
+          "Replacement": "Würzburg"
+        },
+        {
+          "Pattern": "Autnoma",
+          "Replacement": "Autónoma"
+        },
+        {
+          "Pattern": " fr ",
+          "Replacement": " für "
+        },
+        {
+          "Pattern": "hgskola",
+          "Replacement": "högskola"
+        },
+        {
+          "Pattern": "Hgskola",
+          "Replacement": "Högskola"
+        },
+        {
+          "Pattern": "Universit degli ",
+          "Replacement": "Università degli "
+        },
+        {
+          "Pattern": "Universit de ",
+          "Replacement": "Université de "
+        },
+        {
+          "Pattern": "Lyce ",
+          "Replacement": "Lyceé "
+        },
+        {
+          "Pattern": " Mtiers",
+          "Replacement": " Métiers"
+        },
+        {
+          "Pattern": "Mlardalens",
+          "Replacement": "Mälardalens"
+        },
+        {
+          "Pattern": "universitt",
+          "Replacement": "universität"
+        },
+        {
+          "Pattern": "Collge ",
+          "Replacement": "Collège "
+        },
+        {
+          "Pattern": " Mnster",
+          "Replacement": " Münster"
+        },
+        {
+          "Pattern": "gymnzium",
+          "Replacement": "gymnázium"
+        },
+        {
+          "Pattern": "Krrtorps",
+          "Replacement": "Kärrtorps"
+        },
+        {
+          "Pattern": "Knste ",
+          "Replacement": "Künste "
+        },
+        {
+          "Pattern": "JiV Cration",
+          "Replacement": "JiVé Création"
+        },
+        {
+          "Pattern": " Szk# ",
+          "Replacement": " Szkó# "
+        },
+        {
+          "Pattern": "Komenskho",
+          "Replacement": "Komenského"
+        },
+        {
+          "Pattern": "Tcnica",
+          "Replacement": "Técnica"
+        },
+        {
+          "Pattern": "Comunicaes",
+          "Replacement": "Comunicações"
+        },
+        {
+          "Pattern": "Ingnierie ",
+          "Replacement": "Ingénierie "
+        },
+        {
+          "Pattern": "Univerzitet u Niu",
+          "Replacement": "Univerzitet u Nišu"
+        },
+        {
+          "Pattern": "Finspng",
+          "Replacement": "Finspång"
+        },
+        {
+          "Pattern": "Boti#sk",
+          "Replacement": "Boti#ská"
+        },
+        {
+          "Pattern": "Noclich",
+          "Replacement": "Nocliché"
+        },
+        {
+          "Pattern": "Westflische",
+          "Replacement": "Westfälische"
+        },
+        {
+          "Pattern": "Universit di ",
+          "Replacement": "Università di "
+        },
+        {
+          "Pattern": "Ingnieur",
+          "Replacement": "Ingénieur"
+        },
+        {
+          "Pattern": "ffentlichkeitsarbeit",
+          "Replacement": "Öffentlichkeitsarbeit"
+        },
+        {
+          "Pattern": "gnraliste",
+          "Replacement": "généraliste"
+        },
+        {
+          "Pattern": "spcialit",
+          "Replacement": "spécialité"
+        },
+        {
+          "Pattern": "Universit Vincennes",
+          "Replacement": "Université Vincennes"
+        },
+        {
+          "Pattern": " Hxter",
+          "Replacement": " Höxter"
+        },
+        {
+          "Pattern": "Oeste do Paran",
+          "Replacement": "Oeste do Paraná"
+        },
+        {
+          "Pattern": "Cincia da Computao",
+          "Replacement": "Ciência da Computação"
+        },
+        {
+          "Pattern": "Cincias da Computao",
+          "Replacement": "Ciências da Computação"
+        },
+        {
+          "Pattern": "Acadmico",
+          "Replacement": "Acadêmico"
+        },
+        {
+          "Pattern": "Stdelschule",
+          "Replacement": "Städelschule"
+        },
+        {
+          "Pattern": " suprieure",
+          "Replacement": " supérieure"
+        },
+        {
+          "Pattern": "Estagirio",
+          "Replacement": "Estagiário"
+        }
+      ],
+      "AsRegularExpr": false,
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\bsections?\\b",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "^.{0,8}(?>(?~<error=5>MORTGAGE\\x20ELECTRONIC\\x20REGISTRATION\\x20SYSTEMS\\x20INC)).{0,7}\\r?$",
+          "Replacement": "MORTGAGE ELECTRONIC REGISTRATION SYSTEMS INC"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[\\s\\S]*[^-,\\.A-Za-z\\s][\\s\\S]*",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "LLCtoACA,\\sLLC",
+          "Replacement": ", ACA"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "`",
+          "Replacement": "'"
+        },
+        {
+          "Pattern": "\\bC[/I]O\\b\\s*(.*?)(?=\\d)",
+          "Replacement": "$1`"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "COMMON\\sINTEREST\\sCOMMUNITY.+\\d\\s(.+)\\,A condo.+",
+          "Replacement": "$1"
+        },
+        {
+          "Pattern": ".*?([a-z\\s]+(Condominium\\b|Condominiums)).*",
+          "Replacement": "$1"
+        },
+        {
+          "Pattern": "^\\W*\\d+\\W*",
+          "Replacement": ""
+        },
+        {
+          "Pattern": ",\\s*Condominium\\W*(?=\\r?$)",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?<=\\s)(?-i:[a-z]+)\\s(?=\\band\\b)",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\bg/d\\sL\\b",
+          "Replacement": "g/dL"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "file://<RSDFileDir>\\CompanyTranslations.dat.etf;`",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\W+(?<!:\\z)",
+          "Replacement": " "
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\$(\\d+)/(\\d+)?",
+          "Replacement": "~$1.7$2"
+        },
+        {
+          "Pattern": "~",
+          "Replacement": "$"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\bsuffix\\b",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\t(?=\\r?$)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?nx) \\t ((?=[^\\r\\n]+(?'1'\\r\\n)) | (?<=(?'1'\\r\\n)[^\\r\\n]+))",
+          "Replacement": "$1"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[\\s\\S]*\\bvs\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": ",(?!\\W{0,4}\\b(?:INC|N\\x20?\\.?\\x20?A|L\\x20?\\.?\\x20?L\\x20?\\.?\\x20?C)\\b)",
+          "Replacement": ";"
+        },
+        {
+          "Pattern": "\\band\\b",
+          "Replacement": ";"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\s?\\b\\d{1,2}\\x20?[\\\\\\/]\\x20?\\d{1,2}\\x20?[\\\\\\/]\\x20?(?:19|20)\\d{2}\\b\\s?",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?<=\\W)faka(?=\\W)",
+          "Replacement": "aka"
+        },
+        {
+          "Pattern": "(?<=\\W)faka(?=\\W)",
+          "Replacement": "AKA"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "^1+$",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "name[:;][^\\w\\r\\n]*",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[\\r\\n]+You\\z",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\A(DOB|Name|Address|Your?|Age)\\z",
+          "Replacement": "remove"
+        },
+        {
+          "Pattern": "(\\W+)Plaintiff\\W*",
+          "Replacement": "$1"
+        },
+        {
+          "Pattern": "\\W*Plaintiff(\\W+)",
+          "Replacement": "$1"
+        },
+        {
+          "Pattern": "(\\W+)WHEREFORE\\W*",
+          "Replacement": "$1"
+        },
+        {
+          "Pattern": "\\W*WHEREFORE(\\W+)",
+          "Replacement": "$1"
+        },
+        {
+          "Pattern": "\\W*[(\"]\\s*(Fa|Mo)ther\\W*\\z",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\s*\\(\\s*\"\\S+\\W*\\z",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\A\\W+",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\W+\\z",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "&",
+          "Replacement": "and"
+        },
+        {
+          "Pattern": "\\bto\\b",
+          "Replacement": "and"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "the\\x20mortgagor\\x20shall",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "the\\x20mortgage\\x20is",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "^([A-Z]{2,},)\\x20([A-Z]{2,}(?:\\x20[A-Z])?)(?:\\x20AND|\\x20?&)\\s{1,2}([A-Z]{2,}(?:\\x20[A-Z])?)\\s{0,3}(?=~)",
+          "Replacement": "$1 $2 AND $1 $3"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\s+\\z",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\A\\s+",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "BATCH\\s*NUMBER",
+          "Replacement": "Xo% Xo% "
+        },
+        {
+          "Pattern": "are\\s*not",
+          "Replacement": "are\\s*bob"
+        },
+        {
+          "Pattern": "account\\s*number\\s*of\\s*the\\s*new\\s*account",
+          "Replacement": "SomePlaceHolderText"
+        },
+        {
+          "Pattern": "Account\\s*Name",
+          "Replacement": "Xo% Xo% "
+        },
+        {
+          "Pattern": "Order\\s*Number[\\s\\S]{20}",
+          "Replacement": "TheRainInSpainStays"
+        },
+        {
+          "Pattern": "charged",
+          "Replacement": "Xo% Xo% "
+        },
+        {
+          "Pattern": "prior\\s?charge",
+          "Replacement": "Xo% Xo% "
+        },
+        {
+          "Pattern": "creditor",
+          "Replacement": "Xo% Xo% "
+        },
+        {
+          "Pattern": "bank[\\s\\S]{0,5}case",
+          "Replacement": "Xo% Xo% "
+        },
+        {
+          "Pattern": "(?<!CH.{0,2})cking[\\s\\S]{0,10}(?:N[0o]|NUM|UMB|BER|#)",
+          "Replacement": "Xo% Xo% "
+        },
+        {
+          "Pattern": "(check|charge|credit)(?![\\s\\S]{0,10}(?:N[0o]|NUM|UMB|BER|ACC))",
+          "Replacement": "Xo% Xo% "
+        },
+        {
+          "Pattern": "\\bcount\\b",
+          "Replacement": "Xo% Xo% "
+        },
+        {
+          "Pattern": "\\bCRN\\s*:\\s*\\d{7,}\\s*Account",
+          "Replacement": "Xo% Xo% "
+        },
+        {
+          "Pattern": "\\bcase\\W*(No|\\#|(?>(?~<error=2>Number))[\\s\\S]{0,2}?)\\W*\\b\\w+",
+          "Replacement": "Xo% Xo% Xo% Xo% "
+        },
+        {
+          "Pattern": "(?<=BMV\\W*)Account",
+          "Replacement": "tnuocca"
+        },
+        {
+          "Pattern": "(?-i:\\bOAC\\b)",
+          "Replacement": "CAO"
+        },
+        {
+          "Pattern": "(file|policy)\\W*(No|\\#|(?>(?~<error=2>Number))[\\s\\S]{0,2}?)\\W*\\b\\w+",
+          "Replacement": "Xo% Xo% Xo% Xo% "
+        },
+        {
+          "Pattern": "\\bcheck\\W*(No|\\#|(?>(?~<error=2>Number))[\\s\\S]{0,2}?)",
+          "Replacement": "Xo% Xo% Xo%"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\)",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?x) \\A (\\. 00) \\z (?# \\tds 20130219.tif)",
+          "Replacement": "0$1"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "RECORDED\\W*IN\\W*MORTGAGE",
+          "Replacement": "RECORDED IN EGAGTROM"
+        },
+        {
+          "Pattern": "MORTGAGE\\W*BOOK",
+          "Replacement": "EGAGTROM BOOK"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[JVI]\\s?AN(\\s*.{0,3})?\\s*(\\d\\s?){1,2}\\s*[.'\",\\-]?\\s*(\\d[,\\s\\-]?){4}",
+          "Replacement": "~~"
+        },
+        {
+          "Pattern": "(?:(?:\\bMor|tga|gage\\b)\\w{0,6}?)\\W*(FORMS|FO.MS|F.RMS)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "Lien\\W*Number",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "Mort\\W*Rec",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "HELOC\\W*OH\\W*(?:\\w{0,6}?(?:\\bMor|tga|gage\\b)\\w{0,6}\\b)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(\\bCas|ase\\b)\\W*ID\\W*\\d+\\D{1,2}\\d+",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "date\\W*of\\W*this\\W*Mortgage",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?:pri|ori|ity)[\\s\\S]{0,8}?(?:ove|ver)[\\s\\S]{0,4}?(?:thi|his)[\\s\\S]{0,8}?(?:Mor|tga|age)\\w{0,6}?\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "Mortgage\\W*Book",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "MORTGAGO[RP]|Mortgagee",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(of|By)\\W*this\\W*Mortgage|this\\W*Mortgage\\.\\r?\\n",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "term\\W*of\\W*this\\W*Mortgage",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "Lien\\s*#",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "ACCORDANCE\\W*\\d+",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?:less|greater|later|better|more)\\W*than",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "Assignment\\W*of\\W*Mortgage",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "the\\W*Original\\W*Mortgage",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "SECURING\\W*THIS\\W*MORTGAGE",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "be\\W*checking",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "IN\\W*\\d{5}(\\s*-\\s*\\d{4})?\\b",
+          "Replacement": "ZipCode"
+        },
+        {
+          "Pattern": "VMP\\W*MORTGAGE",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "Mortgage\\W*Vol",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "GMACM",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "Lima(?=\\W*OH)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "FIFTH\\W*THIRD\\W*MORTGAGE",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\binterest\\W*accrues?\\b",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?:s.c..l|soc.{2,4}|.{1,2}ocia.{1,2}|.{2,4}ial|.?ocial|s.?cial|so.?ial|soc.?al|soci.?l|socia.?)\\W*(?:s.c.r.ty|secu.{3,5}|.{1,3}curi.{1,3}|.{3,5}rity|.?ecurity|s.?curity|se.?urity|sec.?rity|secu.?ity|secur.?ty|securi.?y|securit.?)\\W*\\$",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?:income|total|less|amount|\\b.m..nt|p.ym.nt)(?:[\\s\\S]{0,5}|\\s*\\S?\\s*)(?:s.c..l|soc.{2,4}|.{1,2}ocia.{1,2}|.{2,4}ial|.?ocial|s.?cial|so.?ial|soc.?al|soci.?l|socia.?)\\W*(?:s.c.r.ty|secu.{3,5}|.{1,3}curi.{1,3}|.{3,5}rity|.?ecurity|s.?curity|se.?urity|sec.?rity|secu.?ity|secur.?ty|securi.?y|securit.?)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "VA\\W*and\\W*(?:s.c..l|soc.{2,4}|.{1,2}ocia.{1,2}|.{2,4}ial|.?ocial|s.?cial|so.?ial|soc.?al|soci.?l|socia.?)\\W*(?:s.c.r.ty|secu.{3,5}|.{1,3}curi.{1,3}|.{3,5}rity|.?ecurity|s.?curity|se.?urity|sec.?rity|secu.?ity|secur.?ty|securi.?y|securit.?)",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "instrument\\W*form",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "page\\W*\\d+\\W*of\\W*\\d+",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "ESTATE\\z",
+          "Replacement": "EST"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\d{4}/\\d{1,2}/\\d{1,2}\\s",
+          "Replacement": "wasDate"
+        },
+        {
+          "Pattern": "s0c",
+          "Replacement": "soc"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\d+\\W{1,3}cents",
+          "Replacement": "some cents"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[\\s\\S]*UNDERSIGN[\\s\\S]*",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "^[1-9][0-9]?$",
+          "Replacement": "remove"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?<=[A-Z]{2,}\\s+)3(?=\\.\\s+[A-Z]{2,})",
+          "Replacement": "J"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "^(?!.*(?:\\d{3}\\x20*-\\x20*\\d{2}|\\d{2}\\x20*-\\x20*\\d{4}).*).*[1.|lI]{5,}.*",
+          "Replacement": "~~~~~~~~~~"
+        },
+        {
+          "Pattern": "^(?!.*(?:\\d{3}\\x20*-\\x20*\\d{2}|\\d{2}\\x20*-\\x20*\\d{4}).*).*1{3}\\x20?1{3}.*",
+          "Replacement": "~~~~~~~~~~"
+        },
+        {
+          "Pattern": "^(?!.*(?:\\d{3}\\x20*-\\x20*\\d{2}|\\d{2}\\x20*-\\x20*\\d{4}).*).*[1\\x20]{15,}.*",
+          "Replacement": "~~~~~~~~~~"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\A\\W+",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "[^\\w.]+\\z",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\W+\\.\\z",
+          "Replacement": "."
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "(?~<error=3>PERSONAL\\x20REPRESENTATIVE'S\\x20DEED)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?:[IA]S[\\s\\S]{0,7}PERSONAL[\\s\\S]{0,4}REPRESENTATIVE[\\s\\S]{0,4}OF[\\s\\S]{0,4}THE[\\s\\S]{0,15}ESTATE[\\s\\S]{0,4}OF)",
+          "Replacement": "and"
+        },
+        {
+          "Pattern": "(?~<error=2>THIS\\x20INDENTURE\\x20WITNESSETH)(?:.{0,5}that)?",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\bTracking\\sNumber\\b",
+          "Replacement": "rebmuN gnikcarT"
+        },
+        {
+          "Pattern": "\\bTracking\\s(No\\b|[#])",
+          "Replacement": "oN gnikcarT"
+        },
+        {
+          "Pattern": "\\bTrucking\\b",
+          "Replacement": "gnikcurT"
+        },
+        {
+          "Pattern": "(?-i:\\bBANK\\sNA\\b)",
+          "Replacement": "AN KNAB"
+        },
+        {
+          "Pattern": "\\bCredited\\b",
+          "Replacement": "detiderC"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\A\\s*Map\\s+Of\\s+",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\A\\s*The",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\s*\\x28Now\\s+City\\x29",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\s{2,}|[\\r\\n]+",
+          "Replacement": " "
+        },
+        {
+          "Pattern": "(?<=\\b[A-Z])\\.(?=\\s)",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\bTrust\\b[\\s\\S]+",
+          "Replacement": "Trust"
+        },
+        {
+          "Pattern": "[\\s\\S]*Amended\\W*Restated",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bFamily\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\d+",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "[\\s\\S]*\\b([A-Z]+(?:\\s*\\-\\s*[A-Z]+)?)\\s+Trust$",
+          "Replacement": "$1 TRUST"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "_",
+          "Replacement": " "
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\b(JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)\\b",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "file://<RSDFileDir>\\..\\formatPerson.dat.etf;%",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[.']",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\bc\\x20?[\\\\\\/]\\x20?o\\b.*$",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "^ATTENTION\\x20?[:;].*",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "Loan\\W*#",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "R\\W*R\\W*#",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "part[\\s\\S]{0,3}of[\\s\\S]{0,7}debt[\\s\\S]{0,35}in[\\s\\S]{0,3}addition[\\s\\S]{0,3}to\\b",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\r\\n\\r\\nAlso",
+          "Replacement": " Also"
+        },
+        {
+          "Pattern": "Also[,\\s]*\\r\\n\\r\\n",
+          "Replacement": "Also, "
+        },
+        {
+          "Pattern": "File\\s*no[\\W\\d]+",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\r\\n\\r\\nThe\\sabove\\sdescribed",
+          "Replacement": "The above described"
+        },
+        {
+          "Pattern": "\\bMap\\sNo[\\d\\W]*",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\r\\n\\r\\nNote\\b",
+          "Replacement": "Note"
+        },
+        {
+          "Pattern": "\\(\\d+\\)",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[\\s\\S]*([x*#0]\\s?){3}\\s?-?(\\s?[x*#0]){2}\\s?-\\s?",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\x20*[\\r\\n]+\\x20*",
+          "Replacement": " "
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\bCCUNTRY",
+          "Replacement": "COUNTRY"
+        },
+        {
+          "Pattern": "^\\W*disclosure(?:\\W*to)?\\W*",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bMERRIII\\W*LYNCH",
+          "Replacement": "MERRILL LYNCH"
+        },
+        {
+          "Pattern": "CLARK\\W*COUNTY\\W*PUBLIC\\W*RESPONSE.+",
+          "Replacement": "PUBLIC RESPONSE CLARK COUNTY"
+        },
+        {
+          "Pattern": "pursuant.*statutes",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "^WE.*FARGO\\b",
+          "Replacement": "WELLS FARGO"
+        },
+        {
+          "Pattern": "\\bA\\W*Federal\\W*Savings\\W*Bank\\W*$",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bFERPETUAL\\b",
+          "Replacement": "PERPETUAL"
+        },
+        {
+          "Pattern": "\\bb\\s*e\\s*n\\s*e\\s*f\\s*i\\s*c\\s*i\\s*a\\s*l\\b",
+          "Replacement": "BENEFICIAL"
+        },
+        {
+          "Pattern": "\\bf\\s*i\\s*n\\s*a\\s*n\\s*c\\s*e\\b",
+          "Replacement": "FINANCE"
+        },
+        {
+          "Pattern": "\\bm\\s*o\\s*r\\s*t\\s*g\\s*a\\s*g\\s*e\\b",
+          "Replacement": "mortgage"
+        },
+        {
+          "Pattern": "\\bc\\s*o\\s*r\\s*p\\s*o\\s*r\\s*a\\s*t\\s*i\\s*o\\s*n\\b",
+          "Replacement": "corporation"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "[li|!]",
+          "Replacement": "1"
+        },
+        {
+          "Pattern": "B",
+          "Replacement": "8"
+        },
+        {
+          "Pattern": "G",
+          "Replacement": "8"
+        },
+        {
+          "Pattern": "[QO]",
+          "Replacement": "0"
+        },
+        {
+          "Pattern": "S",
+          "Replacement": "5"
+        },
+        {
+          "Pattern": "FE8",
+          "Replacement": "FEB"
+        },
+        {
+          "Pattern": "MAV",
+          "Replacement": "MAY"
+        },
+        {
+          "Pattern": "JU[li|!]",
+          "Replacement": "JUL"
+        },
+        {
+          "Pattern": "AU8",
+          "Replacement": "AUG"
+        },
+        {
+          "Pattern": "5EP",
+          "Replacement": "SEP"
+        },
+        {
+          "Pattern": "0CT",
+          "Replacement": "OCT"
+        },
+        {
+          "Pattern": "N[0O][VY]",
+          "Replacement": "NOV"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "BATCH\\s*NUMBER",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "are\\s*not",
+          "Replacement": "are\\s*bob"
+        },
+        {
+          "Pattern": "account\\s*number\\s*of\\s*the\\s*new\\s*account",
+          "Replacement": "SomePlaceHolderText"
+        },
+        {
+          "Pattern": "Account\\s*Name",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "Order\\s*Number[\\s\\S]{20}",
+          "Replacement": "TheRainInSpainStays"
+        },
+        {
+          "Pattern": "bank[\\s\\S]{0,7}NO[A-Z]{1,3}",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "charged",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "prior\\s?charge",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "creditor",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "bank[\\s\\S]{0,5}case",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(?<!CH.{0,2})cking[\\s\\S]{0,10}(?:N[0o]|NUM|UMB|BER|#)",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "(check|charge|credit)(?![\\s\\S]{0,10}(?:N[0o]|NUM|UMB|BER|ACC))",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\bcount\\b",
+          "Replacement": ""
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ReplaceStrings",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Replacements": [
+        {
+          "Pattern": "\\b[,.]\\b",
+          "Replacement": " "
+        },
+        {
+          "Pattern": "[,.]",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "'",
+          "Replacement": ""
+        },
+        {
+          "Pattern": "\\A(?=(?:North|South|East|West)\\s\\d+\\s[NSEW]\\z)([NSEW])\\S+",
+          "Replacement": "$1"
+        },
+        {
+          "Pattern": "(?<=\\A[NSEW]\\s\\d+\\s)(?=(?:North|South|East|West)\\z)([NSEW])\\S+",
+          "Replacement": "$1"
+        }
+      ],
+      "AsRegularExpr": true,
+      "IsCaseSensitive": false
+    }
+  }
+]

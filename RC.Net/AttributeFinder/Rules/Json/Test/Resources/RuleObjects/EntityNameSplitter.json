@@ -1,0 +1,10 @@
+[
+  {
+    "Type": "EntityNameSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntityAliasChoice": "IgnoreLaterEntities"
+    }
+  }
+]

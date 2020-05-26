@@ -1,0 +1,841 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "19.1.0.161",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Page",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "SetDocumentTags",
+      "Description": "<Set document tags>",
+      "Enabled": true,
+      "Object": {
+        "SetStringTag": {
+          "TagName": "DocProbability",
+          "Generator": "Literal",
+          "SpecifiedValue": "2",
+          "ValuesFromTag": "",
+          "AttributeSelector": {
+            "Type": null,
+            "Object": null
+          },
+          "Delimiter": ";"
+        },
+        "SetObjectTag": {
+          "TagName": "DocType",
+          "Generator": "FromAttributes",
+          "SpecifiedValue": "",
+          "AttributeSelector": {
+            "Type": "QueryBasedAS",
+            "Object": {
+              "QueryText": "DocumentType"
+            }
+          }
+        },
+        "NoTagsIfEmpty": true,
+        "GenerateSourceAttributesWithRSDFile": true,
+        "SourceAttributeRSDFile": "<RSDFileDir>\\Classification\\main.rsd.etf"
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Create value",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<DocType>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "Order": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "RequisitionInfo": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "move up Page/Order|Page/RequisitionInfo<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "Page/Order|Page/RequisitionInfo",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "check for Special Order<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "check Order, SpecialOrder, Other for SpecialOrder strings, make subtype<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/DocumentType",
+                    "AttributeSelector": {
+                      "Type": "ValueConditionSelector",
+                      "Object": {
+                        "Condition": {
+                          "Type": "FindingRuleCondition",
+                          "Object": {
+                            "AFRule": {
+                              "Type": "ValueFromList",
+                              "Object": {
+                                "ValueList": [
+                                  "Order Requisition",
+                                  "Other (Unknown)",
+                                  "SpecialOrder"
+                                ],
+                                "IsCaseSensitive": false
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "asdf",
+                        "SetAttributeName": false,
+                        "AttributeType": "_",
+                        "SetAttributeType": true,
+                        "AttributeValue": "",
+                        "SetAttributeValue": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "remove spatial of Page<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Page",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "RemoveSpatialInfo",
+                      "Object": "RemoveSpatialInfo"
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "find SpecialOrder value<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Page{DocumentType@_}",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": true,
+                        "RegExpFileName": "<RSDFileDir>\\Classification\\SpecialOrders.dat.etf",
+                        "Pattern": "",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": true,
+                        "CreateSubAttributesFromNamedMatches": true,
+                        "OnlyCreateOneSubAttributePerGroup": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "set */[special order] Value to its Name<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/*",
+                    "AttributeSelector": {
+                      "Type": "MultipleCriteriaSelector",
+                      "Object": {
+                        "Selectors": [
+                          {
+                            "Select": "NonMatching",
+                            "With": {
+                              "Type": "QueryBasedAS",
+                              "Description": "<Query attribute selector>",
+                              "Enabled": true,
+                              "Object": {
+                                "QueryText": "DocumentType"
+                              }
+                            }
+                          }
+                        ],
+                        "CombineBy": "Chain"
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "",
+                        "SetAttributeName": false,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "%.Name%",
+                        "SetAttributeValue": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "rename top level to DocumentType, value of */DocumentType<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Page{DocumentType}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "DocumentType",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%DocumentType%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "remove DocumentType/DocumentType<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "DocumentType/DocumentType"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "rename DocumentType/* to SpecialOrder<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "DocumentType/*",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "SpecialOrder",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "change _ to space in DocumentType/SpecialOrder<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "DocumentType/SpecialOrder",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "AdvancedReplaceString",
+                      "Object": {
+                        "StrToBeReplaced": "_",
+                        "AsRegularExpression": false,
+                        "IsCaseSensitive": false,
+                        "Replacement": " ",
+                        "ReplacementOccurrenceType": "All",
+                        "SpecifiedOccurrence": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "change Other|SpecialOrder{SpecialOrder} to Order<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "DocumentType{SpecialOrder}",
+                    "AttributeSelector": {
+                      "Type": "MultipleCriteriaSelector",
+                      "Object": {
+                        "Selectors": [
+                          {
+                            "Select": "NonMatching",
+                            "With": {
+                              "Type": "ValueConditionSelector",
+                              "Description": "<Value condition selector>",
+                              "Enabled": true,
+                              "Object": {
+                                "Condition": {
+                                  "Type": "FindingRuleCondition",
+                                  "Object": {
+                                    "AFRule": {
+                                      "Type": "ValueFromList",
+                                      "Object": {
+                                        "ValueList": [
+                                          "Order Requisition"
+                                        ],
+                                        "IsCaseSensitive": false
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "CombineBy": "Chain"
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "",
+                        "SetAttributeName": false,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "Order Requisition",
+                        "SetAttributeValue": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "change leftover Doctype SpecialOrder to Other<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "DocumentType",
+                    "AttributeSelector": {
+                      "Type": "ValueConditionSelector",
+                      "Object": {
+                        "Condition": {
+                          "Type": "FindingRuleCondition",
+                          "Object": {
+                            "AFRule": {
+                              "Type": "ValueFromList",
+                              "Object": {
+                                "ValueList": [
+                                  "SpecialOrder"
+                                ],
+                                "IsCaseSensitive": false
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "",
+                        "SetAttributeName": false,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "Other (Unknown)",
+                        "SetAttributeValue": true
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ConditionalOutputHandler",
+            "Description": "if Order, run OrderDetails rules (split Order with OD/main)<Conditionally handle output>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "DocTypeCondition",
+                "Object": {
+                  "AllowTypes": true,
+                  "DocumentClassifiersPath": "<RSDFileDir>",
+                  "Category": ".",
+                  "Types": [
+                    "Order Requisition"
+                  ],
+                  "MinConfidence": "MaybeLevel"
+                }
+              },
+              "InvertCondition": false,
+              "Rule": {
+                "Type": "RunObjectOnAttributes",
+                "Object": {
+                  "AttributeQuery": "Order",
+                  "AttributeSelector": {
+                    "Type": null,
+                    "Object": null
+                  },
+                  "UseAttributeSelector": false,
+                  "Type": "Splitter",
+                  "Object": {
+                    "Type": "RSDSplitter",
+                    "Object": {
+                      "RSDFileName": "<RSDFileDir>\\OrderDetails\\main.rsd.etf"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "run ReqInfo rules<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "split RequisitionInfo with ReqInfo/main<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "RequisitionInfo",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\OrderDetails\\RequisitionInfo\\main.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove Childless Parent<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "MultipleCriteriaSelector",
+                      "Object": {
+                        "Selectors": [
+                          {
+                            "Select": "Matching",
+                            "With": {
+                              "Type": "QueryBasedAS",
+                              "Description": "File_Name<Query attribute selector>",
+                              "Enabled": true,
+                              "Object": {
+                                "QueryText": "RequisitionInfo"
+                              }
+                            }
+                          },
+                          {
+                            "Select": "NonMatching",
+                            "With": {
+                              "Type": "QueryBasedAS",
+                              "Description": "*{*}<Query attribute selector>",
+                              "Enabled": true,
+                              "Object": {
+                                "QueryText": "*{*}"
+                              }
+                            }
+                          }
+                        ],
+                        "CombineBy": "Chain"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "blank top level RequisitionInfo<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "RequisitionInfo",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": true
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "move up Order/*<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "Order/*",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToParent",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove Order top level<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "Order"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "if ReceivingFaxNumber = 6085358744, et al, set DocumentType to Assignment of Benefits (AOB)<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "create ReceivingFaxNumber/DocumentType<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/ReceivingFaxNumber",
+                    "AttributeSelector": {
+                      "Type": "ValueConditionSelector",
+                      "Object": {
+                        "Condition": {
+                          "Type": "FindingRuleCondition",
+                          "Object": {
+                            "AFRule": {
+                              "Type": "RegExprRule",
+                              "Object": {
+                                "IsRegExpFromFile": false,
+                                "RegExpFileName": "",
+                                "Pattern": "6085358(715|744|933)",
+                                "IsCaseSensitive": false,
+                                "FirstMatchOnly": true,
+                                "CreateSubAttributesFromNamedMatches": false,
+                                "OnlyCreateOneSubAttributePerGroup": false
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": true,
+                        "AttributeName": "DocumentType",
+                        "SetAttributeName": true,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "Assignment of Benefits (AOB)",
+                        "SetAttributeValue": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "create DocumentType/DocumentType if ReceivingFaxNumber/DocumentType exists<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/DocumentType",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "DocumentType",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "/*/*/ReceivingFaxNumber/DocumentType",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": true
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "remove */ReceivingFaxNumber/DocumentType<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/ReceivingFaxNumber/DocumentType"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "MoveAndModifyAttributes",
+                  "Description": "move up DocumentType/DocumentType<Move and modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AddAttributeNameToType": false,
+                    "AddRootOrParentAttributeType": false,
+                    "AddSpecifiedAttributeType": false,
+                    "AttributeQuery": "DocumentType/DocumentType",
+                    "DeleteRootOrParentIfAllChildrenMoved": true,
+                    "MoveAttributeLevel": "MoveToParent",
+                    "OverwriteAttributeName": "DoNotOverwrite",
+                    "RetainAttributeType": true,
+                    "SpecifiedAttributeName": "",
+                    "SpecifiedAttributeType": ""
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputToXML",
+            "Description": "<SourceDocName>.xml<Output data to XML file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.xml",
+              "Format": "XMLSchema",
+              "NamedAttributes": true,
+              "UseSchemaName": false,
+              "SchemaName": "",
+              "ValueAsFullText": true,
+              "RemoveEmptyNodes": false,
+              "RemoveSpatialInfo": true
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

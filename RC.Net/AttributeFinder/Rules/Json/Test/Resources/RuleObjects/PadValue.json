@@ -1,0 +1,102 @@
+[
+  {
+    "Type": "PadValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PadLeft": true,
+      "PaddingCharacter": 48,
+      "RequiredSize": 7
+    }
+  },
+  {
+    "Type": "PadValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PadLeft": true,
+      "PaddingCharacter": 48,
+      "RequiredSize": 8
+    }
+  },
+  {
+    "Type": "PadValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PadLeft": true,
+      "PaddingCharacter": 48,
+      "RequiredSize": 9
+    }
+  },
+  {
+    "Type": "PadValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PadLeft": true,
+      "PaddingCharacter": 48,
+      "RequiredSize": 4
+    }
+  },
+  {
+    "Type": "PadValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PadLeft": true,
+      "PaddingCharacter": 48,
+      "RequiredSize": 10
+    }
+  },
+  {
+    "Type": "PadValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PadLeft": true,
+      "PaddingCharacter": 48,
+      "RequiredSize": 2
+    }
+  },
+  {
+    "Type": "PadValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PadLeft": true,
+      "PaddingCharacter": 48,
+      "RequiredSize": 5
+    }
+  },
+  {
+    "Type": "PadValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PadLeft": true,
+      "PaddingCharacter": 48,
+      "RequiredSize": 3
+    }
+  },
+  {
+    "Type": "PadValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PadLeft": false,
+      "PaddingCharacter": 48,
+      "RequiredSize": 14
+    }
+  },
+  {
+    "Type": "PadValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PadLeft": true,
+      "PaddingCharacter": 48,
+      "RequiredSize": 14
+    }
+  }
+]

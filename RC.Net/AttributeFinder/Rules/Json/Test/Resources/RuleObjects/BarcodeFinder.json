@@ -1,0 +1,90 @@
+[
+  {
+    "Type": "BarcodeFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Types": [
+        "BAR_DMATRIX",
+        "BAR_QR"
+      ],
+      "InheritOCRParameters": false
+    }
+  },
+  {
+    "Type": "BarcodeFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Types": [
+        "BAR_A2of5",
+        "BAR_UCC128",
+        "BAR_2of5",
+        "BAR_C93",
+        "BAR_PDF417",
+        "BAR_PLANET"
+      ],
+      "InheritOCRParameters": false
+    }
+  },
+  {
+    "Type": "BarcodeFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Types": [
+        "BAR_EAN14",
+        "BAR_SSCC18",
+        "BAR_DATABAR_LTD",
+        "BAR_DATABAR_EXP",
+        "BAR_4STATE_USPS",
+        "BAR_4STATE_AUSPOST"
+      ],
+      "InheritOCRParameters": false
+    }
+  },
+  {
+    "Type": "BarcodeFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Types": [
+        "BAR_EAN",
+        "BAR_ITF",
+        "BAR_C39",
+        "BAR_C39_EXT",
+        "BAR_C128",
+        "BAR_CB",
+        "BAR_POSTNET"
+      ],
+      "InheritOCRParameters": false
+    }
+  },
+  {
+    "Type": "BarcodeFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Types": [
+        "BAR_C128"
+      ],
+      "InheritOCRParameters": false
+    }
+  },
+  {
+    "Type": "BarcodeFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Types": [
+        "BAR_DMATRIX",
+        "BAR_C39_NSS",
+        "BAR_QR",
+        "BAR_ITAPOST25",
+        "BAR_BOOKLAND",
+        "BAR_ITF14"
+      ],
+      "InheritOCRParameters": false
+    }
+  }
+]

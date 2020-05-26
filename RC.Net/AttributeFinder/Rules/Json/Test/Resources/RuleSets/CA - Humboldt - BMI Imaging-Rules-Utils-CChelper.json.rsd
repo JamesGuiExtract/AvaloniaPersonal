@@ -1,0 +1,79 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerPage",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Page",
+    "InsertParentValue": "_Page<PageNumber>CC",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Page",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Page": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "createProtofeatures.rsd",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<RSDFileDir>\\createProtofeatures.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "LearningMachineOutputHandler",
+            "Description": "paginator.lm<Learning machine output handler>",
+            "Enabled": true,
+            "Object": {
+              "SavedMachinePath": "<RSDFileDir>\\paginator.lm",
+              "PreserveInputAttributes": false
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Make DocumentData subattribute out of Document<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": true,
+              "AttributeName": "DocumentData",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%Value%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Split DocumentData with getDocumentData.rsd<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/DocumentData",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\getDocumentData.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Clear value of *|*/DocumentData<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*|*/DocumentData",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Set value of *|*/DocumentData to N/A<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*|*/DocumentData",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "N/A",
+              "SetAttributeValue": true
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

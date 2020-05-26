@@ -1,0 +1,550 @@
+[
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision@Untranslated"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "RemoveAttribute",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision@Untranslated"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\..\\Rules\\LegalDescription\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\..\\Rules\\LegalDescription\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": true
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 1.2,
+      "UnableToTranslateAction": "DoNothing",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "word"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\FirstNames.dat.etf",
+      "SynonymMapPath": "",
+      "MinimumMatchScore": 100.0,
+      "UnableToTranslateAction": "DoNothing",
+      "CreateBestMatchScoreSubAttribute": true
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 3.0,
+      "UnableToTranslateAction": "RemoveAttribute",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/*/Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 1.0,
+      "UnableToTranslateAction": "RemoveAttribute",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "RemoveAttribute",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "word"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\LastNames.dat.etf",
+      "SynonymMapPath": "",
+      "MinimumMatchScore": 100.0,
+      "UnableToTranslateAction": "DoNothing",
+      "CreateBestMatchScoreSubAttribute": true
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision@Municipality"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 1.3,
+      "UnableToTranslateAction": "RemoveAttribute",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision|*/Condominium"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 1.2,
+      "UnableToTranslateAction": "RemoveAttribute",
+      "CreateBestMatchScoreSubAttribute": true
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "NonMatching",
+              "With": {
+                "Type": "ValueConditionSelector",
+                "Description": "Legal has condo<Value condition selector>",
+                "Enabled": true,
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "RegExprRule",
+                        "Object": {
+                          "IsRegExpFromFile": false,
+                          "RegExpFileName": "",
+                          "Pattern": "Condo",
+                          "IsCaseSensitive": false,
+                          "FirstMatchOnly": false,
+                          "CreateSubAttributesFromNamedMatches": false,
+                          "OnlyCreateOneSubAttributePerGroup": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "QueryBasedAS",
+                "Description": "*/Subdivision<Query attribute selector>",
+                "Enabled": true,
+                "Object": {
+                  "QueryText": "*/Subdivision"
+                }
+              }
+            }
+          ],
+          "CombineBy": "Chain"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\SubdivisionList.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 1.8,
+      "UnableToTranslateAction": "RemoveAttribute",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\..\\Rules\\LegalDescription\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\..\\Rules\\LegalDescription\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": true
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "word"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Both.dat.etf",
+      "SynonymMapPath": "",
+      "MinimumMatchScore": 100.0,
+      "UnableToTranslateAction": "DoNothing",
+      "CreateBestMatchScoreSubAttribute": true
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/LegalCopy/Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": true
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Condominium"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Condos.dat.etf",
+      "SynonymMapPath": "",
+      "MinimumMatchScore": 1.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "ValueConditionSelector",
+                "Description": "Legal has condo<Value condition selector>",
+                "Enabled": true,
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "RegExprRule",
+                        "Object": {
+                          "IsRegExpFromFile": false,
+                          "RegExpFileName": "",
+                          "Pattern": "Condo",
+                          "IsCaseSensitive": false,
+                          "FirstMatchOnly": false,
+                          "CreateSubAttributesFromNamedMatches": false,
+                          "OnlyCreateOneSubAttributePerGroup": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "QueryBasedAS",
+                "Description": "*/Subdivision<Query attribute selector>",
+                "Enabled": true,
+                "Object": {
+                  "QueryText": "*/Subdivision"
+                }
+              }
+            }
+          ],
+          "CombineBy": "Chain"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\CondoList.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 1.8,
+      "UnableToTranslateAction": "RemoveAttribute",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 1.0,
+      "UnableToTranslateAction": "RemoveAttribute",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision|*/Condominium"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 1.0,
+      "UnableToTranslateAction": "RemoveAttribute",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision@Untranslated"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": true
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\..\\Rules\\LegalDescription\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\..\\Rules\\LegalDescription\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": true
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/BestMatch"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\..\\Rules\\LegalDescription\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\..\\Rules\\LegalDescription\\Synonyms.dat.etf",
+      "MinimumMatchScore": 0.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/LegalCopy/Subdivision@Subdivision"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": true
+    }
+  },
+  {
+    "Type": "TranslateValueToBestMatch",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision{Backup}"
+        }
+      },
+      "SourceListPath": "<RSDFileDir>\\Subdivisions.dat.etf",
+      "SynonymMapPath": "<RSDFileDir>\\Synonyms.dat.etf",
+      "MinimumMatchScore": 2.0,
+      "UnableToTranslateAction": "SetTypeToUntranslated",
+      "CreateBestMatchScoreSubAttribute": false
+    }
+  }
+]

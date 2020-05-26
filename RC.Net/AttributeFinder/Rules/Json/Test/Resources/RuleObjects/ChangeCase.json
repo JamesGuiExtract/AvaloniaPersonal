@@ -1,0 +1,34 @@
+[
+  {
+    "Type": "ChangeCase",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "CaseType": "MakeLowerCase"
+    }
+  },
+  {
+    "Type": "ChangeCase",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "CaseType": "MakeTitleCase"
+    }
+  },
+  {
+    "Type": "ChangeCase",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "CaseType": "NoChangeCase"
+    }
+  },
+  {
+    "Type": "ChangeCase",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "CaseType": "MakeUpperCase"
+    }
+  }
+]

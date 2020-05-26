@@ -1,0 +1,1003 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "2012-03-27:\r\n- Fields: Credit Card Numbers and Verification Codes (both have type of CCN)\r\n- Version: 9.0.0.191\r\n- FKB: 12.1.0.191\r\n- Counter: Redaction (pages)\r\n- USB Key #: None\r\n- Output: VOA",
+    "Counters": [
+      {
+        "ID": 3,
+        "Name": "FLEX Index - Redaction (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "12.1.0.191",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Clues": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "CC_Clues - ComponentData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "ReplaceStrings",
+              "Description": "Remove items that cause false positives<Replace strings>",
+              "Enabled": true,
+              "Object": {
+                "Replacements": [
+                  {
+                    "Pattern": "card.{0,3}number(?:.{0,3}Your|.{0,7}eligibility|.{0,3}\\bif\\b.{0,3}\\bwe\\b)",
+                    "Replacement": ""
+                  }
+                ],
+                "AsRegularExpr": true,
+                "IsCaseSensitive": false
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "CC_Clues"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "CVV Code (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\00018028_160033.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "\\bCVV\\x20?CODE\\b",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "MASTERCARD VISA DISCOVER (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\00049531_225595.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "MasterCard.{0,4}VISA.{0,4}Discover",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Full page clue - renewal (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\00059944_236603.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "Clues"
+                ],
+                "RSDFileName": "<RSDFileDir>\\OtherForms\\Renewal.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Full page clue - low quality page (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\incust2m17842_194838.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "Clues"
+                ],
+                "RSDFileName": "<RSDFileDir>\\LQPage.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "LocateImageRegion",
+                  "Description": "Make Neat<Locate image region>",
+                  "Enabled": true,
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "ImageRegion",
+                    "ImageRegionText": "Low Quality Page",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Character",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "[\\s\\S]*"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Left",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Top": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Top",
+                      "ExpandDirection": "ExpandUp",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Right": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Bottom": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    }
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "HCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "CC_HCData - ComponentData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "CC_HCData"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "MCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "CC_MCData - ComponentData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "ReplaceStrings",
+              "Description": "remove phrases that cause false positives<Replace strings>",
+              "Enabled": true,
+              "Object": {
+                "Replacements": [
+                  {
+                    "Pattern": "\\d{3,5}\\x20refund\\x20by\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bcredit\\x20id\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\$\\d{3,4}",
+                    "Replacement": "dollar"
+                  }
+                ],
+                "AsRegularExpr": true,
+                "IsCaseSensitive": false
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "CC_MCData"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "RegExprRule",
+                  "Description": "Must contain 2 digits that aren't zero or one<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "[\\s\\S]*[2-9][\\s\\S]*[2-9][\\s\\S]*",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": true
+                  }
+                },
+                {
+                  "Type": "RegExprRule",
+                  "Description": "must contain four digits<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "[\\s\\S]*\\d[\\s\\S]*\\d[\\s\\S]*\\d[\\s\\S]*\\d[\\s\\S]*",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": true
+                  }
+                },
+                {
+                  "Type": "TranslateValue",
+                  "Description": "Mark for quality checking<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "CCN",
+                        "To": "checkquality"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Individual Application for Dental Coverage (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\incust2m72_153947.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "Select Individual Plan Application pages<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^.{0,3}(?>(?~<error=3>Individual\\x20Application\\x20for\\x20Dental\\x20Coverage))\r\n\r\n|\r\n^.{0,3}(?>(?~<error=2>Individual\\x20Plan\\x20Application))",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\IndPlanApp\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Delta Dental Invoice (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\00021471_175777.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\Invoice\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [
+                      "item"
+                    ],
+                    "RSDFileName": "<RSDFileDir>\\Invoice\\main.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "BMT form (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\00100361_284956.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\BMT\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [
+                      "item"
+                    ],
+                    "RSDFileName": "<RSDFileDir>\\BMT\\main.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Payment Info (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\00019391_165900.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "Select payment sections<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "(?>(?~<error=2>CREDIT\\x20CARD))[\\s\\S]{0,8}(?>(?~<error=2>IF\\x20PAYING\\x20BY\\x20CREDIT\\x20CARD))\r\n|\r\n(?>(?~<error=3>CHOOSE\\x20THE\\x20PAYMENT\\x20METHOD))[\\s\\S]{0,15}(?>(?~<error=6>CHECK\\x20PAYABLE\\x20TO\\x20DELTA\\x20DENTAL))\r\n|\r\n(?>(?~<error=3>CHOOSE\\x20THE\\x20PAYMENT\\x20METHOD))[\\s\\S]{0,15}(?>(?~<error=3>CHECK\\x20PAYABLE\\x20TO\\x20RLHICA))\r\n|\r\n(?>(?~<error=4>IF\\x20PAYING\\x20BY\\x20CREDIT\\x20CARD)).{0,8}(?>(?~<error=3>please\\x20complete\\x20this\\x20section))\r\n|\r\n(?>(?~<error=2>REQUEST\\x20FOR\\x20PAYMENT)).{0,3}\\r?$\r\n|\r\n^.{0,3}(?>(?~<error=3>CHOOSE\\x20THE\\x20PAYMENT\\x20METHOD))[\\s\\S]{0,7}MASTERCARD[\\s\\S]{0,5}VISA\r\n|\r\n^.{0,5}(?>(?~<error=3>Check\\x20not\\x20equal\\x20to\\x20annual\\x20amount))\r\n|\r\n^.{0,3}(?>(?~<error=3>CHOOSE\\x20THE\\x20PAYMENT))[\\s\\S]{0,15}^.{0,3}(?>(?~<error=4>CHECK\\x20PAYABLE\\x20TO))",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\PaymentInfo\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Other image regions ",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\OtherForms\\Other.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Other Regexs (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\00057312_233967.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=security\\x20code.{0,3})\\b\\d{3,4}\\b\r\n|\r\n(?<=Expiration[\\s\\S]{0,10}code.{0,3})\\b\\d{3,4}\\b\r\n|\r\n(?<=checkcard.{0,3})\\b\\d{3,4}\\b\r\n|\r\n(?<=CHECK.{0,2}CARD.{0,2}PURCHASE.{0,2}PIN.{0,25})\\b\\d{3,4}\\b\r\n|\r\n(?<=VISA[\\s\\S]{0,4}ACCOUNT[\\s\\S]{0,4}ENDING[\\s\\S]{0,4}IN.{0,15})\\b\\d{3,4}\\b",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "CC: 1234123412341234 (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\00094383_278716.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=^CC\\x20?[:;]\\x20?)\\b\\d{16}\\b",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "\"Card #\" followed by broken XXXXXXXXXXXX1234 (K:\\Common\\Engineering\\Sample Files\\Delta Dental\\Set003\\Images\\00027804_198437.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=CARD\\x20?#\\x20?[:;].{0,3})[XO0C\\)\\(]{10,16}\\d{4}\\b",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "XXXXXXXXXXXX1234",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "\\bX{12}\\d{4}\\b",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "Run rules<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Check quality of marked items<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*@checkquality"
+                }
+              },
+              "ConditionalRemove": true,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              },
+              "ScoreCondition": "LT",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 45
+            }
+          },
+          {
+            "Type": "MergeAttributes",
+            "Description": "<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData|MCData",
+              "CreateMergedRegion": false,
+              "NameMergeMode": "PreserveField",
+              "NameMergePriority": [
+                "HCData",
+                "MCData"
+              ],
+              "OverlapPercent": 25.0,
+              "PreserveAsSubAttributes": false,
+              "PreserveType": false,
+              "SpecifiedName": "",
+              "SpecifiedType": "CCN",
+              "SpecifiedValue": "000-00-0000",
+              "TreatNameListAsRegex": false,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": false,
+              "TypeMergeMode": "SpecifyField",
+              "TypeMergePriority": [],
+              "ValueMergeMode": "SelectField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Remove unwanted items<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove clues near found items<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "SpatialProximityAS",
+                      "Object": {
+                        "TargetQuery": "Clues",
+                        "TargetsMustContainReferences": false,
+                        "RequireCompleteInclusion": false,
+                        "ReferenceQuery": "HCData|MCData",
+                        "Left": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Left",
+                          "ExpandDirection": "ExpandLeft",
+                          "ExpandBy": 0.5,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Top": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandUp",
+                          "ExpandBy": 0.5,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Right": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Right",
+                          "ExpandDirection": "ExpandRight",
+                          "ExpandBy": 0.2,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Bottom": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Bottom",
+                          "ExpandDirection": "ExpandDown",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "CompareLinesSeparately": true,
+                        "IncludeDebugAttributes": false
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove blank items<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*@blank"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Type to \"CCN\"<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData|MCData|LCData|Clues",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "CCN",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output Data to VOA File>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

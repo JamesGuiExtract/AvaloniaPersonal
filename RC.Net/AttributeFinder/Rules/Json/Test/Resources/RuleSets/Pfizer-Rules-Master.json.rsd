@@ -1,0 +1,323 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 3,
+        "Name": "FLEX Index - Redaction (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "19.2.0.43",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [
+      {
+        "Key": 0,
+        "Value": 0
+      },
+      {
+        "Key": 3,
+        "Value": 1
+      },
+      {
+        "Key": "Kernel.Img.Max.Pix.X",
+        "Value": 32000
+      },
+      {
+        "Key": "Kernel.Img.Max.Pix.Y",
+        "Value": 32000
+      },
+      {
+        "Key": 4,
+        "Value": 0
+      },
+      {
+        "Key": 27,
+        "Value": 1
+      },
+      {
+        "Key": 26,
+        "Value": 1
+      },
+      {
+        "Key": 5,
+        "Value": 0
+      },
+      {
+        "Key": 25,
+        "Value": 0
+      },
+      {
+        "Key": 9,
+        "Value": 1
+      },
+      {
+        "Key": 10,
+        "Value": 1
+      },
+      {
+        "Key": 11,
+        "Value": -1
+      },
+      {
+        "Key": 12,
+        "Value": 100
+      },
+      {
+        "Key": 13,
+        "Value": 0
+      },
+      {
+        "Key": 14,
+        "Value": 0
+      },
+      {
+        "Key": 15,
+        "Value": 1
+      },
+      {
+        "Key": 16,
+        "Value": 240000
+      },
+      {
+        "Key": "Kernel.OcrMgr.PreferAccurateEngine",
+        "Value": 1
+      },
+      {
+        "Key": 17,
+        "Value": 1
+      },
+      {
+        "Key": 18,
+        "Value": 1
+      },
+      {
+        "Key": 19,
+        "Value": 0
+      },
+      {
+        "Key": 20,
+        "Value": 1
+      },
+      {
+        "Key": 21,
+        "Value": 1
+      },
+      {
+        "Key": 22,
+        "Value": 1
+      },
+      {
+        "Key": 6,
+        "Value": 0
+      },
+      {
+        "Key": 7,
+        "Value": 0
+      }
+    ],
+    "RunMode": "RunPerPage",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Page",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "FSharpPreprocessor",
+      "Description": "AFDoc.Tabula.createTablesPDFIfMissing<FSharp preprocessor>",
+      "Enabled": true,
+      "Object": {
+        "ScriptPath": "<RSDFileDir>\\ML\\currency-cellClassifier\\TableScripts.fsx",
+        "FunctionName": "AFDoc.Tabula.createTablesPDFIfMissing"
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find from RSD file",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<RSDFileDir>\\Currency\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "ModifyAttributeValueOH",
+              "Description": "<Modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*",
+                "CreateSubAttribute": true,
+                "AttributeName": "Name",
+                "SetAttributeName": true,
+                "AttributeType": "",
+                "SetAttributeType": false,
+                "AttributeValue": "%.Name%",
+                "SetAttributeValue": true
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Page with no subattributes<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "Page{*}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "Page{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote Page/*<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "Page/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "rename *{Name} to %Name%<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*{Name}",
+              "CreateSubAttribute": false,
+              "AttributeName": "%Name%",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove */Name<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/Name"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "AutoShrinkRedactionZones",
+            "Description": "<Auto-shrink redaction zones>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "HCData|MCData|LCData|NCData"
+                }
+              },
+              "AutoExpandBeforeAutoShrink": true,
+              "MaxPixelsToExpand": 10.0
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

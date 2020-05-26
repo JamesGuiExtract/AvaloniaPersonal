@@ -1,0 +1,278 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Page",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "PageBoundaries": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "locate image region full page",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "LocateImageRegion",
+              "Object": {
+                "DataInsideBoundaries": true,
+                "FindType": "ImageRegion",
+                "ImageRegionText": "Full Page",
+                "IncludeIntersectingEntities": true,
+                "IntersectingEntityType": "Character",
+                "MatchMultiplePagesPerDocument": true,
+                "ClueList1": {
+                  "Clues": [
+                    "."
+                  ],
+                  "CaseSensitive": false,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList2": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList3": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList4": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "Left": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Left",
+                  "ExpandDirection": "ExpandLeft",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Top": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Top",
+                  "ExpandDirection": "ExpandUp",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Right": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Right",
+                  "ExpandDirection": "ExpandRight",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Bottom": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandDown",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "copy": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input Finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": [
+                {
+                  "Type": "RegExprRule",
+                  "Description": "<Regular expression rule>",
+                  "Enabled": false,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "(\\s(?'sub'\\w+))+",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": true,
+                    "OnlyCreateOneSubAttributePerGroup": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "RunObjectOnAttributes",
+              "Description": "<RSDFileDir>\\MakeContainer.rsd.etf<Run object on attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "UseAttributeSelector": false,
+                "Type": "Splitter",
+                "Object": {
+                  "Type": "RSDSplitter",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\MakeContainer.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "<RSDFileDir>\\RatioCalc.rsd.etf<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Page",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\RatioCalc.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Correct types<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/*",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "GenericFeature",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote Location Values<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "Page/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": "Feature"
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "*testing*<Output data to VOA file>",
+            "Enabled": false,
+            "Object": {
+              "FileName": "<SourceDocName>.testing.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

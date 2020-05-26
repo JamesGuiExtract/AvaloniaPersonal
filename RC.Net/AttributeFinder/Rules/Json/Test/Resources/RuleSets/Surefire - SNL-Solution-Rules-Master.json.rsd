@@ -1,0 +1,1188 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 5,
+        "Name": "FLEX Index - Indexing (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "16.1.0.93",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocPreprocessorSequence",
+      "Description": "<Select multiple document preprocessors>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "ReplaceStrings",
+            "Description": "Spanish translations<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "\\bEnero\\b",
+                  "Replacement": "January"
+                },
+                {
+                  "Pattern": "\\bFebrero\\b",
+                  "Replacement": "February"
+                },
+                {
+                  "Pattern": "\\bMarzo\\b",
+                  "Replacement": "March"
+                },
+                {
+                  "Pattern": "\\bAbril\\b",
+                  "Replacement": "April"
+                },
+                {
+                  "Pattern": "\\bde\\x20Mayo\\b",
+                  "Replacement": "of May"
+                },
+                {
+                  "Pattern": "\\bJunio\\b",
+                  "Replacement": "June"
+                },
+                {
+                  "Pattern": "\\bJulio\\b",
+                  "Replacement": "July"
+                },
+                {
+                  "Pattern": "\\bAgosto\\b",
+                  "Replacement": "August"
+                },
+                {
+                  "Pattern": "\\bSeptiembre\\b",
+                  "Replacement": "September"
+                },
+                {
+                  "Pattern": "\\bOctubre\\b",
+                  "Replacement": "October"
+                },
+                {
+                  "Pattern": "\\bNoviembre\\b",
+                  "Replacement": "November"
+                },
+                {
+                  "Pattern": "\\bDiciembre\\b",
+                  "Replacement": "December"
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          },
+          {
+            "Type": "ReplaceStrings",
+            "Description": "Change misocr'd 7s<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "\\$(\\d+)/(\\d+)?",
+                  "Replacement": "~$1.7$2"
+                },
+                {
+                  "Pattern": "~",
+                  "Replacement": "$"
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          },
+          {
+            "Type": "ReplaceStrings",
+            "Description": "Fix bad dates<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "(\\d{2}\\/\\d{2})\\/016",
+                  "Replacement": "$1/2016"
+                },
+                {
+                  "Pattern": "(\\d{2}\\/\\d{2})120(\\d{2})",
+                  "Replacement": "$1/20$2"
+                },
+                {
+                  "Pattern": "0\\.V31\\/2016",
+                  "Replacement": "03/31/2016"
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          }
+        ]
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "AddressFinder": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Address Finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<RSDFileDir>\\Address\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "NewBalance": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "ADS",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Comenity\\x20(Capital\\x20)?Bank",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=Charge\\x20Off\\x20Amount:)[^\\r\\n]+",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "RemoveCharacters",
+              "Description": "Remove $<Remove characters>",
+              "Enabled": true,
+              "Object": {
+                "Characters": "$",
+                "IsCaseSensitive": false,
+                "RemoveAll": true,
+                "Consolidate": false,
+                "TrimLeading": false,
+                "TrimTrailing": false
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "After Balance - Capital One",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Capital\\x20One",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=(balance\\x20of\\x20|saldo\\x20de\\x20)[\\$S5])\\d+,?\\d+\\.\\d{2}",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "RemoveCharacters",
+              "Description": "Remove $<Remove characters>",
+              "Enabled": true,
+              "Object": {
+                "Characters": "$",
+                "IsCaseSensitive": false,
+                "RemoveAll": true,
+                "Consolidate": false,
+                "TrimLeading": false,
+                "TrimTrailing": false
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "After Balance - Citibank",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Citibank",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=(balance\\x20of\\x20|saldo\\x20de\\x20)[\\$S5])\\d+,?\\d+\\.\\d{2}",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "RemoveCharacters",
+              "Description": "Remove $<Remove characters>",
+              "Enabled": true,
+              "Object": {
+                "Characters": "$",
+                "IsCaseSensitive": false,
+                "RemoveAll": true,
+                "Consolidate": false,
+                "TrimLeading": false,
+                "TrimTrailing": false
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "After Balance - Dell Financial",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Dell\\x20Financial",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=(outstanding\\x20balance\\x20of\\x20|saldo\\x20de\\x20)[\\$S5])\\d+,?\\d+\\.\\d{2}",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "RemoveCharacters",
+              "Description": "Remove $<Remove characters>",
+              "Enabled": true,
+              "Object": {
+                "Characters": "$",
+                "IsCaseSensitive": false,
+                "RemoveAll": true,
+                "Consolidate": false,
+                "TrimLeading": false,
+                "TrimTrailing": false
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "After Time of Sale - Synchrony",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Synchrony",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=^Account\\x20Balance)[^\\r\\n]+",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "RemoveCharacters",
+              "Description": "Remove $<Remove characters>",
+              "Enabled": true,
+              "Object": {
+                "Characters": " \t\r\n$:;ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                "IsCaseSensitive": false,
+                "RemoveAll": true,
+                "Consolidate": false,
+                "TrimLeading": false,
+                "TrimTrailing": false
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "After Balance - Cardmember Service",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Cardmember\\x20Service",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=(Transferred\\x20Balance:?\\x20)[\\$S5])\\d+,?\\d+\\.\\d{2}",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "RemoveCharacters",
+              "Description": "Remove $<Remove characters>",
+              "Enabled": true,
+              "Object": {
+                "Characters": "$",
+                "IsCaseSensitive": false,
+                "RemoveAll": true,
+                "Consolidate": false,
+                "TrimLeading": false,
+                "TrimTrailing": false
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "StartDate": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Above Account - Comenity Bank",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Comenity\\x20(Capital\\x20)?Bank",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "^\\d{2}\\/[^\\r\\n]+(?=[\\r\\n]+Account\\x20Ending)",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Between Addresses - Capital One",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Capital\\x20One",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=-0285[\\r\\n]+)[^\\r\\n]+",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Between Addresses - Citibank",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Citibank",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=-9819[\\r\\n]+)[^\\r\\n]+",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Between Addresses - Dell Financial",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Dell\\x20Financial",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=-0409[\\r\\n]+)[^\\r\\n]+",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Above Code Line - Synchrony",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Synchrony",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "[^\\r\\n]+(?=[\\r\\n]+[\\)\\(:;\\-\\dABCDEFGHIJKLMNOPQRSTUVWXYZ]{15,})",
+                "IsCaseSensitive": true,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Top of page - Cardmember Service",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "^Cardmember\\x20Service",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "[^\\r\\n]+",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Last Resort Date",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectAll",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "",
+                "IsRegExp": false,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": 0,
+                "VerticalEnd": 30,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": true,
+                "RegExpFileName": "<ComponentDataDir>\\ReusableComponents\\Date\\date.dat.etf",
+                "Pattern": "",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote AddressFinder subs<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "AddressFinder/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Handle StartDate<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Split Date up for proper format<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "StartDate",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "DateTimeSplitter",
+                      "Object": {
+                        "MinimumTwoDigitYear": 1970,
+                        "OutputFormat": "",
+                        "ShowFormattedOutput": false,
+                        "SplitDayOfWeek": false,
+                        "SplitDefaults": true,
+                        "SplitFourDigitYear": true,
+                        "SplitMilitaryTime": false,
+                        "SplitMonthAsName": false,
+                        "TwoDigitYearBeforeCurrent": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Reform top<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "StartDate",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "<%Month%>/<%Day%>/<%Year%>",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove subs<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "StartDate/*"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Remove bad dates<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "StartDate",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "RemoveSubAttributes",
+                      "Object": {
+                        "AttributeSelector": {
+                          "Type": "ValueConditionSelector",
+                          "Object": {
+                            "Condition": {
+                              "Type": "FindingRuleCondition",
+                              "Object": {
+                                "AFRule": {
+                                  "Type": "RegExprRule",
+                                  "Object": {
+                                    "IsRegExpFromFile": false,
+                                    "RegExpFileName": "",
+                                    "Pattern": "\\/\\/",
+                                    "IsCaseSensitive": false,
+                                    "FirstMatchOnly": false,
+                                    "CreateSubAttributesFromNamedMatches": false,
+                                    "OnlyCreateOneSubAttributePerGroup": false
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "ConditionalRemove": false,
+                        "DataScorer": {
+                          "Type": null,
+                          "Description": "",
+                          "Enabled": true,
+                          "Object": null
+                        },
+                        "ScoreCondition": "EQ",
+                        "CompareConditionType": "ValueOf",
+                        "ScoreToCompare": 0
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveCharacters",
+            "Description": "Remove trailing and leading spaces<Remove characters>",
+            "Enabled": true,
+            "Object": {
+              "Characters": " \t\r\n",
+              "IsCaseSensitive": false,
+              "RemoveAll": false,
+              "Consolidate": true,
+              "TrimLeading": true,
+              "TrimTrailing": true
+            }
+          },
+          {
+            "Type": "ChangeCase",
+            "Description": "CAPS<Change case>",
+            "Enabled": true,
+            "Object": {
+              "CaseType": "MakeUpperCase"
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Fix bad cities<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "City",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "ReplaceStrings",
+                "Object": {
+                  "Replacements": [
+                    {
+                      "Pattern": "VV",
+                      "Replacement": "W"
+                    }
+                  ],
+                  "AsRegularExpr": true,
+                  "IsCaseSensitive": true
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Check for Proper Amounts<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "NewBalance",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "RegExprRule",
+                "Object": {
+                  "IsRegExpFromFile": false,
+                  "RegExpFileName": "",
+                  "Pattern": "\\A\\d{1,3}(,\\d{3})*\\.\\d{2}\\z",
+                  "IsCaseSensitive": false,
+                  "FirstMatchOnly": true,
+                  "CreateSubAttributesFromNamedMatches": false,
+                  "OnlyCreateOneSubAttributePerGroup": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

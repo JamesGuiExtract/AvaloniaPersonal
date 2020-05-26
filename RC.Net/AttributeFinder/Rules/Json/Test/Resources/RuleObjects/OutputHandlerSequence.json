@@ -1,0 +1,38 @@
+[
+  {
+    "Type": "OutputHandlerSequence",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ObjectsVector": [
+        {
+          "Type": "ReplaceStrings",
+          "Description": "Mark AND/&/JOINT to help splitter (JOINT [K:\\Common\\Engineering\\Sample Files\\AtPac\\CA - Amador\\Set003\\Images\\Affidavit of Death\\20109000212199.003.tif]; & [K:\\Common\\Engineering\\Sample Files\\AtPac\\CA - Amador\\Set003\\Images\\Grant Deed\\20109000112399.003.tif])<Replace strings>",
+          "Enabled": true,
+          "Object": {
+            "Replacements": [
+              {
+                "Pattern": "\\band\\b",
+                "Replacement": "AN$0AN"
+              },
+              {
+                "Pattern": "&",
+                "Replacement": "ANAMPAN"
+              },
+              {
+                "Pattern": "\\bJoint(?=\\s+(?:\\w+\\s+)?(Living|Revocable)\\s+Trust)",
+                "Replacement": "$0ed"
+              },
+              {
+                "Pattern": "\\bS(eparate\\W+)P(roperty)\\b",
+                "Replacement": "P$1S$2"
+              }
+            ],
+            "AsRegularExpr": true,
+            "IsCaseSensitive": false
+          }
+        }
+      ]
+    }
+  }
+]

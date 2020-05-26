@@ -1,0 +1,371 @@
+[
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\deleter.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\SameAsShipping.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\ICD.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\RPagination\\RPagination.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\currency-cellClassifier\\currency-cellClassifier.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\LearningMachines\\NeedsVerification.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\date.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Sensitive.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\ClassifierDF.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\paginator.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\..\\..\\Solution\\Rules\\Common\\hasCoverPage.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\MK.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Classifier.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\ClassifySensitiveAsDeleted.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\DocType.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\NeedsVerification.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\DocType.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\YesNoESBill.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Review\\PageReview.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Sex\\MF.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Pagination\\paginator.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\..\\..\\Common\\checked.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\ML\\Pagination\\Paginator.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\DocDesc.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Type.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\..\\..\\Common\\YesNo.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Classification.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Relationship.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\hasCoverPage.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\MK.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\DocClassifier.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\BarcodeRemovalDoctype.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Classifierv2000.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Classifier.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\paginator.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\..\\..\\Solution\\Rules\\Pagination\\paginator.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\deleter.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Classification\\Classification.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\..\\Machines\\dob.lm",
+      "PreserveInputAttributes": false
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\DocTypeMay2019.lm",
+      "PreserveInputAttributes": true
+    }
+  },
+  {
+    "Type": "LearningMachineOutputHandler",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SavedMachinePath": "<RSDFileDir>\\Classification.lm",
+      "PreserveInputAttributes": false
+    }
+  }
+]

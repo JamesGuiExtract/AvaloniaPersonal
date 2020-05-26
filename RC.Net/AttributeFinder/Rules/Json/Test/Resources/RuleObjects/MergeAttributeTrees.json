@@ -1,0 +1,1451 @@
+[
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Statement",
+      "SubAttributesToCompare": [
+        "StartDate"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Location",
+      "SubAttributesToCompare": [
+        "Subdivision",
+        "Block",
+        "Lot",
+        "Municipality"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "LegalDescription/Location",
+      "SubAttributesToCompare": [
+        "Lot",
+        "Subdivision"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Location",
+      "SubAttributesToCompare": [
+        "Section",
+        "Township",
+        "Range",
+        "Q",
+        "QQ"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/PIN",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Test",
+      "SubAttributesToCompare": [
+        "Name"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Location",
+      "SubAttributesToCompare": [
+        "Section",
+        "Township",
+        "Range"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Lot",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Test",
+      "SubAttributesToCompare": [
+        "CollectionDate",
+        "CollectionTime"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Location6",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Title",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Test",
+      "SubAttributesToCompare": [
+        "UnknownOrder",
+        "DateTime"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Statement",
+      "SubAttributesToCompare": [
+        "merge"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "item",
+      "SubAttributesToCompare": [
+        "First",
+        "Middle"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "LegalDescription",
+      "SubAttributesToCompare": [
+        "Location"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Test",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Grantor/Person",
+      "SubAttributesToCompare": [
+        "tmp"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/TownRangeSection",
+      "SubAttributesToCompare": [
+        "Township",
+        "Range"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Location",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Location",
+      "SubAttributesToCompare": [
+        "Land",
+        "Tract"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "LegalDescription",
+      "SubAttributesToCompare": [
+        "Compare"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Ordering",
+      "SubAttributesToCompare": [
+        "First",
+        "Middle"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Panel",
+      "SubAttributesToCompare": [
+        "Key"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Location2",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "DOB",
+      "SubAttributesToCompare": [
+        "OCRSCORE"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "Company"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Section",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Test/Component",
+      "SubAttributesToCompare": [
+        "Merge",
+        "TestCode",
+        "Units"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "Merge"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": false
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Location",
+      "SubAttributesToCompare": [
+        "Unit",
+        "Building",
+        "Condominium"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "merge"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Test",
+      "SubAttributesToCompare": [
+        "date"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "same"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "Party",
+        "DocType"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*{Trust}",
+      "SubAttributesToCompare": [
+        "Trust"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Location5",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "hasPage3",
+      "SubAttributesToCompare": [
+        "merge"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "PIN",
+      "SubAttributesToCompare": [
+        "firstpart"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Test",
+      "SubAttributesToCompare": [
+        "FakeDate",
+        "FakeTime"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Safer",
+      "SubAttributesToCompare": [
+        "OCRSCORE"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "_/Page",
+      "SubAttributesToCompare": [
+        "Key"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Test",
+      "SubAttributesToCompare": [
+        "CollectionDate",
+        "CollectionTime",
+        "Name",
+        "OrderCode"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "Section"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Location",
+      "SubAttributesToCompare": [
+        "Range",
+        "Section",
+        "Township",
+        "Tract"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "MRN",
+      "SubAttributesToCompare": [
+        "OCRSCORE"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "_/*",
+      "SubAttributesToCompare": [
+        "OriginalName"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Riskier",
+      "SubAttributesToCompare": [
+        "OCRSCORE"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "GreaterThan1"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": false
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "_",
+      "SubAttributesToCompare": [
+        "Merge"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Location",
+      "SubAttributesToCompare": [
+        "Section",
+        "Township",
+        "Range",
+        "Q"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Test",
+      "SubAttributesToCompare": [
+        "Name",
+        "CollectionDate",
+        "CollectionTime"
+      ],
+      "CaseSensitive": true,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "dummy"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*{Two}",
+      "SubAttributesToCompare": [
+        "Two"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Keep/Company",
+      "SubAttributesToCompare": [
+        "CompanyAlias"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/*",
+      "SubAttributesToCompare": [
+        "dummy"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Keep/Trust/Person",
+      "SubAttributesToCompare": [
+        "First",
+        "Last"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*@Beneficiary/*{M}",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Location4",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Location",
+      "SubAttributesToCompare": [
+        "Section",
+        "Township",
+        "Range",
+        "Q",
+        "QQ"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "it/wc/*",
+      "SubAttributesToCompare": [
+        "F"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Record",
+      "SubAttributesToCompare": [
+        "DateNumber"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Name",
+      "SubAttributesToCompare": [
+        "First",
+        "Last"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": false
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Grantee",
+      "SubAttributesToCompare": [
+        "Company"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Location1",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Location3",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/*{M}",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/*",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Location",
+      "SubAttributesToCompare": [
+        "Subdivision",
+        "Block",
+        "Lot"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Keep/Person",
+      "SubAttributesToCompare": [
+        "First",
+        "Last"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Tract",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "_/Page/Arrest",
+      "SubAttributesToCompare": [
+        "Key"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Test",
+      "SubAttributesToCompare": [
+        "DateTime"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Title",
+      "SubAttributesToCompare": [
+        "Merger"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/*",
+      "SubAttributesToCompare": [
+        "M"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Test",
+      "SubAttributesToCompare": [
+        "CollectionDate",
+        "CollectionTime",
+        "ResultDate",
+        "ResultTime",
+        "Name",
+        "OrderCode"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/*",
+      "SubAttributesToCompare": [
+        "First",
+        "Last",
+        "Middle"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Statement",
+      "SubAttributesToCompare": [
+        "EndDate"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*{One}",
+      "SubAttributesToCompare": [
+        "One"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "Date"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Statement",
+      "SubAttributesToCompare": [
+        "DueDate"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "AdministrativeInformation",
+      "SubAttributesToCompare": [
+        "MergeTrees"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Title",
+      "SubAttributesToCompare": [
+        "DocType"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Ordering",
+      "SubAttributesToCompare": [
+        "First",
+        "Last"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Grantee/Person",
+      "SubAttributesToCompare": [
+        "tmp"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Test@UnknownOrder",
+      "SubAttributesToCompare": [
+        "UnknownOrder",
+        "DateTime"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "Name",
+      "SubAttributesToCompare": [
+        "OCRSCORE"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "AttributeWithMostChildren",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Location",
+      "SubAttributesToCompare": [
+        "Compare"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "item",
+      "SubAttributesToCompare": [
+        "First",
+        "Last"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": true,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*",
+      "SubAttributesToCompare": [
+        "DocType"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "_",
+      "SubAttributesToCompare": [
+        "merge"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  },
+  {
+    "Type": "MergeAttributeTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributesToBeMerged": "*/Location",
+      "SubAttributesToCompare": [
+        "Range",
+        "Section",
+        "Township"
+      ],
+      "CaseSensitive": false,
+      "DiscardNonMatchingComparisons": false,
+      "MergeAttributeTreesInto": "FirstAttribute",
+      "RemoveEmptyHierarchy": true
+    }
+  }
+]

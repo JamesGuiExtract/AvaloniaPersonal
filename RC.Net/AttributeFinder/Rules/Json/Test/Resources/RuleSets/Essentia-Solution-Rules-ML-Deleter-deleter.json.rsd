@@ -1,0 +1,166 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Page",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {},
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "CreateAttribute",
+            "Description": "Create bitmap feature<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "bmp",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "es:Bitmap(24, 32, Page[1])",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Page<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "Page"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "LearningMachineOutputHandler",
+            "Description": "deleter.lm<Learning machine output handler>",
+            "Enabled": true,
+            "Object": {
+              "SavedMachinePath": "<RSDFileDir>\\deleter.lm",
+              "PreserveInputAttributes": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove NotDeletedPage<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "DocumentType<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "DocumentType"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "ValueConditionSelector",
+                        "Description": "NotDeletedPage<Value condition selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "Condition": {
+                            "Type": "FindingRuleCondition",
+                            "Object": {
+                              "AFRule": {
+                                "Type": "RegExprRule",
+                                "Object": {
+                                  "IsRegExpFromFile": false,
+                                  "RegExpFileName": "",
+                                  "Pattern": "\\ANotDeletedPage\\z",
+                                  "IsCaseSensitive": true,
+                                  "FirstMatchOnly": true,
+                                  "CreateSubAttributesFromNamedMatches": false,
+                                  "OnlyCreateOneSubAttributePerGroup": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Change name of DocumentType to DeletedPage<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "DocumentType",
+              "CreateSubAttribute": false,
+              "AttributeName": "DeletedPage",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

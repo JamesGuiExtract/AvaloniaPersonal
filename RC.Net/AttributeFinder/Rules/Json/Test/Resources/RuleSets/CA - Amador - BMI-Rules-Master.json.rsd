@@ -1,0 +1,258 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "pre 2-28-13 key list 19,45,121,225,226,227,228,304,314,362,336,402,413",
+    "Counters": [
+      {
+        "ID": 3,
+        "Name": "FLEX Index - Redaction (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "13.4.0.30",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocPreprocessorSequence",
+      "Description": "<Select multiple document preprocessors>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "SelectPageRegion",
+            "Description": "<Select page region>",
+            "Enabled": true,
+            "Object": {
+              "IncludeRegionDefined": true,
+              "PageSelectionType": "SelectAll",
+              "SpecificPages": "",
+              "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+              "Pattern": "",
+              "IsRegExp": false,
+              "IsCaseSensitive": false,
+              "HorizontalStart": 15,
+              "HorizontalEnd": 85,
+              "VerticalStart": -1,
+              "VerticalEnd": -1,
+              "SelectPageRegionReturnType": "ReturnReOcr",
+              "IncludeIntersectingText": false,
+              "TextIntersectionType": "NoEntity",
+              "SelectedRegionRotation": 0,
+              "TextToAssignToRegion": ""
+            }
+          },
+          {
+            "Type": "DocumentClassifier",
+            "Description": "<Document Classifier>",
+            "Enabled": true,
+            "Object": {
+              "IndustryCategoryName": "County Document",
+              "ReRunClassifier": true
+            }
+          }
+        ]
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Create value",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<DocType>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "All pages",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "SelectPageRegion",
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectAll",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "",
+                "IsRegExp": false,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "Run rules, output VOA",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Run rules",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\perPage.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote _/* to the top",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "_/*",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove _",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "_"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "Output VOA<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

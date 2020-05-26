@@ -1,0 +1,296 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "19.2.0.34",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [
+      {
+        "Key": 0,
+        "Value": 0
+      },
+      {
+        "Key": 3,
+        "Value": 1
+      },
+      {
+        "Key": "Kernel.Img.Max.Pix.X",
+        "Value": 32000
+      },
+      {
+        "Key": "Kernel.Img.Max.Pix.Y",
+        "Value": 32000
+      },
+      {
+        "Key": 4,
+        "Value": 0
+      },
+      {
+        "Key": 5,
+        "Value": 0
+      },
+      {
+        "Key": 9,
+        "Value": 1
+      },
+      {
+        "Key": 10,
+        "Value": 1
+      },
+      {
+        "Key": 11,
+        "Value": -1
+      },
+      {
+        "Key": 12,
+        "Value": 100
+      },
+      {
+        "Key": 13,
+        "Value": 0
+      },
+      {
+        "Key": 14,
+        "Value": 0
+      },
+      {
+        "Key": 15,
+        "Value": 1
+      },
+      {
+        "Key": 16,
+        "Value": 240000
+      },
+      {
+        "Key": "Kernel.OcrMgr.PreferAccurateEngine",
+        "Value": 1
+      },
+      {
+        "Key": 17,
+        "Value": 1
+      },
+      {
+        "Key": 18,
+        "Value": 1
+      },
+      {
+        "Key": 19,
+        "Value": 0
+      },
+      {
+        "Key": 20,
+        "Value": 1
+      },
+      {
+        "Key": 21,
+        "Value": 1
+      },
+      {
+        "Key": 22,
+        "Value": 1
+      },
+      {
+        "Key": 6,
+        "Value": 0
+      },
+      {
+        "Key": 7,
+        "Value": 0
+      }
+    ],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "DocumentData",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_DocumentCC": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "<ComponentDataDir>\\ReusableComponents\\getDocAndPagesCC.rsd.etf",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<ComponentDataDir>\\ReusableComponents\\getDocAndPagesCC.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote _DocumentCC<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/_DocumentCC",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Split DocumentData with findDocumentData.rsd<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "DocumentData",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\findDocumentData.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Remove childless DocumentData<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "DocumentData",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "RemoveSubAttributes",
+                "Object": {
+                  "AttributeSelector": {
+                    "Type": "MultipleCriteriaSelector",
+                    "Object": {
+                      "Selectors": [
+                        {
+                          "Select": "NonMatching",
+                          "With": {
+                            "Type": "QueryBasedAS",
+                            "Description": "*{*}<Query attribute selector>",
+                            "Enabled": true,
+                            "Object": {
+                              "QueryText": "*{*}"
+                            }
+                          }
+                        }
+                      ],
+                      "CombineBy": "Chain"
+                    }
+                  },
+                  "ConditionalRemove": false,
+                  "DataScorer": {
+                    "Type": null,
+                    "Description": "",
+                    "Enabled": true,
+                    "Object": null
+                  },
+                  "ScoreCondition": "EQ",
+                  "CompareConditionType": "ValueOf",
+                  "ScoreToCompare": 0
+                }
+              }
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote */*<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "DocumentData/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "Output DataFoundByRules<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.DataFoundByRules.voa"
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "*off* Run Master.rsd to get <SDN>.voa<Output data to VOA file>",
+            "Enabled": false,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

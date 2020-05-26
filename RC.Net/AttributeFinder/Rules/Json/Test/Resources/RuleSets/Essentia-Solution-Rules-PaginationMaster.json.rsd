@@ -1,0 +1,510 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "19.2.0.34",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [
+      {
+        "Key": 0,
+        "Value": 0
+      },
+      {
+        "Key": 3,
+        "Value": 1
+      },
+      {
+        "Key": "Kernel.Img.Max.Pix.X",
+        "Value": 32000
+      },
+      {
+        "Key": "Kernel.Img.Max.Pix.Y",
+        "Value": 32000
+      },
+      {
+        "Key": 4,
+        "Value": 0
+      },
+      {
+        "Key": 5,
+        "Value": 0
+      },
+      {
+        "Key": 9,
+        "Value": 1
+      },
+      {
+        "Key": 10,
+        "Value": 1
+      },
+      {
+        "Key": 11,
+        "Value": -1
+      },
+      {
+        "Key": 12,
+        "Value": 100
+      },
+      {
+        "Key": 13,
+        "Value": 0
+      },
+      {
+        "Key": 14,
+        "Value": 0
+      },
+      {
+        "Key": 15,
+        "Value": 1
+      },
+      {
+        "Key": 16,
+        "Value": 240000
+      },
+      {
+        "Key": "Kernel.OcrMgr.PreferAccurateEngine",
+        "Value": 1
+      },
+      {
+        "Key": 17,
+        "Value": 1
+      },
+      {
+        "Key": 18,
+        "Value": 1
+      },
+      {
+        "Key": 19,
+        "Value": 0
+      },
+      {
+        "Key": 20,
+        "Value": 1
+      },
+      {
+        "Key": 21,
+        "Value": 1
+      },
+      {
+        "Key": 22,
+        "Value": 1
+      },
+      {
+        "Key": 6,
+        "Value": 0
+      },
+      {
+        "Key": 7,
+        "Value": 0
+      }
+    ],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Page",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Page": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Pagination/createProtofeatures.rsd",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<RSDFileDir>\\ML\\Pagination\\createProtofeatures.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Pagination and deleted pages<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "LearningMachineOutputHandler",
+                  "Description": "PAGINATE<Learning machine output handler>",
+                  "Enabled": true,
+                  "Object": {
+                    "SavedMachinePath": "<RSDFileDir>\\ML\\Pagination\\Paginator.lm",
+                    "PreserveInputAttributes": true
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create Document/DeletedPages<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Document",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "DeletedPages",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%Page/DeletedPageNumber<>all:, %",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "remove Document/Page<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "Document/Page"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "remove DeletedPages with no value<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "MultipleCriteriaSelector",
+                      "Object": {
+                        "Selectors": [
+                          {
+                            "Select": "Matching",
+                            "With": {
+                              "Type": "QueryBasedAS",
+                              "Description": "<Query attribute selector>",
+                              "Enabled": true,
+                              "Object": {
+                                "QueryText": "Document/DeletedPages"
+                              }
+                            }
+                          },
+                          {
+                            "Select": "NonMatching",
+                            "With": {
+                              "Type": "ValueConditionSelector",
+                              "Description": "<Value condition selector>",
+                              "Enabled": true,
+                              "Object": {
+                                "Condition": {
+                                  "Type": "FindingRuleCondition",
+                                  "Object": {
+                                    "AFRule": {
+                                      "Type": "RegExprRule",
+                                      "Object": {
+                                        "IsRegExpFromFile": false,
+                                        "RegExpFileName": "",
+                                        "Pattern": ".",
+                                        "IsCaseSensitive": false,
+                                        "FirstMatchOnly": true,
+                                        "CreateSubAttributesFromNamedMatches": false,
+                                        "OnlyCreateOneSubAttributePerGroup": false
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "CombineBy": "Chain"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Handle DocumentData<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Create DocumentData<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Document",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "DocumentData",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%Value%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Split with findDocumentData<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Document/DocumentData",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\findDocumentData.rsd.etf"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Set Document|Document/DocumentData to N/A<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Blank value so we lose the spatial<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Document|Document/DocumentData",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "Document",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Then set to N/A<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Document|Document/DocumentData",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "N/A",
+                    "SetAttributeValue": true
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "Output FoundPagination VOA<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.FoundPagination.voa"
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "move Document/DocumentData/* to top if only one Document<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "*testing* Create another /Document<Create attribute>",
+                  "Enabled": false,
+                  "Object": {
+                    "Root": "/*",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "Document",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "N/A",
+                        "ValueContainsXPath": false,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "Create Document/_delete_me_@_delete_me_ if there is only one Document<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/Document[not(/*/Document[2])]",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "_delete_me_",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "_delete_me_",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "",
+                        "ValueContainsXPath": false,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set type of Document{_delete_me_} to _delete_me_<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Document{_delete_me_}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "_delete_me_",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "MoveAndModifyAttributes",
+                  "Description": "move up Document@_delete_me_/DocumentData/*<Move and modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AddAttributeNameToType": false,
+                    "AddRootOrParentAttributeType": false,
+                    "AddSpecifiedAttributeType": false,
+                    "AttributeQuery": "Document@_delete_me_/DocumentData/*",
+                    "DeleteRootOrParentIfAllChildrenMoved": false,
+                    "MoveAttributeLevel": "MoveToRoot",
+                    "OverwriteAttributeName": "DoNotOverwrite",
+                    "RetainAttributeType": true,
+                    "SpecifiedAttributeName": "",
+                    "SpecifiedAttributeType": ""
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "remove *@_delete_me_<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*@_delete_me_"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "Output DataFoundByRules<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.DataFoundByRules.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

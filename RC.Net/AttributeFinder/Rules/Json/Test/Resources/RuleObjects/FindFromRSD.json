@@ -1,0 +1,1107 @@
+[
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "it"
+      ],
+      "RSDFileName": "<RSDFileDir>\\SignatureArea\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Redact SSN In MDOT Sig Block"
+      ],
+      "RSDFileName": "<RSDFileDir>\\SSN_in_MDOT\\Redact_SSN_In_MDOT.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "MCData"
+      ],
+      "RSDFileName": "<RSDFileDir>\\AccountNumberRegex.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "GGNum"
+      ],
+      "RSDFileName": "<RSDFileDir>\\GrantorGrantee\\GrantorGrantee.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "RedactMortgageSignaturePage"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\DeedOfTrust\\MortgageSignaturePageMaster.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN5"
+      ],
+      "RSDFileName": "<RSDFileDir>\\LIR-PowerOfAttorney.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "item"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Trim.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\PromissoryNote.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Trustor_backup"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Deed Of Trust\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantee"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Personal Representative Deed\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "is"
+      ],
+      "RSDFileName": "<RSDFileDir>\\isPhotoPage.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Clues"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\DocTypeRSD\\Federal Tax Lien\\DocTypeClues.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "item"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Mortgage\\Satisfaction\\Satisfaction.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\rep5.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "HCData"
+      ],
+      "RSDFileName": "<RSDFileDir>\\PrimAndSecMaster.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Plaintiff"
+      ],
+      "RSDFileName": "<RSDFileDir>\\PartyNames\\PartyNames.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "g2"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Standard\\RedactStandard.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Defendant"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Notice of State Tax Lien\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "DLN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\Common\\BookingInfoSheet\\BookingInfoSheet.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\signatureArea.rsd_1_REPM\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\outdoorSystemsLease\\outdoorSystemsLease.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [],
+      "RSDFileName": "<ComponentDataDir>\\Indexing\\ConsiderationAmount\\ZeroAmounts\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\GGFinder.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\SocFieldMid.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Owner"
+      ],
+      "RSDFileName": "<CustomRSD>"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\AppForShortFormReleaseAdmin\\appForShortFormReleaseAdmin.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "HCData"
+      ],
+      "RSDFileName": "<RSDFileDir>\\FinancingStatement\\FinancingStatement.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "HCData"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\CreditCard\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\ImageRegion.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SecondPerson"
+      ],
+      "RSDFileName": "<RSDFileDir>\\UCCGrantorPerson.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\redact_correction.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\ShippingAddress\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "DocumentDate"
+      ],
+      "RSDFileName": "<RSDFileDir>\\DocumentDate\\TestDocumentDate.rsd"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "item"
+      ],
+      "RSDFileName": "<RSDFileDir>\\SealBorrowerPair.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Clues"
+      ],
+      "RSDFileName": "<RSDFileDir>\\TempFinalProtectionFromAbuse.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Receipt\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Amendment\\Amendment.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "APN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\APNand.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "it"
+      ],
+      "RSDFileName": "<RSDFileDir>\\split.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "BackupName"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Name.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "RelatedDoc"
+      ],
+      "RSDFileName": "<RSDFileDir>\\RelatedDoc\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\CertDeath\\certDeath.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "OriginalTrustee"
+      ],
+      "RSDFileName": "<RSDFileDir>\\findFirst.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "MCData"
+      ],
+      "RSDFileName": "<RSDFileDir>\\LoanNo\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\NoticeOfDelinquent\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "MCData"
+      ],
+      "RSDFileName": "<RSDFileDir>\\MRN\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Assignee"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Assignment of Deed of Trust\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "OriginalTrustor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\AssignorOrOrigTrustor.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "it"
+      ],
+      "RSDFileName": "<RSDFileDir>\\callRules.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "OriginalDefendant"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Release of Lien - Misc\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "RedactSSNBoxNew"
+      ],
+      "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\Certificate of Death\\Michigan\\RedactSSNBox_Michigan.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "item"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\Misc\\WellFormed.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "FindMortgageSignaturePageClues"
+      ],
+      "RSDFileName": "<RSDFileDir>\\IsMortgageSignaturePage.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Mortgagee_REPM\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "it"
+      ],
+      "RSDFileName": "<RSDFileDir>\\ClueRemoval\\PrecededByStateOf.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "item"
+      ],
+      "RSDFileName": "<RSDFileDir>\\SecondDOB.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\ReleaseMTG\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantee"
+      ],
+      "RSDFileName": "<ComponentDataDir>\\Indexing\\PartyFinder\\Grant Deed\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\context.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\MortgagorREPM\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "BankCCNum_MCData"
+      ],
+      "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "DCHNL"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Classify.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Clues"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\DocTypeRSD\\ReleaseFromMilitaryDuty\\DocTypeClues.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [],
+      "RSDFileName": "<ComponentDataDir>\\ReusableComponents\\getDocAndPagesCC.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\AffidavitOfCorrection\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "BusPartnerName_Trustee_Temp"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\..\\Rules\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\StudentID\\HockingTech.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSTAXID"
+      ],
+      "RSDFileName": "<RSDFileDir>\\RoyaltyConveyance.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\rightOfSSNumber.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Rule_85.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Vendor"
+      ],
+      "RSDFileName": "<ComponentDataDir>\\Indexing\\PartyFinder\\Land Contract\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Assignment\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\SSNAboveRight.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Lessor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Oil Gas and Mineral Lease\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantee"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Homestead\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Assignor",
+        "Defendant",
+        "Debtor",
+        "Grantor",
+        "GrantorCustom",
+        "Mortgagor",
+        "OriginalBeneficiary",
+        "OriginalMortgagee",
+        "OriginalPlaintiff",
+        "Owner",
+        "Principal",
+        "Testator",
+        "Trustor",
+        "Vendor"
+      ],
+      "RSDFileName": "<ComponentDataDir>\\Indexing\\PartyFinder\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "LIR"
+      ],
+      "RSDFileName": "<RSDFileDir>\\AbstractOfSupportJudgment-LIR.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "item"
+      ],
+      "RSDFileName": "<RSDFileDir>\\AppToMarry\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Above Social Security Number"
+      ],
+      "RSDFileName": "<RSDFileDir>\\POADeepRules.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Trust"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\Trust.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "EID"
+      ],
+      "RSDFileName": "<RSDFileDir>\\EmployerID.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Rule_87.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "GG"
+      ],
+      "RSDFileName": "<RSDFileDir>\\ByDocType\\SubTrustLIR.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\RunRules.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [],
+      "RSDFileName": "<RSDFileDir>\\NameNER.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Gender"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\PatientInfo\\findPatientInfo.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "SSN"
+      ],
+      "RSDFileName": "<RSDFileDir>\\PrelimArraignHearingNotice\\find.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\CertificateOfRedemption\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "DocumentReference"
+      ],
+      "RSDFileName": "<RSDFileDir>\\DocumentReference\\TestDocumentReference.rsd"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Power of Attorney\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [],
+      "RSDFileName": "<RSDFileDir>\\LegalPlanB.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "OnV"
+      ],
+      "RSDFileName": "<RSDFileDir>\\DateOfBirthCol.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "LegalDescription"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Deschutes.rsd"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\OriginalDefendant.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "first"
+      ],
+      "RSDFileName": "<RSDFileDir>\\..\\AddressFinders\\AddressFinder.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "_"
+      ],
+      "RSDFileName": "<RSDFileDir>\\FindLDsOnOtherPages.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "has123"
+      ],
+      "RSDFileName": "<RSDFileDir>\\check_dict.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "has120"
+      ],
+      "RSDFileName": "<RSDFileDir>\\check_dict.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Query"
+      ],
+      "RSDFileName": "<RSDFileDir>\\has_two_pages.rsd.etf"
+    }
+  },
+  {
+    "Type": "FindFromRSD",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeNames": [
+        "Grantor"
+      ],
+      "RSDFileName": "<RSDFileDir>\\Affidavit - Misc\\main.rsd.etf"
+    }
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "Type": "DocumentClassifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IndustryCategoryName": "County Document",
+      "ReRunClassifier": false
+    }
+  },
+  {
+    "Type": "DocumentClassifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IndustryCategoryName": "County_Mortgage Deed of Trust",
+      "ReRunClassifier": false
+    }
+  },
+  {
+    "Type": "DocumentClassifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IndustryCategoryName": "County_Certificate of Death",
+      "ReRunClassifier": true
+    }
+  },
+  {
+    "Type": "DocumentClassifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IndustryCategoryName": "County Document",
+      "ReRunClassifier": true
+    }
+  },
+  {
+    "Type": "DocumentClassifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IndustryCategoryName": "Exact Sciences",
+      "ReRunClassifier": true
+    }
+  }
+]

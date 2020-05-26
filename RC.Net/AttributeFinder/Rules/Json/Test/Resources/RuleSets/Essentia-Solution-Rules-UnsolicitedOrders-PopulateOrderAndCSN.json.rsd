@@ -1,0 +1,325 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "19.2.0.34",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Page",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "NewCSN": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Data query",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "DataQueryRuleObject",
+              "Object": {
+                "DataConnectionString": "",
+                "DataProviderName": "",
+                "DataSourceName": "",
+                "OpenSqlCompactReadOnly": false,
+                "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'NewCSN'\r\n\r\nSELECT [Value] FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\n</SQL>",
+                "UseFAMDBConnection": true,
+                "UseSpecifiedDBConnection": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "NewOrderNumber": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Data query",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "DataQueryRuleObject",
+              "Object": {
+                "DataConnectionString": "",
+                "DataProviderName": "",
+                "DataSourceName": "",
+                "OpenSqlCompactReadOnly": false,
+                "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'NewOrderNumber'\r\n\r\nDECLARE @orderID INT\r\nSELECT @orderID = [Value] FROM [FileMetadataFieldValue] \r\nWHERE [FileID] = @fileID \r\nAND [MetadataFieldID] = @fieldID\r\n\r\nINSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID], [CollectionDate])\r\nVALUES (@orderID, (SELECT CAST([ID] as VARCHAR(MAX)) FROM [FAMFile] WHERE [FileName] = <SourceDocName/>), NULL)\r\n\r\nSELECT @orderID\r\n</SQL>",
+                "UseFAMDBConnection": true,
+                "UseSpecifiedDBConnection": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Now move up the existing attributes<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "_/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "EMROrderInfo/CreateOrder value to 'No'<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "EMROrderInfo/CreateOrder",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "No",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Move NewCSN under EMREncounterInfo/Encounter/CSN<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*/EMREncounterInfo/Encounter/CSN",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "NewCSN",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "/*/NewCSN",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": false
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Modify EMREncounterInfo/Encounter/CSN<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "EMREncounterInfo/Encounter/CSN",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%NewCSN%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Move NewOrderNumber under EMROrderInfo/Order/OrderNumber<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*/EMROrderInfo/Order/OrderNumber",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "NewOrderNumber",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "/*/NewOrderNumber",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": false
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Modify EMROrderInfo/Order/OrderNumber<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "EMROrderInfo/Order/OrderNumber",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%NewOrderNumber%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "NewCSN|NewOrderNumber|*/*/*/NewCSN|*/*/*/NewOrderNumber"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

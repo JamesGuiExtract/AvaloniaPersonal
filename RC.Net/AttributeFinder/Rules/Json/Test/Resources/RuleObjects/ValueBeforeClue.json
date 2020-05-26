@@ -1,0 +1,368 @@
+[
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "CIRCUIT\\s*COURT",
+        "CLERK\\s*OF\\s*THE\\s*CIRCUIT"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": true,
+      "RefiningType": "UptoXLines",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 5,
+      "IncludeClueLine": false,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "CITY"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": false,
+      "RefiningType": "UptoXLines",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 2,
+      "IncludeClueLine": false,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "(,|\\.|:|\\()?\\s*Attorn(e|c)y(\\s|[^'s])"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": true,
+      "RefiningType": "UptoXWords",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 0,
+      "IncludeClueLine": true,
+      "NumOfWords": 3,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": true,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "\\s*,?\\s*Attorn(c|e)y(-|\\s*)at(-|\\s*)Law"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": true,
+      "RefiningType": "ClueLine",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 0,
+      "IncludeClueLine": true,
+      "NumOfWords": 5,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "\\ba\\smarried\\sman\\b"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": true,
+      "RefiningType": "NoRefiningType",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 0,
+      "IncludeClueLine": true,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "\\b(as|a.|.s)[\\s\\S]{0,2}((the|th.|.he)[\\s\\S]{0,3})?((duly|dul.|d.ly|.uly)[\\s\\S]{0,3}(appointed|app.{0,3}ted|.{0,4}inted)[\\s\\S]{0,3})(trustee|tr.{1,3}ee)"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": true,
+      "RefiningType": "ClueToString",
+      "ClueToString": "\\bon\\b|\\r\\n\\r\\n|\\b(that|th.t)\\b",
+      "ClueToStringAsRegExpr": true,
+      "NumOfLines": 0,
+      "IncludeClueLine": true,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "\\((herein,\\sthe)?.?(landlord|land.{0,4}|.{0,4}lord).?\\)",
+        "\\((herein,\\sthe)?.?(lender|lend.{0,3}|.{0,2}nder).?\\)",
+        "\\((herein,\\sthe)?.?(owner|own.{0,2}|.wner).?\\)",
+        "\\((herein,\\sthe)?.?(tenant|tena.{0,2}|.{0,3}nant).?\\)",
+        "\\(.?bank.?\\)"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": true,
+      "RefiningType": "ClueToString",
+      "ClueToString": "(among|by|and|between|\\),)",
+      "ClueToStringAsRegExpr": true,
+      "NumOfLines": 0,
+      "IncludeClueLine": true,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "TITLE\\s*INSURANCE,?\\s*APPLICATION"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": true,
+      "RefiningType": "UptoXLines",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 1,
+      "IncludeClueLine": false,
+      "NumOfWords": 5,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": true,
+      "StopChars": "\\d"
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "\\r\\n\\r\\nJUDGMENT\\sDEBTOR"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": true,
+      "RefiningType": "UptoXWords",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 0,
+      "IncludeClueLine": true,
+      "NumOfWords": 1,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "^City\\s*Registrar(?=\\r?$)"
+      ],
+      "IsCaseSensitive": true,
+      "ClueAsRegExpr": true,
+      "RefiningType": "UptoXLines",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 6,
+      "IncludeClueLine": false,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "2nd Mortgagee insurance: $ n/a (loan amount)."
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": false,
+      "RefiningType": "ClueToString",
+      "ClueToString": "^ (loan amount).",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 0,
+      "IncludeClueLine": true,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "a) Insured:",
+        "a) Lender:",
+        "b) Loan is,"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": false,
+      "RefiningType": "ClueToString",
+      "ClueToString": "b) loan is:",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 0,
+      "IncludeClueLine": true,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "b) I_can is: Permanent"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": false,
+      "RefiningType": "UptoXLines",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 1,
+      "IncludeClueLine": false,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "MINNESOTA\\s*-\\s*MORTGAGE"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": true,
+      "RefiningType": "UptoXLines",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 1,
+      "IncludeClueLine": false,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "hereby[\\s\\S]{0,3}gives[\\s\\S]{0,3}notice"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": true,
+      "RefiningType": "ClueToString",
+      "ClueToString": "(the)",
+      "ClueToStringAsRegExpr": true,
+      "NumOfLines": 0,
+      "IncludeClueLine": true,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "\\bTAX\\b.{1,5}D",
+        "^SS\\.\\s*OR\\s*",
+        "^SS\\s+"
+      ],
+      "IsCaseSensitive": true,
+      "ClueAsRegExpr": true,
+      "RefiningType": "UptoXLines",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 1,
+      "IncludeClueLine": false,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  },
+  {
+    "Type": "ValueBeforeClue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Clues": [
+        "(\"Lender\")"
+      ],
+      "IsCaseSensitive": false,
+      "ClueAsRegExpr": false,
+      "RefiningType": "UptoXLines",
+      "ClueToString": "",
+      "ClueToStringAsRegExpr": false,
+      "NumOfLines": 2,
+      "IncludeClueLine": true,
+      "NumOfWords": 0,
+      "Punctuations": " \t\n\r",
+      "StopAtNewLine": false,
+      "StopChars": ""
+    }
+  }
+]

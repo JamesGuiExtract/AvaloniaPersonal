@@ -1,0 +1,107 @@
+[
+  {
+    "Type": "DoubleInputValidator",
+    "Description": "Default<Double>",
+    "Enabled": true,
+    "Object": {
+      "HasMin": false,
+      "Min": -1.7976931348623157E+308,
+      "HasMax": false,
+      "Max": 1.7976931348623157E+308,
+      "ZeroAllowed": true,
+      "NegativeAllowed": true,
+      "IncludeMinInRange": true,
+      "IncludeMaxInRange": true
+    }
+  },
+  {
+    "Type": "DoubleInputValidator",
+    "Description": "No zero<Double>",
+    "Enabled": true,
+    "Object": {
+      "HasMin": false,
+      "Min": -1.7976931348623157E+308,
+      "HasMax": false,
+      "Max": 1.7976931348623157E+308,
+      "ZeroAllowed": false,
+      "NegativeAllowed": true,
+      "IncludeMinInRange": true,
+      "IncludeMaxInRange": true
+    }
+  },
+  {
+    "Type": "DoubleInputValidator",
+    "Description": "No negative<Double>",
+    "Enabled": true,
+    "Object": {
+      "HasMin": false,
+      "Min": -1.7976931348623157E+308,
+      "HasMax": false,
+      "Max": 1.7976931348623157E+308,
+      "ZeroAllowed": true,
+      "NegativeAllowed": false,
+      "IncludeMinInRange": true,
+      "IncludeMaxInRange": true
+    }
+  },
+  {
+    "Type": "DoubleInputValidator",
+    "Description": "Has min inclusive<Double>",
+    "Enabled": true,
+    "Object": {
+      "HasMin": true,
+      "Min": -20.0,
+      "HasMax": false,
+      "Max": 1.7976931348623157E+308,
+      "ZeroAllowed": true,
+      "NegativeAllowed": true,
+      "IncludeMinInRange": true,
+      "IncludeMaxInRange": true
+    }
+  },
+  {
+    "Type": "DoubleInputValidator",
+    "Description": "Has min exclusive<Double>",
+    "Enabled": true,
+    "Object": {
+      "HasMin": true,
+      "Min": -20.0,
+      "HasMax": false,
+      "Max": 1.7976931348623157E+308,
+      "ZeroAllowed": true,
+      "NegativeAllowed": true,
+      "IncludeMinInRange": false,
+      "IncludeMaxInRange": true
+    }
+  },
+  {
+    "Type": "DoubleInputValidator",
+    "Description": "Has max exclusive<Double>",
+    "Enabled": true,
+    "Object": {
+      "HasMin": false,
+      "Min": -1.7976931348623157E+308,
+      "HasMax": true,
+      "Max": 1.5,
+      "ZeroAllowed": true,
+      "NegativeAllowed": true,
+      "IncludeMinInRange": true,
+      "IncludeMaxInRange": false
+    }
+  },
+  {
+    "Type": "DoubleInputValidator",
+    "Description": "Has max inclusive<Double>",
+    "Enabled": true,
+    "Object": {
+      "HasMin": false,
+      "Min": -1.7976931348623157E+308,
+      "HasMax": true,
+      "Max": 1.5,
+      "ZeroAllowed": true,
+      "NegativeAllowed": true,
+      "IncludeMinInRange": true,
+      "IncludeMaxInRange": true
+    }
+  }
+]

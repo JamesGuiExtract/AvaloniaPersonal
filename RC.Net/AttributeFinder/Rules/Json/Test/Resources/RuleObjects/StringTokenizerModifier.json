@@ -1,0 +1,62 @@
+[
+  {
+    "Type": "StringTokenizerModifier",
+    "Description": "<String tokenizer>",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ";",
+      "ResultExpression": "%1",
+      "TextInBetween": ", ",
+      "NumberOfTokensType": "Any",
+      "NumberOfTokensRequired": -1
+    }
+  },
+  {
+    "Type": "StringTokenizerModifier",
+    "Description": "<String tokenizer>",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ",",
+      "ResultExpression": "%1",
+      "TextInBetween": ", ",
+      "NumberOfTokensType": "Any",
+      "NumberOfTokensRequired": -1
+    }
+  },
+  {
+    "Type": "StringTokenizerModifier",
+    "Description": "<String tokenizer>",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ",",
+      "ResultExpression": "%3",
+      "TextInBetween": ", ",
+      "NumberOfTokensType": "Equal",
+      "NumberOfTokensRequired": 3
+    }
+  },
+  {
+    "Type": "StringTokenizerModifier",
+    "Description": "<String tokenizer>",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ",",
+      "ResultExpression": "%2",
+      "TextInBetween": ", ",
+      "NumberOfTokensType": "GreaterThan",
+      "NumberOfTokensRequired": 1
+    }
+  },
+  {
+    "Type": "StringTokenizerModifier",
+    "Description": "<String tokenizer>",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ",",
+      "ResultExpression": "%2",
+      "TextInBetween": ", ",
+      "NumberOfTokensType": "GreaterThanOrEqual",
+      "NumberOfTokensRequired": 2
+    }
+  }
+]

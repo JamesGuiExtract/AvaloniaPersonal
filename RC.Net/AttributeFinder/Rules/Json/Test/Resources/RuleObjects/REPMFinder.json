@@ -1,0 +1,2376 @@
+[
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\Grantor\\GrantorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "GrantorSPM",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\main.rsd_GrantorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "DeedgorREPM",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\DefendantREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "rule",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnAllMatches",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\Tract_REPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\..\\range.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\PreviousTrusteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\TrusteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\TrustorFindFirstREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnAllMatches",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\grantdeed.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GranteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Grantee",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\JudgmentDebtorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\JudgmentCreditorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\CommissioningEntityREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\MaxObligation\\MaxObligation.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\MortgagorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Mortgagor",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Rule",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "Count<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\getMatchedTests.rsd.etf",
+          "ScoreExpression": "(\r\n#matched = $Matched.count;\r\n#skipped = {$Skipped.count(), 1}.min();\r\n#fuzzy = $Fuzzy.count();\r\n#adjust = (#fuzzy == 0 ? #matched + #skipped : #matched);\r\n(#matched == 0 ? 1 : 2 + #adjust + #matched - #fuzzy - #skipped)\r\n)"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 1,
+      "ReturnMatchType": "ReturnBestMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\AdmittingREPM.dat.etf",
+      "IgnoreInvalidTags": false,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Admitting",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\LenderREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\ServiceFeeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "REPM_Rule",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\Principal\\PrincipalREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "PrincipalRule",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalTrustorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnBestMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\VendorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Vendor",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\Grantee_REPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\TrustorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\LCGranteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalTrustorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "TRUSTOR",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\regexRules.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 7,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\TestatorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Testator",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\..\\units_REPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GranteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\DebtorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GranteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "asdf",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\Last ResortREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\PlaintiffREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "PLAINTIFF",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GrantorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Grantee",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalBeneficiaryREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "numbah",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnBestMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GranteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Grantee",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnAllMatches",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\signatureArea.rsd_1REPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\TrustorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\SignatureAreaREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\CommissioningEntityREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\TrusteeHCREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\DefendantREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Defendant",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\trim_REPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Rule",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\JudgmentAmountREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "JMT_AMT",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\BeneficiaryREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "BENEFICIARY",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalTrusteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "OriginalTrustee",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\CommissioningEntityREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\Grantor_backupREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "GRANTORBU",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\DecedentREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Grantee",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GrantorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "GOR",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\subdivisionRegex.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "SubD",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 1,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 2,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\DefendantREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "DEFENDANT",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\PrimaryCreditorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "R",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\Assignment of MortgageREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\ReusableComponents\\Date\\ScoreDate.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnBestMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalMortgagorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "OM",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GrantorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Grantor",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\valueREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Result",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\rules.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\WarrantyDeed\\Grantee_REPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\BackupRulesREPM.dat.etf",
+      "IgnoreInvalidTags": false,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "BackupRules",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnAllMatches",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\PrincipalREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GrantorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GrantorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Grantor",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnBestMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\AgentREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Mortgagee",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalPlaintiffREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "OriginalPlaintiff",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalTrusteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\REPM.dat.etf",
+      "IgnoreInvalidTags": false,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GranteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnBestMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\ReportForREPM.dat.etf",
+      "IgnoreInvalidTags": false,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "ReportFor",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\PlaintiffREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "PLAINTIFF",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\AffiantREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\signatureAreaREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OtherMortgages\\Mortgagor_REPM_WIafterTitle.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "MortgagorWI",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\RecordedDate.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\BeneficiaryREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "REPM",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\LenderREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "rule",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\Consideration\\Consideration.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\SecondaryCreditorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "SC",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\FormerTrusteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\SubTrust&RecREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GranteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Rule",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\CountyREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\main.rsd_2REPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\TrustorBackupREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\Originator\\OriginatorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "PrincipalRule",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnAllMatches",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\PrimaryCreditorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "PC",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OtherDeedsOfTrust\\TrustorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "RuleWorked",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 6,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GranteeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "GEE",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GrantorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Grantor",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 5,
+      "OnlyCreateOneAttributePerGroup": false
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalMortgagorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Rule",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalPlaintiffREPM.dat.etf",
+      "IgnoreInvalidTags": false,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "OriginalPlaintiff",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\rulesREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "R",
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "MinScoreToConsiderAsMatch": 0,
+      "ReturnMatchType": "ReturnFirstMatch",
+      "MinFirstToConsiderAsMatch": 0,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GrantorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": false,
+      "RuleWorkedName": "",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\Servicer\\ServicerREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "ServicerRule",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalBeneficiaryREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "BENEFICIARY",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OriginalMortgageeREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "OM",
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\OtherMortgages\\Mortgagee_backupREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Mortgagee",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\GrantorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "GRANTOR",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  },
+  {
+    "Type": "REPMFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RulesFileName": "<RSDFileDir>\\TrustorREPM.dat.etf",
+      "IgnoreInvalidTags": true,
+      "CaseSensitive": false,
+      "StoreRuleWorked": true,
+      "RuleWorkedName": "Trustor",
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "MinScoreToConsiderAsMatch": 5,
+      "ReturnMatchType": "ReturnFirstOrBest",
+      "MinFirstToConsiderAsMatch": 10,
+      "OnlyCreateOneAttributePerGroup": true
+    }
+  }
+]

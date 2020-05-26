@@ -1,0 +1,13 @@
+[
+  {
+    "Type": "NumericSequencer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ExpandSequence": true,
+      "Sort": true,
+      "AscendingSortOrder": true,
+      "EliminateDuplicates": true
+    }
+  }
+]

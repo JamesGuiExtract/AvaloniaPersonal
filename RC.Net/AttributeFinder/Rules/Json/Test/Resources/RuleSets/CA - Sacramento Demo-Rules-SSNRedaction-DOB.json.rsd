@@ -1,0 +1,533 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 3,
+        "Name": "FLEX Index - Redaction (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "Latest",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocumentClassifier",
+      "Description": "<Document classifier>",
+      "Enabled": true,
+      "Object": {
+        "IndustryCategoryName": "County Document",
+        "ReRunClassifier": true
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Clues": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "ComponentData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "AdvancedReplaceString",
+              "Description": "Remove \"do by\"<Advanced replace string>",
+              "Enabled": true,
+              "Object": {
+                "StrToBeReplaced": "do\\s?by",
+                "AsRegularExpression": true,
+                "IsCaseSensitive": false,
+                "Replacement": "",
+                "ReplacementOccurrenceType": "All",
+                "SpecifiedOccurrence": 0
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "DOB_Clues"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Create value",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<DocType>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "HCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "ComponentData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "DOB_HCData"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "MCData": {
+        "AttributeRules": [
+          {
+            "Enabled": false,
+            "Description": "*off* (redundant https://extract.atlassian.net/browse/ISSUE-14775) Box Finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "BoxFinder",
+              "Object": {
+                "AttributeText": "000-00-0000",
+                "BoxHeightMax": null,
+                "BoxHeightMin": null,
+                "BoxWidthMax": null,
+                "BoxWidthMin": null,
+                "ClueLocation": "SameBox",
+                "Clues": [
+                  "DATE\\s?OF\\s?BIRTH"
+                ],
+                "CluesAreCaseSensitive": false,
+                "CluesAreRegularExpressions": true,
+                "ExcludeClueArea": false,
+                "FindType": "Text",
+                "FirstBoxOnly": false,
+                "IncludeClueText": false,
+                "IncludeLines": false,
+                "NumFirstPages": 0,
+                "NumLastPages": 0,
+                "PageSelectionMode": "AllPages",
+                "SpecifiedPages": ""
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "RegExprRule",
+                  "Description": "Grab Date<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "(?:\r\n\r\n\t(?#\r\n\t#--------------------------------------------\r\n\t# Long format like \"JULY 3RD, 2008\"\r\n\t#--------------------------------------------\r\n\t)\r\n\r\n\t(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[\\s\\S]{0,15}\\d{1,2}[\\s\\S]{0,5}(?:\\d{4})|\r\n\t\r\n\t(?#\r\n\t#--------------------------------------------\r\n\t# Short format like \"7/03/2008\" or \"7-03-08\"\r\n\t#--------------------------------------------\r\n\t)\r\n\r\n\t\\d{1,2}\\s?[\\\\\\/-]\\s?\\d{1,2}\\s?[\\\\\\/-]\\s?(?:\\d{4}|\\d{2})\r\n\t\r\n)",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": true
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Notice of Admission",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "FindingRuleCondition",
+                  "Object": {
+                    "AFRule": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": false,
+                        "RegExpFileName": "",
+                        "Pattern": "(Compre|hensive)[\\s\\S]{0,21}(Subst|stance)[\\s\\S]{0,11}(Abu|buse)[\\s\\S]{0,15}(Serv|vices)",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": false,
+                        "CreateSubAttributesFromNamedMatches": false,
+                        "OnlyCreateOneSubAttributePerGroup": true
+                      }
+                    }
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "LocateImageRegion",
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "ImageRegion",
+                    "ImageRegionText": "000-00-0000",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Character",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "SSN"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 23.0,
+                      "ExpandUnits": "ClueCharacters"
+                    },
+                    "Top": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Top",
+                      "ExpandDirection": "ExpandUp",
+                      "ExpandBy": 1.0,
+                      "ExpandUnits": "ClueLines"
+                    },
+                    "Right": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 43.0,
+                      "ExpandUnits": "ClueCharacters"
+                    },
+                    "Bottom": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 1.0,
+                      "ExpandUnits": "ClueLines"
+                    }
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove unneed clues<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "SpatialProximityAS",
+                "Object": {
+                  "TargetQuery": "Clues",
+                  "TargetsMustContainReferences": false,
+                  "RequireCompleteInclusion": false,
+                  "ReferenceQuery": "HCData",
+                  "Left": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandLeft",
+                    "ExpandBy": 2.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Top": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandUp",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Right": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandRight",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Bottom": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Bottom",
+                    "ExpandDirection": "ExpandDown",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "CompareLinesSeparately": true,
+                  "IncludeDebugAttributes": false
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "SpatialProximityAS",
+                "Object": {
+                  "TargetQuery": "Clues",
+                  "TargetsMustContainReferences": false,
+                  "RequireCompleteInclusion": false,
+                  "ReferenceQuery": "HCData",
+                  "Left": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandLeft",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Top": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandUp",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Right": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Right",
+                    "ExpandDirection": "ExpandRight",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Bottom": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Bottom",
+                    "ExpandDirection": "ExpandDown",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "CompareLinesSeparately": true,
+                  "IncludeDebugAttributes": false
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Set type to DOB<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData|MCData|LCData|Clues",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "DOB",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.DOB.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

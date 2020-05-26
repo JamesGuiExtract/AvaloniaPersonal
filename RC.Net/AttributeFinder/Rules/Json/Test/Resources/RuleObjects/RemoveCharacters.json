@@ -1,0 +1,1302 @@
+[
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "\r\n*x",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "\r\n-:",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n$",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \r\n:",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "\r\n\\r",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ":,;°",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \r\n:#",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \r\n-",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \r\n",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "-(",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n,.'\";:",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n:,;.",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "-=+_,:;'\"",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "1234567890",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "~",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n:;,.",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \r\n",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n-",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",.",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "\t\r\n_-;:'\",/?\\",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n,$()abcdefghijklmnopqrstuvwxyz*",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "\r\n",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n0abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n(",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "-.,",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " qwertyuiopasdfghjklzxcvbnm",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "~'",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ";:'\"{}[]()-,.1234567890_",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ".",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",.;:'\"",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",.",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \\r\\n",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",.-",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",-_(;:",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " )",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n-(",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n,.-",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n;/:,>.<>?'\"[{]}\\|-_=+",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n,:;",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " )(@",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n/",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n.,",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n.,/;:'\"[]{}\\",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "^",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n,;:",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "#",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "¦·°«»äâéüÇÞ¬¿",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n!`~,.<>/?;:'\"[{]}\\|*&^%$#@abcdefghijklmnopqrstuvwxyz",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " .,-",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " ,.",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "\r\n\\r",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " ,:;_-[]}{\\|/`~",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "[]()\\/?:;*&^%$#@!",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ";:'\"{}[]()-,1234567890_",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "Çüéâä«»¦æ",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "!.",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "s",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "\\",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "\t\r\n:",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n-.)",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\nABCDEFGHIJKLMNOPQRTUVWXYZ`~!@#$%^&*()_-+=[]{}\\|'\";:?><,./",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",.;:\"",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " -.",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n,.",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",-_(",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n,;:'\"`~",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "@",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \r\n:",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",.;:\"-",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "()",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n-",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " ",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "-,.'",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \r\n.-:',",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \r\n123456789",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "',.\":",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n$,.",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ",.()",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "\r\n\\r",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "|",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "$",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " ,.",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "'",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "1",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n,.$",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ".",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ";:'\"{}[]-,1234567890_",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " ,\\\"!:;",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ".,:;'\"`~",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "\r\n^",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " ",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": false,
+      "TrimLeading": true,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n-.'",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": "É",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": " \t\r\n=,;:'\"`~",
+      "IsCaseSensitive": false,
+      "RemoveAll": false,
+      "Consolidate": true,
+      "TrimLeading": true,
+      "TrimTrailing": true
+    }
+  },
+  {
+    "Type": "RemoveCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Characters": ".,'",
+      "IsCaseSensitive": false,
+      "RemoveAll": true,
+      "Consolidate": false,
+      "TrimLeading": false,
+      "TrimTrailing": false
+    }
+  }
+]

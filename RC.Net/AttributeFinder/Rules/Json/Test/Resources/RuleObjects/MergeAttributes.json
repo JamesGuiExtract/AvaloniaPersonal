@@ -1,0 +1,3060 @@
+[
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "WellOCRedPages|Clues",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 1.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "M",
+      "SpecifiedType": "_",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "MCData",
+      "SpecifiedType": "MyRules",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData@Address",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "HCData"
+      ],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "HCData"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/Left|ContentAbove",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 15.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "ContentLeft",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Highlight",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Highlight"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues@|Clues@SSN",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Clues"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "Clues",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Boxes/foundrepeat",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [
+        "number"
+      ],
+      "OverlapPercent": 80.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "Full_Name",
+      "SpecifiedType": "Name",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]+"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "MCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 20.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{27,}",
+        "[\\s\\S]{24,}",
+        "[\\s\\S]{21,}",
+        "[\\s\\S]{18,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]{12,}",
+        "[\\s\\S]{10,}",
+        "[\\s\\S]{8,}",
+        "[\\s\\S]{6,}",
+        "[\\s\\S]{4,}",
+        "[\\s\\S]{2,}"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Clues"
+      ],
+      "OverlapPercent": 90.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]*"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 5.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "MCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "MCData"
+      ],
+      "OverlapPercent": 60.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{45,}",
+        "[\\s\\S]{40,}",
+        "[\\s\\S]{35,}",
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{25,}",
+        "[\\s\\S]{20,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]{12,}",
+        "[\\s\\S]{11,}",
+        "[\\s\\S]{10,}",
+        "[\\s\\S]{9,}",
+        "[\\s\\S]{8,}",
+        "[\\s\\S]{7,}",
+        "[\\s\\S]{6,}",
+        "[\\s\\S]{5,}",
+        "[\\s\\S]{4,}",
+        "[\\s\\S]{3,}",
+        "[\\s\\S]{2,}",
+        "[\\s\\S]"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData@SSN|MCData@SSN|LCData@SSN",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Clues"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "(?s:.{5,})",
+        "(?s:.*)"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData"
+      ],
+      "OverlapPercent": 80.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "HCData",
+        "MCData"
+      ],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 80.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "SSN",
+        "TaxID",
+        "Taxpayer",
+        "DOB",
+        "DLN"
+      ],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "\\A[\\s\\S]*\\z"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "ContentAbove@SSN|ContentAboveLeft@SSN|ContentAboveRight@SSN",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 0.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "Content",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 20.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "M",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "MCData",
+      "SpecifiedType": "HCData",
+      "SpecifiedValue": "HCData",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "a2|b1",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 50.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "candidate",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData{nonewline}|MCData{nonewline}|LCData{nonewline}",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 10.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Content",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "Content",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 60.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "SSN",
+        "DOB",
+        "DLN",
+        "Bank",
+        "Account"
+      ],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{45,}",
+        "[\\s\\S]{40,}",
+        "[\\s\\S]{35,}",
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{25,}",
+        "[\\s\\S]{20,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]{12,}",
+        "[\\s\\S]{11,}",
+        "[\\s\\S]{10,}",
+        "[\\s\\S]{9,}",
+        "[\\s\\S]{8,}",
+        "[\\s\\S]{7,}",
+        "[\\s\\S]{6,}",
+        "[\\s\\S]{5,}",
+        "[\\s\\S]{4,}",
+        "[\\s\\S]{3,}",
+        "[\\s\\S]{2,}",
+        "[\\s\\S]"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData@Address",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 5.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "Address",
+      "SpecifiedValue": "Address",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 100.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "DLN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "First|Middle|Last|Suffix",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 0.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "Person",
+      "SpecifiedType": "",
+      "SpecifiedValue": "%First.Value%< %Middle.Value%> %Last.Value%<, %Suffix.Value%>",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 40.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 1.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "DOB",
+      "SpecifiedValue": "00-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "SSN",
+        "CCN",
+        "DLN",
+        "DOB",
+        "Account"
+      ],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData@SID|MCData@SID|LCData@SID|SID@NCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 50.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "M",
+      "SpecifiedType": "SID",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "Merged",
+      "SpecifiedType": "Currency",
+      "SpecifiedValue": "$0,000.00",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData@UniqueNumber|MCData@UniqueNumber|LCData@UniqueNumber|UniqueNumber@NCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 45.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "M",
+      "SpecifiedType": "UniqueNumber",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "MCData@DOB",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 90.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "DOB",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 60.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "SSN"
+      ],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": [
+        "[\\s\\S]{45,}",
+        "[\\s\\S]{40,}",
+        "[\\s\\S]{35,}",
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{25,}",
+        "[\\s\\S]{20,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]{12,}",
+        "[\\s\\S]{11,}",
+        "[\\s\\S]{10,}",
+        "[\\s\\S]{9,}",
+        "[\\s\\S]{8,}",
+        "[\\s\\S]{7,}",
+        "[\\s\\S]{6,}",
+        "[\\s\\S]{5,}",
+        "[\\s\\S]{4,}",
+        "[\\s\\S]{3,}",
+        "[\\s\\S]{2,}",
+        "[\\s\\S]"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "LegalDescription",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 50.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "LegalDescription",
+      "SpecifiedType": "merged",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 80.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [
+        "SSN",
+        "MRN",
+        "Biometric",
+        "Certificate",
+        "Name",
+        "Insurance",
+        "URL",
+        "Email",
+        "VIN",
+        "Phone",
+        "Address"
+      ],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData{nonewline}|MCData{nonewline}|LCData{nonewline}",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 10.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 7.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Good",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 1.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "Good",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": [
+        "item"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "\\A(?!QRCode)[\\s\\S]+",
+        "[\\s\\S]+"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData@SSN|MCData@SSN|LCData@SSN",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 5.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [
+        "SSN",
+        "Other"
+      ],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@Flag",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 10.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "Flag",
+      "SpecifiedValue": "Possible SSN",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 10.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData{hasnewline}|MCData{hasnewline}|LCData{hasnewline}",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 80.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 80.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "MICR",
+        "CCN",
+        "SSN",
+        "DOB"
+      ],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": [
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{25,}",
+        "[\\s\\S]{24}",
+        "[\\s\\S]{23}",
+        "[\\s\\S]{22}",
+        "[\\s\\S]{21}",
+        "[\\s\\S]{20}",
+        "[\\s\\S]{19}",
+        "[\\s\\S]{18}",
+        "[\\s\\S]{17}",
+        "[\\s\\S]{16}",
+        "[\\s\\S]{15}",
+        "[\\s\\S]{14}",
+        "[\\s\\S]{13}",
+        "[\\s\\S]{12}",
+        "[\\s\\S]{11}",
+        "[\\s\\S]{10}",
+        "[\\s\\S]{9}",
+        "[\\s\\S]{8}",
+        "[\\s\\S]{7}",
+        "[\\s\\S]{6}",
+        "[\\s\\S]{5}",
+        "[\\s\\S]{4}",
+        "[\\s\\S]{3}",
+        "[\\s\\S]{2}",
+        "[\\s\\S]"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData@SSN|MCData@SSN|LCData@SSN|HCData@Other|MCData@Other|LCData@Other",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 5.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 10.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "_",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000000000000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "NCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "NCData"
+      ],
+      "OverlapPercent": 50.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "NCData",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Clues"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "SSN",
+        "TaxID"
+      ],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{29}",
+        "[\\s\\S]{28}",
+        "[\\s\\S]{27}",
+        "[\\s\\S]{26}",
+        "[\\s\\S]{25}",
+        "[\\s\\S]{24}",
+        "[\\s\\S]{23}",
+        "[\\s\\S]{22}",
+        "[\\s\\S]{21}",
+        "[\\s\\S]{20}",
+        "[\\s\\S]{19}",
+        "[\\s\\S]{18}",
+        "[\\s\\S]{17}",
+        "[\\s\\S]{16}",
+        "[\\s\\S]{15}",
+        "[\\s\\S]{14}",
+        "[\\s\\S]{13}",
+        "[\\s\\S]{12}",
+        "[\\s\\S]{11}",
+        "[\\s\\S]{10}",
+        "[\\s\\S]{9}",
+        "[\\s\\S]{8}",
+        "[\\s\\S]{7}",
+        "[\\s\\S]{6}",
+        "[\\s\\S]{5}",
+        "[\\s\\S]{4}",
+        "[\\s\\S]{3}",
+        "[\\s\\S]{2}",
+        "[\\s\\S]"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "PageClue",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "PageClue"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@MICR|NCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "NCData",
+        "HCData",
+        "MCData"
+      ],
+      "OverlapPercent": 25.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "MICR",
+      "SpecifiedValue": "000000000000000000000000000000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "",
+      "SpecifiedValue": "Clues",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 7.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 0.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "_",
+      "SpecifiedType": "",
+      "SpecifiedValue": "0000000000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "_",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 20.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "SecondaryClue"
+      ],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\S\\s]+"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 70.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{27,}",
+        "[\\s\\S]{24,}",
+        "[\\s\\S]{21,}",
+        "[\\s\\S]{18,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]{12,}",
+        "[\\s\\S]{10,}",
+        "[\\s\\S]{8,}",
+        "[\\s\\S]{6,}",
+        "[\\s\\S]{4,}",
+        "[\\s\\S]{2,}"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 5.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData{nonewline}|MCData{nonewline}|LCData{nonewline}",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 10.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Candidate",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 20.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "Candidate",
+      "SpecifiedType": "",
+      "SpecifiedValue": " ",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues@Bank",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 60.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "Bank",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{45,}",
+        "[\\s\\S]{40,}",
+        "[\\s\\S]{35,}",
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{25,}",
+        "[\\s\\S]{20,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]{12,}",
+        "[\\s\\S]{11,}",
+        "[\\s\\S]{10,}",
+        "[\\s\\S]{9,}",
+        "[\\s\\S]{8,}",
+        "[\\s\\S]{7,}",
+        "[\\s\\S]{6,}",
+        "[\\s\\S]{5,}",
+        "[\\s\\S]{4,}",
+        "[\\s\\S]{3,}",
+        "[\\s\\S]{2,}",
+        "[\\s\\S]"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Clues"
+      ],
+      "OverlapPercent": 60.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{45,}",
+        "[\\s\\S]{40,}",
+        "[\\s\\S]{35,}",
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{25,}",
+        "[\\s\\S]{20,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]{12,}",
+        "[\\s\\S]{11,}",
+        "[\\s\\S]{10,}",
+        "[\\s\\S]{9,}",
+        "[\\s\\S]{8,}",
+        "[\\s\\S]{7,}",
+        "[\\s\\S]{6,}",
+        "[\\s\\S]{5,}",
+        "[\\s\\S]{4,}",
+        "[\\s\\S]{3,}",
+        "[\\s\\S]{2,}",
+        "[\\s\\S]"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "_",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "[\\s\\S]+"
+      ],
+      "OverlapPercent": 1.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": true,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 80.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "SSN",
+        "CCN",
+        "DLN",
+        "Bank",
+        "Account"
+      ],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "0+"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@stamp",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 0.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "NCData",
+      "SpecifiedType": "",
+      "SpecifiedValue": "OFFICIAL RECORDS",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues@SSN|Clues@",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Clues"
+      ],
+      "OverlapPercent": 25.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@School",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData"
+      ],
+      "OverlapPercent": 10.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "School",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "HCData",
+        "MCData"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/*",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "SSN"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData"
+      ],
+      "OverlapPercent": 5.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 10.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "CluesCCN|CluesBank|CluesAccount",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "CluesCCN",
+        "CluesBank",
+        "CluesAccount"
+      ],
+      "OverlapPercent": 20.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 5.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "Bank",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 80.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "^(?!copy)[\\s\\S]+",
+        "[\\s\\S]+"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData;MCData:LCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "MCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 60.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "MCData",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "SSN",
+        "TaxID",
+        "MinorName",
+        "DOB",
+        "DLN",
+        "Bank",
+        "CCN",
+        "Account",
+        "Address",
+        "Passport",
+        "StateID"
+      ],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{45,}",
+        "[\\s\\S]{40,}",
+        "[\\s\\S]{35,}",
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{25,}",
+        "[\\s\\S]{20,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]{12,}",
+        "[\\s\\S]{11,}",
+        "[\\s\\S]{10,}",
+        "[\\s\\S]{9,}",
+        "[\\s\\S]{8,}",
+        "[\\s\\S]{7,}",
+        "[\\s\\S]{6,}",
+        "[\\s\\S]{5,}",
+        "[\\s\\S]{4,}",
+        "[\\s\\S]{3,}",
+        "[\\s\\S]{2,}",
+        "[\\s\\S]"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 100.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "DLN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "HCData"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData@Bank|HCData@CCN|MCData@Bank|MCData@CCN|LCData@Bank|LCData@CCN|Clues@Bank|Clues@CCN",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData",
+        "Clues"
+      ],
+      "OverlapPercent": 60.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "Bank",
+        "CCN"
+      ],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": [
+        "^(?!copy)[\\s\\S]+",
+        "[\\s\\S]+"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@Loan|LCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "Loan",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@newline",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 100.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "newline",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 0.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "M",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Adjust|Tax|Balance|PaymentCheck|WriteOff",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Adjust",
+        "Tax",
+        "Balance",
+        "PaymentCheck",
+        "WriteOff"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "Adjust",
+        "Balance",
+        "Tax"
+      ],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@Loan",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "Loan",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "ParcelNumber",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "ParcelNumber",
+      "SpecifiedType": "Merged",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "item",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 1.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "item",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 0.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "Page",
+      "SpecifiedType": "",
+      "SpecifiedValue": " ",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 10.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "MCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "MCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "MCData"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "item",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "item",
+      "SpecifiedType": "",
+      "SpecifiedValue": "item",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 1.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "_",
+      "SpecifiedType": "",
+      "SpecifiedValue": "00-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 100.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues@TaxID",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 60.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "Clues",
+      "SpecifiedType": "TaxID",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{45,}",
+        "[\\s\\S]{40,}",
+        "[\\s\\S]{35,}",
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{25,}",
+        "[\\s\\S]{20,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]{12,}",
+        "[\\s\\S]{11,}",
+        "[\\s\\S]{10,}",
+        "[\\s\\S]{9,}",
+        "[\\s\\S]{8,}",
+        "[\\s\\S]{7,}",
+        "[\\s\\S]{6,}",
+        "[\\s\\S]{5,}",
+        "[\\s\\S]{4,}",
+        "[\\s\\S]{3,}",
+        "[\\s\\S]{2,}",
+        "[\\s\\S]"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 5.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "LCData",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 100.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "LCData",
+      "SpecifiedType": "DLN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "LCData"
+      ],
+      "OverlapPercent": 5.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData@DOB",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "SpecifyField",
+      "NameMergePriority": [],
+      "OverlapPercent": 90.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "DOB",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData@SSN|MCData@SSN",
+      "CreateMergedRegion": true,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": true,
+      "PreserveType": false,
+      "SpecifiedName": "HCData",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "HCData",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "SpecifyField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SpecifyField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 40.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{30,}",
+        "[\\s\\S]{27,}",
+        "[\\s\\S]{24,}",
+        "[\\s\\S]{21,}",
+        "[\\s\\S]{18,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]{12,}",
+        "[\\s\\S]{10,}",
+        "[\\s\\S]{8,}",
+        "[\\s\\S]{6,}",
+        "[\\s\\S]{4,}",
+        "[\\s\\S]{2,}"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Clues"
+      ],
+      "OverlapPercent": 75.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "SSN",
+        "TaxID",
+        "DLN",
+        "StateID",
+        "Account",
+        "Password",
+        "PIN"
+      ],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Clues"
+      ],
+      "OverlapPercent": 100.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": false,
+      "TypeMergeMode": "CombineField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "HCData",
+        "MCData",
+        "LCData"
+      ],
+      "OverlapPercent": 80.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": true,
+      "SpecifiedName": "",
+      "SpecifiedType": "",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [
+        "CCN",
+        "SSN",
+        "DLN",
+        "Bank",
+        "Account"
+      ],
+      "ValueMergeMode": "PreserveField",
+      "ValueMergePriority": [
+        "[\\s\\S]{25,}",
+        "[\\s\\S]{15,}",
+        "[\\s\\S]+"
+      ]
+    }
+  },
+  {
+    "Type": "MergeAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues",
+      "CreateMergedRegion": false,
+      "NameMergeMode": "PreserveField",
+      "NameMergePriority": [
+        "Clues"
+      ],
+      "OverlapPercent": 30.0,
+      "PreserveAsSubAttributes": false,
+      "PreserveType": false,
+      "SpecifiedName": "",
+      "SpecifiedType": "SSN",
+      "SpecifiedValue": "000-00-0000",
+      "TreatNameListAsRegex": false,
+      "TreatTypeListAsRegex": false,
+      "TreatValueListAsRegex": true,
+      "TypeFromName": true,
+      "TypeMergeMode": "SelectField",
+      "TypeMergePriority": [],
+      "ValueMergeMode": "SelectField",
+      "ValueMergePriority": []
+    }
+  }
+]

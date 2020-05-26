@@ -1,0 +1,443 @@
+[
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\..\\dateIsUnder18.rsd.etf",
+      "ScoreExpression": "($_.count > 0 ? 1 : 0)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L[0] == '<' ? (float.Parse($V[0])-0.01 < float.Parse($H[0]) ? 1 : 0) :\r\n  ($H[0] == '>' ? (float.Parse($V[0])+0.01 > float.Parse($L[0]) ? 1 : 0) :\r\n    (float.Parse($V[0])+0.01 > float.Parse($L[0]) and float.Parse($V[0])-0.01 < float.Parse($H[0]) ? 1 : 0)\r\n  )\r\n)\r\n"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($H[0] == '>' ? 0 :\r\n  (#H = float.Parse($H[0]);\r\n   #V = float.Parse($V[0]);\r\n   (#V > #H and (#H == 0 or #V >= 100 and #V < #H * 50 or #V < 100 and #V < #H * 5) ? 1 : 0)\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\getSubattributes.rsd.etf",
+      "ScoreExpression": "#Confidence.sum()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\YN.rsd.etf",
+      "ScoreExpression": "#Y.sum() > #N.sum() and\r\n#Y.sum() > 12"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\ReusableComponents\\MLFeatureGen\\LocationFinder\\PercentLocationFinder.rsd.etf",
+      "ScoreExpression": "(#Center_X.max() > 50) and (#Center_Y.max() < #Center_X.max()) and (100 - #Center_X.max() < #Center_Y.max()) ? 1 : 0"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($V.count() == 0 or !(float.TryParse($V[0],null)) ? 0 :\r\n  ($L.count() == 0 ? 0 :\r\n    ($H.count() == 0 ? 0 :\r\n      (!(float.TryParse($H[0],null) or float.TryParse($L[0],null)) ? 0 : 1))))"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\RecipientTrimming\\getAndScorePrefix.rsd.etf",
+      "ScoreExpression": "#Suffix.sum() - #Prefix.sum()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\getSubattributes.rsd.etf",
+      "ScoreExpression": "#Confidence.average()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getColumnHeaderSurroundings.rsd.etf",
+      "ScoreExpression": "($Below.count() - $Left.count() * 10 > 0 and\r\n $Below.count() - $Right.count() * 10 > 0 ? 1:0)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($H[0] == '>' ? 0 :\r\n  (#H = float.Parse($H[0]);\r\n   #V = float.Parse($V[0]);\r\n   (#V > #H and (#H == 0 or #V >= 100 and #V < #H * 50 or #V < 100 and #V < #H * 5) ? 1 : 0)\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 1 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) <= float.Parse($L[0]) ? 1 : 0) : 1\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\id.rsd.etf",
+      "ScoreExpression": "($parts = $_[0].Split('|'.ToCharArray(), 2);\r\n ($parts.Length == 2 and $parts[0].Length > 0 ?\r\n    $parts[1].Length / $parts[0].Length : 0\r\n))"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\LabDE\\TestResults\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 1 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) <= float.Parse($L[0]) ? 1 : 0) : 1\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\ReusableComponents\\MLFeatureGen\\LocationFinder\\PercentLocationFinder.rsd.etf",
+      "ScoreExpression": "#Height.sum()+#Length.sum()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\id.rsd.etf",
+      "ScoreExpression": "#Confidence.sum()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\AddressTrimming\\getAndScorePrefix.rsd.etf",
+      "ScoreExpression": "#Suffix.sum() - #Prefix.sum()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 0 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) < float.Parse($L[0]) ? 1 : 0) : 0\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\AddressTrimming\\getAndScoreSuffix.rsd.etf",
+      "ScoreExpression": "#Prefix.sum() - #Suffix.sum()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\scoreSubD.rsd.etf",
+      "ScoreExpression": "( #score = #_.sum();\r\n  #score < 0 ? 0 : #score)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\id.rsd.etf",
+      "ScoreExpression": "($parts = $_[0].Split('|'.ToCharArray(), 2);\r\n ($parts.Length == 2 ?\r\n    $parts[1].Length - $parts[0].Length : 0\r\n))"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "( $V[0] == $L[0] ? 1 : 0)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($V.count() == 0 or !(float.TryParse($V[0],null)) ? 0 :\r\n  ($L.count() == 0 ? 0 :\r\n    ($H.count() == 0 ? 0 :\r\n      (!(float.TryParse($H[0],null) or float.TryParse($L[0],null)) ? 0 : 1))))"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\getWordsAndCommonWords.rsd.etf",
+      "ScoreExpression": "(#CommonWords = $CommonWords.count();\r\n #UncommonWords = $Words.count() - #CommonWords;\r\n #CommonWords - #UncommonWords)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\separatorCharsCountScorer.rsd.etf",
+      "ScoreExpression": "#ScorePart.count()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\wordCharsCountScorer.rsd.etf",
+      "ScoreExpression": "#ScorePart.count()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\RecipientTrimming\\getAndScoreSuffix.rsd.etf",
+      "ScoreExpression": "#Prefix.sum() - #Suffix.sum()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getAndScoreAreas.rsd.etf",
+      "ScoreExpression": "(#Baseline = #Rest.sum();\r\n (#Baseline >= 80 ? #Baseline - #Focus.sum() : 0))"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getPersonScore.rsd.etf",
+      "ScoreExpression": "#ScorePart.sum()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L[0] == '<' ? (float.Parse($V[0]) < float.Parse($H[0]) ? 1 : 0) :\r\n  ($H[0] == '>' ? (float.Parse($V[0]) > float.Parse($L[0]) ? 1 : 0) :\r\n    (float.Parse($V[0]) > float.Parse($L[0]) and float.Parse($V[0]) < float.Parse($H[0]) ? 1 : 0)\r\n  )\r\n)\r\n"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L[0] == '<' ? 0 : (float.Parse($V[0]) < float.Parse($L[0]) ? -1 : 0))"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\ReusableComponents\\Date\\ScoreDate.rsd.etf",
+      "ScoreExpression": "#ScorePart.sum()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "( $V[0] == $L[0] ? 1 : 0)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\LabDE\\TestResults\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 0 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) <= float.Parse($L[0]) ? 1 : 0) : 0\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L[0] == '<' ? 0 : (float.Parse($V[0]) < float.Parse($L[0]) ? -1 : 0))"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\TestResults\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 0 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) <= float.Parse($L[0]) ? 1 : 0) : 0\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L[0] == '<' ? (float.Parse($V[0]) < float.Parse($H[0]) ? 1 : 0) :\r\n  ($H[0] == '>' ? (float.Parse($V[0]) > float.Parse($L[0]) ? 1 : 0) :\r\n    (float.Parse($V[0]) > float.Parse($L[0]) and float.Parse($V[0]) < float.Parse($H[0]) ? 1 : 0)\r\n  )\r\n)\r\n"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\scoreInstrumentNumber.rsd.etf",
+      "ScoreExpression": "$ScorePart.count()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 0 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) <= float.Parse($L[0]) ? 1 : 0) : 0\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 1 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) <= float.Parse($L[0]) ? 1 : 0) : 1\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\dateIsUnder18.rsd.etf",
+      "ScoreExpression": "($_.count > 0 ? 1 : 0)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getMatchedTests.rsd.etf",
+      "ScoreExpression": "(\r\n#matched = $Matched.count;\r\n#skipped = {$Skipped.count(), 1}.min();\r\n#fuzzy = $Fuzzy.count();\r\n#adjust = (#fuzzy == 0 ? #matched + #skipped : #matched);\r\n(#matched == 0 ? 1 : 2 + #adjust + #matched - #fuzzy - #skipped)\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 0 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) <= float.Parse($L[0]) ? 1 : 0) : 0\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\id.rsd.etf",
+      "ScoreExpression": "( DateTime.TryParse($_[0], null)\r\n  ? DateTime.Today.AddYears(-18).CompareTo(date($_[0]))\r\n   : 1)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\ReusableComponents\\MLFeatureGen\\LocationFinder\\PercentLocationFinder.rsd.etf",
+      "ScoreExpression": "(#Center_Y.max() > 50) and (#Center_X.max() < #Center_Y.max()) and (100 - #Center_Y.max() < #Center_X.max()) ? 1 : 0"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+      "ScoreExpression": "#ScorePart.sum()"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\TestResults\\getValueAndRangeParts.rsd.etf",
+      "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 1 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) <= float.Parse($L[0]) ? 1 : 0) : 1\r\n  )\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getDelimitedCCNumbers.rsd.etf",
+      "ScoreExpression": "(#FirstCCNumber.count() == 0 or #SecondCCNumber.count() == 0 ? 0 :\r\n  #SecondCCNumber[0] - #FirstCCNumber[0]\r\n)"
+    }
+  },
+  {
+    "Type": "RSDDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\YN.rsd.etf",
+      "ScoreExpression": "#N.sum() > #Y.sum() and\r\n#N.sum() > 12"
+    }
+  }
+]

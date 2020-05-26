@@ -1,0 +1,286 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerPage",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "HCData",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "DocType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "LearningMachineOutputHandler",
+                    "Description": "<Learning machine output handler>",
+                    "Enabled": true,
+                    "Object": {
+                      "SavedMachinePath": "<RSDFileDir>\\ClassifySensitiveAsDeleted.lm",
+                      "PreserveInputAttributes": false
+                    }
+                  },
+                  {
+                    "Type": "RemoveSubAttributes",
+                    "Description": "Remove NotDeletedPage<Remove attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeSelector": {
+                        "Type": "ValueConditionSelector",
+                        "Object": {
+                          "Condition": {
+                            "Type": "FindingRuleCondition",
+                            "Object": {
+                              "AFRule": {
+                                "Type": "RegExprRule",
+                                "Object": {
+                                  "IsRegExpFromFile": false,
+                                  "RegExpFileName": "",
+                                  "Pattern": "\\ANotDeletedPage\\z",
+                                  "IsCaseSensitive": false,
+                                  "FirstMatchOnly": true,
+                                  "CreateSubAttributesFromNamedMatches": false,
+                                  "OnlyCreateOneSubAttributePerGroup": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "ConditionalRemove": false,
+                      "DataScorer": {
+                        "Type": null,
+                        "Description": "",
+                        "Enabled": true,
+                        "Object": null
+                      },
+                      "ScoreCondition": "EQ",
+                      "CompareConditionType": "ValueOf",
+                      "ScoreToCompare": 0
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove !*{*}<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*{*}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove */*<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/*"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "LIR<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "LocateImageRegion",
+                "Object": {
+                  "DataInsideBoundaries": true,
+                  "FindType": "ImageRegion",
+                  "ImageRegionText": "FullPageClue",
+                  "IncludeIntersectingEntities": true,
+                  "IntersectingEntityType": "Character",
+                  "MatchMultiplePagesPerDocument": true,
+                  "ClueList1": {
+                    "Clues": [
+                      "[\\S\\s]"
+                    ],
+                    "CaseSensitive": false,
+                    "Regex": true,
+                    "RestrictByBoundary": false
+                  },
+                  "ClueList2": {
+                    "Clues": [],
+                    "CaseSensitive": false,
+                    "Regex": false,
+                    "RestrictByBoundary": false
+                  },
+                  "ClueList3": {
+                    "Clues": [],
+                    "CaseSensitive": false,
+                    "Regex": false,
+                    "RestrictByBoundary": false
+                  },
+                  "ClueList4": {
+                    "Clues": [],
+                    "CaseSensitive": false,
+                    "Regex": false,
+                    "RestrictByBoundary": false
+                  },
+                  "Left": {
+                    "Anchor": "Page",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandLeft",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Top": {
+                    "Anchor": "Page",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandUp",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Right": {
+                    "Anchor": "Page",
+                    "AnchorSide": "Right",
+                    "ExpandDirection": "ExpandRight",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Bottom": {
+                    "Anchor": "Page",
+                    "AnchorSide": "Bottom",
+                    "ExpandDirection": "ExpandDown",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Set type to be FullPageClue<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "FullPageClue",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

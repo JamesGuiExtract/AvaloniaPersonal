@@ -1,0 +1,902 @@
+[
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "UCC-1",
+      "TypeString": "UCC1"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "<HasTransferPatch>",
+      "TypeString": "Feature"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Arrest Warrant",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "92",
+      "TypeString": "p92"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "ASSUMPTION AGM",
+      "TypeString": "AssumptionAgm"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "SATISFACTION OF JUDGMENT",
+      "TypeString": "SatisfactionOfJudgment"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "RESOLUTION",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Mortgage",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "skip",
+      "TypeString": "skip"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Affidavit of Death",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "MTGR",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "BILL OF SALE",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "lessThan30",
+      "TypeString": "lessThan30"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "UNITED STATES/TREASURY",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Yup. Sig.",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "61",
+      "TypeString": "p61"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "50",
+      "TypeString": "p50"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "ran",
+      "TypeString": "ran"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Military Forms",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Termination",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Find it!",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Low Quality Image",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "FRM-3006-01-c",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "0-40",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "BOC",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "NOTICE DEFAULT",
+      "TypeString": "NoticeDefault"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "MORT!",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "URREC",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "dummy val",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Affidavit - Misc",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "WHOM IT MAY CONCERN PLACEHOLDER, LLC",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "68",
+      "TypeString": "p68"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "isCORF",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "CONSTR TRUST DD",
+      "TypeString": "ConstrTrustDd"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Examiner of Titles",
+      "TypeString": "dontSplit"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "27",
+      "TypeString": "p27"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Affidavit",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Timesheets",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "93",
+      "TypeString": "p93"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Default",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Public",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "2",
+      "TypeString": "p2"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Oil Gas and Mineral Lease",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "10/60",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Subordination Agreement",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "QUIT CLAIM DEED",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "counter-clockwise",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "ChildSupport",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "MULTNOMAH COUNTY SHERIFF",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "U",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Will",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "PUBLIC",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Remove",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "NONLAB",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "No OCR output from first page",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "RELEASE OF JUDGMENT LIEN",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "PUBLIC",
+      "TypeString": "Company"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Notice of County Tax Lien",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Lab",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "TO WHOM IT MAY CONCERN",
+      "TypeString": "Company"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "43",
+      "TypeString": "p43"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "GRANT DEED",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "20",
+      "TypeString": "p20"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "PUBLIC PLACEHOLDER, LLC",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "TRUST",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "DEPARTMENT OF REVENUE",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Assignment of Lease",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "AMD TRUST DEED",
+      "TypeString": "AmendedTrustDeed"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "123",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Discharge from Active Duty",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "<SSNRedactFirstSeven>",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "DEED OF TRUST",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "TRUST TRANSFER DEED",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "MODIFICATION TO DEED OF TRUST",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "NFT",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "WI DEPT OF TRANSPORTATION",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "NeedOCR",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "QUITCLAIM DEED",
+      "TypeString": "QuitClaimDeed"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Notice of Federal Tax Lien",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "63",
+      "TypeString": "p63"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Criminal Docket",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "<DoNotModifyFlag>",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "79",
+      "TypeString": "p79"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "<LMDocType>",
+      "TypeString": "dftba"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Memorandum of Lease",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "59",
+      "TypeString": "p59"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "70",
+      "TypeString": "p70"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "89",
+      "TypeString": "p89"
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Contract",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "INTERNAL REVENUE SERVICE",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "True",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "NotForm1",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Lien",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Complaint",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "No Case Number",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Notice of Completion",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "Release of Lien - Misc\\is.rsd.etf",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "FRM-3006-04-c",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "MDOT",
+      "TypeString": ""
+    }
+  },
+  {
+    "Type": "CreateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueString": "NA",
+      "TypeString": ""
+    }
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "Type": "MoveOrCopyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SourceAttributeTreeXPath": "/*/Document/PaginationConfidence",
+      "DestinationAttributeTreeXPath": "../DocumentData",
+      "CopyAttributes": true
+    }
+  },
+  {
+    "Type": "MoveOrCopyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SourceAttributeTreeXPath": "/*/Person",
+      "DestinationAttributeTreeXPath": "/*/_remove_",
+      "CopyAttributes": false
+    }
+  },
+  {
+    "Type": "MoveOrCopyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SourceAttributeTreeXPath": "/*/Document/QualifiedForAutomaticOutput",
+      "DestinationAttributeTreeXPath": "../DocumentData",
+      "CopyAttributes": true
+    }
+  }
+]

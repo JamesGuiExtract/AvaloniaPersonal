@@ -1,0 +1,1692 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "_",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocPreprocessorSequence",
+      "Description": "*testing*<Select multiple document preprocessors>",
+      "Enabled": false,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "SelectPageRegion",
+            "Description": "<Select page region>",
+            "Enabled": true,
+            "Object": {
+              "IncludeRegionDefined": true,
+              "PageSelectionType": "SelectSpecified",
+              "SpecificPages": "1",
+              "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+              "Pattern": "",
+              "IsRegExp": false,
+              "IsCaseSensitive": false,
+              "HorizontalStart": -1,
+              "HorizontalEnd": -1,
+              "VerticalStart": -1,
+              "VerticalEnd": -1,
+              "SelectPageRegionReturnType": "ReturnText",
+              "IncludeIntersectingText": true,
+              "TextIntersectionType": "Character",
+              "SelectedRegionRotation": -1,
+              "TextToAssignToRegion": ""
+            }
+          },
+          {
+            "Type": "LocateImageRegion",
+            "Description": "<Locate image region>",
+            "Enabled": true,
+            "Object": {
+              "DataInsideBoundaries": true,
+              "FindType": "Text",
+              "ImageRegionText": "",
+              "IncludeIntersectingEntities": true,
+              "IntersectingEntityType": "Character",
+              "MatchMultiplePagesPerDocument": true,
+              "ClueList1": {
+                "Clues": [
+                  "\\b\\d{2}\\x20*-\\x20*\\d{4}\\b",
+                  "01\\s-\\s1107"
+                ],
+                "CaseSensitive": false,
+                "Regex": true,
+                "RestrictByBoundary": false
+              },
+              "ClueList2": {
+                "Clues": [
+                  "Total"
+                ],
+                "CaseSensitive": false,
+                "Regex": false,
+                "RestrictByBoundary": true
+              },
+              "ClueList3": {
+                "Clues": [],
+                "CaseSensitive": false,
+                "Regex": false,
+                "RestrictByBoundary": false
+              },
+              "ClueList4": {
+                "Clues": [],
+                "CaseSensitive": false,
+                "Regex": false,
+                "RestrictByBoundary": false
+              },
+              "Left": {
+                "Anchor": "Page",
+                "AnchorSide": "Left",
+                "ExpandDirection": "ExpandLeft",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              },
+              "Top": {
+                "Anchor": "ClueList1",
+                "AnchorSide": "Top",
+                "ExpandDirection": "ExpandUp",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              },
+              "Right": {
+                "Anchor": "Page",
+                "AnchorSide": "Right",
+                "ExpandDirection": "ExpandRight",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              },
+              "Bottom": {
+                "Anchor": "ClueList2",
+                "AnchorSide": "Bottom",
+                "ExpandDirection": "ExpandDown",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Conc": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\n(?~<>\\bConc\\b).?[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "Emp": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\n(?~<>\\bEmp\\b).?[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "Garag": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\n(?~<>\\bGarag\\b).?[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "GrossPossible": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\n#import dollarAmt.dat.etf\r\n[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n[\\x20\\t]*\r\n#import dollarAmt.dat.etf",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "MTM": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\nMTM[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "Model": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\n(?~<>Model).?[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "PetR": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\nPetR[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "Rent": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\nRent[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "Star": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "Storag": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\n(?~<>\\bStor\\b).?[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "Total": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\n(?~<>\\bTotal\\b).?[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "UnitNumber": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "\\b\\d{2}\\x20*-\\x20*\\d+\\b",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "WS": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?nx)\r\n\\b(?-i:W[S5])[\\x20\\t]*\r\n(?<Amount>\r\n#import dollarAmt.dat.etf\r\n)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "default to 0.00",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "0.00",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "move up amounts<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "_/*/Amount",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToParent",
+              "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "ReplaceStrings",
+            "Description": "change (---) to negative amt<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "\\s+",
+                  "Replacement": ""
+                },
+                {
+                  "Pattern": "\\A([\\d,]+\\.\\d\\d)\\x29",
+                  "Replacement": "-$1"
+                },
+                {
+                  "Pattern": "\\A\\x28([\\d,]+\\.\\d\\d)\\x29?",
+                  "Replacement": "-$1"
+                },
+                {
+                  "Pattern": ",",
+                  "Replacement": ""
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "create totals<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "add up Rent (create Rent/total)<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/_/Rent",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "total",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "sum(/*/_/Rent)",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create _/Rent@total (sum and values---to keep spatial)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "Rent",
+                    "SetAttributeName": true,
+                    "AttributeType": "total",
+                    "SetAttributeType": true,
+                    "AttributeValue": "%Rent/total%`%Rent<>all:%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "add up Conc (create Conc/total)<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/_/Conc",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "total",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "sum(/*/_/Conc)",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create _/Conc@total (sum and values---to keep spatial)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "Conc",
+                    "SetAttributeName": true,
+                    "AttributeType": "total",
+                    "SetAttributeType": true,
+                    "AttributeValue": "%Conc/total%`%Conc<>all:%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "add up MTM (create MTM/total)<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/_/MTM",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "total",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "sum(/*/_/MTM)",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create _/MTM@total (sum and values---to keep spatial)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "MTM",
+                    "SetAttributeName": true,
+                    "AttributeType": "total",
+                    "SetAttributeType": true,
+                    "AttributeValue": "%MTM/total%`%MTM<>all:%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "add up Storag (create Storag/total)<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/_/Storag",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "total",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "sum(/*/_/Storag)",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create _/Storag@total (sum and values---to keep spatial)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "Storag",
+                    "SetAttributeName": true,
+                    "AttributeType": "total",
+                    "SetAttributeType": true,
+                    "AttributeValue": "%Storag/total%`%Storag<>all:%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "add up Model (create Model/total)<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/_/Model",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "total",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "sum(/*/_/Model)",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create _/Model@total (sum and values---to keep spatial)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "Model",
+                    "SetAttributeName": true,
+                    "AttributeType": "total",
+                    "SetAttributeType": true,
+                    "AttributeValue": "%Model/total%`%Model<>all:%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "add up Star (create Star/total)<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/_/Star",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "total",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "sum(/*/_/Star)",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create _/Star@total (sum and values---to keep spatial)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "Star",
+                    "SetAttributeName": true,
+                    "AttributeType": "total",
+                    "SetAttributeType": true,
+                    "AttributeValue": "%Star/total%`%Star<>all:%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "add up Garag (create Garag/total)<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/_/Garag",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "total",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "sum(/*/_/Garag)",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create _/Garag@total (sum and values---to keep spatial)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "Garag",
+                    "SetAttributeName": true,
+                    "AttributeType": "total",
+                    "SetAttributeType": true,
+                    "AttributeValue": "%Garag/total%`%Garag<>all:%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "add up PetR (create PetR/total)<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/_/PetR",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "total",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "sum(/*/_/PetR)",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create _/PetR@total (sum and values---to keep spatial)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "PetR",
+                    "SetAttributeName": true,
+                    "AttributeType": "total",
+                    "SetAttributeType": true,
+                    "AttributeValue": "%PetR/total%`%PetR<>all:%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "add up Emp (create Emp/total)<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/_/Emp",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "total",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "sum(/*/_/Emp)",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create _/Emp@total (sum and values---to keep spatial)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "Emp",
+                    "SetAttributeName": true,
+                    "AttributeType": "total",
+                    "SetAttributeType": true,
+                    "AttributeValue": "%Emp/total%`%Emp<>all:%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "add up WS (create WS/total)<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/_/WS",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "total",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "sum(/*/_/WS)",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create _/WS@total (sum and values---to keep spatial)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "WS",
+                    "SetAttributeName": true,
+                    "AttributeType": "total",
+                    "SetAttributeType": true,
+                    "AttributeValue": "%WS/total%`%WS<>all:%",
+                    "SetAttributeValue": true
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "make */*@total hybrid spatial (to put spatial on total amount)<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/*@total",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "ModifySpatialMode",
+                "Object": {
+                  "ModifySpatialModeAction": "DowngradeToHybrid",
+                  "ModifyRecursively": false,
+                  "ZoneCountCondition": "Single",
+                  "UseCondition": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "set value of */*@total, add cents if necessary<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/*@total",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "ReplaceStrings",
+                "Object": {
+                  "Replacements": [
+                    {
+                      "Pattern": "`.+",
+                      "Replacement": ""
+                    },
+                    {
+                      "Pattern": "(?<!\\.\\d)\\d\\z",
+                      "Replacement": "$0.00"
+                    }
+                  ],
+                  "AsRegularExpr": true,
+                  "IsCaseSensitive": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "move up */*<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove non-totals for some<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "Rent@|Conc@|MTM@|Storag@|Model@|Star@|Garag@|PetR@|Emp@|WS@"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "remove types<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

@@ -1,0 +1,1678 @@
+[
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Abstract of Judgment",
+        "Assignment of Mortgage"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Abatement - Misc",
+        "Abstract of Support Judgment",
+        "Affidavit - Misc",
+        "Affidavit of Death",
+        "Agreement - Misc",
+        "Annual Accounting",
+        "Assignment - Misc",
+        "Assignment of Deed of Trust",
+        "Assignment of Mortgage",
+        "Assignment of Rents",
+        "Assumed Name",
+        "Certificate - Misc",
+        "Certificate of Copy of Record",
+        "Certificate of Death",
+        "Certificate of Delinquency of Personal Property Tax",
+        "Certificate of Marriage",
+        "Certificate of Redemption",
+        "Certificate of Survey",
+        "Contract - Misc",
+        "Conveyance - Misc",
+        "Declaration of Condominium",
+        "Declaration of Domicile",
+        "Deed - Misc",
+        "Deed of Trust",
+        "Discharge from Active Duty",
+        "Divorce",
+        "Easement - Misc",
+        "Financing Statement",
+        "Grant Deed",
+        "Homestead Designation",
+        "Mechanics Lien",
+        "Modification of Deed of Trust",
+        "Mortgage",
+        "Notary Bond",
+        "Notice - Misc",
+        "Notice of Commencement",
+        "Notice of Completion",
+        "Notice of Default",
+        "Notice of Federal Tax Lien",
+        "Notice of Hearing",
+        "Notice of Hospital Lien",
+        "Notice of Rescission",
+        "Notice of State Tax Lien",
+        "Oil Gas and Mineral Lease",
+        "Power of Attorney",
+        "Quit Claim Deed",
+        "Reconveyance",
+        "Release of Assignment of Rents",
+        "Release of Federal Tax Lien",
+        "Release of Hospital Lien",
+        "Release of Lien - Misc",
+        "Release of Lis Pendens",
+        "Release of Mechanics Lien",
+        "Release of State Tax Lien",
+        "Request for Notice of Default",
+        "Revocation of Power of Attorney",
+        "Satisfaction of Judgment",
+        "Satisfaction of Mortgage",
+        "Sheriffs Deed",
+        "Special",
+        "Statement of Abandonment",
+        "Subordination Agreement",
+        "Substitution of Trustee",
+        "Trustees Deed",
+        "Warranty Deed",
+        "Will - Misc"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Certificate of Birth"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Any Unique"
+      ],
+      "MinConfidence": "ProbableLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Relinquishment"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": ".",
+      "Types": [
+        "Notice of Settlement"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Power of Attorney",
+        "Revocation of Power of Attorney"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Abstract of Judgment",
+        "Abstract of Support Judgment",
+        "Satisfaction of Judgment"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>",
+      "Category": "County Document",
+      "Types": [
+        "Reconveyance",
+        "Substitution of Trustee and Reconveyance"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Notice of Federal Tax Lien",
+        "Notice of State Tax Lien",
+        "Release of Federal Tax Lien",
+        "Release of State Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Assignment of Mortgage",
+        "Certificate of Death",
+        "Satisfaction of Mortgage"
+      ],
+      "MinConfidence": "ProbableLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>\\..\\Classifier",
+      "Category": ".",
+      "Types": [
+        "Abstract of Judgment",
+        "Assign of Leases & Rents",
+        "Assignment of Lease",
+        "Assignment of Mortgage",
+        "Assignment of Rents",
+        "Attorneys Lien",
+        "Certificate of Redemption",
+        "Contract for Deed",
+        "Lien (Miscellaneous)",
+        "Mechanics Lien",
+        "Modification Agreement",
+        "Mortgage",
+        "Mortgage_Sec.Agmt_F.S.Etc",
+        "Notice of Lien",
+        "Satisfaction of Mortgage",
+        "Sheriffs Cert & Foreclose"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "Exact Sciences",
+      "Types": [
+        "Order"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>\\..\\Classifier\\",
+      "Category": ".",
+      "Types": [
+        "Summary Re Disposition Jd"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Discharge from Active Duty",
+        "Mortgage - Deed of Trust"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>",
+      "Category": "Classification",
+      "Types": [
+        "VA-FSC"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Notice of Federal Tax Lien",
+        "Sewer Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Lien - Misc",
+        "Notice of Federal Tax Lien",
+        "Notice of Hospital Lien",
+        "Notice of State Tax Lien",
+        "Release of Federal Tax Lien",
+        "Release of Hospital Lien",
+        "Release of Lien - Misc",
+        "Release of State Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Judgment"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Notice of Federal Tax Lien",
+        "Notice of State Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Unclassified",
+        "Notice of State Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Unknown",
+        "Deed of Trust"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Deed of Trust",
+        "Subordination Agreement"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Certificate of Descent",
+        "Letters",
+        "Termination Decedents Property Interests",
+        "Transfer by Affidavit"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Release of Lien - Misc"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Mortgage - Deed of Trust",
+        "Quit Claim Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Affidavit - Misc",
+        "Affidavit of Death",
+        "Deed - Misc",
+        "Deed of Trust",
+        "Grant Deed",
+        "Lien - Misc",
+        "Mechanics Lien",
+        "Mortgage",
+        "Notice of Default",
+        "Notice of Trustees Sale",
+        "Quit Claim Deed",
+        "Sheriffs Deed",
+        "Trustees Deed",
+        "Warranty Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Release of Lien - Misc",
+        "Release of Sewer Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>\\DocumentClassifiers",
+      "Category": ".",
+      "Types": [
+        "Plan of Care"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Lis Pendens",
+        "Modification of Deed of Trust",
+        "Mortgage",
+        "Quit Claim Deed",
+        "Warranty Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Warranty Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": false,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Any Unique",
+        "Unknown"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Assignment - Misc",
+        "Assignment of Mortgage",
+        "Assignment of Rents"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>",
+      "Category": "County Document",
+      "Types": [
+        "Warranty Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Mortgage - Deed of Trust",
+        "Satisfaction of Mortgage"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>",
+      "Category": "County Document",
+      "Types": [
+        "Transfer on Death Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>",
+      "Category": "Classifier",
+      "Types": [
+        "Any Unique"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": ".",
+      "Types": [
+        "Condominium Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Contract - Misc"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Will - Misc"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Judgment",
+        "Lien - Misc",
+        "Lis Pendens",
+        "Release of Federal Tax Lien",
+        "Release of State Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Assignment of Mortgage",
+        "Modification of Deed of Trust",
+        "Satisfaction of Mortgage"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Unclassified",
+        "Discharge from Active Duty",
+        "Financing Statement"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>\\..",
+      "Category": "Classifier",
+      "Types": [
+        "Order of Probate"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>",
+      "Category": ".",
+      "Types": [
+        "Notice of Settlement"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Annual Accounting"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>",
+      "Category": "County Document",
+      "Types": [
+        "Lis Pendens",
+        "Release of Lis Pendens"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Notice of State Tax Lien",
+        "Release of Federal Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Release of Assignment of Rents",
+        "Satisfaction of Mortgage"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Form 1040"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Notice of State Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": ".",
+      "Types": [
+        "Certified Survey Maps"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Substitution of Trustee"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Sheriffs Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Assignment of Deed of Trust",
+        "Deed of Trust"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Any Unique"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": ".",
+      "Types": [
+        "Consult Letter"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>\\..",
+      "Category": "Classifier",
+      "Types": [
+        "Judgment & Decree"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Deed of Trust",
+        "Warranty Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": false,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Agreement - Misc"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Unclassified",
+        "Oil Gas and Mineral Lease",
+        "Power of Attorney"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>",
+      "Category": "Classification",
+      "Types": [
+        "Remittance Advice"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Assignment of Deed of Trust",
+        "Assignment of Mortgage",
+        "Satisfaction of Mortgage",
+        "Subordination Agreement"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Mortgage",
+        "Quit Claim Deed",
+        "Warranty Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Lis Pendens"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Deed - Misc",
+        "Grant Deed",
+        "Quit Claim Deed",
+        "Sheriffs Deed",
+        "Warranty Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>",
+      "Category": ".",
+      "Types": [
+        "Stipulation"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Certificate of Death",
+        "Discharge from Active Duty",
+        "Notice of Federal Tax Lien",
+        "Notice of State Tax Lien",
+        "Release of Federal Tax Lien",
+        "Release of State Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Grant Deed",
+        "Quit Claim Deed",
+        "Sheriffs Deed",
+        "Trustees Deed",
+        "Warranty Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Unknown"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Award of Damages"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Assignment of Deed of Trust",
+        "Assignment of Mortgage",
+        "Deed of Trust",
+        "Modification of Deed of Trust",
+        "Mortgage",
+        "Satisfaction of Mortgage"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": false,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Satisfaction of Mortgage",
+        "Warranty Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Notice of Hospital Lien",
+        "Release of Hospital Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": false,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Certificate of Death"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Transfer on Death Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": false,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Assignment of Deed of Trust",
+        "Cemetery Deed",
+        "Deed - Misc",
+        "Deed of Trust",
+        "Modification of Deed of Trust",
+        "Personal Representative Deed",
+        "Sheriffs Deed",
+        "Special Administrators Deed",
+        "Transfer on Death Deed",
+        "Trustees Deed",
+        "Warranty Deed"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": false,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Discharge from Active Duty",
+        "Notice of Federal Tax Lien",
+        "Release of Federal Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Lien - Misc",
+        "Mechanics Lien",
+        "Notice of Federal Tax Lien",
+        "Notice of Hospital Lien",
+        "Notice of State Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Deed of Trust"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Release of Federal Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Lis Pendens",
+        "Notice of Federal Tax Lien",
+        "Release of Federal Tax Lien",
+        "Release of Lis Pendens"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Reconveyance"
+      ],
+      "MinConfidence": "SureLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Reconveyance"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+      "Category": "County Document",
+      "Types": [
+        "Termination Decedents Property Interests"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Unknown",
+        "Financing Statement"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Abstract of Support Judgment"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Satisfaction of Mortgage"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<RSDFileDir>\\..\\ML\\Classification",
+      "Category": ".",
+      "Types": [
+        "Consent - Encounter"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Financing Statement",
+        "Satisfaction of Mortgage"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Assignment of Deed of Trust",
+        "Assignment of Mortgage",
+        "Deed of Trust",
+        "Mortgage",
+        "Satisfaction of Mortgage"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Notice of Hearing"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Abatement - Misc",
+        "Abstract of Judgment",
+        "Abstract of Support Judgment",
+        "Affidavit - Misc",
+        "Affidavit of Death",
+        "Agreement - Misc",
+        "Annual Accounting",
+        "Assignment - Misc",
+        "Assignment of Deed of Trust",
+        "Assignment of Mortgage",
+        "Assignment of Rents",
+        "Assumed Name",
+        "Certificate - Misc",
+        "Certificate of Copy of Record",
+        "Certificate of Death",
+        "Certificate of Delinquency of Personal Property Tax",
+        "Certificate of Marriage",
+        "Certificate of Redemption",
+        "Certificate of Survey",
+        "Contract - Misc",
+        "Declaration of Condominium",
+        "Declaration of Domicile",
+        "Deed of Trust",
+        "Discharge from Active Duty",
+        "Divorce",
+        "Easement - Misc",
+        "Financing Statement",
+        "Grant Deed",
+        "Homestead Designation",
+        "Judgment",
+        "Lien - Misc",
+        "Lis Pendens",
+        "Mechanics Lien",
+        "Modification of Deed of Trust",
+        "Mortgage",
+        "Notary Bond",
+        "Notice - Misc",
+        "Notice of Commencement",
+        "Notice of Completion",
+        "Notice of Default",
+        "Notice of Federal Tax Lien",
+        "Notice of Hearing",
+        "Notice of Hospital Lien",
+        "Notice of Rescission",
+        "Notice of State Tax Lien",
+        "Oil Gas and Mineral Lease",
+        "Power of Attorney",
+        "Quit Claim Deed",
+        "Reconveyance",
+        "Release of Assignment of Rents",
+        "Release of Federal Tax Lien",
+        "Release of Hospital Lien",
+        "Release of Lien - Misc",
+        "Release of Lis Pendens",
+        "Release of Mechanics Lien",
+        "Release of State Tax Lien",
+        "Request for Notice of Default",
+        "Revocation of Power of Attorney",
+        "Satisfaction of Judgment",
+        "Satisfaction of Mortgage",
+        "Sheriffs Deed",
+        "Special",
+        "Statement of Abandonment",
+        "Subordination Agreement",
+        "Substitution of Trustee",
+        "Warranty Deed",
+        "Will - Misc"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "<ComponentDataDir>",
+      "Category": "County Document",
+      "Types": [
+        "Assignment of Rents"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Lien - Misc",
+        "Notice of County Tax Lien",
+        "Notice of Federal Tax Lien",
+        "Notice of State Tax Lien",
+        "Release of County Tax Lien",
+        "Release of Federal Tax Lien",
+        "Release of Lien - Misc",
+        "Release of State Tax Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Memorandum of Lien",
+        "Release of Memorandum of Lien"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Assignment of Mortgage",
+        "Assignment of Rents",
+        "Mortgage - Deed of Trust"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Assignment of Deed of Trust",
+        "Assignment of Mortgage",
+        "Modification of Deed of Trust",
+        "Satisfaction of Mortgage"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Assignment - Misc",
+        "Assignment of Deed of Trust",
+        "Assignment of Mortgage",
+        "Assignment of Rents"
+      ],
+      "MinConfidence": "MaybeLevel"
+    }
+  },
+  {
+    "Type": "DocTypeCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AllowTypes": true,
+      "DocumentClassifiersPath": "",
+      "Category": "County Document",
+      "Types": [
+        "Quit Claim Deed"
+      ],
+      "MinConfidence": "ProbableLevel"
+    }
+  }
+]

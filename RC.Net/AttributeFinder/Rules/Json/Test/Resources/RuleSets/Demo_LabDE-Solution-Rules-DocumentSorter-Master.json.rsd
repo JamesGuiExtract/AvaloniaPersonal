@@ -1,0 +1,221 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 1,
+        "Name": "FLEX Index - Indexing (By Document)",
+        "ByPage": false,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "19.2.0.40",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "IsNONLAB",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\IsNONLAB.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "CreateValue",
+                  "Object": {
+                    "ValueString": "NonLab",
+                    "TypeString": ""
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "IsLAB",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\IsLAB.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "CreateValue",
+                  "Object": {
+                    "ValueString": "Lab",
+                    "TypeString": ""
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "If Cover Page Only, then Nonlab",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\IsNonLab-CoverPageOnly.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "CreateValue",
+                  "Object": {
+                    "ValueString": "NonLab",
+                    "TypeString": ""
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove decrement_counter_per_page attribute<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "decrement_counter_per_page"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "Create VOA<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

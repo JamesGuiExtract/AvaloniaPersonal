@@ -1,0 +1,8 @@
+[
+  {
+    "Type": "RemoveSpatialInfo",
+    "Description": "",
+    "Enabled": true,
+    "Object": "RemoveSpatialInfo"
+  }
+]

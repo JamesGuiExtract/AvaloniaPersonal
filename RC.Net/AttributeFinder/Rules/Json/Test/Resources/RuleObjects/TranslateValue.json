@@ -1,0 +1,1686 @@
+[
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "TopOfPage"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "CFR_Comma"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "MCData_Date"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "_2A"
+        },
+        {
+          "From": "Blank",
+          "To": "Blank_2A"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "STREET_ADDRESS"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "BankName"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Unknown"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "findRepeatsThenTrimCCN"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Sure1st"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Value",
+      "TranslationStringPairs": [
+        {
+          "From": "0",
+          "To": "9"
+        },
+        {
+          "From": "1",
+          "To": "0"
+        },
+        {
+          "From": "2",
+          "To": "1"
+        },
+        {
+          "From": "3",
+          "To": "2"
+        },
+        {
+          "From": "4",
+          "To": "3"
+        },
+        {
+          "From": "5",
+          "To": "4"
+        },
+        {
+          "From": "6",
+          "To": "5"
+        },
+        {
+          "From": "7",
+          "To": "6"
+        },
+        {
+          "From": "8",
+          "To": "7"
+        },
+        {
+          "From": "9",
+          "To": "8"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "twentytwo"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "Subject2",
+          "To": "Subject"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "twentyone"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Medicaid"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "expandGT40cc"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "TaxID_FEIN",
+          "To": "TaxID"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "remove"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Value",
+      "TranslationStringPairs": [
+        {
+          "From": "A",
+          "To": "H"
+        },
+        {
+          "From": "C",
+          "To": "HH"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "PotentialSigPage"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Name"
+        },
+        {
+          "From": "Person",
+          "To": "Name"
+        },
+        {
+          "From": "NLP",
+          "To": "Name"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Company"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "SSN",
+          "To": "Blank"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "twenty"
+        },
+        {
+          "From": "units",
+          "To": "twenty"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "keepme2"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "DOUBLEFIRST"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "VIC"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "splitForContent"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "stateZip"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "BtwnClue"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "ROJA_2_420_d_1_B_xiii"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Trusts"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Plate"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Value",
+      "TranslationStringPairs": [
+        {
+          "From": "0",
+          "To": "O"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Fort"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Phone"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "addr"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "diagnosis"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "SSN_LastFour",
+          "To": "SSN"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "MakeCOD"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "QCDWD"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "BackupGrantee",
+          "To": "Grantee"
+        },
+        {
+          "From": "BackupGrantee2",
+          "To": "Grantee"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "MakeWarranty"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "COM"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "HCPIN"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "MuffinTops"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "PartPage"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "TaxID",
+          "To": "CD"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Acct"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Value",
+      "TranslationStringPairs": [
+        {
+          "From": "ACA RECEIVABLES CO",
+          "To": "ACA RECEIVABLES CO LLC"
+        },
+        {
+          "From": "C BASS MTG LN",
+          "To": "C BASS MTG"
+        },
+        {
+          "From": "CITIBANK SD",
+          "To": "CITIBANK"
+        },
+        {
+          "From": "COU OF STA CLARA DEPT OF REV",
+          "To": "STA CLARA COU DEPT OF REVENUE"
+        },
+        {
+          "From": "DAIMLERCHRYSLER FINL SERVICES AMERICAS LLC",
+          "To": "DAIMLERCHRYSLER FINL SERVICES"
+        },
+        {
+          "From": "DIRECTOR OF THE EMPL DEVEL DEPT THE",
+          "To": "CALIF ST DEPT EMPLOY DEVEL"
+        },
+        {
+          "From": "DIRECTORY PACIFIC BELL",
+          "To": "PAC BELL DIRECTORY"
+        },
+        {
+          "From": "E*TRADE BK",
+          "To": "E TRADE BK"
+        },
+        {
+          "From": "FARGO WELLS",
+          "To": "WELLS FARGO BK"
+        },
+        {
+          "From": "FRANCHISE TAX BD THE",
+          "To": "CALIF ST FRANCHISE TAX BD"
+        },
+        {
+          "From": "JPMORGAN CHASE BK",
+          "To": "JP MORGAN CHASE BK"
+        },
+        {
+          "From": "LOAN MORGAN STANLEY TRUST",
+          "To": "MORGAN STANLEY LOAN TRUST"
+        },
+        {
+          "From": "MANAGEMENT NCO PORTFOLIO",
+          "To": "NCO PORTFOLIO MANAGEMENT"
+        },
+        {
+          "From": "MOCSE CTRL VALLEY FEDERAL C U",
+          "To": "MOCSE C U"
+        },
+        {
+          "From": "S F F C U",
+          "To": "S F FED CU"
+        },
+        {
+          "From": "SAN MATEO COU REVENUE SERVICES DIV",
+          "To": "SAN MATEO COU REVENUE SERVICES"
+        },
+        {
+          "From": "ST BD OF EQUAL THE",
+          "To": "CALIF ST BD EQUAL"
+        },
+        {
+          "From": "ST OF CA EMPL DEVEL DEPT",
+          "To": "CALIF ST DEPT EMPLOY DEVEL"
+        },
+        {
+          "From": "WASHINGTON MUTUAL BK A FED ASSN",
+          "To": "WASHINGTON MUTUAL BK"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "I"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Value",
+      "TranslationStringPairs": [
+        {
+          "From": "Affidavit - Misc.Affidavit - Heirship",
+          "To": "Affidavit of Heirship"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Language_Or_Ethnicity"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "faxHeader"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Hyphen"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "K3"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "FRE"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "CheckL"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "BLANK"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "MICRdontexpand"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "Diagnosis",
+          "To": ""
+        },
+        {
+          "From": "Note",
+          "To": ""
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "zeroes"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "CCN",
+          "To": "MICR"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "f3"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "one"
+        },
+        {
+          "From": "units",
+          "To": "one"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "discard",
+          "To": "keep"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Defendant"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "File"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Box"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "twentytthree"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "Trustor_backup",
+          "To": "Trustor"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Private"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "thirtysix"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "CHW"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "nineteen"
+        },
+        {
+          "From": "units",
+          "To": "nineteen"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Instrument"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "SCS"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Doc2"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "RightPIN"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "SSN_LastFour"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Juvenile"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "NeedsSplitting"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "estate"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "TDC_NO"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "PFCommon"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "FIRST",
+          "To": ""
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "CheckForCertificate"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "dontRemoveNearClue"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "seven"
+        },
+        {
+          "From": "units",
+          "To": "seven"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Unchecked"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Value",
+      "TranslationStringPairs": [
+        {
+          "From": "ACA RECEIVABLES CO",
+          "To": "ACA RECEIVABLES CO LLC"
+        },
+        {
+          "From": "C BASS MTG LN",
+          "To": "C BASS MTG"
+        },
+        {
+          "From": "CALIFORNIA ST EMPL DEVEL",
+          "To": "CALIF ST DEPT EMPLOY DEVEL"
+        },
+        {
+          "From": "FRANCHISE TAX BD",
+          "To": "CALIF ST FRANCHISE TAX BD"
+        },
+        {
+          "From": "FRANCHISE TAX BOARD",
+          "To": "CALIF ST FRANCHISE TAX BD"
+        },
+        {
+          "From": "MOCSE CTRL VALLEY FEDERAL C U",
+          "To": "MOCSE C U"
+        },
+        {
+          "From": "MORTGAGE ELECTRONIC REGISTN SYS INC",
+          "To": "MORTGAGE ELECTRONIC REGIS SYS"
+        },
+        {
+          "From": "ST BD OF EQUAL OF THE",
+          "To": "CALIF ST BD EQUAL"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "ID",
+          "To": ""
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "dontexpand"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "FRCP"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "LIR"
+        },
+        {
+          "From": "ProbableHandwriting",
+          "To": "LIR"
+        },
+        {
+          "From": "ProbableText",
+          "To": "LIR"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Value",
+      "TranslationStringPairs": [
+        {
+          "From": "file://<RSDFileDir>\\translate.dat.etf;|",
+          "To": ""
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "RegExSPM"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "URL"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "New"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "MedicalSupport"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "TranslateValue",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TranslateFieldType": "Type",
+      "TranslationStringPairs": [
+        {
+          "From": "",
+          "To": "Trust"
+        }
+      ],
+      "IsCaseSensitive": false
+    }
+  }
+]

@@ -1,0 +1,961 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "all": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "rawAddressFinder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "all"
+                ],
+                "RSDFileName": "<RSDFileDir>\\rawAddressFinder.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "first": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "rawAddressFinder.rsd",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "first"
+                ],
+                "RSDFileName": "<RSDFileDir>\\rawAddressFinder.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "Re-create subattrr<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Remove unneeded subattrr<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Add type 'remove' to subattrr<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/*",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "remove",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Un-mark Recipients, addressLines, city, state and zipCode<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Recipient1|*/Recipient2|*/Recipient3|*/Recipient4|*/addressLines|*/city|*/state|*/zipCode",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove */*@remove<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/*@remove"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "validate recipients<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Split Recipient# with invalidateRecipients.rsd<Run object on query>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Recipient1|*/Recipient2|*/Recipient3|*/Recipient4",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\invalidateRecipients.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Clear top-level type<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Mark top-level with type=R if Recipient1 has subattr<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{Recipient1/*}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "R",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Cascade change names if *@R<Run object on query>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*@R",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "RemoveSubAttributes",
+                            "Description": "Remove */Recipient1<Remove attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeSelector": {
+                                "Type": "QueryBasedAS",
+                                "Object": {
+                                  "QueryText": "*/Recipient1"
+                                }
+                              },
+                              "ConditionalRemove": false,
+                              "DataScorer": {
+                                "Type": null,
+                                "Description": "",
+                                "Enabled": true,
+                                "Object": null
+                              },
+                              "ScoreCondition": "EQ",
+                              "CompareConditionType": "ValueOf",
+                              "ScoreToCompare": 0
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Change */Recipient2 to Recipient1<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/Recipient2",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "Recipient1",
+                              "SetAttributeName": true,
+                              "AttributeType": "",
+                              "SetAttributeType": false,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Change */Recipient3 to Recipient2<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/Recipient3",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "Recipient2",
+                              "SetAttributeName": true,
+                              "AttributeType": "",
+                              "SetAttributeType": false,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Change */Recipient4 to Recipient3<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/Recipient4",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "Recipient3",
+                              "SetAttributeName": true,
+                              "AttributeType": "",
+                              "SetAttributeType": false,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Clear top-level type<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Mark top-level with type=R if Recipient1 has subattr<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*{Recipient1/*}",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "R",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Cascade change names if *@R<Run object on query>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*@R",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "OutputHandlerSequence",
+                                "Object": {
+                                  "ObjectsVector": [
+                                    {
+                                      "Type": "RemoveSubAttributes",
+                                      "Description": "Remove */Recipient1<Remove attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeSelector": {
+                                          "Type": "QueryBasedAS",
+                                          "Object": {
+                                            "QueryText": "*/Recipient1"
+                                          }
+                                        },
+                                        "ConditionalRemove": false,
+                                        "DataScorer": {
+                                          "Type": null,
+                                          "Description": "",
+                                          "Enabled": true,
+                                          "Object": null
+                                        },
+                                        "ScoreCondition": "EQ",
+                                        "CompareConditionType": "ValueOf",
+                                        "ScoreToCompare": 0
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Change */Recipient2 to Recipient1<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/Recipient2",
+                                        "CreateSubAttribute": false,
+                                        "AttributeName": "Recipient1",
+                                        "SetAttributeName": true,
+                                        "AttributeType": "",
+                                        "SetAttributeType": false,
+                                        "AttributeValue": "",
+                                        "SetAttributeValue": false
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Change */Recipient3 to Recipient2<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/Recipient3",
+                                        "CreateSubAttribute": false,
+                                        "AttributeName": "Recipient2",
+                                        "SetAttributeName": true,
+                                        "AttributeType": "",
+                                        "SetAttributeType": false,
+                                        "AttributeValue": "",
+                                        "SetAttributeValue": false
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Clear top-level type<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*",
+                                        "CreateSubAttribute": false,
+                                        "AttributeName": "",
+                                        "SetAttributeName": false,
+                                        "AttributeType": "",
+                                        "SetAttributeType": true,
+                                        "AttributeValue": "",
+                                        "SetAttributeValue": false
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Mark top-level with type=R if Recipient1 has subattr<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*{Recipient1/*}",
+                                        "CreateSubAttribute": false,
+                                        "AttributeName": "",
+                                        "SetAttributeName": false,
+                                        "AttributeType": "R",
+                                        "SetAttributeType": true,
+                                        "AttributeValue": "",
+                                        "SetAttributeValue": false
+                                      }
+                                    },
+                                    {
+                                      "Type": "RunObjectOnAttributes",
+                                      "Description": "Cascade change names if *@R<Run object on query>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*@R",
+                                        "AttributeSelector": {
+                                          "Type": null,
+                                          "Object": null
+                                        },
+                                        "UseAttributeSelector": false,
+                                        "Type": "OutputHandler",
+                                        "Object": {
+                                          "Type": "OutputHandlerSequence",
+                                          "Object": {
+                                            "ObjectsVector": [
+                                              {
+                                                "Type": "RemoveSubAttributes",
+                                                "Description": "Remove */Recipient1<Remove attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeSelector": {
+                                                    "Type": "QueryBasedAS",
+                                                    "Object": {
+                                                      "QueryText": "*/Recipient1"
+                                                    }
+                                                  },
+                                                  "ConditionalRemove": false,
+                                                  "DataScorer": {
+                                                    "Type": null,
+                                                    "Description": "",
+                                                    "Enabled": true,
+                                                    "Object": null
+                                                  },
+                                                  "ScoreCondition": "EQ",
+                                                  "CompareConditionType": "ValueOf",
+                                                  "ScoreToCompare": 0
+                                                }
+                                              },
+                                              {
+                                                "Type": "ModifyAttributeValueOH",
+                                                "Description": "Change */Recipient2 to Recipient1<Modify attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "*/Recipient2",
+                                                  "CreateSubAttribute": false,
+                                                  "AttributeName": "Recipient1",
+                                                  "SetAttributeName": true,
+                                                  "AttributeType": "",
+                                                  "SetAttributeType": false,
+                                                  "AttributeValue": "",
+                                                  "SetAttributeValue": false
+                                                }
+                                              },
+                                              {
+                                                "Type": "ModifyAttributeValueOH",
+                                                "Description": "Clear top-level type<Modify attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "*",
+                                                  "CreateSubAttribute": false,
+                                                  "AttributeName": "",
+                                                  "SetAttributeName": false,
+                                                  "AttributeType": "",
+                                                  "SetAttributeType": true,
+                                                  "AttributeValue": "",
+                                                  "SetAttributeValue": false
+                                                }
+                                              },
+                                              {
+                                                "Type": "ModifyAttributeValueOH",
+                                                "Description": "Mark top-level with type=R if Recipient1 has subattr<Modify attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "*{Recipient1/*}",
+                                                  "CreateSubAttribute": false,
+                                                  "AttributeName": "",
+                                                  "SetAttributeName": false,
+                                                  "AttributeType": "R",
+                                                  "SetAttributeType": true,
+                                                  "AttributeValue": "",
+                                                  "SetAttributeValue": false
+                                                }
+                                              },
+                                              {
+                                                "Type": "RemoveSubAttributes",
+                                                "Description": "Remove *@R/Recipient1<Remove attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeSelector": {
+                                                    "Type": "QueryBasedAS",
+                                                    "Object": {
+                                                      "QueryText": "*@R/Recipient1"
+                                                    }
+                                                  },
+                                                  "ConditionalRemove": false,
+                                                  "DataScorer": {
+                                                    "Type": null,
+                                                    "Description": "",
+                                                    "Enabled": true,
+                                                    "Object": null
+                                                  },
+                                                  "ScoreCondition": "EQ",
+                                                  "CompareConditionType": "ValueOf",
+                                                  "ScoreToCompare": 0
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Clear top-level type<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove Recipient# subattrr<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/Recipient1/*|*/Recipient2/*|*/Recipient3/*|*/Recipient4/*"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Remove escape chars (<>)<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*|*/Recipient1|*/Recipient2|*/Recipient3|*/Recipient4",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "AdvancedReplaceString",
+                "Object": {
+                  "StrToBeReplaced": "<([^>]+)>",
+                  "AsRegularExpression": true,
+                  "IsCaseSensitive": false,
+                  "Replacement": "$1",
+                  "ReplacementOccurrenceType": "All",
+                  "SpecifiedOccurrence": 0
+                }
+              }
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Split address into lines<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Clear type<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Create hasmanylines subattr<Run object on query>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": false,
+                        "RegExpFileName": "",
+                        "Pattern": "(?s-m)\r\n^\r\n[^\\r\\n]+\r\n(?'hasmanylines'\r\n  (\\r\\n)+\r\n  [^\\r\\n]+\r\n  (\\r\\n)+\r\n)?\r\n.*",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": false,
+                        "CreateSubAttributesFromNamedMatches": true,
+                        "OnlyCreateOneSubAttributePerGroup": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set type if hasmanylines<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{hasmanylines}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "hasmanylines",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "remove hasmanylines<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/hasmanylines"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Split address into lines with line feeds<Run object on query>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*@hasmanylines/addressLines",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": false,
+                        "RegExpFileName": "",
+                        "Pattern": "(?s-m)\r\n^\r\n(?'Address1'\r\n  [^\\r\\n]+\r\n)\r\n(\r\n  (\\r\\n)+\r\n  (?'Address2'\r\n    [^\\r\\n]+\r\n  )\r\n)?\r\n(\r\n  (\\r\\n)+\r\n  (?'Address3'\r\n    [^\\r\\n]+\r\n  )\r\n)?\r\n\\s*$",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": false,
+                        "CreateSubAttributesFromNamedMatches": true,
+                        "OnlyCreateOneSubAttributePerGroup": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Mis misOCRed comma<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/addressLines",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "AdvancedReplaceString",
+                      "Object": {
+                        "StrToBeReplaced": "(?nx) (?<=\\d\\W([NS][EW]?|[EW])),",
+                        "AsRegularExpression": true,
+                        "IsCaseSensitive": false,
+                        "Replacement": ".",
+                        "ReplacementOccurrenceType": "All",
+                        "SpecifiedOccurrence": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Split address into lines with commas<Run object on query>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*@/addressLines",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": false,
+                        "RegExpFileName": "",
+                        "Pattern": "(?'Address1'\r\n  [^,]+\r\n)\r\n(\r\n  ,\\s*\r\n  (?'Address2'\r\n    [^,]+\r\n  )\r\n)?\r\n(\r\n  ,\\s*\r\n  (?'Address3'\r\n    [^,]+\r\n  )\r\n)?\r\n\\W*$",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": false,
+                        "CreateSubAttributesFromNamedMatches": true,
+                        "OnlyCreateOneSubAttributePerGroup": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Clear type<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote subattrr<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/addressLines/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToParent",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Reorder subattrr (put city, state, zip last)<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Mark city, state and zipCode w/ type 'remove'<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/city|*/state|*/zipCode",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "remove",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Copy city -> City<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{city}",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "City",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%city%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Copy state -> State<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{state}",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "State",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%state%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Copy zipCode -> ZipCode<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{zipCode}",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "ZipCode",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%zipCode%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove */*@remove<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/*@remove"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ReplaceStrings",
+            "Description": "Remove garbage<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "file://<RSDFileDir>\\removeGarbage.dat.etf;%",
+                  "Replacement": ""
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

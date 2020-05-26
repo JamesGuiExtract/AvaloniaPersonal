@@ -1,0 +1,1506 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 5,
+        "Name": "FLEX Index - Indexing (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "17.1.3.102",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Page",
+    "InsertParentValue": "<PageNumber>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "CaseNumber": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "No. ; E:\\ExtractRulewriters\\Judgments\\Set002\\Images\\6011000376086231_JudgmentCopyDefault_20150825.pdf.tif",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=\r\n  (?<! ( phone | tele? | fax )\\W*)\r\nNo\\W*\r\n)\\w{3}\\-\\w{2,3}\\-\\w{4,}",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "After Case No. or Civil Action No.; E:\\ExtractRulewriters\\Judgments\\0000499451824203_JudgmentCopyDefault_20160316.pdf.tif",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=(Case\\x20No|Civil\\x20Action\\x20No)(\\W+))[^\\r\\n]+",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Civil Action No; E:\\ExtractRulewriters\\Judgments\\0000499498483898_JudgmentCopyDefault_20150914.pdf.tif",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "^.{0,3}Civil\\W*Action\\W*No\\W*(?'Case'[^\\r\\n]+)",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "MoveAndModifyAttributes",
+              "Description": "Promote Case<Move and modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AddAttributeNameToType": false,
+                "AddRootOrParentAttributeType": false,
+                "AddSpecifiedAttributeType": false,
+                "AttributeQuery": "*/Case",
+                "DeleteRootOrParentIfAllChildrenMoved": true,
+                "MoveAttributeLevel": "MoveToRoot",
+                "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                "RetainAttributeType": true,
+                "SpecifiedAttributeName": "",
+                "SpecifiedAttributeType": ""
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Case Number Box; E:\\ExtractRulewriters\\Judgments\\0000000104825561_JudgmentCopyDefault_20150831.pdf.tif",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "BoxFinder",
+              "Object": {
+                "AttributeText": "000-00-0000",
+                "BoxHeightMax": null,
+                "BoxHeightMin": null,
+                "BoxWidthMax": null,
+                "BoxWidthMin": null,
+                "ClueLocation": "SameBox",
+                "Clues": [
+                  "^.{0,3}Case(\\W*)Number(\\W*)"
+                ],
+                "CluesAreCaseSensitive": false,
+                "CluesAreRegularExpressions": true,
+                "ExcludeClueArea": false,
+                "FindType": "Text",
+                "FirstBoxOnly": true,
+                "IncludeClueText": false,
+                "IncludeLines": false,
+                "NumFirstPages": 0,
+                "NumLastPages": 0,
+                "PageSelectionMode": "AllPages",
+                "SpecifiedPages": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Docket Number; E:\\ExtractRulewriters\\Judgments\\0000000101043648_JudgmentCopyDefault_20150106.pdf.tif",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "BoxFinder",
+              "Object": {
+                "AttributeText": "000-00-0000",
+                "BoxHeightMax": null,
+                "BoxHeightMin": null,
+                "BoxWidthMax": null,
+                "BoxWidthMin": null,
+                "ClueLocation": "SameBox",
+                "Clues": [
+                  "^.{0,3}Docket(\\W*)Number"
+                ],
+                "CluesAreCaseSensitive": false,
+                "CluesAreRegularExpressions": true,
+                "ExcludeClueArea": false,
+                "FindType": "Text",
+                "FirstBoxOnly": true,
+                "IncludeClueText": false,
+                "IncludeLines": false,
+                "NumFirstPages": 0,
+                "NumLastPages": 0,
+                "PageSelectionMode": "AllPages",
+                "SpecifiedPages": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Right of Docket#; E:\\ExtractRulewriters\\Judgments\\0000000101949984_JudgmentCopyAgreement_20161229.pdf.tif",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "^.{0,3}Docket(\\W*)(#|No)\\W*(?'Case'[^\\r\\n]+)",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "MoveAndModifyAttributes",
+              "Description": "Promote Case<Move and modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AddAttributeNameToType": false,
+                "AddRootOrParentAttributeType": false,
+                "AddSpecifiedAttributeType": false,
+                "AttributeQuery": "*/Case",
+                "DeleteRootOrParentIfAllChildrenMoved": true,
+                "MoveAttributeLevel": "MoveToRoot",
+                "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                "RetainAttributeType": true,
+                "SpecifiedAttributeName": "",
+                "SpecifiedAttributeType": ""
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Below Case; E:\\ExtractRulewriters\\Judgments\\0000001660168867_JudgmentCopyDefault_20080804.pdf.tif",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "^.{0,3}CASE\\W*NUMBER\\W*\\r\\n(?'Case'[^\\r\\n]+)",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "MoveAndModifyAttributes",
+              "Description": "Promote Case<Move and modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AddAttributeNameToType": false,
+                "AddRootOrParentAttributeType": false,
+                "AddSpecifiedAttributeType": false,
+                "AttributeQuery": "*/Case",
+                "DeleteRootOrParentIfAllChildrenMoved": true,
+                "MoveAttributeLevel": "MoveToRoot",
+                "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                "RetainAttributeType": true,
+                "SpecifiedAttributeName": "",
+                "SpecifiedAttributeType": ""
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "No CASENUMBER!",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "No Case Number",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "DateGranted": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "After Date Notice Mailed",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=Date\\x20notice\\x20mailed:\\x20?)[^\\r\\n]+",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "After Notice Issued",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=notice\\W*issued\\W*)[^\\r\\n]+",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Date Judgment Entered",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "LocateImageRegion",
+              "Object": {
+                "DataInsideBoundaries": true,
+                "FindType": "Text",
+                "ImageRegionText": "",
+                "IncludeIntersectingEntities": true,
+                "IntersectingEntityType": "Character",
+                "MatchMultiplePagesPerDocument": true,
+                "ClueList1": {
+                  "Clues": [
+                    "^.{0,4}Date\\W*Judgment\\W*Entered\\W*"
+                  ],
+                  "CaseSensitive": false,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList2": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList3": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList4": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "Left": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Right",
+                  "ExpandDirection": "ExpandLeft",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Top": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Top",
+                  "ExpandDirection": "ExpandUp",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Right": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Right",
+                  "ExpandDirection": "ExpandRight",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Bottom": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandDown",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "CompData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<ComponentDataDir>\\Indexing\\DocumentDate\\Master.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "No DATE!",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "No Date",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "Filename": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Create value based on input image",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<SourceDocName>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "Judgment": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": "RSDSplitter",
+          "Description": "<Split attributes using RSD file>",
+          "Enabled": true,
+          "Object": {
+            "RSDFileName": "<RSDFileDir>\\Judgment\\JudgmentMain.rsd.etf"
+          }
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "Page": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": "RSDSplitter",
+          "Description": "<Split attributes using RSD file>",
+          "Enabled": true,
+          "Object": {
+            "RSDFileName": "<RSDFileDir>\\Pages\\PageMain.rsd.etf"
+          }
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "Parties": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": "RSDSplitter",
+          "Description": "<Split attributes using RSD file>",
+          "Enabled": true,
+          "Object": {
+            "RSDFileName": "<RSDFileDir>\\Party\\PartyMain.rsd.etf"
+          }
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Handle Dates<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ReplaceStrings",
+                  "Description": "Remove No Date<Replace strings>",
+                  "Enabled": true,
+                  "Object": {
+                    "Replacements": [
+                      {
+                        "Pattern": "No\\x20Date",
+                        "Replacement": ""
+                      }
+                    ],
+                    "AsRegularExpr": true,
+                    "IsCaseSensitive": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "format dates<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "DateGranted",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "DateTimeSplitter",
+                      "Object": {
+                        "MinimumTwoDigitYear": 1970,
+                        "OutputFormat": "%m/%d/%Y",
+                        "ShowFormattedOutput": true,
+                        "SplitDayOfWeek": false,
+                        "SplitDefaults": false,
+                        "SplitFourDigitYear": true,
+                        "SplitMilitaryTime": false,
+                        "SplitMonthAsName": false,
+                        "TwoDigitYearBeforeCurrent": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Run CommonOH<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "DateGranted",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<ComponentDataDir>\\Indexing\\DocumentDate\\commonOH.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "MoveAndModifyAttributes",
+                  "Description": "set to formatted date<Move and modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AddAttributeNameToType": false,
+                    "AddRootOrParentAttributeType": true,
+                    "AddSpecifiedAttributeType": false,
+                    "AttributeQuery": "DateGranted/*",
+                    "DeleteRootOrParentIfAllChildrenMoved": true,
+                    "MoveAttributeLevel": "MoveToParent",
+                    "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                    "RetainAttributeType": false,
+                    "SpecifiedAttributeName": "",
+                    "SpecifiedAttributeType": ""
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "remove */Formatted<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/Formatted"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Eliminate Duplicates<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "DateGranted",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "EliminateDuplicates",
+                      "Object": "EliminateDuplicates"
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Remove leading zeros<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "DateGranted",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ReplaceStrings",
+                      "Object": {
+                        "Replacements": [
+                          {
+                            "Pattern": "\\b0(\\d)",
+                            "Replacement": "$1"
+                          }
+                        ],
+                        "AsRegularExpr": true,
+                        "IsCaseSensitive": false
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Handle Pages<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Combine page subs<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Page",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%Page<>all:~%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Remove lesser pages<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Page",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ReplaceStrings",
+                      "Object": {
+                        "Replacements": [
+                          {
+                            "Pattern": "([^~]+~)(?=\\d)",
+                            "Replacement": ""
+                          }
+                        ],
+                        "AsRegularExpr": true,
+                        "IsCaseSensitive": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove page subs<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "Page/Page"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set to Pages<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Page",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "Pages",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "remove spatial<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Pages",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "RemoveSpatialInfo",
+                      "Object": "RemoveSpatialInfo"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Clean up Case Number<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "CaseNumber",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "RemoveCharacters",
+                "Object": {
+                  "Characters": " \t\r\n-,.:;",
+                  "IsCaseSensitive": false,
+                  "RemoveAll": false,
+                  "Consolidate": true,
+                  "TrimLeading": true,
+                  "TrimTrailing": true
+                }
+              }
+            }
+          },
+          {
+            "Type": "ReplaceStrings",
+            "Description": "Remove No Case Number<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "No\\W*Case\\W*Number",
+                  "Replacement": ""
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "If no Parties sub, make blanks<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Parties",
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "Parties{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "UseAttributeSelector": true,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "CreateAttribute",
+                "Object": {
+                  "Root": "*/Parties",
+                  "SubAttributesToCreate": [
+                    {
+                      "Name": "FirstName",
+                      "NameContainsXPath": false,
+                      "DoNotCreateIfNameIsEmpty": false,
+                      "TypeOfAttribute": "",
+                      "TypeContainsXPath": false,
+                      "DoNotCreateIfTypeIsEmpty": false,
+                      "Value": "",
+                      "ValueContainsXPath": false,
+                      "DoNotCreateIfValueIsEmpty": false
+                    },
+                    {
+                      "Name": "MiddleInitial",
+                      "NameContainsXPath": false,
+                      "DoNotCreateIfNameIsEmpty": false,
+                      "TypeOfAttribute": "",
+                      "TypeContainsXPath": false,
+                      "DoNotCreateIfTypeIsEmpty": false,
+                      "Value": "",
+                      "ValueContainsXPath": false,
+                      "DoNotCreateIfValueIsEmpty": false
+                    },
+                    {
+                      "Name": "LastName",
+                      "NameContainsXPath": false,
+                      "DoNotCreateIfNameIsEmpty": false,
+                      "TypeOfAttribute": "",
+                      "TypeContainsXPath": false,
+                      "DoNotCreateIfTypeIsEmpty": false,
+                      "Value": "",
+                      "ValueContainsXPath": false,
+                      "DoNotCreateIfValueIsEmpty": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "If no MiddleInitial, add it<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Parties",
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "Parties{MiddleInitial}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "UseAttributeSelector": true,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "CreateAttribute",
+                "Object": {
+                  "Root": "*/Parties",
+                  "SubAttributesToCreate": [
+                    {
+                      "Name": "MiddleInitial",
+                      "NameContainsXPath": false,
+                      "DoNotCreateIfNameIsEmpty": false,
+                      "TypeOfAttribute": "",
+                      "TypeContainsXPath": false,
+                      "DoNotCreateIfTypeIsEmpty": false,
+                      "Value": "",
+                      "ValueContainsXPath": false,
+                      "DoNotCreateIfValueIsEmpty": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote Parties sub<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "Parties/*",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Remove value from top level judgment<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Judgment",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Judgment/Parties with no subs<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "Judgment|Parties"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*{*}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "*testing*<Select multiple output handlers>",
+            "Enabled": false,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Judgment to NA<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Judgment",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "NA",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove Blanks<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "MultipleCriteriaSelector",
+                      "Object": {
+                        "Selectors": [
+                          {
+                            "Select": "NonMatching",
+                            "With": {
+                              "Type": "ValueConditionSelector",
+                              "Description": "<Value condition selector>",
+                              "Enabled": true,
+                              "Object": {
+                                "Condition": {
+                                  "Type": "FindingRuleCondition",
+                                  "Object": {
+                                    "AFRule": {
+                                      "Type": "RegExprRule",
+                                      "Object": {
+                                        "IsRegExpFromFile": false,
+                                        "RegExpFileName": "",
+                                        "Pattern": "[\\s\\S]+",
+                                        "IsCaseSensitive": false,
+                                        "FirstMatchOnly": false,
+                                        "CreateSubAttributesFromNamedMatches": false,
+                                        "OnlyCreateOneSubAttributePerGroup": false
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "CombineBy": "Chain"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove sub Blanks<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "MultipleCriteriaSelector",
+                      "Object": {
+                        "Selectors": [
+                          {
+                            "Select": "Matching",
+                            "With": {
+                              "Type": "QueryBasedAS",
+                              "Description": "<Query attribute selector>",
+                              "Enabled": true,
+                              "Object": {
+                                "QueryText": "*/*"
+                              }
+                            }
+                          },
+                          {
+                            "Select": "NonMatching",
+                            "With": {
+                              "Type": "ValueConditionSelector",
+                              "Description": "<Value condition selector>",
+                              "Enabled": true,
+                              "Object": {
+                                "Condition": {
+                                  "Type": "FindingRuleCondition",
+                                  "Object": {
+                                    "AFRule": {
+                                      "Type": "RegExprRule",
+                                      "Object": {
+                                        "IsRegExpFromFile": false,
+                                        "RegExpFileName": "",
+                                        "Pattern": "[\\s\\S]+",
+                                        "IsCaseSensitive": false,
+                                        "FirstMatchOnly": false,
+                                        "CreateSubAttributesFromNamedMatches": false,
+                                        "OnlyCreateOneSubAttributePerGroup": false
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ],
+                        "CombineBy": "Chain"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Judgment to Blank<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Judgment",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": true
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "EliminateDuplicates",
+            "Description": "<Eliminate duplicates>",
+            "Enabled": true,
+            "Object": "EliminateDuplicates"
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

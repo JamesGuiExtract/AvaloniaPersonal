@@ -1,0 +1,6791 @@
+[
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "0000-0000-0000-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?~<error=2,method=better_fit>card\\x20number)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.75,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 57.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.25,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "testing",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\bREC\\x20?\\.?\\x20?INFO\\b",
+          "\\bBOOK\\s{0,4}PAGE\\s{0,4}REGISTRY\\b",
+          "\\bRECORDING\\b",
+          "\\bRECORDED\\b"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 8.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(So|ci|al).{0,10}(Sec|cur|ity).{0,9}No[.,]?"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "[\\s\\S]*"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 28.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "file://<ComponentDataDir>\\Redaction\\DocTypeRSD\\Federal Tax Lien\\CL1c-DateOfAssessment.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 24.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 13.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "Driver'sLicense",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "Ohio\\s*Driver",
+          "Ohio.{4,12}(?:\\bLice|.{0,3}cense|.{2,4}ense\\b)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 40.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "é",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "\\(Order"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.2,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "^Control\\x20ID"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "Patient\\x20Details"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [
+          "Specimen\\x20Details"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "700-00-0g11",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "file://<RSDFileDir>\\Addendum-Box11d-11g-CL2.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [
+          "file://<RSDFileDir>\\Addendum-Box11g-CL3.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 36.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(LEG|GAL).{0,10}(DES|CRI|PTION)"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "(cert|ify).{0,6}(th|at).{0,8}(pro|per|ty).{0,9}(tax|xes).{0,5}(ha|ve).{0,5}(be|en).{0,5}(pa|id).{0,4}(b|y).{0,4}(th|he).{0,5}(Sta|ate)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 4.5,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.6,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "--\\s?Units",
+          "\\bUNITS\\b(?!\\s*[:=])"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "«[^«»]+[âä]»"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 4.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\bV\\b",
+          "CASE\\sNO"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "file://<RSDFileDir>\\warrantInDebt.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [
+          "[\\s\\S]*"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "Assignor.{0,3}$"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": " ",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "[\\s\\S]+"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.01,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.03,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.02,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.01,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(soc|cia|ial)[\\s\\S]{0,10}(sec|cur|rity)[\\s\\S]{0,13}No\\.?"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 20.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": " ",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "[^\\r\\n]+"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 8.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.2,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "00-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "DATE.{0,5}BIRTH",
+          "\\b(?~<error=2,method=better_fit>DATE\\WOF\\WBIRTH)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 6.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "In Re the Marriage of"
+        ],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "Petitioner"
+        ],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": " ",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?<=¦\\r\\n)[^\\r\\n¿]{2,}"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "(?<=¦\\r\\n[^\\r\\n¿]{2,}\\r\\n)[^\\r\\n¿]{2,}"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "Units?\\s*[=:]\\s*"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 20.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": " ",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?:DA.{0,3}|.{0,2}AT.{0,2}|.{0,3}TE).{0,2}(?:INDU.{4}|.{0,3}DUCT.{2}|.{2,5}CTED)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "5.{0,4}(?:GR.{1,4}|.{0,2}RAD.{0,2}|.{0,3}ADE).{0,4}(?:RA.{0,3}|.{0,2}AT.{0,2}|.{0,3}TE).{0,4}(?:OR|.{0,3}).{0,4}(?:RA.{0,3}|.{0,2}AN.{0,2}|.{0,3}NK)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 20.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 10.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "asdf",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "SSN"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 9.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "3[.,]?\\x20?(?~<method=better_fit>ADDITIONAL)\\x20?(?~<method=better_fit>DEBTOR)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 85.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "test",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "·«[^\\r\\n\\t]+"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "\\bFlag\\b"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.2,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.8,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?~<method=better_fit>Spouse's\\ssocial\\ssecurity\\snumber)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 6.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.5,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?~<error=2,method=better_fit>an\\Wadmission\\Wof\\Wguilt)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 7.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.1,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": false,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(^(?>(?~<error=2>the\\Wamount\\Win\\Wquestion))|(?>(?~<error=2>we\\Wmay\\Wreport\\Wyou\\Was\\Wdelinquent)))[\\s\\S]{25,275}^(?>(?~<error=2>Important\\WPayment\\WInstructions))[\\s\\S]{0,2}\\W*(?~<error=2>Right\\Wto\\WPrepay)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "500-00-0g22",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\Additional-Box22d-22g-CL1.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [
+          "file://<RSDFileDir>\\Additional-Box21g-22g-23g-CL3.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 36.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "XXXXXXXX",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?~<method=better_fit>DRIVER'S\\x20LIC)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 14.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.3,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?<=\\A|[\\r\\n])Color(?=[\\r\\n]|\\z)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.4,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 38.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.5,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "^Recording\\sFees?\\b"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "100-00-00g7",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\Amendment-Box7d-7g-CL1.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "file://<RSDFileDir>\\Amendment-Box7d-7g-CL2.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [
+          "file://<RSDFileDir>\\Amendment-Box6g-7g-CL3a.dat.etf"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 34.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?~<>DPS/SID)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\Additional-Box22d-CL1a.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "file://<RSDFileDir>\\Additional-Box22d-22g-CL2.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 30.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\bname[:;]"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "2",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "[\\s\\S]+"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 4.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "^.{0,5}(?:obl.{4,5}|.{1,2}bligo.{1,2}|.{3,4}igor).{0,5}\\r?$"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 28.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.7,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?~<error=2>OPTIONAL\\x20FILER)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.5,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "AccountNumber",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "^.{0,5}(?:CH.CK.NG|.?HECKING|C.?ECKING|CH.?CKING|CHE.?KING|CHEC.?ING|CHECK.?NG|CHECKI.?G|CHECKIN.?)"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "$"
+        ],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "MinorName",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?-i:NAME)[:;]?"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.5,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 39.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?:S.c..l|Soc.{2,4}|.{1,2}ocia.{1,2}|.{2,4}ial|.?ocial|S.?cial|So.?ial|Soc.?al|Soci.?l|Socia.?)\\W*(?:S.c.r.ty|Secu.{3,5}|.{1,3}curi.{1,3}|.{3,5}rity|.?ecurity|S.?curity|Se.?urity|Sec.?rity|Secu.?ity|Secur.?ty|Securi.?y|Securit.?)\\W*(?:Num.{2,4}|.{1,2}umbe.{1,2}|.{2,4}ber|.?umber|N.?mber|Nu.?ber|Num.?er|Numb.?r|Numbe.?)(?:\\W*is)?\\W*:?"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 25.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.3,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": false,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "^Lender[:;]"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": " ",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "^[LU]\\.?-\\d{3,5}\\sP-\\d{1,5}\\b",
+          "^L\\s\\d{3,5}\\sP\\s\\d{1,5}\\b"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 8.5,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 8.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": " ",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "^.{0,2}IN.{0,2}WITNESS.{0,2}WHEREOF",
+          "^.{0,2}BY.{0,2}SIGNING.{0,2}BELOW",
+          "^.{0,2}GRANTOR.{0,2}[:;]"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 15.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?:^.{0,3}(?:ORIGINAL.{0,3})?(?:TRUST[O0E]R|GRANTOR|BORROWER).{0,6}[:;])"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "xxxx",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "^.{0,8}Full\\W*name\\W*and\\W*address\\W*of\\W*judgment\\W*debtor\\W*being\\W*fully\\W*or\\W*partially\\W*released\\W*[:;]"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 60.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?x) \\b HR \\x20* P[li]us \\x20* \\(A \\x20* Division \\x20* of \\x20* AlliedBarton \\x20* Security \\x20* Svs\\) \\x20*"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 28.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.6,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.6,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "SSN"
+        ],
+        "CaseSensitive": true,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "DOB"
+        ],
+        "CaseSensitive": true,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "200-00-0001",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\Standard-Box2d-2g-CL1.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "file://<RSDFileDir>\\Standard-Box2d-2g-CL2.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [
+          "file://<RSDFileDir>\\Standard-Box1g-2g-CL3.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 36.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "^.{0,9}yer.{0,4}s\\)\\x20?[:;]"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.5,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "Soc-Se-curi0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?:\\bsoc.{1,5}|ocia.{0,3}|cial)[\\s\\S]{0,2}(?:secu|.{0,2}ecuri|.{0,3}curit|.{0,5}urity)(?!.*(?:\\bNo|num|umb|mbe|ber))"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 33.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "License\\x20Number"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 25.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "¿[^»]+»"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 30.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": " ",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\ssnclue.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 20.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 20.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "PossibleSocialSecurityNumber",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\b\\w{0,5}?(?:Soc|ial)[\\s\\S]{0,10}?(?:Sec|uri|ity)[\\s\\S]{0,11}?(?:Nu|um|mb|ber)\\w{0,6}?\\b"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 9.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "«clue»",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?~<error=4,method=better_fit>PRESENTATION.OF.DEATH.CERTIFICATE)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 6.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 15.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?:GR.{1,4}|.{0,2}RAD.{0,2}|.{0,3}ADE).{0,4}(?:RA.{0,3}|.{0,2}AT.{0,2}|.{0,3}TE)[\\S\\s]{0,4}(?:OR|.{0,3}).{0,4}(?:RA.{2}|.{0,2}AN.|.{0,3}NK)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 12.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 4.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 18.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "sdfg",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?-i:INITIALS)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "\\bAGE\\W*(?~<error=2>or\\WBirthdate)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\b[S5s]\\x20?\\.?\\x20?[S5s]\\x20?\\.?\\x20?N[Oo0]\\b"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.5,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 45.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": false,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?:S.c..l|Soc.{2,4}|.{1,2}ocia.{1,2}|.{2,4}ial|.?ocial|S.?cial|So.?ial|Soc.?al|Soci.?l|Socia.?)\\W*(?:S.c.r.ty|Secu.{3,5}|.{1,3}curi.{1,3}|.{3,5}rity|.?ecurity|S.?curity|Se.?urity|Sec.?rity|Secu.?ity|Secur.?ty|Securi.?y|Securit.?)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.75,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 4.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "00/00/0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\..\\RightOfDOB.dat.etf"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?:IDENT|NTIFIC|CATION)[\\s\\S]{0,14}N[O0]"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 13.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 10.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "RETURN\\W+TO"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 15.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 4.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "Guideline Sentence Form",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "[\\s\\S]+"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?:This\\s*document\\s*)?prepared.{2,16}returns?\\s*to",
+          "(?:prepared|record).{2,20}returns?\\s*to\\s*:?"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 8.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 18.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 6.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "region",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\b[O0o]LN\\b"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 15.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": " ",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "^Test\\r"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "^.{0,2}The.{0,3}foregoing.{0,3}request.{0,3}for.{0,3}release.{0,3}was.{0,3}acknowledged.{0,3}before.{0,3}me.{0,3}this.+by"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "test",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "^.{0,3}\\bCPT\\b"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "test",
+      "IncludeIntersectingEntities": false,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\bOWNER\\b"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 15.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?~<error=3,method=better_fit>SOCIAL\\x20SECURITY\\x20NUMBER)"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "(?~<>Correction\\sOnly)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": true
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 22.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 20.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "name\\W?s\\W?\\x20and\\x20last\\x20known\\x20address(es)?:?"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "who\\x20is\\W?are\\x20liable\\x20to\\x20said\\x20county",
+          "unpaid\\x20amounts\\x20set\\x20forth\\x20below"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "name",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "^(?:PAT(?:IENT)?\\s)?NAME\\x20?[.,]?\\x20?[:;]"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 36.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "region",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "^WITNESS\\x20?[:;]"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 10.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "xxxx",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "^.{0,2}of.{0,3}the.{0,3}City.{0,3}and.{0,3}County"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 8.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 4.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?nx) (?<=\\s) \\d{1,2} / \\d{1,2} / (\\d{4} | \\d{2}) (?=\\s(Fe)?Male\\s)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "leftDOB",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\b(?~<>D\\WO\\WB)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 33.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 2.5,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 29.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\SSNorTax.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "(?:the\\W*(?:n.m.|.?ame|n.?me|na.?e|nam.?|na.{0,3}|.{1,2}am.{1,2}|.{0,3}m))",
+          "\\b(?:ha.|[^gmpw]as|h.s)\\b"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.6,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.3,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "asdf",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "[\\s\\S]+"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(?:^.{0,3}(?:ORIGINAL.{0,3})?(?:TRUST[O0E]R|GRANTOR|BORROWER).{0,6}[:;])"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": false,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "quest.{0,3}diag"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.3,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.3,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\(\\x20*T[Il1|!]N\\x20*\\)",
+          "TIN\\x20*\\)"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "asdf",
+      "IncludeIntersectingEntities": false,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "^.{0,3}(?~<error=2>Telephone)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.2,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 38.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.3,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "asdf",
+      "IncludeIntersectingEntities": false,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "22A\\W*Full\\W*B",
+          "22[B8]\\W*State\\W*(?:o.|.f)",
+          "2[1il]A\\W*Full\\W*B",
+          "2[1il][B8]\\W*State\\W*(?:o.|.f)",
+          "22.{0,4}FULL\\W*BIRTH",
+          "22.{0,4}STATE\\W*OF\\W*BIRTH",
+          "21.{0,4}FULL\\W*BIRTH",
+          "21.{0,4}STATE\\W*OF\\W*BIRTH"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "[1il]2A\\W*First",
+          "[1il]2[B8]\\W*Middle",
+          "[1il]2C\\W*Current",
+          "[1il]2D\\W*Last",
+          "12.{0,4}FIRST",
+          "12.{0,4}MIDDLE",
+          "12.{0,4}CURRENT",
+          "12.{0,4}LAST"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\StartClues.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 45.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": " ",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "«clue»"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 8.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 8.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "^(?~<error=3>tax\\x20collector\\x20of\\x20said\\x20county)",
+          "(?~<error=3>real\\x20property\\x20subject\\x20to\\x20this\\x20notice)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "^(?~<error=5>and\\x20is\\x20situated\\x20in\\x20said\\x20county)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.5,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "100-00-0022",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\Additional-Box22d-22g-CL1.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "file://<RSDFileDir>\\Additional-Box22d-22g-CL2.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [
+          "file://<RSDFileDir>\\Additional-Box21d-22d-23d-CL3a.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 28.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?~<error=1,method=better_fit>SECURED\\x20PARTY)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 4.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "Address",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "4.{0,2}Verificat"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 10.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 88.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "test",
+      "IncludeIntersectingEntities": false,
+      "IntersectingEntityType": "Word",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\bNEW\\x20?TRUSTEE\\x20?:"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 25.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "^3C\\b"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 200.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "\\b(?:prepa.{4,6}|.{1,3}epare.{1,4}|.{4,7}rer'?s)\\b"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 12.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.7,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 50.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "(soc|cia|ial)[\\s\\S]{0,10}(sec|cur|rity)[\\s\\S]{0,13}(num|umb|er)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "asdf",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?~<error=2>reputed\\Wowner)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0001",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\LIR-SSNLine.dat.etf"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [
+          "file://<RSDFileDir>\\LIR-LeftOfSSN.dat.etf"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [
+          "file://<RSDFileDir>\\LIR-RightOfSSN.dat.etf"
+        ],
+        "CaseSensitive": true,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList2",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList3",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": false,
+      "ClueList1": {
+        "Clues": [
+          "\\r\\n.{0,3}Buyer(?:\\(?s\\)?)?.{0,4}Borrower(?:\\(?s\\)?)?:"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "PageCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "file://<RSDFileDir>\\clue.dat.etf"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 18.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.8,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "(?~<error=2>Identifying\\WNumber)"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 17.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "ImageRegion",
+      "ImageRegionText": " ",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "[\\S\\s]+"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  },
+  {
+    "Type": "LocateImageRegion",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataInsideBoundaries": true,
+      "FindType": "Text",
+      "ImageRegionText": "000-00-0000",
+      "IncludeIntersectingEntities": true,
+      "IntersectingEntityType": "Character",
+      "MatchMultiplePagesPerDocument": true,
+      "ClueList1": {
+        "Clues": [
+          "\\b(?:cust.{3,5}|.{1,3}stom.{1,3}|.{3,5}omer)\\b"
+        ],
+        "CaseSensitive": false,
+        "Regex": true,
+        "RestrictByBoundary": false
+      },
+      "ClueList2": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList3": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "ClueList4": {
+        "Clues": [],
+        "CaseSensitive": false,
+        "Regex": false,
+        "RestrictByBoundary": false
+      },
+      "Left": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Top": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "ClueLines"
+      },
+      "Right": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "ClueCharacters"
+      },
+      "Bottom": {
+        "Anchor": "ClueList1",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 10.0,
+        "ExpandUnits": "ClueLines"
+      }
+    }
+  }
+]

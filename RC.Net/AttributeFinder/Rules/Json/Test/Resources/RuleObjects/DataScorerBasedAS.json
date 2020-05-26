@@ -1,0 +1,2109 @@
+[
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 0,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 53,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 66,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 91,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 85,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 69,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 52,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 0,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "Greater than 0 if value is more than upper limit, but not if too much more (might be missing decimal point)<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\getValueAndRangeParts.rsd.etf",
+          "ScoreExpression": "($H[0] == '>' ? 0 :\r\n  (#H = float.Parse($H[0]);\r\n   #V = float.Parse($V[0]);\r\n   (#V > #H and (#H == 0 or #V >= 100 and #V < #H * 50 or #V < 100 and #V < #H * 5) ? 1 : 0)\r\n  )\r\n)"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 55,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 63,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 37,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 45,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 70,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "Average<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 85,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 84,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 92,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 75,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 36,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 90,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 19,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 74,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 67,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 5,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 80,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 90,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 77,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 50,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 29,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 68,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 8,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 88,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 40,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 97,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 54,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 0,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "Entity<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 63,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 44,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 78,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 40,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 35,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 40,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 57,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 0,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "$Below.count() - $Left.count() * 10<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\getColumnHeaderSurroundings.rsd.etf",
+          "ScoreExpression": "($Below.count() - $Left.count() * 10 > 0 and\r\n $Below.count() - $Right.count() * 10 > 0 ? 1:0)"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 74,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 35,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 99,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 5,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\id.rsd.etf",
+          "ScoreExpression": "($parts = $_[0].Split('|'.ToCharArray(), 2);\r\n ($parts.Length == 2 and $parts[0].Length > 0 ?\r\n    $parts[1].Length / $parts[0].Length : 0\r\n))"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 45,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 70,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "Avg<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 79,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 21,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 69,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "NEQ",
+      "FirstScoreToCompare": 0,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "Non-zero if upper limit is less than lower limit<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\TestResults\\getValueAndRangeParts.rsd.etf",
+          "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 0 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) <= float.Parse($L[0]) ? 1 : 0) : 0\r\n  )\r\n)"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 46,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 22,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 1,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "1 if equal to limit<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\getValueAndRangeParts.rsd.etf",
+          "ScoreExpression": "( $V[0] == $L[0] ? 1 : 0)"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 25,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 20,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "#Prefix.sum() - #Suffix.sum()<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\RecipientTrimming\\getAndScoreSuffix.rsd.etf",
+          "ScoreExpression": "#Prefix.sum() - #Suffix.sum()"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 62,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 98,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 72,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 84,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 0,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "Non-zero if upper limit is less than lower limit<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\getValueAndRangeParts.rsd.etf",
+          "ScoreExpression": "($L.count() == 0 or $H.count() == 0 ? 1 :\r\n  (float.TryParse($H[0],null) and float.TryParse($L[0],null) ?\r\n    (float.Parse($H[0]) <= float.Parse($L[0]) ? 1 : 0) : 1\r\n  )\r\n)"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 45,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 5,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 83,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 89,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 94,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 30,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 82,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 29,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 77,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 24,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 75,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 14,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 20,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 23,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 68,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 82,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 10,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "ScoreEntity.rsd<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 0,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "Less than 0 if value is less than lower limit<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\getValueAndRangeParts.rsd.etf",
+          "ScoreExpression": "($L[0] == '<' ? 0 : (float.Parse($V[0]) < float.Parse($L[0]) ? -1 : 0))"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 92,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 80,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 60,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 30,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "Avg<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 35,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 90,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 74,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 71,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 93,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 40,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 85,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 31,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "min<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Minimum"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 48,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 50,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 95,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 81,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 35,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 64,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  },
+  {
+    "Type": "DataScorerBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 91,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "avg",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      }
+    }
+  }
+]

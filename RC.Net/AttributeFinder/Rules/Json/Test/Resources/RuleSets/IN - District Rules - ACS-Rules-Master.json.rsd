@@ -1,0 +1,1337 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 2,
+        "Name": "FLEX Index - Pagination (By Document)",
+        "ByPage": false,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocPreprocessorSequence",
+      "Description": "<Select Multiple Document Preprocessors>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "DocumentClassifier",
+            "Description": "<Document Classifier>",
+            "Enabled": true,
+            "Object": {
+              "IndustryCategoryName": "County Document",
+              "ReRunClassifier": true
+            }
+          },
+          {
+            "Type": "AdvancedReplaceString",
+            "Description": "Remove \"REDACT EACH SOCIAL SECURITY NUMBER\"<Advanced replace string>",
+            "Enabled": true,
+            "Object": {
+              "StrToBeReplaced": "(?:REDACT|EACH)[\\s\\S]{0,15}(So|cia|ial)[\\s\\S]{0,10}(Sec|cur|rity)[\\s\\S]{0,7}(Nu|umb|ber)",
+              "AsRegularExpression": true,
+              "IsCaseSensitive": false,
+              "Replacement": "",
+              "ReplacementOccurrenceType": "All",
+              "SpecifiedOccurrence": 0
+            }
+          },
+          {
+            "Type": "AdvancedReplaceString",
+            "Description": "Remove dates on stamps to reduce False Positives<Advanced replace string>",
+            "Enabled": true,
+            "Object": {
+              "StrToBeReplaced": "\\d{4}.{0,2}AT.{0,15}[AP]M",
+              "AsRegularExpression": true,
+              "IsCaseSensitive": false,
+              "Replacement": "",
+              "ReplacementOccurrenceType": "All",
+              "SpecifiedOccurrence": 0
+            }
+          },
+          {
+            "Type": "AdvancedReplaceString",
+            "Description": "Remove \"dated\" followed by numbers<Advanced replace string>",
+            "Enabled": true,
+            "Object": {
+              "StrToBeReplaced": "Dated.{0,3}\\d{3}",
+              "AsRegularExpression": true,
+              "IsCaseSensitive": false,
+              "Replacement": "",
+              "ReplacementOccurrenceType": "All",
+              "SpecifiedOccurrence": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Clues": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find SSN_Clues from CommonMaster.rsd",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "SSN_Clues"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "CERTIFICATE OF DISCHARGE OF PROPERTY FROM FEDERAL TAX LIEN",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "CERTIFICATE\\s?OF\\s?DISCHARGE\\s?OF\\s?PROPERTY\\s?FROM\\s?FEDERAL\\s?TAX\\s?LIEN",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "LocateImageRegion",
+                  "Description": "<Locate image region>",
+                  "Enabled": true,
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "ImageRegion",
+                    "ImageRegionText": "Possible SSN",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Character",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "[\\s\\S]*"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Left",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "PageCharacters"
+                    },
+                    "Top": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Top",
+                      "ExpandDirection": "ExpandUp",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "PageLines"
+                    },
+                    "Right": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "PageCharacters"
+                    },
+                    "Bottom": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "PageLines"
+                    }
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "\"Tax ID or SS\" and \"55N\"",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "Tax\\s?[I1]D\\s?or\\s?SS\r\n|\r\n\\b55N\\b\r\n|\r\n//K:\\Common\\Engineering\\Sample Files\\ACS\\IN - Districts\\Set001\\WC_District\\IN - Hendricks\\001-2003-00033860-003.tif\r\n\\bS.S\\x20?#",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Low Quality Page",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\LowQualityPage.rsd.etf"
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "LocateImageRegion",
+                  "Description": "Make neat<Locate image region>",
+                  "Enabled": true,
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "ImageRegion",
+                    "ImageRegionText": "Low Quality Page",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Character",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "[\\s\\S]*"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Left",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "PageCharacters"
+                    },
+                    "Top": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Top",
+                      "ExpandDirection": "ExpandUp",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "PageLines"
+                    },
+                    "Right": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "PageCharacters"
+                    },
+                    "Bottom": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "PageLines"
+                    }
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Create Value Rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<DocType>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "HCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Run HCData Text Only on mortgage sig pages",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\MortgageSignaturePage\\IsMortgageSignaturePageWithSSNClues.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [
+                      "SSN_HCDataTextOnly"
+                    ],
+                    "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Run HCData on everything else",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\MortgageSignaturePage\\IsMortgageSignaturePageWithSSNClues.rsd.etf"
+                  }
+                },
+                "InvertCondition": true,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [
+                      "SSN_HCData"
+                    ],
+                    "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "LCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find SSN_LCData from CommonMaster.rsd",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "ReplaceStrings",
+              "Description": "Remove strings that cause false positives<Replace strings>",
+              "Enabled": true,
+              "Object": {
+                "Replacements": [
+                  {
+                    "Pattern": "\\bsections?\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bMATURITY\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bsecur(?:es?|ing)\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bseconds?\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bthis\\x20security\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bSecurity\\s{1,4}Instrument\\b",
+                    "Replacement": ""
+                  }
+                ],
+                "AsRegularExpr": true,
+                "IsCaseSensitive": false
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "SSN_LCData"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "Mark for quality checking<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "CheckQ"
+                      },
+                      {
+                        "From": "SSN",
+                        "To": "CheckQ"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Mortgages Using Seal Clues",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\Mortgages\\IsMortgageSignaturePage.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [
+                      "RedactSSNs"
+                    ],
+                    "RSDFileName": "<RSDFileDir>\\Mortgages\\PartialNumbers+SealClues.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "RegExprRule",
+                  "Description": "Must have three non-one digits<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "(?#\r\n#------------------------------------------------\r\n# Two non-one digits\r\n#------------------------------------------------\r\n)\r\n\r\n(?:[\\s\\S]*[2-9][\\s\\S]*){3}\r\n\r\n|(?# Or...)\r\n\r\n(?#\r\n#------------------------------------------------\r\n# Three X's or pound signs followed by\r\n# a single non-one digit\r\n#------------------------------------------------\r\n)\r\n\r\n[X#]{3}[\\s\\S]*[2-9][\\s\\S]*",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": true
+                  }
+                },
+                {
+                  "Type": "TranslateValue",
+                  "Description": "Mark for quality checking<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "CheckQ"
+                      },
+                      {
+                        "From": "SSN",
+                        "To": "CheckQ"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Handwrttien next to \"SS\"",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "it"
+                ],
+                "RSDFileName": "<RSDFileDir>\\HandwrittenSSN\\HandwrittenSSN.rsd.etf"
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "MCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find SSN_MCData from CommonMaster.rsd",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "ReplaceStrings",
+              "Description": "Remove strings that cause false positives<Replace strings>",
+              "Enabled": true,
+              "Object": {
+                "Replacements": [
+                  {
+                    "Pattern": "\\bsections?\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bMATURITY\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bsecur(?:es?|ing)\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bseconds?\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bthis\\x20security\\b",
+                    "Replacement": ""
+                  },
+                  {
+                    "Pattern": "\\bSecurity\\s{1,4}Instrument\\b",
+                    "Replacement": ""
+                  }
+                ],
+                "AsRegularExpr": true,
+                "IsCaseSensitive": false
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "SSN_MCData"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "RegExprRule",
+                  "Description": "Must have 2 digits that are not zero or one<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "[\\s\\S]*[2-9][\\s\\S]*[2-9][\\s\\S]*",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": true
+                  }
+                },
+                {
+                  "Type": "TranslateValue",
+                  "Description": "Mark for quality checking<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "CheckQ"
+                      },
+                      {
+                        "From": "SSN",
+                        "To": "CheckQ"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Mort Sig Page: HCData rules",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\MortgageSignaturePage\\IsMortgageSignaturePageWithSSNClues.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [
+                      "RedactMortgageSignaturePage"
+                    ],
+                    "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\MortgageSignaturePage\\MortgageSignaturePageMaster.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Mortgages with Future Advanced Clauses",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "Select pages with \"Future Advanced Clause\" or \"1. Dates and Parties\"<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "(?:Wi|th)[\\s\\S]{0,9}(?:Fut|ture)[\\s\\S]{0,10}(?:Adva|vance)[\\s\\S]{0,12}(?:Clau|ause)\r\n|\r\n^[\\s\\S]{0,5}(?:DAT|ATE)[\\s\\S]{0,7}[AND][\\s\\S]{0,9}(?:PARTI|RTIES)",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "NumberStringInRegion"
+                ],
+                "RSDFileName": "<RSDFileDir>\\Mortgages\\MortgageWithFutureAdvanceClause.rsd.etf"
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "RegExprRule",
+                  "Description": "Must have 2 digits that are not zero or one<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "[\\s\\S]*[2-9][\\s\\S]*[2-9][\\s\\S]*",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": true
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select Multiple Output Handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Remove low quality items<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Mark low quality items<Run object on query>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*@CheckQ",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\CheckQuality.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove marked items<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*{low}"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ConditionalOutputHandler",
+            "Description": "Remove clues to the left of HCData and MCData, on mortgage pages that have an even number of clues<Conditionally handle output>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "RSDFileCondition",
+                "Object": {
+                  "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\MortgageSignaturePage\\IsMortgageSignaturePageWithSSNClues.rsd.etf"
+                }
+              },
+              "InvertCondition": false,
+              "Rule": {
+                "Type": "ConditionalOutputHandler",
+                "Object": {
+                  "Condition": {
+                    "Type": "RSDFileCondition",
+                    "Object": {
+                      "RSDFileName": "<RSDFileDir>\\Mortgages\\HasAnOddNumberOfSSNClues.rsd.etf"
+                    }
+                  },
+                  "InvertCondition": true,
+                  "Rule": {
+                    "Type": "ConditionalOutputHandler",
+                    "Object": {
+                      "Condition": {
+                        "Type": "RSDFileCondition",
+                        "Object": {
+                          "RSDFileName": "<RSDFileDir>\\Mortgages\\MoreSealsThanSocials.rsd.etf"
+                        }
+                      },
+                      "InvertCondition": true,
+                      "Rule": {
+                        "Type": "RemoveSubAttributes",
+                        "Object": {
+                          "AttributeSelector": {
+                            "Type": "SpatialProximityAS",
+                            "Object": {
+                              "TargetQuery": "Clues",
+                              "TargetsMustContainReferences": false,
+                              "RequireCompleteInclusion": false,
+                              "ReferenceQuery": "HCData|MCData",
+                              "Left": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Left",
+                                "ExpandDirection": "ExpandLeft",
+                                "ExpandBy": 1.0,
+                                "ExpandUnits": "Inches"
+                              },
+                              "Top": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Top",
+                                "ExpandDirection": "ExpandUp",
+                                "ExpandBy": 0.0,
+                                "ExpandUnits": "Inches"
+                              },
+                              "Right": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Right",
+                                "ExpandDirection": "ExpandRight",
+                                "ExpandBy": 0.0,
+                                "ExpandUnits": "Inches"
+                              },
+                              "Bottom": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Bottom",
+                                "ExpandDirection": "ExpandDown",
+                                "ExpandBy": 0.0,
+                                "ExpandUnits": "Inches"
+                              },
+                              "CompareLinesSeparately": true,
+                              "IncludeDebugAttributes": false
+                            }
+                          },
+                          "ConditionalRemove": false,
+                          "DataScorer": {
+                            "Type": null,
+                            "Description": "",
+                            "Enabled": true,
+                            "Object": null
+                          },
+                          "ScoreCondition": "EQ",
+                          "CompareConditionType": "ValueOf",
+                          "ScoreToCompare": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "Type": "ConditionalOutputHandler",
+            "Description": "Remove clues to the left of HCData and MCData, on non-mortgage pages<Conditionally handle output>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "RSDFileCondition",
+                "Object": {
+                  "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\MortgageSignaturePage\\IsMortgageSignaturePageWithSSNClues.rsd.etf"
+                }
+              },
+              "InvertCondition": true,
+              "Rule": {
+                "Type": "RemoveSubAttributes",
+                "Object": {
+                  "AttributeSelector": {
+                    "Type": "SpatialProximityAS",
+                    "Object": {
+                      "TargetQuery": "Clues",
+                      "TargetsMustContainReferences": false,
+                      "RequireCompleteInclusion": false,
+                      "ReferenceQuery": "HCData|MCData",
+                      "Left": {
+                        "Anchor": "ReferenceAttribute",
+                        "AnchorSide": "Left",
+                        "ExpandDirection": "ExpandLeft",
+                        "ExpandBy": 1.0,
+                        "ExpandUnits": "Inches"
+                      },
+                      "Top": {
+                        "Anchor": "ReferenceAttribute",
+                        "AnchorSide": "Top",
+                        "ExpandDirection": "ExpandUp",
+                        "ExpandBy": 0.0,
+                        "ExpandUnits": "Inches"
+                      },
+                      "Right": {
+                        "Anchor": "ReferenceAttribute",
+                        "AnchorSide": "Right",
+                        "ExpandDirection": "ExpandRight",
+                        "ExpandBy": 0.0,
+                        "ExpandUnits": "Inches"
+                      },
+                      "Bottom": {
+                        "Anchor": "ReferenceAttribute",
+                        "AnchorSide": "Bottom",
+                        "ExpandDirection": "ExpandDown",
+                        "ExpandBy": 0.0,
+                        "ExpandUnits": "Inches"
+                      },
+                      "CompareLinesSeparately": true,
+                      "IncludeDebugAttributes": false
+                    }
+                  },
+                  "ConditionalRemove": false,
+                  "DataScorer": {
+                    "Type": null,
+                    "Description": "",
+                    "Enabled": true,
+                    "Object": null
+                  },
+                  "ScoreCondition": "EQ",
+                  "CompareConditionType": "ValueOf",
+                  "ScoreToCompare": 0
+                }
+              }
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove clues above HCData<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "SpatialProximityAS",
+                "Object": {
+                  "TargetQuery": "Clues",
+                  "TargetsMustContainReferences": false,
+                  "RequireCompleteInclusion": false,
+                  "ReferenceQuery": "HCData",
+                  "Left": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandLeft",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Top": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandUp",
+                    "ExpandBy": 2.0,
+                    "ExpandUnits": "Lines"
+                  },
+                  "Right": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Right",
+                    "ExpandDirection": "ExpandRight",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Bottom": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandDown",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "CompareLinesSeparately": true,
+                  "IncludeDebugAttributes": false
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Blank Attributes<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*@Blank"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Set type to SSN<Modify Attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData|LCData|MCData|Clues",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "SSN",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "MergeAttributes",
+            "Description": "Merge leftovers<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData|MCData|LCData",
+              "CreateMergedRegion": true,
+              "NameMergeMode": "PreserveField",
+              "NameMergePriority": [
+                "HCData",
+                "MCData",
+                "LCData"
+              ],
+              "OverlapPercent": 75.0,
+              "PreserveAsSubAttributes": false,
+              "PreserveType": false,
+              "SpecifiedName": "",
+              "SpecifiedType": "SSN",
+              "SpecifiedValue": "000-00-0000",
+              "TreatNameListAsRegex": false,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": false,
+              "TypeMergeMode": "SpecifyField",
+              "TypeMergePriority": [],
+              "ValueMergeMode": "SpecifyField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "OutputToXML",
+            "Description": "Off for Archive delivery<Output data to XML file>",
+            "Enabled": false,
+            "Object": {
+              "FileName": "<SourceDocName>.xml",
+              "Format": "XMLOriginal",
+              "NamedAttributes": false,
+              "UseSchemaName": false,
+              "SchemaName": "",
+              "ValueAsFullText": true,
+              "RemoveEmptyNodes": false,
+              "RemoveSpatialInfo": false
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

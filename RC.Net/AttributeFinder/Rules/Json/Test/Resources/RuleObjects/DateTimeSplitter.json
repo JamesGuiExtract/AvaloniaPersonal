@@ -1,0 +1,546 @@
+[
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 2010,
+      "OutputFormat": "%m/%d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%Y%m%d",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": true,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1930,
+      "OutputFormat": "%m/%d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m-%d-%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1940,
+      "OutputFormat": "%m/%d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%H%M",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%Y%m%d%H%M%S",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": true,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m-%d-%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%Y|%I:%M:%S %p",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1900,
+      "OutputFormat": "",
+      "ShowFormattedOutput": false,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%Y%m%d",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1940,
+      "OutputFormat": "%m-%d-%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "",
+      "ShowFormattedOutput": false,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": true,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%#m/%#d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%Y,%H:%M",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": true,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": false,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "",
+      "ShowFormattedOutput": false,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%Y%m%d",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "",
+      "ShowFormattedOutput": false,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": true,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m-%d-%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%Y%m%d",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": true,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "",
+      "ShowFormattedOutput": false,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": true,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "",
+      "ShowFormattedOutput": false,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1920,
+      "OutputFormat": "",
+      "ShowFormattedOutput": false,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%B %d, %Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": true,
+      "TwoDigitYearBeforeCurrent": false
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1950,
+      "OutputFormat": "",
+      "ShowFormattedOutput": false,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": true,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": true,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%Y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": true,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  },
+  {
+    "Type": "DateTimeSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "MinimumTwoDigitYear": 1970,
+      "OutputFormat": "%m/%d/%y",
+      "ShowFormattedOutput": true,
+      "SplitDayOfWeek": false,
+      "SplitDefaults": false,
+      "SplitFourDigitYear": true,
+      "SplitMilitaryTime": false,
+      "SplitMonthAsName": false,
+      "TwoDigitYearBeforeCurrent": true
+    }
+  }
+]

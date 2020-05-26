@@ -1,0 +1,107 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "spansPages",
+    "InsertParentValue": "<PageNumber>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "query": {
+        "AttributeRules": [],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "RemoveSubAttributes",
+      "Description": "remove if not 'All'<Remove attributes>",
+      "Enabled": true,
+      "Object": {
+        "AttributeSelector": {
+          "Type": "MultipleCriteriaSelector",
+          "Object": {
+            "Selectors": [
+              {
+                "Select": "Matching",
+                "With": {
+                  "Type": "QueryBasedAS",
+                  "Description": "<Query attribute selector>",
+                  "Enabled": true,
+                  "Object": {
+                    "QueryText": "*"
+                  }
+                }
+              },
+              {
+                "Select": "NonMatching",
+                "With": {
+                  "Type": "ValueConditionSelector",
+                  "Description": "<Value condition selector>",
+                  "Enabled": true,
+                  "Object": {
+                    "Condition": {
+                      "Type": "FindingRuleCondition",
+                      "Object": {
+                        "AFRule": {
+                          "Type": "RegExprRule",
+                          "Object": {
+                            "IsRegExpFromFile": false,
+                            "RegExpFileName": "",
+                            "Pattern": "\\AAll\\z",
+                            "IsCaseSensitive": false,
+                            "FirstMatchOnly": true,
+                            "CreateSubAttributesFromNamedMatches": false,
+                            "OnlyCreateOneSubAttributePerGroup": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "CombineBy": "Chain"
+          }
+        },
+        "ConditionalRemove": false,
+        "DataScorer": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "ScoreCondition": "EQ",
+        "CompareConditionType": "ValueOf",
+        "ScoreToCompare": 0
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

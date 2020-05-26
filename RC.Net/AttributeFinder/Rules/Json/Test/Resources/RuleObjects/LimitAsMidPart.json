@@ -1,0 +1,35 @@
+[
+  {
+    "Type": "LimitAsMidPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StartPosition": 3,
+      "EndPosition": 3,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsMidPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StartPosition": 8,
+      "EndPosition": 8,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsMidPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StartPosition": 4,
+      "EndPosition": 4,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  }
+]

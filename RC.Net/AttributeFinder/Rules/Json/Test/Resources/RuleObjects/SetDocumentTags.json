@@ -1,0 +1,3072 @@
+[
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "OnlyUseCustomerDefinedUnits",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\ML\\Classification\\DocType.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "IsWalmart4Page",
+        "Generator": "Literal",
+        "SpecifiedValue": "IsWalmart4Page",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\Classifier\\TranslatedLMDocClassifier.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "HasTransferPatch",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "*"
+          }
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\hasTransferPatch.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "LMDocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "LMDocType"
+          }
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\Classification\\Classification.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "SSNRedactFirstSeven",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\Common\\DocType.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\Classifier.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "r:\\Rules\\FLEXIndex\\MN - Redwood - Trimin\\Rules\\GrantorGrantee\\Easement - Misc\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "Literal",
+        "SpecifiedValue": "Quit Claim Deed",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomerOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "T:\\Engineering\\Rules\\LabDE\\WI - ProHealth\\10.3_Solution\\Database Files\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "LegalDescription",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "LegalDescription"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Court Order\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DoNotRequireMandatoryTests",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DoNotStandardizeValueAndRange",
+        "Generator": "Literal",
+        "SpecifiedValue": "blah",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "Literal",
+        "SpecifiedValue": "Articles of Incorporation",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomerOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "d:\\Engineering\\Rules\\LabDE\\UW Clinics\\Solution\\Database Files\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "LMDocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "Set013",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Mortgage\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType@Backup"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomerOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "C:\\Engineering\\Rules\\LabDE\\Demo_LabDE\\Solution\\Database Files\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "LMDocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "LMDocType"
+          }
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "r:\\Rules\\FLEXIndex\\MN - Redwood - Trimin\\Rules\\Classifier\\LMDocClassifier.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\Solution\\Rules\\Common\\DocType.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Satisfaction of Mortgage\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\Machines\\Classifier.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "NoOther",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Assignment of Rents\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "RootRSDFileDir",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Stipulation\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "Literal",
+        "SpecifiedValue": "Assignment of Rents",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "SSNRedactFirstSix",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "SSNRedactFirstFive",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "UseCustomerDefinedUnitsWhenAvailable",
+        "Generator": "Literal",
+        "SpecifiedValue": "blah",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "Grantee",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "Grantee"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "wordlist",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\..\\..\\Database Files\\ROIWordList.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "AuroraFasting",
+        "Generator": "Literal",
+        "SpecifiedValue": "asdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Lease\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\<DocType>\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\Common\\DocType.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Power of Attorney\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "URSDocType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\Classification\\Classification.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "xls",
+        "Generator": "Literal",
+        "SpecifiedValue": "xls",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "KeepNA",
+        "Generator": "Literal",
+        "SpecifiedValue": "gimmeNA",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\Classification\\Classification.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "HasCover",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\Common\\hasCoverPage.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomerOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "C:\\Engineering\\Rules\\LabDE\\UW Clinics\\Solution\\Database Files\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\Classification\\classification.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "Literal",
+        "SpecifiedValue": "Reconveyance",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomerOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\..\\..\\..\\NRSTest\\LabDE\\TestResults\\OrderMappingDBTemplate.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "Literal",
+        "SpecifiedValue": "Mortgage",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Other\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DoNotRequireMandatoryTests",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Designation\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DontMakeSubdivisionSetsExclusive",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Satisfaction\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "LMDocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "LMDocType"
+          }
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\Classification\\Classification.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\..\\Solution\\Rules\\HIM\\DocType.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "Literal",
+        "SpecifiedValue": "Assignment of Mortgage",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomerOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "R:\\Rules\\LabDE\\MN - Fairview\\Solution\\Database Files\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "KeepTrustDate",
+        "Generator": "Literal",
+        "SpecifiedValue": "1",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "Literal",
+        "SpecifiedValue": "Easement - Misc",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomerOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "T:\\Engineering\\Rules\\LabDE\\UW Clinics\\Solution\\Database Files\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DoNotStandardizeValueAndRange",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "Literal",
+        "SpecifiedValue": "Termination Decedents Property Interests",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "LMDocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "LMDocType"
+          }
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\Classifier\\LMDocClassifier.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "AsteriskIsNotAFlag",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Personal Representatives Deed\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "MISC2",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "M2"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Reconveyance\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomerOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "T:\\Engineering\\Rules\\LabDE\\Univ of Virginia\\10.3_Solution\\Database Files\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Statement\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Lis Pendens\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRulesDir",
+        "Generator": "Literal",
+        "SpecifiedValue": "E:\\LabDE\\CA - Cedar Sinai\\Solution\\Rules\\TestResults\\CustomRules",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomerOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "T:\\Engineering\\Rules\\LabDE\\UW Transplant\\Solution\\Database Files\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\Machines\\Classifier.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "NoFutureDates",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Subordination Agreement\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "IsCCNStatement",
+        "Generator": "Literal",
+        "SpecifiedValue": "IsCCNStatement",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "NRSOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\..\\OrderMapper\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Abridgment\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Easement - Misc\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Designation of Tod Ben\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocDesc",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\ML\\DocDesc\\DocDesc.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\Classification\\Classification.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomRSD",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\Certified Survey Map\\main.rsd.etf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": true,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\Classifier\\LMDocClassifier.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\LearningMachines\\Classifier.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\LearningMachines\\Classifier.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "Genesis",
+        "Generator": "Literal",
+        "SpecifiedValue": "Genesis",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "Literal",
+        "SpecifiedValue": "NotSensitive",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DoNotModifyFlag",
+        "Generator": "Literal",
+        "SpecifiedValue": "blah",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "LMDocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\..\\Classifier\\LMDocClassifier.rsd.etf"
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "CustomerOrderMappingDB",
+        "Generator": "Literal",
+        "SpecifiedValue": "<RSDFileDir>\\OrderMapper\\OrderMappingDB.sdf",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "TrimMICR8",
+        "Generator": "Literal",
+        "SpecifiedValue": "",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": null,
+        "Generator": "None",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": false,
+      "SourceAttributeRSDFile": ""
+    }
+  },
+  {
+    "Type": "SetDocumentTags",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SetStringTag": {
+        "TagName": "DocProbability",
+        "Generator": "Literal",
+        "SpecifiedValue": "2",
+        "ValuesFromTag": "",
+        "AttributeSelector": {
+          "Type": null,
+          "Object": null
+        },
+        "Delimiter": ";"
+      },
+      "SetObjectTag": {
+        "TagName": "DocType",
+        "Generator": "FromAttributes",
+        "SpecifiedValue": "",
+        "AttributeSelector": {
+          "Type": "QueryBasedAS",
+          "Object": {
+            "QueryText": "DocumentType"
+          }
+        }
+      },
+      "NoTagsIfEmpty": false,
+      "GenerateSourceAttributesWithRSDFile": true,
+      "SourceAttributeRSDFile": "<RSDFileDir>\\Shared\\Classifier.rsd.etf"
+    }
+  }
+]

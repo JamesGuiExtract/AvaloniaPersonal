@@ -1,0 +1,244 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Pages",
+    "InsertParentValue": "<PageNumber>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Document": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Pages 1-2",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectSpecified",
+                "SpecificPages": "1-2",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "",
+                "IsRegExp": false,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "Set the DeletedPages<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": true,
+                      "AttributeName": "DeletedPages",
+                      "SetAttributeName": true,
+                      "AttributeType": "",
+                      "SetAttributeType": false,
+                      "AttributeValue": "1",
+                      "SetAttributeValue": true
+                    }
+                  },
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "Set Pages<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": true,
+                      "AttributeName": "Pages",
+                      "SetAttributeName": true,
+                      "AttributeType": "",
+                      "SetAttributeType": false,
+                      "AttributeValue": "1-2",
+                      "SetAttributeValue": true
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Pages 3-",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "SelectPageRegion",
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectSpecified",
+                "SpecificPages": "3-",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "",
+                "IsRegExp": false,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "ModifyAttributeValueOH",
+              "Description": "<Modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*",
+                "CreateSubAttribute": true,
+                "AttributeName": "Page",
+                "SetAttributeName": true,
+                "AttributeType": "",
+                "SetAttributeType": false,
+                "AttributeValue": "%Value%",
+                "SetAttributeValue": true
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "get page number from getImagePageNumber.rsd<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Document/Page",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\..\\ML\\Pagination\\getImagePageNumber.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Page = Page/Page<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Document/Page",
+              "CreateSubAttribute": false,
+              "AttributeName": "Pages",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%Page%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove */*/Page<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/*/Page"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

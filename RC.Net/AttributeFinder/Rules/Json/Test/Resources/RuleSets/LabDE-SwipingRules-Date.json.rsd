@@ -1,0 +1,192 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "_",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {},
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Add colon to time<Run object on query>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "AdvancedReplaceString",
+                "Object": {
+                  "StrToBeReplaced": "(?<=\\d{4}\\D)(\\d{2})(\\d{2})»?\\s*$",
+                  "AsRegularExpression": true,
+                  "IsCaseSensitive": false,
+                  "Replacement": "$1:$2",
+                  "ReplacementOccurrenceType": "All",
+                  "SpecifiedOccurrence": 0
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Insert space before time<Run object on query>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "AdvancedReplaceString",
+                "Object": {
+                  "StrToBeReplaced": "(?<=\\d)@?(\\d{2}:\\d{2})",
+                  "AsRegularExpression": true,
+                  "IsCaseSensitive": false,
+                  "Replacement": " $1",
+                  "ReplacementOccurrenceType": "All",
+                  "SpecifiedOccurrence": 0
+                }
+              }
+            }
+          },
+          {
+            "Type": "RemoveCharacters",
+            "Description": "Remove leading colons before splitting<Remove characters>",
+            "Enabled": true,
+            "Object": {
+              "Characters": ":",
+              "IsCaseSensitive": false,
+              "RemoveAll": false,
+              "Consolidate": false,
+              "TrimLeading": true,
+              "TrimTrailing": false
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Reformat dates<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<ComponentDataDir>\\LabDE\\PatientInfo\\DOB\\formatDate.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove !*{Formatted}<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*{Formatted}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{Formatted}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Set value of * to %Formatted%<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%Formatted%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove */*<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/*"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

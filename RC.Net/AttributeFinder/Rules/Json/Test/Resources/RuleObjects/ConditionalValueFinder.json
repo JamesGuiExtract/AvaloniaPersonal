@@ -1,0 +1,3780 @@
+[
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Trustees Deed"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantor"
+          ],
+          "RSDFileName": "<RSDFileDir>\\TrusteeDeed.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\SocialSecurityNumber\\HasTaxID.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "SelectPageRegion",
+        "Object": {
+          "IncludeRegionDefined": true,
+          "PageSelectionType": "SelectSpecified",
+          "SpecificPages": "1",
+          "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+          "Pattern": "",
+          "IsRegExp": false,
+          "IsCaseSensitive": false,
+          "HorizontalStart": -1,
+          "HorizontalEnd": -1,
+          "VerticalStart": -1,
+          "VerticalEnd": -1,
+          "SelectPageRegionReturnType": "ReturnImageRegion",
+          "IncludeIntersectingText": false,
+          "TextIntersectionType": "NoEntity",
+          "SelectedRegionRotation": -1,
+          "TextToAssignToRegion": "Release of Federal Tax Lien"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\Classifiers\\Mortgage_3016_990.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Mortgage_3016_990"
+          ],
+          "RSDFileName": "<RSDFileDir>\\Redact_Signature_Pages.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": true,
+              "RegExpFileName": "<RSDFileDir>\\djp.dat.etf",
+              "Pattern": "(?nx)\r\n(\r\n  (?>(?~<>Daniel))[\\s\\S]?\\W*(?~<>J\\WPark)\r\n|\r\n  (?~<>Daniel\\WPark)\r\n|\r\n  \\bDaniel[^\\r\\n\\w]*?\\S[^\\r\\n\\w]*?(?~<>Park)\r\n)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "LCData"
+          ],
+          "RSDFileName": "<RSDFileDir>\\djp.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Unknown",
+            "Affidavit of Death"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": true,
+          "RegExpFileName": "<RSDFileDir>\\certDeath.dat.etf",
+          "Pattern": "",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Deed of Trust"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "DEED OF TRUST",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\IsOlderForm.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Groom"
+          ],
+          "RSDFileName": "<RSDFileDir>\\LastDitch.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\AppForTransfer\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "Application for Transfer of Property to Surviving Joint Tenant",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "[\\s\\S]+"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageCharacters"
+          },
+          "Top": {
+            "Anchor": "Page",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageLines"
+          },
+          "Right": {
+            "Anchor": "Page",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageCharacters"
+          },
+          "Bottom": {
+            "Anchor": "Page",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Subordination Agreement"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Item"
+          ],
+          "RSDFileName": "<RSDFileDir>\\Subordination Agreement\\SubItem.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "SelectPageRegion",
+            "Object": {
+              "IncludeRegionDefined": true,
+              "PageSelectionType": "SelectSpecified",
+              "SpecificPages": "50",
+              "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+              "Pattern": "",
+              "IsRegExp": false,
+              "IsCaseSensitive": false,
+              "HorizontalStart": -1,
+              "HorizontalEnd": -1,
+              "VerticalStart": -1,
+              "VerticalEnd": -1,
+              "SelectPageRegionReturnType": "ReturnText",
+              "IncludeIntersectingText": true,
+              "TextIntersectionType": "Character",
+              "SelectedRegionRotation": -1,
+              "TextToAssignToRegion": ""
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "50",
+          "TypeString": "p50"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "CreateValue",
+            "Object": {
+              "ValueString": "<CustomRSD>",
+              "TypeString": ""
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Assignor"
+          ],
+          "RSDFileName": "<CustomRSD>"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Certificate of Death",
+            "Discharge from Active Duty",
+            "Financing Statement"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN_HCData"
+          ],
+          "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\CancellationOfMortgage\\isCancellationOfMortgage.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN_MCData"
+          ],
+          "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\Is-it-a-company.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "000-00-0001",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": false,
+          "ClueList1": {
+            "Clues": [
+              "^(?:1|I|l)C\\b"
+            ],
+            "CaseSensitive": true,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 120.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 2.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 300.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "SelectPageRegion",
+            "Object": {
+              "IncludeRegionDefined": true,
+              "PageSelectionType": "SelectWithRegExp",
+              "SpecificPages": "",
+              "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+              "Pattern": "CERTIFICATE\\W*OF \\W*TRUST",
+              "IsRegExp": true,
+              "IsCaseSensitive": false,
+              "HorizontalStart": -1,
+              "HorizontalEnd": -1,
+              "VerticalStart": -1,
+              "VerticalEnd": -1,
+              "SelectPageRegionReturnType": "ReturnText",
+              "IncludeIntersectingText": true,
+              "TextIntersectionType": "Character",
+              "SelectedRegionRotation": -1,
+              "TextToAssignToRegion": ""
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "The\\W*Name\\W*of\\W*(?<Grantor>\\bthe\\W*Trust[\\s\\S]{0,250})\\bdate",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": true,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+          "Category": "County Document",
+          "Types": [
+            "Financing Statement"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SecuredParty"
+          ],
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\PartyFinder\\Master.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?:GR.{3,4}|.{1,2}ROU.{1,2}|.{1,3}OUP)\\s{0,4}(?:HEA.{2,4}|.{1,2}EALT.{1,2}|.{2,4}LTH)\\s{0,4}(?:INSU.{5,6}|.{1,3}SURAN.{1,3}|.{4,5}RANCE)\\s{0,4}(?:COVE.{3,5}|.{1,3}VERA.{1,3}|.{3,5}RAGE)\\s{0,4}(?:AVAI.{5,6}|.{1,3}AILAB.{1,3}|.{4,5}LABLE)[\\s\\S]{0,6}(?:DEPE.{5,6}|.{1,3}PENDE.{1,3}|.{4,5}NDENT)\\s{0,4}(?:CHIL.{3,5}|.{1,3}ILDR.{1,3}|.{3,5}DREN)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN"
+          ],
+          "RSDFileName": "<RSDFileDir>\\HealthInsDepChildren\\healthInsDepChildren.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Unknown"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "_"
+          ],
+          "RSDFileName": "<RSDFileDir>\\Misc.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\Marriage\\NoSSNBox.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "Possible SSN: Marriage Certificate",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "[\\s\\S]*"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "<",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "Passport Number",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "[S5]IGNA.UR.\\W{1,3}(?:O.|.F)\\W{1,3}BEAR"
+            ],
+            "CaseSensitive": true,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 25.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 4.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 55.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 8.0,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\PartyFinder\\Certification of Trust\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "Certification of Trust",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\Affidavit\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "remove",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\IsType\\IsType.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": true,
+          "RegExpFileName": "<RSDFilleDir>\\LisPendens03.dat.etf",
+          "Pattern": "",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "//Toledo Municipal Credit\r\n\r\nTo.{1,3}do\\sM.{1,3}ici.{1,3}al\\sC.{1,4}t",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "000-00-0000",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "\\bID\\s."
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.2,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 55.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.2,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Assignment - Misc",
+            "Assignment of Deed of Trust",
+            "Assignment of Mortgage",
+            "Assignment of Rents"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "YES!",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\isSubstitutionAndReconveyance.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "recorded[\\S\\s]{0,20}\\b(19|20)\\d{2}\\W+[\\s\\S]{0,75}\\bDoc(ument)?\\W+((No|Number|[#]|\\bit\\b)\\W+)?(?'Company'\\d+(\\W+\\d+)?)(?=0{0,2}\\b)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": true,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Certificate of Redemption"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "T",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Power of Attorney"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "true",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Warranty Deed"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?<=FOR\\s*VALUABLE\\s*CONSIDERATION)\r\n[\\s\\S]{0,150}\r\n(?=Grantor\\(?s\\W*hereby\\s*conveys)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\Assignment\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantee"
+          ],
+          "RSDFileName": "<RSDFileDir>\\Assignment\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "FindFromRSD",
+            "Object": {
+              "AttributeNames": [
+                "Type1"
+              ],
+              "RSDFileName": "<RSDFileDir>\\..\\Shared\\IsCriminalComplaint.rsd.etf"
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "Criminal Complaint",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "[\\s\\S]+"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\isAffidavitOfDeath.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "_"
+          ],
+          "RSDFileName": "<RSDFileDir>\\DecedentAndAKA.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+          "Category": "County Document",
+          "Types": [
+            "Satisfaction of Mortgage"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [],
+          "RSDFileName": "<RSDFileDir>\\Satisfaction of Mortgage\\Master.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\FinancingStatement\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN"
+          ],
+          "RSDFileName": "<RSDFileDir>\\FinancingStatement\\finStatemnt.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\CourtDocs\\IsCourtDoc.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantee"
+          ],
+          "RSDFileName": "<RSDFileDir>\\..\\CourtDocs\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "FindFromRSD",
+            "Object": {
+              "AttributeNames": [
+                "is"
+              ],
+              "RSDFileName": "<RSDFileDir>\\..\\Common\\Ticket.rsd.etf"
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "DOB"
+          ],
+          "RSDFileName": "<RSDFileDir>\\..\\Common\\Ticket.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Abstract of Judgment",
+            "Abstract of Support Judgment"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "MCData"
+          ],
+          "RSDFileName": "<RSDFileDir>\\..\\AbstractOfJudgment\\AbstractOfSupportJudgment.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\Washington\\isWashington.rsd"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantor"
+          ],
+          "RSDFileName": "<RSDFileDir>\\Washington\\TestGrantor.rsd"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Oil Gas and Mineral Lease"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantor"
+          ],
+          "RSDFileName": "<RSDFileDir>\\Oil Gas and Mineral Lease\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "ä",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\S\\s]*",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\check_first_char.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": ".*",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\AppraiseEstate\\IsAppraiseEstate.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\s\\S]*",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+          "Category": "County Document",
+          "Types": [
+            "Release of Sewer Lien",
+            "Sewer Lien"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "TOTAL\\x20*DUE[^\\d\\r\\n]*(?'amount'\\d+\\.\\d{2})\\r",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": true,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\SpecialPowerOfAttorney\\isSpecialPowerOfAttorney.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN"
+          ],
+          "RSDFileName": "<RSDFileDir>\\SpecialPowerOfAttorney\\specialPowerOfAttorney.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<error=3>labor\\sand\\simprovements\\srequired)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "Text",
+          "ImageRegionText": "",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "^4\\.\\s(?~<error=4>Name\\(s\\)\\sand\\saddress\\(s\\))"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [
+              "(^5?\\.?)\\s*(?~<error=5>The\\sundersigned\\stestify\\sthat\\s)"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [
+              "(?~<error=3>Current\\sMailing)"
+            ],
+            "CaseSensitive": true,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 2.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList3",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList2",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<error=3>NOTICE\\sOF\\sDELINQUENT\\sASSESSMENT)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "NT DELQNT ASSMT",
+          "TypeString": "NtDelqntAssmt"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\SocialSecurityNumber\\HasSSNorNotHasTaxID.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "HCData"
+          ],
+          "RSDFileName": "<RSDFileDir>\\..\\FromCompData\\FedTaxLienNoticeRelease.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "WILSON\\s*&\\s*ASSOCIATES|Notice\\sInformation\\sServices",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "SelectPageRegion",
+        "Object": {
+          "IncludeRegionDefined": true,
+          "PageSelectionType": "SelectAll",
+          "SpecificPages": "",
+          "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+          "Pattern": "",
+          "IsRegExp": false,
+          "IsCaseSensitive": false,
+          "HorizontalStart": 0,
+          "HorizontalEnd": 22,
+          "VerticalStart": 74,
+          "VerticalEnd": 100,
+          "SelectPageRegionReturnType": "ReturnText",
+          "IncludeIntersectingText": true,
+          "TextIntersectionType": "Character",
+          "SelectedRegionRotation": -1,
+          "TextToAssignToRegion": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "CharacterConfidenceCondition",
+        "Object": {
+          "IsMet": true,
+          "AggregateFunction": "Average",
+          "FirstScoreCondition": "LEQ",
+          "FirstScoreToCompare": 40,
+          "IsSecondCondition": false,
+          "AndSecondCondition": true,
+          "SecondScoreCondition": "EQ",
+          "SecondScoreToCompare": 0
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "Low Quality Page - Check for DOB",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "[\\s\\S]{50}"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "Page",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "Page",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "Page",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Discharge from Active Duty"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\s\\S]",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<error=2>MODEL\\sFORM\\sRECORDING\\sSUPPLEMENT)\r\n[\\s\\S]{0,10}\r\n(?~<error=2>OPERATING\\sAGREEMENT\\sAND\\sFINANCING\\sSTATEMENT)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?<=entered\\sinto\\sby\\sand\\sbetween)\r\n\r\n[\\s\\S]{5,100}\r\n\r\n(?=operator)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\IndictmentOrder\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "item"
+          ],
+          "RSDFileName": "<RSDFileDir>\\IndictmentOrder\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\Has_COD_Attachment.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Redact SSN Boxes"
+          ],
+          "RSDFileName": "<RSDFileDir>\\COD\\RedactDeathCertificate_Michigan.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "BlockFinder",
+            "Object": {
+              "BlockBegin": "",
+              "BlockEnd": "",
+              "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+              "Clues": [
+                "\\b[a-z]{4,}\\b"
+              ],
+              "DefineBlocksType": "SeparatorString",
+              "FindAllBlocks": false,
+              "GetMaxOnly": false,
+              "InputAsOneBlock": true,
+              "IsCluePartOfAWord": true,
+              "IsClueRegularExpression": true,
+              "MinNumberOfClues": 340,
+              "PairBeginAndEnd": false
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "has170"
+          ],
+          "RSDFileName": "<RSDFileDir>\\check_dict.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\Court Order\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantor"
+          ],
+          "RSDFileName": "<RSDFileDir>\\Court Order\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\possibleCheck.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "BREAK",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Deed of Trust",
+            "Mortgage"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "GG"
+          ],
+          "RSDFileName": "<RSDFileDir>\\ByDocType\\MortDeedOfTrustLIR.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\WIUCC\\isWIUCC.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN_MCDataTextOnly"
+          ],
+          "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "FindFromRSD",
+            "Object": {
+              "AttributeNames": [
+                "Standard2d"
+              ],
+              "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\FinancingStatement\\RedactForm.rsd.etf"
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "ConditionalValueFinder",
+        "Object": {
+          "Condition": {
+            "Type": "FindingRuleCondition",
+            "Object": {
+              "AFRule": {
+                "Type": "FindFromRSD",
+                "Object": {
+                  "AttributeNames": [
+                    "Standard1g"
+                  ],
+                  "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\FinancingStatement\\RedactForm.rsd.etf"
+                }
+              }
+            }
+          },
+          "InvertCondition": false,
+          "Rule": {
+            "Type": "ConditionalValueFinder",
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "FindFromRSD",
+                    "Object": {
+                      "AttributeNames": [
+                        "Standard2g"
+                      ],
+                      "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\FinancingStatement\\RedactForm.rsd.etf"
+                    }
+                  }
+                }
+              },
+              "InvertCondition": false,
+              "Rule": {
+                "Type": "CreateValue",
+                "Object": {
+                  "ValueString": "YES!",
+                  "TypeString": ""
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\isFinancingStatement.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "Financing Statement",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Warranty Deed"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantee"
+          ],
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\PartyFinder\\Master.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\BankruptcyCt\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN"
+          ],
+          "RSDFileName": "<RSDFileDir>\\BankruptcyCt\\bankruptcyCt.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\SatisfactionOfMortgage_Rule5_Condition.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "GG"
+          ],
+          "RSDFileName": "<RSDFileDir>\\SatisfactionOfMortgage_Rule5.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "FindFromRSD",
+            "Object": {
+              "AttributeNames": [
+                "Type1"
+              ],
+              "RSDFileName": "<RSDFileDir>\\IsCriminalComplaint.rsd.etf"
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "ConditionalValueFinder",
+        "Object": {
+          "Condition": {
+            "Type": "FindingRuleCondition",
+            "Object": {
+              "AFRule": {
+                "Type": "FindFromRSD",
+                "Object": {
+                  "AttributeNames": [
+                    "MCDataType1"
+                  ],
+                  "RSDFileName": "<RSDFileDir>\\..\\DLN\\CriminalComplaint\\main.rsd.etf"
+                }
+              }
+            }
+          },
+          "InvertCondition": false,
+          "Rule": {
+            "Type": "ConditionalValueFinder",
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "FindFromRSD",
+                    "Object": {
+                      "AttributeNames": [
+                        "FirstSSN"
+                      ],
+                      "RSDFileName": "<RSDFileDir>\\..\\SSN\\CriminalComplaint\\Type1Helper.rsd.etf"
+                    }
+                  }
+                }
+              },
+              "InvertCondition": false,
+              "Rule": {
+                "Type": "ConditionalValueFinder",
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "FindFromRSD",
+                        "Object": {
+                          "AttributeNames": [
+                            "SecondSSN"
+                          ],
+                          "RSDFileName": "<RSDFileDir>\\..\\SSN\\CriminalComplaint\\Type1Helper.rsd.etf"
+                        }
+                      }
+                    }
+                  },
+                  "InvertCondition": false,
+                  "Rule": {
+                    "Type": "CreateValue",
+                    "Object": {
+                      "ValueString": "YES!",
+                      "TypeString": ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Unknown"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "BlaBlaNeverFoundBlaBlaBla",
+          "Clues": [
+            "FirstFoundDEATH",
+            "FirstFoundFUNERAL",
+            "FirstFoundINJURY",
+            "This\\scopy.{0,3}is\\snot\\s(val|lid).{0,7}(unl|less).{0,8}(prep|ared).{0,16}(eng|gra|aved).{5,28}(th|he).{0,4}(se|al).*\\b",
+            "This\\sis.{0,4}true.{0,3}(a|nd).{0,7}(ex|act).{0,10}(reprod|uction|ectio).{0,8}(o|f).{0,3}(th|he).{0,8}(doc|cum|ent).{0,9} (off|icia|lly).{0,12}(regis|stered).{0,8}(an|nd).{0,5}(pla|ced).*\\b"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": true,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 2,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Deed of Trust"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "òó",
+          "Clues": [],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": true,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": false,
+          "IsClueRegularExpression": false,
+          "MinNumberOfClues": 0,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "Brown\\W*Automotive\\W*Group",
+              "IsCaseSensitive": true,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "Text",
+          "ImageRegionText": "",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "Brown\\W*Automotive\\W*Group"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageCharacters"
+          },
+          "Top": {
+            "Anchor": "Page",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageLines"
+          },
+          "Right": {
+            "Anchor": "Page",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\IsOilandGasLease.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "ConditionalValueFinder",
+        "Object": {
+          "Condition": {
+            "Type": "RSDFileCondition",
+            "Object": {
+              "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\HasTaxID.rsd.etf"
+            }
+          },
+          "InvertCondition": true,
+          "Rule": {
+            "Type": "ConditionalValueFinder",
+            "Object": {
+              "Condition": {
+                "Type": "RSDFileCondition",
+                "Object": {
+                  "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\HasSSN.rsd.etf"
+                }
+              },
+              "InvertCondition": true,
+              "Rule": {
+                "Type": "ConditionalValueFinder",
+                "Object": {
+                  "Condition": {
+                    "Type": "RSDFileCondition",
+                    "Object": {
+                      "RSDFileName": "<RSDFileDir>\\IsOilandGasLease.rsd.etf"
+                    }
+                  },
+                  "InvertCondition": true,
+                  "Rule": {
+                    "Type": "ConditionalValueFinder",
+                    "Object": {
+                      "Condition": {
+                        "Type": "RSDFileCondition",
+                        "Object": {
+                          "RSDFileName": "<RSDFileDir>\\LastPages.rsd.etf"
+                        }
+                      },
+                      "InvertCondition": false,
+                      "Rule": {
+                        "Type": "ConditionalValueFinder",
+                        "Object": {
+                          "Condition": {
+                            "Type": "RSDFileCondition",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\HasOilandGasLease.rsd.etf"
+                            }
+                          },
+                          "InvertCondition": false,
+                          "Rule": {
+                            "Type": "FindFromRSD",
+                            "Object": {
+                              "AttributeNames": [
+                                "ReOCR"
+                              ],
+                              "RSDFileName": "<RSDFileDir>\\ReOCROilandGasLease2.rsd.etf"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\PowerOfAttorney\\IsPoA.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN"
+          ],
+          "RSDFileName": "<RSDFileDir>\\PowerOfAttorney\\PoA.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+          "Category": "County Document",
+          "Types": [
+            "Satisfaction of Judgment"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Defendant"
+          ],
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\PartyFinder\\Master.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\County Tax Lien\\isReleaseOfCountyTaxLien.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Defendant"
+          ],
+          "RSDFileName": "<RSDFileDir>\\County Tax Lien\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\SocialSecurityNumber\\SSNClues.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "RedactSSNs"
+          ],
+          "RSDFileName": "<RSDFileDir>\\MortgageSignaturePage\\PartialNumbers+SealClues.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\HasTaxID.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "DoesNotHaveTaxID",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Satisfaction of Judgment"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantor"
+          ],
+          "RSDFileName": "<RSDFileDir>\\Satisfaction of Judgment\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\TaxReturn1040\\isTaxReturn1040.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN"
+          ],
+          "RSDFileName": "<RSDFileDir>\\TaxReturn1040\\taxReturn1040.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\InterimReport\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN"
+          ],
+          "RSDFileName": "<RSDFileDir>\\InterimReport\\InterimReport.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Release of State Tax Lien"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantor"
+          ],
+          "RSDFileName": "<RSDFileDir>\\ByDocType\\ReleaseOfStateTaxLien.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Subordination Agreement"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantor"
+          ],
+          "RSDFileName": "<RSDFileDir>\\SubordinationAgreement\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?n)\r\n\\bASSIGNMENTS?\\sOF\\sRENTS\r\n|\r\n\\bASSIGNMENTS?\\sOF\\s(RENTS?|LEASES?)\\s(AND|&)\\s(RENTS|LEASES)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "ASSIGNMENT RNT",
+          "TypeString": "AssignmentRnt"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\LeaseAgrmnt\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "SSN"
+          ],
+          "RSDFileName": "<RSDFileDir>\\LeaseAgrmnt\\LeaseAgrmnt.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Any Unique"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": true,
+          "RegExpFileName": "<RSDFileDir>\\certDeath.dat.etf",
+          "Pattern": "",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\IsReleaseOfStateTaxLien.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "Release of State Tax Lien",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": false,
+          "ClueList1": {
+            "Clues": [
+              "\\A[\\S\\s]+"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageCharacters"
+          },
+          "Top": {
+            "Anchor": "Page",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageLines"
+          },
+          "Right": {
+            "Anchor": "Page",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageCharacters"
+          },
+          "Bottom": {
+            "Anchor": "Page",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\isTitleOffenseReport.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "Offense Report Supplement",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Certificate of Death"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "ConditionalValueFinder",
+        "Object": {
+          "Condition": {
+            "Type": "RSDFileCondition",
+            "Object": {
+              "RSDFileName": "<RSDFileDir>\\IsOtherStateCOD.rsd.etf"
+            }
+          },
+          "InvertCondition": true,
+          "Rule": {
+            "Type": "FindFromRSD",
+            "Object": {
+              "AttributeNames": [
+                "RedactSSN"
+              ],
+              "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\Certificate of Death\\Ohio\\RedactDeathCertificate_Ohio.rsd.etf"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "<RSDFileDir>",
+          "Category": "Classification",
+          "Types": [
+            "Remittance Advice"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [],
+          "RSDFileName": "<RSDFileDir>\\RA\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Modification of Deed of Trust"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Trustor"
+          ],
+          "RSDFileName": "<RSDFileDir>\\Modification of Deed of Trust\\Master.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\..\\..\\Common\\isCORF.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?'Relationship'Relationship\\WTo\\WPatient)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": true,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\bunit\\b.*\\b(room|bed)\\b",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "Text",
+          "ImageRegionText": "name",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Word",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "\\bphone\\b\\:?"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 35.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.2,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 10.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 1.4,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": false,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Discharge from Active Duty"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Clues"
+          ],
+          "RSDFileName": "<RSDFileDir>\\SocialSecurityNumber\\SocialSecurityNumberMaster.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?-i:(?~<>REMITTANCE(\\W*)ADVICE))",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": false
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "Remittance Advice",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<error=3>Freddie\\sMac\\sUniform\\sInstrument)\r\n|\r\n(?~<error=3>Multistate\\sSecond\\sHome\\sRiderSingle\\sFamilyFannie\\sMae)",
+              "IsCaseSensitive": true,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "123456789",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "(1{4,}\\W{0,1}){4,}"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.2,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "Page",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Unknown",
+            "Assignment - Misc"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "ConditionalValueFinder",
+        "Object": {
+          "Condition": {
+            "Type": "FindingRuleCondition",
+            "Object": {
+              "AFRule": {
+                "Type": "RegExprRule",
+                "Object": {
+                  "IsRegExpFromFile": false,
+                  "RegExpFileName": "",
+                  "Pattern": "^ASSIGNMENT\\b",
+                  "IsCaseSensitive": true,
+                  "FirstMatchOnly": true,
+                  "CreateSubAttributesFromNamedMatches": false,
+                  "OnlyCreateOneSubAttributePerGroup": true
+                }
+              }
+            }
+          },
+          "InvertCondition": false,
+          "Rule": {
+            "Type": "CreateValue",
+            "Object": {
+              "ValueString": "ASSIGN",
+              "TypeString": ""
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\Grantee\\Deed\\IsDeed.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Grantor"
+          ],
+          "RSDFileName": "<RSDFileDir>\\Deeds\\Deeds.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\LastPages.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "ConditionalValueFinder",
+        "Object": {
+          "Condition": {
+            "Type": "RSDFileCondition",
+            "Object": {
+              "RSDFileName": "<RSDFileDir>\\HasOilandGasLease.rsd.etf"
+            }
+          },
+          "InvertCondition": false,
+          "Rule": {
+            "Type": "FindFromRSD",
+            "Object": {
+              "AttributeNames": [
+                "SSN"
+              ],
+              "RSDFileName": "<RSDFileDir>\\OilandGasLease.rsd.etf"
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\Shared\\IsBailBackgroundInformation.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "_"
+          ],
+          "RSDFileName": "<RSDFileDir>\\BailBackgroundInformation\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "BlockFinder",
+            "Object": {
+              "BlockBegin": "",
+              "BlockEnd": "",
+              "BlockSeparator": "SomethingThatWillNeverBeInAnyDocumentEver",
+              "Clues": [
+                "(?:AFF|IANT)[\\s\\S]{0,14}(?:MONT|THLY)[\\s\\S]{0,11}(?:EXPE|ENSES)",
+                "^[\\s\\S]{0,19}lump\\s*sum\\s*income",
+                "^[\\s\\S]{0,2}2[\\s\\S]{0,3}Describe[\\s\\S]{0,6}asset",
+                "^[\\s\\S]{0,2}A[\\s\\S]{0,3}MONTHLY\\s*EXPENSES",
+                "^[\\s\\S]{0,2}b[\\s\\S]{0,3}Water[\\s\\S]{0,3}Sewer",
+                "^[\\s\\S]{0,9}list\\s*all\\s*funds"
+              ],
+              "DefineBlocksType": "SeparatorString",
+              "FindAllBlocks": false,
+              "GetMaxOnly": true,
+              "InputAsOneBlock": true,
+              "IsCluePartOfAWord": true,
+              "IsClueRegularExpression": true,
+              "MinNumberOfClues": 4,
+              "PairBeginAndEnd": false
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "LIR"
+          ],
+          "RSDFileName": "<RSDFileDir>\\AccountColumnHelper.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+          "Category": "County Document",
+          "Types": [
+            "Assignment of Rents"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Assignee",
+            "OriginalTrustor"
+          ],
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\PartyFinder\\Master.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Certificate of Death"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "000-00-0000",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": false,
+          "ClueList1": {
+            "Clues": [
+              "(So|cia|ial)[\\s\\S]{0,8}(Sec|cur|ity)[\\s\\S]{0,8}(No|Nu|umb|mber)"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 5.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 45.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 4.0,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\FederalTaxLien\\isNotice.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "Plaintiff"
+          ],
+          "RSDFileName": "<RSDFileDir>\\FederalTaxLien\\main.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalValueFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "[\\s\\S]{4,}",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "Special",
+          "TypeString": ""
+        }
+      }
+    }
+  }
+]

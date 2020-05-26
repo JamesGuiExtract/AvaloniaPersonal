@@ -1,0 +1,40 @@
+[
+  {
+    "Type": "MicrFinderV2",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FilterCharsWhenSplitting": true,
+      "FilterRegex": "file://<ComponentDataDir>\\Redaction\\Common\\Checks\\MICRFinderFilter.dat.etf",
+      "HighConfidenceThreshold": 80,
+      "InheritOCRParameters": false,
+      "LowConfidenceThreshold": 50,
+      "MicrSplitterRegex": "file://<ComponentDataDir>\\Redaction\\Common\\Checks\\MICRFinderSplitter.dat.etf",
+      "ReturnUnrecognizedCharacters": false,
+      "SplitAccountNumber": false,
+      "SplitAmount": false,
+      "SplitCheckNumber": false,
+      "SplitRoutingNumber": false,
+      "UseLowConfidenceThreshold": true
+    }
+  },
+  {
+    "Type": "MicrFinderV2",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FilterCharsWhenSplitting": true,
+      "FilterRegex": "file://<ComponentDataDir>\\Redaction\\Common\\Checks\\MICRFinderFilter.dat.etf",
+      "HighConfidenceThreshold": 80,
+      "InheritOCRParameters": false,
+      "LowConfidenceThreshold": 50,
+      "MicrSplitterRegex": "file://<ComponentDataDir>\\Redaction\\Common\\Checks\\MICRFinderSplitter.dat.etf",
+      "ReturnUnrecognizedCharacters": true,
+      "SplitAccountNumber": false,
+      "SplitAmount": false,
+      "SplitCheckNumber": false,
+      "SplitRoutingNumber": false,
+      "UseLowConfidenceThreshold": true
+    }
+  }
+]

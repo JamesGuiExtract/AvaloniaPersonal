@@ -1,0 +1,82 @@
+[
+  {
+    "Type": "ExtractLine",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EachLineAsUniqueValue": false,
+      "IncludeLineBreak": true,
+      "LineNumbers": "2,3"
+    }
+  },
+  {
+    "Type": "ExtractLine",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EachLineAsUniqueValue": false,
+      "IncludeLineBreak": true,
+      "LineNumbers": "1-4"
+    }
+  },
+  {
+    "Type": "ExtractLine",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EachLineAsUniqueValue": false,
+      "IncludeLineBreak": true,
+      "LineNumbers": "1"
+    }
+  },
+  {
+    "Type": "ExtractLine",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EachLineAsUniqueValue": false,
+      "IncludeLineBreak": false,
+      "LineNumbers": "1"
+    }
+  },
+  {
+    "Type": "ExtractLine",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EachLineAsUniqueValue": false,
+      "IncludeLineBreak": true,
+      "LineNumbers": "1-10"
+    }
+  },
+  {
+    "Type": "ExtractLine",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EachLineAsUniqueValue": true,
+      "IncludeLineBreak": false,
+      "LineNumbers": ""
+    }
+  },
+  {
+    "Type": "ExtractLine",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EachLineAsUniqueValue": false,
+      "IncludeLineBreak": false,
+      "LineNumbers": "2"
+    }
+  },
+  {
+    "Type": "ExtractLine",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EachLineAsUniqueValue": false,
+      "IncludeLineBreak": true,
+      "LineNumbers": "1-3"
+    }
+  }
+]

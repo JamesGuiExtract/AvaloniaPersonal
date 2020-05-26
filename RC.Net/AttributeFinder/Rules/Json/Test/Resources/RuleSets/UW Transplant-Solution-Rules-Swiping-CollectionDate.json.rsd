@@ -1,0 +1,298 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 101,
+        "Name": "MultiplePatient Detection (By Page)",
+        "ByPage": true,
+        "Enabled": false
+      }
+    ],
+    "FKBVersion": "19.2.0.41",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "CollectionDate": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "[\\s\\S]*",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "AdvancedReplaceString",
+                  "Description": "Remove leading clue<Advanced replace string>",
+                  "Enabled": true,
+                  "Object": {
+                    "StrToBeReplaced": "\\A\\W*[A-Z]+(\\W+[A-Z]+)*\\s*:\\s*",
+                    "AsRegularExpression": true,
+                    "IsCaseSensitive": false,
+                    "Replacement": "",
+                    "ReplacementOccurrenceType": "First",
+                    "SpecifiedOccurrence": 0
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": false,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Add colon to time<Run object on query>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "AdvancedReplaceString",
+                "Object": {
+                  "StrToBeReplaced": "(?<=\\d+\\D\\d+\\D\\d{2}(?:\\d{2})?\\D*)(\\d{2})(\\d{2})»?\\s*$",
+                  "AsRegularExpression": true,
+                  "IsCaseSensitive": false,
+                  "Replacement": "$1:$2",
+                  "ReplacementOccurrenceType": "All",
+                  "SpecifiedOccurrence": 0
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Insert space before time<Run object on query>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "AdvancedReplaceString",
+                "Object": {
+                  "StrToBeReplaced": "(?<=\\d)@?(\\d{2}:\\d{2})",
+                  "AsRegularExpression": true,
+                  "IsCaseSensitive": false,
+                  "Replacement": " $1",
+                  "ReplacementOccurrenceType": "All",
+                  "SpecifiedOccurrence": 0
+                }
+              }
+            }
+          },
+          {
+            "Type": "RemoveCharacters",
+            "Description": "Remove leading colons before splitting<Remove characters>",
+            "Enabled": true,
+            "Object": {
+              "Characters": ":",
+              "IsCaseSensitive": false,
+              "RemoveAll": false,
+              "Consolidate": false,
+              "TrimLeading": true,
+              "TrimTrailing": false
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Generate date time subattrr<Run object on query>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "DateTimeSplitter",
+                "Object": {
+                  "MinimumTwoDigitYear": 1950,
+                  "OutputFormat": "",
+                  "ShowFormattedOutput": false,
+                  "SplitDayOfWeek": false,
+                  "SplitDefaults": true,
+                  "SplitFourDigitYear": true,
+                  "SplitMilitaryTime": true,
+                  "SplitMonthAsName": false,
+                  "TwoDigitYearBeforeCurrent": true
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Create time subattr if Hour is present<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*{Hour}",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "OutputHandlerSequence",
+                "Object": {
+                  "ObjectsVector": [
+                    {
+                      "Type": "RunObjectOnAttributes",
+                      "Description": "Pad hour/minute<Run object on query>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "*/Hour|*/Minute",
+                        "AttributeSelector": {
+                          "Type": null,
+                          "Object": null
+                        },
+                        "UseAttributeSelector": false,
+                        "Type": "Modifier",
+                        "Object": {
+                          "Type": "PadValue",
+                          "Object": {
+                            "PadLeft": true,
+                            "PaddingCharacter": 48,
+                            "RequiredSize": 2
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "Type": "ModifyAttributeValueOH",
+                      "Description": "Create Time attr with value of subattributes<Modify attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": true,
+                        "AttributeName": "Time",
+                        "SetAttributeName": true,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "%Hour%<%Minute%>",
+                        "SetAttributeValue": true
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Set parent value to subattributes<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%Month%/%Day%/%Year%< %Time%>",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove temporary subattrr<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/Month|*/Day|*/Year|*/Hour|*/Minute|*/Second|*/Time"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

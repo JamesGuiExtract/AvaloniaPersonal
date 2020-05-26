@@ -1,0 +1,313 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "19.1.0.161",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "RequisitionInfo",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Create value",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "Order Requisition",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "RequisitionInfo": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find from RSD file",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<RSDFileDir>\\OrderDetails\\RequisitionInfo\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "ModifyAttributeValueOH",
+              "Description": "set type to Attribute name from ReqInfo main<Modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*",
+                "CreateSubAttribute": false,
+                "AttributeName": "",
+                "SetAttributeName": false,
+                "AttributeType": "%.Name%",
+                "SetAttributeType": true,
+                "AttributeValue": "",
+                "SetAttributeValue": false
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "move up DocumentType<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/DocumentType",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": false,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "rename */RequisitionInfo to proper attribute name<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/RequisitionInfo",
+              "CreateSubAttribute": false,
+              "AttributeName": "%.Type%",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "if ReceivingFaxNumber = 6085358744, et al, set DocumentType to Assignment of Benefits (AOB)<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "create ReceivingFaxNumber/DocumentType<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/ReceivingFaxNumber",
+                    "AttributeSelector": {
+                      "Type": "ValueConditionSelector",
+                      "Object": {
+                        "Condition": {
+                          "Type": "FindingRuleCondition",
+                          "Object": {
+                            "AFRule": {
+                              "Type": "RegExprRule",
+                              "Object": {
+                                "IsRegExpFromFile": false,
+                                "RegExpFileName": "",
+                                "Pattern": "6085358(715|744|933)",
+                                "IsCaseSensitive": false,
+                                "FirstMatchOnly": true,
+                                "CreateSubAttributesFromNamedMatches": false,
+                                "OnlyCreateOneSubAttributePerGroup": false
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": true,
+                        "AttributeName": "DocumentType",
+                        "SetAttributeName": true,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "Assignment of Benefits (AOB)",
+                        "SetAttributeValue": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "create DocumentType/DocumentType if ReceivingFaxNumber/DocumentType exists<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/DocumentType",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "DocumentType",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "/*/*/ReceivingFaxNumber/DocumentType",
+                        "ValueContainsXPath": true,
+                        "DoNotCreateIfValueIsEmpty": true
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "remove */ReceivingFaxNumber/DocumentType<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/ReceivingFaxNumber/DocumentType"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "MoveAndModifyAttributes",
+                  "Description": "move up DocumentType/DocumentType<Move and modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AddAttributeNameToType": false,
+                    "AddRootOrParentAttributeType": false,
+                    "AddSpecifiedAttributeType": false,
+                    "AttributeQuery": "DocumentType/DocumentType",
+                    "DeleteRootOrParentIfAllChildrenMoved": true,
+                    "MoveAttributeLevel": "MoveToParent",
+                    "OverwriteAttributeName": "DoNotOverwrite",
+                    "RetainAttributeType": true,
+                    "SpecifiedAttributeName": "",
+                    "SpecifiedAttributeType": ""
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputToXML",
+            "Description": "<SourceDocName>.xml<Output data to XML file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.xml",
+              "Format": "XMLSchema",
+              "NamedAttributes": true,
+              "UseSchemaName": false,
+              "SchemaName": "",
+              "ValueAsFullText": true,
+              "RemoveEmptyNodes": false,
+              "RemoveSpatialInfo": true
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

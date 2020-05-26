@@ -1,0 +1,802 @@
+[
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.dln.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.patientinfo.e.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.grantor.evoa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.pi.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.party.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "$DirOf(<SourceDocName>)\\Feedback\\TestResults\\$FileOf(<SourceDocName>).voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.Claimant.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.ssnb.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "K:\\$DirNoDriveOf(<SourceDocName>)\\..\\EAV\\LabInfo\\$FileOf(<SourceDocName>).voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.RestoredFound.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.dobcandidates.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "$DirOf(<SourceDocName>)\\..\\Expected\\Lien_KnownAsName\\$FileOf(<SourceDocName>).voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.DocumentType.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.DOB.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.protofeatures.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "$DirOf(<SourceDocName>)\\..\\..\\EAV\\DocumentType\\$FileOf(<SourceDocName>).voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.LD.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "C:\\Documents and Settings\\nathaniel_heyer\\Desktop\\test.tif.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.shortlegal.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.DataFoundByRules.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.bpnt.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.found.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.provider.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.CA.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.lgl.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.training.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.page.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.longlegal.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.docdesc.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.MortgageAmount.evoa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.shipping.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.evoa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.CellsWithProtofeatures.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.grantor.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.preMap.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.DocumentDate.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.ML.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.PropertyAddress.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.IndexItem.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.landtype.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.propaddress.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.dl.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.tif.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "$DirOf(<SourceDocName>)\\Feedback\\PatientInfo\\$FileOf(<SourceDocName>).voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.newlgl.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.loba.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.RPaginationProtoFeatures.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.trustee.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.debug.features.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.rsd.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.checkedCandidates.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.LabInfo.e.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.lkan.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.patient.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.Component.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "K:\\$DirNoDriveOf(<SourceDocName>)\\Feedback\\LabInfo\\$FileOf(<SourceDocName>).voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "$DirOf(<SourceDocName>)\\..\\..\\EAV\\DocumentDescription\\$FileOf(<SourceDocName>).voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.testing.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.labinfo.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.reference.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.gor.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "$DirOf(<SourceDocName>)\\..\\Expected\\Lien_LienOriginalMortgagee\\$FileOf(<SourceDocName>).voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.TestResults.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.xr.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.ldridiculous.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.Indexing.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.apn.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.Paragraph.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.Grantor.evoa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.paginationProtoFeatures.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.llom.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.minor.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.gee.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.RPagination.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.legal.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.reqinfo.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.address.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.documentdate.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "$DirOf(<SourceDocName>)\\..\\EAV\\LabInfo\\$FileOf(<SourceDocName>).voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.VendorName.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.FoundPagination.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.SSN.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.idshield.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.lab.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.test.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.consideration.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.docnumber.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.dn.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.redaction.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.DoesUssHaveData.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.PatientInfo.e.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.PaymentReceived.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.rel.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.pin.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "$DirOf(<SourceDocName>)\\..\\EAV\\DocumentDescription\\$FileOf(<SourceDocName>).voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.LabInfo.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.DocumentReference.evoa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.coverpage.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.DocumentDescription.voa"
+    }
+  },
+  {
+    "Type": "OutputToVOA",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.PageBoundaries.voa"
+    }
+  }
+]

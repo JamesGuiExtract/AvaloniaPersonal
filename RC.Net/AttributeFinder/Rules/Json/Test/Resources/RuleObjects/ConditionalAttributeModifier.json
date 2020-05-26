@@ -1,0 +1,3363 @@
+[
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "DIVINE.{0,3}SAVIOR.{0,3}HEALTHCARE\\s*.*\\d{5}",
+              "IsCaseSensitive": true,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "\\S*[a-z]\\S*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": true,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\CaliforniaTaxLiens\\IsCaliforniaTaxLien.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?'wellformed'\\d{9})",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": true,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\bAGE\\b",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "00-00-0000",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "^(DOB|Date\\sOf\\sBirth|Birth\\s?date)[:;]?"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.05,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 1.2,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\b(?~<xtra_ws=2>Test\\sDeveloped\\sand\\scharacteristics\\sdetermined\\sby\\sArup\\b)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\S\\s]*",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "STATE\\s?OF\\s?LOUISIANA[\\s\\S]{0,5}UNIFORM\\s?COMMERCIAL\\s?CODE\\s?FINANCING\\s?STATEMENT\\s?UCC\\s?-\\s?1",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "000-00-0000",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "[\\s\\S]*"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 3.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+          "Category": "County Document",
+          "Types": [
+            "Notice of State Tax Lien",
+            "Release of Federal Tax Lien"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "\\ASTATE\\W*OF\\W*MINNESOTA\\z",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "STATE OF MN. - DEPARTMENT OF REVENUE",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\Common\\isEntity.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\S\\s]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Certificate of Death"
+          ],
+          "MinConfidence": "ProbableLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "000-00-0000",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": false,
+          "ClueList1": {
+            "Clues": [
+              "[\\S\\s]*"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 1.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 1.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 1.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 1.0,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\isInTestColumn.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\S\\s]*^(?:«|[^«»]+»)[\\S\\s]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\beginningLowCC.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": " ",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Word",
+          "MatchMultiplePagesPerDocument": false,
+          "ClueList1": {
+            "Clues": [
+              "[\\S\\s]+"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.5,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.2,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.2,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<error=4>patient(\\W*)as(\\W*)appropriate)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": false
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": " ",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "ORDER\\r",
+              "NATURE\\r",
+              "(?~<error=2>SIGNATURE)",
+              "(?~<error=2>DATE\\x20of\\x20order)"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [
+              "\\A[\\s\\S]{100}"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList2",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 1.5,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList2",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.5,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\Shared\\IsProbableCause.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Type",
+          "TranslationStringPairs": [
+            {
+              "From": "SSN",
+              "To": "probaff"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\isLineNumber.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "\\d+\\s*\\z",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Unknown"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "\\A[\\s\\S]*\\Z",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Any Unique"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "ChangeCase",
+        "Object": {
+          "CaseType": "NoChangeCase"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Abstract of Judgment",
+            "Abstract of Support Judgment"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "\\A\\W*\\d{4}\\s+1\\W*\\z",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": true,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "City\\W*of\\W*Racine[\\s\\S]*?Racine\\W*Water\\W*Works",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": false
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?'CityOfRacine'City\\W*of\\W*Racine)[\\s\\S]*?(?'Water'Racine\\W*Water\\W*Works[^\\r\\n]*)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": true,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<error=3>Michigan)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\S\\s]+",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "Michigan",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "STATE\\s?OF\\s?LOUISIANA[\\s\\S]{0,5}UNIFORM\\s?COMMERCIAL\\s?CODE\\s?FINANCING\\s?STATEMENT\\s?UCC\\s?-\\s?1",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "000-00-0000",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "[\\s\\S]*"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 3.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Warranty Deed"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "^Tract",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "Lot",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "  ^(?~<error=2>INTERSPOUSAL\\sTRANSFER\\sGRANT\\sDEED)\r\n| ^^(?~<error=2>INTERSPOUSAL\\sTRANSFER\\sDEED)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Value",
+          "TranslationStringPairs": [
+            {
+              "From": "Grant Deed",
+              "To": "INTER SPOUSAL DEED"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "CharacterConfidenceCondition",
+        "Object": {
+          "IsMet": true,
+          "AggregateFunction": "Average",
+          "FirstScoreCondition": "LT",
+          "FirstScoreToCompare": 70,
+          "IsSecondCondition": false,
+          "AndSecondCondition": true,
+          "SecondScoreCondition": "EQ",
+          "SecondScoreToCompare": 0
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Type",
+          "TranslationStringPairs": [
+            {
+              "From": "",
+              "To": "MCData"
+            },
+            {
+              "From": "SSN",
+              "To": "MCData"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "Comment[\\s\\S]",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": false
+            }
+          }
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Type",
+          "TranslationStringPairs": [
+            {
+              "From": "",
+              "To": "DELETE"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\b[a-z]+",
+              "IsCaseSensitive": true,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "ChangeCase",
+        "Object": {
+          "CaseType": "MakeTitleCase"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\FinancingStatement\\IsVAUCC.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]*^\\d{2}[a-z]-\\d{2}-\\d{3}[\\s\\S]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\bAGE\\b",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "00-00-0000",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "^(DOB|Date\\sOf\\sBirth|Birth\\s?date)[:;]?"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [
+              "\\bAGE\\b[:;]?"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": true
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.05,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ClueList2",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "LocateImageRegion",
+            "Object": {
+              "DataInsideBoundaries": true,
+              "FindType": "ImageRegion",
+              "ImageRegionText": "BAD OCR",
+              "IncludeIntersectingEntities": true,
+              "IntersectingEntityType": "Character",
+              "MatchMultiplePagesPerDocument": true,
+              "ClueList1": {
+                "Clues": [
+                  "[\\s\\S]"
+                ],
+                "CaseSensitive": false,
+                "Regex": true,
+                "RestrictByBoundary": false
+              },
+              "ClueList2": {
+                "Clues": [],
+                "CaseSensitive": false,
+                "Regex": false,
+                "RestrictByBoundary": false
+              },
+              "ClueList3": {
+                "Clues": [],
+                "CaseSensitive": false,
+                "Regex": false,
+                "RestrictByBoundary": false
+              },
+              "ClueList4": {
+                "Clues": [],
+                "CaseSensitive": false,
+                "Regex": false,
+                "RestrictByBoundary": false
+              },
+              "Left": {
+                "Anchor": "Page",
+                "AnchorSide": "Left",
+                "ExpandDirection": "ExpandRight",
+                "ExpandBy": 1.2,
+                "ExpandUnits": "Inches"
+              },
+              "Top": {
+                "Anchor": "Page",
+                "AnchorSide": "Top",
+                "ExpandDirection": "ExpandDown",
+                "ExpandBy": 1.0,
+                "ExpandUnits": "Inches"
+              },
+              "Right": {
+                "Anchor": "Page",
+                "AnchorSide": "Right",
+                "ExpandDirection": "ExpandLeft",
+                "ExpandBy": 1.0,
+                "ExpandUnits": "Inches"
+              },
+              "Bottom": {
+                "Anchor": "Page",
+                "AnchorSide": "Bottom",
+                "ExpandDirection": "ExpandUp",
+                "ExpandBy": 1.2,
+                "ExpandUnits": "Inches"
+              }
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "BAD OCR",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "[\\s\\S]"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 1.2,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "Page",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 1.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "Page",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 1.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "Page",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 1.2,
+            "ExpandUnits": "Inches"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\FinancingStatement\\IsVAUCC.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]*^\\d{2}[a-z]-\\d{2}-\\d{3}[\\s\\S]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "^[a-z-\\x20]+\\r?$",
+              "IsCaseSensitive": true,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "ChangeCase",
+        "Object": {
+          "CaseType": "MakeUpperCase"
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?>(?~<error=3>LOCAL\\x20CHILD\\x20SUPPORT\\x20AGENCY))[\\s\\S]{0,15}(?>(?~<error=2>hereby\\x20releases))\r\n|\r\n(?>(?~<error=3>Full\\x20name\\x20and\\x20address\\x20of\\x20judgment\\x20creditor))\\W{0,10}(?>(?~<error=3>DEPARTMENT\\x20OF\\x20CHILD\\x20SUPPORT\\x20SERVICES))\r\n",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Type",
+          "TranslationStringPairs": [
+            {
+              "From": "",
+              "To": "ChildSupport"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\Is_It_a_Company.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]+",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\PartyFinder\\County Lien\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "ReplaceStrings",
+        "Object": {
+          "Replacements": [
+            {
+              "Pattern": "\\bsec\\b",
+              "Replacement": "Section"
+            },
+            {
+              "Pattern": "\\bHTS\\b",
+              "Replacement": "HEIGHTS"
+            },
+            {
+              "Pattern": "[\\s\\S]*^LEGAL\\x20?[:;]\\x20?",
+              "Replacement": ""
+            },
+            {
+              "Pattern": "\\x20?\\.?\\x20?(?:\\x200\\x20?[,.]?\\x20?)?\\d{1,3}\\x20?ac\\b[\\s\\S]*",
+              "Replacement": ", a subdivision"
+            },
+            {
+              "Pattern": "(?<=^LOT.*SECTION\\x20?\\d+[A-G]?)\\r?$",
+              "Replacement": ", a subdivision "
+            },
+            {
+              "Pattern": "\\d{2}\\x20?\\.\\x20?\\d{3}[\\s\\S]*",
+              "Replacement": ", a subdivision"
+            },
+            {
+              "Pattern": "[\\s\\S]+(?=^LOT)",
+              "Replacement": ""
+            }
+          ],
+          "AsRegularExpr": true,
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Abstract of Judgment",
+            "Abstract of Support Judgment"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\s\\S]{4,}",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<error=4>patient(\\W*)as(\\W*)appropriate)",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": false
+            }
+          }
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": " ",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "ORDER\\r",
+              "NATURE\\r",
+              "(?~<error=2>SIGNATURE)",
+              "(?~<error=2>DATE\\x20of\\x20order)"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [
+              "\\A[\\s\\S]{100}"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList2",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 2.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList2",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.5,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\isEntity.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\S\\s]+",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\UCC\\is.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\s\\S]*\\D[\\s\\S]*",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "CharacterConfidenceCondition",
+        "Object": {
+          "IsMet": true,
+          "AggregateFunction": "Average",
+          "FirstScoreCondition": "LT",
+          "FirstScoreToCompare": 50,
+          "IsSecondCondition": false,
+          "AndSecondCondition": true,
+          "SecondScoreCondition": "EQ",
+          "SecondScoreToCompare": 0
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "notfound",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Abstract of Support Judgment"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]*(?<!\\d[\\s\\S]*)\\d{4}\\x20*$[\\s\\S]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\..\\Common\\isEntity.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\S\\s]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<>DEATH\\sOF\\sJOINT\\sTENANT).?\\r",
+              "IsCaseSensitive": true,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Value",
+          "TranslationStringPairs": [
+            {
+              "From": "AFFIDAVIT OF DEATH",
+              "To": "AFFIDAVIT DEATH JOINT TENANT"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\FinancingStatement\\IsVAUCC.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]*^\\d{4}-\\d{3}-[a-z]\\d{2}[\\s\\S]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\FinancingStatement\\IsVAUCC.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]*^\\d{4}-\\d{3}-[a-z]\\d{2}[\\s\\S]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\isNotColumnHeader.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?!)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\isEntity.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\S\\s]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\..\\isEntity.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\S\\s]+",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\bAGE\\b",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "00-00-0000",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "^(DOB|Date\\sOf\\sBirth|Birth\\s?date)[:;]?"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.1,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 1.2,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "BlockFinder",
+            "Object": {
+              "BlockBegin": "",
+              "BlockEnd": "",
+              "BlockSeparator": "adsasfdsfasdfasdfasdfasdfasdfasdf",
+              "Clues": [
+                "\\bhousing\\s{0,4}credit\\b"
+              ],
+              "DefineBlocksType": "SeparatorString",
+              "FindAllBlocks": false,
+              "GetMaxOnly": false,
+              "InputAsOneBlock": true,
+              "IsCluePartOfAWord": false,
+              "IsClueRegularExpression": true,
+              "MinNumberOfClues": 3,
+              "PairBeginAndEnd": false
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\s\\S]*-[\\s\\S]*",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "VENTURES\\W*TRUST[\\s\\S]*?\\bBY\\b[\\s\\S]+",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": false
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?'VENTURES'VENTURES\\W*TRUST[\\s\\S]*?)\\bBY\\b(?'BY'[\\s\\S]+)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": true,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Certificate of Death"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "000-00-0000",
+          "AsRegularExpression": false,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\r\\n\\r\\n",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\s\\S]*?(?=\\r\\n\\r\\n[\\s\\S]*)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\FinancingStatement\\IsVAUCC.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]*^\\d{3}-\\d{2}-\\d{2}[a-z]\\b[\\s\\S]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "Comment[\\s\\S]+",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": false
+            }
+          }
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Type",
+          "TranslationStringPairs": [
+            {
+              "From": "",
+              "To": "DELETE"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "CharacterConfidenceCondition",
+        "Object": {
+          "IsMet": true,
+          "AggregateFunction": "Average",
+          "FirstScoreCondition": "LT",
+          "FirstScoreToCompare": 70,
+          "IsSecondCondition": false,
+          "AndSecondCondition": true,
+          "SecondScoreCondition": "EQ",
+          "SecondScoreToCompare": 0
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]+",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Notice of Federal Tax Lien",
+            "Release of Federal Tax Lien"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "000-00-0000",
+          "AsRegularExpression": false,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<>Death\\sOf\\sTrustee).?\\r\r\n|\r\n(?~<>Death\\sOf\\sAn\\sOriginal\\sTrustee).?\\r",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Value",
+          "TranslationStringPairs": [
+            {
+              "From": "AFFIDAVIT OF DEATH",
+              "To": "AFFIDAVIT OF DEATH OF TRUSTEE"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\Common\\isEntity.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]+",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "((Jan(uary)?|Feb(ruary)?|Mar(ch)?|Apr(il)?|May|June?|July?|Aug(ust)?|Sep(tember)?|Oct(ober)?|Nov(ember)?|Dec(ember)?|\\d{1,2})\\s*[\\-/\\|]?\\s*\\d{1,2})",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "((Jan(uary)?|Feb(ruary)?|Mar(ch)?|Apr(il)?|May|June?|July?|Aug(ust)?|Sep(tember)?|Oct(ober)?|Nov(ember)?|Dec(ember)?|\\d{1,2})\\s*[\\-/\\|]?\\s*\\d{1,2})",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\bDOB[:;]",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": "00-00-0000",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": true,
+          "ClueList1": {
+            "Clues": [
+              "SSN[:;]"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [
+              "CID\\sNo"
+            ],
+            "CaseSensitive": false,
+            "Regex": true,
+            "RestrictByBoundary": true
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.9,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ClueList2",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.05,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ClueList2",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\isSecurityAgreement.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\S\\s]+",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "remove",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": true,
+              "RegExpFileName": "<RSDFileDir>\\nonrangevalue.dat.etf",
+              "Pattern": "",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": true,
+          "RegExpFileName": "<RSDFileDir>\\nonrangevalue.dat.etf",
+          "Pattern": "",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": true,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Notice of Federal Tax Lien",
+            "Release of Federal Tax Lien"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "000-00-0000",
+          "AsRegularExpression": false,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\UCC\\ShortForm\\IsUCCShort.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]*\\d\\x20\\d\\x20\\d[\\s\\S]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Notice of Federal Tax Lien",
+            "Release of Federal Tax Lien"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "(?=(?:\\D|^|\\b)(?:\\d{3}\\x20*[-.,\\x20='\"*_]-?\\x20*\\d{2}\\x20*[-.,\\x20='\"*_]-?\\x20*\\d{4}(?!\\x20*-\\x20*\\d)|\\d{3}\\x20*(?:-\\x20*[\\r\\n]+|[\\r\\n]+\\x20*-\\x20*)\\d{2}\\x20*-\\x20*\\d{4}|\\d{3}\\x20*-\\x20*\\d{2}\\x20*(?:-\\x20*[\\r\\n]+|[\\r\\n]+\\x20*-\\x20*)\\d{4}|X{3}\\s*[-.,='\"*_]-?\\s*X{2}\\s*[-.,='\"*_]-?\\s*\\d{4}|\\d{3}\\s*[-.,='\"*_]-?\\s*\\d{2}\\s*[-.,='\"*_]-?\\s*(?:X{4}|#{4})|#{3}\\s*[-.,='\"*_]-?\\s*#{2}\\s*[-.,='\"*_]-?\\s*\\d{4})(?:\\D|$|\\b))(^\\d{3})\\W+",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "$1`",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\r\\n\\r\\n",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\s\\S]*?(?=\\r\\n\\r\\n[\\s\\S]*)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\d+.*\\b(?:road|rd|street|st|boulevard|blvd|avenue|ave|lane|ln|highway|hwy|parkway|pkwy)\\b.*\\s*^.{0,3}([a-z]+[\\x20,])+\\x20*\\b(ALABAMA|AL|ALASKA|AK|AMERICAN\\s+SAMOA|AS|ARIZONA|AZ|ARKANSAS|AR|CALIFORNIA|CA|COLORADO|CO|CONNECTICUT|CT|DELAWARE|DE|DISTRICT\\s+OF\\s+COLUMBIA|DC|FEDERATED\\s+STATES\\s+OF\\s+MICRONESIA|FM|FLORIDA|FL|GEORGIA|GA|GUAM|GU|HAWAII|HI|IDAHO|ILLINOIS|IL|INDIANA|IN|IOWA|IA|KANSAS|KS|KENTUCKY|KY|LOUISIANA|LA|MAINE|ME|MARSHALL\\s+ISLANDS|MH|MARYLAND|MD|MASSACHUSETTS|MA|MICHIGAN|MI|MINNESOTA|MN|MISSISSIPPI|MS|MISSOURI|MO|MONTANA|MT|NEBRASKA|NE|NEVADA|NV|NEW\\s+HAMPSHIRE|NH|NEW\\s+JERSEY|NJ|NEW\\s+MEXICO|NM|NEW\\s+YORK|NY|NORTH\\s+CAROLINA|NC|NORTH\\s+DAKOTA|ND|NORTHERN\\s+MARIANA\\s+ISLANDS|MP|OHIO|OH|OKLAHOMA|OK|OREGON|OR|PALAU|PW|PENNSYLVANIA|PA|PUERTO\\s+RICO|PR|RHODE\\s+ISLAND|RI|SOUTH\\s+CAROLINA|SC|SOUTH\\s+DAKOTA|SD|TENNESSEE|TN|TEXAS|TX|UTAH|UT|VERMONT|VT|VIRGIN\\s+ISLANDS|VI|VIRGINIA|VA|WASHINGTON|WA|WEST\\s+VIRGINIA|WV|WISCONSIN|WI|WYOMING|WY)\\b\\s*\\d{5}\\b(?:\\D\\d{4})?.{0,3}\\r?$",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Assignment of Deed of Trust"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Type",
+          "TranslationStringPairs": [
+            {
+              "From": "",
+              "To": "OriginalBeneficiary"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<error=2>IMPOSED\\sUNDER\\sA\\sCERTIFICATE\\sOR\\sNOTICE\\sOF\\sSTATE\\sTAX\\sLIEN)",
+              "IsCaseSensitive": true,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Value",
+          "TranslationStringPairs": [
+            {
+              "From": "RELEASE OF LIEN - MISC",
+              "To": "RELEASE OF LIEN IMPOSED UNDER CERT/NOT STATE TAX LIEN"
+            },
+            {
+              "From": "RELEASE OF STATE TAX LIEN",
+              "To": "RELEASE OF LIEN IMPOSED UNDER CERT/NOT STATE TAX LIEN"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "  \\A\\x20\\z\r\n| \\A[A-Z]+\\s\\d",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "OCRArea",
+        "Object": {
+          "Filter": [
+            "Alpha",
+            "Numeral",
+            "Period",
+            "Hyphen",
+            "Comma",
+            "ForwardSlash",
+            "Custom"
+          ],
+          "CustomFilterCharacters": "!@#$%&*()=+[]:;\"'?",
+          "DetectHandwriting": false,
+          "ReturnUnrecognized": false,
+          "ClearIfNoneFound": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Abstract of Judgment",
+            "Abstract of Support Judgment"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\s\\S]{4,}",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\bexhibit\\x20\"?a\"?",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "^\\d{3}-\\d{2}-\\d{3}[a-z]$",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "remove",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\Common\\isRotated.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "ExtractOcrTextInImageArea",
+        "Object": {
+          "IncludeTextOnBoundary": true,
+          "SpatialEntityType": "Character",
+          "UseOriginalDocumentOcr": false,
+          "UseOverallBounds": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "[A-Z]\\d\r\n|\r\n\\d[A-Z]",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "OCRArea",
+        "Object": {
+          "Filter": [
+            "Alpha",
+            "Numeral",
+            "Period",
+            "Hyphen",
+            "ForwardSlash",
+            "Custom"
+          ],
+          "CustomFilterCharacters": "#%*()<>",
+          "DetectHandwriting": false,
+          "ReturnUnrecognized": false,
+          "ClearIfNoneFound": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "\\A[\\S\\s]{0,50}TERMINATION\\W+OF\\W+DECEDENT'S\\W+PROPERTY\\W+INTEREST\r\n",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "Certificate of Death",
+          "AsRegularExpression": false,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\secondTagToRight.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\S\\s]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "First",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "10",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": false,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "OCRArea",
+        "Object": {
+          "Filter": [
+            "Numeral",
+            "Period",
+            "Custom"
+          ],
+          "CustomFilterCharacters": "$",
+          "DetectHandwriting": true,
+          "ReturnUnrecognized": false,
+          "ClearIfNoneFound": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "DocTypeCondition",
+        "Object": {
+          "AllowTypes": true,
+          "DocumentClassifiersPath": "",
+          "Category": "County Document",
+          "Types": [
+            "Notice of Federal Tax Lien",
+            "Release of Federal Tax Lien"
+          ],
+          "MinConfidence": "MaybeLevel"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "ConditionalAttributeModifier",
+        "Object": {
+          "Condition": {
+            "Type": "CharacterConfidenceCondition",
+            "Object": {
+              "IsMet": true,
+              "AggregateFunction": "Average",
+              "FirstScoreCondition": "LT",
+              "FirstScoreToCompare": 70,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0
+            }
+          },
+          "InvertCondition": false,
+          "Rule": {
+            "Type": "TranslateValue",
+            "Object": {
+              "TranslateFieldType": "Type",
+              "TranslationStringPairs": [
+                {
+                  "From": "",
+                  "To": "MCData"
+                },
+                {
+                  "From": "SSN",
+                  "To": "MCData"
+                }
+              ],
+              "IsCaseSensitive": false
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\FinancingStatement\\IsVAUCC.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "ReplaceStrings",
+        "Object": {
+          "Replacements": [
+            {
+              "Pattern": "(?#tax map)[\\s\\S]*^\\d{2}[a-z]-\\d{2}-\\d{3}[\\s\\S]*",
+              "Replacement": ""
+            },
+            {
+              "Pattern": "(?#project number)[\\s\\S]*^\\d{4}-\\d{3}-[a-z]\\d{2}[\\s\\S]*",
+              "Replacement": ""
+            },
+            {
+              "Pattern": "(?#tax map, alpha at end)[\\s\\S]*^\\d{3}-\\d{2}-\\d{2}[a-z]\\b[\\s\\S]*",
+              "Replacement": ""
+            }
+          ],
+          "AsRegularExpr": true,
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\isEntity.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\S\\s]+",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\..\\FinancingStatement\\IsVAUCC.rsd.etf"
+        }
+      },
+      "InvertCondition": true,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]*^\\d{3}-\\d{2}-\\d{2}[a-z]\\b[\\s\\S]*",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "FindingRuleCondition",
+        "Object": {
+          "AFRule": {
+            "Type": "RegExprRule",
+            "Object": {
+              "IsRegExpFromFile": false,
+              "RegExpFileName": "",
+              "Pattern": "(?~<>Death\\sOf\\sTrustee).?\\r",
+              "IsCaseSensitive": false,
+              "FirstMatchOnly": true,
+              "CreateSubAttributesFromNamedMatches": false,
+              "OnlyCreateOneSubAttributePerGroup": true
+            }
+          }
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "TranslateValue",
+        "Object": {
+          "TranslateFieldType": "Value",
+          "TranslationStringPairs": [
+            {
+              "From": "AFFIDAVIT OF DEATH",
+              "To": "AFFIDAVIT OF DEATH OF TRUSTEE"
+            }
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\Speeding.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "AdvancedReplaceString",
+        "Object": {
+          "StrToBeReplaced": "[\\s\\S]+",
+          "AsRegularExpression": true,
+          "IsCaseSensitive": false,
+          "Replacement": "Speeding",
+          "ReplacementOccurrenceType": "All",
+          "SpecifiedOccurrence": 0
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "RSDFileCondition",
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\hasDateToRight.rsd.etf"
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?!)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "ConditionalAttributeModifier",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Condition": {
+        "Type": "CharacterConfidenceCondition",
+        "Object": {
+          "IsMet": true,
+          "AggregateFunction": "Average",
+          "FirstScoreCondition": "LT",
+          "FirstScoreToCompare": 80,
+          "IsSecondCondition": false,
+          "AndSecondCondition": true,
+          "SecondScoreCondition": "EQ",
+          "SecondScoreToCompare": 0
+        }
+      },
+      "InvertCondition": false,
+      "Rule": {
+        "Type": "OCRArea",
+        "Object": {
+          "Filter": [
+            "Numeral",
+            "Hyphen"
+          ],
+          "CustomFilterCharacters": "",
+          "DetectHandwriting": false,
+          "ReturnUnrecognized": false,
+          "ClearIfNoneFound": true
+        }
+      }
+    }
+  }
+]

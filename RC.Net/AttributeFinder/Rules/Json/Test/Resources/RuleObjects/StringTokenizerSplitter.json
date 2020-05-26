@@ -1,0 +1,1509 @@
+[
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ￅ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "PossibleSocial",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSN",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound21_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSN6_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "@",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Ref_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾫ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "F",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "toMC",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾻ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Final",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾦ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Copy",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ";",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "entity",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound14_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "invalid",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "|",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Word",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSN8_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound02_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound01_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "|",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Lot",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSdot2_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "%",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Name",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ",",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "check",
+          "Value": "%1"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "|",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "CollectionDate",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾧ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Subdivision",
+          "Value": "%1"
+        },
+        {
+          "Name": "Building",
+          "Value": "%2"
+        },
+        {
+          "Name": "Unit",
+          "Value": "%3"
+        },
+        {
+          "Name": "Garage",
+          "Value": "%4"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SocSec1_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "﾿",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Split",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "^",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Split",
+          "Value": "%1"
+        },
+        {
+          "Name": "Split2",
+          "Value": "%2"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ",",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Split",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾧ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Location",
+          "Value": "%1"
+        },
+        {
+          "Name": "Subdivision",
+          "Value": "%2"
+        },
+        {
+          "Name": "Block",
+          "Value": "%3"
+        },
+        {
+          "Name": "Lot",
+          "Value": "%4"
+        },
+        {
+          "Name": "Unit",
+          "Value": "%5"
+        },
+        {
+          "Name": "Section",
+          "Value": "%6"
+        },
+        {
+          "Name": "Township",
+          "Value": "%7"
+        },
+        {
+          "Name": "Range",
+          "Value": "%8"
+        },
+        {
+          "Name": "Tract",
+          "Value": "%9"
+        },
+        {
+          "Name": "Municipality",
+          "Value": "%10"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ￅ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "FirstRelated",
+          "Value": "%1"
+        },
+        {
+          "Name": "SecondRelated",
+          "Value": "%2"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ￄ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "State",
+          "Value": "%1"
+        },
+        {
+          "Name": "Good",
+          "Value": "%2"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Zip",
+          "Value": "%1"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SocialSecurityNo2_2_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾮ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSN",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ￇ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "sub",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "﾿",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "-",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSN",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾦ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "ParcelNumber1",
+          "Value": "%1"
+        },
+        {
+          "Name": "ParcelNumber2",
+          "Value": "%2"
+        },
+        {
+          "Name": "ParcelNumber3",
+          "Value": "%3"
+        },
+        {
+          "Name": "ParcelNumber4",
+          "Value": "%4"
+        },
+        {
+          "Name": "ParcelNumber5",
+          "Value": "%5"
+        },
+        {
+          "Name": "Location",
+          "Value": "%6"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ";",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ",",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SplitFromMultiple",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾧ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Grantee",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SocialSecurity1_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "|",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "FirstName",
+          "Value": "%1"
+        },
+        {
+          "Name": "MiddleName",
+          "Value": "%2"
+        },
+        {
+          "Name": "LastName",
+          "Value": "%3"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound07_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾦ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "l%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ";",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Party",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "~",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "NotAPerson",
+          "Value": "%1"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound06_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "DocType",
+          "Value": "%1"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ",",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "DeletedPages",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Check",
+          "Value": "%1"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound17_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "|",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Date",
+          "Value": "%1"
+        },
+        {
+          "Name": "Time",
+          "Value": "%2"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ";",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "new",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ￅ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "CaseNumber%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾧ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Subdivision",
+          "Value": "%1"
+        },
+        {
+          "Name": "Block",
+          "Value": "%2"
+        },
+        {
+          "Name": "Lot",
+          "Value": "%3"
+        },
+        {
+          "Name": "Unit",
+          "Value": "%4"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "top",
+          "Value": "%1"
+        },
+        {
+          "Name": "Number",
+          "Value": "%2"
+        },
+        {
+          "Name": "Type",
+          "Value": "%3"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾧ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Backup",
+          "Value": "%1"
+        },
+        {
+          "Name": "Subdivision",
+          "Value": "%2"
+        },
+        {
+          "Name": "Block",
+          "Value": "%3"
+        },
+        {
+          "Name": "Lot",
+          "Value": "%4"
+        },
+        {
+          "Name": "Unit",
+          "Value": "%5"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "makeLC",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "|",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "MothersMaidenName",
+          "Value": "%3"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Text",
+          "Value": "%1"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SocSecNo1_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ￅ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Name",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "﾿",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Company",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Sub",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSdot1_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSN1_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "|",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "MothersFirstName",
+          "Value": "%1"
+        },
+        {
+          "Name": "MothersMiddleName",
+          "Value": "%2"
+        },
+        {
+          "Name": "MothersLastName",
+          "Value": "%3"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ",",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Lot",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "remove",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾷ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "l%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound04_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "|",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Person",
+          "Value": "%1"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ￇ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "phone",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "CO%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾧ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Subdivision",
+          "Value": "%1"
+        },
+        {
+          "Name": "Block",
+          "Value": "%2"
+        },
+        {
+          "Name": "Lot",
+          "Value": "%3"
+        },
+        {
+          "Name": "Section",
+          "Value": "%4"
+        },
+        {
+          "Name": "Township",
+          "Value": "%5"
+        },
+        {
+          "Name": "Range",
+          "Value": "%6"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾫ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Name4",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ",",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "MCData",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SocialSecurityNo2_1_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ￅ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "GG",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Good",
+          "Value": "%1"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "@",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "APN_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "checkit",
+          "Value": "%1"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾧ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Location",
+          "Value": "%1"
+        },
+        {
+          "Name": "Subdivision",
+          "Value": "%2"
+        },
+        {
+          "Name": "Block",
+          "Value": "%3"
+        },
+        {
+          "Name": "Lot",
+          "Value": "%4"
+        },
+        {
+          "Name": "Unit",
+          "Value": "%5"
+        },
+        {
+          "Name": "Section",
+          "Value": "%6"
+        },
+        {
+          "Name": "Township",
+          "Value": "%7"
+        },
+        {
+          "Name": "Range",
+          "Value": "%8"
+        },
+        {
+          "Name": "Q",
+          "Value": "%9"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound03_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ";",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Split",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "-",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "_",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Year",
+          "Value": "%1"
+        },
+        {
+          "Name": "DocumentNumber",
+          "Value": "%2"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound19_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SocialSecurityNumber1_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾦ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Address1",
+          "Value": "%1"
+        },
+        {
+          "Name": "City",
+          "Value": "%2"
+        },
+        {
+          "Name": "State",
+          "Value": "%3"
+        },
+        {
+          "Name": "ZipCode",
+          "Value": "%4"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾧ",
+      "SplitType": "EachTokenAsSpecified",
+      "FieldNameExpression": "Field_%d",
+      "AttributeNameAndValueExprVector": [
+        {
+          "Name": "Location",
+          "Value": "%1"
+        },
+        {
+          "Name": "Subdivision",
+          "Value": "%2"
+        },
+        {
+          "Name": "Block",
+          "Value": "%3"
+        },
+        {
+          "Name": "Lot1",
+          "Value": "%4"
+        },
+        {
+          "Name": "Lot2",
+          "Value": "%5"
+        },
+        {
+          "Name": "Lot3",
+          "Value": "%6"
+        },
+        {
+          "Name": "Lot4",
+          "Value": "%7"
+        },
+        {
+          "Name": "Lot5",
+          "Value": "%8"
+        },
+        {
+          "Name": "Lot6",
+          "Value": "%9"
+        },
+        {
+          "Name": "Lot7",
+          "Value": "%10"
+        },
+        {
+          "Name": "Lot8",
+          "Value": "%11"
+        },
+        {
+          "Name": "Lot9",
+          "Value": "%12"
+        },
+        {
+          "Name": "Lot10",
+          "Value": "%13"
+        },
+        {
+          "Name": "Unit",
+          "Value": "%14"
+        },
+        {
+          "Name": "Section",
+          "Value": "%15"
+        },
+        {
+          "Name": "Township",
+          "Value": "%16"
+        },
+        {
+          "Name": "Range",
+          "Value": "%17"
+        },
+        {
+          "Name": "Q",
+          "Value": "%18"
+        }
+      ]
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound22_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ﾻ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "_",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "￼",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "name",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSPound11_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": ";",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Grantor",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "`",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "SSN7_%d",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ￅ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "RemoveMe",
+      "AttributeNameAndValueExprVector": []
+    }
+  },
+  {
+    "Type": "StringTokenizerSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Delimiter": "ￅ",
+      "SplitType": "EachTokenAsSubAttribute",
+      "FieldNameExpression": "Phone",
+      "AttributeNameAndValueExprVector": []
+    }
+  }
+]

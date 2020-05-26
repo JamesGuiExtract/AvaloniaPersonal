@@ -1,0 +1,113 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "The intention of this ruleset is to update the LastVolume and LastPage items in the TarrantData table in the FAM database.",
+    "Counters": [],
+    "FKBVersion": "14.1.3.5",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "_/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "DataQueryRuleObject",
+            "Description": "<Data query>",
+            "Enabled": true,
+            "Object": {
+              "DataConnectionString": "Data Source=PSSVR;Initial Catalog=Xerox_TX_Tarrant_Sample_Index_MultiPage;Integrated Security=True",
+              "DataProviderName": ".NET Framework Data Provider for SQL Server",
+              "DataSourceName": "Microsoft SQL Server",
+              "OpenSqlCompactReadOnly": false,
+              "Query": "<SQL>\r\n -- Get Page value or reset to 0 if non-numeric\r\n DECLARE @Page int\r\n IF (ISNUMERIC(<Attribute>/Page</Attribute>) = 1)\r\n  SET @Page = <Attribute>/Page</Attribute>\r\n ELSE\r\n  SET @Page = 0\r\n  \r\n -- Update table if desired user ID already present\r\n UPDATE TarrantData SET LastVolume = <Attribute>/Volume</Attribute>, LastPage = @Page WHERE UserID IN (SELECT ID FROM FAMUser WHERE UserName = <Composite>$UserName()</Composite>)\r\n \r\n -- Add new row to table if desired user not present yet\r\n INSERT INTO TarrantData (UserID, LastVolume, LastPage)\r\n SELECT ID, <Attribute>/Volume</Attribute>, @Page \r\n FROM\r\n  (\r\n\tSELECT ID FROM FAMUser\r\n\tWHERE UserName = <Composite>$UserName()</Composite>\r\n  ) AS T\r\n  WHERE NOT EXISTS\r\n  (\r\n   SELECT UserID FROM TarrantData INNER JOIN FAMUser ON TarrantData.UserID = FAMUser.ID \r\n\tWHERE FAMUser.UserName = <Composite>$UserName()</Composite>\r\n  )\r\n</SQL>",
+              "UseFAMDBConnection": false,
+              "UseSpecifiedDBConnection": true
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

@@ -1,0 +1,142 @@
+[
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 50,
+      "AcceptSmallerLength": true,
+      "Extract": true
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 15,
+      "AcceptSmallerLength": true,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 11,
+      "AcceptSmallerLength": true,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 4,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 6,
+      "AcceptSmallerLength": true,
+      "Extract": true
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 12,
+      "AcceptSmallerLength": true,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 32,
+      "AcceptSmallerLength": true,
+      "Extract": true
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 1,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 11,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 2,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 9,
+      "AcceptSmallerLength": false,
+      "Extract": true
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 13,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 12,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsLeftPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 9,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  }
+]

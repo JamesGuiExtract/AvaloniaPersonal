@@ -1,0 +1,1167 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 4,
+        "Name": "FLEX Index - Redaction (By Document)",
+        "ByPage": false,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "Latest",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "people": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "person_splitter.dat",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": true,
+                "RegExpFileName": "<RSDFileDir>\\person_splitter.dat.etf",
+                "Pattern": "(?'p0'    \\A N1 \\* P5 \\* [\\s\\S]*? ~ (?= NM1 \\*)    )\r\n(?'p1'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )\r\n(?'p2'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p3'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p4'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p5'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p6'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p7'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p8'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p9'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p10'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p11'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p12'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p13'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p14'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p15'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p16'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p17'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p18'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p19'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?\r\n(?'p20'    NM1 \\* [\\s\\S]*? ~ (?= NM1 \\* | \\z)    )?",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": false,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": false,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "process all people . . .<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p0 has just one step<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p0",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "ReplaceStrings",
+                      "Object": {
+                        "Replacements": [
+                          {
+                            "Pattern": "file://<RSDFileDir>\\replace_p0.dat.etf;;",
+                            "Replacement": ""
+                          }
+                        ],
+                        "AsRegularExpr": true,
+                        "IsCaseSensitive": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p1 has just one step<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p1",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "ReplaceStrings",
+                      "Object": {
+                        "Replacements": [
+                          {
+                            "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                            "Replacement": ""
+                          }
+                        ],
+                        "AsRegularExpr": true,
+                        "IsCaseSensitive": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p2<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p2",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<2_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p3<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p3",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<3_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p4<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p4",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<4_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p5<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p5",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<5_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p6<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p6",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<6_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p7<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p7",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<7_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p8<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p8",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<8_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p9<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p9",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<9_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p10<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p10",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<10_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p11<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p11",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<11_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p12<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p12",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<12_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p13<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p13",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<13_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p14<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p14",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<14_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p15<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p15",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<15_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p16<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p16",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<16_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p17<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p17",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<17_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p18<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p18",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<18_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p19<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p19",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<19_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "p20<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/p20",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "p1<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "file://<RSDFileDir>\\replace_p1.dat.etf;;",
+                                  "Replacement": ""
+                                }
+                              ],
+                              "AsRegularExpr": true,
+                              "IsCaseSensitive": false
+                            }
+                          },
+                          {
+                            "Type": "ReplaceStrings",
+                            "Description": "change tag number<Replace strings>",
+                            "Enabled": true,
+                            "Object": {
+                              "Replacements": [
+                                {
+                                  "Pattern": "<1_",
+                                  "Replacement": "<20_"
+                                }
+                              ],
+                              "AsRegularExpr": false,
+                              "IsCaseSensitive": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "concatenate people<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%p0%%p1%<%p2%><%p3%><%p4%><%p5%><%p6%><%p7%><%p8%><%p9%><%p10%><%p11%><%p12%><%p13%><%p14%><%p15%><%p16%><%p17%><%p18%><%p19%><%p20%>",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove all subattributes<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/*"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

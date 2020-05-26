@@ -1,0 +1,1007 @@
+[
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 95,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 36,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 95,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 37,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 92,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 80,
+      "IsSecondCondition": true,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "GT",
+      "SecondScoreToCompare": 40
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 30,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 31,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 50,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 91,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 40,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 85,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 0,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 55,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 45,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 65,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 65,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 20,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 80,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Minimum",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 40,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 85,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Maximum",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 90,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Maximum",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 60,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 70,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 60,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 97,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 90,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 90,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 95,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 65,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 99,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Minimum",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 20,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 60,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 80,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 70,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 35,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Minimum",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 10,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 60,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 57,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 37,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Maximum",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 70,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 80,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 75,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 98,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Maximum",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 100,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 36,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 45,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 40,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 98,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 70,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 100,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 35,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 90,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Minimum",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 30,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 50,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Minimum",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 50,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 0,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 86,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Maximum",
+      "FirstScoreCondition": "GEQ",
+      "FirstScoreToCompare": 80,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 93,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 94,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "EQ",
+      "FirstScoreToCompare": 96,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LT",
+      "FirstScoreToCompare": 58,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 30,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 10,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "GT",
+      "FirstScoreToCompare": 45,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "CharacterConfidenceCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IsMet": true,
+      "AggregateFunction": "Average",
+      "FirstScoreCondition": "LEQ",
+      "FirstScoreToCompare": 50,
+      "IsSecondCondition": false,
+      "AndSecondCondition": true,
+      "SecondScoreCondition": "EQ",
+      "SecondScoreToCompare": 0
+    }
+  }
+]

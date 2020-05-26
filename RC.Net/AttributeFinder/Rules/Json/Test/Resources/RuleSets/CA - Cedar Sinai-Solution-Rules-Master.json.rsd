@@ -1,0 +1,135 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 5,
+        "Name": "FLEX Index - Indexing (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "19.2.0.34",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "DocumentData",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {},
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Split DocumentData with getDocumentData.rsd<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "DocumentData",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\getDocumentData.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Remove childless DocumentData<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "DocumentData",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "RemoveSubAttributes",
+                "Object": {
+                  "AttributeSelector": {
+                    "Type": "MultipleCriteriaSelector",
+                    "Object": {
+                      "Selectors": [
+                        {
+                          "Select": "NonMatching",
+                          "With": {
+                            "Type": "QueryBasedAS",
+                            "Description": "*{*}<Query attribute selector>",
+                            "Enabled": true,
+                            "Object": {
+                              "QueryText": "*{*}"
+                            }
+                          }
+                        }
+                      ],
+                      "CombineBy": "Chain"
+                    }
+                  },
+                  "ConditionalRemove": false,
+                  "DataScorer": {
+                    "Type": null,
+                    "Description": "",
+                    "Enabled": true,
+                    "Object": null
+                  },
+                  "ScoreCondition": "EQ",
+                  "CompareConditionType": "ValueOf",
+                  "ScoreToCompare": 0
+                }
+              }
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote */*<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

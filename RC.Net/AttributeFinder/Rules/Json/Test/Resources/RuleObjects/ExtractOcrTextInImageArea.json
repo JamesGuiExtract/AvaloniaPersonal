@@ -1,0 +1,134 @@
+[
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": false,
+      "SpatialEntityType": "Word",
+      "UseOriginalDocumentOcr": false,
+      "UseOverallBounds": true
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": true,
+      "SpatialEntityType": "Line",
+      "UseOriginalDocumentOcr": false,
+      "UseOverallBounds": true
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": true,
+      "SpatialEntityType": "Line",
+      "UseOriginalDocumentOcr": true,
+      "UseOverallBounds": true
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": true,
+      "SpatialEntityType": "Word",
+      "UseOriginalDocumentOcr": true,
+      "UseOverallBounds": false
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": true,
+      "SpatialEntityType": "Character",
+      "UseOriginalDocumentOcr": true,
+      "UseOverallBounds": true
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": true,
+      "SpatialEntityType": "Word",
+      "UseOriginalDocumentOcr": false,
+      "UseOverallBounds": true
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": true,
+      "SpatialEntityType": "Character",
+      "UseOriginalDocumentOcr": false,
+      "UseOverallBounds": false
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": true,
+      "SpatialEntityType": "Character",
+      "UseOriginalDocumentOcr": true,
+      "UseOverallBounds": false
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": false,
+      "SpatialEntityType": "Character",
+      "UseOriginalDocumentOcr": false,
+      "UseOverallBounds": true
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": true,
+      "SpatialEntityType": "Character",
+      "UseOriginalDocumentOcr": false,
+      "UseOverallBounds": true
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": true,
+      "SpatialEntityType": "Word",
+      "UseOriginalDocumentOcr": true,
+      "UseOverallBounds": true
+    }
+  },
+  {
+    "Type": "ExtractOcrTextInImageArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "IncludeTextOnBoundary": false,
+      "SpatialEntityType": "Character",
+      "UseOriginalDocumentOcr": true,
+      "UseOverallBounds": true
+    }
+  }
+]

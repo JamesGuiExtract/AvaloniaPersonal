@@ -1,0 +1,720 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerPage",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Date",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "LIR for date on stickers",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "LocateImageRegion",
+              "Object": {
+                "DataInsideBoundaries": true,
+                "FindType": "Text",
+                "ImageRegionText": "test",
+                "IncludeIntersectingEntities": true,
+                "IntersectingEntityType": "Word",
+                "MatchMultiplePagesPerDocument": false,
+                "ClueList1": {
+                  "Clues": [
+                    "\\bENC\\s*(\\d\\s*){8}\\b"
+                  ],
+                  "CaseSensitive": true,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList2": {
+                  "Clues": [
+                    "\\bCSN\\s*(\\d\\s*){10}\\b"
+                  ],
+                  "CaseSensitive": true,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList3": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList4": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "Left": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Left",
+                  "ExpandDirection": "ExpandLeft",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "ClueCharacters"
+                },
+                "Top": {
+                  "Anchor": "ClueList2",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandDown",
+                  "ExpandBy": 0.4,
+                  "ExpandUnits": "ClueLines"
+                },
+                "Right": {
+                  "Anchor": "ClueList2",
+                  "AnchorSide": "Right",
+                  "ExpandDirection": "ExpandRight",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Bottom": {
+                  "Anchor": "ClueList2",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandDown",
+                  "ExpandBy": 1.2,
+                  "ExpandUnits": "ClueLines"
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "LIR right of DOB line on sticker - \\\\engsvr\\Documents\\SecureSamples\\Essentia\\Set006\\Images\\Scan\\Park RapidsP924010022018125328_Paginated_1.tif",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "LocateImageRegion",
+              "Object": {
+                "DataInsideBoundaries": true,
+                "FindType": "Text",
+                "ImageRegionText": "test",
+                "IncludeIntersectingEntities": true,
+                "IntersectingEntityType": "Word",
+                "MatchMultiplePagesPerDocument": true,
+                "ClueList1": {
+                  "Clues": [
+                    "^\\d{6,}\\s(?:(?:FE)?MALE|[FM])\\s\\d{1,2}/\\d{1,2}/\\d{2}(?:\\d{2})?\\b"
+                  ],
+                  "CaseSensitive": true,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList2": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList3": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList4": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "Left": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Right",
+                  "ExpandDirection": "ExpandRight",
+                  "ExpandBy": 10.0,
+                  "ExpandUnits": "ClueCharacters"
+                },
+                "Top": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Top",
+                  "ExpandDirection": "ExpandDown",
+                  "ExpandBy": 0.1,
+                  "ExpandUnits": "ClueLines"
+                },
+                "Right": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Right",
+                  "ExpandDirection": "ExpandRight",
+                  "ExpandBy": 20.0,
+                  "ExpandUnits": "ClueCharacters"
+                },
+                "Bottom": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandUp",
+                  "ExpandBy": 0.2,
+                  "ExpandUnits": "ClueLines"
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "LIR, right of clue list",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "ReplaceStrings",
+              "Description": "insert tags<Replace strings>",
+              "Enabled": true,
+              "Object": {
+                "Replacements": [
+                  {
+                    "Pattern": "file://<RSDFileDir>\\HCdatesRightOf.dat.etf;%",
+                    "Replacement": ""
+                  }
+                ],
+                "AsRegularExpr": true,
+                "IsCaseSensitive": false
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "LoopFinder",
+              "Object": {
+                "LoopType": "DoLoop",
+                "Condition": {
+                  "Type": "FindingRuleCondition",
+                  "Description": "<Finding rule condition>",
+                  "Enabled": true,
+                  "Object": {
+                    "AFRule": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": false,
+                        "RegExpFileName": "",
+                        "Pattern": "«",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": true,
+                        "CreateSubAttributesFromNamedMatches": false,
+                        "OnlyCreateOneSubAttributePerGroup": false
+                      }
+                    }
+                  }
+                },
+                "ConditionValue": true,
+                "FindingRule": {
+                  "Type": "LocateImageRegion",
+                  "Description": "<Locate image region>",
+                  "Enabled": true,
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "Text",
+                    "ImageRegionText": "",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Word",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "«[^»]+»"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Top": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Top",
+                      "ExpandDirection": "ExpandUp",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Right": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 1.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Bottom": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    }
+                  }
+                },
+                "Preprocessor": {
+                  "Type": "AdvancedReplaceString",
+                  "Description": "replace first tag<Advanced replace string>",
+                  "Enabled": true,
+                  "Object": {
+                    "StrToBeReplaced": "«",
+                    "AsRegularExpression": true,
+                    "IsCaseSensitive": false,
+                    "Replacement": "",
+                    "ReplacementOccurrenceType": "First",
+                    "SpecifiedOccurrence": 0
+                  }
+                },
+                "Iterations": 10,
+                "LogExceptionForMaxIterations": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Plan of Care, Start of Care Date",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "DocTypeCondition",
+                  "Object": {
+                    "AllowTypes": true,
+                    "DocumentClassifiersPath": "<RSDFileDir>\\DocumentClassifiers",
+                    "Category": ".",
+                    "Types": [
+                      "Plan of Care"
+                    ],
+                    "MinConfidence": "MaybeLevel"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "LocateImageRegion",
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "Text",
+                    "ImageRegionText": "asdf",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Character",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "(?~<error=2,method=better_fit>start\\sof\\scare\\sdate)"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Left",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 1.0,
+                      "ExpandUnits": "ClueCharacters"
+                    },
+                    "Top": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Top",
+                      "ExpandDirection": "ExpandUp",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Right": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 1.0,
+                      "ExpandUnits": "ClueCharacters"
+                    },
+                    "Bottom": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 3.0,
+                      "ExpandUnits": "ClueLines"
+                    }
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "AdvancedReplaceString",
+                  "Description": "insert separators if necessary<Advanced replace string>",
+                  "Enabled": true,
+                  "Object": {
+                    "StrToBeReplaced": "(?nx)\\b((?'m'0[1-9] | 1[0-2]) (?'d'0[1-9] | [12]\\d | 3[01]) (?'y'(19|20)?\\d{2}))\\b",
+                    "AsRegularExpression": true,
+                    "IsCaseSensitive": false,
+                    "Replacement": "${m}/${d}/${y}",
+                    "ReplacementOccurrenceType": "All",
+                    "SpecifiedOccurrence": 0
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "find dates<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "RegExprRule",
+                "Object": {
+                  "IsRegExpFromFile": true,
+                  "RegExpFileName": "<ComponentDataDir>\\ReusableComponents\\Date\\date.dat.etf",
+                  "Pattern": "",
+                  "IsCaseSensitive": false,
+                  "FirstMatchOnly": true,
+                  "CreateSubAttributesFromNamedMatches": false,
+                  "OnlyCreateOneSubAttributePerGroup": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove top level if no dates found<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*{*}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "move up dates<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "SpatiallySortAttributes",
+            "Description": "reorder dates spatially<Spatially sort attributes>",
+            "Enabled": true,
+            "Object": "SpatiallySortAttributes"
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "create top level Date (use first by spatial sort)<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "Date",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "/*/*",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": false
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove remaining dates<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "_"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "run dateOutputHandlers<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\..\\ML\\Dates\\dateOutputHandlers.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove any not processed by dateOutputHandlers<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*{*}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "move up */*<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

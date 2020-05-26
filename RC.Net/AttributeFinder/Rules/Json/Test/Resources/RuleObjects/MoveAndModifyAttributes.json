@@ -1,0 +1,1702 @@
+[
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/*/Block",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "STR/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/_",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "AdministrativeInformation/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "LCData/LCData|MCData/MCData",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "TaxID/item",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/copy2/copy2/finding/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "_/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "DocumentInfo/RecordedDate",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "Lien_LienRecordingDate",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "_/*/Amount",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/name",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "_/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/PersonAlias",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "Person",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Person",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "Name",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "LegalDescription/Location/LegalDescription/Location/*",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "GG/Split1",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/*/Company|*/*/*/Person|*/*/*/Trust",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/RealEstate_LotBlockSubdivisionName",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "_/Content",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Location/splitMe/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "*@MCDataMedicaid/*",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "MCData",
+      "SpecifiedAttributeType": "Medicaid"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/*/trimdobD4",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "dobdash4",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "HCData/*|LCData/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/Lot/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/RealEstate_LegalDesc",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*@CheckForCertificate/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "*/Recipient1|*/Recipient2|*/Recipient3|*/Recipient4",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": "Defendant"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Clues|*/LCData@DOB|*/LCData@Account|*/LCData@Bank|*/LCData@CCN|*/LCData@DLN|*/LCData@SSN|*/LCData@TaxID",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "*/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": "Bank"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "ContentRight/ContentAbove",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "ContentAboveRight",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Person|*/Company|*/Trust",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Trust",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*@Barcode/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Item/Company",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/redact",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Lot/Lot",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/topRight@keep/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/assignee|*/assignor",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Right/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": "StateID"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "NCData/*",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "Account",
+      "SpecifiedAttributeType": "NCData"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "HCData",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Person/PersonAlias",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Recipient1|*/Recipient2|*/Recipient3",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Instrument",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*@splitTokens/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "ReferenceField/*@A",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Trust/Trust2",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/CollectionTime/Time",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/Company|*/*/Person|*/*/CompanyAlias|*/*/RelatedCompany|*/*/PersonAlias",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "GrantorGrantee",
+      "SpecifiedAttributeType": "Grantee"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/NomineeFor/Company|*/*/NomineeFor/Person",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "GrantorGrantee",
+      "SpecifiedAttributeType": "Grantee"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/*/Value",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Grantee/Recipient1",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "all/Barcode/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": "Barcode"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "AllPages/*/CollectionDate|AllPages/*/ResultDate",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "*/*/l4",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": "c"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "OperatorLicense/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*@FindAndSplit/_/Trust/Person",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Clues/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "*/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": "Passport"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Company",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/it",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Box",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Content@ProbableHandwriting",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Happy/Content",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Record/DateOfService/Formatted",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "_ALL_TEXT_/*{V}",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Prefixed/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Company/*/*/CompanyAlias",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Defendant/*/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "License/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "LCData",
+      "SpecifiedAttributeType": "License"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "MCData/account",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": true,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "Possible",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Clues/MCData",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Company/CompanyAlias",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Document/NeedDOB/*",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "GrantorGrantee/Person/PersonAlias|GrantorGrantee/Person|GrantorGrantee/Company|GrantorGrantee/Company/CompanyAlias|GrantorGrantee/Company/RelatedCompany|GrantorGrantee/Company/NomineeFor/Company|GrantorGrantee/Company/NomineeFor/Company/CompanyAlias|GrantorGrantee/Company/NomineeFor/Company/RelatedCompany",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "GrantorGrantee",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "RealEstate_LegalDesc/Location/Township",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "RealEstate_Township",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "*/SSNNCData/*",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "NCData",
+      "SpecifiedAttributeType": "SSN"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Defendant/*/*/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/NomineeFor/CompanyAlias|*/*/NomineeFor/RelatedCompany|*/Trust/Company/CompanyAlias|*/*/CompanyAlias/RelatedCompany|*/Company/CompanyAlias/CompanyAlias",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Interpretation/i",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "*/LCData@SSN/number",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": "LCDataSSN"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/NCData",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "MCData/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "MCDatanew",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/Company|*/*/Person|*/*/CompanyAlias|*/*/RelatedCompany",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "GrantorGrantee",
+      "SpecifiedAttributeType": "Grantee"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Value/Combined/Flag",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Offense/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "MCData@srica0/Content",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "Content0",
+      "SpecifiedAttributeType": "Content0"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/Content",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "IndexItem/*@B",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "ArrestingOfficer/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/CheckMERS/NomineeFor",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/NewTrust/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "Trust",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Decedent/Last/Suffix",
+      "DeleteRootOrParentIfAllChildrenMoved": false,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/Range/*",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": true,
+      "AddSpecifiedAttributeType": true,
+      "AttributeQuery": "*/Nine",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": "trimmed"
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "*/*/Person|*/*/Company",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToParent",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "One/Index",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+      "RetainAttributeType": true,
+      "SpecifiedAttributeName": "PageOneIndex",
+      "SpecifiedAttributeType": ""
+    }
+  },
+  {
+    "Type": "MoveAndModifyAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AddAttributeNameToType": false,
+      "AddRootOrParentAttributeType": false,
+      "AddSpecifiedAttributeType": false,
+      "AttributeQuery": "Full_Name/Split",
+      "DeleteRootOrParentIfAllChildrenMoved": true,
+      "MoveAttributeLevel": "MoveToRoot",
+      "OverwriteAttributeName": "DoNotOverwrite",
+      "RetainAttributeType": false,
+      "SpecifiedAttributeName": "",
+      "SpecifiedAttributeType": "Name"
+    }
+  }
+]

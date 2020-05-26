@@ -1,0 +1,8 @@
+[
+  {
+    "Type": "EliminateDuplicates",
+    "Description": "",
+    "Enabled": true,
+    "Object": "EliminateDuplicates"
+  }
+]

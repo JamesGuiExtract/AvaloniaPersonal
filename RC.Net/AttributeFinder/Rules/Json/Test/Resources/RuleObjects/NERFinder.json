@@ -1,0 +1,722 @@
+[
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\..\\Machines\\Redaction.nlp.etf",
+      "EntityTypes": "SSN",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\DocumentReference2.nlp.etf",
+      "EntityTypes": "DocumentReference",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\Searcher.NonRefTablePages\\model.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\Searcher.NonTableSensitiveText\\model.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\all-NLPOnly.PHI.nlp",
+      "EntityTypes": "Data",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\Grantor.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\subdivisions.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\DocumentDate.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": false,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\currency-general\\currency.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<RSDFileDir>\\..\\..\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<RSDFileDir>\\..\\..\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<LocalNLPModel>",
+      "EntityTypes": "Person",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\grantee.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": false,
+      "SentenceDetectorPath": "",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\..\\names-sensitiveRows.nlp",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\..\\ML\\docDate\\docDate.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\Searcher.SensitiveRows\\model.nlp",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<RSDFileDir>\\..\\..\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<RSDFileDir>\\..\\..\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<LocalNLPModel>",
+      "EntityTypes": "Person,Data",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\..\\Machines\\Redaction.nlp.etf",
+      "EntityTypes": "DOB",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\..\\ML\\PatientName\\patientname.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\Grantee.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\DocumentDate.nlp.etf",
+      "EntityTypes": "DocumentDate",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<RSDFileDir>\\..\\..\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<RSDFileDir>\\..\\..\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\en-ner-person.bin",
+      "EntityTypes": "Person",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\documentDate.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": false,
+      "SentenceDetectorPath": "",
+      "TokenizerType": "SimpleTokenizer",
+      "TokenizerPath": "",
+      "NameFinderPath": "<RSDFileDir>\\en-ner-person.bin",
+      "EntityTypes": "Person",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\..\\ML\\dob\\dob.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\all.PHI.nlp",
+      "EntityTypes": "Data,Manual",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\subdivision.nlp.etf",
+      "EntityTypes": "Subdivision",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\Searcher.OutsideSensitiveRows\\model.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\grantor.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\Searcher.NonTableSensitivePages\\model.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\Searcher.SensitiveRows\\model.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\..\\..\\..\\set3_with_sent_part.nlp",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\all.PHI.nlp.etf",
+      "EntityTypes": "Data,Manual",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\all-NLPOnly.PHI.nlp.etf",
+      "EntityTypes": "Data",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\Subdivision.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\DocumentReference.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\Searcher.NonTablePages\\model.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": true,
+      "ApplyLogFunctionToConfidence": false,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  },
+  {
+    "Type": "NERFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NameFinderType": "OpenNLP",
+      "SplitIntoSentences": true,
+      "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+      "TokenizerType": "LearnableTokenizer",
+      "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+      "NameFinderPath": "<RSDFileDir>\\MortgageAmount.nlp.etf",
+      "EntityTypes": "",
+      "OutputConfidenceSubAttribute": false,
+      "ApplyLogFunctionToConfidence": true,
+      "LogBase": 2.0,
+      "LogSteepness": 10.0,
+      "LogXValueOfMiddle": 0.1,
+      "ConvertConfidenceToPercent": true
+    }
+  }
+]

@@ -1,0 +1,199 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "17.1.0.7",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Page",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Document": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "PaginationRules\\main.rsd",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<RSDFileDir>\\PaginationRules\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "Output VOA<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "move Document/DocumentData/* to top if only one Document<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "*testing* Create another /Document<Create attribute>",
+                  "Enabled": false,
+                  "Object": {
+                    "Root": "/*",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "Document",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "N/A",
+                        "ValueContainsXPath": false,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "Create Document/_delete_me_@_delete_me_ if there is only one Document<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/Document[not(/*/Document[2])]",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "_delete_me_",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "_delete_me_",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "",
+                        "ValueContainsXPath": false,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set type of Document{_delete_me_} to _delete_me_<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Document{_delete_me_}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "_delete_me_",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "MoveAndModifyAttributes",
+                  "Description": "move up Document@_delete_me_/DocumentData/*<Move and modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AddAttributeNameToType": false,
+                    "AddRootOrParentAttributeType": false,
+                    "AddSpecifiedAttributeType": false,
+                    "AttributeQuery": "Document@_delete_me_/DocumentData/*",
+                    "DeleteRootOrParentIfAllChildrenMoved": false,
+                    "MoveAttributeLevel": "MoveToRoot",
+                    "OverwriteAttributeName": "DoNotOverwrite",
+                    "RetainAttributeType": true,
+                    "SpecifiedAttributeName": "",
+                    "SpecifiedAttributeType": ""
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "remove *@_delete_me_<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*@_delete_me_"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

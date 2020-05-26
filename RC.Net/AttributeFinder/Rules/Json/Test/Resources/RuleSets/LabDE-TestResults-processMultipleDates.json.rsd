@@ -1,0 +1,2884 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "*off*<Move and modify attributes>",
+            "Enabled": false,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "DuplicateAndSeparateTrees",
+            "Description": "Duplicate on Test<Duplicate and separate attribute trees>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*"
+                }
+              },
+              "DividingAttributeName": "Test",
+              "OutputHandler": {
+                "Type": null,
+                "Object": null
+              },
+              "RunOutputHandler": false
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Make Text subattribute of */Test<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/Test",
+              "CreateSubAttribute": true,
+              "AttributeName": "Text",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%Value%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Expand */Test/Text@ to page edges<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/Test/Text@",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "LocateImageRegion",
+                "Object": {
+                  "DataInsideBoundaries": true,
+                  "FindType": "ImageRegion",
+                  "ImageRegionText": " ",
+                  "IncludeIntersectingEntities": true,
+                  "IntersectingEntityType": "Character",
+                  "MatchMultiplePagesPerDocument": true,
+                  "ClueList1": {
+                    "Clues": [
+                      "[\\S\\s]+"
+                    ],
+                    "CaseSensitive": false,
+                    "Regex": true,
+                    "RestrictByBoundary": false
+                  },
+                  "ClueList2": {
+                    "Clues": [],
+                    "CaseSensitive": false,
+                    "Regex": false,
+                    "RestrictByBoundary": false
+                  },
+                  "ClueList3": {
+                    "Clues": [],
+                    "CaseSensitive": false,
+                    "Regex": false,
+                    "RestrictByBoundary": false
+                  },
+                  "ClueList4": {
+                    "Clues": [],
+                    "CaseSensitive": false,
+                    "Regex": false,
+                    "RestrictByBoundary": false
+                  },
+                  "Left": {
+                    "Anchor": "Page",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandLeft",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Top": {
+                    "Anchor": "Page",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandUp",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Right": {
+                    "Anchor": "Page",
+                    "AnchorSide": "Right",
+                    "ExpandDirection": "ExpandRight",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Bottom": {
+                    "Anchor": "Page",
+                    "AnchorSide": "Bottom",
+                    "ExpandDirection": "ExpandDown",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Get text<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/Test/Text",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "ExtractOcrTextInImageArea",
+                "Object": {
+                  "IncludeTextOnBoundary": true,
+                  "SpatialEntityType": "Word",
+                  "UseOriginalDocumentOcr": false,
+                  "UseOverallBounds": true
+                }
+              }
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Set top-level value to %Test/Text%<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%Test/Text%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove */Test/Text<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/Test/Text"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Add tags and try to get a value for each test<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Make Name subattribute out of test name<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "Name",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%Value%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Add tags<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test/Name",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "AdvancedReplaceString",
+                      "Object": {
+                        "StrToBeReplaced": "[\\S\\s]+",
+                        "AsRegularExpression": true,
+                        "IsCaseSensitive": false,
+                        "Replacement": "«$0ä»",
+                        "ReplacementOccurrenceType": "First",
+                        "SpecifiedOccurrence": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Add trailing | to CollectionDate and ResultDate<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/CollectionDate|*/ResultDate",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%Value%|",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Make First and LastAttempt subattributes out of CollectionDate<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/CollectionDate",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": false,
+                        "RegExpFileName": "",
+                        "Pattern": "(?nx)\r\n[|]\r\n(?<= (?'LastAttempt'(?'First'[^|]+)) [|] )\r\n[\\S\\s]*",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": false,
+                        "CreateSubAttributesFromNamedMatches": true,
+                        "OnlyCreateOneSubAttributePerGroup": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Add tags to First<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/CollectionDate/First",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "AdvancedReplaceString",
+                      "Object": {
+                        "StrToBeReplaced": "[\\S\\s]+",
+                        "AsRegularExpression": true,
+                        "IsCaseSensitive": false,
+                        "Replacement": "·$0Ç¦",
+                        "ReplacementOccurrenceType": "First",
+                        "SpecifiedOccurrence": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Make LastAttempt subattribute out of ResultDate<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/ResultDate",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": false,
+                        "RegExpFileName": "",
+                        "Pattern": "(?nx)\r\n[|]\r\n(?<= (?'LastAttempt'[^|]+) [|] )\r\n[\\S\\s]*",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": false,
+                        "CreateSubAttributesFromNamedMatches": true,
+                        "OnlyCreateOneSubAttributePerGroup": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "OutputHandlerSequence",
+                  "Description": "Copy */*/LastAttempt to save for later<Select multiple output handlers>",
+                  "Enabled": true,
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "ModifyAttributeValueOH",
+                        "Description": "Copy<Modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "*/*/LastAttempt",
+                          "CreateSubAttribute": true,
+                          "AttributeName": "Backup",
+                          "SetAttributeName": true,
+                          "AttributeType": "",
+                          "SetAttributeType": false,
+                          "AttributeValue": "%Value%",
+                          "SetAttributeValue": true
+                        }
+                      },
+                      {
+                        "Type": "MoveAndModifyAttributes",
+                        "Description": "Promote<Move and modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AddAttributeNameToType": false,
+                          "AddRootOrParentAttributeType": false,
+                          "AddSpecifiedAttributeType": false,
+                          "AttributeQuery": "*/*/LastAttempt/Backup",
+                          "DeleteRootOrParentIfAllChildrenMoved": false,
+                          "MoveAttributeLevel": "MoveToParent",
+                          "OverwriteAttributeName": "DoNotOverwrite",
+                          "RetainAttributeType": true,
+                          "SpecifiedAttributeName": "",
+                          "SpecifiedAttributeType": ""
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Make Pieces subattribute out of test first date, name and full-text<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "Pieces",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%CollectionDate/First%\r\n%Test/Name%\r\n%Value%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Split pieces with Type_1\\Type_B\\getValue.rsd<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Pieces",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\Type_1\\Type_B\\getValue.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Name */Pieces Keep if it has a subattribute<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Pieces{*}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "Keep",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Try again with next date on *{Pieces}<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{Pieces}",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Clear type of *|*/CollectionDate<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*|*/CollectionDate",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "If another collection date remains, set type of CollectionDate to HasMore<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/CollectionDate",
+                              "AttributeSelector": {
+                                "Type": "ValueConditionSelector",
+                                "Object": {
+                                  "Condition": {
+                                    "Type": "FindingRuleCondition",
+                                    "Object": {
+                                      "AFRule": {
+                                        "Type": "RegExprRule",
+                                        "Object": {
+                                          "IsRegExpFromFile": false,
+                                          "RegExpFileName": "",
+                                          "Pattern": "[^|]",
+                                          "IsCaseSensitive": false,
+                                          "FirstMatchOnly": true,
+                                          "CreateSubAttributesFromNamedMatches": false,
+                                          "OnlyCreateOneSubAttributePerGroup": true
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "UseAttributeSelector": true,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "ModifyAttributeValueOH",
+                                "Object": {
+                                  "AttributeQuery": "*",
+                                  "CreateSubAttribute": false,
+                                  "AttributeName": "",
+                                  "SetAttributeName": false,
+                                  "AttributeType": "HasMore",
+                                  "SetAttributeType": true,
+                                  "AttributeValue": "",
+                                  "SetAttributeValue": false
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Set type of *{CollectionDate@HasMore} to Continue<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*{CollectionDate@HasMore}",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "Continue",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Continue for *@Continue<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*@Continue",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "OutputHandlerSequence",
+                                "Object": {
+                                  "ObjectsVector": [
+                                    {
+                                      "Type": "RemoveSubAttributes",
+                                      "Description": "Remove */Pieces<Remove attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeSelector": {
+                                          "Type": "QueryBasedAS",
+                                          "Object": {
+                                            "QueryText": "*/Pieces"
+                                          }
+                                        },
+                                        "ConditionalRemove": false,
+                                        "DataScorer": {
+                                          "Type": null,
+                                          "Description": "",
+                                          "Enabled": true,
+                                          "Object": null
+                                        },
+                                        "ScoreCondition": "EQ",
+                                        "CompareConditionType": "ValueOf",
+                                        "ScoreToCompare": 0
+                                      }
+                                    },
+                                    {
+                                      "Type": "RunObjectOnAttributes",
+                                      "Description": "If another date remains, make new First and LastAttempt subattributes out of CollectionDate<Run object on attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/CollectionDate|*/ResultDate",
+                                        "AttributeSelector": {
+                                          "Type": "ValueConditionSelector",
+                                          "Object": {
+                                            "Condition": {
+                                              "Type": "FindingRuleCondition",
+                                              "Object": {
+                                                "AFRule": {
+                                                  "Type": "RegExprRule",
+                                                  "Object": {
+                                                    "IsRegExpFromFile": false,
+                                                    "RegExpFileName": "",
+                                                    "Pattern": "[^|]",
+                                                    "IsCaseSensitive": false,
+                                                    "FirstMatchOnly": true,
+                                                    "CreateSubAttributesFromNamedMatches": false,
+                                                    "OnlyCreateOneSubAttributePerGroup": true
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "UseAttributeSelector": true,
+                                        "Type": "OutputHandler",
+                                        "Object": {
+                                          "Type": "OutputHandlerSequence",
+                                          "Object": {
+                                            "ObjectsVector": [
+                                              {
+                                                "Type": "RemoveSubAttributes",
+                                                "Description": "Remove */First|*/LastAttempt<Remove attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeSelector": {
+                                                    "Type": "QueryBasedAS",
+                                                    "Object": {
+                                                      "QueryText": "*/First|*/LastAttempt"
+                                                    }
+                                                  },
+                                                  "ConditionalRemove": false,
+                                                  "DataScorer": {
+                                                    "Type": null,
+                                                    "Description": "",
+                                                    "Enabled": true,
+                                                    "Object": null
+                                                  },
+                                                  "ScoreCondition": "EQ",
+                                                  "CompareConditionType": "ValueOf",
+                                                  "ScoreToCompare": 0
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Make First and LastAttempt subattributes out of CollectionDate<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "CollectionDate",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "RegExprRule",
+                                                    "Object": {
+                                                      "IsRegExpFromFile": false,
+                                                      "RegExpFileName": "",
+                                                      "Pattern": "(?nx)\r\n[|]\r\n(?<= (?'LastAttempt'(?'First'[^|]+)) [|] )\r\n[\\S\\s]*",
+                                                      "IsCaseSensitive": false,
+                                                      "FirstMatchOnly": false,
+                                                      "CreateSubAttributesFromNamedMatches": true,
+                                                      "OnlyCreateOneSubAttributePerGroup": true
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Add tags to CollectionDate/First<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "CollectionDate/First",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "AdvancedReplaceString",
+                                                    "Object": {
+                                                      "StrToBeReplaced": "[\\S\\s]+",
+                                                      "AsRegularExpression": true,
+                                                      "IsCaseSensitive": false,
+                                                      "Replacement": "·$0Ç¦",
+                                                      "ReplacementOccurrenceType": "First",
+                                                      "SpecifiedOccurrence": 0
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Make LastAttempt subattribute out of ResultDate<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "ResultDate",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "RegExprRule",
+                                                    "Object": {
+                                                      "IsRegExpFromFile": false,
+                                                      "RegExpFileName": "",
+                                                      "Pattern": "(?nx)\r\n[|]\r\n(?<= (?'LastAttempt'[^|]+) [|] )\r\n[\\S\\s]*",
+                                                      "IsCaseSensitive": false,
+                                                      "FirstMatchOnly": false,
+                                                      "CreateSubAttributesFromNamedMatches": true,
+                                                      "OnlyCreateOneSubAttributePerGroup": true
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Make Pieces subattribute out of test first date, name and full-text<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*",
+                                        "CreateSubAttribute": true,
+                                        "AttributeName": "Pieces",
+                                        "SetAttributeName": true,
+                                        "AttributeType": "",
+                                        "SetAttributeType": false,
+                                        "AttributeValue": "%CollectionDate/First%\r\n%Test/Name%\r\n%Value%",
+                                        "SetAttributeValue": true
+                                      }
+                                    },
+                                    {
+                                      "Type": "RunObjectOnAttributes",
+                                      "Description": "Split pieces with Type_1\\Type_B\\getValue.rsd<Run object on attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/Pieces",
+                                        "AttributeSelector": {
+                                          "Type": null,
+                                          "Object": null
+                                        },
+                                        "UseAttributeSelector": false,
+                                        "Type": "Splitter",
+                                        "Object": {
+                                          "Type": "RSDSplitter",
+                                          "Object": {
+                                            "RSDFileName": "<RSDFileDir>\\Type_1\\Type_B\\getValue.rsd.etf"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Name */Pieces Keep if it has a subattribute<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/Pieces{*}",
+                                        "CreateSubAttribute": false,
+                                        "AttributeName": "Keep",
+                                        "SetAttributeName": true,
+                                        "AttributeType": "",
+                                        "SetAttributeType": false,
+                                        "AttributeValue": "",
+                                        "SetAttributeValue": false
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Try again with next date on *{Pieces}<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{Pieces}",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Clear type of *|*/CollectionDate<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*|*/CollectionDate",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "If another collection date remains, set type of CollectionDate to HasMore<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/CollectionDate",
+                              "AttributeSelector": {
+                                "Type": "ValueConditionSelector",
+                                "Object": {
+                                  "Condition": {
+                                    "Type": "FindingRuleCondition",
+                                    "Object": {
+                                      "AFRule": {
+                                        "Type": "RegExprRule",
+                                        "Object": {
+                                          "IsRegExpFromFile": false,
+                                          "RegExpFileName": "",
+                                          "Pattern": "[^|]",
+                                          "IsCaseSensitive": false,
+                                          "FirstMatchOnly": true,
+                                          "CreateSubAttributesFromNamedMatches": false,
+                                          "OnlyCreateOneSubAttributePerGroup": true
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "UseAttributeSelector": true,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "ModifyAttributeValueOH",
+                                "Object": {
+                                  "AttributeQuery": "*",
+                                  "CreateSubAttribute": false,
+                                  "AttributeName": "",
+                                  "SetAttributeName": false,
+                                  "AttributeType": "HasMore",
+                                  "SetAttributeType": true,
+                                  "AttributeValue": "",
+                                  "SetAttributeValue": false
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Set type of *{CollectionDate@HasMore} to Continue<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*{CollectionDate@HasMore}",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "Continue",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Continue for *@Continue<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*@Continue",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "OutputHandlerSequence",
+                                "Object": {
+                                  "ObjectsVector": [
+                                    {
+                                      "Type": "RemoveSubAttributes",
+                                      "Description": "Remove */Pieces<Remove attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeSelector": {
+                                          "Type": "QueryBasedAS",
+                                          "Object": {
+                                            "QueryText": "*/Pieces"
+                                          }
+                                        },
+                                        "ConditionalRemove": false,
+                                        "DataScorer": {
+                                          "Type": null,
+                                          "Description": "",
+                                          "Enabled": true,
+                                          "Object": null
+                                        },
+                                        "ScoreCondition": "EQ",
+                                        "CompareConditionType": "ValueOf",
+                                        "ScoreToCompare": 0
+                                      }
+                                    },
+                                    {
+                                      "Type": "RunObjectOnAttributes",
+                                      "Description": "If another date remains, make new First and LastAttempt subattributes out of CollectionDate<Run object on attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/CollectionDate|*/ResultDate",
+                                        "AttributeSelector": {
+                                          "Type": "ValueConditionSelector",
+                                          "Object": {
+                                            "Condition": {
+                                              "Type": "FindingRuleCondition",
+                                              "Object": {
+                                                "AFRule": {
+                                                  "Type": "RegExprRule",
+                                                  "Object": {
+                                                    "IsRegExpFromFile": false,
+                                                    "RegExpFileName": "",
+                                                    "Pattern": "[^|]",
+                                                    "IsCaseSensitive": false,
+                                                    "FirstMatchOnly": true,
+                                                    "CreateSubAttributesFromNamedMatches": false,
+                                                    "OnlyCreateOneSubAttributePerGroup": true
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "UseAttributeSelector": true,
+                                        "Type": "OutputHandler",
+                                        "Object": {
+                                          "Type": "OutputHandlerSequence",
+                                          "Object": {
+                                            "ObjectsVector": [
+                                              {
+                                                "Type": "RemoveSubAttributes",
+                                                "Description": "Remove */First|*/LastAttempt<Remove attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeSelector": {
+                                                    "Type": "QueryBasedAS",
+                                                    "Object": {
+                                                      "QueryText": "*/First|*/LastAttempt"
+                                                    }
+                                                  },
+                                                  "ConditionalRemove": false,
+                                                  "DataScorer": {
+                                                    "Type": null,
+                                                    "Description": "",
+                                                    "Enabled": true,
+                                                    "Object": null
+                                                  },
+                                                  "ScoreCondition": "EQ",
+                                                  "CompareConditionType": "ValueOf",
+                                                  "ScoreToCompare": 0
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Make First and LastAttempt subattributes out of CollectionDate<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "CollectionDate",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "RegExprRule",
+                                                    "Object": {
+                                                      "IsRegExpFromFile": false,
+                                                      "RegExpFileName": "",
+                                                      "Pattern": "(?nx)\r\n[|]\r\n(?<= (?'LastAttempt'(?'First'[^|]+)) [|] )\r\n[\\S\\s]*",
+                                                      "IsCaseSensitive": false,
+                                                      "FirstMatchOnly": false,
+                                                      "CreateSubAttributesFromNamedMatches": true,
+                                                      "OnlyCreateOneSubAttributePerGroup": true
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Add tags to CollectionDate/First<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "CollectionDate/First",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "AdvancedReplaceString",
+                                                    "Object": {
+                                                      "StrToBeReplaced": "[\\S\\s]+",
+                                                      "AsRegularExpression": true,
+                                                      "IsCaseSensitive": false,
+                                                      "Replacement": "·$0Ç¦",
+                                                      "ReplacementOccurrenceType": "First",
+                                                      "SpecifiedOccurrence": 0
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Make LastAttempt subattribute out of ResultDate<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "ResultDate",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "RegExprRule",
+                                                    "Object": {
+                                                      "IsRegExpFromFile": false,
+                                                      "RegExpFileName": "",
+                                                      "Pattern": "(?nx)\r\n[|]\r\n(?<= (?'LastAttempt'[^|]+) [|] )\r\n[\\S\\s]*",
+                                                      "IsCaseSensitive": false,
+                                                      "FirstMatchOnly": false,
+                                                      "CreateSubAttributesFromNamedMatches": true,
+                                                      "OnlyCreateOneSubAttributePerGroup": true
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Make Pieces subattribute out of test first date, name and full-text<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*",
+                                        "CreateSubAttribute": true,
+                                        "AttributeName": "Pieces",
+                                        "SetAttributeName": true,
+                                        "AttributeType": "",
+                                        "SetAttributeType": false,
+                                        "AttributeValue": "%CollectionDate/First%\r\n%Test/Name%\r\n%Value%",
+                                        "SetAttributeValue": true
+                                      }
+                                    },
+                                    {
+                                      "Type": "RunObjectOnAttributes",
+                                      "Description": "Split pieces with Type_1\\Type_B\\getValue.rsd<Run object on attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/Pieces",
+                                        "AttributeSelector": {
+                                          "Type": null,
+                                          "Object": null
+                                        },
+                                        "UseAttributeSelector": false,
+                                        "Type": "Splitter",
+                                        "Object": {
+                                          "Type": "RSDSplitter",
+                                          "Object": {
+                                            "RSDFileName": "<RSDFileDir>\\Type_1\\Type_B\\getValue.rsd.etf"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Name */Pieces Keep if it has a subattribute<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/Pieces{*}",
+                                        "CreateSubAttribute": false,
+                                        "AttributeName": "Keep",
+                                        "SetAttributeName": true,
+                                        "AttributeType": "",
+                                        "SetAttributeType": false,
+                                        "AttributeValue": "",
+                                        "SetAttributeValue": false
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Try again with next date on *{Pieces}<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{Pieces}",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Clear type of *|*/CollectionDate<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*|*/CollectionDate",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "If another collection date remains, set type of CollectionDate to HasMore<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/CollectionDate",
+                              "AttributeSelector": {
+                                "Type": "ValueConditionSelector",
+                                "Object": {
+                                  "Condition": {
+                                    "Type": "FindingRuleCondition",
+                                    "Object": {
+                                      "AFRule": {
+                                        "Type": "RegExprRule",
+                                        "Object": {
+                                          "IsRegExpFromFile": false,
+                                          "RegExpFileName": "",
+                                          "Pattern": "[^|]",
+                                          "IsCaseSensitive": false,
+                                          "FirstMatchOnly": true,
+                                          "CreateSubAttributesFromNamedMatches": false,
+                                          "OnlyCreateOneSubAttributePerGroup": true
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "UseAttributeSelector": true,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "ModifyAttributeValueOH",
+                                "Object": {
+                                  "AttributeQuery": "*",
+                                  "CreateSubAttribute": false,
+                                  "AttributeName": "",
+                                  "SetAttributeName": false,
+                                  "AttributeType": "HasMore",
+                                  "SetAttributeType": true,
+                                  "AttributeValue": "",
+                                  "SetAttributeValue": false
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Set type of *{CollectionDate@HasMore} to Continue<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*{CollectionDate@HasMore}",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "Continue",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Continue for *@Continue<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*@Continue",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "OutputHandlerSequence",
+                                "Object": {
+                                  "ObjectsVector": [
+                                    {
+                                      "Type": "RemoveSubAttributes",
+                                      "Description": "Remove */Pieces<Remove attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeSelector": {
+                                          "Type": "QueryBasedAS",
+                                          "Object": {
+                                            "QueryText": "*/Pieces"
+                                          }
+                                        },
+                                        "ConditionalRemove": false,
+                                        "DataScorer": {
+                                          "Type": null,
+                                          "Description": "",
+                                          "Enabled": true,
+                                          "Object": null
+                                        },
+                                        "ScoreCondition": "EQ",
+                                        "CompareConditionType": "ValueOf",
+                                        "ScoreToCompare": 0
+                                      }
+                                    },
+                                    {
+                                      "Type": "RunObjectOnAttributes",
+                                      "Description": "If another date remains, make new First and LastAttempt subattributes out of CollectionDate<Run object on attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/CollectionDate|*/ResultDate",
+                                        "AttributeSelector": {
+                                          "Type": "ValueConditionSelector",
+                                          "Object": {
+                                            "Condition": {
+                                              "Type": "FindingRuleCondition",
+                                              "Object": {
+                                                "AFRule": {
+                                                  "Type": "RegExprRule",
+                                                  "Object": {
+                                                    "IsRegExpFromFile": false,
+                                                    "RegExpFileName": "",
+                                                    "Pattern": "[^|]",
+                                                    "IsCaseSensitive": false,
+                                                    "FirstMatchOnly": true,
+                                                    "CreateSubAttributesFromNamedMatches": false,
+                                                    "OnlyCreateOneSubAttributePerGroup": true
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "UseAttributeSelector": true,
+                                        "Type": "OutputHandler",
+                                        "Object": {
+                                          "Type": "OutputHandlerSequence",
+                                          "Object": {
+                                            "ObjectsVector": [
+                                              {
+                                                "Type": "RemoveSubAttributes",
+                                                "Description": "Remove */First|*/LastAttempt<Remove attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeSelector": {
+                                                    "Type": "QueryBasedAS",
+                                                    "Object": {
+                                                      "QueryText": "*/First|*/LastAttempt"
+                                                    }
+                                                  },
+                                                  "ConditionalRemove": false,
+                                                  "DataScorer": {
+                                                    "Type": null,
+                                                    "Description": "",
+                                                    "Enabled": true,
+                                                    "Object": null
+                                                  },
+                                                  "ScoreCondition": "EQ",
+                                                  "CompareConditionType": "ValueOf",
+                                                  "ScoreToCompare": 0
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Make First and LastAttempt subattributes out of CollectionDate<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "CollectionDate",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "RegExprRule",
+                                                    "Object": {
+                                                      "IsRegExpFromFile": false,
+                                                      "RegExpFileName": "",
+                                                      "Pattern": "(?nx)\r\n[|]\r\n(?<= (?'LastAttempt'(?'First'[^|]+)) [|] )\r\n[\\S\\s]*",
+                                                      "IsCaseSensitive": false,
+                                                      "FirstMatchOnly": false,
+                                                      "CreateSubAttributesFromNamedMatches": true,
+                                                      "OnlyCreateOneSubAttributePerGroup": true
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Add tags to CollectionDate/First<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "CollectionDate/First",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "AdvancedReplaceString",
+                                                    "Object": {
+                                                      "StrToBeReplaced": "[\\S\\s]+",
+                                                      "AsRegularExpression": true,
+                                                      "IsCaseSensitive": false,
+                                                      "Replacement": "·$0Ç¦",
+                                                      "ReplacementOccurrenceType": "First",
+                                                      "SpecifiedOccurrence": 0
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Make LastAttempt subattribute out of ResultDate<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "ResultDate",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "RegExprRule",
+                                                    "Object": {
+                                                      "IsRegExpFromFile": false,
+                                                      "RegExpFileName": "",
+                                                      "Pattern": "(?nx)\r\n[|]\r\n(?<= (?'LastAttempt'[^|]+) [|] )\r\n[\\S\\s]*",
+                                                      "IsCaseSensitive": false,
+                                                      "FirstMatchOnly": false,
+                                                      "CreateSubAttributesFromNamedMatches": true,
+                                                      "OnlyCreateOneSubAttributePerGroup": true
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Make Pieces subattribute out of test first date, name and full-text<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*",
+                                        "CreateSubAttribute": true,
+                                        "AttributeName": "Pieces",
+                                        "SetAttributeName": true,
+                                        "AttributeType": "",
+                                        "SetAttributeType": false,
+                                        "AttributeValue": "%CollectionDate/First%\r\n%Test/Name%\r\n%Value%",
+                                        "SetAttributeValue": true
+                                      }
+                                    },
+                                    {
+                                      "Type": "RunObjectOnAttributes",
+                                      "Description": "Split pieces with Type_1\\Type_B\\getValue.rsd<Run object on attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/Pieces",
+                                        "AttributeSelector": {
+                                          "Type": null,
+                                          "Object": null
+                                        },
+                                        "UseAttributeSelector": false,
+                                        "Type": "Splitter",
+                                        "Object": {
+                                          "Type": "RSDSplitter",
+                                          "Object": {
+                                            "RSDFileName": "<RSDFileDir>\\Type_1\\Type_B\\getValue.rsd.etf"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Name */Pieces Keep if it has a subattribute<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/Pieces{*}",
+                                        "CreateSubAttribute": false,
+                                        "AttributeName": "Keep",
+                                        "SetAttributeName": true,
+                                        "AttributeType": "",
+                                        "SetAttributeType": false,
+                                        "AttributeValue": "",
+                                        "SetAttributeValue": false
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Try again with next date on *{Pieces}<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{Pieces}",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Clear type of *|*/CollectionDate<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*|*/CollectionDate",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "If another collection date remains, set type of CollectionDate to HasMore<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/CollectionDate",
+                              "AttributeSelector": {
+                                "Type": "ValueConditionSelector",
+                                "Object": {
+                                  "Condition": {
+                                    "Type": "FindingRuleCondition",
+                                    "Object": {
+                                      "AFRule": {
+                                        "Type": "RegExprRule",
+                                        "Object": {
+                                          "IsRegExpFromFile": false,
+                                          "RegExpFileName": "",
+                                          "Pattern": "[^|]",
+                                          "IsCaseSensitive": false,
+                                          "FirstMatchOnly": true,
+                                          "CreateSubAttributesFromNamedMatches": false,
+                                          "OnlyCreateOneSubAttributePerGroup": true
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "UseAttributeSelector": true,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "ModifyAttributeValueOH",
+                                "Object": {
+                                  "AttributeQuery": "*",
+                                  "CreateSubAttribute": false,
+                                  "AttributeName": "",
+                                  "SetAttributeName": false,
+                                  "AttributeType": "HasMore",
+                                  "SetAttributeType": true,
+                                  "AttributeValue": "",
+                                  "SetAttributeValue": false
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Set type of *{CollectionDate@HasMore} to Continue<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*{CollectionDate@HasMore}",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "Continue",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Continue for *@Continue<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*@Continue",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "OutputHandlerSequence",
+                                "Object": {
+                                  "ObjectsVector": [
+                                    {
+                                      "Type": "RemoveSubAttributes",
+                                      "Description": "Remove */Pieces<Remove attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeSelector": {
+                                          "Type": "QueryBasedAS",
+                                          "Object": {
+                                            "QueryText": "*/Pieces"
+                                          }
+                                        },
+                                        "ConditionalRemove": false,
+                                        "DataScorer": {
+                                          "Type": null,
+                                          "Description": "",
+                                          "Enabled": true,
+                                          "Object": null
+                                        },
+                                        "ScoreCondition": "EQ",
+                                        "CompareConditionType": "ValueOf",
+                                        "ScoreToCompare": 0
+                                      }
+                                    },
+                                    {
+                                      "Type": "RunObjectOnAttributes",
+                                      "Description": "If another date remains, make new First and LastAttempt subattributes out of CollectionDate<Run object on attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/CollectionDate|*/ResultDate",
+                                        "AttributeSelector": {
+                                          "Type": "ValueConditionSelector",
+                                          "Object": {
+                                            "Condition": {
+                                              "Type": "FindingRuleCondition",
+                                              "Object": {
+                                                "AFRule": {
+                                                  "Type": "RegExprRule",
+                                                  "Object": {
+                                                    "IsRegExpFromFile": false,
+                                                    "RegExpFileName": "",
+                                                    "Pattern": "[^|]",
+                                                    "IsCaseSensitive": false,
+                                                    "FirstMatchOnly": true,
+                                                    "CreateSubAttributesFromNamedMatches": false,
+                                                    "OnlyCreateOneSubAttributePerGroup": true
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "UseAttributeSelector": true,
+                                        "Type": "OutputHandler",
+                                        "Object": {
+                                          "Type": "OutputHandlerSequence",
+                                          "Object": {
+                                            "ObjectsVector": [
+                                              {
+                                                "Type": "RemoveSubAttributes",
+                                                "Description": "Remove */First|*/LastAttempt<Remove attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeSelector": {
+                                                    "Type": "QueryBasedAS",
+                                                    "Object": {
+                                                      "QueryText": "*/First|*/LastAttempt"
+                                                    }
+                                                  },
+                                                  "ConditionalRemove": false,
+                                                  "DataScorer": {
+                                                    "Type": null,
+                                                    "Description": "",
+                                                    "Enabled": true,
+                                                    "Object": null
+                                                  },
+                                                  "ScoreCondition": "EQ",
+                                                  "CompareConditionType": "ValueOf",
+                                                  "ScoreToCompare": 0
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Make First and LastAttempt subattributes out of CollectionDate<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "CollectionDate",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "RegExprRule",
+                                                    "Object": {
+                                                      "IsRegExpFromFile": false,
+                                                      "RegExpFileName": "",
+                                                      "Pattern": "(?nx)\r\n[|]\r\n(?<= (?'LastAttempt'(?'First'[^|]+)) [|] )\r\n[\\S\\s]*",
+                                                      "IsCaseSensitive": false,
+                                                      "FirstMatchOnly": false,
+                                                      "CreateSubAttributesFromNamedMatches": true,
+                                                      "OnlyCreateOneSubAttributePerGroup": true
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Add tags to CollectionDate/First<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "CollectionDate/First",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "AdvancedReplaceString",
+                                                    "Object": {
+                                                      "StrToBeReplaced": "[\\S\\s]+",
+                                                      "AsRegularExpression": true,
+                                                      "IsCaseSensitive": false,
+                                                      "Replacement": "·$0Ç¦",
+                                                      "ReplacementOccurrenceType": "First",
+                                                      "SpecifiedOccurrence": 0
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "Type": "RunObjectOnAttributes",
+                                                "Description": "Make LastAttempt subattribute out of ResultDate<Run object on attributes>",
+                                                "Enabled": true,
+                                                "Object": {
+                                                  "AttributeQuery": "ResultDate",
+                                                  "AttributeSelector": {
+                                                    "Type": null,
+                                                    "Object": null
+                                                  },
+                                                  "UseAttributeSelector": false,
+                                                  "Type": "Modifier",
+                                                  "Object": {
+                                                    "Type": "RegExprRule",
+                                                    "Object": {
+                                                      "IsRegExpFromFile": false,
+                                                      "RegExpFileName": "",
+                                                      "Pattern": "(?nx)\r\n[|]\r\n(?<= (?'LastAttempt'[^|]+) [|] )\r\n[\\S\\s]*",
+                                                      "IsCaseSensitive": false,
+                                                      "FirstMatchOnly": false,
+                                                      "CreateSubAttributesFromNamedMatches": true,
+                                                      "OnlyCreateOneSubAttributePerGroup": true
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Make Pieces subattribute out of test first date, name and full-text<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*",
+                                        "CreateSubAttribute": true,
+                                        "AttributeName": "Pieces",
+                                        "SetAttributeName": true,
+                                        "AttributeType": "",
+                                        "SetAttributeType": false,
+                                        "AttributeValue": "%CollectionDate/First%\r\n%Test/Name%\r\n%Value%",
+                                        "SetAttributeValue": true
+                                      }
+                                    },
+                                    {
+                                      "Type": "RunObjectOnAttributes",
+                                      "Description": "Split pieces with Type_1\\Type_B\\getValue.rsd<Run object on attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/Pieces",
+                                        "AttributeSelector": {
+                                          "Type": null,
+                                          "Object": null
+                                        },
+                                        "UseAttributeSelector": false,
+                                        "Type": "Splitter",
+                                        "Object": {
+                                          "Type": "RSDSplitter",
+                                          "Object": {
+                                            "RSDFileName": "<RSDFileDir>\\Type_1\\Type_B\\getValue.rsd.etf"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "Type": "ModifyAttributeValueOH",
+                                      "Description": "Name */Pieces Keep if it has a subattribute<Modify attributes>",
+                                      "Enabled": true,
+                                      "Object": {
+                                        "AttributeQuery": "*/Pieces{*}",
+                                        "CreateSubAttribute": false,
+                                        "AttributeName": "Keep",
+                                        "SetAttributeName": true,
+                                        "AttributeType": "",
+                                        "SetAttributeType": false,
+                                        "AttributeValue": "",
+                                        "SetAttributeValue": false
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Try again with backup rules<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{Pieces}",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "RemoveSubAttributes",
+                            "Description": "Remove */*/LastAttempt<Remove attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeSelector": {
+                                "Type": "QueryBasedAS",
+                                "Object": {
+                                  "QueryText": "*/*/LastAttempt"
+                                }
+                              },
+                              "ConditionalRemove": false,
+                              "DataScorer": {
+                                "Type": null,
+                                "Description": "",
+                                "Enabled": true,
+                                "Object": null
+                              },
+                              "ScoreCondition": "EQ",
+                              "CompareConditionType": "ValueOf",
+                              "ScoreToCompare": 0
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Split pieces with Type_1\\Type_B\\getValueBackup.rsd<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/Pieces",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "Splitter",
+                              "Object": {
+                                "Type": "RSDSplitter",
+                                "Object": {
+                                  "RSDFileName": "<RSDFileDir>\\Type_1\\Type_B\\getValueBackup.rsd.etf"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Name */Pieces Keep<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/Pieces",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "Keep",
+                              "SetAttributeName": true,
+                              "AttributeType": "",
+                              "SetAttributeType": false,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove */CollectionDate/First<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/CollectionDate/First"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Remove */(CollectionDate|ResultDate){LastAttempt}/Backup<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/CollectionDate{LastAttempt}|*/ResultDate{LastAttempt}",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "RemoveSubAttributes",
+                      "Object": {
+                        "AttributeSelector": {
+                          "Type": "QueryBasedAS",
+                          "Object": {
+                            "QueryText": "*/Backup"
+                          }
+                        },
+                        "ConditionalRemove": false,
+                        "DataScorer": {
+                          "Type": null,
+                          "Description": "",
+                          "Enabled": true,
+                          "Object": null
+                        },
+                        "ScoreCondition": "EQ",
+                        "CompareConditionType": "ValueOf",
+                        "ScoreToCompare": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "MoveAndModifyAttributes",
+                  "Description": "Promote */CollectionDate/*|*/ResultDate/*<Move and modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AddAttributeNameToType": false,
+                    "AddRootOrParentAttributeType": false,
+                    "AddSpecifiedAttributeType": false,
+                    "AttributeQuery": "*/CollectionDate/*|*/ResultDate/*",
+                    "DeleteRootOrParentIfAllChildrenMoved": true,
+                    "MoveAttributeLevel": "MoveToParent",
+                    "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                    "RetainAttributeType": true,
+                    "SpecifiedAttributeName": "",
+                    "SpecifiedAttributeType": ""
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove */Keep/Value@PLACEHOLDER<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/Keep/Value@PLACEHOLDER"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Get other subattributes<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Make Pieces subattribute of */Keep<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Keep",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "Pieces",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%Value%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Split */Keep/Pieces with Type_1\\Type_B\\getOtherSubattributes.rsd<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Keep/Pieces",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\Type_1\\Type_B\\getOtherSubattributes.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "MoveAndModifyAttributes",
+                  "Description": "Promote */Keep/Pieces/*<Move and modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AddAttributeNameToType": false,
+                    "AddRootOrParentAttributeType": false,
+                    "AddSpecifiedAttributeType": false,
+                    "AttributeQuery": "*/Keep/Pieces/*",
+                    "DeleteRootOrParentIfAllChildrenMoved": true,
+                    "MoveAttributeLevel": "MoveToParent",
+                    "OverwriteAttributeName": "DoNotOverwrite",
+                    "RetainAttributeType": true,
+                    "SpecifiedAttributeName": "",
+                    "SpecifiedAttributeType": ""
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove */Test<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/Test"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Name */Keep Test and set value to %Component%<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Keep",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "Test",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%Component%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Find flag from Value<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test",
+                    "AttributeSelector": {
+                      "Type": "MultipleCriteriaSelector",
+                      "Object": {
+                        "Selectors": [
+                          {
+                            "Select": "NonMatching",
+                            "With": {
+                              "Type": "QueryBasedAS",
+                              "Description": "*{Flag}<Query attribute selector>",
+                              "Enabled": true,
+                              "Object": {
+                                "QueryText": "*{Flag}"
+                              }
+                            }
+                          }
+                        ],
+                        "CombineBy": "Chain"
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Make Surroundings subattribute of Value<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/Value",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "ModifyAttributeValueOH",
+                                "Object": {
+                                  "AttributeQuery": "*",
+                                  "CreateSubAttribute": true,
+                                  "AttributeName": "Surroundings",
+                                  "SetAttributeName": true,
+                                  "AttributeType": "",
+                                  "SetAttributeType": false,
+                                  "AttributeValue": "%Value%",
+                                  "SetAttributeValue": true
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Expand */Value/Surroundings to the right<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/Value/Surroundings",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "Modifier",
+                              "Object": {
+                                "Type": "LocateImageRegion",
+                                "Object": {
+                                  "DataInsideBoundaries": true,
+                                  "FindType": "ImageRegion",
+                                  "ImageRegionText": " ",
+                                  "IncludeIntersectingEntities": true,
+                                  "IntersectingEntityType": "Word",
+                                  "MatchMultiplePagesPerDocument": true,
+                                  "ClueList1": {
+                                    "Clues": [
+                                      "\\A(?!(N/A|PLACEHOLDER)\\z)[\\S\\s]+"
+                                    ],
+                                    "CaseSensitive": false,
+                                    "Regex": true,
+                                    "RestrictByBoundary": false
+                                  },
+                                  "ClueList2": {
+                                    "Clues": [],
+                                    "CaseSensitive": false,
+                                    "Regex": false,
+                                    "RestrictByBoundary": false
+                                  },
+                                  "ClueList3": {
+                                    "Clues": [],
+                                    "CaseSensitive": false,
+                                    "Regex": false,
+                                    "RestrictByBoundary": false
+                                  },
+                                  "ClueList4": {
+                                    "Clues": [],
+                                    "CaseSensitive": false,
+                                    "Regex": false,
+                                    "RestrictByBoundary": false
+                                  },
+                                  "Left": {
+                                    "Anchor": "ClueList1",
+                                    "AnchorSide": "Left",
+                                    "ExpandDirection": "ExpandLeft",
+                                    "ExpandBy": 0.0,
+                                    "ExpandUnits": "Inches"
+                                  },
+                                  "Top": {
+                                    "Anchor": "ClueList1",
+                                    "AnchorSide": "Top",
+                                    "ExpandDirection": "ExpandUp",
+                                    "ExpandBy": 0.0,
+                                    "ExpandUnits": "Inches"
+                                  },
+                                  "Right": {
+                                    "Anchor": "ClueList1",
+                                    "AnchorSide": "Right",
+                                    "ExpandDirection": "ExpandRight",
+                                    "ExpandBy": 1.5,
+                                    "ExpandUnits": "Inches"
+                                  },
+                                  "Bottom": {
+                                    "Anchor": "ClueList1",
+                                    "AnchorSide": "Bottom",
+                                    "ExpandDirection": "ExpandDown",
+                                    "ExpandBy": 0.0,
+                                    "ExpandUnits": "Inches"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "RemoveSubAttributes",
+                            "Description": "Remove empty<Remove attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeSelector": {
+                                "Type": "QueryBasedAS",
+                                "Object": {
+                                  "QueryText": "*/Value/Surroundings"
+                                }
+                              },
+                              "ConditionalRemove": true,
+                              "DataScorer": {
+                                "Type": "CharacterConfidenceDS",
+                                "Description": "<Character confidence data scorer>",
+                                "Enabled": true,
+                                "Object": {
+                                  "AggregateFunction": "Average"
+                                }
+                              },
+                              "ScoreCondition": "EQ",
+                              "CompareConditionType": "ValueOf",
+                              "ScoreToCompare": 0
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Get text<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/Value/Surroundings",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "Modifier",
+                              "Object": {
+                                "Type": "ExtractOcrTextInImageArea",
+                                "Object": {
+                                  "IncludeTextOnBoundary": true,
+                                  "SpatialEntityType": "Word",
+                                  "UseOriginalDocumentOcr": false,
+                                  "UseOverallBounds": true
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Make Combined out of Value and Surroundings<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/Value{Surroundings}",
+                              "CreateSubAttribute": true,
+                              "AttributeName": "Combined",
+                              "SetAttributeName": true,
+                              "AttributeType": "",
+                              "SetAttributeType": false,
+                              "AttributeValue": "%Value%¦%Surroundings%",
+                              "SetAttributeValue": true
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Find flag following value<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/Value/Combined",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "Modifier",
+                              "Object": {
+                                "Type": "RegExprRule",
+                                "Object": {
+                                  "IsRegExpFromFile": false,
+                                  "RegExpFileName": "",
+                                  "Pattern": "(?nx)\r\n(?>(?'1'[^¦]+)¦[\\S\\s]{0,3}\\1)\r\n\\W*\r\n(\\b1\\W+)?\r\n(?'Flag'\r\n#import flag.dat.etf\r\n)",
+                                  "IsCaseSensitive": false,
+                                  "FirstMatchOnly": false,
+                                  "CreateSubAttributesFromNamedMatches": true,
+                                  "OnlyCreateOneSubAttributePerGroup": true
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "MoveAndModifyAttributes",
+                            "Description": "Promote */Value/Combined/Flag<Move and modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AddAttributeNameToType": false,
+                              "AddRootOrParentAttributeType": false,
+                              "AddSpecifiedAttributeType": false,
+                              "AttributeQuery": "*/Value/Combined/Flag",
+                              "DeleteRootOrParentIfAllChildrenMoved": false,
+                              "MoveAttributeLevel": "MoveToParent",
+                              "OverwriteAttributeName": "DoNotOverwrite",
+                              "RetainAttributeType": true,
+                              "SpecifiedAttributeName": "",
+                              "SpecifiedAttributeType": ""
+                            }
+                          },
+                          {
+                            "Type": "MoveAndModifyAttributes",
+                            "Description": "Promote */Value/Flag<Move and modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AddAttributeNameToType": false,
+                              "AddRootOrParentAttributeType": false,
+                              "AddSpecifiedAttributeType": false,
+                              "AttributeQuery": "*/Value/Flag",
+                              "DeleteRootOrParentIfAllChildrenMoved": false,
+                              "MoveAttributeLevel": "MoveToParent",
+                              "OverwriteAttributeName": "DoNotOverwrite",
+                              "RetainAttributeType": true,
+                              "SpecifiedAttributeName": "",
+                              "SpecifiedAttributeType": ""
+                            }
+                          },
+                          {
+                            "Type": "RemoveSubAttributes",
+                            "Description": "Remove */Value/*<Remove attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeSelector": {
+                                "Type": "QueryBasedAS",
+                                "Object": {
+                                  "QueryText": "*/Value/*"
+                                }
+                              },
+                              "ConditionalRemove": false,
+                              "DataScorer": {
+                                "Type": null,
+                                "Description": "",
+                                "Enabled": true,
+                                "Object": null
+                              },
+                              "ScoreCondition": "EQ",
+                              "CompareConditionType": "ValueOf",
+                              "ScoreToCompare": 0
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove */Test/Component|*/Test/Pieces<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/Test/Component|*/Test/Pieces"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Remove tags<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "AdvancedReplaceString",
+                      "Object": {
+                        "StrToBeReplaced": "«([^ä»]+)ä»",
+                        "AsRegularExpression": true,
+                        "IsCaseSensitive": false,
+                        "Replacement": "$1",
+                        "ReplacementOccurrenceType": "First",
+                        "SpecifiedOccurrence": 0
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Make M subattribute out of CollectionDate, ResultDate, Header_TestGroup<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": true,
+              "AttributeName": "M",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "<%CollectionDate%><%ResultDate%><%Header_TestGroup%>",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "MergeAttributeTrees",
+            "Description": "Merge on M<Merge attribute trees>",
+            "Enabled": true,
+            "Object": {
+              "AttributesToBeMerged": "*",
+              "SubAttributesToCompare": [
+                "M"
+              ],
+              "CaseSensitive": false,
+              "DiscardNonMatchingComparisons": false,
+              "MergeAttributeTreesInto": "FirstAttribute",
+              "RemoveEmptyHierarchy": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove */M<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/M"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Name CollectionDate CD<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/CollectionDate",
+              "CreateSubAttribute": false,
+              "AttributeName": "CD",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Create CollectionDate<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*{CD}",
+              "CreateSubAttribute": true,
+              "AttributeName": "CollectionDate",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%CD%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Name ResultDate RD<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/ResultDate",
+              "CreateSubAttribute": false,
+              "AttributeName": "RD",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Create ResultDate<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*{RD}",
+              "CreateSubAttribute": true,
+              "AttributeName": "ResultDate",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%RD%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove */CD|*/RD<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/CD|*/RD"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Remove values, etc if belong to other test<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Clear type of */Test<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Set type of */Test to Skip if GFR<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test",
+                    "AttributeSelector": {
+                      "Type": "ValueConditionSelector",
+                      "Object": {
+                        "Condition": {
+                          "Type": "FindingRuleCondition",
+                          "Object": {
+                            "AFRule": {
+                              "Type": "RegExprRule",
+                              "Object": {
+                                "IsRegExpFromFile": false,
+                                "RegExpFileName": "",
+                                "Pattern": "GFR",
+                                "IsCaseSensitive": false,
+                                "FirstMatchOnly": true,
+                                "CreateSubAttributesFromNamedMatches": false,
+                                "OnlyCreateOneSubAttributePerGroup": true
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "",
+                        "SetAttributeName": false,
+                        "AttributeType": "Skip",
+                        "SetAttributeType": true,
+                        "AttributeValue": "",
+                        "SetAttributeValue": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Set type of */Test to Zero if there is another on the next line<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test@",
+                    "AttributeSelector": {
+                      "Type": "SpatialProximityAS",
+                      "Object": {
+                        "TargetQuery": "*",
+                        "TargetsMustContainReferences": false,
+                        "RequireCompleteInclusion": false,
+                        "ReferenceQuery": "*",
+                        "Left": {
+                          "Anchor": "Page",
+                          "AnchorSide": "Left",
+                          "ExpandDirection": "ExpandLeft",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Top": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandUp",
+                          "ExpandBy": 0.5,
+                          "ExpandUnits": "Lines"
+                        },
+                        "Right": {
+                          "Anchor": "Page",
+                          "AnchorSide": "Right",
+                          "ExpandDirection": "ExpandRight",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Bottom": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandDown",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "CompareLinesSeparately": false,
+                        "IncludeDebugAttributes": false
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "",
+                        "SetAttributeName": false,
+                        "AttributeType": "Zero",
+                        "SetAttributeType": true,
+                        "AttributeValue": "",
+                        "SetAttributeValue": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Set type of */Test to One if there is another two lines below<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test@",
+                    "AttributeSelector": {
+                      "Type": "SpatialProximityAS",
+                      "Object": {
+                        "TargetQuery": "*@",
+                        "TargetsMustContainReferences": false,
+                        "RequireCompleteInclusion": false,
+                        "ReferenceQuery": "*",
+                        "Left": {
+                          "Anchor": "Page",
+                          "AnchorSide": "Left",
+                          "ExpandDirection": "ExpandLeft",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Top": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandUp",
+                          "ExpandBy": 1.2,
+                          "ExpandUnits": "Lines"
+                        },
+                        "Right": {
+                          "Anchor": "Page",
+                          "AnchorSide": "Right",
+                          "ExpandDirection": "ExpandRight",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Bottom": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandDown",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "CompareLinesSeparately": false,
+                        "IncludeDebugAttributes": false
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "",
+                        "SetAttributeName": false,
+                        "AttributeType": "One",
+                        "SetAttributeType": true,
+                        "AttributeValue": "",
+                        "SetAttributeValue": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Set type of */Test to Two if there is another three lines below<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test@",
+                    "AttributeSelector": {
+                      "Type": "SpatialProximityAS",
+                      "Object": {
+                        "TargetQuery": "*@",
+                        "TargetsMustContainReferences": false,
+                        "RequireCompleteInclusion": false,
+                        "ReferenceQuery": "*",
+                        "Left": {
+                          "Anchor": "Page",
+                          "AnchorSide": "Left",
+                          "ExpandDirection": "ExpandLeft",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Top": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandUp",
+                          "ExpandBy": 2.2,
+                          "ExpandUnits": "Lines"
+                        },
+                        "Right": {
+                          "Anchor": "Page",
+                          "AnchorSide": "Right",
+                          "ExpandDirection": "ExpandRight",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Bottom": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandDown",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "CompareLinesSeparately": false,
+                        "IncludeDebugAttributes": false
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "",
+                        "SetAttributeName": false,
+                        "AttributeType": "Two",
+                        "SetAttributeType": true,
+                        "AttributeValue": "",
+                        "SetAttributeValue": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Split */Test@Zero with removeSubattributesZero.rsd<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test@Zero",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\removeSubattributesZero.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Split */Test@One with removeSubattributesOne.rsd<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test@One",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\removeSubattributesOne.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Split */Test@Two with removeSubattributesTwo.rsd<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Test@Two",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\removeSubattributesTwo.rsd.etf"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": true
+  }
+}

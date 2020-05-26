@@ -1,0 +1,57 @@
+[
+  {
+    "Type": "ModifySpatialMode",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ModifySpatialModeAction": "DowngradeToHybrid",
+      "ModifyRecursively": true,
+      "ZoneCountCondition": "Single",
+      "UseCondition": false
+    }
+  },
+  {
+    "Type": "ModifySpatialMode",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ModifySpatialModeAction": "DowngradeToHybrid",
+      "ModifyRecursively": false,
+      "ZoneCountCondition": "Single",
+      "UseCondition": false
+    }
+  },
+  {
+    "Type": "ModifySpatialMode",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ModifySpatialModeAction": "Remove",
+      "ModifyRecursively": false,
+      "ZoneCountCondition": "Single",
+      "UseCondition": false
+    }
+  },
+  {
+    "Type": "ModifySpatialMode",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ModifySpatialModeAction": "ConvertToPseudoSpatial",
+      "ModifyRecursively": false,
+      "ZoneCountCondition": "Single",
+      "UseCondition": true
+    }
+  },
+  {
+    "Type": "ModifySpatialMode",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ModifySpatialModeAction": "ConvertToPseudoSpatial",
+      "ModifyRecursively": false,
+      "ZoneCountCondition": "Single",
+      "UseCondition": false
+    }
+  }
+]

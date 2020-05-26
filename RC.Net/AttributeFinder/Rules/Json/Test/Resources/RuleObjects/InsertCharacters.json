@@ -1,0 +1,1202 @@
+[
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": "REPLACETREE",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " ETVIR",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " DEC",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " BY RECVR",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " TRUSTEE",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": "~",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " DECEASED",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "Instrument ",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " EXTX",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " DBA",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " PT",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "-",
+      "InsertAt": 3,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " TRE",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": "remove",
+      "InsertAt": 0,
+      "LengthType": "LessThan",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "00000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 5
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "000000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 4
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "T",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "19",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 2
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 2
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": "`",
+      "InsertAt": 0,
+      "LengthType": "LessThan",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " BFC",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": "L/U",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 5
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "R",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " ETUX",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "LLAD #",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " CHILD SUPPORT",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "0000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " MB",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " RECEIVER",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " BY SHERIFF",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "-",
+      "InsertAt": 10,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "00",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "0000000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 4
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " DEC'D",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 7
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " TR",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "00",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 6
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "00000000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 3
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "City of ",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " EE",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " NKA",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "00",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 3
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " TR",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "Subdivision Map ",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " TRUSTEE",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": ", TRUSTEE",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "1",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " ATTORNEY",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "$",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " LAND SURVEYOR",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " INC",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "0",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 4
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "~",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " EXTR",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "-",
+      "InsertAt": 4,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " ESTATE",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "000000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 5
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "LOT LINE ADJUSTMENT #",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": "00",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " PROTECTED LLC",
+      "InsertAt": 0,
+      "LengthType": "GreaterThan",
+      "NumOfCharsLong": 2
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " EX",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": ", FAKETOWN PA 00000",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": ".00",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " DUPOT",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": "removeMe",
+      "InsertAt": 0,
+      "LengthType": "LessThan",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "AGRICULTURAL PRESERVE #",
+      "InsertAt": 1,
+      "LengthType": "GreaterThan",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " COTR",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 8
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "-",
+      "InsertAt": 7,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " FKA",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " EST",
+      "InsertAt": 0,
+      "LengthType": "GreaterThan",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "-",
+      "InsertAt": 6,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 9
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " DCSD",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " ADMR",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "0000000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 3
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " ATTORNEY IN FACT",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " (RCVR)",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " (TR)",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "-",
+      "InsertAt": 6,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "00",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 9
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " DIV",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " ESTATE OF",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "0",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 7
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " - BY SHERIFF",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " (EST)",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "MLR ED Visit Summary - ",
+      "InsertAt": 1,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " AGT",
+      "InsertAt": 0,
+      "LengthType": "GreaterThan",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": ".00",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " EST",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " SUCKS",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " AS NOMINEE",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " AKA",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " SURVEYOR",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " EST OF",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " THE",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "0000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 6
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "00000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 6
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": "`",
+      "InsertAt": 0,
+      "LengthType": "AnyLength",
+      "NumOfCharsLong": 0
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": true,
+      "CharsToInsert": " RECVR",
+      "InsertAt": 0,
+      "LengthType": "GreaterThanEqual",
+      "NumOfCharsLong": 1
+    }
+  },
+  {
+    "Type": "InsertCharacters",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AppendToEnd": false,
+      "CharsToInsert": "0000",
+      "InsertAt": 1,
+      "LengthType": "Equal",
+      "NumOfCharsLong": 7
+    }
+  }
+]

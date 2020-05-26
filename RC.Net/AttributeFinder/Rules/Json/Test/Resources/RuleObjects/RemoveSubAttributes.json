@@ -1,0 +1,3415 @@
+[
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Person/*|*/Company/*"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/*{/Query}"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*{query}"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "_/ConsiderationAmount"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "Clues@DocType",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "HCData|MCData|LCData|Clues@SSN|Clues@",
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "Page",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "Page",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "Page",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Units/NoSpatialInfo"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialContentBasedAS",
+        "Object": {
+          "Contains": false,
+          "ConsecutiveRows": 3,
+          "MinPercent": 4,
+          "MaxPercent": 100,
+          "IncludeNonSpatial": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Delete"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "Clues",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "HCData|MCData|*@Blank",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.5,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialContentBasedAS",
+        "Object": {
+          "Contains": false,
+          "ConsecutiveRows": 25,
+          "MinPercent": 5,
+          "MaxPercent": 100,
+          "IncludeNonSpatial": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/InvalidOrderCode"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Location|*/PropertyAddress|*/LegalDescription|*/*/Location|*/*/PropertyAddress"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Party/_"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "QueryBasedAS",
+                "Description": "Clues<Query attribute selector>",
+                "Enabled": true,
+                "Object": {
+                  "QueryText": "Clues"
+                }
+              }
+            },
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "ValueConditionSelector",
+                "Description": "with CC < 30%<Value condition selector>",
+                "Enabled": true,
+                "Object": {
+                  "Condition": {
+                    "Type": "CharacterConfidenceCondition",
+                    "Object": {
+                      "IsMet": true,
+                      "AggregateFunction": "Average",
+                      "FirstScoreCondition": "LT",
+                      "FirstScoreToCompare": 30,
+                      "IsSecondCondition": false,
+                      "AndSecondCondition": true,
+                      "SecondScoreCondition": "EQ",
+                      "SecondScoreToCompare": 0
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "CombineBy": "Chain"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "*/SSN/Clues@SSN",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "*/SSN/HCData@SSN|*/SSN/*@Blank",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.5,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "ValueConditionSelector",
+        "Object": {
+          "Condition": {
+            "Type": "FindingRuleCondition",
+            "Object": {
+              "AFRule": {
+                "Type": "RegExprRule",
+                "Object": {
+                  "IsRegExpFromFile": false,
+                  "RegExpFileName": "",
+                  "Pattern": "(?~<>SUBSTITUTION)|(?~<>RECONVEYANCE)",
+                  "IsCaseSensitive": false,
+                  "FirstMatchOnly": true,
+                  "CreateSubAttributesFromNamedMatches": false,
+                  "OnlyCreateOneSubAttributePerGroup": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialContentBasedAS",
+        "Object": {
+          "Contains": true,
+          "ConsecutiveRows": 10,
+          "MinPercent": 2,
+          "MaxPercent": 100,
+          "IncludeNonSpatial": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Keep/*|_"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Subdivision/Copy/*"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "ContentAbove{Above}"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "CrossReference"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "HCData",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "NCData",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "NAME@Protected/*"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/*|_"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "NonMatching",
+              "With": {
+                "Type": "ValueConditionSelector",
+                "Description": "<Value condition selector>",
+                "Enabled": true,
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "RegExprRule",
+                        "Object": {
+                          "IsRegExpFromFile": false,
+                          "RegExpFileName": "",
+                          "Pattern": "\\A\\d{11}\\z",
+                          "IsCaseSensitive": false,
+                          "FirstMatchOnly": false,
+                          "CreateSubAttributesFromNamedMatches": false,
+                          "OnlyCreateOneSubAttributePerGroup": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "ValueConditionSelector",
+                "Description": "5 or more 1's<Value condition selector>",
+                "Enabled": true,
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "RegExprRule",
+                        "Object": {
+                          "IsRegExpFromFile": false,
+                          "RegExpFileName": "",
+                          "Pattern": "(1\\d?){5,}",
+                          "IsCaseSensitive": false,
+                          "FirstMatchOnly": false,
+                          "CreateSubAttributesFromNamedMatches": false,
+                          "OnlyCreateOneSubAttributePerGroup": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "CombineBy": "Union"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "*/Person",
+          "TargetsMustContainReferences": true,
+          "RequireCompleteInclusion": true,
+          "ReferenceQuery": "*/Person1",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "*@C4BX/*",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "*@C4BX/*",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.75,
+            "ExpandUnits": "Lines"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.05,
+            "ExpandUnits": "Lines"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Test/DocType"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      },
+      "ScoreCondition": "LT",
+      "CompareConditionType": "Maximum",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*@SSNBlank"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/*/Garage"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialContentBasedAS",
+        "Object": {
+          "Contains": true,
+          "ConsecutiveRows": 39,
+          "MinPercent": 0,
+          "MaxPercent": 8,
+          "IncludeNonSpatial": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialContentBasedAS",
+        "Object": {
+          "Contains": false,
+          "ConsecutiveRows": 10,
+          "MinPercent": 1,
+          "MaxPercent": 100,
+          "IncludeNonSpatial": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Clues"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      },
+      "ScoreCondition": "LEQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 30
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "NonMatching",
+              "With": {
+                "Type": "ValueConditionSelector",
+                "Description": "<Value condition selector>",
+                "Enabled": true,
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "RegExprRule",
+                        "Object": {
+                          "IsRegExpFromFile": true,
+                          "RegExpFileName": "<RSDFileDir>\\localDocTypes.dat.etf",
+                          "Pattern": "",
+                          "IsCaseSensitive": false,
+                          "FirstMatchOnly": true,
+                          "CreateSubAttributesFromNamedMatches": false,
+                          "OnlyCreateOneSubAttributePerGroup": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "CombineBy": "Chain"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "id|*/digit"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "MCData",
+          "TargetsMustContainReferences": true,
+          "RequireCompleteInclusion": true,
+          "ReferenceQuery": "MCData{spaced}",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "NERPatientInfo|NERDocumentDate"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*@splitme"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "PhysicianInfo/*@"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "ValueConditionSelector",
+                "Description": "Bar code<Value condition selector>",
+                "Enabled": true,
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "RegExprRule",
+                        "Object": {
+                          "IsRegExpFromFile": false,
+                          "RegExpFileName": "",
+                          "Pattern": "11111|111\\d{1,2}111",
+                          "IsCaseSensitive": false,
+                          "FirstMatchOnly": true,
+                          "CreateSubAttributesFromNamedMatches": false,
+                          "OnlyCreateOneSubAttributePerGroup": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "DataScorerBasedAS",
+                "Description": "Low Conf<Data scorer based attribute selector>",
+                "Enabled": true,
+                "Object": {
+                  "FirstScoreCondition": "LEQ",
+                  "FirstScoreToCompare": 50,
+                  "IsSecondCondition": false,
+                  "AndSecondCondition": true,
+                  "SecondScoreCondition": "EQ",
+                  "SecondScoreToCompare": 0,
+                  "DataScorer": {
+                    "Type": "CharacterConfidenceDS",
+                    "Description": "<Character confidence data scorer>",
+                    "Enabled": true,
+                    "Object": {
+                      "AggregateFunction": "Average"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "Select": "NonMatching",
+              "With": {
+                "Type": "ValueConditionSelector",
+                "Description": "Does not start with a 1 or 2<Value condition selector>",
+                "Enabled": true,
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "RegExprRule",
+                        "Object": {
+                          "IsRegExpFromFile": false,
+                          "RegExpFileName": "",
+                          "Pattern": "\\A[12]",
+                          "IsCaseSensitive": false,
+                          "FirstMatchOnly": false,
+                          "CreateSubAttributesFromNamedMatches": false,
+                          "OnlyCreateOneSubAttributePerGroup": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "CombineBy": "Union"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/CollectionDate@Following"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "*@Fix/possibleLine",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "*@Fix/digit|*@Fix/possibleLine",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.085,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "Clues@DLN|PageClues@DLN",
+          "TargetsMustContainReferences": true,
+          "RequireCompleteInclusion": true,
+          "ReferenceQuery": "HCData@DLN|MCData@DLN|LCData@DLN",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "HCDataWF|MCDataWF|HCData|MCData",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "HCDataWF|MCDataWF",
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 1.0,
+            "ExpandUnits": "Lines"
+          },
+          "Right": {
+            "Anchor": "Page",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "Page",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "_/Index@"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "Clues@MinorName",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "HCData@MinorName|MCData@MinorName",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 2.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "NonMatching",
+              "With": {
+                "Type": "ValueConditionSelector",
+                "Description": "<Value condition selector>",
+                "Enabled": true,
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "RegExprRule",
+                        "Object": {
+                          "IsRegExpFromFile": false,
+                          "RegExpFileName": "",
+                          "Pattern": ".*\\w{3,}.*",
+                          "IsCaseSensitive": false,
+                          "FirstMatchOnly": false,
+                          "CreateSubAttributesFromNamedMatches": false,
+                          "OnlyCreateOneSubAttributePerGroup": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "CombineBy": "Chain"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Cleaned"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/UniqueNumberNCData"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*@checkquality"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      },
+      "ScoreCondition": "LEQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 45
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "Text",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": true,
+          "ReferenceQuery": "Page",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Recipient1|*/Recipient2|*/Recipient3|*/Recipient4|*/Address1|*/Address2|*/City|*/State|*/ZipCode"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "*/Account/Clues|*/Account/LCData|*/Account/MCData|*/Account/HCData",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "*/AccountNCData/*",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "MCData@interest"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Page/Arrest@"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "NonMatching",
+              "With": {
+                "Type": "QueryBasedAS",
+                "Description": "Childless?<Query attribute selector>",
+                "Enabled": true,
+                "Object": {
+                  "QueryText": "*{*}"
+                }
+              }
+            }
+          ],
+          "CombineBy": "Chain"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "NCData",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "Clues",
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "Page",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": false,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*@DocumentDate"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "id.rsd<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<RSDFileDir>\\id.rsd.etf",
+          "ScoreExpression": "#Confidence.sum()"
+        }
+      },
+      "ScoreCondition": "LT",
+      "CompareConditionType": "Maximum",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*|*/*|*/*/*|*/*/*/*|*/*/*/*/*|*/*/*/*/*/*"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Maximum"
+        }
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LCData@fuzzyLA"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      },
+      "ScoreCondition": "LT",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 50
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/_/_"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "ValueConditionSelector",
+        "Object": {
+          "Condition": {
+            "Type": "FindingRuleCondition",
+            "Object": {
+              "AFRule": {
+                "Type": "RegExprRule",
+                "Object": {
+                  "IsRegExpFromFile": false,
+                  "RegExpFileName": "",
+                  "Pattern": "\\A00",
+                  "IsCaseSensitive": false,
+                  "FirstMatchOnly": true,
+                  "CreateSubAttributesFromNamedMatches": false,
+                  "OnlyCreateOneSubAttributePerGroup": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/DOB"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*@SplitMe/*"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "bottom"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "GG"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "RSDDataScorer",
+        "Description": "<RSD data scorer>",
+        "Enabled": true,
+        "Object": {
+          "RSDFileName": "<ComponentDataDir>\\Indexing\\EntityFinder\\ScoreEntity.rsd.etf",
+          "ScoreExpression": "#ScorePart.sum()"
+        }
+      },
+      "ScoreCondition": "LT",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 5
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "*",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": true,
+          "ReferenceQuery": "*",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.1,
+            "ExpandUnits": "Characters"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.1,
+            "ExpandUnits": "Lines"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.1,
+            "ExpandUnits": "Characters"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.1,
+            "ExpandUnits": "Lines"
+          },
+          "CompareLinesSeparately": false,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LegalDescription/LMU1/MultipleUnits|LegalDescription/LMU2/MultipleUnits"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "*/DLN9NCData/*@",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "*/DLN9/Clues",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Characters"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Lines"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 10.0,
+            "ExpandUnits": "Characters"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 2.0,
+            "ExpandUnits": "Lines"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LegalDescription/Subdivision/*"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "ValueConditionSelector",
+        "Object": {
+          "Condition": {
+            "Type": "FindingRuleCondition",
+            "Object": {
+              "AFRule": {
+                "Type": "RegExprRule",
+                "Object": {
+                  "IsRegExpFromFile": false,
+                  "RegExpFileName": "",
+                  "Pattern": "(?n)\r\n\\A(\\D*1)+\\z",
+                  "IsCaseSensitive": false,
+                  "FirstMatchOnly": true,
+                  "CreateSubAttributesFromNamedMatches": false,
+                  "OnlyCreateOneSubAttributePerGroup": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*{*@ProbableText}"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "GrantorGrantee/Person|GrantorGrantee/Company"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity Name Data Scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "ScoreCondition": "LT",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 10
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "NCData{*}"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/*"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      },
+      "ScoreCondition": "GEQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 40
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialContentBasedAS",
+        "Object": {
+          "Contains": true,
+          "ConsecutiveRows": 100,
+          "MinPercent": 0,
+          "MaxPercent": 100,
+          "IncludeNonSpatial": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Address@"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      },
+      "ScoreCondition": "LEQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 50
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LCData@AOJhw"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*@remove|Person/Title|Trust/Person|Trust/Company|Person/PersonAlias|Person/CompanyAlias|*@decedent"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/BG"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "QueryBasedAS",
+                "Description": "*/CollectionDate|*/*/CollectionTime|*/ResultDate|*/*/ResultDate<Query attribute selector>",
+                "Enabled": true,
+                "Object": {
+                  "QueryText": "*/CollectionDate|*/*/CollectionTime|*/ResultDate|*/*/ResultDate"
+                }
+              }
+            },
+            {
+              "Select": "NonMatching",
+              "With": {
+                "Type": "QueryBasedAS",
+                "Description": "*{*}<Query attribute selector>",
+                "Enabled": true,
+                "Object": {
+                  "QueryText": "*{*}"
+                }
+              }
+            }
+          ],
+          "CombineBy": "Chain"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "DocumentType{Backup}"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/X"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*@checkquality"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      },
+      "ScoreCondition": "LT",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 45
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "DistinctNameCount"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "NonMatching",
+              "With": {
+                "Type": "QueryBasedAS",
+                "Description": "<Query attribute selector>",
+                "Enabled": true,
+                "Object": {
+                  "QueryText": "MortgageAmount{*}"
+                }
+              }
+            }
+          ],
+          "CombineBy": "Chain"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "*@CheckForOverlap",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "MCData@SSN|HCData@SSN",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "Data/*@DLN",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "HCData@DLN|MCData@DLN",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "Clues",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "HCData",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Characters"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 1.0,
+            "ExpandUnits": "Lines"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Characters"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Unit|*/Building|*/Condominium"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "GG"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "EntityNameDataScorer",
+        "Description": "<Entity name data scorer>",
+        "Enabled": true,
+        "Object": "EntityNameDataScorer"
+      },
+      "ScoreCondition": "LT",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 5
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "MultipleCriteriaSelector",
+        "Object": {
+          "Selectors": [
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "QueryBasedAS",
+                "Description": "*@checkfortab<Query attribute selector>",
+                "Enabled": true,
+                "Object": {
+                  "QueryText": "*@checkfortab"
+                }
+              }
+            },
+            {
+              "Select": "Matching",
+              "With": {
+                "Type": "ValueConditionSelector",
+                "Description": "\\t<Value condition selector>",
+                "Enabled": true,
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "RegExprRule",
+                        "Object": {
+                          "IsRegExpFromFile": false,
+                          "RegExpFileName": "",
+                          "Pattern": "\\t",
+                          "IsCaseSensitive": false,
+                          "FirstMatchOnly": true,
+                          "CreateSubAttributesFromNamedMatches": false,
+                          "OnlyCreateOneSubAttributePerGroup": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "CombineBy": "Chain"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "HCData@SSN|MCData@SSN|LCData@SSN",
+          "TargetsMustContainReferences": false,
+          "RequireCompleteInclusion": false,
+          "ReferenceQuery": "NCData@SSN",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Characters"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Lines"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Characters"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Lines"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialContentBasedAS",
+        "Object": {
+          "Contains": false,
+          "ConsecutiveRows": 13,
+          "MinPercent": 6,
+          "MaxPercent": 90,
+          "IncludeNonSpatial": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*@oldYearCC"
+        }
+      },
+      "ConditionalRemove": true,
+      "DataScorer": {
+        "Type": "CharacterConfidenceDS",
+        "Description": "<Character confidence data scorer>",
+        "Enabled": true,
+        "Object": {
+          "AggregateFunction": "Average"
+        }
+      },
+      "ScoreCondition": "LT",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 65
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Date"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/*/Content"
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  },
+  {
+    "Type": "RemoveSubAttributes",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "SpatialProximityAS",
+        "Object": {
+          "TargetQuery": "HCData",
+          "TargetsMustContainReferences": true,
+          "RequireCompleteInclusion": true,
+          "ReferenceQuery": "HCData@check",
+          "Left": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Top": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Right": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "Bottom": {
+            "Anchor": "ReferenceAttribute",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "Inches"
+          },
+          "CompareLinesSeparately": true,
+          "IncludeDebugAttributes": false
+        }
+      },
+      "ConditionalRemove": false,
+      "DataScorer": {
+        "Type": null,
+        "Description": "",
+        "Enabled": true,
+        "Object": null
+      },
+      "ScoreCondition": "EQ",
+      "CompareConditionType": "ValueOf",
+      "ScoreToCompare": 0
+    }
+  }
+]

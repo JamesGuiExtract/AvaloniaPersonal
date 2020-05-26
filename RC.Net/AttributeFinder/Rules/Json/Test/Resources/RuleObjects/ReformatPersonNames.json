@@ -1,0 +1,552 @@
+[
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Contractor/Person|Owner/Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last, %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "GG",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Middle ><%Last ><%First >"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last, %First< %Middle>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "SellerName/Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%First< %1Middle>< %Last><, %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Person1",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last, ><%First>< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Person|PersonAlias",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/PersonPart",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last >< %First>< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Person|PersonAlias",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last< %Suffix>, %First< %Middle>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last, %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@irrevocable",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last IRREV TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@familyCombinedRevocable",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last FAMILY COMBINED REV TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Name",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%First %Last"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@jointLiving",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last JT LIV TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last< %Suffix>, %First< %Middle>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Person|PersonAlias",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last, %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last>< %First>< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@trust",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@family",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last FAMILY TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@marital",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last MARITAL TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Person1",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last >< %First>< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last, %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%First %Last"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Item/Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last, %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@revocableLiving",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last REV LIV TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Trustee1Reversed",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last, ><%First>< %Middle>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Person2",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": " %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "GG",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last >< %First>< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last> <%First>< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "GG|OG",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last >< %First>< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last %First <%Middle ><%Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@revocableFamily",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last REV FAMILY TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@jointRevocableLiving",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last JT REV LIV TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "GrantorGrantee/Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last>< %First>< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@survivors",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last SURVIVORS TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last<, %First>< %Middle>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@jointRevocable",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last JT REV TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%First>< %Middle>< %Last>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Trustee2Reversed",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%First>< %Middle>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@revocable",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last REV TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%First>< %Middle>< %Last><, %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/wc/name",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last, >%First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Trust/person",
+      "ReformatPersonSubAttributes": false,
+      "FormatString": "%Last %First< %Middle>< %Suffix> (TR)"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Person",
+      "ReformatPersonSubAttributes": false,
+      "FormatString": "%Last,< %Suffix.,> %First< %1Middle>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@living",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last LIV TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "GrantorGrantee",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last< %Suffix>, <%First ><%1Middle>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last, %First< %Middle>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@cottage",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last COTTAGE TR %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "GG/Person|GG/Trust/Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last, %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*@Grantor|*@OriginalGrantor",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last> <%First>< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "Person",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "<%Last >< %First>< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Trust/person",
+      "ReformatPersonSubAttributes": false,
+      "FormatString": "%Last %First< %Middle>< %Suffix>"
+    }
+  },
+  {
+    "Type": "ReformatPersonNames",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "PersonAttributeQuery": "*/Person@familyIrrevocable",
+      "ReformatPersonSubAttributes": true,
+      "FormatString": "%Last FAMILY IRREV TR %First< %Middle>< %Suffix>"
+    }
+  }
+]

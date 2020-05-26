@@ -1,0 +1,4006 @@
+[
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "Patient\\WAddress:"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          20.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          8.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "[\\s\\S]*"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          20.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "^2\\x20*A(?=(?:[\\s\\S]{0,120}?^2){2})"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToTop",
+      "Clues": [
+        "AMOUNT.{0,7}LIEN"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(ACCO|OUNT)[\\s\\S]{0,6}NO\\.?"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          7.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          47.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          39.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?-i:(?~<>PATIENT\\WNAME))"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=2>LICENSE\\x20NUMBER)"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          15.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?-i:[S5])o\\w*\\s(?-i:[S5])ec\\w*\\s(?-i:N)[ou]m?\\w*",
+        "(?-i:[S5]\\.?[S5]\\.?(?:[#N]|N[OoUu][Mm]?\\w*))"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "[BLANK]",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bStorage[\\s]{0,2}Pressure\\b",
+        "\\b224\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "([S$5]\\.?\\x20?){2}N[o0]\\.?"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "Account Number",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToTop",
+      "Clues": [
+        "ACCOUNT\\s*NO",
+        "NUMBER\\W*ACCOUNT",
+        "ACCOUNT\\W*NUMBER"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "[BLANK]",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bLargest[\\s]{0,2}Container\\b",
+        "\\b215\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          20.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<>Payment\\sDue\\sDate)"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "mailing\\W*address"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": true,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "[BLANK]",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bTrade[\\s]{0,2}Secret\\b",
+        "\\b206\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:POSTAL|ZIP)\\W?CODE"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          15.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToRight",
+      "Clues": [
+        "^Specimen\\sNumber(?=[\\r\\n]+)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          30.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          20.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?s)(?'clues'.*?^.{0,4}DDA\\b)?(?'clues'.*?^.{0,4}ENHANCED\\b)?(?'clues'.*?^.{0,4}CREDIT\\b)?(?'clues'.*?^.{0,4}ATM\\b)?(?'clues'.*?^.{0,4}M/L\\b)?(?'-clues'){3}"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": true,
+      "IncludeClueText": true,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "00-0000000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "Federal\\sI[\\s\\S]{1,15}umber",
+        "provider\\snumber\\sor\\sfederal\\sID\\snumber"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          16.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "file://<RSDFileDir>\\SSNBoxClues.dat.etf"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": true,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          30.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:NA|ME)[\\s\\S]{0,5}[O0F][\\s\\S]{0,8}(?:TAXP.{0,5}\\b|PAYER)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          23.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          18.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=4,method=better_fit>Social\\WSecurity\\WNumber)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          35.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:ACC|COUNT).{0,11}(?:NU|UMB|BER|N[O0]|#)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "LoanNo",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToLeft",
+      "Clues": [
+        "\\bMaturity|\\bM.t.r.ty|\\bMatur.{0,4}|.{0,3}turity\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          45.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "ClueLocation": "BoxToLeft",
+      "Clues": [
+        "customer\\W*id"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "0000000000000000000000000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bNUMBER\\b",
+        "\\bSOCIAL\\b",
+        "\\bSECURITY\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          8.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=5,xtra_ws=4,method=better_fit>\\bS[O0]CIALSECURITYNUMBER\\b)|(?~<error=4,xtra_ws=4,method=better_fit>S[0O]CIALSECURITYN[O0])|(?~<>\\bSECURITY\\sNO\\b)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          8.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "[\\s\\S]*"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "00000000000000000000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=2,method=better_fit>ACCT.\\x20NO)",
+        "^A.{1,4}\\.\\x20no\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          16.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          60.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "ClueLocation": "BoxToTop",
+      "Clues": [
+        "^(?~<error=3>Account\\sNo\\.\\sPrim)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        ".*first.*"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          14.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bSTATE\\b[^\\r\\n]*",
+        "\\bSLATE\\b[^\\r\\n]*",
+        "(?x) \\b SI\\x20?ATE \\b [^\\r\\n]* (?# K:\\Common\\Engineering\\SecureSamples\\TX-MidlandCountyDA\\Set005\\Images\\09-17-2014.pdf_038.tif)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "$ Amounts",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToTop",
+      "Clues": [
+        "Principal\\W*Cash",
+        "Investments",
+        "Income\\W*Cash",
+        "Carrying\\W*Value",
+        "Price\\W*At\\W*Market",
+        "Market\\W*Value",
+        "Estimated\\W*Annual\\W*Income"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "00000000000000000000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=2>SSN\\x20or\\x20EIN)",
+        "(?~<error=4>SEE\\x20INSTRUCTIONS)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToLeft",
+      "Clues": [
+        "Loan\\s*No[.,]?"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "BoxToTop",
+      "Clues": [
+        "CUSTOMER"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": false,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          90.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          95.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          60.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "¬"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": false,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": true,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "[BLANK]",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bAnnual[\\s]{0,2}Waste\\b",
+        "\\b219\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          20.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bpostal\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:Oper|rator).{0,11}(?:Lice|cense).{0,10}(?:Num|umb|ber)",
+        "\\d+\\W*(?:oper.{3,5}|.{1,3}erat.{1,3}|.{3,5}ator)\\b(?:lic.{4,5}|.{1,2}icens.{1,2}|.{3,4}ense)\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "«clue»"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "[BLANK]",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bStorage[\\s]{0,2}Temperature\\b",
+        "\\b225\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "AccountNumber",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToTop",
+      "Clues": [
+        "(?:CHE|ECK).{0,8}N[O0Q]"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "00/00/0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          4.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bD\\.?O\\.?B\\b"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "0000000000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=2>DRIVER\\WLICENSE)"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "BoxToBottom",
+      "Clues": [
+        "\\bPhone\\r\\n\\(\\s?\\)"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          15.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          30.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bSSN\\b",
+        "[Il1|!]T[Il1|!]N\\b",
+        "^.{0,2}(?>(?~<>Seller))(?=.*(SSN|TIN))",
+        "^.{0,2}(?>(?~<>Spouse))(?=.*(SSN|TIN))",
+        "(?-i:SSN\\W*[Il1|!]T[Il1|!]N)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "00/00/0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          4.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          14.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\n[^\\w\\r\\n]?D\\W?[O0]\\W?[B8ERH]\\b",
+        "\\n[^\\w\\r\\n]?[DO0]\\W?[O0]B\\b"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<>LICENSE).{0,3}(?~<>NUMBER)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "AccountNumber",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToBottomRight",
+      "Clues": [
+        "IRS\\W*IDENTIFICATION\\W*NO"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "[BLANK]",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bRadioactive\\b",
+        "\\b212\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<>SOCIAL)",
+        "(?~<error=2>SECURITY)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<>Social).{0,3}(?~<>Security).{0,3}(?:(?~<>Number)|(?~<>Num)|\\#)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          35.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          29.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=4,method=better_fit>Soc\\.\\sSec\\.\\sNo\\.\\sor\\sFed\\.\\sTax\\sI\\.D\\.\\sNo)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "^Name"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "Officer Name",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          22.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:OFFI.{5,6}|.{1,3}FICER.{1,3}|.{4,5}CER'S)\\s{0,4}(?:NA.{0,3}|.{1,2}AM.{1,2}|.{0,3}ME)"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          35.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:SOC|IAL).{0,12}(?:SEC|CUR|RITY)",
+        "(?:SEC|CUR|RITY).{0,12}(?:NUM|UMB|BER)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bReferring\\s{0,4}Physician\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          15.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "^Patient\\sName(?=[\\r\\n])",
+        "^Patient[^\\r\\n\\w]*N.m.?(?=[\\r\\n])"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          0.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          23.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          17.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\w*"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": true,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          35.0
+        ]
+      },
+      "ClueLocation": "BoxToTop",
+      "Clues": [
+        "(?:ISSU|UING).{0,9}(?:STA|ATE)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          15.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToRight",
+      "Clues": [
+        "^Specimen\\WNumber(?=[\\r\\n])"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          15.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:SOC|CAI|IAL).{0,12}(?:SEC|CURI|RITY).{0,12}(?:NUM|UMB|BER)",
+        "B.{0,3}SOCIAL"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\b(?~<error=1>RACE)\\b[^\\r\\n]*"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          20.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "^4\\x20*A(?=(?:[\\s\\S]{0,120}?^4){2})"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToRight",
+      "Clues": [
+        "(?~<error=4>DRIVER'S\\sLICENSE)"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          28.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          22.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bPHYSICIAN\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          35.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          35.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "ClueLocation": "BoxToTop",
+      "Clues": [
+        "file://<ComponentDataDir>\\Redaction\\DocTypeRSD\\Federal Tax Lien\\CL1-IdentifyingNumber.dat.etf"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          30.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "^(?>(?~<error=2>Defendant)).{0,2}\\W*(?~<>Name)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:Loca|cation).{0,12}(?:Prop|perty)",
+        "(?:Prop|perty).{0,13}(?:Conve|veyed)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "00-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          7.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          28.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          8.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\D6\\W*(?:D.T.\\W*OF|DATE|DAT.\\b|[\\s\\S]{4,15}(?:\\bBIR(?!THD.Y)|(?:B..TH|B.RTH|RTH\\b)(?!DAY)))"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=5>SOCIAL\\sSECURITY\\sNUMBER)",
+        "(?~<error=4>SOCIAL\\sSECURITY\\sNO)"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "00/00/00",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          14.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "BoxToRight",
+      "Clues": [
+        "^9\\."
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "LoanNo",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToRight",
+      "Clues": [
+        "CALL",
+        "COLL"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          8.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:So|cia|ial)[\\s\\S]{0,10}(?:Sec|ecu|cur|rity)[\\s\\S]{0,7}(?:Nu|umb|ber|N[0O])",
+        "(?~<error=5,xtra_ws=4,method=better_fit>\\bS[O0]CIALSECURITYNUMBER\\b)|(?~<error=4,xtra_ws=4,method=better_fit>S[0O]CIALSECURITYN[O0])|(?~<>\\bSECURITY\\sNO\\b)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "middle.{0,3}name"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "0000000000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          8.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          35.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:Ch.ck.ng|.?hecking|C.?ecking|Ch.?cking|Che.?king|Chec.?ing|Check.?ng|Checki.?g|Checkin.?|\\b(?:Chec.{3,5}|.{1,3}ecki.{1,3}|.{3,5}king)\\b)\\W*(?:Sh.r.|.?hare|S.?are|Sh.?re|Sha.?e|Shar.?|\\b(?:Sh.{3,4}|.{1,2}har.{1,2}|.{1,3}are)\\b)",
+        "(?:Sh.r.|.?hare|S.?are|Sh.?re|Sha.?e|Shar.?|\\b(?:Sh.{3,4}|.{1,2}har.{1,2}|.{1,3}are)\\b)\\W*(?:Dr.ft|.?raft|D.?aft|Dr.?ft|Dra.?t|Draf.?|\\b(?:Dr.{3,4}|.{1,2}raf.{1,2}|.{1,3}aft)\\b)\\W*(?:Acct|\\b.cc.\\b)",
+        "(?:Dr.ft|.?raft|D.?aft|Dr.?ft|Dra.?t|Draf.?|\\b(?:Dr.{3,4}|.{1,2}raf.{1,2}|.{1,3}aft)\\b)\\W*(?:.cct|\\b.cc.\\b)\\W*N(?:o|.\\.)",
+        "\\bN(?:o|.\\.)\\W*(?:.nst.t.t..n|.?nstitution|I.?stitution|In.?titution|Ins.?itution|Inst.?tution|Insti.?ution|Instit.?tion|Institu.?ion|Institut.?on|Instituti.?n|Institutio.?|(?:Insti.{6,7}|.{1,3}stituti.{1,3}|.{5,6}tution))",
+        "(?:.nst.t.t..n|.?nstitution|I.?stitution|In.?titution|Ins.?itution|Inst.?tution|Insti.?ution|Instit.?tion|Institu.?ion|Institut.?on|Instituti.?n|Institutio.?|(?:Insti.{6,7}|.{1,3}stituti.{1,3}|.{5,6}tution))\\W*(?:N.m.|.?ame|N.?me|Na.?e|Nam.?)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "BoxToBottomLeft",
+      "Clues": [
+        "(?~<error=2,method=better_fit,xtra_ws=4>Defendant's\\sVehicle\\sInformation)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "^.{0,12}(?>(?~<error=2>BUYERS\\x20NAME))"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": true,
+      "IncludeClueText": true,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "[BLANK]",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bHazardous[\\s]{0,2}Material\\b",
+        "\\b211\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "00000000000000000000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "ClueLocation": "BoxToBottom",
+      "Clues": [
+        "file://<RSDFileDir>\\NameAndAddress.dat.etf"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": true,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          7.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          15.0
+        ]
+      },
+      "ClueLocation": "BoxToLeft",
+      "Clues": [
+        "ACCOUNT.{0,4}NUMBER",
+        "ACCOUNT.{0,2}N[O0]",
+        "ACCTNUM"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          0.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          36.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          0.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<>SOCIAL\\WSECURITY\\WNUMBER)",
+        "(?~<>SOCIAL\\WSECURITY\\WNO)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          4.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          55.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:SOC|CIA|IAL).{0,13}(?:SEC|CUR|RITY).{0,14}(?:NUM|UMB|BER)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "00000000000000000000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=3,method=better_fit>ACCT.\\x20NO)",
+        "^A.{1,4}\\.\\x20no\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": true,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          30.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "^(?>(?~<error=2>Plaintiff)).{0,2}\\W*(?~<>Name)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          4.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "Date\\sof\\sBirth\\:?"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          14.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "\\bHEIGHT\\b[^\\r\\n]*",
+        "\\bHEIGH[^\\r\\n]*"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "VIN",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          9.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          28.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          15.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "Vehicle\\W*Identification\\W*Number",
+        "(?~<error=4>Vehicle\\WIdentification\\WNumber)asdf"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "file://<ComponentDataDir>\\Redaction\\DocTypeRSD\\MortgageSignaturePage\\SocialSecurityNumberClue.dat.etf"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          35.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          8.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=3>Social)\\W*(?~<error=4>Security)\\W*(?:(?~<error=3>Number)|no)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "0000 0000 0000 0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          2.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          20.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "BoxToRight",
+      "Clues": [
+        "(?~<>Payment\\sDue\\sDate)"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:S.C.R.TY|.?ECURITY|S.?CURITY|SE.?URITY|SEC.?RITY|SECU.?ITY|SECUR.?TY|SECURI.?Y|SECURIT.?)",
+        "^12\\b"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "[^\\r\\n]*individual.{0,3}last.{0,3}name",
+        "^(?-i:[1lI\\|]b)\\b.{0,3}ind[^\\r\\n]+"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "Text",
+      "FirstBoxOnly": true,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          6.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "^2a\\W*Age"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          5.0
+        ]
+      },
+      "BoxHeightMin": {
+        "Case": "Some",
+        "Fields": [
+          1.0
+        ]
+      },
+      "BoxWidthMax": null,
+      "BoxWidthMin": null,
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?:^.{0,5}(?:.?HIO|O.?IO|OH.?O|OHI.?)\\W*(?:DR.V.R|.?RIVER|D.?IVER|DR.?VER|DRI.?ER|DRIV.?R|DRIVE.?|\\b(?:DRI.{2,4}|.{1,2}RIVE.{1,2}|.{2,4}VER)\\b)\\W*(?:L.C.NS.|.?ICENSE|L.?CENSE|LI.?ENSE|LIC.?NSE|LICE.?SE|LICEN.?E|LICENS.?|\\b(?:LIC.{4,5}|.{1,2}ICENS.{1,2}|.{3,4}ENSE)\\b)|(?:L.C.NS.|.?ICENSE|L.?CENSE|LI.?ENSE|LIC.?NSE|LICE.?SE|LICEN.?E|LICENS.?|\\b(?:LIC.{4,5}|.{1,2}ICENS.{1,2}|.{3,4}ENSE)\\b)\\W*(?:N.MB.R|.?UMBER|N.?MBER|NU.?BER|NUM.?ER|NUMB.?R|NUMBE.?|\\b(?:NUM.{2,4}|.{1,2}UMBE.{1,2}|.{2,4}BER)\\b))"
+      ],
+      "CluesAreCaseSensitive": true,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": true,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          40.0
+        ]
+      },
+      "BoxWidthMin": null,
+      "ClueLocation": "BoxToTop",
+      "Clues": [
+        "(?:DRI|IVER).{0,8}(?:NUM|UMB|BER)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          3.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": null,
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          30.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "file://<RSDFileDir>\\Arrested.dat.etf"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": {
+        "Case": "Some",
+        "Fields": [
+          10.0
+        ]
+      },
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          50.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          25.0
+        ]
+      },
+      "ClueLocation": "SameBox",
+      "Clues": [
+        "(?~<error=4>Second\\x20social\\x20security)"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "ImageRegion",
+      "FirstBoxOnly": false,
+      "IncludeClueText": true,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  },
+  {
+    "Type": "BoxFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeText": "000-00-0000",
+      "BoxHeightMax": null,
+      "BoxHeightMin": null,
+      "BoxWidthMax": {
+        "Case": "Some",
+        "Fields": [
+          90.0
+        ]
+      },
+      "BoxWidthMin": {
+        "Case": "Some",
+        "Fields": [
+          30.0
+        ]
+      },
+      "ClueLocation": "BoxToLeft",
+      "Clues": [
+        "\\.wa[vy]\\.wa[vy]"
+      ],
+      "CluesAreCaseSensitive": false,
+      "CluesAreRegularExpressions": true,
+      "ExcludeClueArea": false,
+      "FindType": "Text",
+      "FirstBoxOnly": false,
+      "IncludeClueText": false,
+      "IncludeLines": false,
+      "NumFirstPages": 0,
+      "NumLastPages": 0,
+      "PageSelectionMode": "AllPages",
+      "SpecifiedPages": ""
+    }
+  }
+]

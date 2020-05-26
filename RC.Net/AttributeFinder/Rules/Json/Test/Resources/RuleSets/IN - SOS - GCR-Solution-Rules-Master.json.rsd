@@ -1,0 +1,328 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 3,
+        "Name": "FLEX Index - Redaction (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "19.1.0.161",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Page",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": "RSDSplitter",
+          "Description": "perPage<Split attributes using RSD file>",
+          "Enabled": true,
+          "Object": {
+            "RSDFileName": "<RSDFileDir>\\perPage.rsd.etf"
+          }
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "_DocumentCC": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find from RSD file",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<ComponentDataDir>\\ReusableComponents\\getDocAndPagesCC.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "remove type from */*<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*/*",
+                      "CreateSubAttribute": false,
+                      "AttributeName": "",
+                      "SetAttributeName": false,
+                      "AttributeType": "",
+                      "SetAttributeType": true,
+                      "AttributeValue": "",
+                      "SetAttributeValue": false
+                    }
+                  },
+                  {
+                    "Type": "RemoveSpatialInfo",
+                    "Description": "<Remove spatial information>",
+                    "Enabled": true,
+                    "Object": "RemoveSpatialInfo"
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote _/* to the top",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "_/*",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove _",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "_"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MergeAttributes",
+            "Description": "Merge duplicates, HCData|MCData|LCData<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData|MCData|LCData",
+              "CreateMergedRegion": false,
+              "NameMergeMode": "PreserveField",
+              "NameMergePriority": [
+                "HCData",
+                "MCData",
+                "LCData"
+              ],
+              "OverlapPercent": 80.0,
+              "PreserveAsSubAttributes": false,
+              "PreserveType": false,
+              "SpecifiedName": "",
+              "SpecifiedType": "",
+              "SpecifiedValue": "000-00-0000",
+              "TreatNameListAsRegex": false,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": true,
+              "TypeMergeMode": "SelectField",
+              "TypeMergePriority": [
+                "Bank"
+              ],
+              "ValueMergeMode": "SelectField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Clues next to HCData<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "SpatialProximityAS",
+                "Object": {
+                  "TargetQuery": "Clues",
+                  "TargetsMustContainReferences": false,
+                  "RequireCompleteInclusion": false,
+                  "ReferenceQuery": "HCData|*@Blank",
+                  "Left": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandLeft",
+                    "ExpandBy": 1.5,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Top": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandUp",
+                    "ExpandBy": 2.0,
+                    "ExpandUnits": "Lines"
+                  },
+                  "Right": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Right",
+                    "ExpandDirection": "ExpandRight",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Bottom": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Bottom",
+                    "ExpandDirection": "ExpandDown",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "CompareLinesSeparately": true,
+                  "IncludeDebugAttributes": false
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove *@Blank",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*@Blank"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "SpatiallySortAttributes",
+            "Description": "<Spatially sort attributes>",
+            "Enabled": true,
+            "Object": "SpatiallySortAttributes"
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

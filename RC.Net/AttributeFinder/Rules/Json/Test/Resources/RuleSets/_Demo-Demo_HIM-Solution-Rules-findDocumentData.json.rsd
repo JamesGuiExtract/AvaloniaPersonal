@@ -1,0 +1,521 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Document",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Date": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find unless Junk doc",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "DocTypeCondition",
+                  "Object": {
+                    "AllowTypes": false,
+                    "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+                    "Category": ".",
+                    "Types": [
+                      "Junk",
+                      "Medical Necessity",
+                      "Other - Print Only",
+                      "Plan of Care",
+                      "Refill Request"
+                    ],
+                    "MinConfidence": "MaybeLevel"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [],
+                    "RSDFileName": "<RSDFileDir>\\Dates\\LMdates.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "set <DocType>",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<DocType>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "PatientInfo": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find unless Junk doc",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "DocTypeCondition",
+                  "Object": {
+                    "AllowTypes": false,
+                    "DocumentClassifiersPath": "<ComponentDataDir>\\DocumentClassifiers",
+                    "Category": ".",
+                    "Types": [
+                      "Junk",
+                      "Medical Necessity",
+                      "Other - Print Only",
+                      "Plan of Care",
+                      "Refill Request"
+                    ],
+                    "MinConfidence": "MaybeLevel"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [],
+                    "RSDFileName": "<RSDFileDir>\\PatientInfo\\main.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "promote PatientInfo, DocumentType<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/PatientInfo|*/DocumentType",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "ConditionalOutputHandler",
+            "Description": "Create date attributes unless Junk document<Conditionally handle output>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "DocTypeCondition",
+                "Object": {
+                  "AllowTypes": false,
+                  "DocumentClassifiersPath": "<RSDFileDir>",
+                  "Category": "Common",
+                  "Types": [
+                    "Junk",
+                    "Medical Necessity",
+                    "Other - Print Only",
+                    "Plan of Care",
+                    "Refill Request"
+                  ],
+                  "MinConfidence": "MaybeLevel"
+                }
+              },
+              "InvertCondition": false,
+              "Rule": {
+                "Type": "OutputHandlerSequence",
+                "Object": {
+                  "ObjectsVector": [
+                    {
+                      "Type": "CreateAttribute",
+                      "Description": "Create PatientInfo if missing<Create attribute>",
+                      "Enabled": true,
+                      "Object": {
+                        "Root": "/*[not(PatientInfo)]",
+                        "SubAttributesToCreate": [
+                          {
+                            "Name": "PatientInfo",
+                            "NameContainsXPath": false,
+                            "DoNotCreateIfNameIsEmpty": false,
+                            "TypeOfAttribute": "",
+                            "TypeContainsXPath": false,
+                            "DoNotCreateIfTypeIsEmpty": false,
+                            "Value": "N/A",
+                            "ValueContainsXPath": false,
+                            "DoNotCreateIfValueIsEmpty": true
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "Type": "CreateAttribute",
+                      "Description": "Create PatientInfo/DOB<Create attribute>",
+                      "Enabled": true,
+                      "Object": {
+                        "Root": "/*/PatientInfo",
+                        "SubAttributesToCreate": [
+                          {
+                            "Name": "DOB",
+                            "NameContainsXPath": false,
+                            "DoNotCreateIfNameIsEmpty": false,
+                            "TypeOfAttribute": "",
+                            "TypeContainsXPath": false,
+                            "DoNotCreateIfTypeIsEmpty": false,
+                            "Value": "../Document/Date[@Type='DOB']",
+                            "ValueContainsXPath": true,
+                            "DoNotCreateIfValueIsEmpty": true
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "Type": "CreateAttribute",
+                      "Description": "Create DocumentInfo<Create attribute>",
+                      "Enabled": true,
+                      "Object": {
+                        "Root": "/*",
+                        "SubAttributesToCreate": [
+                          {
+                            "Name": "DocumentInfo",
+                            "NameContainsXPath": false,
+                            "DoNotCreateIfNameIsEmpty": false,
+                            "TypeOfAttribute": "",
+                            "TypeContainsXPath": false,
+                            "DoNotCreateIfTypeIsEmpty": false,
+                            "Value": "N/A",
+                            "ValueContainsXPath": false,
+                            "DoNotCreateIfValueIsEmpty": false
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "Type": "CreateAttribute",
+                      "Description": "Create DocumentInfo/DocumentDate<Create attribute>",
+                      "Enabled": true,
+                      "Object": {
+                        "Root": "/*/DocumentInfo",
+                        "SubAttributesToCreate": [
+                          {
+                            "Name": "DocumentDate",
+                            "NameContainsXPath": false,
+                            "DoNotCreateIfNameIsEmpty": false,
+                            "TypeOfAttribute": "",
+                            "TypeContainsXPath": false,
+                            "DoNotCreateIfTypeIsEmpty": false,
+                            "Value": "../Document/Date[@Type='DocumentDate']",
+                            "ValueContainsXPath": true,
+                            "DoNotCreateIfValueIsEmpty": true
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "Type": "RunObjectOnAttributes",
+                      "Description": "If no Document/Date@DocumentDate, set type to NeedDocumentDate<Run object on attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "Document",
+                        "AttributeSelector": {
+                          "Type": "MultipleCriteriaSelector",
+                          "Object": {
+                            "Selectors": [
+                              {
+                                "Select": "NonMatching",
+                                "With": {
+                                  "Type": "QueryBasedAS",
+                                  "Description": "*{Date@DocumentDate}<Query attribute selector>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "QueryText": "*{Date@DocumentDate}"
+                                  }
+                                }
+                              }
+                            ],
+                            "CombineBy": "Chain"
+                          }
+                        },
+                        "UseAttributeSelector": true,
+                        "Type": "OutputHandler",
+                        "Object": {
+                          "Type": "ModifyAttributeValueOH",
+                          "Object": {
+                            "AttributeQuery": "*",
+                            "CreateSubAttribute": false,
+                            "AttributeName": "",
+                            "SetAttributeName": false,
+                            "AttributeType": "NeedDocumentDate",
+                            "SetAttributeType": true,
+                            "AttributeValue": "",
+                            "SetAttributeValue": false
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "Type": "RunObjectOnAttributes",
+                      "Description": "If no Document/Date@DOB, run findDOB<Run object on attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "Document",
+                        "AttributeSelector": {
+                          "Type": "MultipleCriteriaSelector",
+                          "Object": {
+                            "Selectors": [
+                              {
+                                "Select": "NonMatching",
+                                "With": {
+                                  "Type": "QueryBasedAS",
+                                  "Description": "*{Date@DOB}<Query attribute selector>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "QueryText": "*{Date@DOB}"
+                                  }
+                                }
+                              }
+                            ],
+                            "CombineBy": "Chain"
+                          }
+                        },
+                        "UseAttributeSelector": true,
+                        "Type": "Splitter",
+                        "Object": {
+                          "Type": "RSDSplitter",
+                          "Object": {
+                            "RSDFileName": "<RSDFileDir>\\PatientInfo\\findDOB.rsd.etf"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "Type": "CreateAttribute",
+                      "Description": "Create PatientInfo/DOB<Create attribute>",
+                      "Enabled": true,
+                      "Object": {
+                        "Root": "/*/PatientInfo",
+                        "SubAttributesToCreate": [
+                          {
+                            "Name": "DOB",
+                            "NameContainsXPath": false,
+                            "DoNotCreateIfNameIsEmpty": false,
+                            "TypeOfAttribute": "",
+                            "TypeContainsXPath": false,
+                            "DoNotCreateIfTypeIsEmpty": false,
+                            "Value": "../Document/DOB",
+                            "ValueContainsXPath": true,
+                            "DoNotCreateIfValueIsEmpty": true
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "Type": "RunObjectOnAttributes",
+                      "Description": "Run DocumentDate/main.rsd on Document@NeedDocumentDate<Run object on attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "Document@NeedDocumentDate",
+                        "AttributeSelector": {
+                          "Type": null,
+                          "Object": null
+                        },
+                        "UseAttributeSelector": false,
+                        "Type": "Splitter",
+                        "Object": {
+                          "Type": "RSDSplitter",
+                          "Object": {
+                            "RSDFileName": "<RSDFileDir>\\DocumentDate\\main.rsd.etf"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "Type": "CreateAttribute",
+                      "Description": "Create DocumentInfo/DocumentDate<Create attribute>",
+                      "Enabled": true,
+                      "Object": {
+                        "Root": "/*/DocumentInfo",
+                        "SubAttributesToCreate": [
+                          {
+                            "Name": "DocumentDate",
+                            "NameContainsXPath": false,
+                            "DoNotCreateIfNameIsEmpty": false,
+                            "TypeOfAttribute": "",
+                            "TypeContainsXPath": false,
+                            "DoNotCreateIfTypeIsEmpty": false,
+                            "Value": "../Document/DocumentDate",
+                            "ValueContainsXPath": true,
+                            "DoNotCreateIfValueIsEmpty": true
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Document<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "Document"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

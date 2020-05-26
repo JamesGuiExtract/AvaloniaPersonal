@@ -1,0 +1,1061 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 4,
+        "Name": "FLEX Index - Redaction (By Document)",
+        "ByPage": false,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "17.1.3.102",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Page",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "ABBM Applications",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\ABBM\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "CreateValue",
+                  "Object": {
+                    "ValueString": "ABBM Applications",
+                    "TypeString": ""
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Complaint",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\Complaint\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "CreateValue",
+                  "Object": {
+                    "ValueString": "Complaint",
+                    "TypeString": ""
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Early Voting Sheet",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\EarlyVotingSheet\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "CreateValue",
+                  "Object": {
+                    "ValueString": "Early Voting Sheet",
+                    "TypeString": ""
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Expense Sheet",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\ExpenseSheet\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "CreateValue",
+                  "Object": {
+                    "ValueString": "Expense Sheet",
+                    "TypeString": ""
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Military Forms",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\MilitaryForm\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "CreateValue",
+                  "Object": {
+                    "ValueString": "Military Forms",
+                    "TypeString": ""
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Poll Place Listing",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\PollPlaceListing\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "CreateValue",
+                  "Object": {
+                    "ValueString": "Poll Place Listing",
+                    "TypeString": ""
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Timesheets",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\TimeSheet\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "CreateValue",
+                  "Object": {
+                    "ValueString": "Timesheets",
+                    "TypeString": ""
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "HCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "ABBM Applications",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\ABBM\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [],
+                    "RSDFileName": "<RSDFileDir>\\ABBM\\main.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "create subatt with data type<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": true,
+                      "AttributeName": "%.Name%",
+                      "SetAttributeName": true,
+                      "AttributeType": "%.Name%",
+                      "SetAttributeType": true,
+                      "AttributeValue": "%Value%",
+                      "SetAttributeValue": true
+                    }
+                  },
+                  {
+                    "Type": "MoveAndModifyAttributes",
+                    "Description": "move up */* and use both types<Move and modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AddAttributeNameToType": false,
+                      "AddRootOrParentAttributeType": true,
+                      "AddSpecifiedAttributeType": false,
+                      "AttributeQuery": "*/*",
+                      "DeleteRootOrParentIfAllChildrenMoved": true,
+                      "MoveAttributeLevel": "MoveToParent",
+                      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                      "RetainAttributeType": true,
+                      "SpecifiedAttributeName": "",
+                      "SpecifiedAttributeType": ""
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Complaint",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\Complaint\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [],
+                    "RSDFileName": "<RSDFileDir>\\Complaint\\main.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "create subatt with data type<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": true,
+                      "AttributeName": "%.Name%",
+                      "SetAttributeName": true,
+                      "AttributeType": "%.Name%",
+                      "SetAttributeType": true,
+                      "AttributeValue": "%Value%",
+                      "SetAttributeValue": true
+                    }
+                  },
+                  {
+                    "Type": "MoveAndModifyAttributes",
+                    "Description": "move up */* and use both types<Move and modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AddAttributeNameToType": false,
+                      "AddRootOrParentAttributeType": true,
+                      "AddSpecifiedAttributeType": false,
+                      "AttributeQuery": "*/*",
+                      "DeleteRootOrParentIfAllChildrenMoved": true,
+                      "MoveAttributeLevel": "MoveToParent",
+                      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                      "RetainAttributeType": true,
+                      "SpecifiedAttributeName": "",
+                      "SpecifiedAttributeType": ""
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Expense Sheet",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\ExpenseSheet\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [],
+                    "RSDFileName": "<RSDFileDir>\\ExpenseSheet\\main.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "create subatt with data type<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": true,
+                      "AttributeName": "%.Name%",
+                      "SetAttributeName": true,
+                      "AttributeType": "%.Name%",
+                      "SetAttributeType": true,
+                      "AttributeValue": "%Value%",
+                      "SetAttributeValue": true
+                    }
+                  },
+                  {
+                    "Type": "MoveAndModifyAttributes",
+                    "Description": "move up */* and use both types<Move and modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AddAttributeNameToType": false,
+                      "AddRootOrParentAttributeType": true,
+                      "AddSpecifiedAttributeType": false,
+                      "AttributeQuery": "*/*",
+                      "DeleteRootOrParentIfAllChildrenMoved": true,
+                      "MoveAttributeLevel": "MoveToParent",
+                      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                      "RetainAttributeType": true,
+                      "SpecifiedAttributeName": "",
+                      "SpecifiedAttributeType": ""
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Military Forms",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\MilitaryForm\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [],
+                    "RSDFileName": "<RSDFileDir>\\MilitaryForm\\main.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "create subatt with data type<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": true,
+                      "AttributeName": "%.Name%",
+                      "SetAttributeName": true,
+                      "AttributeType": "%.Name%",
+                      "SetAttributeType": true,
+                      "AttributeValue": "%Value%",
+                      "SetAttributeValue": true
+                    }
+                  },
+                  {
+                    "Type": "MoveAndModifyAttributes",
+                    "Description": "move up */* and use both types<Move and modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AddAttributeNameToType": false,
+                      "AddRootOrParentAttributeType": true,
+                      "AddSpecifiedAttributeType": false,
+                      "AttributeQuery": "*/*",
+                      "DeleteRootOrParentIfAllChildrenMoved": true,
+                      "MoveAttributeLevel": "MoveToParent",
+                      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                      "RetainAttributeType": true,
+                      "SpecifiedAttributeName": "",
+                      "SpecifiedAttributeType": ""
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Early Voting Sheet",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\EarlyVotingSheet\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [],
+                    "RSDFileName": "<RSDFileDir>\\EarlyVotingSheet\\main.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "create subatt with data type<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": true,
+                      "AttributeName": "%.Name%",
+                      "SetAttributeName": true,
+                      "AttributeType": "%.Name%",
+                      "SetAttributeType": true,
+                      "AttributeValue": "%Value%",
+                      "SetAttributeValue": true
+                    }
+                  },
+                  {
+                    "Type": "MoveAndModifyAttributes",
+                    "Description": "move up */* and use both types<Move and modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AddAttributeNameToType": false,
+                      "AddRootOrParentAttributeType": true,
+                      "AddSpecifiedAttributeType": false,
+                      "AttributeQuery": "*/*",
+                      "DeleteRootOrParentIfAllChildrenMoved": true,
+                      "MoveAttributeLevel": "MoveToParent",
+                      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                      "RetainAttributeType": true,
+                      "SpecifiedAttributeName": "",
+                      "SpecifiedAttributeType": ""
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Poll Place Listing",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\PollPlaceListing\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [],
+                    "RSDFileName": "<RSDFileDir>\\PollPlaceListing\\main.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "create subatt with data type<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": true,
+                      "AttributeName": "%.Name%",
+                      "SetAttributeName": true,
+                      "AttributeType": "%.Name%",
+                      "SetAttributeType": true,
+                      "AttributeValue": "%Value%",
+                      "SetAttributeValue": true
+                    }
+                  },
+                  {
+                    "Type": "MoveAndModifyAttributes",
+                    "Description": "move up */* and use both types<Move and modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AddAttributeNameToType": false,
+                      "AddRootOrParentAttributeType": true,
+                      "AddSpecifiedAttributeType": false,
+                      "AttributeQuery": "*/*",
+                      "DeleteRootOrParentIfAllChildrenMoved": true,
+                      "MoveAttributeLevel": "MoveToParent",
+                      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                      "RetainAttributeType": true,
+                      "SpecifiedAttributeName": "",
+                      "SpecifiedAttributeType": ""
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Timesheets",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "RSDFileCondition",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\TimeSheet\\is.rsd.etf"
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "FindFromRSD",
+                  "Object": {
+                    "AttributeNames": [],
+                    "RSDFileName": "<RSDFileDir>\\TimeSheet\\main.rsd.etf"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "create subatt with data type<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": true,
+                      "AttributeName": "%.Name%",
+                      "SetAttributeName": true,
+                      "AttributeType": "%.Name%",
+                      "SetAttributeType": true,
+                      "AttributeValue": "%Value%",
+                      "SetAttributeValue": true
+                    }
+                  },
+                  {
+                    "Type": "MoveAndModifyAttributes",
+                    "Description": "move up */* and use both types<Move and modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AddAttributeNameToType": false,
+                      "AddRootOrParentAttributeType": true,
+                      "AddSpecifiedAttributeType": false,
+                      "AttributeQuery": "*/*",
+                      "DeleteRootOrParentIfAllChildrenMoved": true,
+                      "MoveAttributeLevel": "MoveToParent",
+                      "OverwriteAttributeName": "OverwriteWithRootOrParentName",
+                      "RetainAttributeType": true,
+                      "SpecifiedAttributeName": "",
+                      "SpecifiedAttributeType": ""
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "email, general",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?xn)\r\n(?'name'[\\w%.+-]{1,60})\r\n(?:@|\\%40)\r\n(?:[\\w.-]+\\.)+\r\n[A-Z]{2,4}(?=[\\W_]|\\z)\r\n",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "Email"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                },
+                {
+                  "Type": "RegExprRule",
+                  "Description": "exclude dallascounty.org, etc.<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "\\A\r\n(?![\\s\\S]*\r\n  (\r\n    (?~<>dallascounty\\.org)\r\n  |\r\n    fvap\\.gov\r\n  )\r\n)\r\n[\\s\\S]+\r\n",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MergeAttributes",
+            "Description": "<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData",
+              "CreateMergedRegion": false,
+              "NameMergeMode": "PreserveField",
+              "NameMergePriority": [
+                "[\\s\\S]+"
+              ],
+              "OverlapPercent": 75.0,
+              "PreserveAsSubAttributes": false,
+              "PreserveType": true,
+              "SpecifiedName": "",
+              "SpecifiedType": "",
+              "SpecifiedValue": "000-00-0000",
+              "TreatNameListAsRegex": true,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": false,
+              "TypeMergeMode": "SelectField",
+              "TypeMergePriority": [
+                "Phone",
+                "Email",
+                "DOB",
+                "SSN",
+                "DLN",
+                "ID",
+                "Name",
+                "Stamp",
+                "Reasons"
+              ],
+              "ValueMergeMode": "SelectField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "eliminate dupe Doctypes<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "DocumentType",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "EliminateDuplicates",
+                "Object": "EliminateDuplicates"
+              }
+            }
+          },
+          {
+            "Type": "SpatiallySortAttributes",
+            "Description": "<Spatially sort attributes>",
+            "Enabled": true,
+            "Object": "SpatiallySortAttributes"
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

@@ -1,0 +1,349 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "Output VOAs<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "*off - moved to ReportDate* Adjust formatting of date to match what's in the EAVs<Run object on attributes>",
+            "Enabled": false,
+            "Object": {
+              "AttributeQuery": "_/ReportDate",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "ReplaceStrings",
+                "Object": {
+                  "Replacements": [
+                    {
+                      "Pattern": "January ",
+                      "Replacement": "01/"
+                    },
+                    {
+                      "Pattern": "February ",
+                      "Replacement": "02/"
+                    },
+                    {
+                      "Pattern": "March",
+                      "Replacement": "03/"
+                    },
+                    {
+                      "Pattern": "April ",
+                      "Replacement": "04/"
+                    },
+                    {
+                      "Pattern": "May ",
+                      "Replacement": "05/"
+                    },
+                    {
+                      "Pattern": "June ",
+                      "Replacement": "06/"
+                    },
+                    {
+                      "Pattern": "July ",
+                      "Replacement": "07/"
+                    },
+                    {
+                      "Pattern": "August ",
+                      "Replacement": "08/"
+                    },
+                    {
+                      "Pattern": "September ",
+                      "Replacement": "09/"
+                    },
+                    {
+                      "Pattern": "October ",
+                      "Replacement": "10/"
+                    },
+                    {
+                      "Pattern": "November ",
+                      "Replacement": "11/"
+                    },
+                    {
+                      "Pattern": "December ",
+                      "Replacement": "12/"
+                    },
+                    {
+                      "Pattern": "\\x20?(\\d{2}),\\x20?",
+                      "Replacement": "$1/"
+                    },
+                    {
+                      "Pattern": "\\x20?\\b(\\d),\\x20?",
+                      "Replacement": "0$1/"
+                    }
+                  ],
+                  "AsRegularExpr": true,
+                  "IsCaseSensitive": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Force all caps for PropertyAddress subattrs<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/PropertyAddress/*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "ChangeCase",
+                "Object": {
+                  "CaseType": "MakeUpperCase"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Remove Dashes on ClaimNumbers, since this was done for some reason by the indexer<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/ClaimNumber",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "AdvancedReplaceString",
+                "Object": {
+                  "StrToBeReplaced": "-",
+                  "AsRegularExpression": false,
+                  "IsCaseSensitive": false,
+                  "Replacement": "",
+                  "ReplacementOccurrenceType": "All",
+                  "SpecifiedOccurrence": 0
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "*off - handling in Siding.rsd* Add word \"SIDING\" to end of SidingType that doesn't end with it already<Run object on attributes>",
+            "Enabled": false,
+            "Object": {
+              "AttributeQuery": "*/SidingType",
+              "AttributeSelector": {
+                "Type": "ValueConditionSelector",
+                "Object": {
+                  "Condition": {
+                    "Type": "FindingRuleCondition",
+                    "Object": {
+                      "AFRule": {
+                        "Type": "RegExprRule",
+                        "Object": {
+                          "IsRegExpFromFile": false,
+                          "RegExpFileName": "",
+                          "Pattern": "[\\S\\s]+(?<!Siding)$",
+                          "IsCaseSensitive": false,
+                          "FirstMatchOnly": false,
+                          "CreateSubAttributesFromNamedMatches": false,
+                          "OnlyCreateOneSubAttributePerGroup": false
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "UseAttributeSelector": true,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "AdvancedReplaceString",
+                "Object": {
+                  "StrToBeReplaced": "([\\s\\S]+)",
+                  "AsRegularExpression": true,
+                  "IsCaseSensitive": false,
+                  "Replacement": "$1 SIDING",
+                  "ReplacementOccurrenceType": "All",
+                  "SpecifiedOccurrence": 0
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Output ReportDate<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_/ReportDate",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "OutputToVOA",
+                "Object": {
+                  "FileName": "<SourceDocName>.ReportDate.voa"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Output ClaimNumber<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_/ClaimNumber",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "OutputToVOA",
+                "Object": {
+                  "FileName": "<SourceDocName>.ClaimNumber.voa"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Output PropertyAddress<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_/PropertyAddress",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "OutputToVOA",
+                "Object": {
+                  "FileName": "<SourceDocName>.PropertyAddress.voa"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Output ShingleType<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_/ShingleType",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "OutputToVOA",
+                "Object": {
+                  "FileName": "<SourceDocName>.ShingleType.voa"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Output SidingType<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_/SidingType",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "OutputToVOA",
+                "Object": {
+                  "FileName": "<SourceDocName>.SidingType.voa"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

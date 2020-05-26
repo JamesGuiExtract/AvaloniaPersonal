@@ -1,0 +1,1046 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 3,
+        "Name": "FLEX Index - Redaction (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "17.1.0.22",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Page",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "SetDocumentTags",
+      "Description": "<Set document tags>",
+      "Enabled": true,
+      "Object": {
+        "SetStringTag": {
+          "TagName": "DocProbability",
+          "Generator": "Literal",
+          "SpecifiedValue": "2",
+          "ValuesFromTag": "",
+          "AttributeSelector": {
+            "Type": null,
+            "Object": null
+          },
+          "Delimiter": ";"
+        },
+        "SetObjectTag": {
+          "TagName": "DocType",
+          "Generator": "FromAttributes",
+          "SpecifiedValue": "",
+          "AttributeSelector": {
+            "Type": "QueryBasedAS",
+            "Object": {
+              "QueryText": "DocumentType"
+            }
+          }
+        },
+        "NoTagsIfEmpty": false,
+        "GenerateSourceAttributesWithRSDFile": true,
+        "SourceAttributeRSDFile": "<RSDFileDir>\\LearningMachines\\Classifier.rsd.etf"
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "DocYearNN": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Create value",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<SourceDocName.FileName>",
+                "TypeString": "Feature"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "RegExprRule",
+                  "Description": "Limit to first four chars<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "\\A.{4}",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": false
+                  }
+                },
+                {
+                  "Type": "AdvancedReplaceString",
+                  "Description": "Prefix with _ so that feature is not numeric<Advanced replace string>",
+                  "Enabled": true,
+                  "Object": {
+                    "StrToBeReplaced": ".*",
+                    "AsRegularExpression": true,
+                    "IsCaseSensitive": false,
+                    "Replacement": "_$0",
+                    "ReplacementOccurrenceType": "All",
+                    "SpecifiedOccurrence": 0
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "DocumentCC": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find from RSD file",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<RSDFileDir>\\Utils\\CC.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Create value",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<DocType>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      },
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": "RSDSplitter",
+          "Description": "<RSDFileDir>\\Finders\\main.rsd.etf<Split attributes using RSD file>",
+          "Enabled": true,
+          "Object": {
+            "RSDFileName": "<RSDFileDir>\\Finders\\main.rsd.etf"
+          }
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "Run rules, output VOA<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote */* to top<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "_/*",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Name _ TaxID<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_",
+              "CreateSubAttribute": false,
+              "AttributeName": "TaxID",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Find TaxID data<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "TaxID",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\Finders\\TaxID.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Make features before merging/removing blanks<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "RulesFoundDataCountNN",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "concat('_', count(HCData|MCData|LCData))",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                },
+                {
+                  "Name": "HCDataCountNN",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "concat('_', count(HCData))",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                },
+                {
+                  "Name": "MCDataCountNN",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "concat('_', count(MCData))",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                },
+                {
+                  "Name": "LCDataCountNN",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "concat('_', count(LCData))",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                },
+                {
+                  "Name": "RulesFoundCluesNN",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "concat('_', count(Clues))",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                },
+                {
+                  "Name": "AltRulesFoundDataCount",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "count(TaxID/HCData|TaxID/MCData|TaxID/LCData)",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                },
+                {
+                  "Name": "AltRulesFoundDataCountNN",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "concat('_', count(TaxID/HCData|TaxID/MCData|TaxID/LCData))",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                },
+                {
+                  "Name": "AltRulesFoundCluesNN",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "concat('_', count(TaxID/Clues))",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                },
+                {
+                  "Name": "DocumentTypeNotFaked",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "DocumentType",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove TaxID<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "TaxID"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Remove some Clues<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove clues to the left of HCData or *@Blank<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "SpatialProximityAS",
+                      "Object": {
+                        "TargetQuery": "Clues",
+                        "TargetsMustContainReferences": false,
+                        "RequireCompleteInclusion": false,
+                        "ReferenceQuery": "HCData|*@Blank",
+                        "Left": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Left",
+                          "ExpandDirection": "ExpandLeft",
+                          "ExpandBy": 40.0,
+                          "ExpandUnits": "Characters"
+                        },
+                        "Top": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandUp",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Right": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Left",
+                          "ExpandDirection": "ExpandRight",
+                          "ExpandBy": 5.0,
+                          "ExpandUnits": "Characters"
+                        },
+                        "Bottom": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Bottom",
+                          "ExpandDirection": "ExpandDown",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "CompareLinesSeparately": true,
+                        "IncludeDebugAttributes": false
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove clues above HCData or *@Blank<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "SpatialProximityAS",
+                      "Object": {
+                        "TargetQuery": "Clues",
+                        "TargetsMustContainReferences": false,
+                        "RequireCompleteInclusion": false,
+                        "ReferenceQuery": "HCData|*@Blank",
+                        "Left": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Left",
+                          "ExpandDirection": "ExpandLeft",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Characters"
+                        },
+                        "Top": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandUp",
+                          "ExpandBy": 1.0,
+                          "ExpandUnits": "Lines"
+                        },
+                        "Right": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Right",
+                          "ExpandDirection": "ExpandRight",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Characters"
+                        },
+                        "Bottom": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Bottom",
+                          "ExpandDirection": "ExpandDown",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "CompareLinesSeparately": true,
+                        "IncludeDebugAttributes": false
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove Blanks<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*@Blank"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Merge duplicates<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Get subattribute hasnewline or nonewline<Run object on query>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "HCData|MCData|LCData",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": false,
+                        "RegExpFileName": "",
+                        "Pattern": "(?n)\r\n  (?'hasnewline'\r\n    [^\\n]*\\n[\\S\\s]+\r\n  )\r\n| (?'nonewline'\r\n    [\\S\\s]+\r\n  )",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": false,
+                        "CreateSubAttributesFromNamedMatches": true,
+                        "OnlyCreateOneSubAttributePerGroup": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "MergeAttributes",
+                  "Description": "Merge duplicate attrr with newlines (preserve subattrr)<Merge attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "HCData{hasnewline}|MCData{hasnewline}|LCData{hasnewline}",
+                    "CreateMergedRegion": true,
+                    "NameMergeMode": "PreserveField",
+                    "NameMergePriority": [
+                      "HCData",
+                      "MCData",
+                      "LCData"
+                    ],
+                    "OverlapPercent": 80.0,
+                    "PreserveAsSubAttributes": true,
+                    "PreserveType": false,
+                    "SpecifiedName": "",
+                    "SpecifiedType": "",
+                    "SpecifiedValue": "000-00",
+                    "TreatNameListAsRegex": false,
+                    "TreatTypeListAsRegex": false,
+                    "TreatValueListAsRegex": true,
+                    "TypeFromName": false,
+                    "TypeMergeMode": "CombineField",
+                    "TypeMergePriority": [],
+                    "ValueMergeMode": "SpecifyField",
+                    "ValueMergePriority": []
+                  }
+                },
+                {
+                  "Type": "MergeAttributes",
+                  "Description": "Merge duplicate attrr with no newlines [K:\\Common\\Engineering\\Sample Files\\TriMin\\WI - Always Nine\\Set001\\Images\\Taylor__County_DTSXROD1_262382__001.tif]<Merge attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "HCData{nonewline}|MCData{nonewline}|LCData{nonewline}",
+                    "CreateMergedRegion": true,
+                    "NameMergeMode": "PreserveField",
+                    "NameMergePriority": [
+                      "HCData",
+                      "MCData",
+                      "LCData"
+                    ],
+                    "OverlapPercent": 10.0,
+                    "PreserveAsSubAttributes": false,
+                    "PreserveType": false,
+                    "SpecifiedName": "",
+                    "SpecifiedType": "",
+                    "SpecifiedValue": "000-00",
+                    "TreatNameListAsRegex": false,
+                    "TreatTypeListAsRegex": false,
+                    "TreatValueListAsRegex": true,
+                    "TypeFromName": false,
+                    "TypeMergeMode": "CombineField",
+                    "TypeMergePriority": [],
+                    "ValueMergeMode": "SelectField",
+                    "ValueMergePriority": []
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set value of HCData{HCData} to %HCData%<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "HCData{HCData}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%HCData%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove HCData/*<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "HCData/*"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set value of MCData{MCData} to %MCData%<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "MCData{MCData}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%MCData%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove MCData/*<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "MCData/*"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set value of LCData{LCData} to %LCData%<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "LCData{LCData}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%LCData%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove LCData/*<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "LCData/*"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set type of SSN to SSN (in case multiple types)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*@SSN",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "SSN",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "MergeAttributes",
+            "Description": "merge duplicate Clues<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Clues",
+              "CreateMergedRegion": false,
+              "NameMergeMode": "PreserveField",
+              "NameMergePriority": [
+                "Clues"
+              ],
+              "OverlapPercent": 75.0,
+              "PreserveAsSubAttributes": false,
+              "PreserveType": false,
+              "SpecifiedName": "",
+              "SpecifiedType": "",
+              "SpecifiedValue": "000-00-0000",
+              "TreatNameListAsRegex": false,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": true,
+              "TypeMergeMode": "SelectField",
+              "TypeMergePriority": [],
+              "ValueMergeMode": "SelectField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove */*<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "DocumentCC"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*/*"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Make addl count of data feature after merging/removing blanks<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "RulesFoundDataCountAfterMergeNN",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "Feature",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "concat('_', count(HCData|MCData|LCData))",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Temporarily set DocumentType type to Feature differentiate<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "DocumentType",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "Feature",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "*off* _DEBUG_ Output VOA<Output data to VOA file>",
+            "Enabled": false,
+            "Object": {
+              "FileName": "<SourceDocName>.debug.features.voa"
+            }
+          },
+          {
+            "Type": "LearningMachineOutputHandler",
+            "Description": "Run NeedsVerification.lm<Learning machine output handler>",
+            "Enabled": true,
+            "Object": {
+              "SavedMachinePath": "<RSDFileDir>\\LearningMachines\\NeedsVerification.lm",
+              "PreserveInputAttributes": true
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Set DocumentType@ to Special if value is NeedsVerification or Unknown<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "DocumentType@",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "TranslateValue",
+                "Object": {
+                  "TranslateFieldType": "Value",
+                  "TranslationStringPairs": [
+                    {
+                      "From": "NeedsVerification",
+                      "To": "Special"
+                    },
+                    {
+                      "From": "Unknown",
+                      "To": "Special"
+                    }
+                  ],
+                  "IsCaseSensitive": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Clear type of DocumentType@Feature<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "DocumentType@Feature",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove *@Feature<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*@Feature"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

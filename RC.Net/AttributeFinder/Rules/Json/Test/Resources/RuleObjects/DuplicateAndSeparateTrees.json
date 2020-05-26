@@ -1,0 +1,1628 @@
+[
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Location"
+        }
+      },
+      "DividingAttributeName": "Lot",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*{Page}"
+        }
+      },
+      "DividingAttributeName": "Page",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "_",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Address"
+        }
+      },
+      "DividingAttributeName": "Address",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LegalDescription/Location"
+        }
+      },
+      "DividingAttributeName": "Section",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "Component",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Page"
+        }
+      },
+      "DividingAttributeName": "temp",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LegalDescription"
+        }
+      },
+      "DividingAttributeName": "QQ",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "Lot",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/wc"
+        }
+      },
+      "DividingAttributeName": "Person",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "_"
+        }
+      },
+      "DividingAttributeName": "number",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/*"
+        }
+      },
+      "DividingAttributeName": "V",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Title"
+        }
+      },
+      "DividingAttributeName": "DocType",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "Address",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Party"
+        }
+      },
+      "DividingAttributeName": "Person",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LegalDescription/Location"
+        }
+      },
+      "DividingAttributeName": "Lot",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "Location",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "AllPages"
+        }
+      },
+      "DividingAttributeName": "_",
+      "OutputHandler": {
+        "Type": "OutputHandlerSequence",
+        "Object": {
+          "ObjectsVector": [
+            {
+              "Type": "MoveAndModifyAttributes",
+              "Description": "Promote */*/* one level<Move and modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AddAttributeNameToType": false,
+                "AddRootOrParentAttributeType": false,
+                "AddSpecifiedAttributeType": false,
+                "AttributeQuery": "*/*/*",
+                "DeleteRootOrParentIfAllChildrenMoved": true,
+                "MoveAttributeLevel": "MoveToParent",
+                "OverwriteAttributeName": "DoNotOverwrite",
+                "RetainAttributeType": true,
+                "SpecifiedAttributeName": "",
+                "SpecifiedAttributeType": ""
+              }
+            },
+            {
+              "Type": "DuplicateAndSeparateTrees",
+              "Description": "Duplicate on TestGroup and process<Duplicate and separate attribute trees>",
+              "Enabled": true,
+              "Object": {
+                "AttributeSelector": {
+                  "Type": "QueryBasedAS",
+                  "Object": {
+                    "QueryText": "*"
+                  }
+                },
+                "DividingAttributeName": "TestGroup",
+                "OutputHandler": {
+                  "Type": "OutputHandlerSequence",
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Eliminate extra headers and dates<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "*",
+                          "AttributeSelector": {
+                            "Type": null,
+                            "Object": null
+                          },
+                          "UseAttributeSelector": false,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\eliminateExtraHeadersAndDates.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "OutputHandlerSequence",
+                        "Description": "Remove test groups that are really NCEP guidelines [K:\\Common\\Engineering\\SecureSamples\\WI-UW Clinics\\Set002\\Images\\AR-M355N_20150225_141742.pdf.tif]<Select multiple output handlers>",
+                        "Enabled": true,
+                        "Object": {
+                          "ObjectsVector": [
+                            {
+                              "Type": "RunObjectOnAttributes",
+                              "Description": "Make FirstNCEP subattribute of first NCEP GUIDELINES header<Run object on attributes>",
+                              "Enabled": true,
+                              "Object": {
+                                "AttributeQuery": "*/NCEP",
+                                "AttributeSelector": {
+                                  "Type": null,
+                                  "Object": null
+                                },
+                                "UseAttributeSelector": false,
+                                "Type": "OutputHandler",
+                                "Object": {
+                                  "Type": "OutputHandlerSequence",
+                                  "Object": {
+                                    "ObjectsVector": [
+                                      {
+                                        "Type": "EliminateDuplicates",
+                                        "Description": "<Eliminate duplicates>",
+                                        "Enabled": true,
+                                        "Object": "EliminateDuplicates"
+                                      },
+                                      {
+                                        "Type": "ModifyAttributeValueOH",
+                                        "Description": "Make FirstNCEP subattribute<Modify attributes>",
+                                        "Enabled": true,
+                                        "Object": {
+                                          "AttributeQuery": "*",
+                                          "CreateSubAttribute": true,
+                                          "AttributeName": "FirstNCEP",
+                                          "SetAttributeName": true,
+                                          "AttributeType": "",
+                                          "SetAttributeType": false,
+                                          "AttributeValue": "%Value%",
+                                          "SetAttributeValue": true
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            },
+                            {
+                              "Type": "MoveAndModifyAttributes",
+                              "Description": "Promote */NCEP/FirstNCEP one level<Move and modify attributes>",
+                              "Enabled": true,
+                              "Object": {
+                                "AddAttributeNameToType": false,
+                                "AddRootOrParentAttributeType": false,
+                                "AddSpecifiedAttributeType": false,
+                                "AttributeQuery": "*/NCEP/FirstNCEP",
+                                "DeleteRootOrParentIfAllChildrenMoved": false,
+                                "MoveAttributeLevel": "MoveToParent",
+                                "OverwriteAttributeName": "DoNotOverwrite",
+                                "RetainAttributeType": true,
+                                "SpecifiedAttributeName": "",
+                                "SpecifiedAttributeType": ""
+                              }
+                            },
+                            {
+                              "Type": "RemoveSubAttributes",
+                              "Description": "Remove */NCEP if it overlaps */FirstNCEP<Remove attributes>",
+                              "Enabled": true,
+                              "Object": {
+                                "AttributeSelector": {
+                                  "Type": "SpatialProximityAS",
+                                  "Object": {
+                                    "TargetQuery": "*/NCEP",
+                                    "TargetsMustContainReferences": false,
+                                    "RequireCompleteInclusion": false,
+                                    "ReferenceQuery": "*/FirstNCEP",
+                                    "Left": {
+                                      "Anchor": "ReferenceAttribute",
+                                      "AnchorSide": "Left",
+                                      "ExpandDirection": "ExpandLeft",
+                                      "ExpandBy": 0.0,
+                                      "ExpandUnits": "Inches"
+                                    },
+                                    "Top": {
+                                      "Anchor": "ReferenceAttribute",
+                                      "AnchorSide": "Top",
+                                      "ExpandDirection": "ExpandUp",
+                                      "ExpandBy": 0.0,
+                                      "ExpandUnits": "Inches"
+                                    },
+                                    "Right": {
+                                      "Anchor": "ReferenceAttribute",
+                                      "AnchorSide": "Right",
+                                      "ExpandDirection": "ExpandRight",
+                                      "ExpandBy": 0.0,
+                                      "ExpandUnits": "Inches"
+                                    },
+                                    "Bottom": {
+                                      "Anchor": "ReferenceAttribute",
+                                      "AnchorSide": "Bottom",
+                                      "ExpandDirection": "ExpandDown",
+                                      "ExpandBy": 0.0,
+                                      "ExpandUnits": "Inches"
+                                    },
+                                    "CompareLinesSeparately": true,
+                                    "IncludeDebugAttributes": false
+                                  }
+                                },
+                                "ConditionalRemove": false,
+                                "DataScorer": {
+                                  "Type": null,
+                                  "Description": "",
+                                  "Enabled": true,
+                                  "Object": null
+                                },
+                                "ScoreCondition": "EQ",
+                                "CompareConditionType": "ValueOf",
+                                "ScoreToCompare": 0
+                              }
+                            },
+                            {
+                              "Type": "RemoveSubAttributes",
+                              "Description": "Remove *{NCEP}|*{FirstNCEP}<Remove attributes>",
+                              "Enabled": true,
+                              "Object": {
+                                "AttributeSelector": {
+                                  "Type": "QueryBasedAS",
+                                  "Object": {
+                                    "QueryText": "*{NCEP}|*{FirstNCEP}"
+                                  }
+                                },
+                                "ConditionalRemove": false,
+                                "DataScorer": {
+                                  "Type": null,
+                                  "Description": "",
+                                  "Enabled": true,
+                                  "Object": null
+                                },
+                                "ScoreCondition": "EQ",
+                                "CompareConditionType": "ValueOf",
+                                "ScoreToCompare": 0
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "splitTestGroup.rsd<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "*/TestGroup",
+                          "AttributeSelector": {
+                            "Type": null,
+                            "Object": null
+                          },
+                          "UseAttributeSelector": false,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\splitTestGroup.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "MoveAndModifyAttributes",
+                        "Description": "Promote */TestGroup/*<Move and modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AddAttributeNameToType": false,
+                          "AddRootOrParentAttributeType": false,
+                          "AddSpecifiedAttributeType": false,
+                          "AttributeQuery": "*/TestGroup/*",
+                          "DeleteRootOrParentIfAllChildrenMoved": true,
+                          "MoveAttributeLevel": "MoveToParent",
+                          "OverwriteAttributeName": "DoNotOverwrite",
+                          "RetainAttributeType": true,
+                          "SpecifiedAttributeName": "",
+                          "SpecifiedAttributeType": ""
+                        }
+                      },
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Process tests<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "*",
+                          "AttributeSelector": {
+                            "Type": null,
+                            "Object": null
+                          },
+                          "UseAttributeSelector": false,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\processTests.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "ModifyAttributeValueOH",
+                        "Description": "Clear top-level value<Modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "*",
+                          "CreateSubAttribute": false,
+                          "AttributeName": "",
+                          "SetAttributeName": false,
+                          "AttributeType": "",
+                          "SetAttributeType": false,
+                          "AttributeValue": "",
+                          "SetAttributeValue": true
+                        }
+                      },
+                      {
+                        "Type": "ModifyAttributeValueOH",
+                        "Description": "Set top-level value to N/A<Modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "*",
+                          "CreateSubAttribute": false,
+                          "AttributeName": "",
+                          "SetAttributeName": false,
+                          "AttributeType": "",
+                          "SetAttributeType": false,
+                          "AttributeValue": "N/A",
+                          "SetAttributeValue": true
+                        }
+                      }
+                    ]
+                  }
+                },
+                "RunOutputHandler": true
+              }
+            }
+          ]
+        }
+      },
+      "RunOutputHandler": true
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LegalDescription"
+        }
+      },
+      "DividingAttributeName": "Unit",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*@Split"
+        }
+      },
+      "DividingAttributeName": "Person",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "Grantee",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "_"
+        }
+      },
+      "DividingAttributeName": "_",
+      "OutputHandler": {
+        "Type": "ModifyAttributeValueOH",
+        "Object": {
+          "AttributeQuery": "*",
+          "CreateSubAttribute": false,
+          "AttributeName": "%*.Type%",
+          "SetAttributeName": true,
+          "AttributeType": "",
+          "SetAttributeType": false,
+          "AttributeValue": "",
+          "SetAttributeValue": false
+        }
+      },
+      "RunOutputHandler": true
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Clues"
+        }
+      },
+      "DividingAttributeName": "_",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "Person",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Top"
+        }
+      },
+      "DividingAttributeName": "item",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/_"
+        }
+      },
+      "DividingAttributeName": "Page",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LegalDescription"
+        }
+      },
+      "DividingAttributeName": "Lot",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "DocType"
+        }
+      },
+      "DividingAttributeName": "DocType",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Trust"
+        }
+      },
+      "DividingAttributeName": "Person",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*{Title}"
+        }
+      },
+      "DividingAttributeName": "Title",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "Test",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "TestGroup",
+      "OutputHandler": {
+        "Type": "OutputHandlerSequence",
+        "Object": {
+          "ObjectsVector": [
+            {
+              "Type": "RunObjectOnAttributes",
+              "Description": "Eliminate extra headers and dates<Run object on attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "UseAttributeSelector": false,
+                "Type": "Splitter",
+                "Object": {
+                  "Type": "RSDSplitter",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\eliminateExtraHeadersAndDates.rsd.etf"
+                  }
+                }
+              }
+            },
+            {
+              "Type": "OutputHandlerSequence",
+              "Description": "Remove test groups that are really NCEP guidelines [K:\\Common\\Engineering\\SecureSamples\\WI-UW Clinics\\Set002\\Images\\AR-M355N_20150225_141742.pdf.tif]<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "RunObjectOnAttributes",
+                    "Description": "Make FirstNCEP subattribute of first NCEP GUIDELINES header<Run object on attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*/NCEP",
+                      "AttributeSelector": {
+                        "Type": null,
+                        "Object": null
+                      },
+                      "UseAttributeSelector": false,
+                      "Type": "OutputHandler",
+                      "Object": {
+                        "Type": "OutputHandlerSequence",
+                        "Object": {
+                          "ObjectsVector": [
+                            {
+                              "Type": "EliminateDuplicates",
+                              "Description": "<Eliminate duplicates>",
+                              "Enabled": true,
+                              "Object": "EliminateDuplicates"
+                            },
+                            {
+                              "Type": "ModifyAttributeValueOH",
+                              "Description": "Make FirstNCEP subattribute<Modify attributes>",
+                              "Enabled": true,
+                              "Object": {
+                                "AttributeQuery": "*",
+                                "CreateSubAttribute": true,
+                                "AttributeName": "FirstNCEP",
+                                "SetAttributeName": true,
+                                "AttributeType": "",
+                                "SetAttributeType": false,
+                                "AttributeValue": "%Value%",
+                                "SetAttributeValue": true
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "Type": "MoveAndModifyAttributes",
+                    "Description": "Promote */NCEP/FirstNCEP one level<Move and modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AddAttributeNameToType": false,
+                      "AddRootOrParentAttributeType": false,
+                      "AddSpecifiedAttributeType": false,
+                      "AttributeQuery": "*/NCEP/FirstNCEP",
+                      "DeleteRootOrParentIfAllChildrenMoved": false,
+                      "MoveAttributeLevel": "MoveToParent",
+                      "OverwriteAttributeName": "DoNotOverwrite",
+                      "RetainAttributeType": true,
+                      "SpecifiedAttributeName": "",
+                      "SpecifiedAttributeType": ""
+                    }
+                  },
+                  {
+                    "Type": "RemoveSubAttributes",
+                    "Description": "Remove */NCEP if it overlaps */FirstNCEP<Remove attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeSelector": {
+                        "Type": "SpatialProximityAS",
+                        "Object": {
+                          "TargetQuery": "*/NCEP",
+                          "TargetsMustContainReferences": false,
+                          "RequireCompleteInclusion": false,
+                          "ReferenceQuery": "*/FirstNCEP",
+                          "Left": {
+                            "Anchor": "ReferenceAttribute",
+                            "AnchorSide": "Left",
+                            "ExpandDirection": "ExpandLeft",
+                            "ExpandBy": 0.0,
+                            "ExpandUnits": "Inches"
+                          },
+                          "Top": {
+                            "Anchor": "ReferenceAttribute",
+                            "AnchorSide": "Top",
+                            "ExpandDirection": "ExpandUp",
+                            "ExpandBy": 0.0,
+                            "ExpandUnits": "Inches"
+                          },
+                          "Right": {
+                            "Anchor": "ReferenceAttribute",
+                            "AnchorSide": "Right",
+                            "ExpandDirection": "ExpandRight",
+                            "ExpandBy": 0.0,
+                            "ExpandUnits": "Inches"
+                          },
+                          "Bottom": {
+                            "Anchor": "ReferenceAttribute",
+                            "AnchorSide": "Bottom",
+                            "ExpandDirection": "ExpandDown",
+                            "ExpandBy": 0.0,
+                            "ExpandUnits": "Inches"
+                          },
+                          "CompareLinesSeparately": true,
+                          "IncludeDebugAttributes": false
+                        }
+                      },
+                      "ConditionalRemove": false,
+                      "DataScorer": {
+                        "Type": null,
+                        "Description": "",
+                        "Enabled": true,
+                        "Object": null
+                      },
+                      "ScoreCondition": "EQ",
+                      "CompareConditionType": "ValueOf",
+                      "ScoreToCompare": 0
+                    }
+                  },
+                  {
+                    "Type": "RemoveSubAttributes",
+                    "Description": "Remove *{NCEP}|*{FirstNCEP}<Remove attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeSelector": {
+                        "Type": "QueryBasedAS",
+                        "Object": {
+                          "QueryText": "*{NCEP}|*{FirstNCEP}"
+                        }
+                      },
+                      "ConditionalRemove": false,
+                      "DataScorer": {
+                        "Type": null,
+                        "Description": "",
+                        "Enabled": true,
+                        "Object": null
+                      },
+                      "ScoreCondition": "EQ",
+                      "CompareConditionType": "ValueOf",
+                      "ScoreToCompare": 0
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Type": "RunObjectOnAttributes",
+              "Description": "splitTestGroup.rsd<Run object on attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*/TestGroup",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "UseAttributeSelector": false,
+                "Type": "Splitter",
+                "Object": {
+                  "Type": "RSDSplitter",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\splitTestGroup.rsd.etf"
+                  }
+                }
+              }
+            },
+            {
+              "Type": "MoveAndModifyAttributes",
+              "Description": "Promote */TestGroup/*<Move and modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AddAttributeNameToType": false,
+                "AddRootOrParentAttributeType": false,
+                "AddSpecifiedAttributeType": false,
+                "AttributeQuery": "*/TestGroup/*",
+                "DeleteRootOrParentIfAllChildrenMoved": true,
+                "MoveAttributeLevel": "MoveToParent",
+                "OverwriteAttributeName": "DoNotOverwrite",
+                "RetainAttributeType": true,
+                "SpecifiedAttributeName": "",
+                "SpecifiedAttributeType": ""
+              }
+            },
+            {
+              "Type": "RunObjectOnAttributes",
+              "Description": "Process tests<Run object on attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "UseAttributeSelector": false,
+                "Type": "Splitter",
+                "Object": {
+                  "Type": "RSDSplitter",
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\processTests.rsd.etf"
+                  }
+                }
+              }
+            },
+            {
+              "Type": "ModifyAttributeValueOH",
+              "Description": "Clear top-level value<Modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*",
+                "CreateSubAttribute": false,
+                "AttributeName": "",
+                "SetAttributeName": false,
+                "AttributeType": "",
+                "SetAttributeType": false,
+                "AttributeValue": "",
+                "SetAttributeValue": true
+              }
+            },
+            {
+              "Type": "ModifyAttributeValueOH",
+              "Description": "Set top-level value to N/A<Modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*",
+                "CreateSubAttribute": false,
+                "AttributeName": "",
+                "SetAttributeName": false,
+                "AttributeType": "",
+                "SetAttributeType": false,
+                "AttributeValue": "N/A",
+                "SetAttributeValue": true
+              }
+            }
+          ]
+        }
+      },
+      "RunOutputHandler": true
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Test"
+        }
+      },
+      "DividingAttributeName": "Order",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LegalDescription"
+        }
+      },
+      "DividingAttributeName": "Location",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/*"
+        }
+      },
+      "DividingAttributeName": "Page",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Panel"
+        }
+      },
+      "DividingAttributeName": "Test",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "FormattedTrust"
+        }
+      },
+      "DividingAttributeName": "PersonPart",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "CollectionDate",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "D",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "DocType",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Title"
+        }
+      },
+      "DividingAttributeName": "DocType",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Location"
+        }
+      },
+      "DividingAttributeName": "Lot",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "Party",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Address/Address"
+        }
+      },
+      "DividingAttributeName": "Recipient",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Title"
+        }
+      },
+      "DividingAttributeName": "M",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "LegalDescription"
+        }
+      },
+      "DividingAttributeName": "Subdivision",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*@R"
+        }
+      },
+      "DividingAttributeName": "R",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "_/T"
+        }
+      },
+      "DividingAttributeName": "HCData",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*{number}"
+        }
+      },
+      "DividingAttributeName": "number",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "repeatname",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "MCData|HCData"
+        }
+      },
+      "DividingAttributeName": "number",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Location{Lot}"
+        }
+      },
+      "DividingAttributeName": "Lot",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "DividingAttributeName": "TestGroup",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*{Person}"
+        }
+      },
+      "DividingAttributeName": "Person",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Title"
+        }
+      },
+      "DividingAttributeName": "Entity",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  },
+  {
+    "Type": "DuplicateAndSeparateTrees",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "Party"
+        }
+      },
+      "DividingAttributeName": "Company",
+      "OutputHandler": {
+        "Type": null,
+        "Object": null
+      },
+      "RunOutputHandler": false
+    }
+  }
+]

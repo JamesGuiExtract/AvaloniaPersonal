@@ -1,0 +1,1202 @@
+[
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 19,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 100,
+      "MinPercent": 0,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 5,
+      "MaxPercent": 90,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 1200,
+      "MinPercent": 0,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 12,
+      "MinPercent": 20,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 3,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 20,
+      "MinPercent": 80,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 50,
+      "MinPercent": 0,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 20,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 8,
+      "MinPercent": 65,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 14,
+      "MinPercent": 10,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 20,
+      "MinPercent": 60,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": true
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 11,
+      "MinPercent": 6,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 6,
+      "MinPercent": 75,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 40,
+      "MinPercent": 80,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 12,
+      "MinPercent": 5,
+      "MaxPercent": 85,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 10,
+      "MinPercent": 5,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 13,
+      "MinPercent": 5,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 10,
+      "MinPercent": 7,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 10,
+      "MinPercent": 70,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 16,
+      "MinPercent": 0,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 8,
+      "MinPercent": 80,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 3,
+      "MinPercent": 25,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 8,
+      "MinPercent": 40,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 12,
+      "MinPercent": 3,
+      "MaxPercent": 80,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 50,
+      "MinPercent": 0,
+      "MaxPercent": 1,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 20,
+      "MinPercent": 50,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 5,
+      "MinPercent": 15,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 8,
+      "MinPercent": 0,
+      "MaxPercent": 12,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 6,
+      "MinPercent": 50,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 4,
+      "MinPercent": 45,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 4,
+      "MinPercent": 20,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 7,
+      "MinPercent": 4,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 6,
+      "MinPercent": 55,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 15,
+      "MinPercent": 3,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 15,
+      "MinPercent": 12,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 4,
+      "MinPercent": 8,
+      "MaxPercent": 80,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 13,
+      "MinPercent": 6,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 12,
+      "MinPercent": 10,
+      "MaxPercent": 90,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 4,
+      "MinPercent": 50,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 7,
+      "MinPercent": 12,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 4,
+      "MinPercent": 1,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 50,
+      "MinPercent": 0,
+      "MaxPercent": 7,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 11,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 20,
+      "MinPercent": 65,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 4,
+      "MinPercent": 3,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 10,
+      "MinPercent": 80,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 11,
+      "MinPercent": 6,
+      "MaxPercent": 85,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 12,
+      "MinPercent": 6,
+      "MaxPercent": 50,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 35,
+      "MinPercent": 0,
+      "MaxPercent": 5,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 11,
+      "MinPercent": 7,
+      "MaxPercent": 30,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 30,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 6,
+      "MinPercent": 6,
+      "MaxPercent": 95,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 6,
+      "MinPercent": 95,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 15,
+      "MinPercent": 45,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 4,
+      "MinPercent": 9,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 6,
+      "MinPercent": 15,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 20,
+      "MinPercent": 0,
+      "MaxPercent": 1,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 6,
+      "MinPercent": 10,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 15,
+      "MinPercent": 70,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 40,
+      "MinPercent": 0,
+      "MaxPercent": 1,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 30,
+      "MinPercent": 0,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": true
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 4,
+      "MinPercent": 25,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 5,
+      "MaxPercent": 99,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 4,
+      "MinPercent": 8,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 4,
+      "MinPercent": 40,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 16,
+      "MinPercent": 3,
+      "MaxPercent": 90,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 19,
+      "MinPercent": 7,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 8,
+      "MinPercent": 10,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 15,
+      "MinPercent": 10,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 8,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 4,
+      "MinPercent": 7,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 40,
+      "MinPercent": 0,
+      "MaxPercent": 3,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 15,
+      "MinPercent": 8,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 9,
+      "MinPercent": 6,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 17,
+      "MinPercent": 0,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 40,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 6,
+      "MinPercent": 20,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 35,
+      "MinPercent": 0,
+      "MaxPercent": 2,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 7,
+      "MinPercent": 0,
+      "MaxPercent": 95,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 5,
+      "MaxPercent": 90,
+      "IncludeNonSpatial": true
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 5,
+      "MinPercent": 10,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 10,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 12,
+      "MinPercent": 3,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 8,
+      "MinPercent": 2,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 1,
+      "MinPercent": 0,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": true
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 7,
+      "MinPercent": 2,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 5,
+      "MinPercent": 1,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 4,
+      "MinPercent": 16,
+      "MaxPercent": 80,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 19,
+      "MinPercent": 6,
+      "MaxPercent": 80,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 13,
+      "MinPercent": 2,
+      "MaxPercent": 90,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 13,
+      "MinPercent": 1,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 10,
+      "MinPercent": 1,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 8,
+      "MinPercent": 3,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 3,
+      "MinPercent": 2,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 66,
+      "MinPercent": 0,
+      "MaxPercent": 1,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 20,
+      "MinPercent": 15,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 38,
+      "MinPercent": 0,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": true,
+      "ConsecutiveRows": 1,
+      "MinPercent": 1,
+      "MaxPercent": 100,
+      "IncludeNonSpatial": false
+    }
+  },
+  {
+    "Type": "SpatialContentBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Contains": false,
+      "ConsecutiveRows": 8,
+      "MinPercent": 6,
+      "MaxPercent": 95,
+      "IncludeNonSpatial": false
+    }
+  }
+]

@@ -1,0 +1,67 @@
+[
+  {
+    "Type": "EnhanceOCR",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfidenceCriteria": 60,
+      "FilterPackage": "High",
+      "CustomFilterPackage": "",
+      "PreferredFormatRegexFile": "<RSDFileDir>\\perfectPhone.dat.etf",
+      "CharsToIgnore": "_abcdefghijklmnopqrstuvwxyz!@#$%^&*_=+",
+      "OutputFilteredImages": false
+    }
+  },
+  {
+    "Type": "EnhanceOCR",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfidenceCriteria": 60,
+      "FilterPackage": "HalftoneSpeckled",
+      "CustomFilterPackage": "",
+      "PreferredFormatRegexFile": "",
+      "CharsToIgnore": "_",
+      "OutputFilteredImages": false
+    }
+  },
+  {
+    "Type": "EnhanceOCR",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfidenceCriteria": 60,
+      "FilterPackage": "High",
+      "CustomFilterPackage": "",
+      "PreferredFormatRegexFile": "<RSDFileDir>\\perfectNPI.dat.etf",
+      "CharsToIgnore": "_abcdefghijklmnopqrstuvwxyz!@#$%^&*()-_=+",
+      "OutputFilteredImages": false
+    }
+  },
+  {
+    "Type": "EnhanceOCR",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfidenceCriteria": 90,
+      "FilterPackage": "Medium",
+      "CustomFilterPackage": "",
+      "PreferredFormatRegexFile": "<RSDFileDir>\\..\\units1.dat.etf",
+      "CharsToIgnore": "_",
+      "OutputFilteredImages": false
+    }
+  },
+  {
+    "Type": "EnhanceOCR",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfidenceCriteria": 100,
+      "FilterPackage": "High",
+      "CustomFilterPackage": "",
+      "PreferredFormatRegexFile": "",
+      "CharsToIgnore": "_",
+      "OutputFilteredImages": false
+    }
+  }
+]

@@ -1,0 +1,4657 @@
+[
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "MultipleCriteriaSelector",
+            "Description": "CCN<Multiple criteria attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Selectors": [
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "MultipleCriteriaSelector",
+                    "Description": "@CCN and 12 to 18 digits<Multiple criteria attribute selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "Selectors": [
+                        {
+                          "Select": "Matching",
+                          "With": {
+                            "Type": "QueryBasedAS",
+                            "Description": "[HML]CData@CCN<Query attribute selector>",
+                            "Enabled": true,
+                            "Object": {
+                              "QueryText": "HCData@CCN|MCData@CCN|LCData@CCN"
+                            }
+                          }
+                        },
+                        {
+                          "Select": "Matching",
+                          "With": {
+                            "Type": "ValueConditionSelector",
+                            "Description": "<Value condition selector>",
+                            "Enabled": true,
+                            "Object": {
+                              "Condition": {
+                                "Type": "FindingRuleCondition",
+                                "Object": {
+                                  "AFRule": {
+                                    "Type": "RegExprRule",
+                                    "Object": {
+                                      "IsRegExpFromFile": false,
+                                      "RegExpFileName": "",
+                                      "Pattern": "(?nx)\r\n\\A\r\n(?!(0\\D*)+\\z)\r\n(\r\n    (\\D*\\d){4}\r\n    (?<!20[0-2]\\d | 19[89]\\d)\r\n    \\W*\r\n  | (\\W*\\d){12,18}\\W*\r\n)\r\n\\z",
+                                      "IsCaseSensitive": false,
+                                      "FirstMatchOnly": true,
+                                      "CreateSubAttributesFromNamedMatches": false,
+                                      "OnlyCreateOneSubAttributePerGroup": false
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      ],
+                      "CombineBy": "Chain"
+                    }
+                  }
+                },
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "QueryBasedAS",
+                    "Description": "*@findRepeatsThenTrimCCN<Query attribute selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "QueryText": "HCData@findRepeatsThenTrimCCN|MCData@findRepeatsThenTrimCCN|LCData@findRepeatsThenTrimCCN"
+                    }
+                  }
+                }
+              ],
+              "CombineBy": "Union"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "MultipleCriteriaSelector",
+            "Description": "SSN<Multiple criteria attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Selectors": [
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "QueryBasedAS",
+                    "Description": "HCData@SSN|MCData@SSN<Query attribute selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "QueryText": "HCData@SSN|MCData@SSN"
+                    }
+                  }
+                },
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "ValueConditionSelector",
+                    "Description": "<Value condition selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "Condition": {
+                        "Type": "FindingRuleCondition",
+                        "Object": {
+                          "AFRule": {
+                            "Type": "RegExprRule",
+                            "Object": {
+                              "IsRegExpFromFile": false,
+                              "RegExpFileName": "",
+                              "Pattern": "(?nx)\r\n\\A\r\n(?!(0+\\D*)+\\z)\r\n(\r\n    (\\D*\\d){4}\r\n    (?<!20[0-2]\\d | 19[89]\\d)\r\n\r\n  | (\\D*\\d){5,}\r\n)\r\n\\D*\r\n\\z",
+                              "IsCaseSensitive": false,
+                              "FirstMatchOnly": true,
+                              "CreateSubAttributesFromNamedMatches": false,
+                              "OnlyCreateOneSubAttributePerGroup": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "CombineBy": "Chain"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "MultipleCriteriaSelector",
+            "Description": "Bank<Multiple criteria attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Selectors": [
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "QueryBasedAS",
+                    "Description": "HCData@Bank|MCData@Bank<Query attribute selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "QueryText": "HCData@Bank|MCData@Bank"
+                    }
+                  }
+                },
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "ValueConditionSelector",
+                    "Description": "<Value condition selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "Condition": {
+                        "Type": "FindingRuleCondition",
+                        "Object": {
+                          "AFRule": {
+                            "Type": "RegExprRule",
+                            "Object": {
+                              "IsRegExpFromFile": false,
+                              "RegExpFileName": "",
+                              "Pattern": "(?nx)\r\n\\A\r\n(?!(0+\\D*)+\\z)\r\n(\r\n    (\\D*\\d){4}\r\n    (?<!20[0-2]\\d | 19[89]\\d)\r\n\r\n  | (\\D*\\d){5,}\r\n)\r\n\\D*\r\n\\z",
+                              "IsCaseSensitive": false,
+                              "FirstMatchOnly": true,
+                              "CreateSubAttributesFromNamedMatches": false,
+                              "OnlyCreateOneSubAttributePerGroup": false
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "CombineBy": "Chain"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Name}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Name}"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{LabName}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{LabName}"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Address}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Address}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "DataScorerBasedAS",
+            "Description": "< 30 CConf<Data scorer based attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "FirstScoreCondition": "LT",
+              "FirstScoreToCompare": 30,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "DataScorerBasedAS",
+            "Description": "CC < 40<Data scorer based attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "FirstScoreCondition": "LT",
+              "FirstScoreToCompare": 40,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "\\A ( [\\s\\S]{1,2} | MinorName ) \\z<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "(?nx)\r\n\\A ( [\\s\\S]{1,2} | [a-z](\\W[a-z])+\\W? | MinorName | Probable\\WMinor\\WName) \\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "MERS<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": true,
+                      "RegExpFileName": "<ComponentDataDir>\\Indexing\\PartyFinder\\MERS.dat.etf",
+                      "Pattern": "",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Company/NomineeFor}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Company/NomineeFor}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{First@I}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{First@I}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*/Location/Subdivision<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*/Location/Subdivision"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Doesn't Have Subdivision<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "Auditor'?s?.{,10}$",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": false,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{NomineeFor}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{NomineeFor}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "300+ characters on page<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "[\\s\\S]{300}",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "DataScorerBasedAS",
+            "Description": "Char Conf < 50%<Data scorer based attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "FirstScoreCondition": "LT",
+              "FirstScoreToCompare": 40,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*/wc"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "(?nx)\r\n//p48 K:\\SecureSamples\\eVantageServices\\Set003\\150DL\\MA_19-009212_8625436_150DayRighttoCureMGL24435ALetter.pdf.tif\r\n([\\s\\S]{666,}\r\n| \\b[a-z]{4,}\\b([\\s\\S]+?\\b[a-z]{4,}\\b){2}\r\n)",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "HCData|MCData|LCData"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": false,
+              "ConsecutiveRows": 5,
+              "MinPercent": 0,
+              "MaxPercent": 100,
+              "IncludeNonSpatial": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Has Child<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": true,
+              "ConsecutiveRows": 6,
+              "MinPercent": 8,
+              "MaxPercent": 100,
+              "IncludeNonSpatial": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "OperatorLicense{*}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "OperatorLicense{*}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "OperatorLicense<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "OperatorLicense"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "kill these<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\A(?-i:tin)\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "*off* but not these<Value condition selector>",
+            "Enabled": false,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "(?>(?~<>BIRTH))[\\s\\S]?\\W*(?~<>DATE)",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*/*"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "(?~<>INSTRUMENT\\sSECURITY)\r\n|\r\n\\AAUTHORITY\\z\r\n|\r\nDOCUMENT\r\n|\r\n\\ADIVISION\\WCIVIL\\z\r\n|\r\n\\APROPERTY\\WHOMESTEAD\\z\r\n|\r\n\\ATRUST\\z\r\n|\r\n\\ABANK\\z\r\n|\r\nADJUSTABLE\\WRATE\\WRIDER \r\n|\r\n\\ASURVIVORS\\WTRUST\\z\r\n|\r\n\\AINC\\z\r\n|\r\n\\ALLC\\z\r\n|\r\n\\AATTEST\\z\r\n|\r\n\\ACITY\\WOF\\WFOND\\z\r\n|\r\n\\ANO\\WDOCUMENT\\z\r\n|\r\n\\ACORP\\z\r\n|\r\n\\AApril\\z\r\n|\r\n\\ADecember\\z\r\n|\r\n\\ABANK\\WNA\\z\r\n|\r\n\\ADU\\WLAC\\WFOND\\z\r\n|\r\n\\ARecord\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{page/*}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{page/*}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Check Before Half<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "(?xn)\r\n(?<_anchor>Plaintiff|Defendant)(?<!minor[\\s\\S]*\\k<_anchor>)\r\n|\r\npersonally\\s{1,3}came\r\n|\r\n\\svs\\.?\\s\r\n|\r\nby\\sand\\sbetween",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Check After Half<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "(?xn)\r\n@@[\\s\\S]*\r\n(?:\r\n  \\bS(enio)?r\\b\r\n|\r\n  known\\s{1,3}to\\s{1,3}me\r\n|\r\n  (?:plaintiff|defendant)\r\n|\r\n  (?:husband|wife)\r\n)",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Has *{minor} sub<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{minor}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": true,
+                      "RegExpFileName": "<RSDFileDir>\\Instrument_Before_Keep.dat.etf",
+                      "Pattern": "(?x)\r\n  (?: described | record (?: ed | ation)? \\b ) \r\n  [\\s\\S]{1,120} \r\n  (?: (?: Instr? | Doc )(?: ument )? | \\# | Nu\\.?m?(?:ber)? | No\\.? | Record ) ",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": false,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@CBAS<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@CBAS"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "Doesn't contain at least 3% markings<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": false,
+              "ConsecutiveRows": 9,
+              "MinPercent": 3,
+              "MaxPercent": 100,
+              "IncludeNonSpatial": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{PIN/LCData}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{PIN/LCData}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "ShippingAddress<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "ShippingAddress"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{*}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{NomineeFor}|*{NewNomineeFor}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{NomineeFor}|*{NewNomineeFor}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Value =~ MERS<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": true,
+                      "RegExpFileName": "<ComponentDataDir>\\Indexing\\PartyFinder\\MERS.dat.etf",
+                      "Pattern": "",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "MCData|LCData"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\d",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "_{Account/*}|_{DLN/*}|_{DOB/*}|_{MinorName/*}|_{SSN/*}|_{VIN/*}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Name{*}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "Name{*}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Name<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "Name"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Name}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Name}"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{LabName}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{LabName}"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Address}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Address}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{PerformedAtName}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{PerformedAtName}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{BackupAddress}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{BackupAddress}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "HCData@Bank|MCData@Bank<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "HCData@Bank|MCData@Bank"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "(?nx)\r\n\\A\r\n(?!(0+\\D*)+\\z)\r\n(\r\n    (\\D*\\d){4}\r\n    (?<!20[0-2]\\d | 19[89]\\d)\r\n\r\n  | (\\D*\\d){5,}\r\n)\r\n\\D*\r\n\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "HCData|MCData|LCData"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "DataScorerBasedAS",
+            "Description": "<Data scorer based attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "FirstScoreCondition": "LT",
+              "FirstScoreToCompare": 50,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "FindFromRSD",
+                    "Object": {
+                      "AttributeNames": [
+                        "it"
+                      ],
+                      "RSDFileName": "<RSDFileDir>\\twice01OfOther.rsd.etf"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "DataScorerBasedAS",
+            "Description": "low CC<Data scorer based attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "FirstScoreCondition": "LT",
+              "FirstScoreToCompare": 45,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "6 digits at least<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\d{6}",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@MICR<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@MICR"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@Fingerhut<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@Fingerhut"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@ccn3of4<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@ccn3of4"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@dontTrim<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@dontTrim"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@findRepeatsThenTrimCCN<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@findRepeatsThenTrimCCN"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialProximityAS",
+            "Description": "Box is not much taller and doesn't extend far to the left of the clue<Spatial proximity attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "TargetQuery": "*@Box",
+              "TargetsMustContainReferences": false,
+              "RequireCompleteInclusion": true,
+              "ReferenceQuery": "*@",
+              "Left": {
+                "Anchor": "ReferenceAttribute",
+                "AnchorSide": "Left",
+                "ExpandDirection": "ExpandLeft",
+                "ExpandBy": 0.1,
+                "ExpandUnits": "Inches"
+              },
+              "Top": {
+                "Anchor": "ReferenceAttribute",
+                "AnchorSide": "Top",
+                "ExpandDirection": "ExpandUp",
+                "ExpandBy": 0.1,
+                "ExpandUnits": "Inches"
+              },
+              "Right": {
+                "Anchor": "Page",
+                "AnchorSide": "Right",
+                "ExpandDirection": "ExpandRight",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              },
+              "Bottom": {
+                "Anchor": "ReferenceAttribute",
+                "AnchorSide": "Bottom",
+                "ExpandDirection": "ExpandDown",
+                "ExpandBy": 0.1,
+                "ExpandUnits": "Inches"
+              },
+              "CompareLinesSeparately": false,
+              "IncludeDebugAttributes": false
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialProximityAS",
+            "Description": "Box extends to the right of the clue<Spatial proximity attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "TargetQuery": "*@Box",
+              "TargetsMustContainReferences": false,
+              "RequireCompleteInclusion": false,
+              "ReferenceQuery": "*@",
+              "Left": {
+                "Anchor": "ReferenceAttribute",
+                "AnchorSide": "Right",
+                "ExpandDirection": "ExpandRight",
+                "ExpandBy": 0.2,
+                "ExpandUnits": "Inches"
+              },
+              "Top": {
+                "Anchor": "ReferenceAttribute",
+                "AnchorSide": "Top",
+                "ExpandDirection": "ExpandUp",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              },
+              "Right": {
+                "Anchor": "Page",
+                "AnchorSide": "Right",
+                "ExpandDirection": "ExpandRight",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              },
+              "Bottom": {
+                "Anchor": "ReferenceAttribute",
+                "AnchorSide": "Bottom",
+                "ExpandDirection": "ExpandDown",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              },
+              "CompareLinesSeparately": false,
+              "IncludeDebugAttributes": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "LCData@FEINish<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "LCData@FEINish"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "DataScorerBasedAS",
+            "Description": "<Data scorer based attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "FirstScoreCondition": "LT",
+              "FirstScoreToCompare": 30,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "MCData|LCData<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "MCData|LCData"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "DataScorerBasedAS",
+            "Description": "<= 30%<Data scorer based attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "FirstScoreCondition": "LEQ",
+              "FirstScoreToCompare": 30,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\A[0-]+\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Range}|*{Section}|*{Township}|*{Tract}|*{Lot}|*{Block}|*{Subdivision}|*{Unit}|*{Building}|*{Condominium}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Title/*}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Title/*}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Title}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Title}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "DocumentReference|MortgageAmount"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "HCData|MCData|LCData<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "HCData|MCData|LCData"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Spatial<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "LocateImageRegion",
+                    "Object": {
+                      "DataInsideBoundaries": true,
+                      "FindType": "ImageRegion",
+                      "ImageRegionText": " ",
+                      "IncludeIntersectingEntities": true,
+                      "IntersectingEntityType": "Character",
+                      "MatchMultiplePagesPerDocument": true,
+                      "ClueList1": {
+                        "Clues": [
+                          "[\\S\\s]+"
+                        ],
+                        "CaseSensitive": false,
+                        "Regex": true,
+                        "RestrictByBoundary": false
+                      },
+                      "ClueList2": {
+                        "Clues": [],
+                        "CaseSensitive": false,
+                        "Regex": false,
+                        "RestrictByBoundary": false
+                      },
+                      "ClueList3": {
+                        "Clues": [],
+                        "CaseSensitive": false,
+                        "Regex": false,
+                        "RestrictByBoundary": false
+                      },
+                      "ClueList4": {
+                        "Clues": [],
+                        "CaseSensitive": false,
+                        "Regex": false,
+                        "RestrictByBoundary": false
+                      },
+                      "Left": {
+                        "Anchor": "Page",
+                        "AnchorSide": "Left",
+                        "ExpandDirection": "ExpandLeft",
+                        "ExpandBy": 0.0,
+                        "ExpandUnits": "Inches"
+                      },
+                      "Top": {
+                        "Anchor": "Page",
+                        "AnchorSide": "Top",
+                        "ExpandDirection": "ExpandUp",
+                        "ExpandBy": 0.0,
+                        "ExpandUnits": "Inches"
+                      },
+                      "Right": {
+                        "Anchor": "Page",
+                        "AnchorSide": "Right",
+                        "ExpandDirection": "ExpandRight",
+                        "ExpandBy": 0.0,
+                        "ExpandUnits": "Inches"
+                      },
+                      "Bottom": {
+                        "Anchor": "Page",
+                        "AnchorSide": "Bottom",
+                        "ExpandDirection": "ExpandDown",
+                        "ExpandBy": 0.0,
+                        "ExpandUnits": "Inches"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Has Child<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": true,
+              "ConsecutiveRows": 6,
+              "MinPercent": 95,
+              "MaxPercent": 100,
+              "IncludeNonSpatial": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Content<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*/*"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\S",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "@AOJhw<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@AOJhw"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Clues<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "Clues"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "\\ADOB\\z<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\ADOB\\z",
+                      "IsCaseSensitive": true,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Bottom of page<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "SelectPageRegion",
+                    "Object": {
+                      "IncludeRegionDefined": true,
+                      "PageSelectionType": "SelectAll",
+                      "SpecificPages": "",
+                      "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                      "Pattern": "",
+                      "IsRegExp": false,
+                      "IsCaseSensitive": false,
+                      "HorizontalStart": -1,
+                      "HorizontalEnd": -1,
+                      "VerticalStart": 90,
+                      "VerticalEnd": 100,
+                      "SelectPageRegionReturnType": "ReturnText",
+                      "IncludeIntersectingText": true,
+                      "TextIntersectionType": "Character",
+                      "SelectedRegionRotation": -1,
+                      "TextToAssignToRegion": ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Parties}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Parties}"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{DocumentType}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{DocumentType}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@BAR_DMATRIX"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "MCData<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "MCData"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "(?:1[\\s\\S]*){7}<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "(?:1[\\s\\S]*){7}",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "0<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\A0\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": false,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "0.00<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\A0\\.00\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": false,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "[ML]CData<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "MCData|LCData"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "//K:\\Common\\Engineering\\Sample Files\\AtPac\\NV - Washoe\\Set004\\randomSubset\\19999236709800.007\r\n\\d{3}\\s*,\\s*\\d{2}\\s*,",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Person/Last}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Person/Last}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Last> <Suffix> <Comma><Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\A[A-Z]+\r\n\\s+\r\n#import Name\\PersonSuffix.dat.etf\r\n,",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": false,
+              "ConsecutiveRows": 10,
+              "MinPercent": 11,
+              "MaxPercent": 95,
+              "IncludeNonSpatial": false
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "DOB"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "MERS<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "Mortgage\\W*Electronic\\W*Registration\\W*Systems\\W*Inc\\W*",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "Grantor|Grantee"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "kill these<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\bage\\b\r\n|North\r\n|South\r\n|Forth\r\n|thirt\r\n|\\bgate\\b\r\n|\r\n\\ABorn\\z\r\n|\r\n//K:\\Common\\Engineering\\Sample Files\\PA - Carbon\\Set001\\RandomSubset\\2\\09-9189 IMAGE 118498 PG 8.tif\r\n(?:\\bBIR|IRT|RTH\\b)[\\s\\S]{0,7}(?:\\bDAT|ATE\\b(?<!\\bState))",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "but not these<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "(?>(?~<>BIRTH))[\\s\\S]?\\W*(?~<>DATE)",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Not Clues<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "HCData|MCData|LCData"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\A\\D+\\z\r\n|\r\n\\A(.?1.?){5,}\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": false,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "Lotta black pixels<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": true,
+              "ConsecutiveRows": 4,
+              "MinPercent": 70,
+              "MaxPercent": 100,
+              "IncludeNonSpatial": false
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "(No on next line<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\n\\(No",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": false,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "MultipleCriteriaSelector",
+            "Description": "Is high CConf and contains FAX<Multiple criteria attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Selectors": [
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "DataScorerBasedAS",
+                    "Description": ">= 80 CConf<Data scorer based attribute selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "FirstScoreCondition": "GEQ",
+                      "FirstScoreToCompare": 80,
+                      "IsSecondCondition": false,
+                      "AndSecondCondition": true,
+                      "SecondScoreCondition": "EQ",
+                      "SecondScoreToCompare": 0,
+                      "DataScorer": {
+                        "Type": "CharacterConfidenceDS",
+                        "Description": "<Character confidence data scorer>",
+                        "Enabled": true,
+                        "Object": {
+                          "AggregateFunction": "Average"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "ValueConditionSelector",
+                    "Description": "Contains FAX<Value condition selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "Condition": {
+                        "Type": "FindingRuleCondition",
+                        "Object": {
+                          "AFRule": {
+                            "Type": "RegExprRule",
+                            "Object": {
+                              "IsRegExpFromFile": false,
+                              "RegExpFileName": "",
+                              "Pattern": "FAX",
+                              "IsCaseSensitive": false,
+                              "FirstMatchOnly": true,
+                              "CreateSubAttributesFromNamedMatches": false,
+                              "OnlyCreateOneSubAttributePerGroup": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "CombineBy": "Chain"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Has Child<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": true,
+              "ConsecutiveRows": 6,
+              "MinPercent": 50,
+              "MaxPercent": 100,
+              "IncludeNonSpatial": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "MCData|LCData<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "MCData|LCData"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "-  <Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "-",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "5 or more [14]<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "([14][^14]*){5}",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "paired separators<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\d{3}(\\W)\\d{2}\\1\\d{4}",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Indent1}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Indent1}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Indent2}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Indent2}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Has Child<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": true,
+              "ConsecutiveRows": 4,
+              "MinPercent": 35,
+              "MaxPercent": 100,
+              "IncludeNonSpatial": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{First}|*{Middle}|*{Last}|*{Suffix}|*{Title}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{First}|*{Middle}|*{Last}|*{Suffix}|*{Title}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{OrderingPhysicianName}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{OrderingPhysicianName}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Ineligible}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Ineligible}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "LIR values<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\A[0-]+\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Has Child<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": true,
+              "ConsecutiveRows": 8,
+              "MinPercent": 35,
+              "MaxPercent": 100,
+              "IncludeNonSpatial": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "DOB"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\d{1,2}[/-]\\d{1,2}[/-](19\\d{2}|200\\d|2010)",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Volume}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "_{SSN/*}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "well-formed<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\A(?!000-00-0000)\\d{3}\\W\\d{2}\\W\\d{4}\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": false,
+              "ConsecutiveRows": 12,
+              "MinPercent": 6,
+              "MaxPercent": 90,
+              "IncludeNonSpatial": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Units}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Units}"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Value}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Value}"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Flag}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Flag}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Instrument<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": true,
+                      "RegExpFileName": "<RSDFileDir>\\Instrument_Before_Keep.dat.etf",
+                      "Pattern": "(?x)\r\n  (?: described | record (?: ed | ation)? \\b ) \r\n  [\\s\\S]{1,120} \r\n  (?: (?: Instr? | Doc )(?: ument )? | \\# | Nu\\.?m?(?:ber)? | No\\.? | Record ) ",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": false,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*/Subdivision/Copy"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\S",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Instrument}"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{keep}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{keep}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{CC_Minimum}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{CC_Minimum}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@MICR<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@MICR|*@ccn3of4"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@dontTrim<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@dontTrim"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@findRepeatsThenTrimCCN<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@findRepeatsThenTrimCCN"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Name}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Name}"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Address}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Address}"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{LabName}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{LabName}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Not all zeros<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\A[\\W0]+\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": false,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Does not have Condo<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "LegalDescription{Condominium}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\bSubdivision\\b",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "DataScorerBasedAS",
+            "Description": "*off*Low Char Conf.<Data scorer based attribute selector>",
+            "Enabled": false,
+            "Object": {
+              "FirstScoreCondition": "LEQ",
+              "FirstScoreToCompare": 35,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "MultipleCriteriaSelector",
+            "Description": "Check for False+<Multiple criteria attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Selectors": [
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "ValueConditionSelector",
+                    "Description": "False+ Regex<Value condition selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "Condition": {
+                        "Type": "FindingRuleCondition",
+                        "Object": {
+                          "AFRule": {
+                            "Type": "RegExprRule",
+                            "Object": {
+                              "IsRegExpFromFile": false,
+                              "RegExpFileName": "<RSDFileDir>\\..\\..\\Common\\Data\\XCData_False+.dat.etf",
+                              "Pattern": "(?x)\r\n(?:\r\n  statement\\sn\r\n|\r\n  ^\\d{5,8}[a-z]\r\n)",
+                              "IsCaseSensitive": false,
+                              "FirstMatchOnly": true,
+                              "CreateSubAttributesFromNamedMatches": false,
+                              "OnlyCreateOneSubAttributePerGroup": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "CombineBy": "Chain"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "LCData<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "LCData"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "\\r\\n<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\r\\n",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": false,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Person}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Person}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Trust}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Trust}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@MICR"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@Fingerhut<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@Fingerhut"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "HCData and MCData<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "HCData|MCData"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "DataScorerBasedAS",
+            "Description": "Less than 45% CC<Data scorer based attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "FirstScoreCondition": "LT",
+              "FirstScoreToCompare": 45,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{Middle}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{Middle}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\bCOMPANY\\b[\\s\\S]{3,}\\bLLC",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "MultipleCriteriaSelector",
+            "Description": "<Multiple criteria attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Selectors": [
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "QueryBasedAS",
+                    "Description": "*/Company<Query attribute selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "QueryText": "*/Company"
+                    }
+                  }
+                },
+                {
+                  "Select": "Matching",
+                  "With": {
+                    "Type": "ValueConditionSelector",
+                    "Description": "<Value condition selector>",
+                    "Enabled": true,
+                    "Object": {
+                      "Condition": {
+                        "Type": "FindingRuleCondition",
+                        "Object": {
+                          "AFRule": {
+                            "Type": "RegExprRule",
+                            "Object": {
+                              "IsRegExpFromFile": false,
+                              "RegExpFileName": "",
+                              "Pattern": "COMPANY\\z",
+                              "IsCaseSensitive": false,
+                              "FirstMatchOnly": false,
+                              "CreateSubAttributesFromNamedMatches": false,
+                              "OnlyCreateOneSubAttributePerGroup": false
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "CombineBy": "Chain"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "\\bTime\\b<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\bTime\\b",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Two dates<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\d+[/-]\\d+[/-]\\d+\\b[\\S\\s]+\\d+[/-]\\d+[/-]\\d+",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{SameLastName/YES}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "HealthcareOrganization<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "HealthcareOrganization"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{*}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Affidavit<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@Affidavit}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "*testing*Always Evaluates TRUE<Value condition selector>",
+            "Enabled": false,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "[\\s\\S]",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "AssignmentRnt<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@AssignmentRnt}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "GrantDeed<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@GrantDeed}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "NtDelqntAssmt<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@NtDelqntAssmt}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "QuitClaimDeed<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@QuitClaimDeed}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "RemovInvlLien<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@RemovInvlLien}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Reconveyance<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@Reconveyance}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Release<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@Release}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "SubstitutionTr<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@SubstitutionTr}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "TrustDeed<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@TrustDeed}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "WarrantyDeed<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@WarrantyDeed}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "NoticeDefault<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*@NoticeDefault}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Union"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*/PatientName/Suffix<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*/PatientName/Suffix"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "MD<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\AMD\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Not mostly 1s<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "(?nx)\r\n\\A([1Il\\D](?'1')|[^1Il\\D])+\\z\r\n(?<=\r\n  (?(1)(?!))\r\n  \\A(?>([1Il\\D]|[^1Il\\D](?'-1')?(?'-1')?)+)\r\n)",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "\\A\\W*[\\S\\s]{0,4}\\z<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\A\\W*[\\S\\s]{0,4}\\z",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "DataScorerBasedAS",
+            "Description": "Low char conf<Data scorer based attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "FirstScoreCondition": "LT",
+              "FirstScoreToCompare": 50,
+              "IsSecondCondition": false,
+              "AndSecondCondition": true,
+              "SecondScoreCondition": "EQ",
+              "SecondScoreToCompare": 0,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "avg<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "number"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Has Child<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": true,
+              "ConsecutiveRows": 4,
+              "MinPercent": 80,
+              "MaxPercent": 100,
+              "IncludeNonSpatial": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "^[01\\.\\|]+$<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "^[01\\.\\|]+$",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": false,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@Handwriting<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@Handwriting"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "000-00-0000<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "000-00-0000",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "Has Child<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{*}"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialContentBasedAS",
+            "Description": "<Spatial content attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "Contains": true,
+              "ConsecutiveRows": 6,
+              "MinPercent": 4,
+              "MaxPercent": 100,
+              "IncludeNonSpatial": false
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "not without mistakes<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "Mortgage\\W*Electronic\\W*Registration\\W*Systems\\W*Inc",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "HCData|MCData|LCData"
+            }
+          }
+        },
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "<RSDFileDir>\\BadData.dat.etf<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": true,
+                      "RegExpFileName": "<RSDFileDir>\\BadData.dat.etf",
+                      "Pattern": "",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*{OutstandingOrderCode}<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*{OutstandingOrderCode}"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@Trimmed<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@Trimmed"
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "QueryBasedAS",
+            "Description": "*@first5<Query attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "QueryText": "*@first5"
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  },
+  {
+    "Type": "MultipleCriteriaSelector",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Selectors": [
+        {
+          "Select": "Matching",
+          "With": {
+            "Type": "SpatialProximityAS",
+            "Description": "Top of page<Spatial proximity attribute selector>",
+            "Enabled": true,
+            "Object": {
+              "TargetQuery": "Possible@Test",
+              "TargetsMustContainReferences": false,
+              "RequireCompleteInclusion": false,
+              "ReferenceQuery": "*@Anchor_AllTextZone",
+              "Left": {
+                "Anchor": "ReferenceAttribute",
+                "AnchorSide": "Left",
+                "ExpandDirection": "ExpandLeft",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              },
+              "Top": {
+                "Anchor": "ReferenceAttribute",
+                "AnchorSide": "Top",
+                "ExpandDirection": "ExpandUp",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              },
+              "Right": {
+                "Anchor": "ReferenceAttribute",
+                "AnchorSide": "Right",
+                "ExpandDirection": "ExpandRight",
+                "ExpandBy": 0.0,
+                "ExpandUnits": "Inches"
+              },
+              "Bottom": {
+                "Anchor": "ReferenceAttribute",
+                "AnchorSide": "Top",
+                "ExpandDirection": "ExpandDown",
+                "ExpandBy": 2.0,
+                "ExpandUnits": "Inches"
+              },
+              "CompareLinesSeparately": false,
+              "IncludeDebugAttributes": false
+            }
+          }
+        },
+        {
+          "Select": "NonMatching",
+          "With": {
+            "Type": "ValueConditionSelector",
+            "Description": "Fasting<Value condition selector>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "FindingRuleCondition",
+                "Object": {
+                  "AFRule": {
+                    "Type": "RegExprRule",
+                    "Object": {
+                      "IsRegExpFromFile": false,
+                      "RegExpFileName": "",
+                      "Pattern": "\\bFASTING\\b",
+                      "IsCaseSensitive": false,
+                      "FirstMatchOnly": true,
+                      "CreateSubAttributesFromNamedMatches": false,
+                      "OnlyCreateOneSubAttributePerGroup": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "CombineBy": "Chain"
+    }
+  }
+]

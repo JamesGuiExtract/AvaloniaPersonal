@@ -1,0 +1,1146 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "Latest",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [],
+    "RunMode": "RunPerPage",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Page",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocPreprocessorSequence",
+      "Description": "<Select multiple document preprocessors>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "ReplaceStrings",
+            "Description": "fp fixes<Replace strings>",
+            "Enabled": true,
+            "Object": {
+              "Replacements": [
+                {
+                  "Pattern": "born\\W*be",
+                  "Replacement": "eb nrob"
+                }
+              ],
+              "AsRegularExpr": true,
+              "IsCaseSensitive": false
+            }
+          }
+        ]
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Clues": {
+        "AttributeRules": [
+          {
+            "Enabled": false,
+            "Description": "*off* SSN@Clues",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "Clues"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\SocialSecurityNumber\\SocialSecurityNumber.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": false,
+            "Description": "*off* DOB@Clues",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "ReplaceStrings",
+              "Description": "fp fixes<Replace strings>",
+              "Enabled": true,
+              "Object": {
+                "Replacements": [
+                  {
+                    "Pattern": "born\\W*before",
+                    "Replacement": "erofeb nrob"
+                  }
+                ],
+                "AsRegularExpr": true,
+                "IsCaseSensitive": false
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "Clues"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\DateOfBirth\\DateOfBirth.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "HCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "SSN@HCData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "HCData"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\SocialSecurityNumber\\SocialSecurityNumber.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "DOB@HCData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "HCData"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\DateOfBirth\\DateOfBirth.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "MCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "SSN@MCData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "MCData"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\SocialSecurityNumber\\SocialSecurityNumber.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "RemoveSubAttributes",
+              "Description": "<Remove attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeSelector": {
+                  "Type": "ValueConditionSelector",
+                  "Object": {
+                    "Condition": {
+                      "Type": "FindingRuleCondition",
+                      "Object": {
+                        "AFRule": {
+                          "Type": "RegExprRule",
+                          "Object": {
+                            "IsRegExpFromFile": false,
+                            "RegExpFileName": "",
+                            "Pattern": "/(19|20)\\d{2}\\z",
+                            "IsCaseSensitive": false,
+                            "FirstMatchOnly": false,
+                            "CreateSubAttributesFromNamedMatches": false,
+                            "OnlyCreateOneSubAttributePerGroup": false
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "ConditionalRemove": false,
+                "DataScorer": {
+                  "Type": null,
+                  "Description": "",
+                  "Enabled": true,
+                  "Object": null
+                },
+                "ScoreCondition": "EQ",
+                "CompareConditionType": "ValueOf",
+                "ScoreToCompare": 0
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "DOB@MCData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "MCData"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\DateOfBirth\\DateOfBirth.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "LIR for DOB box (K:\\SecureSamples\\MGIC\\set001\\0530007798_G2 - Loan Application.pdf.tif; page1)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "(?~<error=3>Uniform\\WResidential\\WLoan\\WApplication)",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "LoopFinder",
+              "Object": {
+                "LoopType": "ForLoop",
+                "Condition": {
+                  "Type": null,
+                  "Description": null,
+                  "Enabled": false,
+                  "Object": null
+                },
+                "ConditionValue": true,
+                "FindingRule": {
+                  "Type": "LocateImageRegion",
+                  "Description": "<Locate image region>",
+                  "Enabled": true,
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "Text",
+                    "ImageRegionText": "",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Word",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "YRS\\W*School"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Left",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 14.0,
+                      "ExpandUnits": "ClueCharacters"
+                    },
+                    "Top": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 0.5,
+                      "ExpandUnits": "ClueLines"
+                    },
+                    "Right": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Left",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Bottom": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 1.25,
+                      "ExpandUnits": "ClueLines"
+                    }
+                  }
+                },
+                "Preprocessor": {
+                  "Type": "AdvancedReplaceString",
+                  "Description": "<Advanced replace string>",
+                  "Enabled": true,
+                  "Object": {
+                    "StrToBeReplaced": "YRS\\W*School",
+                    "AsRegularExpression": true,
+                    "IsCaseSensitive": false,
+                    "Replacement": "",
+                    "ReplacementOccurrenceType": "First",
+                    "SpecifiedOccurrence": 0
+                  }
+                },
+                "Iterations": 5,
+                "LogExceptionForMaxIterations": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "DOB"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "LIR for SSN box (K:\\SecureSamples\\MGIC\\set001\\4211004159_G2 - Loan Application.pdf.tif; page1)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "(?~<error=3>Uniform\\WResidential\\WLoan\\WApplication)",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "LoopFinder",
+              "Object": {
+                "LoopType": "ForLoop",
+                "Condition": {
+                  "Type": null,
+                  "Description": null,
+                  "Enabled": false,
+                  "Object": null
+                },
+                "ConditionValue": true,
+                "FindingRule": {
+                  "Type": "LocateImageRegion",
+                  "Description": "<Locate image region>",
+                  "Enabled": true,
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "Text",
+                    "ImageRegionText": "",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Word",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "Social\\WSecurity"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Left",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Top": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 0.5,
+                      "ExpandUnits": "ClueLines"
+                    },
+                    "Right": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 5.0,
+                      "ExpandUnits": "ClueCharacters"
+                    },
+                    "Bottom": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 1.25,
+                      "ExpandUnits": "ClueLines"
+                    }
+                  }
+                },
+                "Preprocessor": {
+                  "Type": "AdvancedReplaceString",
+                  "Description": "<Advanced replace string>",
+                  "Enabled": true,
+                  "Object": {
+                    "StrToBeReplaced": "Social\\WSecurity",
+                    "AsRegularExpression": true,
+                    "IsCaseSensitive": false,
+                    "Replacement": "",
+                    "ReplacementOccurrenceType": "First",
+                    "SpecifiedOccurrence": 0
+                  }
+                },
+                "Iterations": 5,
+                "LogExceptionForMaxIterations": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "SSN"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "SSN Box (K:\\SecureSamples\\MGIC\\set001\\2126002441_D1 - Signed Loan Documents.pdf.tif; page17)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "(?~<>Identification\\WNumber\\Wand\\WCertification)",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "BoxFinder",
+              "Object": {
+                "AttributeText": "000-00-0000",
+                "BoxHeightMax": null,
+                "BoxHeightMin": null,
+                "BoxWidthMax": {
+                  "Case": "Some",
+                  "Fields": [
+                    25.0
+                  ]
+                },
+                "BoxWidthMin": {
+                  "Case": "Some",
+                  "Fields": [
+                    0.0
+                  ]
+                },
+                "ClueLocation": "SameBox",
+                "Clues": [
+                  "(?~<error=2, method=better_fit>Social\\WSecurity\\WNumber)"
+                ],
+                "CluesAreCaseSensitive": false,
+                "CluesAreRegularExpressions": true,
+                "ExcludeClueArea": true,
+                "FindType": "ImageRegion",
+                "FirstBoxOnly": false,
+                "IncludeClueText": false,
+                "IncludeLines": false,
+                "NumFirstPages": 0,
+                "NumLastPages": 0,
+                "PageSelectionMode": "AllPages",
+                "SpecifiedPages": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "SSN"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "RunObjectOnAttributes",
+                    "Description": "SRICA<Run object on attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "AttributeSelector": {
+                        "Type": null,
+                        "Object": null
+                      },
+                      "UseAttributeSelector": false,
+                      "Type": "Splitter",
+                      "Object": {
+                        "Type": "SplitRegionIntoContentAreas",
+                        "Object": {
+                          "AttributeName": "Content",
+                          "DefaultAttributeText": "[unrecognized]",
+                          "GoodOCRType": "ProbableText",
+                          "IncludeGoodOCR": true,
+                          "IncludeOCRAsTrueSpatialString": false,
+                          "IncludePoorOCR": true,
+                          "MinimumHeight": 0.5,
+                          "MinimumWidth": 3.0,
+                          "OCRThreshold": 60,
+                          "PoorOCRType": "ProbableHandwriting",
+                          "ReOCRWithHandwriting": false,
+                          "RequiredHorizontalSeparation": 4,
+                          "UseLines": true
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "Type": "RemoveSubAttributes",
+                    "Description": "Remove if no subs<Remove attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeSelector": {
+                        "Type": "MultipleCriteriaSelector",
+                        "Object": {
+                          "Selectors": [
+                            {
+                              "Select": "NonMatching",
+                              "With": {
+                                "Type": "QueryBasedAS",
+                                "Description": "<Query attribute selector>",
+                                "Enabled": true,
+                                "Object": {
+                                  "QueryText": "*{*}"
+                                }
+                              }
+                            }
+                          ],
+                          "CombineBy": "Chain"
+                        }
+                      },
+                      "ConditionalRemove": false,
+                      "DataScorer": {
+                        "Type": null,
+                        "Description": "",
+                        "Enabled": true,
+                        "Object": null
+                      },
+                      "ScoreCondition": "EQ",
+                      "CompareConditionType": "ValueOf",
+                      "ScoreToCompare": 0
+                    }
+                  },
+                  {
+                    "Type": "RemoveSubAttributes",
+                    "Description": "Remove subs<Remove attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeSelector": {
+                        "Type": "QueryBasedAS",
+                        "Object": {
+                          "QueryText": "*/*"
+                        }
+                      },
+                      "ConditionalRemove": false,
+                      "DataScorer": {
+                        "Type": null,
+                        "Description": "",
+                        "Enabled": true,
+                        "Object": null
+                      },
+                      "ScoreCondition": "EQ",
+                      "CompareConditionType": "ValueOf",
+                      "ScoreToCompare": 0
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "LIR between clues (K:\\SecureSamples\\MGIC\\set001\\0721025262_G1 - Signed Loan Documents.pdf.tif; page 50)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "LocateImageRegion",
+              "Object": {
+                "DataInsideBoundaries": true,
+                "FindType": "ImageRegion",
+                "ImageRegionText": "00/00/0000",
+                "IncludeIntersectingEntities": true,
+                "IntersectingEntityType": "Character",
+                "MatchMultiplePagesPerDocument": true,
+                "ClueList1": {
+                  "Clues": [
+                    "^Printed\\WName"
+                  ],
+                  "CaseSensitive": false,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList2": {
+                  "Clues": [
+                    "^Date\\Wof\\WBirth"
+                  ],
+                  "CaseSensitive": false,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList3": {
+                  "Clues": [
+                    "^SSN"
+                  ],
+                  "CaseSensitive": false,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList4": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "Left": {
+                  "Anchor": "ClueList2",
+                  "AnchorSide": "Right",
+                  "ExpandDirection": "ExpandRight",
+                  "ExpandBy": 1.0,
+                  "ExpandUnits": "ClueCharacters"
+                },
+                "Top": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandDown",
+                  "ExpandBy": 0.1,
+                  "ExpandUnits": "ClueLines"
+                },
+                "Right": {
+                  "Anchor": "ClueList3",
+                  "AnchorSide": "Left",
+                  "ExpandDirection": "ExpandLeft",
+                  "ExpandBy": 2.0,
+                  "ExpandUnits": "ClueCharacters"
+                },
+                "Bottom": {
+                  "Anchor": "ClueList2",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandDown",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "DOB"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote found items<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Delete Page attribute<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "Page"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "NCData<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "HCData|MCData",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\utils\\NCData.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*{*}"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove MCData under HCData<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "SpatialProximityAS",
+                "Object": {
+                  "TargetQuery": "MCData",
+                  "TargetsMustContainReferences": false,
+                  "RequireCompleteInclusion": false,
+                  "ReferenceQuery": "HCData",
+                  "Left": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandLeft",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Top": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandUp",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Right": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Right",
+                    "ExpandDirection": "ExpandRight",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Bottom": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Bottom",
+                    "ExpandDirection": "ExpandDown",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "CompareLinesSeparately": true,
+                  "IncludeDebugAttributes": false
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MergeAttributes",
+            "Description": "Merge HCData, MCData<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData|MCData",
+              "CreateMergedRegion": false,
+              "NameMergeMode": "PreserveField",
+              "NameMergePriority": [
+                "HCData",
+                "MCData"
+              ],
+              "OverlapPercent": 75.0,
+              "PreserveAsSubAttributes": false,
+              "PreserveType": false,
+              "SpecifiedName": "",
+              "SpecifiedType": "",
+              "SpecifiedValue": "000-00-0000",
+              "TreatNameListAsRegex": false,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": true,
+              "TypeMergeMode": "SelectField",
+              "TypeMergePriority": [],
+              "ValueMergeMode": "SelectField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "AutoShrinkRedactionZones",
+            "Description": "<Auto-shrink redaction zones>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "HCData|MCData|LCData|NCData"
+                }
+              },
+              "AutoExpandBeforeAutoShrink": false,
+              "MaxPixelsToExpand": 10.0
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

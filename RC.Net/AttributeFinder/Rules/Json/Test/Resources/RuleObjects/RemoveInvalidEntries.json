@@ -1,0 +1,8 @@
+[
+  {
+    "Type": "RemoveInvalidEntries",
+    "Description": "",
+    "Enabled": true,
+    "Object": "RemoveInvalidEntries"
+  }
+]

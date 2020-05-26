@@ -1,0 +1,802 @@
+[
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "DocumentReference|MortgageAmount"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/eleven"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Test/CollectionDateProtean"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Component/Name"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/PerformedAtName"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "LegalDescription/Location/Outlot|LegalDescription/Location/Municipality/*"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Clues/Clues"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*{State}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "PhysicianInfo{OrderingPhysicianName}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*@Dashed"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Filename|PaymentActivity"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/QQ|*/Taxlot"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "HealthcareOrganization"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Component/valid"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Component/TestCode|*/Name|*/EpicCode"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Trust/*@Remove"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Test/UnknownOrder|Test/DateTime|Test/Date|Test/Time"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*/County|*/*/State"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "LegalDescription/Municipality"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Trustee/Person/PersonAlias"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/toMC"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "BirthDate|DeathDate"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "FirstIsWellFormed"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Name"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*@VillageOf|*@TownOf|*@CityOf"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*@ProbableText"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Building"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Address/Address/Recipient/Temp|*/Party/Recipient/Temp"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Test/Component/ESNames|Test/Component/OfficialName|Test/Component/ReRunOM"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "HCData/Right"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/BestMatch"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*{Units}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Person@BADNAME/*"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Subdivision@REMOVESUB"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*/CheckMERS"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "LCData|MCData@check"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*{/WC/empty}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/V"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*{*@B}|*@B"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Location1|*/Location2|*/Location3|*/Location4|*/Location5|*/Location6|*/Location7|*/Location8|*/Location9|*/Location10|*/ParcelNumber1|*/ParcelNumber2|*/ParcelNumber3|*/ParcelNumber4|*/ParcelNumber5"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*/a1@|*/*/a2@|*/*/b1@|*/*/b2@"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Company/*|CompanyTrustee/*"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "_/Remove"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "_DocumentCC"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/QQQ|*/QQQQ|*/QQQQQ"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "MCData1Bottom"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Recipient1|*/Recipient2"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "LCData@Footer|MCData@Temp/LCData@Footer"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*/data|*/*/reference"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*{CC_Minimum}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*{*@}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "LCData|Keep/keep"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Special"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Test/remove|*/Test/Component/t"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "_/PersonSummary"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "GG/Split2"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*@Backup"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Suffix"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Test/Last|*/Test/First|*/Test/Middle|*/Test/Suffix|*/Test/DOB"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/MinorNameNCData"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Data"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*@DecedentAKA/Person/*"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "SubstitutionOfTrustee/Company/CompanyAlias"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*@MICR"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Combined"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*{SSN/*}|*{Nine/*}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "HCData"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "LHCombFields|RHCombFields"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/BothLastNames"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/default@discard"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*@Name"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/tmp"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "delete"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*/*@SII|*/*/*/*@SII|*/*/*/*/*@SII"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*{Last2}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "HCData@findRepeatsThenTrimCCN|MCData@findRepeatsThenTrimCCN|LCData@findRepeatsThenTrimCCN"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/ResultDate/*"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Book"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*/Header_TestGroup"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "_/Page/Arrest/*@"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*{*}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Signatory{Signed@NOTFOUND}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*@ReOCR"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/IDNumberNCData"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "all/FHA{}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "BirthDate/*"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*@Trustor"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "_{MCData}|_{LCData}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Trust"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/Component/OldCode"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "_|*/good"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Grantee/First|Grantee/Last|Grantee/Middle|Grantee/Suffix|Grantee/Title"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/DocumentData{DocumentDate}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "Item"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*@Blank|Clues|DocumentType"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*{*/Multititle@C}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*{Range}"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "RealEstate_LegalDesc/Location/Township/*|RealEstate_LegalDesc/Location/Range/*|RealEstate_LegalDesc/Location/Section/*"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/RT"
+    }
+  },
+  {
+    "Type": "QueryBasedAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "QueryText": "*/*@RequireSubattribute"
+    }
+  }
+]

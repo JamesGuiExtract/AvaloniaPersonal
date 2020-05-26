@@ -1,0 +1,792 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 3,
+        "Name": "FLEX Index - Redaction (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "Latest",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Clues": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Medical Record Number",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": true,
+                "RegExpFileName": "<RSDFileDir>\\MRN_Clues.dat.etf",
+                "Pattern": "M(edical|\\.)?\\x20*R(ecord|\\.)?\\x20*(I\\.?\\x20?D\\.?|N(umber|\\.)?|#)\\x20?:?\r\n|\r\nPa?t(ient)?\\x20*ID(entifier)?:?\r\n|\r\nPa?t(ient)?\\x20*(N(UMBER|O\\.)|#)\\x20?:?\r\n|\r\n\\b[iL1]\\.?\\x20*D\\.?#",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Create Value Rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<DocType>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "HCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=(\r\n   \\bM(edical|\\.)?\\x20*R(ecord|\\.)?\\x20*(I\\.?\\x20?D\\.?|N(umber|\\.)?|#)\\x20?:?\r\n   |\r\n   \\bPa?t(ient)?\\x20*ID(entifier)?:?\r\n   |\r\n   \\bPa?t(ient)?\\x20*(N(UMBER|O\\.)|#)\\x20?:?\r\n   |\r\n   \\b[iL1]\\.?\\x20*D\\.?#\r\n   )\r\n\\x20*)\r\n\\w+\\d\\w+(\\x20*/\\x20*\\w+\\d\\w+)?",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "MCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find numbers next to clues.",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "LoopFinder",
+              "Object": {
+                "LoopType": "WhileLoop",
+                "Condition": {
+                  "Type": "FindingRuleCondition",
+                  "Description": "<Finding rule condition>",
+                  "Enabled": true,
+                  "Object": {
+                    "AFRule": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": true,
+                        "RegExpFileName": "<RSDFileDir>\\MRN_Clues.dat.etf",
+                        "Pattern": "M(edical|\\.)?\\x20*R(ecord|\\.)?\\x20*(I\\.?\\x20?D\\.?|N(umber|\\.)?|#)\\x20?:?\r\n|\r\nPa?t(ient)?\\x20*ID(entifier)?:?\r\n|\r\nPa?t(ient)?\\x20*(N(UMBER|O\\.)|#)\\x20?:?\r\n|\r\n\\b[iL1]\\.?\\x20*D\\.?#",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": false,
+                        "CreateSubAttributesFromNamedMatches": false,
+                        "OnlyCreateOneSubAttributePerGroup": true
+                      }
+                    }
+                  }
+                },
+                "ConditionValue": true,
+                "FindingRule": {
+                  "Type": "LocateImageRegion",
+                  "Description": "<Locate image region>",
+                  "Enabled": true,
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "Text",
+                    "ImageRegionText": "test",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Character",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "\\bM(edical|\\.)?\\x20*R(ecord|\\.)?\\x20*(I\\.?\\x20?D\\.?|N(umber|\\.)?|#)\\x20?:?",
+                        "\\bPa?t(ient)?\\x20*ID(entifier)?:?",
+                        "\\bPa?t(ient)?\\x20*(N(umber|O\\.)|#)\\x20?:?",
+                        "\\b[iL1]\\.?\\x20*D\\.?#"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "ClueCharacters"
+                    },
+                    "Top": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Top",
+                      "ExpandDirection": "ExpandUp",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "ClueLines"
+                    },
+                    "Right": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 18.0,
+                      "ExpandUnits": "ClueCharacters"
+                    },
+                    "Bottom": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "ClueLines"
+                    }
+                  }
+                },
+                "Preprocessor": {
+                  "Type": "AdvancedReplaceString",
+                  "Description": "<Advanced replace string>",
+                  "Enabled": true,
+                  "Object": {
+                    "StrToBeReplaced": "M(edical|\\.)?\\x20*R(ecord|\\.)?\\x20*(I\\.?\\x20?D\\.?|N(umber|\\.)?|#)\\x20?:?|Pa?t(ient)?\\x20*ID(entifier)?:?|Pa?t(ient)?\\x20*(N(umber|o\\.)|#)\\x20?:?|\\b[iL1]\\.?\\x20*D\\.?#",
+                    "AsRegularExpression": true,
+                    "IsCaseSensitive": false,
+                    "Replacement": "",
+                    "ReplacementOccurrenceType": "First",
+                    "SpecifiedOccurrence": 0
+                  }
+                },
+                "Iterations": 10,
+                "LogExceptionForMaxIterations": false
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "RegExprRule",
+                  "Description": "<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "\\w+\\d{3,}\\w+(\\x20*/\\x20*\\w+\\d{3,}\\w+)?",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": true
+                  }
+                },
+                {
+                  "Type": "RemoveCharacters",
+                  "Description": "<Remove characters>",
+                  "Enabled": true,
+                  "Object": {
+                    "Characters": "\t\r\n",
+                    "IsCaseSensitive": false,
+                    "RemoveAll": true,
+                    "Consolidate": false,
+                    "TrimLeading": false,
+                    "TrimTrailing": false
+                  }
+                },
+                {
+                  "Type": "ReplaceStrings",
+                  "Description": "<Replace strings>",
+                  "Enabled": true,
+                  "Object": {
+                    "Replacements": [
+                      {
+                        "Pattern": "Date[\\s\\S]*",
+                        "Replacement": ""
+                      },
+                      {
+                        "Pattern": "Room[\\s\\S]*",
+                        "Replacement": ""
+                      }
+                    ],
+                    "AsRegularExpr": true,
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Find numbers under clues.",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "LoopFinder",
+              "Object": {
+                "LoopType": "WhileLoop",
+                "Condition": {
+                  "Type": "FindingRuleCondition",
+                  "Description": "<Finding rule condition>",
+                  "Enabled": true,
+                  "Object": {
+                    "AFRule": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": true,
+                        "RegExpFileName": "<RSDFileDir>\\MRN_Clues.dat.etf",
+                        "Pattern": "M(edical|\\.)?\\x20*R(ecord|\\.)?\\x20*(I\\.?\\x20?D\\.?|N(umber|\\.)?|#)\\x20?:?\r\n|\r\nPa?t(ient)?\\x20*ID(entifier)?:?\r\n|\r\nPa?t(ient)?\\x20*(N(UMBER|O\\.)|#)\\x20?:?\r\n|\r\n\\b[iL1]\\.?\\x20*D\\.?#",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": false,
+                        "CreateSubAttributesFromNamedMatches": false,
+                        "OnlyCreateOneSubAttributePerGroup": true
+                      }
+                    }
+                  }
+                },
+                "ConditionValue": true,
+                "FindingRule": {
+                  "Type": "LocateImageRegion",
+                  "Description": "<Locate image region>",
+                  "Enabled": true,
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "Text",
+                    "ImageRegionText": "test",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Character",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "\\bM(edical|\\.)?\\x20*R(ecord|\\.)?\\x20*(I\\.?\\x20?D\\.?|N(umber|\\.)?|#)\\x20?:?",
+                        "\\bPa?t(ient)?\\x20*ID(entifier)?:?",
+                        "\\bPa?t(ient)?\\x20*(N(umber|O\\.)|#)\\x20?:?",
+                        "\\b[iL1]\\.?\\x20*D\\.?#"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Left",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 10.0,
+                      "ExpandUnits": "ClueCharacters"
+                    },
+                    "Top": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandUp",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "ClueLines"
+                    },
+                    "Right": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 18.0,
+                      "ExpandUnits": "ClueCharacters"
+                    },
+                    "Bottom": {
+                      "Anchor": "ClueList1",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 2.0,
+                      "ExpandUnits": "ClueLines"
+                    }
+                  }
+                },
+                "Preprocessor": {
+                  "Type": "AdvancedReplaceString",
+                  "Description": "<Advanced replace string>",
+                  "Enabled": true,
+                  "Object": {
+                    "StrToBeReplaced": "M(edical|\\.)?\\x20*R(ecord|\\.)?\\x20*(I\\.?\\x20?D\\.?|N(umber|\\.)?|#)\\x20?:?|Pa?t(ient)?\\x20*ID(entifier)?:?|Pa?t(ient)?\\x20*(N(umber|o\\.)|#)\\x20?:?|\\b[iL1]\\.?\\x20*D\\.?#",
+                    "AsRegularExpression": true,
+                    "IsCaseSensitive": false,
+                    "Replacement": "",
+                    "ReplacementOccurrenceType": "First",
+                    "SpecifiedOccurrence": 0
+                  }
+                },
+                "Iterations": 10,
+                "LogExceptionForMaxIterations": false
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "RegExprRule",
+                  "Description": "<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "\\w+\\d{3,}\\w+(\\x20*/\\x20*\\w+\\d{3,}\\w+)?",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": true
+                  }
+                },
+                {
+                  "Type": "RemoveCharacters",
+                  "Description": "<Remove characters>",
+                  "Enabled": true,
+                  "Object": {
+                    "Characters": "\t\r\n",
+                    "IsCaseSensitive": false,
+                    "RemoveAll": true,
+                    "Consolidate": false,
+                    "TrimLeading": false,
+                    "TrimTrailing": false
+                  }
+                },
+                {
+                  "Type": "ReplaceStrings",
+                  "Description": "<Replace strings>",
+                  "Enabled": true,
+                  "Object": {
+                    "Replacements": [
+                      {
+                        "Pattern": "Date[\\s\\S]*",
+                        "Replacement": ""
+                      },
+                      {
+                        "Pattern": "Room[\\s\\S]*",
+                        "Replacement": ""
+                      }
+                    ],
+                    "AsRegularExpr": true,
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Find \"Patient ID\" boxes.",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "BoxFinder",
+              "Object": {
+                "AttributeText": "000-00-0000",
+                "BoxHeightMax": {
+                  "Case": "Some",
+                  "Fields": [
+                    10.0
+                  ]
+                },
+                "BoxHeightMin": null,
+                "BoxWidthMax": {
+                  "Case": "Some",
+                  "Fields": [
+                    25.0
+                  ]
+                },
+                "BoxWidthMin": null,
+                "ClueLocation": "SameBox",
+                "Clues": [
+                  "\\bM(edical|\\.)?\\x20*R(ecord|\\.)?\\x20*(N(umber|\\.)?|#)\\x20?:?",
+                  "\\bPa?t(ient)?\\x20*ID(entifier)?:?",
+                  "\\bPa?t(ient)?\\x20*(N(umber|O\\.)|#)\\x20?:?"
+                ],
+                "CluesAreCaseSensitive": false,
+                "CluesAreRegularExpressions": true,
+                "ExcludeClueArea": false,
+                "FindType": "Text",
+                "FirstBoxOnly": false,
+                "IncludeClueText": false,
+                "IncludeLines": false,
+                "NumFirstPages": 0,
+                "NumLastPages": 0,
+                "PageSelectionMode": "AllPages",
+                "SpecifiedPages": ""
+              }
+            },
+            "IgnoreErrors": true,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Remove overlaps.<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove overlaps with HCData.<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "SpatialProximityAS",
+                      "Object": {
+                        "TargetQuery": "MCData|LCData",
+                        "TargetsMustContainReferences": false,
+                        "RequireCompleteInclusion": false,
+                        "ReferenceQuery": "HCData",
+                        "Left": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Left",
+                          "ExpandDirection": "ExpandLeft",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Top": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandUp",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Right": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Right",
+                          "ExpandDirection": "ExpandRight",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Bottom": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Bottom",
+                          "ExpandDirection": "ExpandDown",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "CompareLinesSeparately": true,
+                        "IncludeDebugAttributes": false
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove overlaps with MCData.<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "SpatialProximityAS",
+                      "Object": {
+                        "TargetQuery": "LCData",
+                        "TargetsMustContainReferences": false,
+                        "RequireCompleteInclusion": false,
+                        "ReferenceQuery": "MCData",
+                        "Left": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Left",
+                          "ExpandDirection": "ExpandLeft",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Top": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandUp",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Right": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Right",
+                          "ExpandDirection": "ExpandRight",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Bottom": {
+                          "Anchor": "ReferenceAttribute",
+                          "AnchorSide": "Bottom",
+                          "ExpandDirection": "ExpandDown",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "CompareLinesSeparately": true,
+                        "IncludeDebugAttributes": false
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveCharacters",
+            "Description": "Removing leading/trailing spaces.<Remove characters>",
+            "Enabled": true,
+            "Object": {
+              "Characters": " ",
+              "IsCaseSensitive": false,
+              "RemoveAll": false,
+              "Consolidate": true,
+              "TrimLeading": true,
+              "TrimTrailing": true
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Change type to MRN.<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "MRN",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

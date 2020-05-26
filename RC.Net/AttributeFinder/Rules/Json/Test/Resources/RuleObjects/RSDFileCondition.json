@@ -1,0 +1,802 @@
+[
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\IsDearborn.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>/IsMultiPage.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\RelCountyTax\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\Certificate of Death\\SSN-COD.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\FinancingStatement\\StateRules\\California\\is_CA_UCC.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\InfoParentProceedAffidavit\\isInfoParentProceedAffidavit.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\FinStatement\\is_CA_UCC.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\MilitaryDischarge\\isMilitaryDischarge.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\IsTestName.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\PhysCert\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Release of Mechanics Lien\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\SSN\\IndictmentOrder\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\IsOddAmendment.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\CheckCopies\\IsCheckPage.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Misc\\hasSSNColumn.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\HandleStoneComponents\\isStoneComponent.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\InParagraph\\IsParagraphPage.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Misc\\MoreSealsThanSocials.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\numbers\\has_number.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\PromissoryNote\\isPromissoryNote.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\CriminalTranscript\\IsCriminalTranscript.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Deed of Trust\\isAssignmentofRents.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\MiniClassifier\\WarrantyDeed.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\AOJ\\IsAOJ.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Shared\\IsVehicleCode.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\AffidavitDeath\\isLifeTenant.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\normalFollowedByAbnormal.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\will\\isWill.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\IsSubordinationAgreement.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\PatriotActDisclosure\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\FingerprintOrder\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\TaxLienTester.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Shared\\IsCriminalProceedings.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\SSN\\FedTaxLien\\IsFedTaxLien.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\SignaturePage\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Mortgages\\IsMortgageSignaturePage.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\isLaneCounty.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\isUnderLabAddress.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Affidavit of Death\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\DD214\\MilitaryDischarge\\isMilitaryDischarge.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Shared\\hasVid.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\AckPaternity\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\TallColumn\\isStartOfColumn.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\findTaxIDRegion.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\LastDitchHelper.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\SSN-COD.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Shared\\IsCommitment.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\AssignmentOfMortgage_Rule1_Condition1.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\TermOfInterest\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\WorkersCompBoard\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\IsNoticeOfStateTaxLien.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\isCommercialPromissoryNote.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\FinancingStatement\\IsVAUCC.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Shared\\IsCriminalInformation.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Lease\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Mesc Lien\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\ShowCauseOrder\\IsShowCauseOrder.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Classifiers\\OE_Real_Estate_MTG_AGCO_MTG_IA.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\IsWill.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Has6A.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\SellerAffidavit\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\AttributeFound.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\MDOT\\IsMortgageSignaturePageWithSSNClues.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\AdjustableRateNote\\IsAdjustableRateNote.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Trustees Deed\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\MiniClassifier\\ModificationOfDeedOfTrust.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\IsMortgageSignaturePage.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\ReOCR\\NeedReOCR.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\MedRecordCopy\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\ReleaseOfJudgment\\IsReleaseOfJudgment.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\AssignmentOfMortgage_Rule1_Condition2.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Type_1\\Type_A\\isNonFasting.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\PetProbGrantLett\\isPetProbGrantLett.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\GenericSignaturePage\\isSmallSignaturePage.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\WarrantyDeed\\IsWarrantyDeed.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Classifiers\\Mortgage_3016_990.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Offense_Report.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\areaAboveClueIsEmpty.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\shouldCheckLineBelowName.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\OilGasLease\\IsOilAndGasLeaseSignaturePage.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\isNotaryBond.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Epic\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\SocialSecurityNumber\\HandwrittenSSN\\lineToTheRight.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\ChildSupport\\IsChildSupport.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\DLN\\VehicleCode\\RemoveDLNClues.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\RelMechLien\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Is_Line_Type_MDOT.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\TrustSale\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\isNOSTL.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Mortgage_Rule7_Condition1.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Shared\\isPotentialHeaderLO.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\clueIsInBox.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Shared\\IsCosmeticAct.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\TextOnNextLine.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Complaint\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Foreclosure\\IsForeclosure.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Checks\\is.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\StatementsCompanyAgent\\isStatementsCompanyAgent.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\UCC\\IsFinancingStatement.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDFileCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Notice of Assessment Lien\\is.rsd.etf"
+    }
+  }
+]

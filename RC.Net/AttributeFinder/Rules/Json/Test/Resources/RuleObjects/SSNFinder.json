@@ -1,0 +1,32 @@
+[
+  {
+    "Type": "SSNFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SubattributeName": "SSN",
+      "SpatialSubattribute": true,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "SSNFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SubattributeName": "SSN",
+      "SpatialSubattribute": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "SSNFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SubattributeName": "SSN",
+      "SpatialSubattribute": true,
+      "ClearIfNoneFound": false
+    }
+  }
+]

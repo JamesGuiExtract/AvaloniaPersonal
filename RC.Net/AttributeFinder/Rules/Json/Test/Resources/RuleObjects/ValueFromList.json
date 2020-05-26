@@ -1,0 +1,705 @@
+[
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "NotDeletedPage"
+      ],
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "AK"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "00",
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "1984",
+        "1985",
+        "1986",
+        "1987",
+        "1988",
+        "1989",
+        "1990",
+        "1991",
+        "1992",
+        "1993",
+        "1994",
+        "1995",
+        "1996",
+        "1997",
+        "1998",
+        "1999",
+        "20",
+        "2000",
+        "2001",
+        "2002",
+        "2003",
+        "2004",
+        "2005",
+        "2006",
+        "2007",
+        "2008",
+        "2009",
+        "2010",
+        "2011",
+        "2012",
+        "2013",
+        "2014",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020",
+        "84",
+        "85",
+        "86",
+        "87",
+        "88",
+        "89",
+        "90",
+        "91",
+        "92",
+        "93",
+        "94",
+        "95",
+        "96",
+        "97",
+        "98",
+        "99"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "DoNotVerify"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "block"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "Alabama",
+        "Alaska",
+        "Arizona",
+        "Arkansas",
+        "California",
+        "Colorado",
+        "Connecticut",
+        "Delaware",
+        "Florida",
+        "Georgia",
+        "Hawaii",
+        "Idaho",
+        "Illinois",
+        "Indiana",
+        "Iowa",
+        "Kansas",
+        "Kentucky",
+        "Louisiana",
+        "Maine",
+        "Maryland",
+        "Massachusetts",
+        "Michigan",
+        "Minnesota",
+        "Mississippi",
+        "Missouri",
+        "Montana",
+        "Nebraska",
+        "Nevada",
+        "New Hampshire",
+        "New Jersey",
+        "New Mexico",
+        "New York",
+        "North Carolina",
+        "North Dakota",
+        "Ohio",
+        "Oklahoma",
+        "Oregon",
+        "Pennsylvania",
+        "Rhode Island",
+        "South Carolina",
+        "South Dakota",
+        "Tennessee",
+        "Texas",
+        "Utah",
+        "Vermont",
+        "Virginia",
+        "Washington",
+        "West Virginia",
+        "Wisconsin"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "file://<RSDFileDir>\\..\\Solution\\Rules\\TestResults\\Differential.dat.etf"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "COCSK"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "1991",
+        "1992",
+        "1993",
+        "1994",
+        "1995",
+        "1996",
+        "1997",
+        "1998",
+        "1999",
+        "20",
+        "2000",
+        "2001",
+        "2002",
+        "2003",
+        "2004",
+        "2005",
+        "2006",
+        "2007",
+        "2008",
+        "2009",
+        "2010",
+        "2011",
+        "2012",
+        "2013",
+        "2014",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020",
+        "91",
+        "92",
+        "93",
+        "94",
+        "95",
+        "96",
+        "97",
+        "98",
+        "99"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "Unknown"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "file://<RSDFileDir>\\getReference.dat.etf"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "GarbageText",
+        "ReallyLongGarbageText"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "Original plat of",
+        "Original plat of the village",
+        "Village"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "file://<RSDFileDir>\\excludedAKAs.txt"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "(SOC)"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "Village"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "MORTGAGE ELECTRONIC REG"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "SpecialOrder"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "000-00-0000"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "Order Requisition",
+        "Other (Unknown)",
+        "SpecialOrder"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "EASEMENTS",
+        "GOVERNMENT LOT",
+        "OUTLOT"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "00",
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "1993",
+        "1994",
+        "1995",
+        "1996",
+        "1997",
+        "1998",
+        "1999",
+        "20",
+        "2000",
+        "2001",
+        "2002",
+        "2003",
+        "2004",
+        "2005",
+        "2006",
+        "2007",
+        "2008",
+        "2009",
+        "2010",
+        "2011",
+        "2012",
+        "2013",
+        "2014",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020",
+        "93",
+        "94",
+        "95",
+        "96",
+        "97",
+        "98",
+        "99"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "COCF"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "Includes Parcels"
+      ],
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "EASEMENTS",
+        "GOVERNMENT LOT",
+        "OUTLOT",
+        "RIGHT TO USE",
+        "SOUTH OF BLOCKS",
+        "STATE SUBDIV"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "DIVISION OF CHILD SUPPORT ENFORCEMENT",
+        "DIVISION OF CHILD SUPPORT-ENFORCEMENT"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "% BASOS (OUTSIDE)",
+        "% EOS (OUTSIDE)",
+        "% LYMPHS (OUTSIDE)",
+        "% MONOS (OUTSIDE)",
+        "% NEUTROPHILS  (OUTSIDE)",
+        "BASOPHILS (OUTSIDE)",
+        "EOSINOPHILS (OUTSIDE)",
+        "LYMPHOCYTES (OUTSIDE)",
+        "MONOCYTES (OUTSIDE)",
+        "NEUTROPHILS (OUTSIDE)"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "Order Requisition"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "during"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "file://<RSDFileDir>\\TestResults\\Differential.dat.etf"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "F",
+        "Female",
+        "M",
+        "Male"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "00",
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "1991",
+        "1992",
+        "1993",
+        "1994",
+        "1995",
+        "1996",
+        "1997",
+        "1998",
+        "1999",
+        "20",
+        "2000",
+        "2001",
+        "2002",
+        "2003",
+        "2004",
+        "2005",
+        "2006",
+        "2007",
+        "2008",
+        "2009",
+        "2010",
+        "2011",
+        "2012",
+        "2013",
+        "2014",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020",
+        "91",
+        "92",
+        "93",
+        "94",
+        "95",
+        "96",
+        "97",
+        "98",
+        "99"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "0"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "HIDE"
+      ],
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "ValueFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ValueList": [
+        "Special"
+      ],
+      "IsCaseSensitive": false
+    }
+  }
+]

@@ -1,0 +1,267 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Doc",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocPreprocessorSequence",
+      "Description": "getSensitiveCellsFromDocument<Select multiple document preprocessors>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "FSharpPreprocessor",
+            "Description": "getSensitiveCellsFromDocument<FSharp preprocessor>",
+            "Enabled": true,
+            "Object": {
+              "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+              "FunctionName": "getSensitiveCellsFromDocument"
+            }
+          }
+        ]
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find on subattributes",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "RunObjectOnAttributes",
+                    "Description": "*/* -> sensitiveCells.rsd<Run object on attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*/*",
+                      "AttributeSelector": {
+                        "Type": null,
+                        "Object": null
+                      },
+                      "UseAttributeSelector": false,
+                      "Type": "Splitter",
+                      "Object": {
+                        "Type": "RSDSplitter",
+                        "Object": {
+                          "RSDFileName": "<RSDFileDir>\\sensitiveCells.rsd.etf"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "Mark */* for deletion<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*/*",
+                      "CreateSubAttribute": false,
+                      "AttributeName": "Delete",
+                      "SetAttributeName": true,
+                      "AttributeType": "",
+                      "SetAttributeType": false,
+                      "AttributeValue": "",
+                      "SetAttributeValue": false
+                    }
+                  },
+                  {
+                    "Type": "MoveAndModifyAttributes",
+                    "Description": "Promote */*/*<Move and modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AddAttributeNameToType": false,
+                      "AddRootOrParentAttributeType": true,
+                      "AddSpecifiedAttributeType": false,
+                      "AttributeQuery": "*/*/*",
+                      "DeleteRootOrParentIfAllChildrenMoved": false,
+                      "MoveAttributeLevel": "MoveToParent",
+                      "OverwriteAttributeName": "DoNotOverwrite",
+                      "RetainAttributeType": false,
+                      "SpecifiedAttributeName": "",
+                      "SpecifiedAttributeType": ""
+                    }
+                  },
+                  {
+                    "Type": "RemoveSubAttributes",
+                    "Description": "Remove marked<Remove attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeSelector": {
+                        "Type": "QueryBasedAS",
+                        "Object": {
+                          "QueryText": "*/Delete"
+                        }
+                      },
+                      "ConditionalRemove": false,
+                      "DataScorer": {
+                        "Type": null,
+                        "Description": "",
+                        "Enabled": true,
+                        "Object": null
+                      },
+                      "ScoreCondition": "EQ",
+                      "CompareConditionType": "ValueOf",
+                      "ScoreToCompare": 0
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "merge<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\Merge\\main.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Find repeats<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\FindRepeats\\main.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Mark top level for deletion<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "Delete",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote */*<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove marked<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "Delete"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

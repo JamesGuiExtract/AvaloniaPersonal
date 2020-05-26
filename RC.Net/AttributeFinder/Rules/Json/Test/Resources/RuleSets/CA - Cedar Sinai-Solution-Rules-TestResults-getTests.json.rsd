@@ -1,0 +1,2693 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "_",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocPreprocessorSequence",
+      "Description": "<Select multiple document preprocessors>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "SetDocumentTags",
+            "Description": "Set CustomerOrderMappingDB<Set document tags>",
+            "Enabled": true,
+            "Object": {
+              "SetStringTag": {
+                "TagName": "CustomerOrderMappingDB",
+                "Generator": "Literal",
+                "SpecifiedValue": "<RSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf",
+                "ValuesFromTag": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "Delimiter": ";"
+              },
+              "SetObjectTag": {
+                "TagName": null,
+                "Generator": "None",
+                "SpecifiedValue": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                }
+              },
+              "NoTagsIfEmpty": false,
+              "GenerateSourceAttributesWithRSDFile": false,
+              "SourceAttributeRSDFile": ""
+            }
+          },
+          {
+            "Type": "SetDocumentTags",
+            "Description": "Set CustomRulesDir<Set document tags>",
+            "Enabled": true,
+            "Object": {
+              "SetStringTag": {
+                "TagName": "CustomRulesDir",
+                "Generator": "Literal",
+                "SpecifiedValue": "<RSDFileDir>\\CustomRules",
+                "ValuesFromTag": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "Delimiter": ";"
+              },
+              "SetObjectTag": {
+                "TagName": null,
+                "Generator": "None",
+                "SpecifiedValue": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                }
+              },
+              "NoTagsIfEmpty": false,
+              "GenerateSourceAttributesWithRSDFile": false,
+              "SourceAttributeRSDFile": ""
+            }
+          },
+          {
+            "Type": "SetDocumentTags",
+            "Description": "Set <DoNotFindResultDate><Set document tags>",
+            "Enabled": true,
+            "Object": {
+              "SetStringTag": {
+                "TagName": "DoNotFindResultDate",
+                "Generator": "Literal",
+                "SpecifiedValue": "",
+                "ValuesFromTag": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "Delimiter": ";"
+              },
+              "SetObjectTag": {
+                "TagName": null,
+                "Generator": "None",
+                "SpecifiedValue": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                }
+              },
+              "NoTagsIfEmpty": false,
+              "GenerateSourceAttributesWithRSDFile": false,
+              "SourceAttributeRSDFile": ""
+            }
+          },
+          {
+            "Type": "SetDocumentTags",
+            "Description": "Set UserCustomerDefinedUnitsWhenAvailable<Set document tags>",
+            "Enabled": true,
+            "Object": {
+              "SetStringTag": {
+                "TagName": "UseCustomerDefinedUnitsWhenAvailable",
+                "Generator": "Literal",
+                "SpecifiedValue": "Just has to be set to something",
+                "ValuesFromTag": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "Delimiter": ";"
+              },
+              "SetObjectTag": {
+                "TagName": null,
+                "Generator": "None",
+                "SpecifiedValue": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                }
+              },
+              "NoTagsIfEmpty": false,
+              "GenerateSourceAttributesWithRSDFile": false,
+              "SourceAttributeRSDFile": ""
+            }
+          }
+        ]
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "Find tests<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "TestResults\\main.rsd.etf<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<ComponentDataDir>\\LabDE\\TestResults\\main.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove *!{*}<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*{*}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "ConditionalOutputHandler",
+            "Description": "If IBDSGI, Name to IBD sgi Diagnostic<Conditionally handle output>",
+            "Enabled": true,
+            "Object": {
+              "Condition": {
+                "Type": "RSDFileCondition",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\CustomRules\\isIBDSGI.rsd.etf"
+                }
+              },
+              "InvertCondition": false,
+              "Rule": {
+                "Type": "OutputHandlerSequence",
+                "Object": {
+                  "ObjectsVector": [
+                    {
+                      "Type": "ModifyAttributeValueOH",
+                      "Description": "Unknown->IBD<Modify attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "*/*/Name",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "",
+                        "SetAttributeName": false,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "IBD sgi Diagnostic",
+                        "SetAttributeValue": true
+                      }
+                    },
+                    {
+                      "Type": "MergeAttributeTrees",
+                      "Description": "Merge on Name<Merge attribute trees>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributesToBeMerged": "*/Test",
+                        "SubAttributesToCompare": [
+                          "Name"
+                        ],
+                        "CaseSensitive": false,
+                        "DiscardNonMatchingComparisons": false,
+                        "MergeAttributeTreesInto": "AttributeWithMostChildren",
+                        "RemoveEmptyHierarchy": true
+                      }
+                    },
+                    {
+                      "Type": "RunObjectOnAttributes",
+                      "Description": "Fix missing TestCodes<Run object on attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "*/*/Component",
+                        "AttributeSelector": {
+                          "Type": "MultipleCriteriaSelector",
+                          "Object": {
+                            "Selectors": [
+                              {
+                                "Select": "NonMatching",
+                                "With": {
+                                  "Type": "QueryBasedAS",
+                                  "Description": "No TestCode!?<Query attribute selector>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "QueryText": "*{TestCode}"
+                                  }
+                                }
+                              }
+                            ],
+                            "CombineBy": "Chain"
+                          }
+                        },
+                        "UseAttributeSelector": true,
+                        "Type": "OutputHandler",
+                        "Object": {
+                          "Type": "ModifyAttributeValueOH",
+                          "Object": {
+                            "AttributeQuery": "*",
+                            "CreateSubAttribute": true,
+                            "AttributeName": "TestCode",
+                            "SetAttributeName": true,
+                            "AttributeType": "",
+                            "SetAttributeType": false,
+                            "AttributeValue": "%Value%",
+                            "SetAttributeValue": true
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "Type": "OutputHandlerSequence",
+                      "Description": "Fix ASCAG (FIXED off b/c ruins DGPG tests [K:\\SecureSamples\\CA-CedarsSinai\\Set002\\Images\\LSS_Copier@cshs.org_20171208_143129.pdf_2.tif])<Select multiple output handlers>",
+                      "Enabled": true,
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Set type for ASCAG<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/*/Component",
+                              "AttributeSelector": {
+                                "Type": "MultipleCriteriaSelector",
+                                "Object": {
+                                  "Selectors": [
+                                    {
+                                      "Select": "Matching",
+                                      "With": {
+                                        "Type": "QueryBasedAS",
+                                        "Description": "Look at OriginalName<Query attribute selector>",
+                                        "Enabled": true,
+                                        "Object": {
+                                          "QueryText": "*/OriginalName"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "Select": "Matching",
+                                      "With": {
+                                        "Type": "ValueConditionSelector",
+                                        "Description": "IgG?<Value condition selector>",
+                                        "Enabled": true,
+                                        "Object": {
+                                          "Condition": {
+                                            "Type": "FindingRuleCondition",
+                                            "Object": {
+                                              "AFRule": {
+                                                "Type": "RegExprRule",
+                                                "Object": {
+                                                  "IsRegExpFromFile": false,
+                                                  "RegExpFileName": "",
+                                                  "Pattern": "ASCA\\W*\\bIgG\\b",
+                                                  "IsCaseSensitive": false,
+                                                  "FirstMatchOnly": true,
+                                                  "CreateSubAttributesFromNamedMatches": false,
+                                                  "OnlyCreateOneSubAttributePerGroup": false
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ],
+                                  "CombineBy": "Chain"
+                                }
+                              },
+                              "UseAttributeSelector": true,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "TranslateValue",
+                                "Object": {
+                                  "TranslateFieldType": "Type",
+                                  "TranslationStringPairs": [
+                                    {
+                                      "From": "",
+                                      "To": "ITSASCAG"
+                                    }
+                                  ],
+                                  "IsCaseSensitive": false
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Set Component name for ASCAG<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/*/Component{OriginalName@ITSASCAG}",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "",
+                              "SetAttributeType": false,
+                              "AttributeValue": "ASCAG",
+                              "SetAttributeValue": true
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Change TestCode for ASCAG to ASCAG<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/*/Component",
+                              "AttributeSelector": {
+                                "Type": "ValueConditionSelector",
+                                "Object": {
+                                  "Condition": {
+                                    "Type": "FindingRuleCondition",
+                                    "Object": {
+                                      "AFRule": {
+                                        "Type": "RegExprRule",
+                                        "Object": {
+                                          "IsRegExpFromFile": false,
+                                          "RegExpFileName": "",
+                                          "Pattern": "ASCAG",
+                                          "IsCaseSensitive": false,
+                                          "FirstMatchOnly": true,
+                                          "CreateSubAttributesFromNamedMatches": false,
+                                          "OnlyCreateOneSubAttributePerGroup": false
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "UseAttributeSelector": true,
+                              "Type": "OutputHandler",
+                              "Object": {
+                                "Type": "ModifyAttributeValueOH",
+                                "Object": {
+                                  "AttributeQuery": "*/TestCode",
+                                  "CreateSubAttribute": false,
+                                  "AttributeName": "",
+                                  "SetAttributeName": false,
+                                  "AttributeType": "",
+                                  "SetAttributeType": false,
+                                  "AttributeValue": "ASCAG",
+                                  "SetAttributeValue": true
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote */* as Test<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "OverwriteWithSpecifiedName",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "Test",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove */Name if UnknownOrder<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*/Name<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*/Name"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "ValueConditionSelector",
+                        "Description": "UnknownOrder<Value condition selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "Condition": {
+                            "Type": "FindingRuleCondition",
+                            "Object": {
+                              "AFRule": {
+                                "Type": "RegExprRule",
+                                "Object": {
+                                  "IsRegExpFromFile": false,
+                                  "RegExpFileName": "",
+                                  "Pattern": "\\AUnknownOrder\\z",
+                                  "IsCaseSensitive": false,
+                                  "FirstMatchOnly": true,
+                                  "CreateSubAttributesFromNamedMatches": false,
+                                  "OnlyCreateOneSubAttributePerGroup": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove !*{Name}<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*{Name}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{Name}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Test/Component/ESNames<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "Test/Component/ESNames"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Remove Tests with value of TNP or PENDING<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Cond set name of */Component/Value to Remove<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/Component/Value",
+                    "AttributeSelector": {
+                      "Type": "ValueConditionSelector",
+                      "Object": {
+                        "Condition": {
+                          "Type": "FindingRuleCondition",
+                          "Object": {
+                            "AFRule": {
+                              "Type": "RegExprRule",
+                              "Object": {
+                                "IsRegExpFromFile": false,
+                                "RegExpFileName": "",
+                                "Pattern": "(?nx)\r\n\\A(\r\n    TNP\r\n  | PEND(ING)?\r\n  | SEN[DT]\\sOUT\r\n  | Collected\r\n)\\z",
+                                "IsCaseSensitive": false,
+                                "FirstMatchOnly": true,
+                                "CreateSubAttributesFromNamedMatches": false,
+                                "OnlyCreateOneSubAttributePerGroup": true
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "Remove",
+                        "SetAttributeName": true,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "",
+                        "SetAttributeValue": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove */Component{Remove}<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/Component{Remove}"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Tests with no Components<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "Test<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "Test"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "Test{Component}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "Test{Component}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove empty units<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/*/Units"
+                }
+              },
+              "ConditionalRemove": true,
+              "DataScorer": {
+                "Type": "CharacterConfidenceDS",
+                "Description": "<Character confidence data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "AggregateFunction": "Average"
+                }
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Translate Flag values<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/*/Flag",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "ReplaceStrings",
+                "Object": {
+                  "Replacements": [
+                    {
+                      "Pattern": "file://<RSDFileDir>\\translateFlag.dat.etf;%",
+                      "Replacement": ""
+                    }
+                  ],
+                  "AsRegularExpr": true,
+                  "IsCaseSensitive": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Handle Allergen orders (RA#)<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Make AllergenOrder subattribute of OrderCode if an allergen order<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/OrderCode",
+                    "AttributeSelector": {
+                      "Type": "ValueConditionSelector",
+                      "Object": {
+                        "Condition": {
+                          "Type": "FindingRuleCondition",
+                          "Object": {
+                            "AFRule": {
+                              "Type": "RegExprRule",
+                              "Object": {
+                                "IsRegExpFromFile": false,
+                                "RegExpFileName": "",
+                                "Pattern": "^RA\\d+$",
+                                "IsCaseSensitive": false,
+                                "FirstMatchOnly": true,
+                                "CreateSubAttributesFromNamedMatches": false,
+                                "OnlyCreateOneSubAttributePerGroup": false
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "ModifyAttributeValueOH",
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "CreateSubAttribute": true,
+                        "AttributeName": "AllergenOrder",
+                        "SetAttributeName": true,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "",
+                        "SetAttributeValue": false
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Process *{OrderCode/AllergenOrder}<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{OrderCode/AllergenOrder}",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "RemoveSubAttributes",
+                            "Description": "Remove */OrderCode/AllergenOrder<Remove attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeSelector": {
+                                "Type": "QueryBasedAS",
+                                "Object": {
+                                  "QueryText": "*/OrderCode/AllergenOrder"
+                                }
+                              },
+                              "ConditionalRemove": false,
+                              "DataScorer": {
+                                "Type": null,
+                                "Description": "",
+                                "Enabled": true,
+                                "Object": null
+                              },
+                              "ScoreCondition": "EQ",
+                              "CompareConditionType": "ValueOf",
+                              "ScoreToCompare": 0
+                            }
+                          },
+                          {
+                            "Type": "OutputHandlerSequence",
+                            "Description": "Change test codes<Select multiple output handlers>",
+                            "Enabled": true,
+                            "Object": {
+                              "ObjectsVector": [
+                                {
+                                  "Type": "ModifyAttributeValueOH",
+                                  "Description": "Rename TestCode OldCode<Modify attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/TestCode",
+                                    "CreateSubAttribute": false,
+                                    "AttributeName": "OldCode",
+                                    "SetAttributeName": true,
+                                    "AttributeType": "",
+                                    "SetAttributeType": false,
+                                    "AttributeValue": "",
+                                    "SetAttributeValue": false
+                                  }
+                                },
+                                {
+                                  "Type": "CreateAttribute",
+                                  "Description": "Decrement numbers, etc, for NewCode subattributes<Create attribute>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "Root": "/*/*/Component",
+                                    "SubAttributesToCreate": [
+                                      {
+                                        "Name": "TestCode",
+                                        "NameContainsXPath": false,
+                                        "DoNotCreateIfNameIsEmpty": false,
+                                        "TypeOfAttribute": "OldCode[text() = 'RA1']",
+                                        "TypeContainsXPath": true,
+                                        "DoNotCreateIfTypeIsEmpty": true,
+                                        "Value": "concat('R', substring(../OrderCode, 3, 1))",
+                                        "ValueContainsXPath": true,
+                                        "DoNotCreateIfValueIsEmpty": false
+                                      },
+                                      {
+                                        "Name": "TestCode",
+                                        "NameContainsXPath": false,
+                                        "DoNotCreateIfNameIsEmpty": false,
+                                        "TypeOfAttribute": "OldCode[not(text() = 'RA1')][not(text() = 'R2')]",
+                                        "TypeContainsXPath": true,
+                                        "DoNotCreateIfTypeIsEmpty": true,
+                                        "Value": "concat('R', substring(OldCode, 2, 1) - 1)",
+                                        "ValueContainsXPath": true,
+                                        "DoNotCreateIfValueIsEmpty": false
+                                      },
+                                      {
+                                        "Name": "TestCode",
+                                        "NameContainsXPath": false,
+                                        "DoNotCreateIfNameIsEmpty": false,
+                                        "TypeOfAttribute": "OldCode[text() = 'R2']",
+                                        "TypeContainsXPath": true,
+                                        "DoNotCreateIfTypeIsEmpty": true,
+                                        "Value": "RA1",
+                                        "ValueContainsXPath": false,
+                                        "DoNotCreateIfValueIsEmpty": false
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "Type": "ModifyAttributeValueOH",
+                                  "Description": "Clear type of Component/TestCode<Modify attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/TestCode",
+                                    "CreateSubAttribute": false,
+                                    "AttributeName": "",
+                                    "SetAttributeName": false,
+                                    "AttributeType": "",
+                                    "SetAttributeType": true,
+                                    "AttributeValue": "",
+                                    "SetAttributeValue": false
+                                  }
+                                },
+                                {
+                                  "Type": "RemoveSubAttributes",
+                                  "Description": "Remove Component/OldCode<Remove attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeSelector": {
+                                      "Type": "QueryBasedAS",
+                                      "Object": {
+                                        "QueryText": "*/Component/OldCode"
+                                      }
+                                    },
+                                    "ConditionalRemove": false,
+                                    "DataScorer": {
+                                      "Type": null,
+                                      "Description": "",
+                                      "Enabled": true,
+                                      "Object": null
+                                    },
+                                    "ScoreCondition": "EQ",
+                                    "CompareConditionType": "ValueOf",
+                                    "ScoreToCompare": 0
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "Type": "OutputHandlerSequence",
+                            "Description": "Expand values to include allergen name<Select multiple output handlers>",
+                            "Enabled": true,
+                            "Object": {
+                              "ObjectsVector": [
+                                {
+                                  "Type": "CreateAttribute",
+                                  "Description": "Make Expanded subattribute of Value that is a copy of OriginalName<Create attribute>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "Root": "/*/*/*/Value",
+                                    "SubAttributesToCreate": [
+                                      {
+                                        "Name": "Expanded",
+                                        "NameContainsXPath": false,
+                                        "DoNotCreateIfNameIsEmpty": false,
+                                        "TypeOfAttribute": "",
+                                        "TypeContainsXPath": false,
+                                        "DoNotCreateIfTypeIsEmpty": false,
+                                        "Value": "../OriginalName",
+                                        "ValueContainsXPath": true,
+                                        "DoNotCreateIfValueIsEmpty": false
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Make region to the left, including original name area<Run object on attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value/Expanded",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Modifier",
+                                    "Object": {
+                                      "Type": "LocateImageRegion",
+                                      "Object": {
+                                        "DataInsideBoundaries": true,
+                                        "FindType": "ImageRegion",
+                                        "ImageRegionText": " ",
+                                        "IncludeIntersectingEntities": true,
+                                        "IntersectingEntityType": "Character",
+                                        "MatchMultiplePagesPerDocument": true,
+                                        "ClueList1": {
+                                          "Clues": [
+                                            "[\\S\\s]+"
+                                          ],
+                                          "CaseSensitive": false,
+                                          "Regex": true,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "ClueList2": {
+                                          "Clues": [],
+                                          "CaseSensitive": false,
+                                          "Regex": false,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "ClueList3": {
+                                          "Clues": [],
+                                          "CaseSensitive": false,
+                                          "Regex": false,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "ClueList4": {
+                                          "Clues": [],
+                                          "CaseSensitive": false,
+                                          "Regex": false,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "Left": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Left",
+                                          "ExpandDirection": "ExpandLeft",
+                                          "ExpandBy": 2.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Top": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Top",
+                                          "ExpandDirection": "ExpandUp",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Right": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Right",
+                                          "ExpandDirection": "ExpandRight",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Bottom": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Bottom",
+                                          "ExpandDirection": "ExpandDown",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Extract OCR text<Run object on attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value/Expanded",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Modifier",
+                                    "Object": {
+                                      "Type": "ExtractOcrTextInImageArea",
+                                      "Object": {
+                                        "IncludeTextOnBoundary": true,
+                                        "SpatialEntityType": "Word",
+                                        "UseOriginalDocumentOcr": false,
+                                        "UseOverallBounds": true
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Cleanup Expanded<Run object on attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value/Expanded",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Modifier",
+                                    "Object": {
+                                      "Type": "AdvancedReplaceString",
+                                      "Object": {
+                                        "StrToBeReplaced": "(?nx) \\A\\W+ | [\\r\\n]+",
+                                        "AsRegularExpression": true,
+                                        "IsCaseSensitive": false,
+                                        "Replacement": " ",
+                                        "ReplacementOccurrenceType": "All",
+                                        "SpecifiedOccurrence": 0
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "ModifyAttributeValueOH",
+                                  "Description": "Combine expanded value with original value<Modify attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value",
+                                    "CreateSubAttribute": false,
+                                    "AttributeName": "",
+                                    "SetAttributeName": false,
+                                    "AttributeType": "",
+                                    "SetAttributeType": false,
+                                    "AttributeValue": ";%Expanded% = %Value%",
+                                    "SetAttributeValue": true
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Cleanup Value<Run object on attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Modifier",
+                                    "Object": {
+                                      "Type": "AdvancedReplaceString",
+                                      "Object": {
+                                        "StrToBeReplaced": "(?nx) \\A;\\x20=\\x20 | \\x20(?=\\x20)",
+                                        "AsRegularExpression": true,
+                                        "IsCaseSensitive": false,
+                                        "Replacement": "",
+                                        "ReplacementOccurrenceType": "All",
+                                        "SpecifiedOccurrence": 0
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "RemoveSubAttributes",
+                                  "Description": "Remove */Component/Value/Expanded<Remove attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeSelector": {
+                                      "Type": "QueryBasedAS",
+                                      "Object": {
+                                        "QueryText": "*/Component/Value/Expanded"
+                                      }
+                                    },
+                                    "ConditionalRemove": false,
+                                    "DataScorer": {
+                                      "Type": null,
+                                      "Description": "",
+                                      "Enabled": true,
+                                      "Object": null
+                                    },
+                                    "ScoreCondition": "EQ",
+                                    "CompareConditionType": "ValueOf",
+                                    "ScoreToCompare": 0
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "Type": "OutputHandlerSequence",
+                            "Description": "Expand values to include allergy class<Select multiple output handlers>",
+                            "Enabled": true,
+                            "Object": {
+                              "ObjectsVector": [
+                                {
+                                  "Type": "CreateAttribute",
+                                  "Description": "Make Expanded subattribute of Value that is a copy of OriginalName<Create attribute>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "Root": "/*/*/*/Value",
+                                    "SubAttributesToCreate": [
+                                      {
+                                        "Name": "Expanded",
+                                        "NameContainsXPath": false,
+                                        "DoNotCreateIfNameIsEmpty": false,
+                                        "TypeOfAttribute": "",
+                                        "TypeContainsXPath": false,
+                                        "DoNotCreateIfTypeIsEmpty": false,
+                                        "Value": "../OriginalName",
+                                        "ValueContainsXPath": true,
+                                        "DoNotCreateIfValueIsEmpty": false
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Make region below and to the left and right<Run object on attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value/Expanded",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Modifier",
+                                    "Object": {
+                                      "Type": "LocateImageRegion",
+                                      "Object": {
+                                        "DataInsideBoundaries": true,
+                                        "FindType": "ImageRegion",
+                                        "ImageRegionText": " ",
+                                        "IncludeIntersectingEntities": true,
+                                        "IntersectingEntityType": "Character",
+                                        "MatchMultiplePagesPerDocument": true,
+                                        "ClueList1": {
+                                          "Clues": [
+                                            "[\\S\\s]+"
+                                          ],
+                                          "CaseSensitive": false,
+                                          "Regex": true,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "ClueList2": {
+                                          "Clues": [],
+                                          "CaseSensitive": false,
+                                          "Regex": false,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "ClueList3": {
+                                          "Clues": [],
+                                          "CaseSensitive": false,
+                                          "Regex": false,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "ClueList4": {
+                                          "Clues": [],
+                                          "CaseSensitive": false,
+                                          "Regex": false,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "Left": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Left",
+                                          "ExpandDirection": "ExpandLeft",
+                                          "ExpandBy": 2.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Top": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Bottom",
+                                          "ExpandDirection": "ExpandUp",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Right": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Right",
+                                          "ExpandDirection": "ExpandRight",
+                                          "ExpandBy": 4.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Bottom": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Bottom",
+                                          "ExpandDirection": "ExpandDown",
+                                          "ExpandBy": 1.0,
+                                          "ExpandUnits": "ClueLines"
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Extract OCR text<Run object on attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value/Expanded",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Modifier",
+                                    "Object": {
+                                      "Type": "ExtractOcrTextInImageArea",
+                                      "Object": {
+                                        "IncludeTextOnBoundary": true,
+                                        "SpatialEntityType": "Word",
+                                        "UseOriginalDocumentOcr": false,
+                                        "UseOverallBounds": true
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Get value right of Class<Run object on attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value/Expanded",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Modifier",
+                                    "Object": {
+                                      "Type": "LocateImageRegion",
+                                      "Object": {
+                                        "DataInsideBoundaries": true,
+                                        "FindType": "Text",
+                                        "ImageRegionText": " ",
+                                        "IncludeIntersectingEntities": true,
+                                        "IntersectingEntityType": "Character",
+                                        "MatchMultiplePagesPerDocument": true,
+                                        "ClueList1": {
+                                          "Clues": [
+                                            "(?~<>\\bClass\\b)"
+                                          ],
+                                          "CaseSensitive": false,
+                                          "Regex": true,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "ClueList2": {
+                                          "Clues": [],
+                                          "CaseSensitive": false,
+                                          "Regex": false,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "ClueList3": {
+                                          "Clues": [],
+                                          "CaseSensitive": false,
+                                          "Regex": false,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "ClueList4": {
+                                          "Clues": [],
+                                          "CaseSensitive": false,
+                                          "Regex": false,
+                                          "RestrictByBoundary": false
+                                        },
+                                        "Left": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Right",
+                                          "ExpandDirection": "ExpandRight",
+                                          "ExpandBy": 1.0,
+                                          "ExpandUnits": "ClueCharacters"
+                                        },
+                                        "Top": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Top",
+                                          "ExpandDirection": "ExpandUp",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Right": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Right",
+                                          "ExpandDirection": "ExpandRight",
+                                          "ExpandBy": 4.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Bottom": {
+                                          "Anchor": "ClueList1",
+                                          "AnchorSide": "Bottom",
+                                          "ExpandDirection": "ExpandDown",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "ClueLines"
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Cleanup Expanded<Run object on attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value/Expanded",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Modifier",
+                                    "Object": {
+                                      "Type": "RegExprRule",
+                                      "Object": {
+                                        "IsRegExpFromFile": false,
+                                        "RegExpFileName": "",
+                                        "Pattern": "(?<=\\A\\W*)[1-9]\\d?",
+                                        "IsCaseSensitive": false,
+                                        "FirstMatchOnly": true,
+                                        "CreateSubAttributesFromNamedMatches": false,
+                                        "OnlyCreateOneSubAttributePerGroup": false
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "ModifyAttributeValueOH",
+                                  "Description": "Combine expanded value with original value<Modify attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value",
+                                    "CreateSubAttribute": false,
+                                    "AttributeName": "",
+                                    "SetAttributeName": false,
+                                    "AttributeType": "",
+                                    "SetAttributeType": false,
+                                    "AttributeValue": "%Value% Class %Expanded%",
+                                    "SetAttributeValue": true
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Cleanup Value<Run object on attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/Component/Value",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Modifier",
+                                    "Object": {
+                                      "Type": "AdvancedReplaceString",
+                                      "Object": {
+                                        "StrToBeReplaced": "\\s+Class\\s+\\z",
+                                        "AsRegularExpression": true,
+                                        "IsCaseSensitive": false,
+                                        "Replacement": "",
+                                        "ReplacementOccurrenceType": "All",
+                                        "SpecifiedOccurrence": 0
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "RemoveSubAttributes",
+                                  "Description": "Remove */Component/Value/Expanded<Remove attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeSelector": {
+                                      "Type": "QueryBasedAS",
+                                      "Object": {
+                                        "QueryText": "*/Component/Value/Expanded"
+                                      }
+                                    },
+                                    "ConditionalRemove": false,
+                                    "DataScorer": {
+                                      "Type": null,
+                                      "Description": "",
+                                      "Enabled": true,
+                                      "Object": null
+                                    },
+                                    "ScoreCondition": "EQ",
+                                    "CompareConditionType": "ValueOf",
+                                    "ScoreToCompare": 0
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Custom Test Fields<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Handle Cocci values<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Test/Component",
+                    "AttributeSelector": {
+                      "Type": "ValueConditionSelector",
+                      "Object": {
+                        "Condition": {
+                          "Type": "FindingRuleCondition",
+                          "Object": {
+                            "AFRule": {
+                              "Type": "RegExprRule",
+                              "Object": {
+                                "IsRegExpFromFile": false,
+                                "RegExpFileName": "",
+                                "Pattern": "\\bCocci\\b",
+                                "IsCaseSensitive": false,
+                                "FirstMatchOnly": true,
+                                "CreateSubAttributesFromNamedMatches": false,
+                                "OnlyCreateOneSubAttributePerGroup": false
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "UseAttributeSelector": true,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "RunObjectOnAttributes",
+                      "Object": {
+                        "AttributeQuery": "*/Value",
+                        "AttributeSelector": {
+                          "Type": null,
+                          "Object": null
+                        },
+                        "UseAttributeSelector": false,
+                        "Type": "Modifier",
+                        "Object": {
+                          "Type": "AdvancedReplaceString",
+                          "Object": {
+                            "StrToBeReplaced": "\\ANot\\x20Detected\\z",
+                            "AsRegularExpression": true,
+                            "IsCaseSensitive": false,
+                            "Replacement": "NONREACTIVE",
+                            "ReplacementOccurrenceType": "All",
+                            "SpecifiedOccurrence": 0
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "OutputHandlerSequence",
+                  "Description": "Remove garbage Cocci order [K:\\SecureSamples\\CA-CedarsSinai\\Set006\\Images\\ESWPBISFAXSRV01_1805032224438586.PDF.tif]<Select multiple output handlers>",
+                  "Enabled": true,
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Set type of Test/OrderCode to COCF if that is its value<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test/OrderCode",
+                          "AttributeSelector": {
+                            "Type": "ValueConditionSelector",
+                            "Object": {
+                              "Condition": {
+                                "Type": "FindingRuleCondition",
+                                "Object": {
+                                  "AFRule": {
+                                    "Type": "ValueFromList",
+                                    "Object": {
+                                      "ValueList": [
+                                        "COCF"
+                                      ],
+                                      "IsCaseSensitive": false
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "UseAttributeSelector": true,
+                          "Type": "OutputHandler",
+                          "Object": {
+                            "Type": "ModifyAttributeValueOH",
+                            "Object": {
+                              "AttributeQuery": "*",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "COCF",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Set type of Test/OrderCode to COCSK if that is its value<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test/OrderCode",
+                          "AttributeSelector": {
+                            "Type": "ValueConditionSelector",
+                            "Object": {
+                              "Condition": {
+                                "Type": "FindingRuleCondition",
+                                "Object": {
+                                  "AFRule": {
+                                    "Type": "ValueFromList",
+                                    "Object": {
+                                      "ValueList": [
+                                        "COCSK"
+                                      ],
+                                      "IsCaseSensitive": false
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "UseAttributeSelector": true,
+                          "Type": "OutputHandler",
+                          "Object": {
+                            "Type": "ModifyAttributeValueOH",
+                            "Object": {
+                              "AttributeQuery": "*",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "COCSK",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "OutputHandlerSequence",
+                        "Description": "[Kind of risky] Remove COCF if COCSK exists<Select multiple output handlers>",
+                        "Enabled": true,
+                        "Object": {
+                          "ObjectsVector": [
+                            {
+                              "Type": "CreateAttribute",
+                              "Description": "Create Delete under COCF order if COCSK order exists<Create attribute>",
+                              "Enabled": true,
+                              "Object": {
+                                "Root": "/*/Test[OrderCode/@Type='COCF']",
+                                "SubAttributesToCreate": [
+                                  {
+                                    "Name": "Delete",
+                                    "NameContainsXPath": false,
+                                    "DoNotCreateIfNameIsEmpty": false,
+                                    "TypeOfAttribute": "",
+                                    "TypeContainsXPath": false,
+                                    "DoNotCreateIfTypeIsEmpty": false,
+                                    "Value": "/*/Test/OrderCode/@Type='COCSK '",
+                                    "ValueContainsXPath": true,
+                                    "DoNotCreateIfValueIsEmpty": true
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "Type": "RemoveSubAttributes",
+                              "Description": "Delete Test{Delete}<Remove attributes>",
+                              "Enabled": true,
+                              "Object": {
+                                "AttributeSelector": {
+                                  "Type": "QueryBasedAS",
+                                  "Object": {
+                                    "QueryText": "Test{Delete}"
+                                  }
+                                },
+                                "ConditionalRemove": false,
+                                "DataScorer": {
+                                  "Type": null,
+                                  "Description": "",
+                                  "Enabled": true,
+                                  "Object": null
+                                },
+                                "ScoreCondition": "EQ",
+                                "CompareConditionType": "ValueOf",
+                                "ScoreToCompare": 0
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Require component of Test{*@COCF} to be very high char conf<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test{*@COCF}",
+                          "AttributeSelector": {
+                            "Type": null,
+                            "Object": null
+                          },
+                          "UseAttributeSelector": false,
+                          "Type": "OutputHandler",
+                          "Object": {
+                            "Type": "RemoveSubAttributes",
+                            "Object": {
+                              "AttributeSelector": {
+                                "Type": "QueryBasedAS",
+                                "Object": {
+                                  "QueryText": "*/Component"
+                                }
+                              },
+                              "ConditionalRemove": true,
+                              "DataScorer": {
+                                "Type": "CharacterConfidenceDS",
+                                "Description": "<Character confidence data scorer>",
+                                "Enabled": true,
+                                "Object": {
+                                  "AggregateFunction": "Average"
+                                }
+                              },
+                              "ScoreCondition": "LT",
+                              "CompareConditionType": "ValueOf",
+                              "ScoreToCompare": 95
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "RemoveSubAttributes",
+                        "Description": "Remove Test{*@COCF} if has no components<Remove attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeSelector": {
+                            "Type": "MultipleCriteriaSelector",
+                            "Object": {
+                              "Selectors": [
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "Test{*@COCF}<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "Test{*@COCF}"
+                                    }
+                                  }
+                                },
+                                {
+                                  "Select": "NonMatching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "*{Component}<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*{Component}"
+                                    }
+                                  }
+                                }
+                              ],
+                              "CombineBy": "Chain"
+                            }
+                          },
+                          "ConditionalRemove": false,
+                          "DataScorer": {
+                            "Type": null,
+                            "Description": "",
+                            "Enabled": true,
+                            "Object": null
+                          },
+                          "ScoreCondition": "EQ",
+                          "CompareConditionType": "ValueOf",
+                          "ScoreToCompare": 0
+                        }
+                      },
+                      {
+                        "Type": "ModifyAttributeValueOH",
+                        "Description": "Remove type from Test/OrderCode<Modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test/COCF",
+                          "CreateSubAttribute": false,
+                          "AttributeName": "",
+                          "SetAttributeName": false,
+                          "AttributeType": "",
+                          "SetAttributeType": true,
+                          "AttributeValue": "",
+                          "SetAttributeValue": false
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "OutputHandlerSequence",
+                  "Description": "[Kind of risky] Remove Range from IGAP (backup, in case URS updates didn't work) [K:\\SecureSamples\\CA-CedarsSinai\\Set006\\Images\\ESWPBISFAXSRV01_1804302249165534_Paginated_2.pdf.tif]<Select multiple output handlers>",
+                  "Enabled": true,
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "CreateAttribute",
+                        "Description": "Create Delete subattribute of IGAP range<Create attribute>",
+                        "Enabled": true,
+                        "Object": {
+                          "Root": "/*/Test/Component[TestCode/text()='IGAP']/Range",
+                          "SubAttributesToCreate": [
+                            {
+                              "Name": "Delete",
+                              "NameContainsXPath": false,
+                              "DoNotCreateIfNameIsEmpty": false,
+                              "TypeOfAttribute": "",
+                              "TypeContainsXPath": false,
+                              "DoNotCreateIfTypeIsEmpty": false,
+                              "Value": "",
+                              "ValueContainsXPath": false,
+                              "DoNotCreateIfValueIsEmpty": false
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "Type": "RemoveSubAttributes",
+                        "Description": "Remove Test/Component/Range{Delete}<Remove attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeSelector": {
+                            "Type": "QueryBasedAS",
+                            "Object": {
+                              "QueryText": "Test/Component/Range{Delete}"
+                            }
+                          },
+                          "ConditionalRemove": false,
+                          "DataScorer": {
+                            "Type": null,
+                            "Description": "",
+                            "Enabled": true,
+                            "Object": null
+                          },
+                          "ScoreCondition": "EQ",
+                          "CompareConditionType": "ValueOf",
+                          "ScoreToCompare": 0
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Give Component/TestCode<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Test/Component/TestCode",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "_%Value%",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "CreateAttribute",
+                  "Description": "ImmuKnow TCIFQ<Create attribute>",
+                  "Enabled": true,
+                  "Object": {
+                    "Root": "/*/Test/Component[TestCode[text()='TCIFQ']]/OriginalName[text()='ImmuKnow']",
+                    "SubAttributesToCreate": [
+                      {
+                        "Name": "Comment",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "Assay Range\r\nLow Immune Cell Response <=225 ATP Level ng/ml\r\nModerate Immune Cell Response 226 - 524 ATP Level ng/ml\r\nStrong Immune Cell Response >=525 ATP Level ng/ml  NOTE:  This is a qualitative assay.\r\nTherefore the result does not directly quantify the level of immunosuppression.\r\nThese results should be used in conjunction with clinical presentation, medical history, and other clinical indicators when establishing the immune status of a patient.  This test has been cleared or approved for diagnostic use by the U.S. Food and Drug Administration.  ImmuKnow (R) is a registered trademark.",
+                        "ValueContainsXPath": false,
+                        "DoNotCreateIfValueIsEmpty": false
+                      },
+                      {
+                        "Name": "Range",
+                        "NameContainsXPath": false,
+                        "DoNotCreateIfNameIsEmpty": false,
+                        "TypeOfAttribute": "",
+                        "TypeContainsXPath": false,
+                        "DoNotCreateIfTypeIsEmpty": false,
+                        "Value": "SEE COMMENT",
+                        "ValueContainsXPath": false,
+                        "DoNotCreateIfValueIsEmpty": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "MoveAndModifyAttributes",
+                  "Description": "Promote Range and Comment<Move and modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AddAttributeNameToType": false,
+                    "AddRootOrParentAttributeType": false,
+                    "AddSpecifiedAttributeType": false,
+                    "AttributeQuery": "*/*/OriginalName/Range|*/*/OriginalName/Comment",
+                    "DeleteRootOrParentIfAllChildrenMoved": false,
+                    "MoveAttributeLevel": "MoveToParent",
+                    "OverwriteAttributeName": "DoNotOverwrite",
+                    "RetainAttributeType": true,
+                    "SpecifiedAttributeName": "",
+                    "SpecifiedAttributeType": ""
+                  }
+                },
+                {
+                  "Type": "OutputHandlerSequence",
+                  "Description": "Get CoCCi CF Value, Range, comment<Select multiple output handlers>",
+                  "Enabled": true,
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Get CoCCi CF Value<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test/Component{TestCode@_CCFK}",
+                          "AttributeSelector": {
+                            "Type": "MultipleCriteriaSelector",
+                            "Object": {
+                              "Selectors": [
+                                {
+                                  "Select": "NonMatching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "*{Value} does not exist<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*{Value}"
+                                    }
+                                  }
+                                },
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "ValueConditionSelector",
+                                    "Description": "Cocci CF<Value condition selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "Condition": {
+                                        "Type": "FindingRuleCondition",
+                                        "Object": {
+                                          "AFRule": {
+                                            "Type": "RegExprRule",
+                                            "Object": {
+                                              "IsRegExpFromFile": false,
+                                              "RegExpFileName": "",
+                                              "Pattern": "^Cocci\\sCF$",
+                                              "IsCaseSensitive": false,
+                                              "FirstMatchOnly": false,
+                                              "CreateSubAttributesFromNamedMatches": false,
+                                              "OnlyCreateOneSubAttributePerGroup": false
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "Select OriginalName<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*/OriginalName"
+                                    }
+                                  }
+                                }
+                              ],
+                              "CombineBy": "Chain"
+                            }
+                          },
+                          "UseAttributeSelector": true,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\CustomRules\\CCFK.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "MoveAndModifyAttributes",
+                        "Description": "Promote Attributes<Move and modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AddAttributeNameToType": false,
+                          "AddRootOrParentAttributeType": false,
+                          "AddSpecifiedAttributeType": false,
+                          "AttributeQuery": "*/*/OriginalName/Value",
+                          "DeleteRootOrParentIfAllChildrenMoved": false,
+                          "MoveAttributeLevel": "MoveToParent",
+                          "OverwriteAttributeName": "DoNotOverwrite",
+                          "RetainAttributeType": true,
+                          "SpecifiedAttributeName": "",
+                          "SpecifiedAttributeType": ""
+                        }
+                      },
+                      {
+                        "Type": "RemoveSubAttributes",
+                        "Description": "Remove Comment and Range to start with<Remove attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeSelector": {
+                            "Type": "QueryBasedAS",
+                            "Object": {
+                              "QueryText": "*/*/OriginalName/Range|*/*/OrignalName/Comment"
+                            }
+                          },
+                          "ConditionalRemove": false,
+                          "DataScorer": {
+                            "Type": null,
+                            "Description": "",
+                            "Enabled": true,
+                            "Object": null
+                          },
+                          "ScoreCondition": "EQ",
+                          "CompareConditionType": "ValueOf",
+                          "ScoreToCompare": 0
+                        }
+                      },
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Get CoCCi CF Range/Comment<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test/Component{TestCode@_CCFK}",
+                          "AttributeSelector": {
+                            "Type": "MultipleCriteriaSelector",
+                            "Object": {
+                              "Selectors": [
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "Select OriginalName<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*/Value"
+                                    }
+                                  }
+                                },
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "ValueConditionSelector",
+                                    "Description": "Cocci CF<Value condition selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "Condition": {
+                                        "Type": "FindingRuleCondition",
+                                        "Object": {
+                                          "AFRule": {
+                                            "Type": "RegExprRule",
+                                            "Object": {
+                                              "IsRegExpFromFile": false,
+                                              "RegExpFileName": "",
+                                              "Pattern": ".*[02-9].*",
+                                              "IsCaseSensitive": false,
+                                              "FirstMatchOnly": false,
+                                              "CreateSubAttributesFromNamedMatches": false,
+                                              "OnlyCreateOneSubAttributePerGroup": false
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              ],
+                              "CombineBy": "Chain"
+                            }
+                          },
+                          "UseAttributeSelector": true,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\CustomRules\\CCFK.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "MoveAndModifyAttributes",
+                        "Description": "Promote Attributes<Move and modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AddAttributeNameToType": false,
+                          "AddRootOrParentAttributeType": false,
+                          "AddSpecifiedAttributeType": false,
+                          "AttributeQuery": "*/*/*/Range|*/*/*/Comment",
+                          "DeleteRootOrParentIfAllChildrenMoved": false,
+                          "MoveAttributeLevel": "MoveToParent",
+                          "OverwriteAttributeName": "DoNotOverwrite",
+                          "RetainAttributeType": true,
+                          "SpecifiedAttributeName": "",
+                          "SpecifiedAttributeType": ""
+                        }
+                      },
+                      {
+                        "Type": "RemoveSubAttributes",
+                        "Description": "remove */*/Value/Value<Remove attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeSelector": {
+                            "Type": "QueryBasedAS",
+                            "Object": {
+                              "QueryText": "*/*/Value/Value"
+                            }
+                          },
+                          "ConditionalRemove": false,
+                          "DataScorer": {
+                            "Type": null,
+                            "Description": "",
+                            "Enabled": true,
+                            "Object": null
+                          },
+                          "ScoreCondition": "EQ",
+                          "CompareConditionType": "ValueOf",
+                          "ScoreToCompare": 0
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "OutputHandlerSequence",
+                  "Description": "Get TGLB Range, Comment<Select multiple output handlers>",
+                  "Enabled": true,
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Get TGLB Range/Comment<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test/Component{TestCode@_TGLB}",
+                          "AttributeSelector": {
+                            "Type": "MultipleCriteriaSelector",
+                            "Object": {
+                              "Selectors": [
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "Select OriginalName<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*/OriginalName"
+                                    }
+                                  }
+                                },
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "ValueConditionSelector",
+                                    "Description": "Thyroglobulln (Tg) IMA<Value condition selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "Condition": {
+                                        "Type": "FindingRuleCondition",
+                                        "Object": {
+                                          "AFRule": {
+                                            "Type": "RegExprRule",
+                                            "Object": {
+                                              "IsRegExpFromFile": false,
+                                              "RegExpFileName": "",
+                                              "Pattern": "^Thyroglobulln\\s\\(Tg\\)\\sIMA$",
+                                              "IsCaseSensitive": false,
+                                              "FirstMatchOnly": false,
+                                              "CreateSubAttributesFromNamedMatches": false,
+                                              "OnlyCreateOneSubAttributePerGroup": false
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              ],
+                              "CombineBy": "Chain"
+                            }
+                          },
+                          "UseAttributeSelector": true,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\CustomRules\\TGLB.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "MoveAndModifyAttributes",
+                        "Description": "Promote Attributes<Move and modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AddAttributeNameToType": false,
+                          "AddRootOrParentAttributeType": false,
+                          "AddSpecifiedAttributeType": false,
+                          "AttributeQuery": "*/*/*/Range|*/*/*/Comment",
+                          "DeleteRootOrParentIfAllChildrenMoved": false,
+                          "MoveAttributeLevel": "MoveToParent",
+                          "OverwriteAttributeName": "DoNotOverwrite",
+                          "RetainAttributeType": true,
+                          "SpecifiedAttributeName": "",
+                          "SpecifiedAttributeType": ""
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "OutputHandlerSequence",
+                  "Description": "Get IGAP Range, Comment<Select multiple output handlers>",
+                  "Enabled": true,
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Get IGAP Range/Comment<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test/Component{TestCode@_IGAP}",
+                          "AttributeSelector": {
+                            "Type": "MultipleCriteriaSelector",
+                            "Object": {
+                              "Selectors": [
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "ValueConditionSelector",
+                                    "Description": "TOTAL IgA<Value condition selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "Condition": {
+                                        "Type": "FindingRuleCondition",
+                                        "Object": {
+                                          "AFRule": {
+                                            "Type": "RegExprRule",
+                                            "Object": {
+                                              "IsRegExpFromFile": false,
+                                              "RegExpFileName": "",
+                                              "Pattern": "^TOTAL\\sIgA$",
+                                              "IsCaseSensitive": true,
+                                              "FirstMatchOnly": false,
+                                              "CreateSubAttributesFromNamedMatches": false,
+                                              "OnlyCreateOneSubAttributePerGroup": false
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "Select Units<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*/Units"
+                                    }
+                                  }
+                                }
+                              ],
+                              "CombineBy": "Chain"
+                            }
+                          },
+                          "UseAttributeSelector": true,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\CustomRules\\IGAP.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "MoveAndModifyAttributes",
+                        "Description": "Promote Attributes<Move and modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AddAttributeNameToType": false,
+                          "AddRootOrParentAttributeType": false,
+                          "AddSpecifiedAttributeType": false,
+                          "AttributeQuery": "*/*/*/Range|*/*/*/Comment",
+                          "DeleteRootOrParentIfAllChildrenMoved": false,
+                          "MoveAttributeLevel": "MoveToParent",
+                          "OverwriteAttributeName": "DoNotOverwrite",
+                          "RetainAttributeType": true,
+                          "SpecifiedAttributeName": "",
+                          "SpecifiedAttributeType": ""
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "OutputHandlerSequence",
+                  "Description": "Get VORIC Comment<Select multiple output handlers>",
+                  "Enabled": true,
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Get VORIC Comment<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test/Component{TestCode@_VORIC}",
+                          "AttributeSelector": {
+                            "Type": "MultipleCriteriaSelector",
+                            "Object": {
+                              "Selectors": [
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "Select OriginalName<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*/OriginalName"
+                                    }
+                                  }
+                                },
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "ValueConditionSelector",
+                                    "Description": "Voriconazole<Value condition selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "Condition": {
+                                        "Type": "FindingRuleCondition",
+                                        "Object": {
+                                          "AFRule": {
+                                            "Type": "RegExprRule",
+                                            "Object": {
+                                              "IsRegExpFromFile": false,
+                                              "RegExpFileName": "",
+                                              "Pattern": "^Voriconazole$",
+                                              "IsCaseSensitive": false,
+                                              "FirstMatchOnly": false,
+                                              "CreateSubAttributesFromNamedMatches": false,
+                                              "OnlyCreateOneSubAttributePerGroup": false
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              ],
+                              "CombineBy": "Chain"
+                            }
+                          },
+                          "UseAttributeSelector": true,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\CustomRules\\VORIC.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "MoveAndModifyAttributes",
+                        "Description": "Promote Attributes<Move and modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AddAttributeNameToType": false,
+                          "AddRootOrParentAttributeType": false,
+                          "AddSpecifiedAttributeType": false,
+                          "AttributeQuery": "*/*/*/Comment|*/*/*/Range",
+                          "DeleteRootOrParentIfAllChildrenMoved": false,
+                          "MoveAttributeLevel": "MoveToParent",
+                          "OverwriteAttributeName": "DoNotOverwrite",
+                          "RetainAttributeType": true,
+                          "SpecifiedAttributeName": "",
+                          "SpecifiedAttributeType": ""
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "OutputHandlerSequence",
+                  "Description": "Get CPDI Value [\\\\extract.local\\ps\\Samples\\SecureSamples\\CA-CedarsSinai\\Set012\\HighAccuracy\\ESWPBISFAXSRV02_1806062334035062_Paginated_2.pdf.tif]<Select multiple output handlers>",
+                  "Enabled": true,
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Get CDPI Value<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test/Component{TestCode@_CDPI}",
+                          "AttributeSelector": {
+                            "Type": "MultipleCriteriaSelector",
+                            "Object": {
+                              "Selectors": [
+                                {
+                                  "Select": "NonMatching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "*{Value} does not exist<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*{Value}"
+                                    }
+                                  }
+                                },
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "Select */OriginalName<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*/OriginalName"
+                                    }
+                                  }
+                                }
+                              ],
+                              "CombineBy": "Chain"
+                            }
+                          },
+                          "UseAttributeSelector": true,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\CustomRules\\CDPI.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "MoveAndModifyAttributes",
+                        "Description": "Promote Attributes<Move and modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AddAttributeNameToType": false,
+                          "AddRootOrParentAttributeType": false,
+                          "AddSpecifiedAttributeType": false,
+                          "AttributeQuery": "*/*/*/Value",
+                          "DeleteRootOrParentIfAllChildrenMoved": false,
+                          "MoveAttributeLevel": "MoveToParent",
+                          "OverwriteAttributeName": "DoNotOverwrite",
+                          "RetainAttributeType": true,
+                          "SpecifiedAttributeName": "",
+                          "SpecifiedAttributeType": ""
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Type": "OutputHandlerSequence",
+                  "Description": "Get THGBR Range<Select multiple output handlers>",
+                  "Enabled": true,
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Get THGBR Range<Run object on attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "Test/Component{TestCode@_THGBR}",
+                          "AttributeSelector": {
+                            "Type": "MultipleCriteriaSelector",
+                            "Object": {
+                              "Selectors": [
+                                {
+                                  "Select": "NonMatching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "*{Range} does not exist<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*{Range}"
+                                    }
+                                  }
+                                },
+                                {
+                                  "Select": "Matching",
+                                  "With": {
+                                    "Type": "QueryBasedAS",
+                                    "Description": "Select Units<Query attribute selector>",
+                                    "Enabled": true,
+                                    "Object": {
+                                      "QueryText": "*/Units"
+                                    }
+                                  }
+                                }
+                              ],
+                              "CombineBy": "Chain"
+                            }
+                          },
+                          "UseAttributeSelector": true,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\CustomRules\\TGLBR.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "MoveAndModifyAttributes",
+                        "Description": "Promote Attributes<Move and modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AddAttributeNameToType": false,
+                          "AddRootOrParentAttributeType": false,
+                          "AddSpecifiedAttributeType": false,
+                          "AttributeQuery": "*/*/Units/Range",
+                          "DeleteRootOrParentIfAllChildrenMoved": false,
+                          "MoveAttributeLevel": "MoveToParent",
+                          "OverwriteAttributeName": "DoNotOverwrite",
+                          "RetainAttributeType": true,
+                          "SpecifiedAttributeName": "",
+                          "SpecifiedAttributeType": ""
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Correct Decimals<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Correct decimals<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Test/Component/Value",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "AdvancedReplaceString",
+                      "Object": {
+                        "StrToBeReplaced": "^([><])?0(\\d+)",
+                        "AsRegularExpression": true,
+                        "IsCaseSensitive": false,
+                        "Replacement": "$1 0.$2",
+                        "ReplacementOccurrenceType": "All",
+                        "SpecifiedOccurrence": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Correct decimals<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Test/Component/Value",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "ReplaceStrings",
+                      "Object": {
+                        "Replacements": [
+                          {
+                            "Pattern": "< ",
+                            "Replacement": "<"
+                          },
+                          {
+                            "Pattern": "> ",
+                            "Replacement": ">"
+                          }
+                        ],
+                        "AsRegularExpr": false,
+                        "IsCaseSensitive": false
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "NO TYPES<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*|*/*|*/*/*",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "*off* Correct EU units<Run object on attributes>",
+            "Enabled": false,
+            "Object": {
+              "AttributeQuery": "Test/Component/Units",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "AdvancedReplaceString",
+                "Object": {
+                  "StrToBeReplaced": "\\bEU\\b",
+                  "AsRegularExpression": true,
+                  "IsCaseSensitive": false,
+                  "Replacement": "U/ML",
+                  "ReplacementOccurrenceType": "All",
+                  "SpecifiedOccurrence": 0
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

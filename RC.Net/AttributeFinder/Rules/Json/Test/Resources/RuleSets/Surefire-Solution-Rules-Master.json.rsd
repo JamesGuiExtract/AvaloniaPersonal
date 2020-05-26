@@ -1,0 +1,618 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 5,
+        "Name": "FLEX Index - Indexing (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "16.1.0.93",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "_",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "AccountNumber": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find from RSD file",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "_"
+                ],
+                "RSDFileName": "<RSDFileDir>\\AccountNumber\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "Address": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find from RSD file",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "_"
+                ],
+                "RSDFileName": "<RSDFileDir>\\Address\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "ModifyAttributeValueOH",
+              "Description": "set name to type<Modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*",
+                "CreateSubAttribute": false,
+                "AttributeName": "",
+                "SetAttributeName": false,
+                "AttributeType": "%.Name%",
+                "SetAttributeType": true,
+                "AttributeValue": "",
+                "SetAttributeValue": false
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "Originator": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find from RSD file",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "_"
+                ],
+                "RSDFileName": "<RSDFileDir>\\Originator\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "Statement": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find from RSD file",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "_"
+                ],
+                "RSDFileName": "<RSDFileDir>\\Statement\\perPage.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "rename Address parts<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_/Address",
+              "CreateSubAttribute": false,
+              "AttributeName": "%Type%",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "ChangeCase",
+            "Description": "*off* search for Name if address didn't find<Change case>",
+            "Enabled": false,
+            "Object": {
+              "CaseType": "NoChangeCase"
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "split Name, rename parts<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_/Name",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "OutputHandlerSequence",
+                "Object": {
+                  "ObjectsVector": [
+                    {
+                      "Type": "RunObjectOnAttributes",
+                      "Description": "split Name<Run object on attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "*",
+                        "AttributeSelector": {
+                          "Type": null,
+                          "Object": null
+                        },
+                        "UseAttributeSelector": false,
+                        "Type": "Splitter",
+                        "Object": {
+                          "Type": "PersonNameSplitter",
+                          "Object": "PersonNameSplitter"
+                        }
+                      }
+                    },
+                    {
+                      "Type": "ModifyAttributeValueOH",
+                      "Description": "rename First<Modify attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "*/First",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "FirstName",
+                        "SetAttributeName": true,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "",
+                        "SetAttributeValue": false
+                      }
+                    },
+                    {
+                      "Type": "ModifyAttributeValueOH",
+                      "Description": "rename Middle<Modify attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "*/Middle",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "MiddleInitial",
+                        "SetAttributeName": true,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "",
+                        "SetAttributeValue": false
+                      }
+                    },
+                    {
+                      "Type": "ModifyAttributeValueOH",
+                      "Description": "Remake Last and rename<Modify attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "Name",
+                        "CreateSubAttribute": true,
+                        "AttributeName": "LastName",
+                        "SetAttributeName": true,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "%Last%< %Suffix%>",
+                        "SetAttributeValue": true
+                      }
+                    },
+                    {
+                      "Type": "ModifyAttributeValueOH",
+                      "Description": "*off* rename Last<Modify attributes>",
+                      "Enabled": false,
+                      "Object": {
+                        "AttributeQuery": "*/Last",
+                        "CreateSubAttribute": false,
+                        "AttributeName": "LastName",
+                        "SetAttributeName": true,
+                        "AttributeType": "",
+                        "SetAttributeType": false,
+                        "AttributeValue": "%Value%<%Middle%>",
+                        "SetAttributeValue": true
+                      }
+                    },
+                    {
+                      "Type": "RunObjectOnAttributes",
+                      "Description": "trim to MiddleInitial<Run object on attributes>",
+                      "Enabled": true,
+                      "Object": {
+                        "AttributeQuery": "*/MiddleInitial",
+                        "AttributeSelector": {
+                          "Type": null,
+                          "Object": null
+                        },
+                        "UseAttributeSelector": false,
+                        "Type": "Modifier",
+                        "Object": {
+                          "Type": "AdvancedReplaceString",
+                          "Object": {
+                            "StrToBeReplaced": "\\A(\\w)[\\s\\S]*",
+                            "AsRegularExpression": true,
+                            "IsCaseSensitive": false,
+                            "Replacement": "$1",
+                            "ReplacementOccurrenceType": "All",
+                            "SpecifiedOccurrence": 0
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "move up Name parts<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/Name/FirstName|*/Name/MiddleInitial|*/Name/LastName",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToParent",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove */Name<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/Name"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "blank out */Statement<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/Statement",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "move up _/*<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "_/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove Statement with no subs<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "Statement<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "Statement"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "Statement{*}<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "Statement{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove _<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "_"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MergeAttributeTrees",
+            "Description": "merge statements with matching DueDate<Merge attribute trees>",
+            "Enabled": true,
+            "Object": {
+              "AttributesToBeMerged": "Statement",
+              "SubAttributesToCompare": [
+                "DueDate"
+              ],
+              "CaseSensitive": false,
+              "DiscardNonMatchingComparisons": false,
+              "MergeAttributeTreesInto": "AttributeWithMostChildren",
+              "RemoveEmptyHierarchy": true
+            }
+          },
+          {
+            "Type": "MergeAttributeTrees",
+            "Description": "merge statements with matching EndDate<Merge attribute trees>",
+            "Enabled": true,
+            "Object": {
+              "AttributesToBeMerged": "Statement",
+              "SubAttributesToCompare": [
+                "EndDate"
+              ],
+              "CaseSensitive": false,
+              "DiscardNonMatchingComparisons": false,
+              "MergeAttributeTreesInto": "AttributeWithMostChildren",
+              "RemoveEmptyHierarchy": true
+            }
+          },
+          {
+            "Type": "MergeAttributeTrees",
+            "Description": "merge statements with matching StartDate<Merge attribute trees>",
+            "Enabled": true,
+            "Object": {
+              "AttributesToBeMerged": "Statement",
+              "SubAttributesToCompare": [
+                "StartDate"
+              ],
+              "CaseSensitive": false,
+              "DiscardNonMatchingComparisons": false,
+              "MergeAttributeTreesInto": "AttributeWithMostChildren",
+              "RemoveEmptyHierarchy": true
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "eliminate dupe Statement subs, keep most common (split with Common/selectMajoritySubs )<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Statement",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "RSDSplitter",
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\Common\\selectMajoritySubs.rsd.etf"
+                }
+              }
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

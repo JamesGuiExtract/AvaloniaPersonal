@@ -1,0 +1,1502 @@
+[
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/copy1/Component",
+      "CreateSubAttribute": true,
+      "AttributeName": "Comment",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Possible@Test{Overlapping}",
+      "CreateSubAttribute": false,
+      "AttributeName": "Candidate1",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/*/*",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{/Component}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/Building",
+      "CreateSubAttribute": false,
+      "AttributeName": "Block",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/*@Person",
+      "CreateSubAttribute": true,
+      "AttributeName": "ISNOT",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "LCData{LCData}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%*%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": true,
+      "AttributeName": "lE7",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/ResultDate",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "_",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/Person|*/Trust@Trustee|*/PersonAlias",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "Person",
+      "SetAttributeType": false,
+      "AttributeValue": "%Last% %First%< %Middle%>< %Suffix%>< %Trustee%>",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": true,
+      "AttributeName": "l7C",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "item",
+      "CreateSubAttribute": true,
+      "AttributeName": "L11",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": true,
+      "AttributeName": "FullPageClue",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "living",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/Public",
+      "CreateSubAttribute": false,
+      "AttributeName": "Grantee",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "Release",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/*{Quarter}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "Quarter",
+      "SetAttributeType": true,
+      "AttributeValue": "%Dir%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/CollectionDate",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Month%/%Day%/%Year%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "LegalDescription",
+      "CreateSubAttribute": true,
+      "AttributeName": "LegalDescription8",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "dontRun",
+      "CreateSubAttribute": false,
+      "AttributeName": "_",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "M",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "_/Index{DocumentType@OffenseReport}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "OffenseReport",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/*",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value% {Status}",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{is}",
+      "CreateSubAttribute": true,
+      "AttributeName": "PartitionPlat",
+      "SetAttributeName": true,
+      "AttributeType": "PartitionPlat",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/copy1/Component@Phrase",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "Phrase",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Content",
+      "CreateSubAttribute": false,
+      "AttributeName": "HCData",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "GrantorReduce{wc}",
+      "CreateSubAttribute": false,
+      "AttributeName": "Grantor",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@Person2",
+      "CreateSubAttribute": true,
+      "AttributeName": "Person2",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": true,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": true,
+      "AttributeName": "tmp",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@Trust",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "Company",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%CCNStatementText<>all:\r\n\r\n%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData|MCData|LCData|Clues",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "SSN",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "survivors",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues@TaxID{NotBlank}",
+      "CreateSubAttribute": false,
+      "AttributeName": "Keep",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "_{MinorName/HCData}|_{MinorName/MCData}|_{MinorName/LCData}",
+      "CreateSubAttribute": true,
+      "AttributeName": "MakeNCData",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{Subdivision}|*{Block}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "splitlot",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "pages",
+      "CreateSubAttribute": true,
+      "AttributeName": "wc",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Disqualified@Test{KeepBasedOnIndent}",
+      "CreateSubAttribute": false,
+      "AttributeName": "Candidate",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "Done",
+      "SetAttributeType": true,
+      "AttributeValue": "80",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "_",
+      "CreateSubAttribute": true,
+      "AttributeName": "Certificate",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/copy2/copy2/finding/*@Finding",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "Finding",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": true,
+      "AttributeName": "___Name___",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%.Name%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{Lot12}",
+      "CreateSubAttribute": true,
+      "AttributeName": "Location",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%§<%Subdivision%>§<%Block%>§<%Lot12%>§<%Unit%>§<%Section%>§<%Township%>§<%Range%>§<%Tract%>§<%Municipality%>",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "it",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "Estate",
+      "SetAttributeType": true,
+      "AttributeValue": "%PersonalRepresentative%, personal representative(s) of the %InitialEstate%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "CompanyTR",
+      "CreateSubAttribute": false,
+      "AttributeName": "Company",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "Safe",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/*/CollectionTime",
+      "CreateSubAttribute": false,
+      "AttributeName": "Time",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/*@Loan/MIN",
+      "CreateSubAttribute": true,
+      "AttributeName": "number",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Title/Company",
+      "CreateSubAttribute": true,
+      "AttributeName": "BeingType",
+      "SetAttributeName": true,
+      "AttributeType": "Company",
+      "SetAttributeType": false,
+      "AttributeValue": "Company",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/BackupName",
+      "CreateSubAttribute": false,
+      "AttributeName": "Name",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{number@HCDataBank}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "HCDataBank",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/Unit",
+      "CreateSubAttribute": false,
+      "AttributeName": "CondoUnit",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@Blank{CBAS}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{*}",
+      "CreateSubAttribute": true,
+      "AttributeName": "Continue",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%»%*%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@AssignSubject/*|*@AssignSubject/*/Person|*@AssignSubject/*/PersonAlias",
+      "CreateSubAttribute": true,
+      "AttributeName": "AssignSubject",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/Q@Half|*/QQ@Half|*/QQQ@Half|*/QQQQ@Half|*/QQQQQ@Half",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%2",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Desired_Address|CustomAddress",
+      "CreateSubAttribute": false,
+      "AttributeName": "HCData",
+      "SetAttributeName": true,
+      "AttributeType": "Address",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": true,
+      "AttributeName": "FirstLD",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues@Blank",
+      "CreateSubAttribute": false,
+      "AttributeName": "BClues",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/*/Township",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%TownNum%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "P2First",
+      "CreateSubAttribute": false,
+      "AttributeName": "First",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{/Blank}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "Blank",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": true,
+      "AttributeName": "lC2",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "_",
+      "CreateSubAttribute": true,
+      "AttributeName": "Insurance",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Clues@Doc",
+      "CreateSubAttribute": false,
+      "AttributeName": "CluesDoc",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "LL",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "LL",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{Component}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "HCData",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "DLN",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{CopyTo}",
+      "CreateSubAttribute": true,
+      "AttributeName": "OrderingPhysicianName",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%CopyTo%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@Trimmed|*@first5",
+      "CreateSubAttribute": true,
+      "AttributeName": "Content",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "GG@OriginalGrantor/Person",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value% DEC",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Keep",
+      "CreateSubAttribute": false,
+      "AttributeName": "Clues",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": true,
+      "AttributeName": "Over40",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "HIGH",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{L29}",
+      "CreateSubAttribute": true,
+      "AttributeName": "Location",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "<%Prefix%><%L29%><%Suffix%>",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{L26}",
+      "CreateSubAttribute": true,
+      "AttributeName": "Location",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "<%Prefix%><%L26%><%Suffix%>",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "LegalDescription/Location",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "N/A",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": true,
+      "AttributeName": "lF4",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{R}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "R",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Value{V}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%¦%V%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "GotAPin",
+      "CreateSubAttribute": false,
+      "AttributeName": "PIN",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{Page}",
+      "CreateSubAttribute": true,
+      "AttributeName": "P",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Page%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "_",
+      "CreateSubAttribute": true,
+      "AttributeName": "ReportDate",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Trust{LNF1}|Trust{LNF2}|Trust{LNL}|Trust{DblName}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "remove",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": false,
+      "AttributeName": "UniqueD",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/*",
+      "CreateSubAttribute": false,
+      "AttributeName": "party",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{*}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%*%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "_{SSN/HCData}|_{SSN/MCData}",
+      "CreateSubAttribute": false,
+      "AttributeName": "keep",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "Keep/*",
+      "CreateSubAttribute": false,
+      "AttributeName": "%Name%",
+      "SetAttributeName": true,
+      "AttributeType": "%Type.Value%",
+      "SetAttributeType": true,
+      "AttributeValue": "%Value.Value%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "BirthDate",
+      "CreateSubAttribute": false,
+      "AttributeName": "DOB",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": false,
+      "AttributeName": "createStreet",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{/people}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%people%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*@grantee",
+      "CreateSubAttribute": false,
+      "AttributeName": "Grantee",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{m}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "MCData",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*/*/Subdivision2",
+      "CreateSubAttribute": false,
+      "AttributeName": "Subdivision",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "AddressFinder/Middle",
+      "CreateSubAttribute": false,
+      "AttributeName": "MiddleInitial",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{Valid/*}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "Valid",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "_",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Type%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "%Copy%",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*",
+      "CreateSubAttribute": true,
+      "AttributeName": "Over88",
+      "SetAttributeName": true,
+      "AttributeType": "",
+      "SetAttributeType": false,
+      "AttributeValue": "HIGH",
+      "SetAttributeValue": true
+    }
+  },
+  {
+    "Type": "ModifyAttributeValueOH",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeQuery": "*{Section}|*{Township}|*{Range}|*{Tract}",
+      "CreateSubAttribute": false,
+      "AttributeName": "",
+      "SetAttributeName": false,
+      "AttributeType": "hasSTRQ",
+      "SetAttributeType": true,
+      "AttributeValue": "",
+      "SetAttributeValue": false
+    }
+  }
+]

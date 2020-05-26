@@ -1,0 +1,8 @@
+[
+  {
+    "Type": "EntityNameDataScorer",
+    "Description": "",
+    "Enabled": true,
+    "Object": "EntityNameDataScorer"
+  }
+]

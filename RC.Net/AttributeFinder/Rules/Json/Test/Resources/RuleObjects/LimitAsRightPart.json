@@ -1,0 +1,72 @@
+[
+  {
+    "Type": "LimitAsRightPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 49,
+      "AcceptSmallerLength": true,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsRightPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 4,
+      "AcceptSmallerLength": false,
+      "Extract": true
+    }
+  },
+  {
+    "Type": "LimitAsRightPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 4,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsRightPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 1,
+      "AcceptSmallerLength": false,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsRightPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 5,
+      "AcceptSmallerLength": false,
+      "Extract": true
+    }
+  },
+  {
+    "Type": "LimitAsRightPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 66,
+      "AcceptSmallerLength": true,
+      "Extract": false
+    }
+  },
+  {
+    "Type": "LimitAsRightPart",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "NumberOfCharacters": 9,
+      "AcceptSmallerLength": false,
+      "Extract": true
+    }
+  }
+]

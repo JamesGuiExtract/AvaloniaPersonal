@@ -20,7 +20,8 @@ namespace Extract.AttributeFinder.Rules.Json
             new JsonSerializerSettings
             {
                 ContractResolver = new ConverterContractResolver(),
-                Converters = new [] { new StringEnumConverter() }
+                Converters = new [] { new StringEnumConverter() },
+                Formatting = Formatting.Indented
             };
 
         /// <summary>

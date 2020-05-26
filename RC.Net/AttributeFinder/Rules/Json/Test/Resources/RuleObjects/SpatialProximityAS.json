@@ -1,0 +1,4102 @@
+[
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Candidate",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*@Header_TestGroup",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "Page",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "NCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Clues@SSN|Clues@DLN",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/*/tentativecopy",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/*/copy",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@URS",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*@WF",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/TaxID/HCData|*/TaxID/MCData|*/TaxID/LCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/TaxIDNCData/*",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Possible@Test",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Possible@Test|Confirmed@Test",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "ZipCode",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "MCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/Content",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/Content7",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.2,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "MCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "NCData/NCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues",
+      "TargetsMustContainReferences": true,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "HCData|MCData|LCData|Clues",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.01,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.01,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.01,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.01,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@Bank",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "NCData@Bank",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "HCData@SSN|MCData@SSN|LCData@SSN",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "NCData@SSN",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Candidate{True}",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Candidate{True}|Confirmed@ReportDate",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 30.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@Candidate",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*@Candidate|*@FirstTest",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "CollectionDate@Following",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Test",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "value",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Optimal|HighRisk|IntermediateRisk",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|MCData|LCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "HCData|MCData|LCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|MCData|LCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@Document",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Clues@SSN|Clues|HCData|MCData|LCData",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "Page",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/Other/HCData|*/Other/MCData|*/Other/LCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/NCDataOther/*",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@TaxID",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "NCData@TaxID",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Test",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Test",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.9,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.9,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "MCData@SSN|LCData@SSN",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "HCData@SSN",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.15,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.15,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.15,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.15,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/Found/*",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/NCData/item",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@LastDitch",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|MCData",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "Page",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@MIN",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|MCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "MCData@CheckForRemoval",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|LCData|MCData@SSN|MCData@",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "*",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|*@Blank",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 40.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 5.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@region|*@removeclueCO|*@removeclue",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*@wellformed",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@Backup",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Clues",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "NCData@DOB/*@",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Clues@DOB",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 10.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/SSN/Clues",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/SSNNCData/*@",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.5,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@FullPage",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Clues@|HCData|MCData|LCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@fullpage",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|MCData|LCData|Clues",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "HCData@DOB",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "MCData@DOB|LCData@DOB",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@FullPage",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Clues@|Clues@CCN|HCData|MCData|LCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@DocType",
+      "TargetsMustContainReferences": true,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "*@SSN",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "LegalDescription",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "LegalDescription/FirstLD",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "HCData",
+      "TargetsMustContainReferences": true,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "HCDataWF|MCDataWF|LCDataWF",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@fullpage",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|MCData|LCData|Clues@Bank|Clues@Account|Clues@",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@flag",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|MCData|LCData|Clues",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "LegalDescription",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "LegalDescription",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "NCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Clues",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/AccountNCData/*@",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/Clues",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 10.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@SSN|Clues@",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "HCData|MCData|LCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "NCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/SSNNCData/*@",
+      "TargetsMustContainReferences": true,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "*/SSN/Clues",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 10.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Possible@Test",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Possible@LongSentence",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 3.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/TaxID/*",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/TaxIDNCData/*",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Candidate",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Confirmed@Test{Indent1}|Confirmed@Test{Indent3}",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@DOB",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|MCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/ToLot",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/ToLot1",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "MCData@SSN",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "MCData@Blank",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "*",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 16.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@RegEx|*@RegExTrim",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*@remove",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/Person",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/Person1",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/DOB2/HCData|*/DOB2/MCData|*/DOB2/LCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/DOB2NCData/*",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@Doc",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Clues@SSN|HCData|MCData|LCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/Test",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/Value",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@Flag",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Clues@|Clues@SSN",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.2,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Candidate",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Confirmed@Test{Indent2}",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "MCDATA@COM",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCDATA",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Candidate{Indent2}",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Confirmed@Test{Indent1}|Candidate{Indent1}",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "Page",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/*/Content@Alpha",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/*/Content@ProbableHandwriting|*/*/Content@ProbableText",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|*@Blank",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/*",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "*",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.5,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*",
+      "TargetsMustContainReferences": true,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "*@WellFormed",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@Fix/possibleLine",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*@Fix/digit|*@Fix/possibleLine",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.085,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Possible@Test",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*@Header_LaboratoryTest",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.25,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@SSN|Clues@",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|*@Blank",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Range@LC",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Value",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@SSN",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|*@Blank",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "MCData@DOB",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData@DOB",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues@Account|PageClues@Account",
+      "TargetsMustContainReferences": true,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "HCData@Account|MCData@Account|LCData@Account",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/PII/HCData|*/PII/MCData|*/PII/LCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/PIINCData/*",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "StarredValue",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "Possible@Value",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Line1",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "Line2",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.1,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "SSN",
+      "TargetsMustContainReferences": true,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "SSN_Top",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*",
+      "TargetsMustContainReferences": true,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "well_formed",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@ProbableHandwriting",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "*@ProbableHandwriting",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|NCData",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Date",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Date",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "_/SSN/Clues",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "_/SSN/HCData@Blank|_/SSN/MCData@Blank",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.5,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Candidate",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Candidate|Possible@Test|Confirmed@Test",
+      "Left": {
+        "Anchor": "Page",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 1.3,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "Page",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Candidate{True}",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "Candidate{True}|Confirmed@CollectionDate",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 30.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "MCData|LCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData@Disbursement",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/PIN/LCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/LNNCData/*",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues|HCData|MCData|LCData",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*@Blank",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*/DOB3NCData/*@",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*/DOB3/Clues",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Characters"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Lines"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 10.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 2.0,
+        "ExpandUnits": "Lines"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "LCData@Account",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "LCData@Footer",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": false,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Clues",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "HCData|*@Blank",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.5,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "gBoxes",
+      "TargetsMustContainReferences": true,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "gBoxes",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "HCData@|MCData@|LCData@",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*@wellformed|*@NCData|*@TaxID",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 1.0,
+        "ExpandUnits": "Characters"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@SSN",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "NCData@SSN",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "Candidate",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": false,
+      "ReferenceQuery": "*@Header_Anylate",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "Page",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  },
+  {
+    "Type": "SpatialProximityAS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TargetQuery": "*@|*@SSN",
+      "TargetsMustContainReferences": false,
+      "RequireCompleteInclusion": true,
+      "ReferenceQuery": "*@Blank",
+      "Left": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Left",
+        "ExpandDirection": "ExpandLeft",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Top": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Top",
+        "ExpandDirection": "ExpandUp",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Right": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Right",
+        "ExpandDirection": "ExpandRight",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "Bottom": {
+        "Anchor": "ReferenceAttribute",
+        "AnchorSide": "Bottom",
+        "ExpandDirection": "ExpandDown",
+        "ExpandBy": 0.0,
+        "ExpandUnits": "Inches"
+      },
+      "CompareLinesSeparately": true,
+      "IncludeDebugAttributes": false
+    }
+  }
+]

@@ -1,0 +1,1808 @@
+[
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "&",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#$:;\"'()",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Period",
+        "Hyphen",
+        "Comma"
+      ],
+      "CustomFilterCharacters": "!@#$%&*()=+:;\"'<>,.?",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Period",
+        "Comma",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "$",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "()&",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#$%*()=+:;<>,.",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "@#$%&*()",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "!@#$%&*()=+:;\"'<>,.?",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Period"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "!@#$%&*()\"?:;",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "!@#$%&*()=+:;\"'<>,.?",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral"
+      ],
+      "CustomFilterCharacters": "!@#$%&*()=+:;\"'<>,.?",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "(",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#$*:;\"'()",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "@#$%&*():;\"'?",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#$:;\"'",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Custom"
+      ],
+      "CustomFilterCharacters": ":#",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "%",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "$",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "$#():;\"'",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "%",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "X",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "$#:;",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "'",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#:",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Hyphen",
+        "Comma"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Comma",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "|",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "@#$%&*()+[]:;\"'<>?",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": true,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "'\"",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#$*:;\"'()",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": true,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#%*()<>",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "[]()",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "(",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "$",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen",
+        "Custom"
+      ],
+      "CustomFilterCharacters": ":L",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": true,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen",
+        "Custom"
+      ],
+      "CustomFilterCharacters": " ",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "@#$%&*()+[]:;\"'<>?©°",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "!@#$%&*():;\"'",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#$",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "!@#$%&*()+={[}]:;\"'<>?",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "$#@:;@@@",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#:",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen",
+        "Comma"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "()'\";:",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "*",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "<=>",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": true,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#$%*()=:;<>,.",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#:abcdefghijkmnopqrtuvwxyzABCDEFGHIJKLMNOPQRTUVWXYZ",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#$\"':;",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "!@#$%&*()=+:;\"'<>,.?",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Hyphen"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Comma"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "!@#$%&*()+=[{]};:'\"?",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha"
+      ],
+      "CustomFilterCharacters": "!@#$%&*()=+:;\"'<>,.?",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "!@#$%&*()=+:;\"'<>,.?",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "()[]:;",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "[]()!|",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "()",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "Custom"
+      ],
+      "CustomFilterCharacters": ":;",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "#",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "'\"",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "AEF",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "'\"",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Numeral",
+        "Hyphen",
+        "Custom"
+      ],
+      "CustomFilterCharacters": ")(",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": true,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": true,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash"
+      ],
+      "CustomFilterCharacters": "",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": ":;",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen",
+        "Comma",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "()#",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Period",
+        "Hyphen",
+        "Underscore",
+        "Comma",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": ":#",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": true
+    }
+  },
+  {
+    "Type": "OCRArea",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Filter": [
+        "Alpha",
+        "Numeral",
+        "Hyphen",
+        "ForwardSlash",
+        "Custom"
+      ],
+      "CustomFilterCharacters": "<",
+      "DetectHandwriting": false,
+      "ReturnUnrecognized": false,
+      "ClearIfNoneFound": false
+    }
+  }
+]

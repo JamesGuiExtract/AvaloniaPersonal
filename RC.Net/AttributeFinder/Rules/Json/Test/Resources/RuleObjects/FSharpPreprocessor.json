@@ -1,0 +1,191 @@
+[
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\CountDistinctNames.fsx",
+      "FunctionName": "AFDoc.getDistinctNameCount"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+      "FunctionName": "getSensitiveParagraphsOutsideOfTablesFromDocument"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Tables.fsx",
+      "FunctionName": "test"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+      "FunctionName": "predictSensitiveText"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\TableScripts.fsx",
+      "FunctionName": "AFDoc.Tabula.createTablesPDFIfMissing"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+      "FunctionName": "getSensitiveLinesOutsideOfTablesFromDocument"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+      "FunctionName": "getTextOutsideOfTablesFromDocument"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Ensemble\\Scripts\\AFDoc.fsx",
+      "FunctionName": "tryToLearn"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Ensemble\\Scripts\\AFDoc.fsx",
+      "FunctionName": "createTrainingDataAndTryToLearn"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts.fsx",
+      "FunctionName": "AFDoc.getTextOutsideOfTables"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Ensemble\\Scripts\\AFDoc.fsx",
+      "FunctionName": "reLearn"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts.fsx",
+      "FunctionName": "writeCSV"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\TableScripts.fsx",
+      "FunctionName": "AFDoc.getCellsWithFeaturesForNonEmptyPages"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+      "FunctionName": "getSensitiveRowsFromPage"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+      "FunctionName": "getNonTablePagesFromDocument"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\ML\\currency-cellClassifier\\TableScripts.fsx",
+      "FunctionName": "AFDoc.Tabula.createTablesPDFIfMissing"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+      "FunctionName": "getNonRefTablePagesFromDocument"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\..\\Scripts\\AFDoc.fsx",
+      "FunctionName": "findRepeatsForHighConfidenceItems"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\NERUtils.fsx",
+      "FunctionName": "AFDoc.getSensitiveRows"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+      "FunctionName": "getSensitiveCellsFromDocument"
+    }
+  },
+  {
+    "Type": "FSharpPreprocessor",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+      "FunctionName": "getSensitiveRowsFromDocument"
+    }
+  }
+]

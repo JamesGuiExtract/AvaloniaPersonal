@@ -1,0 +1,32 @@
+[
+  {
+    "Type": "IntegerInputValidator",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "HasMin": true,
+      "Min": 1900,
+      "HasMax": true,
+      "Max": 2099,
+      "ZeroAllowed": false,
+      "NegativeAllowed": false,
+      "IncludeMinInRange": true,
+      "IncludeMaxInRange": true
+    }
+  },
+  {
+    "Type": "IntegerInputValidator",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "HasMin": false,
+      "Min": -2147483647,
+      "HasMax": false,
+      "Max": 2147483646,
+      "ZeroAllowed": true,
+      "NegativeAllowed": true,
+      "IncludeMinInRange": true,
+      "IncludeMaxInRange": true
+    }
+  }
+]

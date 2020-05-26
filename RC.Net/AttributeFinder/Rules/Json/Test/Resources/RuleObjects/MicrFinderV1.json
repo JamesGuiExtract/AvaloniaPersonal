@@ -1,0 +1,32 @@
+[
+  {
+    "Type": "MicrFinderV1",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SplitRoutingNumber": true,
+      "SplitAccountNumber": true,
+      "SplitCheckNumber": false,
+      "SplitAmount": false,
+      "Rotate0": true,
+      "Rotate90": true,
+      "Rotate180": true,
+      "Rotate270": true
+    }
+  },
+  {
+    "Type": "MicrFinderV1",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "SplitRoutingNumber": false,
+      "SplitAccountNumber": false,
+      "SplitCheckNumber": false,
+      "SplitAmount": false,
+      "Rotate0": true,
+      "Rotate90": true,
+      "Rotate180": true,
+      "Rotate270": true
+    }
+  }
+]

@@ -1,0 +1,8 @@
+[
+  {
+    "Type": "FloatInputValidator",
+    "Description": "Default<Float>",
+    "Enabled": true,
+    "Object": "FloatInputValidator"
+  }
+]

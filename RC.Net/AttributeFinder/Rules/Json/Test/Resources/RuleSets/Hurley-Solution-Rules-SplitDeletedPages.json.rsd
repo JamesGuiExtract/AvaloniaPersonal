@@ -1,0 +1,166 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "PassInputVOAToOutput",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Page",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {},
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "split DeletedPages<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/DeletedPages",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Splitter",
+              "Object": {
+                "Type": "StringTokenizerSplitter",
+                "Object": {
+                  "Delimiter": ",",
+                  "SplitType": "EachTokenAsSubAttribute",
+                  "FieldNameExpression": "DeletedPages",
+                  "AttributeNameAndValueExprVector": []
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "make a copy if there is no comma<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/DeletedPages",
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "ValueConditionSelector",
+                        "Description": "comma<Value condition selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "Condition": {
+                            "Type": "FindingRuleCondition",
+                            "Object": {
+                              "AFRule": {
+                                "Type": "RegExprRule",
+                                "Object": {
+                                  "IsRegExpFromFile": false,
+                                  "RegExpFileName": "",
+                                  "Pattern": ",",
+                                  "IsCaseSensitive": false,
+                                  "FirstMatchOnly": false,
+                                  "CreateSubAttributesFromNamedMatches": false,
+                                  "OnlyCreateOneSubAttributePerGroup": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "UseAttributeSelector": true,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "ModifyAttributeValueOH",
+                "Object": {
+                  "AttributeQuery": "DeletedPages",
+                  "CreateSubAttribute": true,
+                  "AttributeName": "DeletedPages",
+                  "SetAttributeName": true,
+                  "AttributeType": "",
+                  "SetAttributeType": false,
+                  "AttributeValue": "%Value%",
+                  "SetAttributeValue": true
+                }
+              }
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "remove Whitespace<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*/*/DeletedPages",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "RemoveCharacters",
+                "Object": {
+                  "Characters": " \t\r\n",
+                  "IsCaseSensitive": false,
+                  "RemoveAll": true,
+                  "Consolidate": false,
+                  "TrimLeading": false,
+                  "TrimTrailing": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote */*/DeletedPages<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*/DeletedPages",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<SDN>.PaginationTemp.voa<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.PaginationDeletedPagesSplit.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

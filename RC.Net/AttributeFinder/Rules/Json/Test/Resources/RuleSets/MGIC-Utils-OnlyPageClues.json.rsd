@@ -1,0 +1,561 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "Latest",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [],
+    "RunMode": "RunPerPage",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Page",
+    "InsertParentValue": "<PageNumber>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "SelectPageRegion",
+      "Description": "*testing*<Select page region>",
+      "Enabled": false,
+      "Object": {
+        "IncludeRegionDefined": true,
+        "PageSelectionType": "SelectSpecified",
+        "SpecificPages": "3",
+        "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+        "Pattern": "",
+        "IsRegExp": false,
+        "IsCaseSensitive": false,
+        "HorizontalStart": -1,
+        "HorizontalEnd": -1,
+        "VerticalStart": -1,
+        "VerticalEnd": -1,
+        "SelectPageRegionReturnType": "ReturnText",
+        "IncludeIntersectingText": true,
+        "TextIntersectionType": "Character",
+        "SelectedRegionRotation": -1,
+        "TextToAssignToRegion": ""
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "ReviewPage": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "List of phrases",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "LocateImageRegion",
+              "Object": {
+                "DataInsideBoundaries": true,
+                "FindType": "ImageRegion",
+                "ImageRegionText": "ReviewPage",
+                "IncludeIntersectingEntities": true,
+                "IntersectingEntityType": "Character",
+                "MatchMultiplePagesPerDocument": true,
+                "ClueList1": {
+                  "Clues": [
+                    "Individual\\W*Income\\W*Tax\\W*Return",
+                    "(?~<>Earnings)\\W*(?~<>Statement)",
+                    "Form\\W*1040[A-Z]?\\b"
+                  ],
+                  "CaseSensitive": false,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList2": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList3": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList4": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "Left": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Left",
+                  "ExpandDirection": "ExpandLeft",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Top": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Top",
+                  "ExpandDirection": "ExpandUp",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Right": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Right",
+                  "ExpandDirection": "ExpandRight",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Bottom": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandDown",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "W-2",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(??FindIfXOf=2)\r\n(\r\n(Wages\\W*tips\\W*other\\W*compensation)\r\n(wage\\W*and\\W*tax\\W*statement)\r\n(social\\W*security\\W*wages)\r\n(Medicare\\W*wages\\W*and\\W*tips)\r\n(federal\\W*income\\W*tax\\W*withheld)\r\n(Employer\\W*Modification\\W*number)\r\n(\\bW-2\\b)\r\n)\r\n(\\A.)",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "LocateImageRegion",
+                  "Description": "<Locate image region>",
+                  "Enabled": true,
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "ImageRegion",
+                    "ImageRegionText": "ReviewPage",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Character",
+                    "MatchMultiplePagesPerDocument": true,
+                    "ClueList1": {
+                      "Clues": [
+                        "[\\s\\S]"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Left",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Top": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Top",
+                      "ExpandDirection": "ExpandUp",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Right": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Bottom": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    }
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "COD",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "FindingRuleCondition",
+                  "Object": {
+                    "AFRule": {
+                      "Type": "FindFromRSD",
+                      "Object": {
+                        "AttributeNames": [],
+                        "RSDFileName": "<ComponentDataDir>\\Redaction\\DocTypeRSD\\Certificate of Death\\DocTypeClues.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "LocateImageRegion",
+                  "Object": {
+                    "DataInsideBoundaries": true,
+                    "FindType": "ImageRegion",
+                    "ImageRegionText": "ReviewPage",
+                    "IncludeIntersectingEntities": true,
+                    "IntersectingEntityType": "Character",
+                    "MatchMultiplePagesPerDocument": false,
+                    "ClueList1": {
+                      "Clues": [
+                        "[\\s\\S]"
+                      ],
+                      "CaseSensitive": false,
+                      "Regex": true,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList2": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList3": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "ClueList4": {
+                      "Clues": [],
+                      "CaseSensitive": false,
+                      "Regex": false,
+                      "RestrictByBoundary": false
+                    },
+                    "Left": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Left",
+                      "ExpandDirection": "ExpandLeft",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Top": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Top",
+                      "ExpandDirection": "ExpandUp",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Right": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Right",
+                      "ExpandDirection": "ExpandRight",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    },
+                    "Bottom": {
+                      "Anchor": "Page",
+                      "AnchorSide": "Bottom",
+                      "ExpandDirection": "ExpandDown",
+                      "ExpandBy": 0.0,
+                      "ExpandUnits": "Inches"
+                    }
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Low quality",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "CharacterConfidenceCondition",
+                  "Object": {
+                    "IsMet": true,
+                    "AggregateFunction": "Average",
+                    "FirstScoreCondition": "LEQ",
+                    "FirstScoreToCompare": 50,
+                    "IsSecondCondition": false,
+                    "AndSecondCondition": true,
+                    "SecondScoreCondition": "EQ",
+                    "SecondScoreToCompare": 0
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "ConditionalValueFinder",
+                  "Object": {
+                    "Condition": {
+                      "Type": "FindingRuleCondition",
+                      "Object": {
+                        "AFRule": {
+                          "Type": "RegExprRule",
+                          "Object": {
+                            "IsRegExpFromFile": false,
+                            "RegExpFileName": "",
+                            "Pattern": "[\\s\\S]{500}",
+                            "IsCaseSensitive": false,
+                            "FirstMatchOnly": true,
+                            "CreateSubAttributesFromNamedMatches": false,
+                            "OnlyCreateOneSubAttributePerGroup": false
+                          }
+                        }
+                      }
+                    },
+                    "InvertCondition": false,
+                    "Rule": {
+                      "Type": "LocateImageRegion",
+                      "Object": {
+                        "DataInsideBoundaries": true,
+                        "FindType": "ImageRegion",
+                        "ImageRegionText": "ReviewPage",
+                        "IncludeIntersectingEntities": true,
+                        "IntersectingEntityType": "Character",
+                        "MatchMultiplePagesPerDocument": true,
+                        "ClueList1": {
+                          "Clues": [
+                            "[\\s\\S]"
+                          ],
+                          "CaseSensitive": false,
+                          "Regex": true,
+                          "RestrictByBoundary": false
+                        },
+                        "ClueList2": {
+                          "Clues": [],
+                          "CaseSensitive": false,
+                          "Regex": false,
+                          "RestrictByBoundary": false
+                        },
+                        "ClueList3": {
+                          "Clues": [],
+                          "CaseSensitive": false,
+                          "Regex": false,
+                          "RestrictByBoundary": false
+                        },
+                        "ClueList4": {
+                          "Clues": [],
+                          "CaseSensitive": false,
+                          "Regex": false,
+                          "RestrictByBoundary": false
+                        },
+                        "Left": {
+                          "Anchor": "Page",
+                          "AnchorSide": "Left",
+                          "ExpandDirection": "ExpandLeft",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Top": {
+                          "Anchor": "Page",
+                          "AnchorSide": "Top",
+                          "ExpandDirection": "ExpandUp",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Right": {
+                          "Anchor": "Page",
+                          "AnchorSide": "Right",
+                          "ExpandDirection": "ExpandRight",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        },
+                        "Bottom": {
+                          "Anchor": "Page",
+                          "AnchorSide": "Bottom",
+                          "ExpandDirection": "ExpandDown",
+                          "ExpandBy": 0.0,
+                          "ExpandUnits": "Inches"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "ModifyAttributeValueOH",
+              "Description": "<Modify attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeQuery": "*",
+                "CreateSubAttribute": false,
+                "AttributeName": "",
+                "SetAttributeName": false,
+                "AttributeType": "LowCC",
+                "SetAttributeType": true,
+                "AttributeValue": "",
+                "SetAttributeValue": false
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": true
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": true,
+              "AttributeQuery": "Page/*",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": false,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": "ReviewPage"
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "Page"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.FPC.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

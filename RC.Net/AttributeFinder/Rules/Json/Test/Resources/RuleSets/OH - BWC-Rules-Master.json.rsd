@@ -1,0 +1,1492 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "2012-03-01\r\nUpdated for problem images discovered during verification.\r\n\r\n2012-02-02:\r\n- Fields: CCN\r\n- Version: 9.0.0.173\r\n- FKB: 12.1.0.173\r\n- Counter: Redaction (pages)\r\n- USB Key #: None\r\n- Output: VOA\r\n- Notes:\r\n  - Rules were written using TIF, GIF, and JPG images. Many of the TIF images were created by rasterizing PDFs.\r\n  - Rules will log benign \"Failed to obtain image resolution!\" exceptions (ELI22686) when run on GIF images.\r\n\r\n\r\n2012-01-27: Ohio - BWC\r\n- These are redaction rules for Credit Card Numbers\r\n- To be used with ID Shield 9.0.0.173, FKBUpdate 12.1.0.173\r\n- PDF read/write license\r\n- Redaction (pages) counter\r\n- no USB key\r\n- VOA file output",
+    "Counters": [
+      {
+        "ID": 3,
+        "Name": "FLEX Index - Redaction (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "12.1.0.173",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Clues": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "ComponentData Clues",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "ReplaceStrings",
+              "Description": "Remove strings that cause false positives<Replace strings>",
+              "Enabled": true,
+              "Object": {
+                "Replacements": [
+                  {
+                    "Pattern": "\\bon\\x20credit\\x20card\\b",
+                    "Replacement": ""
+                  }
+                ],
+                "AsRegularExpr": true,
+                "IsCaseSensitive": false
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "CC_Clues"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "ReplaceStrings",
+                  "Description": "Remove bad clues<Replace strings>",
+                  "Enabled": true,
+                  "Object": {
+                    "Replacements": [
+                      {
+                        "Pattern": "\\ACHARGE\\z",
+                        "Replacement": "remove"
+                      }
+                    ],
+                    "AsRegularExpr": true,
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "CREDIT CARD PAYMENT...policy account (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set002\\Images\\EB8QRYHM.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=^.{0,2})\r\nCREDIT.{0,3}CARD.{0,2}PAYMENT\r\n(?=.{0,2}\\r?$[\\s\\S]{0,20}^.{0,2}policy.{0,3}account)\r\n|\r\n(?<=^.{0,2})\r\nCREDIT\\x20CARD\r\n(?=.{0,2}\\r?$[\\s\\S]{0,12}^.{0,2}policy)",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Has \"charge\" checkbox checked (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set002\\Images\\10Q86K36.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\CheckBox\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Insurance document - WRONG SPOT (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set003\\Images\\8590.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "Select insurance pages<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "(?~<error=4>WARNING:\\x20INSURANCE)\r\n|\r\n(?~<error=4>WARNING:\\x20NO\\x20INSURANCE)\r\n|\r\nWC[\\s\\S]{0,5}receives[\\s\\S]{0,15}(?>(?~<error=2>application))[\\s\\S]{0,25}security",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\Insurance\\WrongSpot.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Screen Cap (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set002\\Images\\RX4D8BJ3.gif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?:\r\n\r\n    VISA|(?~<error=4>MASTERCARD)|(?~<error=4>AMERICAN\\x20EXPRESS)\r\n\r\n)\r\n\r\n.{0,25}\r\n\r\n(?~<error=2>account)",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Parital Page Clue: Credit Card Payment Information",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "LocateImageRegion",
+              "Object": {
+                "DataInsideBoundaries": true,
+                "FindType": "ImageRegion",
+                "ImageRegionText": "Possible Credit Card Number",
+                "IncludeIntersectingEntities": true,
+                "IntersectingEntityType": "Character",
+                "MatchMultiplePagesPerDocument": true,
+                "ClueList1": {
+                  "Clues": [
+                    "^.{0,7}(?>(?~<error=5>CREDIT\\x20CARD\\x20PAYMENT\\x20INFORMATION))"
+                  ],
+                  "CaseSensitive": false,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList2": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList3": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList4": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "Left": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Left",
+                  "ExpandDirection": "ExpandLeft",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Top": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandUp",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Right": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Right",
+                  "ExpandDirection": "ExpandRight",
+                  "ExpandBy": 1.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Bottom": {
+                  "Anchor": "ClueList1",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandDown",
+                  "ExpandBy": 1.5,
+                  "ExpandUnits": "Inches"
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "Type to PartPage<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "PartPage"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Full page clue: Certain pages",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "LocateImageRegion",
+              "Object": {
+                "DataInsideBoundaries": true,
+                "FindType": "ImageRegion",
+                "ImageRegionText": "Possible Credit Card Number",
+                "IncludeIntersectingEntities": true,
+                "IntersectingEntityType": "Character",
+                "MatchMultiplePagesPerDocument": true,
+                "ClueList1": {
+                  "Clues": [
+                    "insurance[\\s\\S]{0,9}effect[\\s\\S]{0,4}until[\\s\\S]{0,5}BWC",
+                    "WC[\\s\\S]{0,5}receives[\\s\\S]{0,15}(?>(?~<error=2>application))[\\s\\S]{0,25}security",
+                    "^.{0,6}(?>(?~<error=2>Certification\\x20to\\x20BWC))",
+                    "^.{0,3}RETROSPECTIVE.{0,3}RATING",
+                    "(?~<error=4>WARNING:\\x20INSURANCE)",
+                    "(?~<error=4>WARNING:\\x20NO\\x20INSURANCE)",
+                    "WARNING[\\s\\S]{0,29}effect[\\s\\S]{0,4}until[\\s\\S]{0,5}BWC",
+                    "^.{0,3}WARNING.{0,2}[:;].{0,35}BWC.{0,25}application",
+                    "(?~<error=3>certify\\x20that\\x20the\\x20payroll\\x20reported)",
+                    "(?~<error=4>certify\\x20that\\x20the\\x20payroll\\x20amount\\x20reported)",
+                    "(?~<error=4>certify\\x20the\\x20payroll\\x20reported)",
+                    "\\bI\\b.{0,5}certify.{0,15}payroll.{0,15}reported",
+                    "^.{0,2}\\bI\\b.{0,5}HEREBY.{0,17}payroll.{0,15}herein.{0,6}correct",
+                    "(?~<error=3>appears\\x20on\\x20credit\\x20card)",
+                    "^.{0,3}Print.{0,3}name.{0,3}as.{0,3}it.{0,7}(?:APPE|EARS).{0,5}On.{0,9}card.",
+                    "(?~<error=4>\\x20portion\\x20of\\x20the\\x20claims\\x20liability\\x20for\\x20a\\x20possible\\x20future\\x20reduction\\x20in\\x20premiums)"
+                  ],
+                  "CaseSensitive": false,
+                  "Regex": true,
+                  "RestrictByBoundary": false
+                },
+                "ClueList2": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList3": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "ClueList4": {
+                  "Clues": [],
+                  "CaseSensitive": false,
+                  "Regex": false,
+                  "RestrictByBoundary": false
+                },
+                "Left": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Left",
+                  "ExpandDirection": "ExpandLeft",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Top": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Top",
+                  "ExpandDirection": "ExpandUp",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Right": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Right",
+                  "ExpandDirection": "ExpandRight",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                },
+                "Bottom": {
+                  "Anchor": "Page",
+                  "AnchorSide": "Bottom",
+                  "ExpandDirection": "ExpandDown",
+                  "ExpandBy": 0.0,
+                  "ExpandUnits": "Inches"
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "Type to FullPage<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "FullPage"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Full page clue: Low quality pages",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\LowQuality\\LQPage.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "Type to FullPage<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "FullPage"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Full Page: Screen Cap (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set002\\Images\\VHZU7808.gif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "ConditionalValueFinder",
+              "Object": {
+                "Condition": {
+                  "Type": "FindingRuleCondition",
+                  "Object": {
+                    "AFRule": {
+                      "Type": "BlockFinder",
+                      "Object": {
+                        "BlockBegin": "",
+                        "BlockEnd": "",
+                        "BlockSeparator": "SOMETHINGTHATWILLNEVER APPEAR",
+                        "Clues": [
+                          "^.{0,6}(?>(?~<error=2>Claim\\x20Reference\\x20Info))",
+                          "^.{0,6}(?>(?~<error=2>COVERAGE\\x20look-up))",
+                          "^.{0,6}(?>(?~<error=2>CUSTOM\\x20SERVICES))",
+                          "^.{0,6}(?>(?~<error=2>POLICY\\x20MANAGEMENT))",
+                          "^.{0,6}(?>(?~<error=2>Quick\\x20PAY))",
+                          "^.{0,6}(?>(?~<error=2>Safety\\x20Services))",
+                          "^.{0,6}(?>(?~<error=2>self-insured))"
+                        ],
+                        "DefineBlocksType": "SeparatorString",
+                        "FindAllBlocks": false,
+                        "GetMaxOnly": true,
+                        "InputAsOneBlock": true,
+                        "IsCluePartOfAWord": true,
+                        "IsClueRegularExpression": true,
+                        "MinNumberOfClues": 3,
+                        "PairBeginAndEnd": false
+                      }
+                    }
+                  }
+                },
+                "InvertCondition": false,
+                "Rule": {
+                  "Type": "SelectPageRegion",
+                  "Object": {
+                    "IncludeRegionDefined": true,
+                    "PageSelectionType": "SelectWithRegExp",
+                    "SpecificPages": "",
+                    "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                    "Pattern": "^.{0,6}(?>(?~<error=2>Claim\\x20Reference\\x20Info))\r\n|\r\n^.{0,6}(?>(?~<error=2>COVERAGE\\x20look-up))\r\n|\r\n^.{0,6}(?>(?~<error=2>CUSTOM\\x20SERVICES))\r\n|\r\n^.{0,6}(?>(?~<error=2>POLICY\\x20MANAGEMENT))\r\n|\r\n^.{0,6}(?>(?~<error=2>Quick\\x20PAY))\r\n|\r\n^.{0,6}(?>(?~<error=2>Safety\\x20Services))\r\n|\r\n^.{0,6}(?>(?~<error=2>self-insured))",
+                    "IsRegExp": true,
+                    "IsCaseSensitive": false,
+                    "HorizontalStart": -1,
+                    "HorizontalEnd": -1,
+                    "VerticalStart": -1,
+                    "VerticalEnd": -1,
+                    "SelectPageRegionReturnType": "ReturnImageRegion",
+                    "IncludeIntersectingText": false,
+                    "TextIntersectionType": "NoEntity",
+                    "SelectedRegionRotation": -1,
+                    "TextToAssignToRegion": "Possible Credit Card Number"
+                  }
+                }
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "Type to FullPage<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "FullPage"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Full Page: More Screen Cap (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set002\\Images\\1JK1HWV4.gif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "Contains \"ohio.gov\"<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "\\bohio\\x20?\\.\\x20?gov\\b",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "SelectPageRegion",
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "Employer.{0,8}Form.{0,8}Payroll.{0,4}reports.{0,8}Confirmation ",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnImageRegion",
+                "IncludeIntersectingText": false,
+                "TextIntersectionType": "NoEntity",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": "Possible Credit Card Number"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "TranslateValue",
+                  "Description": "Type to FullPage<Translate values or types>",
+                  "Enabled": true,
+                  "Object": {
+                    "TranslateFieldType": "Type",
+                    "TranslationStringPairs": [
+                      {
+                        "From": "",
+                        "To": "FullPage"
+                      }
+                    ],
+                    "IsCaseSensitive": false
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "No OCR page [K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set002\\Images\\CMS6KM7T.tif]",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "_"
+                ],
+                "RSDFileName": "<RSDFileDir>\\LowQuality\\NoOCRPage.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Possible Receipt [K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set002\\Images\\CAI6X9OZ.tif;K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set002\\Images\\NXL97NBB.tif]",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "_"
+                ],
+                "RSDFileName": "<RSDFileDir>\\LowQuality\\ReceiptPage.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "HCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "ComponentData HCData",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "CC_HCData"
+                ],
+                "RSDFileName": "<ComponentDataDir>\\Redaction\\Common\\CommonMaster.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "XXXX-XXXX-XXXX-1234 (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set002\\Images\\K2MJN4WN.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?<=\\bX{4}\\x20?-\\x20?X{4}\\x20?-\\x20?X{4}\\x20?-\\x20?)\\d{4}\\b",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "LCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Screen Cap (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set002\\Images\\RX4D8BJ3.gif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "(?:\r\n\r\n    (?~<>VISA)|(?~<error=4>MASTERCARD)|(?~<error=4>AMERICAN\\x20EXPRESS)\r\n\r\n)\r\n\r\n.{0,27}\r\n\r\n(?~<error=2>account)\r\n\r\n.{0,5}\\d{4}",
+                "IsCaseSensitive": false,
+                "FirstMatchOnly": false,
+                "CreateSubAttributesFromNamedMatches": false,
+                "OnlyCreateOneSubAttributePerGroup": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "RegExprRule",
+                  "Description": "Grab number<Regular expression rule>",
+                  "Enabled": true,
+                  "Object": {
+                    "IsRegExpFromFile": false,
+                    "RegExpFileName": "",
+                    "Pattern": "\\d{4}(?=.{0,2}\\r?$)",
+                    "IsCaseSensitive": false,
+                    "FirstMatchOnly": false,
+                    "CreateSubAttributesFromNamedMatches": false,
+                    "OnlyCreateOneSubAttributePerGroup": true
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Reciepts",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\Receipts\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Accounting documents (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set003\\Images\\9250.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "Select accounting pages<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "(?~<error=4>Accounting\\x20General\\x20Deposit\\x20Slip)\r\n",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\Accounting\\LCData.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "MCData": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Payroll documents (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set001\\Images\\tif\\WGL23W04_01072008_152817_1.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "Select payroll pages<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "(?~<error=4>certify\\x20that\\x20the\\x20payroll\\x20amount\\x20reported)\r\n|\r\n(?~<error=3>certify\\x20that\\x20the\\x20payroll\\x20reported)\r\n|\r\n(?~<error=4>certify\\x20the\\x20payroll\\x20reported)\r\n|\r\n^.{0,3}RETROSPECTIVE.{0,3}RATING\r\n|\r\n^.{0,6}(?>(?~<error=2>Certification\\x20to\\x20BWC))",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\Payroll\\Payroll.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Insurance documents (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set001\\Images\\PDF\\CSYS01812169-001.PDF)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "Select insurance pages<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "(?~<error=4>WARNING:\\x20INSURANCE)\r\n|\r\n(?~<error=4>WARNING:\\x20NO\\x20INSURANCE)\r\n|\r\nWC[\\s\\S]{0,5}receives[\\s\\S]{0,15}(?>(?~<error=2>application))[\\s\\S]{0,25}security",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\Insurance\\Insurance.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "Accounting documents (K:\\Common\\Engineering\\Sample Files\\OH - BWC\\Set001\\Images\\tif\\1250.tif)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "SelectPageRegion",
+              "Description": "Select accounting pages<Select page region>",
+              "Enabled": true,
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectWithRegExp",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "(?~<error=4>Accounting\\x20General\\x20Deposit\\x20Slip)\r\n",
+                "IsRegExp": true,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "item"
+                ],
+                "RSDFileName": "<RSDFileDir>\\Accounting\\Accounting.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Move up recipet sub-attrbiutes<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": true,
+              "AttributeQuery": "LCData/Clues|LCData/LCData",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": false,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": "CCN"
+            }
+          },
+          {
+            "Type": "RemoveEntriesFromList",
+            "Description": "remove marked items<Remove entries from list>",
+            "Enabled": true,
+            "Object": {
+              "EntryList": [
+                "remove"
+              ],
+              "IsCaseSensitive": false
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Clues@CCN near blank items<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "SpatialProximityAS",
+                "Object": {
+                  "TargetQuery": "Clues@CCN",
+                  "TargetsMustContainReferences": false,
+                  "RequireCompleteInclusion": false,
+                  "ReferenceQuery": "*@Blank",
+                  "Left": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandLeft",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Top": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandUp",
+                    "ExpandBy": 0.2,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Right": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Right",
+                    "ExpandDirection": "ExpandRight",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Bottom": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Bottom",
+                    "ExpandDirection": "ExpandDown",
+                    "ExpandBy": 0.1,
+                    "ExpandUnits": "Inches"
+                  },
+                  "CompareLinesSeparately": true,
+                  "IncludeDebugAttributes": false
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MergeAttributes",
+            "Description": "Merge full pages clues<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*@FullPage",
+              "CreateMergedRegion": false,
+              "NameMergeMode": "SpecifyField",
+              "NameMergePriority": [],
+              "OverlapPercent": 25.0,
+              "PreserveAsSubAttributes": false,
+              "PreserveType": false,
+              "SpecifiedName": "Clues",
+              "SpecifiedType": "FullPage",
+              "SpecifiedValue": "Possible Credit Card Number",
+              "TreatNameListAsRegex": false,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": false,
+              "TypeMergeMode": "SpecifyField",
+              "TypeMergePriority": [],
+              "ValueMergeMode": "SpecifyField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove full page clue if overlapping other items<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "SpatialProximityAS",
+                "Object": {
+                  "TargetQuery": "*@FullPage",
+                  "TargetsMustContainReferences": false,
+                  "RequireCompleteInclusion": false,
+                  "ReferenceQuery": "HCData|MCData|LCData|Clues",
+                  "Left": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandLeft",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Top": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandUp",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Right": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Right",
+                    "ExpandDirection": "ExpandRight",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Bottom": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Bottom",
+                    "ExpandDirection": "ExpandDown",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "CompareLinesSeparately": true,
+                  "IncludeDebugAttributes": false
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove partial page clue if overlapping othe items<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "SpatialProximityAS",
+                "Object": {
+                  "TargetQuery": "*@PartPage",
+                  "TargetsMustContainReferences": false,
+                  "RequireCompleteInclusion": false,
+                  "ReferenceQuery": "HCData|MCData|LCData|Clues",
+                  "Left": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Left",
+                    "ExpandDirection": "ExpandLeft",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Top": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Top",
+                    "ExpandDirection": "ExpandUp",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Right": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Right",
+                    "ExpandDirection": "ExpandRight",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "Bottom": {
+                    "Anchor": "ReferenceAttribute",
+                    "AnchorSide": "Bottom",
+                    "ExpandDirection": "ExpandDown",
+                    "ExpandBy": 0.0,
+                    "ExpandUnits": "Inches"
+                  },
+                  "CompareLinesSeparately": true,
+                  "IncludeDebugAttributes": false
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove blank items<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*@Blank"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MergeAttributes",
+            "Description": "Merge leftovers<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData|MCData|LCData",
+              "CreateMergedRegion": false,
+              "NameMergeMode": "PreserveField",
+              "NameMergePriority": [
+                "HCData",
+                "MCData",
+                "LCData"
+              ],
+              "OverlapPercent": 75.0,
+              "PreserveAsSubAttributes": false,
+              "PreserveType": false,
+              "SpecifiedName": "",
+              "SpecifiedType": "CCN",
+              "SpecifiedValue": "0000-0000-0000-0000",
+              "TreatNameListAsRegex": false,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": false,
+              "TypeMergeMode": "SpecifyField",
+              "TypeMergePriority": [],
+              "ValueMergeMode": "SpecifyField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "type to CCN<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData|MCData|LCData|Clues",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "CCN",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

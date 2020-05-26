@@ -1,0 +1,669 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 3,
+        "Name": "FLEX Index - Redaction (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "16.2.0.90",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerPage",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "_",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocumentClassifier",
+      "Description": "<Document classifier>",
+      "Enabled": true,
+      "Object": {
+        "IndustryCategoryName": "County Document",
+        "ReRunClassifier": false
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "Page": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "Run rules<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "move up individual pages<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "_/Page",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToParent",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "remove _<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "_"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "rename Page to _<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Page",
+              "CreateSubAttribute": false,
+              "AttributeName": "_",
+              "SetAttributeName": true,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Run SSN rules<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Create SSN attribute<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "SSN",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%Value%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Run SSN rules on _/SSN<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_/SSN",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\SSN\\main.rsd.etf"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Run NCData rules for SSN as necessary<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Create MakeNCData attribute<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_{SSN/HCData}|_{SSN/MCData}|_{SSN/LCData}",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "MakeNCData",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Run NCData rules<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_{MakeNCData}",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Create SSNNCData attribute<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*",
+                              "CreateSubAttribute": true,
+                              "AttributeName": "SSNNCData",
+                              "SetAttributeName": true,
+                              "AttributeType": "",
+                              "SetAttributeType": false,
+                              "AttributeValue": "%Value%",
+                              "SetAttributeValue": true
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Run SSN NCData rules on */SSNNCData<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/SSNNCData",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "Splitter",
+                              "Object": {
+                                "Type": "RSDSplitter",
+                                "Object": {
+                                  "RSDFileName": "<RSDFileDir>\\SSN\\NCData.rsd.etf"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "Remove */MakeNCData<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "*/MakeNCData"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Remove SSN attributes with NCData as necessary<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Remove SSN attributes<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_{SSNNCData/*}",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "RemoveSubAttributes",
+                            "Description": "Remove */SSNNCData/*@ that are near */SSN/Clues<Remove attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeSelector": {
+                                "Type": "SpatialProximityAS",
+                                "Object": {
+                                  "TargetQuery": "*/SSNNCData/*@",
+                                  "TargetsMustContainReferences": false,
+                                  "RequireCompleteInclusion": false,
+                                  "ReferenceQuery": "*/SSN/Clues",
+                                  "Left": {
+                                    "Anchor": "ReferenceAttribute",
+                                    "AnchorSide": "Left",
+                                    "ExpandDirection": "ExpandLeft",
+                                    "ExpandBy": 0.0,
+                                    "ExpandUnits": "Characters"
+                                  },
+                                  "Top": {
+                                    "Anchor": "ReferenceAttribute",
+                                    "AnchorSide": "Top",
+                                    "ExpandDirection": "ExpandUp",
+                                    "ExpandBy": 0.0,
+                                    "ExpandUnits": "Lines"
+                                  },
+                                  "Right": {
+                                    "Anchor": "ReferenceAttribute",
+                                    "AnchorSide": "Right",
+                                    "ExpandDirection": "ExpandRight",
+                                    "ExpandBy": 10.0,
+                                    "ExpandUnits": "Characters"
+                                  },
+                                  "Bottom": {
+                                    "Anchor": "ReferenceAttribute",
+                                    "AnchorSide": "Bottom",
+                                    "ExpandDirection": "ExpandDown",
+                                    "ExpandBy": 2.0,
+                                    "ExpandUnits": "Lines"
+                                  },
+                                  "CompareLinesSeparately": true,
+                                  "IncludeDebugAttributes": false
+                                }
+                              },
+                              "ConditionalRemove": false,
+                              "DataScorer": {
+                                "Type": null,
+                                "Description": "",
+                                "Enabled": true,
+                                "Object": null
+                              },
+                              "ScoreCondition": "EQ",
+                              "CompareConditionType": "ValueOf",
+                              "ScoreToCompare": 0
+                            }
+                          },
+                          {
+                            "Type": "RemoveSubAttributes",
+                            "Description": "Remove */SSN/HCData|*/SSN/MCData|*/SSN/LCData that overlap */SSNNCData/*<Remove attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeSelector": {
+                                "Type": "SpatialProximityAS",
+                                "Object": {
+                                  "TargetQuery": "*/SSN/HCData|*/SSN/MCData|*/SSN/LCData",
+                                  "TargetsMustContainReferences": false,
+                                  "RequireCompleteInclusion": false,
+                                  "ReferenceQuery": "*/SSNNCData/*",
+                                  "Left": {
+                                    "Anchor": "ReferenceAttribute",
+                                    "AnchorSide": "Left",
+                                    "ExpandDirection": "ExpandLeft",
+                                    "ExpandBy": 0.0,
+                                    "ExpandUnits": "Characters"
+                                  },
+                                  "Top": {
+                                    "Anchor": "ReferenceAttribute",
+                                    "AnchorSide": "Top",
+                                    "ExpandDirection": "ExpandUp",
+                                    "ExpandBy": 0.0,
+                                    "ExpandUnits": "Lines"
+                                  },
+                                  "Right": {
+                                    "Anchor": "ReferenceAttribute",
+                                    "AnchorSide": "Right",
+                                    "ExpandDirection": "ExpandRight",
+                                    "ExpandBy": 0.0,
+                                    "ExpandUnits": "Characters"
+                                  },
+                                  "Bottom": {
+                                    "Anchor": "ReferenceAttribute",
+                                    "AnchorSide": "Bottom",
+                                    "ExpandDirection": "ExpandDown",
+                                    "ExpandBy": 0.0,
+                                    "ExpandUnits": "Lines"
+                                  },
+                                  "CompareLinesSeparately": true,
+                                  "IncludeDebugAttributes": false
+                                }
+                              },
+                              "ConditionalRemove": false,
+                              "DataScorer": {
+                                "Type": null,
+                                "Description": "",
+                                "Enabled": true,
+                                "Object": null
+                              },
+                              "ScoreCondition": "EQ",
+                              "CompareConditionType": "ValueOf",
+                              "ScoreToCompare": 0
+                            }
+                          },
+                          {
+                            "Type": "RemoveSubAttributes",
+                            "Description": "Remove */SSNNCData<Remove attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeSelector": {
+                                "Type": "QueryBasedAS",
+                                "Object": {
+                                  "QueryText": "*/SSNNCData"
+                                }
+                              },
+                              "ConditionalRemove": false,
+                              "DataScorer": {
+                                "Type": null,
+                                "Description": "",
+                                "Enabled": true,
+                                "Object": null
+                              },
+                              "ScoreCondition": "EQ",
+                              "CompareConditionType": "ValueOf",
+                              "ScoreToCompare": 0
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Run DocType rules as necessary<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "rename _{SSN/*}|_{TaxID/*} to dontRun<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_{SSN/*}|_{TaxID/*}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "dontRun",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Run SSN DocType rules<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Create SSNDocTypeClues attribute<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*",
+                              "CreateSubAttribute": true,
+                              "AttributeName": "SSNDocTypeClues",
+                              "SetAttributeName": true,
+                              "AttributeType": "",
+                              "SetAttributeType": false,
+                              "AttributeValue": "%Value%",
+                              "SetAttributeValue": true
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Run SSNDocTypeClues rules on */SSNDocTypeClues<Run object on attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/SSNDocTypeClues",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "Splitter",
+                              "Object": {
+                                "Type": "RSDSplitter",
+                                "Object": {
+                                  "RSDFileName": "<RSDFileDir>\\SSN\\DocTypeClues.rsd.etf"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "rename _{SSNDocTypeClues/*} to dontRun<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_{SSN/DocTypeClues/*}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "dontRun",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "rename dontRun to _<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "dontRun",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "_",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote _/*/* to the top<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "_/*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove _<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "_"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove *@Blank<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*@Blank"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MergeAttributes",
+            "Description": "Merge duplicates<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "HCData|MCData|LCData",
+              "CreateMergedRegion": false,
+              "NameMergeMode": "PreserveField",
+              "NameMergePriority": [
+                "HCData",
+                "MCData",
+                "LCData"
+              ],
+              "OverlapPercent": 80.0,
+              "PreserveAsSubAttributes": false,
+              "PreserveType": false,
+              "SpecifiedName": "",
+              "SpecifiedType": "",
+              "SpecifiedValue": "000-00-0000",
+              "TreatNameListAsRegex": false,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": true,
+              "TypeMergeMode": "SelectField",
+              "TypeMergePriority": [],
+              "ValueMergeMode": "SelectField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<VOAOutputFile>"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

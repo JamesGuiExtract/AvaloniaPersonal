@@ -1,0 +1,26 @@
+[
+  {
+    "Type": "CharacterConfidenceDS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AggregateFunction": "Average"
+    }
+  },
+  {
+    "Type": "CharacterConfidenceDS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AggregateFunction": "Minimum"
+    }
+  },
+  {
+    "Type": "CharacterConfidenceDS",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AggregateFunction": "Maximum"
+    }
+  }
+]

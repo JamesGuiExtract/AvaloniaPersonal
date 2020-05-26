@@ -1,0 +1,1302 @@
+[
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "05",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "ISC.{0,2}CRID.{1,6}\\d{3,5}.{0,2}\\d{3,5}.{0,2}[- \\d]{4,8}.{0,4}",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?nx) \\bBy\\b (?=[\\S\\s]*? (\\bBy\\b | \\bIts\\s+Attorney\\b(?'AIF') )) (?(AIF)[\\S\\s]*|(?!))",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "¿",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "«",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 2
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\d{2}([\\x20-]*\\d){8,}",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "*********",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?:p.rc.l|.?arcel|p.?rcel|pa.?cel|par.?el|parc.?l|parce.?|\\b(?:par.{2,4}|.{1,2}arce.{1,2}|.{2,4}cel)\\b)\\W*(?:\\b(?:.ax|t.x|ta.)\\b\\W*)?(?:.?dentification|I.?entification|Id.?ntification|Ide.?tification|Iden.?ification|Ident.?fication|Identi.?ication|Identif.?cation|Identifi.?ation|Identific.?tion|Identifica.?ion|Identificat.?on|Identificati.?n|Identificatio.?|\\b(?:Identif.{6,8}|.{1,4}ntificat.{1,4}|.{6,8}ication)\\b\\W*)?(?:No|N.mb.r|.?umber|N.?mber|Nu.?ber|Num.?er|Numb.?r|Numbe.?|\\b(?:Num.{2,4}|.{1,2}umbe.{1,2}|.{2,4}ber)\\b)[\\s\\S]{0,5}\\d(?:\\W?\\d)+",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "Xo% Xo% Xo% Xo% Xo% ",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\bor\\b",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "of",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\d{2}=\\d{7}",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "~~~~~~~~~~~~",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?:\\bAVE\\b|\\bAVENUE\\b|\\bBLVD\\b|\\bBOULEVARD\\b|\\bCI\\b|\\bCIR\\b|\\bCIRCLE\\b|\\bCOURT\\b|\\bCT\\b|\\bDR\\b|\\bDRIVE\\b|\\bHWY\\b|\\bLANE\\b|\\bLN\\b|\\bPARKWAY\\b|\\bPLACE\\b|\\bPL\\b|\\bRD\\b|\\bROAD\\b|\\bST\\b|ST[.]|\\bSTREET\\b|\\bTERRACE\\b|\\bTPKE\\b|\\bTRAIL\\b|\\bTRL\\b|\\bTURNPIKE\\b|\\bWAY\\b|\\bWO\\b|\\bWOODS\\b|\\bWY\\b)[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[\\s\\S]+",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "Remove",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\bP\\W*[O0]\\W+(?=Box)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "PO ",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "«",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "$0·",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "((D\\w{2,4}ment|Doc.?|Instrument|Dkt)\\s*(((No.?|Number|\\#)[\\s\\S]{2,35})|(([\\s\\S]{0,4}\\d){4,7}))(and\\s*(D\\w{2,4}ment|Doc.?|Instrument|Dkt)?\\s*(((No.?|Number|\\#)[\\s\\S]{2,35})|(([\\s\\S]{0,4}\\d){4,7})))?)[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "$1",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": ",.{0,12}$",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?-m)^(?=(?'noComma'[^,]+\\z))(?(noComma)(?'lname'\\w+))",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "${lname},",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?<=\\d)\\s*[\\r\\n]+(?=\\d)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "-",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[\\s\\S]*(?>(?~<error=5>Department)).{0,5}\\W*(?:o.|.f)\\W*(?>(?~<error=3>Agriculture))(?!=and\\W*rural\\W*development)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "Michigan Department of Agriculture",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?:social|s.{0,3}ial|soc.{0,3}l).{0,3}(?:security|s.{0,3}urity|sec.{0,3}ity|secur.{0,3})(?!.{0,10}(?:tax|.ax|t.x|\\bta))",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "ü",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "â",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\b\\d{2}\\x20*-\\x20*\\d+\\b",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "«$0»",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "Index.{0,9}\\d{3,}",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\(\\s*U\\.S\\.\\s*\\$(.*)\\)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "$1",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "^Ho(?:m|r?n)e\\:",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?:CAS|ASE)\\s*[;:!].{8,25}$",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "Placeholder",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?n)certified\\W*copy\\W*of.{0,8}(CER|TIF|CATE)[\\s\\S]{0,14}(DEA|EAT|ATH)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\bno\\b",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "00",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?<=\\s|\\A)(Operator\\x20?License)(?=\\s|\\z)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "«$1»",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "Exp.{1,3}es:?\\s+\\d{7}",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\bNO[\\s\\S]*R\\b",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "NOVEMBER",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[\\s\\S]*STATE[\\s\\S]{0,7}WYOMING[\\s\\S]{0,32}BOARD[\\s\\S]{0,7}LAND[\\s\\S]{0,3}COMMISSIONER[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "WY STATE BOARD OF LAND COMMISSIONERS",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "file://<RSDFileDir>\\CommonWords.dat.etf",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "~",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\d(\\d{3})",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "$1",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "«(?=[^«ä]+ä)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "·$0",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[\\s\\S]*(?>(?~<error=4>PRINCIPAL\\x20STONE\\x20CO))[\\s\\S]*|[\\s\\S]*(?>(?~<error=2>CHEMICAL\\x20NAME))[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "PRINCIPAL STONE COMPONENTS",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "file://<ComponentDataDir>\\Redaction\\Common\\TaxID\\TaxIDMCData.dat.etf",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "ATEXTBUFFERRRRRRRRRR",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "4\\W+your\\W*social\\W*security",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "4 your ytiruces laicos",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[~!]",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "file://<RSDFileDir>\\DateOfBirth.dat.etf",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "^(?:SS|55(?!\\d))",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "«",
+      "AsRegularExpression": false,
+      "IsCaseSensitive": false,
+      "Replacement": "¿",
+      "ReplacementOccurrenceType": "Specified",
+      "SpecifiedOccurrence": 2
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[\\S\\s]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?nx) ^(SEC(TION)?\\x20?)? (  [1-9] | [12]\\d | 3[0-6] ) \\x20?[:;]",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "¿$0",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "^[A-Z]{4,},\\s?[A-Z]+\\s[A-Z]+[\\S\\s]+",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\bCLS.{0,2}(?:\\d+\\D{0,4})+",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "Social summary",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\sTRUSTEE\\z",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\bSID\\b[\\S\\s]{0,8}(?:[^\\d\\r\\n]{0,2}\\d)+",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "CCCCCCOOOOO",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "^\\d{2}[-/]\\d{2}[-/]\\d{4}(?=\\r?$)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "([\\s\\S]*)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "$1 PLACEHOLDER, LLC",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "¦([^¦]+)¦",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "$1",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?:taxe[ds]|tax.?\\s*.?(?:asses|b(?:ureau|ill)|c(?:losing|redit)|d(?:eductio|ue)|l(?:aw|i[eo]n)|not|obligatio|purpos|return|statem))[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "file://<ComponentDataDir>\\Redaction\\Common\\SocialSecurityNumber\\SSN-allvariations.dat.etf",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "Garbage",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?<=Ç[^Ç]+)Ç",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "¢",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "SSN",
+      "AsRegularExpression": false,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "of\\s{1,3}the\\W{1,3}",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?:SOC|IAL).{0,12}(?:SEC|CUR|RITY)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "STATE.{0,3}OF.{0,6}(?:[0o]H|[1I][0O]).{0,5}SS",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?~<error=3>Social)\\W*(?~<error=4>Security)\\W*(?:(?~<error=3>Number)|(?~<>No)|#)[\\s\\S]{0,8}(?:(?~<>last)\\W*(?:4|(?~<>four))\\W*(?~<>digit)|xxx\\s*-\\s*xx|[\\s\\S]{1,5}xx\\s*-(?=\\s*\\d{4}))",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "ššššššš ššššššššššš ššššš ššš ššš šššššš",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\b(?:ss.{0,2})|(?:\\b.{0,2}sn)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "file://<RSDFileDir>\\SocialSecurityNumberClue.dat.etf",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "The|(?:Plai.{5,6}|.{1,3}ainti.{1,3}|.{4,5}ntiff)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\bTOWN.{0,4}P\\b\\D*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "Received\\W*Social\\W*Security",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "~~~~~~~~~~~~~~~~~~~~~",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "SSN-?",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\d(?:\\D{0,2}\\d)+\\sacres",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "b\\s*\\)\\s*Use \\s*of \\s*[Pp]roperty\\:",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\bas\\s{0,4}trust\\x20or\\b",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "as trustor",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?x) (?<=\\s) (CASE) (?!\\W[a-z]{3,}) (?# case, not case name)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "«$1»",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\A([A-Z])\\s([A-Z]{2,}[\\S\\s]*)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "$2 $1",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "See\\x20Above",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "^tacrolimus",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "«$0ä»",
+      "ReplacementOccurrenceType": "Specified",
+      "SpecifiedOccurrence": 2
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\s*(?:\\(\\d{3}\\)\\s*)?\\d{3}\\D\\d{4}(?=\\r?$)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "which[\\s\\S]{0,6}organized.*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": ".nd.v.d..l",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?s)\\r\\n\\r\\n.+",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "^.{0,4}Lab.{0,3}Number[;:]?",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(CASE\\W*NO\\W*)\\d{2}\\W+\\d{2}(\\W+(\\d{9}))",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "$1.....$2",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "wheaton.{0,3}franciscan.{0,3}laborator(?:y|ies)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\b(?:(?:dri.{4,5}|.{1,2}river.{1,2}|.{3,4}vers)\\s{0,4}(?:lic.{4,5}|.{1,2}icens.{1,2}|.{3,4}ense)|dl)[\\s\\S]{0,4}#?:?\\s{0,4}[a-z]{1,2}\\d{3,}\\b",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "SSW",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?<=(my\\W*commission|sion\\W*expires)[\\s\\S]{0,175})^.{0,5}Return\\W*to",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "file://<RSDFileDir>\\Splitters\\SportsTeams.dat.etf",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(\\d)[,_](?=\\d{1,2}\\b)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "$1.",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "DEATH",
+      "AsRegularExpression": false,
+      "IsCaseSensitive": false,
+      "Replacement": "FirstFoundDEATH",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\ba\\b[\\s\\S]{0,20}(corporation|business)[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "·«¦?([^«»]+)ä",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "$1",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "^.{0,3}(?=\\r?$)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "Too Short",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(^\\d{6,12}\\b|\\b\\d{6,12}\\r?$)[\\s\\S]{0,60}(?:Acco.{0,3}|ount).{0,3}(?:No|Num|.{0,3}ber)[\\s\\S]{0,400}(?=\\1)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "file://<RSDFileDir>\\clue.dat.etf",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "file://<RSDFileDir>\\clue.dat.etf",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "~~~~~~~~~~~~",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[\\s\\S]*(?>(?~<error=4>Department)).{0,4}\\W*(?:o.|.f)\\W*(?>(?~<error=3>Agriculture)).{0,3}\\W*(?>(?~<>and)).?\\W*(?~<>rural).?\\W*(?~<error=3>development)[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "Michigan Department of Agriculture and Rural Development",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "1{5}[\\s\\S]{100}",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "Remove",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\A«",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": true,
+      "Replacement": "`«",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\(\\s?MERS\\s?\\)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[\\s\\S]*South[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "remove",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "«",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\A\\d{4}\\z",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "First",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "(?~<error=2>FINANCE)\\W*(?~<error=2>CHARGE).{0,5}\\d+",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "\\A([NEWS])([\\s\\S]*\\z)",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "$1",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  },
+  {
+    "Type": "AdvancedReplaceString",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "StrToBeReplaced": "[\\s\\S]*\\d\\x20\\d\\x20\\d[\\s\\S]*",
+      "AsRegularExpression": true,
+      "IsCaseSensitive": false,
+      "Replacement": "",
+      "ReplacementOccurrenceType": "All",
+      "SpecifiedOccurrence": 0
+    }
+  }
+]

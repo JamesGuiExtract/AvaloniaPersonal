@@ -1,0 +1,2002 @@
+[
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "X0000000",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 8.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000000000000",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 10.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.8,
+      "MinimumWidth": 6.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 9.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 9.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 6,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Above",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.75,
+      "MinimumWidth": 4.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 9.0,
+      "OCRThreshold": 80,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 11.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "remove",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 2.5,
+      "MinimumWidth": 4.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "SSN",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 6,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "text",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 8.0,
+      "OCRThreshold": 70,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "remove",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 3.0,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "SSN",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "SSN",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 11.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "SSN",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 6,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 3,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": false,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 8.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 6.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 2,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 1,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.2,
+      "MinimumWidth": 0.5,
+      "OCRThreshold": 80,
+      "PoorOCRType": "PLACEHOLDER",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 4.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.3,
+      "MinimumWidth": 13.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 8.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 1.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "Possible MinorName",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 4.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 15,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 17.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.4,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.8,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 80,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 3,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 10,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "x",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 9.0,
+      "OCRThreshold": 90,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 1,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "00-0000000",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 10.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 9.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 12.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 6,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": false,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 20,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": true,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "remove",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 50.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "SSN",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "Log Number",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 2.0,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.5,
+      "MinimumWidth": 14.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 0.3,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 8.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 0.5,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 1,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "0000-0000-0000-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.5,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "remove",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 2.5,
+      "MinimumWidth": 4.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "SSN",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.7,
+      "MinimumWidth": 7.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": true,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.8,
+      "MinimumWidth": 7.0,
+      "OCRThreshold": 80,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 3,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "remove",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 4.0,
+      "MinimumWidth": 6.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "SSN",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 3.0,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.65,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 10,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 50,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 8.0,
+      "OCRThreshold": 50,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": true,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 4.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 1,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "X0000000",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.3,
+      "MinimumWidth": 10.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "removeclueblankCO",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 70,
+      "PoorOCRType": "removeclueCO",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "Treatment Facility",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 2.0,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.7,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 15.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "SSN",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 6,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "HW",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 10.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "HW",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.85,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "x",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000000000000",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 20.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.75,
+      "MinimumWidth": 4.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 6,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.6,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 80,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 3,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.6,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "MAGIC",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.5,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.8,
+      "MinimumWidth": 6.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": true,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "Text",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 68,
+      "PoorOCRType": "HW",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "DOB",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 80,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "remove",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 3.0,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "SSN",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 6,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 4.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 1,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 8.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.3,
+      "MinimumWidth": 0.5,
+      "OCRThreshold": 66,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 55,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "Probable_Text",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 5.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "Probable_Handwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 10.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 9.0,
+      "OCRThreshold": 80,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "CAUSE_NO",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "CAUSE_NO",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.9,
+      "MinimumWidth": 7.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.75,
+      "MinimumWidth": 8.0,
+      "OCRThreshold": 70,
+      "PoorOCRType": "",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 0.5,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 2.0,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 10,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 80,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 10.0,
+      "OCRThreshold": 80,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 9.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.8,
+      "MinimumWidth": 2.0,
+      "OCRThreshold": 95,
+      "PoorOCRType": "C",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 2,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "00-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 25,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 9.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 9.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": true,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.65,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.8,
+      "MinimumWidth": 30.0,
+      "OCRThreshold": 45,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": false
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "remove",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": false,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 11.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "SSN",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 6,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": false,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 20,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.7,
+      "MinimumWidth": 6.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "TaxID",
+      "DefaultAttributeText": "00-0000000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "000-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "[unrecognized]",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 1.0,
+      "MinimumWidth": 9.0,
+      "OCRThreshold": 60,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  },
+  {
+    "Type": "SplitRegionIntoContentAreas",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeName": "Content",
+      "DefaultAttributeText": "00-00-0000",
+      "GoodOCRType": "ProbableText",
+      "IncludeGoodOCR": true,
+      "IncludeOCRAsTrueSpatialString": false,
+      "IncludePoorOCR": true,
+      "MinimumHeight": 0.5,
+      "MinimumWidth": 3.0,
+      "OCRThreshold": 75,
+      "PoorOCRType": "ProbableHandwriting",
+      "ReOCRWithHandwriting": false,
+      "RequiredHorizontalSeparation": 4,
+      "UseLines": true
+    }
+  }
+]

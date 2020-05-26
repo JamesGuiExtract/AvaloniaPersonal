@@ -1,0 +1,1370 @@
+[
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "[unrecognized]",
+        "region"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "FourClues",
+        "TwoClues"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Blank"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Deed - Misc"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "a",
+        "as man",
+        "coll inc",
+        "DECLN TRUST",
+        "EXHIBIT A",
+        "grantee",
+        "grantor",
+        "holders",
+        "marital",
+        "marital trust",
+        "officer trust",
+        "OWNER AS TR",
+        "pooling",
+        "right",
+        "SERVICES",
+        "services llc",
+        "servicing",
+        "sole",
+        "sole as her",
+        "sole as his",
+        "substituted",
+        "successor",
+        "successor trust",
+        "SUCCUSSOR",
+        "surviving",
+        "too long",
+        "too short",
+        "trust",
+        "whose",
+        "women"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "`"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "remove"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "None"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Perfect"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "OneClue",
+        "ThreeClues"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "***-**",
+        "xxx-xx"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "___EMPTYPAGE___"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "UNCLEAN"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "NoCheckDocType"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "on"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "NoClueNeeded"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "community"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "#########"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "ACCEPTANCE",
+        "AGREEMENT",
+        "ANY OR",
+        "APN",
+        "APT",
+        "BANK",
+        "BOX",
+        "CORPORATION",
+        "DRIVERS LICENSE NO LAST 4",
+        "EGO ALTER",
+        "EXHIBIT",
+        "FOREVER",
+        "GIVEN",
+        "HEREBY",
+        "INC",
+        "IRA ROTH",
+        "LEASES",
+        "LIVING TRUST",
+        "LLC",
+        "LLP",
+        "MAN",
+        "MERGER",
+        "OWNER/BUILDER",
+        "PLEASE",
+        "RELEASE",
+        "REMITE",
+        "RENTS",
+        "RETAINING TITLE",
+        "SOLE WOMAN AS HER",
+        "TENANTS",
+        "THEIR",
+        "THEREFORE",
+        "THIS",
+        "TRUST",
+        "UNIFORM COMML CODE",
+        "WOMAN"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "XXX-XX-"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Remove"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Mortgage"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "BANK",
+        "LLC",
+        "ME, BEFORE",
+        "MORTGAGE",
+        "PO BOX"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Well OCRed"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "A MAN",
+        "A WOMAN",
+        "DEED QUIT CLAIM",
+        "ENTIRETY IN",
+        "FED ID",
+        "ID FED",
+        "MAN A",
+        "MORTGAGE",
+        "QUIT CLAIM DEED",
+        "TUSCOLA CITYOF CARO",
+        "TUSCOLA COUNTY OF",
+        "TUSCOLA VILLAGEOF KINGSTON",
+        "WOMAN A"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "DoNotVerify"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "born"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Mergeme"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "REMOVE"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "ANY OR",
+        "BANK",
+        "BOX",
+        "CORP",
+        "CORP FKA",
+        "CORP TR FKA",
+        "EGO ALTER",
+        "INC",
+        "LLC",
+        "MERGER",
+        "NEW",
+        "OWNER/BUILDER",
+        "SELLER",
+        "THEREFORE",
+        "TRUST"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "RemoveThis"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "N/A",
+        "remove"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "GRANTEE",
+        "GRANTEES",
+        "MORTGAGOR",
+        "PERSON"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "N/A"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "~~~~~~~~~~"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "HCData"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Test"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "remove",
+        "remove1234"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "BANK",
+        "PO BOX"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "NA"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Text"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "DoNotReview",
+        "remove"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "False"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "-"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "HCData",
+        "WORDS"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "CT1"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "regular"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "AS SOLE",
+        "INC",
+        "JR",
+        "MAN",
+        "NEVADA REVISED STATUTES",
+        "PASTOR"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "GETRIDOFINITIALS",
+        "GETRIDOFNUMBERS",
+        "INEXCESSOFFIFTY",
+        "TITLE INSURANCE APPLICATION",
+        "TRACTS",
+        "TYPE OF TITLE FEE"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "social"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "ASSIGNOR",
+        "INC",
+        "LENDER",
+        "NA",
+        "YOU"
+      ],
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "removeMe"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "BadAttribute"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Admitting",
+        "Attending",
+        "Family",
+        "Ordering"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "UNITED STATES",
+        "UNITED STATES OF AM"
+      ],
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "ANY OR",
+        "BANK",
+        "INC",
+        "LLC",
+        "MERGER",
+        "OWNER/BUILDER",
+        "THEREFORE"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "TaxID"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "digit"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "DESCRIBED AS FOLLOWS"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "a",
+        "as man",
+        "coll inc",
+        "DECLN TRUST",
+        "grantee",
+        "grantor",
+        "hereby",
+        "holders",
+        "marital",
+        "marital trust",
+        "officer trust",
+        "OWNER AS TR",
+        "pooling",
+        "right",
+        "SERVICES",
+        "services llc",
+        "servicing",
+        "sole",
+        "sole as her",
+        "sole as his",
+        "substituted",
+        "successor",
+        "successor trust",
+        "SUCCUSSOR",
+        "sucessor",
+        "surviving",
+        "too long",
+        "too short",
+        "trust",
+        "whose",
+        "women"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "testing"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "other"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "ADULT AN",
+        "CREEK MOSS",
+        "DOE JANE",
+        "DOE JOHN",
+        "OCCUPANT UNKNOWN",
+        "PROPERTY SEPARATE",
+        "SELF SEPARATE",
+        "SOLE AS HIS",
+        "Too Long",
+        "Too Short"
+      ],
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "000000000",
+        "999999999",
+        "Remove"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "MTG",
+        "NO PARCEL",
+        "REMOVE",
+        "THIS MTG"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "BLANK"
+      ],
+      "IsCaseSensitive": true
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "PUBLIC, THE"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Remove",
+        "Replace"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "F"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Appointment",
+        "Have",
+        "OSBA"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "a",
+        "as man",
+        "coll inc",
+        "DECLN TRUST",
+        "grantee",
+        "grantor",
+        "holders",
+        "marital",
+        "marital trust",
+        "officer trust",
+        "OWNER AS TR",
+        "pooling",
+        "right",
+        "SERVICES",
+        "services llc",
+        "servicing",
+        "sole",
+        "sole as her",
+        "sole as his",
+        "substituted",
+        "successor",
+        "successor trust",
+        "SUCCUSSOR",
+        "surviving",
+        "too long",
+        "too short",
+        "trust",
+        "whose",
+        "women"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Mortgage - Deed of Trust",
+        "Oil Gas and Mineral Lease"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Perfect",
+        "Remove"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "BANK",
+        "FILED",
+        "QUITCLAIMOR",
+        "QUITCLAIMOR TRUST"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "TRUST",
+        "TRUSTEE"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "NotSensitive"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "[unrecognized]"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "born",
+        "on"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Judgment"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "invalid"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "ANY OR",
+        "BANK",
+        "BOX",
+        "EGO ALTER",
+        "INC",
+        "LLC",
+        "MERGER",
+        "OWNER/BUILDER",
+        "THEREFORE",
+        "TRUST"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "BANK"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Fail"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "adult",
+        "an adult",
+        "as owner",
+        "bank",
+        "borrower",
+        "executed",
+        "executive",
+        "grantee",
+        "grantor",
+        "indiana and",
+        "invalid",
+        "mortagee",
+        "mortgage",
+        "mortgagee",
+        "mortgagor",
+        "not",
+        "notary public",
+        "real estate",
+        "releases mortgage",
+        "trust company",
+        "vigo county indiana"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "SUBSTITUTION TRUSTEE"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Last4"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "NO"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "ProbableText"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "APRIL",
+        "AUGUST",
+        "DECEMBER",
+        "FEBRUARY",
+        "JANUARY",
+        "JULY",
+        "JUNE",
+        "MARCH",
+        "MAY",
+        "NOVEMBER",
+        "OCTOBER",
+        "SEPTEMBER"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "AlreadyFound"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "INC",
+        "P.O. BOX"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "CHARGE"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "TooManyOnes"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "block"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "INC"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Lending"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "000-00",
+        "000-00-"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Badge",
+        "Date",
+        "FILED",
+        "OOSReturn",
+        "Printed Name",
+        "Ref",
+        "Remove",
+        "SHFN",
+        "SHFNI",
+        "STATE",
+        "SUBJECT",
+        "The",
+        "Toledo"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "Badly OCRd"
+      ],
+      "IsCaseSensitive": false
+    }
+  },
+  {
+    "Type": "RemoveEntriesFromList",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "EntryList": [
+        "ETC",
+        "MAINT",
+        "TAXES"
+      ],
+      "IsCaseSensitive": false
+    }
+  }
+]

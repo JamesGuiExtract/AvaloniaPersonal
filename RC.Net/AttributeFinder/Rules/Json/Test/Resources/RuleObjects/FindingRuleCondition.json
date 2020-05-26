@@ -1,0 +1,2204 @@
+[
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "òó",
+          "Clues": [
+            "\\b[a-z]+\\b"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": false,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 2,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\r\\n\\r\\n",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "card.*(?:with|\\r\\n\\r\\n).*NO$\r\n|\r\n\\nP.?US.{0,3}NO$",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": ".{0,2}(?:\\*.{0,2}){5}[\\s\\S]*",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "^\\w+$",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "HOMESTEAD\\W*WAIVER\\W*AND\\W*JURAT",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "ANNUAL[\\s\\S]{0,5}REPORT[\\s\\S]{0,5}OF[\\s\\S]{0,5}GUARDIAN",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[\\s\\S]+",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "[2-9]",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": true,
+          "RegExpFileName": "<ComponentDataDir>\\Redaction\\Common\\TaxID\\TaxID-allvariations.dat.etf",
+          "Pattern": "",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "_Fuzzy\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "<DoNotStandardizeValueAndRange>",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\bNAME.{0,3}(?:DOB.{0,3})?[:;]",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?~<error=4>AFFIDAVIT\\x20OF\\x20IDENTITY\\x20AND\\x20SURVIVORSHIP)\r\n|\r\n(?~<>AFFIDAVIT)\\W*OF\\W*(?~<>IDENTITY)\\W*AND\\W*(?~<>SURVIVORSHIP)\r\n|\r\n(?~<error=2>AFFIDAVIT\\x20OF\\x20SURVIVORSHIP)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "ImageRegion",
+          "ImageRegionText": " ",
+          "IncludeIntersectingEntities": true,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": false,
+          "ClueList1": {
+            "Clues": [
+              "[^\\r\\n\\t ¯]*[^\\r\\n\\t ¯](?=¯)"
+            ],
+            "CaseSensitive": true,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [
+              "(?<=¯)[^\\r\\n\\t ¯][^\\r\\n\\t¯]*"
+            ],
+            "CaseSensitive": true,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 2.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Top",
+            "ExpandDirection": "ExpandUp",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "ClueList2",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 2.0,
+            "ExpandUnits": "ClueCharacters"
+          },
+          "Bottom": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+          "Clues": [
+            "\\b[a-z]{4,}\\b"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 190,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\bREAL\\W*ESTATE\\W*CONTRACT([\\s\\S]{0,15}ESCROW\\W*AGREEMENT)?",
+          "IsCaseSensitive": true,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "SelectPageRegion",
+        "Object": {
+          "IncludeRegionDefined": true,
+          "PageSelectionType": "SelectSpecified",
+          "SpecificPages": "1-10",
+          "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+          "Pattern": "",
+          "IsRegExp": false,
+          "IsCaseSensitive": false,
+          "HorizontalStart": -1,
+          "HorizontalEnd": -1,
+          "VerticalStart": -1,
+          "VerticalEnd": -1,
+          "SelectPageRegionReturnType": "ReturnText",
+          "IncludeIntersectingText": true,
+          "TextIntersectionType": "Character",
+          "SelectedRegionRotation": -1,
+          "TextToAssignToRegion": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "~&~&~&~&~&~&~&~&~&~&~&~&~&~&~&~&~",
+          "Clues": [
+            "(?~<>COMPREHENSIVE\\sPLAN)[\\s\\S]*",
+            "(?~<>LAND\\sAUTHORITY)[\\s\\S]*",
+            "(?~<>MONROE\\sCOUNTY)"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": false,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 3,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\A\r\n(?:\\b[A-Z]{1,3})?\\d[\\d\\x20-.]+\r\n\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "^¶¶",
+          "Clues": [
+            "\\r\\n(?:\\r\\n.{2,6}:.*){3}\\r\\n\\r\\n",
+            "^(?:.OB|D.B|DO.):",
+            "^(?:.SN|S.N|SS.):",
+            "^(JU.{1,3}MENT|J.{1,3}GMENT)",
+            "^.{0,2}(?:.?ASE|C.?SE|CA.?E|CAS.?):",
+            "^.{0,2}(?:.DDR.SS|.?DDRESS|A.?DRESS|AD.?RESS|ADD.?ESS|ADDR.?SS|ADDRE.?S|ADDRES.?|ADD.{4,5}|.{1,2}DDRES.{1,2}|.{3,4}RESS)",
+            "^.{0,2}(?:D.F.ND.NT|.?EFENDANT|D.?FENDANT|DE.?ENDANT|DEF.?NDANT|DEFE.?DANT|DEFEN.?ANT|DEFEND.?NT|DEFENDA.?T|DEFENDAN.?|DEFE.{5,6}|.{1,3}FENDA.{1,3}|.{4,5}NDANT)",
+            "^.{0,2}(?:PL..NT.FF|.?LAINTIFF|P.?AINTIFF|PL.?INTIFF|PLA.?NTIFF|PLAI.?TIFF|PLAIN.?IFF|PLAINT.?FF|PLAINTI.?F|PLAINTIF.?|PLAI.{5,6}|.{4,5}NTIFF)",
+            "^.{0,2}(?:TYPE|.?YPE|T.?PE|TY.?E|TYP.?)"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": true,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 1,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "«»",
+          "Clues": [
+            "(?~<error=3>certain\\Wsuit\\Wpending)[\\s\\S]*",
+            "(?-i:(?~<error=2>STATE\\WOF\\WTEXAS))[\\s\\S]*",
+            "^(?~<error=2>as\\Wsureties)[\\s\\S]*",
+            "^(?~<error=2>Said\\Wjudgment\\Wis\\Wof)[\\s\\S]*",
+            "^(?~<error=3>There\\Wis\\Wnow\\Wstill\\Wdue)[\\s\\S]*"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 5,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?n)\r\n\\b(\r\n    STATUS\r\n  | COLL\r\n)[:;]",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "FindFromRSD",
+        "Object": {
+          "AttributeNames": [
+            "it"
+          ],
+          "RSDFileName": "<RSDFileDir>\\twice01OfOther.rsd.etf"
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "^.{0,5}(?~<>REQUEST)\\W*(?~<>FOR)\\W*(?~<error=2>INFORMATION)\\W*(?:O.|.R)\\W*(?~<>COPIES)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": true,
+          "RegExpFileName": "<RSDFileDir>\\SSN.dat.etf",
+          "Pattern": "",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?nx)\r\n\\AMononucleosis\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "^Wheaton\\sFranciscan\\sLaboratories",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "000-00-0000|00-0000000",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\b[a-z]{4,}\\b",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "ValueFromList",
+        "Object": {
+          "ValueList": [
+            "% BASOS (OUTSIDE)",
+            "% EOS (OUTSIDE)",
+            "% LYMPHS (OUTSIDE)",
+            "% MONOS (OUTSIDE)",
+            "% NEUTROPHILS  (OUTSIDE)",
+            "BASOPHILS (OUTSIDE)",
+            "EOSINOPHILS (OUTSIDE)",
+            "LYMPHOCYTES (OUTSIDE)",
+            "MONOCYTES (OUTSIDE)",
+            "NEUTROPHILS (OUTSIDE)"
+          ],
+          "IsCaseSensitive": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "  \\A\r\n  (?>\\b(\\d+))\r\n  \\|\r\n  \\1\\b\r\n  \\|\r\n  (?:\\1)?\r\n  \\z\r\n|\r\n  \\A\r\n  \\|\r\n  (?>\\b(\\d+))\r\n  \\|\r\n  \\1\\b\r\n  \\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\bADOPTION\\x20CERTIFICATE\\b",
+          "IsCaseSensitive": true,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "SelectPageRegion",
+        "Object": {
+          "IncludeRegionDefined": true,
+          "PageSelectionType": "SelectSpecified",
+          "SpecificPages": "94",
+          "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+          "Pattern": "",
+          "IsRegExp": false,
+          "IsCaseSensitive": false,
+          "HorizontalStart": -1,
+          "HorizontalEnd": -1,
+          "VerticalStart": -1,
+          "VerticalEnd": -1,
+          "SelectPageRegionReturnType": "ReturnText",
+          "IncludeIntersectingText": true,
+          "TextIntersectionType": "Character",
+          "SelectedRegionRotation": -1,
+          "TextToAssignToRegion": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\b(?-i:I)(?~<>ncident)\\sReport",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "SelectPageRegion",
+        "Object": {
+          "IncludeRegionDefined": true,
+          "PageSelectionType": "SelectSpecified",
+          "SpecificPages": "23",
+          "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+          "Pattern": "",
+          "IsRegExp": false,
+          "IsCaseSensitive": false,
+          "HorizontalStart": -1,
+          "HorizontalEnd": -1,
+          "VerticalStart": -1,
+          "VerticalEnd": -1,
+          "SelectPageRegionReturnType": "ReturnText",
+          "IncludeIntersectingText": true,
+          "TextIntersectionType": "Character",
+          "SelectedRegionRotation": -1,
+          "TextToAssignToRegion": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "<RSDFileDir>\\..\\Grantor\\IsMultiDoc.dat.etf",
+          "Pattern": "(?xi)\r\n(?:\r\n  \\(?\r\n  (?:\r\n    DEED \\s{1,3} OF \\s{1,3} TRUST (?: \\s{1,3} WITH )? (?: \\s{1,3} POWER \\s{1,3} OF \\s{1,3} SALE)?\r\n  |\r\n    ASSIGNMENT \\s{1,3} OF \\s{1,3}\r\n    (?: (?: RENTS? | LEASES? | PROFITS? ),? \\s{1,3} (?: (?: AND | & ) \\s{1,3})? ){2,3}\r\n  |\r\n    SECURITY \\s{1,3} AGREEMENTS?\r\n  |\r\n    FIXTURE \\s{1,3} FILING\r\n  )\r\n  \\)?\r\n\r\n  (?: \\s{1,3} \\( [^\\)\\r]{1,20} \\) )?\r\n\r\n  (?:\r\n    [,\\.]? \\s{1,4} (?: AND | & ) \\s{1,4}\r\n  |\r\n    \\s? [,\\.]? \\s{0,4}\r\n  )\r\n\r\n){4}\r\n\\r",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\bSS#",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\A0{7,}\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": true,
+          "RegExpFileName": "<RSDFileDir>\\date.dat.etf",
+          "Pattern": "\\d{2}\\/\\d{2}\\/\\d{2,}",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\A\\W*\r\n.{0,8}\\s*\r\n#import date.dat.etf\r\n",
+          "IsCaseSensitive": true,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\AMERS\\z\r\n|\r\nMORTGAGE\\sELECTRONIC\\sREG",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+          "Clues": [
+            "(?~<error=2>For\\x20calendar\\x20year)\\s*1951",
+            "^1951[\\r\\n]"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": false,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 2,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "^Results\\b",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": ".{3}",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "TRUST.{0,3}TRANSFER.{0,8}(?:GRANT|QUITCLAIM)?.{0,3}DEED",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?<=[A-Z]\\W*\\r\\n\\r\\n)\r\n\\d",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "^(?~<error=3>Social\\WSecurity)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "PTH\\x20INTACT",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "^ššš",
+          "Clues": [
+            "(?:.his|t.is|th.s|thi.)\\W*(?:c.ntr.ct|.?ontract|c.?ntract|co.?tract|con.?ract|cont.?act|contr.?ct|contra.?t|contrac.?|\\b(?:cont.{3,5}|.{1,3}ntra.{1,3}|.{3,5}ract)\\b)\\W*(?:c.nt..ns|.?ontains|c.?ntains|co.?tains|con.?ains|cont.?ins|conta.?ns|contai.?s|contain.?|\\b(?:cont.{3,5}|.{1,3}ntai.{1,3}|.{3,5}ains)\\b)\\W*(?:.he|t.e|th.)\\W*(?:.nt.r.|.?ntire|e.?tire|en.?ire|ent.?re|enti.?e|entir.?|\\b(?:ent.{2,4}|.{1,2}ntir.{1,2}|.{2,4}ire)\\b)[\\s\\S]*",
+            "associate\\W*additional\\W*counsel\\W*to\\W*assist[\\s\\S]*",
+            "claim\\W*without\\W*prior\\W*consultation[\\s\\S]*",
+            "client\\W*agrees\\W*not\\W*to\\W*(?:c.mm.n.c.t.|.?ommunicate|c.?mmunicate|co.?municate|com.?unicate|comm.?nicate|commu.?icate|commun.?cate|communi.?ate|communic.?te|communica.?e|communicat.?|\\b(?:commu.{6,7}|.{1,3}mmunica.{1,3}|.{5,6}nicate)\\b)[\\s\\S]*",
+            "disclose\\W*material\\W*facts\\W*to\\W*the\\W*Attorney",
+            "proceeds\\W*allocated\\W*to\\W*the\\W*Attorney[\\s\\S]*",
+            "upon\\W*reasonable\\W*notice\\W*to\\W*the\\W*Client[\\s\\S]*"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 4,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\A[0\\W]+\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "<RSDFileDir>\\duplicateofficialnames.txt",
+          "Pattern": "\\bLipase\\b",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?~<error=3>\\*\\sMETROPOLITAN\\sMEDICAL\\s\\*)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\s(D[eiu](?:\\sLa)?|Van|San|L[ea]|Del)(?=$|\\sTR)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\APROTIME\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\bVARIANCE\\b",
+          "IsCaseSensitive": true,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "^\\d{7}\\b",
+          "IsCaseSensitive": true,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(BOX|SUITE|ROOM|\\bApt\\b)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "···",
+          "Clues": [
+            "(?~<>\\bNotice\\sof\\sFederal\\sTax\\b)",
+            "(?~<>Identifying\\sNumber)",
+            "(?~<>Name\\sof\\sTaxpayer)",
+            "(?~<>Tax\\sPeriod)",
+            "(?~<error=2>\\bDepartment\\sof\\sthe\\sTreasury\\s-\\sInternal\\sRevenue\\b)"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 3,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": true,
+          "RegExpFileName": "<RSDFileDir>\\MinorName\\NonNames.dat.etf",
+          "Pattern": "\\A\r\n#import MinorName\\NonNames.dat.etf\r\n\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "SelectPageRegion",
+        "Object": {
+          "IncludeRegionDefined": true,
+          "PageSelectionType": "SelectSpecified",
+          "SpecificPages": "16",
+          "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+          "Pattern": "",
+          "IsRegExp": false,
+          "IsCaseSensitive": false,
+          "HorizontalStart": -1,
+          "HorizontalEnd": -1,
+          "VerticalStart": -1,
+          "VerticalEnd": -1,
+          "SelectPageRegionReturnType": "ReturnText",
+          "IncludeIntersectingText": true,
+          "TextIntersectionType": "Character",
+          "SelectedRegionRotation": -1,
+          "TextToAssignToRegion": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?:social|s.{0,3}ial|soc.{0,3}l).{0,3}(?:security|s.{0,3}urity|secu.{0,3}y)(?!.{0,10}(?:tax|.ax|t.x|\\bta))",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?~<error=2>Statement\\Wof\\WAssets)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\b(?:Gen.{4,5}|.{1,2}enera.{1,2}|.{3,4}eral)\\s{0,4}(?:Med.{4,5}|.{1,2}edica.{1,2}|.{3,4}ical)\\s{0,4}(?:Labora.{5,7}|.{1,4}orator.{1,4}|.{5,7}tories)\\b\r\n[\\s\\S]{0,100}\r\n\\*{4,}",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "the\\s{0,4}undersigned\\s{0,4}hereby\\s{0,4}substitutes\\s{0,4}itself",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "MERCHANTS\\W*NATIONAL\\W*BANK\\W*OF\\W*WINONA",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "Old\\s*Republic\\s*Title\\s*Company",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "D\\W?O\\W?D",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "state\\W*tax\\W*lien",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "YYYNNN",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "SelectPageRegion",
+        "Object": {
+          "IncludeRegionDefined": true,
+          "PageSelectionType": "SelectSpecified",
+          "SpecificPages": "97",
+          "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+          "Pattern": "",
+          "IsRegExp": false,
+          "IsCaseSensitive": false,
+          "HorizontalStart": -1,
+          "HorizontalEnd": -1,
+          "VerticalStart": -1,
+          "VerticalEnd": -1,
+          "SelectPageRegionReturnType": "ReturnText",
+          "IncludeIntersectingText": true,
+          "TextIntersectionType": "Character",
+          "SelectedRegionRotation": -1,
+          "TextToAssignToRegion": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\A\\d\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\A\r\n(\r\n  (19|20)\\d{2}\r\n|\r\n  \\d{3}\r\n)\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "^.{0,3}\\bS[.]?S\\b",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "Condomi(ni|m)um\\W+Deed",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\A\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\AVIC",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "CreateValue",
+        "Object": {
+          "ValueString": "<InvalidOrderCodes>",
+          "TypeString": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "Register\\W+of\\W+deeds",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "ÇÇ",
+          "Clues": [
+            "[S$5]tatement[\\w\\W]{3,6}A[S$5]{1,2}et[\\s\\S]*",
+            "Cusip\\W*N[\\s\\S]*",
+            "Face\\W*Amount[\\s\\S]*",
+            "Fredericksburg[\\s\\S]*",
+            "National\\W*Bank[\\s\\S]*"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 3,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "SelectPageRegion",
+        "Object": {
+          "IncludeRegionDefined": true,
+          "PageSelectionType": "SelectSpecified",
+          "SpecificPages": "1",
+          "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+          "Pattern": "",
+          "IsRegExp": false,
+          "IsCaseSensitive": false,
+          "HorizontalStart": -1,
+          "HorizontalEnd": -1,
+          "VerticalStart": -1,
+          "VerticalEnd": -1,
+          "SelectPageRegionReturnType": "ReturnText",
+          "IncludeIntersectingText": true,
+          "TextIntersectionType": "Character",
+          "SelectedRegionRotation": -1,
+          "TextToAssignToRegion": ""
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\A\\D?\\d{3}\\W\\d{2}\\z",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "YouNeverFindThisTextBlaBlaBlaBla",
+          "Clues": [
+            "(ha|ve).{0,4}(ha|ad).{0,5}(rec|ent).{0,7}(cont|tact).{0,6}(wi|th).{0,4}(la|aw).{0,7}(enfo|forc|cement)",
+            "(init|tial).{0,5}(th|he).{0,10}(foll|ollo|wing).{0,10}(stat|ements).{0,11}(conf|firm|rming).{0,12}(yo|ou).{0,4}(ha|ve)[\\s\\S]{0,8}(re|ad).{0,5}(th|em).{0,5}(an|nd).{0,8}(unde|ders|tand).{0,9}(th|em)",
+            "(Li|st).{0,6}(repo|orts).{0,10}(arre|sts).{0,8}(pend|ding).{0,6}(cas|ses).{0,5}etc",
+            "(requ|uest).{0,5}(th|he).{0,8}(Resp|pond|dent).{0,8}(b|e).{0,7}(rest|trai|ained)",
+            "(wi|th).{0,4}(th|he).{0,6}(fol|low|owing).{0,12}(min|nor).{0,10}(pen|ding).{0,14}(prot|tect|tive).{0,10}(ord|der).{0,6}(hear|ring)"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": true,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 3,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?:c.mm.ss..n|.?ommission|c.?mmission|co.?mission|com.?ission|comm.?ssion|commi.?sion|commis.?ion|commiss.?on|commissi.?n|commissio.?|\\b(?:commi.{4,6}|.{1,3}mmissi.{1,3}|.{4,6}ssion)\\b)\\W*(?:.xp.r.s|.?xpires|e.?pires|ex.?ires|exp.?res|expi.?es|expir.?s|expire.?|\\b(?:exp.{4,5}|.{1,2}xpire.{1,2}|.{3,4}ires)\\b)|\r\n(?:(?:N.t.ry|.?otary|N.?tary|No.?ary|Not.?ry|Nota.?y|Notar.?|\\b(?:Not.{2,4}|.{1,2}otar.{1,2}|.{2,4}ary)\\b)\\W*(?:P.bl.c|.?ublic|P.?blic|Pu.?lic|Pub.?ic|Publ.?c|Publi.?|\\b(?:Pub.{2,4}|.{1,2}ubli.{1,2}|.{2,4}lic)\\b))|\r\n(?:instrument[\\s\\S]{0,7}executed[\\s\\S]{0,10}date[\\s\\S]{0,20}written)|\r\n(?:I.|.N)\\W*(?:W.TN.SS|.?ITNESS|W.?TNESS|WI.?NESS|WIT.?ESS|WITN.?SS|WITNE.?S|WITNES.?|\\b(?:WIT.{4,5}|.{1,2}ITNES.{1,2}|.{3,4}NESS)\\b)\\W*(?:WH.R..F|.?HEREOF|W.?EREOF|WH.?REOF|WHE.?EOF|WHER.?OF|WHERE.?F|WHEREO.?|\\b(?:WHE.{4,5}|.{1,2}HEREO.{1,2}|.{3,4}REOF)\\b)|\r\n(?:(?:.nstr.m.nt|.?nstrument|i.?strument|in.?trument|ins.?rument|inst.?ument|instr.?ment|instru.?ent|instrum.?nt|instrume.?t|instrumen.?|\\b(?:instr.{4,6}|.{1,3}strume.{1,3}|.{4,6}ument)\\b)\\W*(?:.ckn.wl.dg.d|.?cknowledged|a.?knowledged|ac.?nowledged|ack.?owledged|ackn.?wledged|ackno.?ledged|acknow.?edged|acknowl.?dged|acknowle.?ged|acknowled.?ed|acknowledg.?d|acknowledge.?|\\b(?:acknow.{5,7}|.{1,4}nowled.{1,4}|.{5,7}ledged)\\b)\\W*(?:b.f.r.|.?efore|b.?fore|be.?ore|bef.?re|befo.?e|befor.?|\\b(?:bef.{2,4}|.{1,2}efor.{1,2}|.{2,4}ore)\\b))",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+          "Clues": [
+            "\\b[a-z]{4,}\\b"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 95,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\A\r\n(\r\n  \\d{3}\\.\\d{2}\\x20{3}\r\n|\r\n  \\d{4,6}\\.\\d{2}\\z\r\n)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "NOTICE\\W*OF\\W*LIEN\\W*FOR\\W*DELINQUENT",
+          "IsCaseSensitive": true,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?:.{0,2}haded|s.{0,2}aded|sh.{0,2}ded|sha.{0,2}ed|shad.{0,2}d|shade.{0,2})\r\n\\x20\r\n(?:.{0,2}reas|a.{0,2}eas|ar.{0,2}as|are.{0,2}s|area.{0,2})",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\A19",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "PROMISSORY\\sNOTE",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "GENERAL\\W*POWER\\W*OF\\W*ATTORNEY",
+          "IsCaseSensitive": true,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "«»",
+          "Clues": [
+            "^(?~<error=3>AND\\WASSIGNMENT\\WOF)[\\s\\S]*",
+            "^(?~<error=3>MORTGAGE\\WSECURITY\\WAGREEMENT)[\\s\\S]*",
+            "Type[;:]\\s*(?-i:MORT)[\\s\\S]*"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 3,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "«<|>»",
+          "Clues": [
+            "License Plates Used",
+            "Scars/Marks/Tattoos",
+            "Warrants and Arrests"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": false,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 2,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": true,
+          "RegExpFileName": "<RSDFileDir>\\deleteUnits.txt",
+          "Pattern": "",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "(?:C.ST.M.R|.?USTOMER|C.?STOMER|CU.?TOMER|CUS.?OMER|CUST.?MER|CUSTO.?ER|CUSTOM.?R|CUSTOME.?|\\b(?:CUST.{3,5}|.{1,3}STOM.{1,3}|.{3,5}OMER)\\b)\r\n\\W*(?:.D.NT.F.C.T..N|.?DENTIFICATION|I.?ENTIFICATION|ID.?NTIFICATION|IDE.?TIFICATION|IDEN.?IFICATION|IDENT.?FICATION|IDENTI.?ICATION|IDENTIF.?CATION|IDENTIFI.?ATION|IDENTIFIC.?TION|IDENTIFICA.?ION|IDENTIFICAT.?ON|IDENTIFICATI.?N|IDENTIFICATIO.?|\\b(?:IDENTIF.{6,8}|.{1,4}NTIFICAT.{1,4}|.{6,8}ICATION)\\b)\r\n\\W*(?:.ATA|D.TA|DA.A|DAT.)\r\n\\W*(?:.ORM|F.RM|FO.M|FOR.)",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "LocateImageRegion",
+        "Object": {
+          "DataInsideBoundaries": true,
+          "FindType": "Text",
+          "ImageRegionText": "",
+          "IncludeIntersectingEntities": false,
+          "IntersectingEntityType": "Character",
+          "MatchMultiplePagesPerDocument": false,
+          "ClueList1": {
+            "Clues": [
+              "[^\\r\\n]*\\S¬"
+            ],
+            "CaseSensitive": true,
+            "Regex": true,
+            "RestrictByBoundary": false
+          },
+          "ClueList2": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList3": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "ClueList4": {
+            "Clues": [],
+            "CaseSensitive": false,
+            "Regex": false,
+            "RestrictByBoundary": false
+          },
+          "Left": {
+            "Anchor": "Page",
+            "AnchorSide": "Left",
+            "ExpandDirection": "ExpandLeft",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageCharacters"
+          },
+          "Top": {
+            "Anchor": "ClueList1",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "ClueLines"
+          },
+          "Right": {
+            "Anchor": "Page",
+            "AnchorSide": "Right",
+            "ExpandDirection": "ExpandRight",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageCharacters"
+          },
+          "Bottom": {
+            "Anchor": "Page",
+            "AnchorSide": "Bottom",
+            "ExpandDirection": "ExpandDown",
+            "ExpandBy": 0.0,
+            "ExpandUnits": "PageLines"
+          }
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "\\s?\\d{2}/\\d{2}/\\d{2}\\s?",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": false,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "RegExprRule",
+        "Object": {
+          "IsRegExpFromFile": false,
+          "RegExpFileName": "",
+          "Pattern": "Third\\W+Party\\W+Lender\\W+Agreement",
+          "IsCaseSensitive": false,
+          "FirstMatchOnly": true,
+          "CreateSubAttributesFromNamedMatches": false,
+          "OnlyCreateOneSubAttributePerGroup": true
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "^»»",
+          "Clues": [
+            "(?:COMMON|WEALTH).{0,22}(?:PENNS|YLVANIA).{0,12}\\r?$[\\s\\S]*",
+            "(?:POL|LICE)[\\s\\S]{0,10}(?:CRIM|MINAL)[\\s\\S]{0,13}(?:COMPL|PLAINT).{0,8}\\r?$[\\s\\S]*"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": false,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": true,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 2,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  },
+  {
+    "Type": "FindingRuleCondition",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AFRule": {
+        "Type": "BlockFinder",
+        "Object": {
+          "BlockBegin": "",
+          "BlockEnd": "",
+          "BlockSeparator": "©©©®®®NeverFoundText©©©®®®",
+          "Clues": [
+            "Children\\W*\\w{0,2}\\W*Health\\W*Council",
+            "Direct\\W*Deposit\\W*Accounts",
+            "NON\\W*NEGOTIABLE",
+            "Paid\\W*Time\\W*Off",
+            "REMOVE\\W*DOCUMENT\\W*ALONG\\W*THIS\\W*PERFORATION"
+          ],
+          "DefineBlocksType": "SeparatorString",
+          "FindAllBlocks": false,
+          "GetMaxOnly": true,
+          "InputAsOneBlock": true,
+          "IsCluePartOfAWord": false,
+          "IsClueRegularExpression": true,
+          "MinNumberOfClues": 3,
+          "PairBeginAndEnd": false
+        }
+      }
+    }
+  }
+]

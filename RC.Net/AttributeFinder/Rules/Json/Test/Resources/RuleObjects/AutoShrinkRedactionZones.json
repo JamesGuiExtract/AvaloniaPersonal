@@ -1,0 +1,77 @@
+[
+  {
+    "Type": "AutoShrinkRedactionZones",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*/Copy"
+        }
+      },
+      "AutoExpandBeforeAutoShrink": false,
+      "MaxPixelsToExpand": 10.0
+    }
+  },
+  {
+    "Type": "AutoShrinkRedactionZones",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "*"
+        }
+      },
+      "AutoExpandBeforeAutoShrink": false,
+      "MaxPixelsToExpand": 10.0
+    }
+  },
+  {
+    "Type": "AutoShrinkRedactionZones",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "_"
+        }
+      },
+      "AutoExpandBeforeAutoShrink": false,
+      "MaxPixelsToExpand": 10.0
+    }
+  },
+  {
+    "Type": "AutoShrinkRedactionZones",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "HCData|MCData|LCData|NCData"
+        }
+      },
+      "AutoExpandBeforeAutoShrink": false,
+      "MaxPixelsToExpand": 10.0
+    }
+  },
+  {
+    "Type": "AutoShrinkRedactionZones",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "AttributeSelector": {
+        "Type": "QueryBasedAS",
+        "Object": {
+          "QueryText": "HCData|MCData|LCData|NCData"
+        }
+      },
+      "AutoExpandBeforeAutoShrink": true,
+      "MaxPixelsToExpand": 10.0
+    }
+  }
+]

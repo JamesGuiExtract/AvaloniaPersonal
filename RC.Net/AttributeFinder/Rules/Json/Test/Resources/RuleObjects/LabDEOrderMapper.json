@@ -1,0 +1,189 @@
+[
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<RSDFileDir>\\..\\..\\..\\Database Files\\OrderMappingDB.sdf",
+      "EliminateDuplicateTestSubAttributes": false,
+      "RequireMandatoryTests": false,
+      "RequirementsAreOptional": false,
+      "UseFilledRequirement": true,
+      "UseOutstandingOrders": false,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  },
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<RSDFileDir>\\..\\Database Files\\OrderMappingDB.sdf",
+      "EliminateDuplicateTestSubAttributes": false,
+      "RequireMandatoryTests": false,
+      "RequirementsAreOptional": false,
+      "UseFilledRequirement": true,
+      "UseOutstandingOrders": false,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  },
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<RSDFileDir>\\..\\Solution\\Database Files\\OrderMappingDB.sdf",
+      "EliminateDuplicateTestSubAttributes": true,
+      "RequireMandatoryTests": false,
+      "RequirementsAreOptional": false,
+      "UseFilledRequirement": true,
+      "UseOutstandingOrders": false,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  },
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<CustomerOrderMappingDB>",
+      "EliminateDuplicateTestSubAttributes": true,
+      "RequireMandatoryTests": true,
+      "RequirementsAreOptional": true,
+      "UseFilledRequirement": true,
+      "UseOutstandingOrders": true,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  },
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<RSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf",
+      "EliminateDuplicateTestSubAttributes": true,
+      "RequireMandatoryTests": false,
+      "RequirementsAreOptional": false,
+      "UseFilledRequirement": false,
+      "UseOutstandingOrders": true,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  },
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<CustomerOrderMappingDB>",
+      "EliminateDuplicateTestSubAttributes": true,
+      "RequireMandatoryTests": false,
+      "RequirementsAreOptional": true,
+      "UseFilledRequirement": true,
+      "UseOutstandingOrders": true,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  },
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<RSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf",
+      "EliminateDuplicateTestSubAttributes": false,
+      "RequireMandatoryTests": true,
+      "RequirementsAreOptional": false,
+      "UseFilledRequirement": true,
+      "UseOutstandingOrders": false,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  },
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<CustomerOrderMappingDB>",
+      "EliminateDuplicateTestSubAttributes": true,
+      "RequireMandatoryTests": true,
+      "RequirementsAreOptional": true,
+      "UseFilledRequirement": true,
+      "UseOutstandingOrders": false,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  },
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<RSDFileDir>\\Sort.sdf",
+      "EliminateDuplicateTestSubAttributes": false,
+      "RequireMandatoryTests": false,
+      "RequirementsAreOptional": false,
+      "UseFilledRequirement": true,
+      "UseOutstandingOrders": false,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  },
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<RSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf",
+      "EliminateDuplicateTestSubAttributes": false,
+      "RequireMandatoryTests": false,
+      "RequirementsAreOptional": false,
+      "UseFilledRequirement": true,
+      "UseOutstandingOrders": false,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  },
+  {
+    "Type": "LabDEOrderMapper",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DatabaseFileName": "<RSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf",
+      "EliminateDuplicateTestSubAttributes": true,
+      "RequireMandatoryTests": false,
+      "RequirementsAreOptional": false,
+      "UseFilledRequirement": true,
+      "UseOutstandingOrders": true,
+      "SkipSecondPass": false,
+      "AddESNamesAttribute": true,
+      "AddESTestCodesAttribute": false,
+      "SetFuzzyType": false
+    }
+  }
+]

@@ -1,0 +1,1605 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [
+      {
+        "ID": 3,
+        "Name": "FLEX Index - Redaction (By Page)",
+        "ByPage": true,
+        "Enabled": true
+      }
+    ],
+    "FKBVersion": "16.1.0.93",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "_",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocPreprocessorSequence",
+      "Description": "<Select multiple document preprocessors>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "SetDocumentTags",
+            "Description": "*testing* get DocType from VOA if available<Set document tags>",
+            "Enabled": false,
+            "Object": {
+              "SetStringTag": {
+                "TagName": "DocProbability",
+                "Generator": "Literal",
+                "SpecifiedValue": "2",
+                "ValuesFromTag": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "Delimiter": ";"
+              },
+              "SetObjectTag": {
+                "TagName": "DocType",
+                "Generator": "FromAttributes",
+                "SpecifiedValue": "",
+                "AttributeSelector": {
+                  "Type": "QueryBasedAS",
+                  "Object": {
+                    "QueryText": "DocumentType"
+                  }
+                }
+              },
+              "NoTagsIfEmpty": false,
+              "GenerateSourceAttributesWithRSDFile": false,
+              "SourceAttributeRSDFile": ""
+            }
+          },
+          {
+            "Type": "DocumentClassifier",
+            "Description": "<Document classifier>",
+            "Enabled": true,
+            "Object": {
+              "IndustryCategoryName": "County Document",
+              "ReRunClassifier": false
+            }
+          }
+        ]
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Create value",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<DocType>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "All pages",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "SelectPageRegion",
+              "Object": {
+                "IncludeRegionDefined": true,
+                "PageSelectionType": "SelectAll",
+                "SpecificPages": "",
+                "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+                "Pattern": "",
+                "IsRegExp": false,
+                "IsCaseSensitive": false,
+                "HorizontalStart": -1,
+                "HorizontalEnd": -1,
+                "VerticalStart": -1,
+                "VerticalEnd": -1,
+                "SelectPageRegionReturnType": "ReturnText",
+                "IncludeIntersectingText": true,
+                "TextIntersectionType": "Character",
+                "SelectedRegionRotation": -1,
+                "TextToAssignToRegion": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "Run rules, output VOA<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "handle CC<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create copy CC subattr of _<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "CC",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%Value%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "create copy of _/CC<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_/CC",
+                    "CreateSubAttribute": true,
+                    "AttributeName": "CC",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%Value%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "split _/CC/CC with Utils\\PageCC.rsd.etf<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_/CC/CC",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\Utils\\PageCC.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "set name of _/CC/CC/Page to value<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_/CC/CC/Page",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "%Value%",
+                    "SetAttributeName": true,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "set value of _/CC/CC/Page# to value of _/CC/CC/Page/CC<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_/CC/CC/*{CC}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "%Value%",
+                    "SetAttributeName": false,
+                    "AttributeType": "Page",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%CC%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "MoveAndModifyAttributes",
+                  "Description": "promo _/CC/CC/Page#<Move and modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AddAttributeNameToType": false,
+                    "AddRootOrParentAttributeType": false,
+                    "AddSpecifiedAttributeType": false,
+                    "AttributeQuery": "_/CC/CC/*",
+                    "DeleteRootOrParentIfAllChildrenMoved": false,
+                    "MoveAttributeLevel": "MoveToParent",
+                    "OverwriteAttributeName": "DoNotOverwrite",
+                    "RetainAttributeType": true,
+                    "SpecifiedAttributeName": "",
+                    "SpecifiedAttributeType": ""
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "find avg CC of doc<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_/CC/CC",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<ComponentDataDir>\\ReusableComponents\\getAvgCC.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "set value of _/CC (document CC)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_/CC",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%CC/_%",
+                    "SetAttributeValue": true
+                  }
+                },
+                {
+                  "Type": "RemoveSubAttributes",
+                  "Description": "remove unneeded attributes<Remove attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeSelector": {
+                      "Type": "QueryBasedAS",
+                      "Object": {
+                        "QueryText": "_/CC/*/CC|_/CC/CC"
+                      }
+                    },
+                    "ConditionalRemove": false,
+                    "DataScorer": {
+                      "Type": null,
+                      "Description": "",
+                      "Enabled": true,
+                      "Object": null
+                    },
+                    "ScoreCondition": "EQ",
+                    "CompareConditionType": "ValueOf",
+                    "ScoreToCompare": 0
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "remove CC|CC/* spatial<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "_/CC|_/CC/*",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "RemoveSpatialInfo",
+                      "Object": "RemoveSpatialInfo"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "First try<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Run Finders on */_<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*/_",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Splitter",
+                    "Object": {
+                      "Type": "RSDSplitter",
+                      "Object": {
+                        "RSDFileName": "<RSDFileDir>\\Finders\\main.rsd.etf"
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set type of *{*/HCData}|*{*/MCData}|*{*/LCData} to checkData<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{*/HCData}|*{*/MCData}|*{*/LCData}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "checkData",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "OutputHandlerSequence",
+                  "Description": "Use NCData to eliminate other data<Select multiple output handlers>",
+                  "Enabled": true,
+                  "Object": {
+                    "ObjectsVector": [
+                      {
+                        "Type": "ModifyAttributeValueOH",
+                        "Description": "Create copy NCDataPage subattr of *@checkData<Modify attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "*@checkData",
+                          "CreateSubAttribute": true,
+                          "AttributeName": "NCDataPage",
+                          "SetAttributeName": true,
+                          "AttributeType": "",
+                          "SetAttributeType": false,
+                          "AttributeValue": "%Value%",
+                          "SetAttributeValue": true
+                        }
+                      },
+                      {
+                        "Type": "RunObjectOnAttributes",
+                        "Description": "Run NCData rules on */NCDataPage<Run object on query>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeQuery": "*/NCDataPage",
+                          "AttributeSelector": {
+                            "Type": null,
+                            "Object": null
+                          },
+                          "UseAttributeSelector": false,
+                          "Type": "Splitter",
+                          "Object": {
+                            "Type": "RSDSplitter",
+                            "Object": {
+                              "RSDFileName": "<RSDFileDir>\\Finders\\NCData.rsd.etf"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "Type": "RemoveSubAttributes",
+                        "Description": "Remove NCData@ items that are near clues [K:\\Common\\Engineering\\Sample Files\\Trimin\\WI - Sometimes Five\\Set002\\Images\\283679_009.tif]<Remove attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeSelector": {
+                            "Type": "SpatialProximityAS",
+                            "Object": {
+                              "TargetQuery": "*/*/NCData@",
+                              "TargetsMustContainReferences": false,
+                              "RequireCompleteInclusion": false,
+                              "ReferenceQuery": "*/*/Clues",
+                              "Left": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Right",
+                                "ExpandDirection": "ExpandLeft",
+                                "ExpandBy": 0.0,
+                                "ExpandUnits": "Inches"
+                              },
+                              "Top": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Top",
+                                "ExpandDirection": "ExpandUp",
+                                "ExpandBy": 0.0,
+                                "ExpandUnits": "Lines"
+                              },
+                              "Right": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Right",
+                                "ExpandDirection": "ExpandRight",
+                                "ExpandBy": 10.0,
+                                "ExpandUnits": "Characters"
+                              },
+                              "Bottom": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Bottom",
+                                "ExpandDirection": "ExpandDown",
+                                "ExpandBy": 2.0,
+                                "ExpandUnits": "Lines"
+                              },
+                              "CompareLinesSeparately": true,
+                              "IncludeDebugAttributes": false
+                            }
+                          },
+                          "ConditionalRemove": false,
+                          "DataScorer": {
+                            "Type": null,
+                            "Description": "",
+                            "Enabled": true,
+                            "Object": null
+                          },
+                          "ScoreCondition": "EQ",
+                          "CompareConditionType": "ValueOf",
+                          "ScoreToCompare": 0
+                        }
+                      },
+                      {
+                        "Type": "RemoveSubAttributes",
+                        "Description": "Remove attributes that overlap with NCData items<Remove attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeSelector": {
+                            "Type": "SpatialProximityAS",
+                            "Object": {
+                              "TargetQuery": "*/*/HCData|*/*/MCData|*/*/LCData",
+                              "TargetsMustContainReferences": false,
+                              "RequireCompleteInclusion": false,
+                              "ReferenceQuery": "*/*/NCData",
+                              "Left": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Left",
+                                "ExpandDirection": "ExpandLeft",
+                                "ExpandBy": 0.0,
+                                "ExpandUnits": "Inches"
+                              },
+                              "Top": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Top",
+                                "ExpandDirection": "ExpandUp",
+                                "ExpandBy": 0.0,
+                                "ExpandUnits": "Inches"
+                              },
+                              "Right": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Right",
+                                "ExpandDirection": "ExpandRight",
+                                "ExpandBy": 0.0,
+                                "ExpandUnits": "Inches"
+                              },
+                              "Bottom": {
+                                "Anchor": "ReferenceAttribute",
+                                "AnchorSide": "Bottom",
+                                "ExpandDirection": "ExpandDown",
+                                "ExpandBy": 0.0,
+                                "ExpandUnits": "Inches"
+                              },
+                              "CompareLinesSeparately": true,
+                              "IncludeDebugAttributes": false
+                            }
+                          },
+                          "ConditionalRemove": false,
+                          "DataScorer": {
+                            "Type": null,
+                            "Description": "",
+                            "Enabled": true,
+                            "Object": null
+                          },
+                          "ScoreCondition": "EQ",
+                          "CompareConditionType": "ValueOf",
+                          "ScoreToCompare": 0
+                        }
+                      },
+                      {
+                        "Type": "RemoveSubAttributes",
+                        "Description": "Remove NCDataPage<Remove attributes>",
+                        "Enabled": true,
+                        "Object": {
+                          "AttributeSelector": {
+                            "Type": "QueryBasedAS",
+                            "Object": {
+                              "QueryText": "*/NCDataPage"
+                            }
+                          },
+                          "ConditionalRemove": false,
+                          "DataScorer": {
+                            "Type": null,
+                            "Description": "",
+                            "Enabled": true,
+                            "Object": null
+                          },
+                          "ScoreCondition": "EQ",
+                          "CompareConditionType": "ValueOf",
+                          "ScoreToCompare": 0
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote doctype, CC<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/DocumentType|*/CC",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "run FullPageClues if nothing found<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "_",
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "_{*/*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "UseAttributeSelector": true,
+              "Type": "OutputHandler",
+              "Object": {
+                "Type": "RunObjectOnAttributes",
+                "Object": {
+                  "AttributeQuery": "_/_",
+                  "AttributeSelector": {
+                    "Type": null,
+                    "Object": null
+                  },
+                  "UseAttributeSelector": false,
+                  "Type": "Splitter",
+                  "Object": {
+                    "Type": "RSDSplitter",
+                    "Object": {
+                      "RSDFileName": "<RSDFileDir>\\Utils\\fullPageClues.rsd.etf"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "*off* ReOCR and try again on pages where nothing found and poor quality<Select multiple output handlers>",
+            "Enabled": false,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set type of *{*} to tryAgain<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{*}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "tryAgain",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Clear type of *{*/HCData}|*{*/MCData}|*{*/LCData}|*{*/Clues}<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{*/HCData}|*{*/MCData}|*{*/LCData}|*{*/Clues}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Continue on *@tryAgain<Run object on query>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*@tryAgain",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "OutputHandlerSequence",
+                            "Description": "If page has low avg character confidence, reOCR [K:\\Common\\Engineering\\Sample Files\\ACS\\MI - Clare\\Set001\\Images\\198800000920.tif]<Select multiple output handlers>",
+                            "Enabled": true,
+                            "Object": {
+                              "ObjectsVector": [
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Split * with isLowConfidence.rsd<Run object on query>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Splitter",
+                                    "Object": {
+                                      "Type": "RSDSplitter",
+                                      "Object": {
+                                        "RSDFileName": "<RSDFileDir>\\Utils\\isLowConfidence.rsd.etf"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "ModifyAttributeValueOH",
+                                  "Description": "Set type of *{*} to lowConf<Modify attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*{*}",
+                                    "CreateSubAttribute": false,
+                                    "AttributeName": "",
+                                    "SetAttributeName": false,
+                                    "AttributeType": "lowConf",
+                                    "SetAttributeType": true,
+                                    "AttributeValue": "",
+                                    "SetAttributeValue": false
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Split *@lowConf with notRightSideUp.rsd<Run object on query>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*@lowConf",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Splitter",
+                                    "Object": {
+                                      "Type": "RSDSplitter",
+                                      "Object": {
+                                        "RSDFileName": "<RSDFileDir>\\Utils\\notRightSideUp.rsd.etf"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "ModifyAttributeValueOH",
+                                  "Description": "Set type of *@lowConf{*} to notRightSideUp<Modify attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*@lowConf{*}",
+                                    "CreateSubAttribute": false,
+                                    "AttributeName": "",
+                                    "SetAttributeName": false,
+                                    "AttributeType": "notRightSideUp",
+                                    "SetAttributeType": true,
+                                    "AttributeValue": "",
+                                    "SetAttributeValue": false
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "get reOCRed subattrr for *@notRightSideUp<Run object on query>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*@notRightSideUp",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Splitter",
+                                    "Object": {
+                                      "Type": "RSDSplitter",
+                                      "Object": {
+                                        "RSDFileName": "<RSDFileDir>\\Utils\\OCR0.rsd.etf"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "get reOCRed subattrr for *@lowConf [K:\\Common\\Engineering\\Sample Files\\ACS\\MI - Clare\\Set001\\Images\\199500004031.tif]<Run object on query>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*@lowConf",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Splitter",
+                                    "Object": {
+                                      "Type": "RSDSplitter",
+                                      "Object": {
+                                        "RSDFileName": "<RSDFileDir>\\Utils\\OCRVariations.rsd.etf"
+                                      }
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Run Finders on */*<Run object on query>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/*",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "Splitter",
+                              "Object": {
+                                "Type": "RSDSplitter",
+                                "Object": {
+                                  "RSDFileName": "<RSDFileDir>\\Finders\\main.rsd.etf"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Set type of *{*/HCData}|*{*/MCData}|*{*/LCData} to checkData<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*{*/HCData}|*{*/MCData}|*{*/LCData}",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "checkData",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "OutputHandlerSequence",
+                            "Description": "Use NCData to eliminate other data<Select multiple output handlers>",
+                            "Enabled": true,
+                            "Object": {
+                              "ObjectsVector": [
+                                {
+                                  "Type": "ModifyAttributeValueOH",
+                                  "Description": "Create copy NCDataPage subattr of *@checkData<Modify attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*@checkData",
+                                    "CreateSubAttribute": true,
+                                    "AttributeName": "NCDataPage",
+                                    "SetAttributeName": true,
+                                    "AttributeType": "",
+                                    "SetAttributeType": false,
+                                    "AttributeValue": "%Value%",
+                                    "SetAttributeValue": true
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Run NCData rules on */NCDataPage<Run object on query>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/NCDataPage",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Splitter",
+                                    "Object": {
+                                      "Type": "RSDSplitter",
+                                      "Object": {
+                                        "RSDFileName": "<RSDFileDir>\\Finders\\NCData.rsd.etf"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "RemoveSubAttributes",
+                                  "Description": "Remove NCData@ items that are near clues [K:\\Common\\Engineering\\Sample Files\\Trimin\\WI - Sometimes Five\\Set002\\Images\\283679_009.tif]<Remove attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeSelector": {
+                                      "Type": "SpatialProximityAS",
+                                      "Object": {
+                                        "TargetQuery": "*/*/NCData@",
+                                        "TargetsMustContainReferences": false,
+                                        "RequireCompleteInclusion": false,
+                                        "ReferenceQuery": "*/*/Clues",
+                                        "Left": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Right",
+                                          "ExpandDirection": "ExpandLeft",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Top": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Top",
+                                          "ExpandDirection": "ExpandUp",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Lines"
+                                        },
+                                        "Right": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Right",
+                                          "ExpandDirection": "ExpandRight",
+                                          "ExpandBy": 10.0,
+                                          "ExpandUnits": "Characters"
+                                        },
+                                        "Bottom": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Bottom",
+                                          "ExpandDirection": "ExpandDown",
+                                          "ExpandBy": 2.0,
+                                          "ExpandUnits": "Lines"
+                                        },
+                                        "CompareLinesSeparately": true,
+                                        "IncludeDebugAttributes": false
+                                      }
+                                    },
+                                    "ConditionalRemove": false,
+                                    "DataScorer": {
+                                      "Type": null,
+                                      "Description": "",
+                                      "Enabled": true,
+                                      "Object": null
+                                    },
+                                    "ScoreCondition": "EQ",
+                                    "CompareConditionType": "ValueOf",
+                                    "ScoreToCompare": 0
+                                  }
+                                },
+                                {
+                                  "Type": "RemoveSubAttributes",
+                                  "Description": "Remove attributes that overlap with NCData items<Remove attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeSelector": {
+                                      "Type": "SpatialProximityAS",
+                                      "Object": {
+                                        "TargetQuery": "*/*/HCData|*/*/MCData|*/*/LCData",
+                                        "TargetsMustContainReferences": false,
+                                        "RequireCompleteInclusion": false,
+                                        "ReferenceQuery": "*/*/NCData",
+                                        "Left": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Left",
+                                          "ExpandDirection": "ExpandLeft",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Top": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Top",
+                                          "ExpandDirection": "ExpandUp",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Right": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Right",
+                                          "ExpandDirection": "ExpandRight",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Bottom": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Bottom",
+                                          "ExpandDirection": "ExpandDown",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "CompareLinesSeparately": true,
+                                        "IncludeDebugAttributes": false
+                                      }
+                                    },
+                                    "ConditionalRemove": false,
+                                    "DataScorer": {
+                                      "Type": null,
+                                      "Description": "",
+                                      "Enabled": true,
+                                      "Object": null
+                                    },
+                                    "ScoreCondition": "EQ",
+                                    "CompareConditionType": "ValueOf",
+                                    "ScoreToCompare": 0
+                                  }
+                                },
+                                {
+                                  "Type": "RemoveSubAttributes",
+                                  "Description": "Remove NCDataPage<Remove attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeSelector": {
+                                      "Type": "QueryBasedAS",
+                                      "Object": {
+                                        "QueryText": "*/NCDataPage"
+                                      }
+                                    },
+                                    "ConditionalRemove": false,
+                                    "DataScorer": {
+                                      "Type": null,
+                                      "Description": "",
+                                      "Enabled": true,
+                                      "Object": null
+                                    },
+                                    "ScoreCondition": "EQ",
+                                    "CompareConditionType": "ValueOf",
+                                    "ScoreToCompare": 0
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "*off* ReOCR and try again on signature pages where nothing found [K:\\Common\\Engineering\\Sample Files\\Trimin\\WI - Sometimes Five\\Set001\\Images\\Racine__County_I_EXP1994_ICONV_1475396__006.tif;K:\\Common\\Engineering\\Sample Files\\Trimin\\WI - Sometimes Five\\Set001\\Images\\Racine__County_L_EXP1992_ICONV_1397803__006.tif]<Select multiple output handlers>",
+            "Enabled": false,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set type of *{*} to tryAgain<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{*}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "tryAgain",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Clear type of *{*/HCData}|*{*/MCData}|*{*/LCData}|*{*/Clues}<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*{*/HCData}|*{*/MCData}|*{*/LCData}|*{*/Clues}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                },
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Continue on *@tryAgain<Run object on query>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*@tryAgain",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "OutputHandlerSequence",
+                      "Object": {
+                        "ObjectsVector": [
+                          {
+                            "Type": "OutputHandlerSequence",
+                            "Description": "If page is signature page, reOCR [K:\\Common\\Engineering\\Sample Files\\Trimin\\WI - Sometimes Five\\Set001\\Images\\Racine__County_I_EXP1994_ICONV_1475396__006.tif]<Select multiple output handlers>",
+                            "Enabled": true,
+                            "Object": {
+                              "ObjectsVector": [
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Split * with isSigPage.rsd<Run object on query>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Splitter",
+                                    "Object": {
+                                      "Type": "RSDSplitter",
+                                      "Object": {
+                                        "RSDFileName": "<RSDFileDir>\\Utils\\isSigPage.rsd.etf"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "ModifyAttributeValueOH",
+                                  "Description": "Set type of *{*} to sigPage<Modify attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*{*}",
+                                    "CreateSubAttribute": false,
+                                    "AttributeName": "",
+                                    "SetAttributeName": false,
+                                    "AttributeType": "sigPage",
+                                    "SetAttributeType": true,
+                                    "AttributeValue": "",
+                                    "SetAttributeValue": false
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "get reOCRed subattrr for *@sigPage<Run object on query>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*@sigPage",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Splitter",
+                                    "Object": {
+                                      "Type": "RSDSplitter",
+                                      "Object": {
+                                        "RSDFileName": "<RSDFileDir>\\Utils\\OCRSigPage.rsd.etf"
+                                      }
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "Type": "RunObjectOnAttributes",
+                            "Description": "Run Finders on */*<Run object on query>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*/*",
+                              "AttributeSelector": {
+                                "Type": null,
+                                "Object": null
+                              },
+                              "UseAttributeSelector": false,
+                              "Type": "Splitter",
+                              "Object": {
+                                "Type": "RSDSplitter",
+                                "Object": {
+                                  "RSDFileName": "<RSDFileDir>\\Finders\\main.rsd.etf"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "Type": "ModifyAttributeValueOH",
+                            "Description": "Set type of *{*/HCData}|*{*/MCData}|*{*/LCData} to checkData<Modify attributes>",
+                            "Enabled": true,
+                            "Object": {
+                              "AttributeQuery": "*{*/HCData}|*{*/MCData}|*{*/LCData}",
+                              "CreateSubAttribute": false,
+                              "AttributeName": "",
+                              "SetAttributeName": false,
+                              "AttributeType": "checkData",
+                              "SetAttributeType": true,
+                              "AttributeValue": "",
+                              "SetAttributeValue": false
+                            }
+                          },
+                          {
+                            "Type": "OutputHandlerSequence",
+                            "Description": "Use NCData to eliminate other data<Select multiple output handlers>",
+                            "Enabled": true,
+                            "Object": {
+                              "ObjectsVector": [
+                                {
+                                  "Type": "ModifyAttributeValueOH",
+                                  "Description": "Create copy NCDataPage subattr of *@checkData<Modify attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*@checkData",
+                                    "CreateSubAttribute": true,
+                                    "AttributeName": "NCDataPage",
+                                    "SetAttributeName": true,
+                                    "AttributeType": "",
+                                    "SetAttributeType": false,
+                                    "AttributeValue": "%Value%",
+                                    "SetAttributeValue": true
+                                  }
+                                },
+                                {
+                                  "Type": "RunObjectOnAttributes",
+                                  "Description": "Run NCData rules on */NCDataPage<Run object on query>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeQuery": "*/NCDataPage",
+                                    "AttributeSelector": {
+                                      "Type": null,
+                                      "Object": null
+                                    },
+                                    "UseAttributeSelector": false,
+                                    "Type": "Splitter",
+                                    "Object": {
+                                      "Type": "RSDSplitter",
+                                      "Object": {
+                                        "RSDFileName": "<RSDFileDir>\\Finders\\NCData.rsd.etf"
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "Type": "RemoveSubAttributes",
+                                  "Description": "Remove NCData@ items that are near clues [K:\\Common\\Engineering\\Sample Files\\Trimin\\WI - Sometimes Five\\Set002\\Images\\283679_009.tif]<Remove attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeSelector": {
+                                      "Type": "SpatialProximityAS",
+                                      "Object": {
+                                        "TargetQuery": "*/*/NCData@",
+                                        "TargetsMustContainReferences": false,
+                                        "RequireCompleteInclusion": false,
+                                        "ReferenceQuery": "*/*/Clues",
+                                        "Left": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Right",
+                                          "ExpandDirection": "ExpandLeft",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Top": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Top",
+                                          "ExpandDirection": "ExpandUp",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Lines"
+                                        },
+                                        "Right": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Right",
+                                          "ExpandDirection": "ExpandRight",
+                                          "ExpandBy": 10.0,
+                                          "ExpandUnits": "Characters"
+                                        },
+                                        "Bottom": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Bottom",
+                                          "ExpandDirection": "ExpandDown",
+                                          "ExpandBy": 2.0,
+                                          "ExpandUnits": "Lines"
+                                        },
+                                        "CompareLinesSeparately": true,
+                                        "IncludeDebugAttributes": false
+                                      }
+                                    },
+                                    "ConditionalRemove": false,
+                                    "DataScorer": {
+                                      "Type": null,
+                                      "Description": "",
+                                      "Enabled": true,
+                                      "Object": null
+                                    },
+                                    "ScoreCondition": "EQ",
+                                    "CompareConditionType": "ValueOf",
+                                    "ScoreToCompare": 0
+                                  }
+                                },
+                                {
+                                  "Type": "RemoveSubAttributes",
+                                  "Description": "Remove attributes that overlap with NCData items<Remove attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeSelector": {
+                                      "Type": "SpatialProximityAS",
+                                      "Object": {
+                                        "TargetQuery": "*/*/HCData|*/*/MCData|*/*/LCData",
+                                        "TargetsMustContainReferences": false,
+                                        "RequireCompleteInclusion": false,
+                                        "ReferenceQuery": "*/*/NCData",
+                                        "Left": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Left",
+                                          "ExpandDirection": "ExpandLeft",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Top": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Top",
+                                          "ExpandDirection": "ExpandUp",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Right": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Right",
+                                          "ExpandDirection": "ExpandRight",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "Bottom": {
+                                          "Anchor": "ReferenceAttribute",
+                                          "AnchorSide": "Bottom",
+                                          "ExpandDirection": "ExpandDown",
+                                          "ExpandBy": 0.0,
+                                          "ExpandUnits": "Inches"
+                                        },
+                                        "CompareLinesSeparately": true,
+                                        "IncludeDebugAttributes": false
+                                      }
+                                    },
+                                    "ConditionalRemove": false,
+                                    "DataScorer": {
+                                      "Type": null,
+                                      "Description": "",
+                                      "Enabled": true,
+                                      "Object": null
+                                    },
+                                    "ScoreCondition": "EQ",
+                                    "CompareConditionType": "ValueOf",
+                                    "ScoreToCompare": 0
+                                  }
+                                },
+                                {
+                                  "Type": "RemoveSubAttributes",
+                                  "Description": "Remove NCDataPage<Remove attributes>",
+                                  "Enabled": true,
+                                  "Object": {
+                                    "AttributeSelector": {
+                                      "Type": "QueryBasedAS",
+                                      "Object": {
+                                        "QueryText": "*/NCDataPage"
+                                      }
+                                    },
+                                    "ConditionalRemove": false,
+                                    "DataScorer": {
+                                      "Type": null,
+                                      "Description": "",
+                                      "Enabled": true,
+                                      "Object": null
+                                    },
+                                    "ScoreCondition": "EQ",
+                                    "CompareConditionType": "ValueOf",
+                                    "ScoreToCompare": 0
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote */*/* to top<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove _<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "_"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Merge duplicates<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Get subattribute hasnewline or nonewline<Run object on query>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "HCData|MCData|LCData",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "Modifier",
+                    "Object": {
+                      "Type": "RegExprRule",
+                      "Object": {
+                        "IsRegExpFromFile": false,
+                        "RegExpFileName": "",
+                        "Pattern": "(?n)\r\n  (?'hasnewline'\r\n    [^\\n]*\\n[\\S\\s]+\r\n  )\r\n| (?'nonewline'\r\n    [\\S\\s]+\r\n  )",
+                        "IsCaseSensitive": false,
+                        "FirstMatchOnly": false,
+                        "CreateSubAttributesFromNamedMatches": true,
+                        "OnlyCreateOneSubAttributePerGroup": true
+                      }
+                    }
+                  }
+                },
+                {
+                  "Type": "MergeAttributes",
+                  "Description": "Merge duplicate attrr with newlines<Merge attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "HCData{hasnewline}|MCData{hasnewline}|LCData{hasnewline}",
+                    "CreateMergedRegion": true,
+                    "NameMergeMode": "PreserveField",
+                    "NameMergePriority": [
+                      "HCData",
+                      "MCData",
+                      "LCData"
+                    ],
+                    "OverlapPercent": 80.0,
+                    "PreserveAsSubAttributes": false,
+                    "PreserveType": false,
+                    "SpecifiedName": "",
+                    "SpecifiedType": "",
+                    "SpecifiedValue": "000-00-0000",
+                    "TreatNameListAsRegex": false,
+                    "TreatTypeListAsRegex": false,
+                    "TreatValueListAsRegex": true,
+                    "TypeFromName": false,
+                    "TypeMergeMode": "CombineField",
+                    "TypeMergePriority": [],
+                    "ValueMergeMode": "SelectField",
+                    "ValueMergePriority": []
+                  }
+                },
+                {
+                  "Type": "MergeAttributes",
+                  "Description": "Merge duplicate attrr with no newlines [K:\\Common\\Engineering\\Sample Files\\TriMin\\WI - Always Nine\\Set001\\Images\\Taylor__County_DTSXROD1_262382__001.tif]<Merge attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "HCData{nonewline}|MCData{nonewline}|LCData{nonewline}",
+                    "CreateMergedRegion": true,
+                    "NameMergeMode": "PreserveField",
+                    "NameMergePriority": [
+                      "HCData",
+                      "MCData",
+                      "LCData"
+                    ],
+                    "OverlapPercent": 10.0,
+                    "PreserveAsSubAttributes": false,
+                    "PreserveType": false,
+                    "SpecifiedName": "",
+                    "SpecifiedType": "",
+                    "SpecifiedValue": "000-00-0000",
+                    "TreatNameListAsRegex": false,
+                    "TreatTypeListAsRegex": false,
+                    "TreatValueListAsRegex": true,
+                    "TypeFromName": false,
+                    "TypeMergeMode": "CombineField",
+                    "TypeMergePriority": [],
+                    "ValueMergeMode": "SelectField",
+                    "ValueMergePriority": []
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set type of SSN to SSN (in case multiple types)<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "*@SSN",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "SSN",
+                    "SetAttributeType": true,
+                    "AttributeValue": "",
+                    "SetAttributeValue": false
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove .CData/*<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "HCData/*|MCData/*|LCData/*"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MergeAttributes",
+            "Description": "Merge duplicate Clues<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Clues",
+              "CreateMergedRegion": false,
+              "NameMergeMode": "PreserveField",
+              "NameMergePriority": [
+                "Clues"
+              ],
+              "OverlapPercent": 75.0,
+              "PreserveAsSubAttributes": false,
+              "PreserveType": false,
+              "SpecifiedName": "",
+              "SpecifiedType": "",
+              "SpecifiedValue": "000-00-0000",
+              "TreatNameListAsRegex": false,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": true,
+              "TypeMergeMode": "SelectField",
+              "TypeMergePriority": [],
+              "ValueMergeMode": "SelectField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

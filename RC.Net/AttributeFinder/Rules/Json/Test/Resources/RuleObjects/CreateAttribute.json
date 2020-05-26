@@ -1,0 +1,3565 @@
+[
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentInfo/DocumentDate",
+      "SubAttributesToCreate": [
+        {
+          "Name": "PreviousDate",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/PreviousDate",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/LegalDescription[LegalDescription[2]]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "merged",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*[not(TransactionID)]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "TransactionID",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "non-xmedius-filename",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Name",
+      "SubAttributesToCreate": [
+        {
+          "Name": "First",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/First",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Middle",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/Middle",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Last",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/Last",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Suffix",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/Suffix",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/_/Star",
+      "SubAttributesToCreate": [
+        {
+          "Name": "total",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "sum(/*/_/Star)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Party[PartyType = \"Defendant\"]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "MappedTo",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "Direct",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Document",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "N/A",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/_/Rent",
+      "SubAttributesToCreate": [
+        {
+          "Name": "total",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "sum(/*/_/Rent)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Date",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Name",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentInfo",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentDescription",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "../Document/Description",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/_/MTM",
+      "SubAttributesToCreate": [
+        {
+          "Name": "total",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "sum(/*/_/MTM)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*/*/Value",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Expanded",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "../OriginalName",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/PatientInfo",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DOB",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "../Document/Date[@Type='DOB']",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "*/Parties",
+      "SubAttributesToCreate": [
+        {
+          "Name": "FirstName",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "MiddleInitial",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "LastName",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/PatientInfo",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DOB",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "../Document/DOB",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Test[OrderCode = InvalidOrderCode]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Unknown",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*[1]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "keep",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/_/PetR",
+      "SubAttributesToCreate": [
+        {
+          "Name": "total",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "sum(/*/_/PetR)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Page",
+      "SubAttributesToCreate": [
+        {
+          "Name": "NameDiff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Name, Name)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "NameDiff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Name, Name)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "NameDiff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Name, following-sibling::Page[1]/Name)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "NameDiff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Name, following-sibling::Page[1]/Name)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*[Subdivision]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "OriginalSubdivisionName",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "./Subdivision",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Grantee/Company[not(@Type!=\"\") and text()=/*/Grantee/Company[@Type='SBM' or @Type='FKA']]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Remove",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentType[1]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentType1",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/DocumentType[1]",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/AccessionNumber",
+      "SubAttributesToCreate": [
+        {
+          "Name": "AccessionNumber",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "string()",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "Last",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/PatientInfo/Name/Last",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "First",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/PatientInfo/Name/First",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "DOB",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/PatientInfo/DOB",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentReference[this>check]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "invalid",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "BOO",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Name",
+      "SubAttributesToCreate": [
+        {
+          "Name": "First",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/First",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Middle",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/Middle",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Last",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/Last",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Suffix",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/Suffix",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PatientNameCount",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/DistinctNameCount",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Document[not(/*/Document[2])][(/*/Document/DeletedPages)]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "_delete_me_",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "_delete_me_",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/_/WS",
+      "SubAttributesToCreate": [
+        {
+          "Name": "total",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "sum(/*/_/WS)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentInfo",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentDate",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "../Document/Date[@Type='DocumentDate']",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Party[PartyType = \"GranteeOrPlaintiff\"]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "MappedTo",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "Reverse",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "PageTopPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/PageTop/PageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageTopTotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/PageTop/TotalPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageTopPageNumPattern",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/PageTop/PageNumPattern",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageBottomPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/PageBottom/PageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageBottomTotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/PageBottom/TotalPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageBottomPageNumPattern",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/PageBottom/PageNumPattern",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentType",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "Special",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Name",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*[1]",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentInfo",
+      "SubAttributesToCreate": [
+        {
+          "Name": "ProcessedDate",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "../Document/PDate",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Count",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "string-length()",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/_",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocDateAndType",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "concat(*/DocumentDate,'|',DocumentType)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*[not(PatientNameCount)]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "PatientNameCount",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "0",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Page",
+      "SubAttributesToCreate": [
+        {
+          "Name": "PageBottomPageNumDiff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/PageBottomPageNum, PageBottomPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageBottomPageNumDiff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/PageBottomPageNum, PageBottomPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageBottomPageNumDiff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/PageBottomPageNum, following-sibling::Page[1]/PageBottomPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageBottomPageNumDiff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/PageBottomPageNum, following-sibling::Page[1]/PageBottomPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageTopPageNumDiff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/PageTopPageNum, PageTopPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageTopPageNumDiff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/PageTopPageNum, PageTopPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageTopPageNumDiff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/PageTopPageNum, following-sibling::Page[1]/PageTopPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageTopPageNumDiff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/PageTopPageNum, following-sibling::Page[1]/PageTopPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageBottomTotalPageNumDiff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/PageBottomTotalPageNum, PageBottomTotalPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageBottomTotalPageNumDiff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/PageBottomTotalPageNum, PageBottomTotalPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageBottomTotalPageNumDiff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/PageBottomTotalPageNum, following-sibling::Page[1]/PageBottomTotalPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageBottomTotalPageNumDiff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/PageBottomTotalPageNum, following-sibling::Page[1]/PageBottomTotalPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageTopTotalPageNumDiff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/PageTopTotalPageNum, PageTopTotalPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageTopTotalPageNumDiff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/PageTopTotalPageNum, PageTopTotalPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageTopTotalPageNumDiff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/PageTopTotalPageNum, following-sibling::Page[1]/PageTopTotalPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageTopTotalPageNumDiff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/PageTopTotalPageNum, following-sibling::Page[1]/PageTopTotalPageNum)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date0Diff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date0, Date0)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date0Diff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date0, Date0)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date0Diff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date0, following-sibling::Page[1]/Date0)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date0Diff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date0, following-sibling::Page[1]/Date0)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date1Diff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date1, Date1)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date1Diff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date1, Date1)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date1Diff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date1, following-sibling::Page[1]/Date1)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date1Diff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date1, following-sibling::Page[1]/Date1)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date2Diff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date2, Date2)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date2Diff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date2, Date2)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date2Diff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date2, following-sibling::Page[1]/Date2)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date2Diff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date2, following-sibling::Page[1]/Date2)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date3Diff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date3, Date3)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date3Diff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date3, Date3)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date3Diff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date3, following-sibling::Page[1]/Date3)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date3Diff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date3, following-sibling::Page[1]/Date3)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date4Diff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date4, Date4)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date4Diff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date4, Date4)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date4Diff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date4, following-sibling::Page[1]/Date4)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date4Diff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date4, following-sibling::Page[1]/Date4)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date5Diff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date5, Date5)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date5Diff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date5, Date5)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date5Diff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date5, following-sibling::Page[1]/Date5)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date5Diff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date5, following-sibling::Page[1]/Date5)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date6Diff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date6, Date6)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date6Diff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date6, Date6)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date6Diff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date6, following-sibling::Page[1]/Date6)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date6Diff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date6, following-sibling::Page[1]/Date6)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date7Diff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date7, Date7)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date7Diff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date7, Date7)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date7Diff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date7, following-sibling::Page[1]/Date7)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date7Diff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date7, following-sibling::Page[1]/Date7)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date8Diff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date8, Date8)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date8Diff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date8, Date8)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date8Diff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date8, following-sibling::Page[1]/Date8)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date8Diff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date8, following-sibling::Page[1]/Date8)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date9Diff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date9, Date9)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date9Diff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date9, Date9)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date9Diff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Date9, following-sibling::Page[1]/Date9)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Date9Diff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Date9, following-sibling::Page[1]/Date9)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "RulesFoundDataCountAfterMergeNN",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "concat('_', count(HCData|MCData|LCData))",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/_/Model",
+      "SubAttributesToCreate": [
+        {
+          "Name": "total",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "sum(/*/_/Model)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentType",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "Other - Print Only",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Page",
+      "SubAttributesToCreate": [
+        {
+          "Name": "TotalPagesDiff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/TotalPages, TotalPages)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "TotalPagesDiff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/TotalPages, TotalPages)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "TotalPagesDiff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/TotalPages, following-sibling::Page[1]/TotalPages)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "TotalPagesDiff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/TotalPages, following-sibling::Page[1]/TotalPages)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Grantor/Company[not(@Type!=\"\") and text()=/*/Grantor/Company[@Type='SBM' or @Type='FKA']]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Remove",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/_/Garag",
+      "SubAttributesToCreate": [
+        {
+          "Name": "total",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "sum(/*/_/Garag)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*[OriginalSubdivisionName]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Subdivision",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "./OriginalSubdivisionName",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Page[not(Feature)]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Feature",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "FirstPage",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "OrderNumber",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "string()",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "OrderCode",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "RUNC",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "Component",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "RUNC",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "AverageBestMatch",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "sum(/*/BestMatchScore) div count(/*/BestMatchScore)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "NumWords",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "count(/*/word)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "FirstNameCount",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "count(/*/*/First) + count(/*/*/Both)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "LastNameCount",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "count(/*/*/Last) + count(/*/*/Both)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "MatchedWords",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "count(/*/BestMatchScore)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "SumBestMatch",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "sum(/*/BestMatchScore)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DateNumber",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "concat(/*/Date,/*/PCN)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentInfo",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentDescription",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "../DocumentDescription",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*/*/Person[not(Last)]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Last",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Person/Last",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/_/Storag",
+      "SubAttributesToCreate": [
+        {
+          "Name": "total",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "sum(/*/_/Storag)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/_",
+      "SubAttributesToCreate": [
+        {
+          "Name": "UniqueDocString",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "concat(*/DocumentDate,'|',DocumentType,'|',../Pages)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "PageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*[1]/Page",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "TotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*[1]/TotalPages",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageNumPattern",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*[1]",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Test/Component[TestCode/text()='IGAP']/Range",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Delete",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Beneficiary[@Type='Beneficiary_backup']",
+      "SubAttributesToCreate": [
+        {
+          "Name": "remove",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Beneficiary[@Type='Beneficiary']",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DOB",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*[1]",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*[not(UserErrorCode)]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "UserErrorCode",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "non-xmedius-filename",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*/Subdivision[text()=\"Original Plat\"]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "newSub",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "concat(.,' ',string(.././Municipality/forSub))",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Bitmap",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Bitmap(50,10, .)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentType",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentType",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*/ReceivingFaxNumber/DocumentType",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Page",
+      "SubAttributesToCreate": [
+        {
+          "Name": "GenderDiff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Gender, Gender)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "GenderDiff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Gender, Gender)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "GenderDiff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Gender, following-sibling::Page[1]/Gender)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "GenderDiff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Gender, following-sibling::Page[1]/Gender)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentType",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "ADS",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Date",
+      "SubAttributesToCreate": [
+        {
+          "Name": "SpecificPatternsToTheLeft",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "'Feature+RequireSubattribute'",
+          "TypeContainsXPath": true,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "ToTheLeft",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "FuzzyPatternsToTheLeft",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "'Feature+RequireSubattribute'",
+          "TypeContainsXPath": true,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "ToTheLeft",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "SpecificPatternsAbove",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "'Feature+RequireSubattribute'",
+          "TypeContainsXPath": true,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "Above",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "FuzzyPatternsAbove",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "'Feature+RequireSubattribute'",
+          "TypeContainsXPath": true,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "Above",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        },
+        {
+          "Name": "SpecificPatternsFarLeft",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "'Feature+RequireSubattribute'",
+          "TypeContainsXPath": true,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "FarLeft",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentReference",
+      "SubAttributesToCreate": [
+        {
+          "Name": "check",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/DocumentNumber",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Page",
+      "SubAttributesToCreate": [
+        {
+          "Name": "LastNameDiff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Name/Last, Name/Last)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "LastNameDiff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Name/Last, Name/Last)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "LastNameDiff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Name/Last, following-sibling::Page[1]/Name/Last)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "LastNameDiff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Name/Last, following-sibling::Page[1]/Name/Last)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Test/FSComponent",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Value",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Test/Component[1 and text()='FASTING STATUS']/Value",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "OrderCode",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Test/Component[1 and text()='FASTING STATUS']/OrderCode",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "OriginalName",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Test/Component[1 and text()='FASTING STATUS']/OriginalName",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Party[PartyType = \"Grantee\"]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "MappedTo",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "Reverse",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/EMREncounterInfo/Encounter",
+      "SubAttributesToCreate": [
+        {
+          "Name": "CSN",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/CSN",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Reference[1]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "keep",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/EMREncounterInfo",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Encounter",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "N/A",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Test[OrderCode/@Type='COCF']",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Delete",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Test/OrderCode/@Type='COCSK '",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/top",
+      "SubAttributesToCreate": [
+        {
+          "Name": "ICDCode1",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*[1]/ICDCode1",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ICDCode2",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*[2]/ICDCode1",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ICDCodeOther",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/*[3]/ICDCode1",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Page",
+      "SubAttributesToCreate": [
+        {
+          "Name": "MRNDiff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/MRN, MRN)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "MRNDiff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/MRN, MRN)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "MRNDiff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/MRN, following-sibling::Page[1]/MRN)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "MRNDiff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/MRN, following-sibling::Page[1]/MRN)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Page",
+      "SubAttributesToCreate": [
+        {
+          "Name": "PageDiff01",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Page, Page)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageDiff02",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Page, Page)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageDiff03",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[2]/Page, following-sibling::Page[1]/Page)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PageDiff04",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "es:Levenshtein(preceding-sibling::Page[1]/Page, following-sibling::Page[1]/Page)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "*/MiddleInitial[1]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "KEEP",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "KEEP",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentInfo",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentDate",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "../DocumentDate",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Test/Component[Value[text()=\"Positive\"] and text()=\"COLOGUARD\"]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Flag",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "A",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Party[PartyType = \"Lender\"]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "MappedTo",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "Reverse",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "_docdate",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/_/DocumentInfo/DocumentDate",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*/Subdivision",
+      "SubAttributesToCreate": [
+        {
+          "Name": "newSub",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "concat(string(.././Municipality/forSub),'-',.)",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Document/DocumentData[not(*)]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "PatientInfo",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "N/A",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Record",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DateOfService",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "child::Date[1]",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "PatientControlNumber",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "child::PCN[1]",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "*/Parties",
+      "SubAttributesToCreate": [
+        {
+          "Name": "MiddleInitial",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*[not(PagesReceived)]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "PagesReceived",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "non-xmedius-filename",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentType[@Type='Backup']",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Backup",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/DocumentType[not(@Type='Backup')]",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "MERS",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "MERS",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Party[PartyType = \"SellerOrMortgagor\"]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "MappedTo",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "Direct",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/LegalDescription/QQ[2][@Type='Half']",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Q",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/LegalDescription/Q[2][@Type='Quarter']",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "*/FirstName[1]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "KEEP",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "KEEP",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "EMREncounterInfo",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "N/A",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "ConsiderationAmount",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Amount[1]",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentType[2]",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentType2",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/DocumentType[2]",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "First",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "*[1]",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentType",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "Special",
+          "ValueContainsXPath": false,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Pages",
+      "SubAttributesToCreate": [
+        {
+          "Name": "DocumentCC",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "round( sum(/*/Pages/*) div count(/*/Pages/*) )",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Name",
+      "SubAttributesToCreate": [
+        {
+          "Name": "Last",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/Last",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "First",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/First",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "Middle",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Person[1]/Middle",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*[*/@Type='nonLM']",
+      "SubAttributesToCreate": [
+        {
+          "Name": "NonLM",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/DocumentType",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": false
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/Page",
+      "SubAttributesToCreate": [
+        {
+          "Name": "FirstPageText",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/Page[1]/PageText",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "IsFirstOrSecondPage",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "substring('True', 1, 4 * number(text()='1' or text()='2'))",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ps1_PageBottomPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Page[1]/PageBottomPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ps1_PageBottomTotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Page[1]/PageBottomTotalPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ps1_PageTopPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Page[1]/PageTopPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ps1_PageTopTotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Page[1]/PageTopTotalPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ps1_PageTopPageNumPattern",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Page[1]/PageTopPageNumPattern",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ps2_PageTopTotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Page[2]/PageTopTotalPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ps2_PageTopPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Page[2]/PageTopPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ps2_PageBottomTotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Page[2]/PageBottomTotalPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ps2_PageBottomPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Page[2]/PageBottomPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "ps2_PageTopPageNumPattern",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "preceding-sibling::Page[2]/PageTopPageNumPattern",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs1_PageBottomPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[1]/PageBottomPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs1_PageBottomTotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[1]/PageBottomTotalPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs1_PageBottomPageNumPattern",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[1]/PageBottomPageNumPattern",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs1_PageTopPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[1]/PageTopPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs1_PageTopTotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[1]/PageTopTotalPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs1_PageTopPageNumPattern",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[1]/PageTopPageNumPattern",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs2_PageBottomPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[2]/PageBottomPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs2_PageBottomTotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[2]/PageBottomTotalPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs2_PageBottomPageNumPattern",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[2]/PageBottomPageNumPattern",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs2_PageTopPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[2]/PageTopPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs2_PageTopTotalPageNum",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[2]/PageTopTotalPageNum",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        },
+        {
+          "Name": "fs2_PageTopPageNumPattern",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "Feature",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "following-sibling::Page[2]/PageTopPageNumPattern",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  },
+  {
+    "Type": "CreateAttribute",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "Root": "/*/DocumentInfo/DocumentDate",
+      "SubAttributesToCreate": [
+        {
+          "Name": "_docdate",
+          "NameContainsXPath": false,
+          "DoNotCreateIfNameIsEmpty": false,
+          "TypeOfAttribute": "",
+          "TypeContainsXPath": false,
+          "DoNotCreateIfTypeIsEmpty": false,
+          "Value": "/*/_docdate",
+          "ValueContainsXPath": true,
+          "DoNotCreateIfValueIsEmpty": true
+        }
+      ]
+    }
+  }
+]

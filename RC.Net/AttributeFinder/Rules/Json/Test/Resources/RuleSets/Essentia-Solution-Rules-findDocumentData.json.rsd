@@ -1,0 +1,704 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "Document",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "DocPreprocessorSequence",
+      "Description": "<Select multiple document preprocessors>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "SetDocumentTags",
+            "Description": "<RSDFileDir>\\ML\\Classification\\DocType.rsd.etf<Set document tags>",
+            "Enabled": true,
+            "Object": {
+              "SetStringTag": {
+                "TagName": "DocProbability",
+                "Generator": "Literal",
+                "SpecifiedValue": "2",
+                "ValuesFromTag": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "Delimiter": ";"
+              },
+              "SetObjectTag": {
+                "TagName": "DocType",
+                "Generator": "FromAttributes",
+                "SpecifiedValue": "",
+                "AttributeSelector": {
+                  "Type": "QueryBasedAS",
+                  "Object": {
+                    "QueryText": "DocumentType"
+                  }
+                }
+              },
+              "NoTagsIfEmpty": true,
+              "GenerateSourceAttributesWithRSDFile": true,
+              "SourceAttributeRSDFile": "<RSDFileDir>\\ML\\Classification\\DocType.rsd.etf"
+            }
+          },
+          {
+            "Type": "SetDocumentTags",
+            "Description": "<RSDFileDir>\\ML\\DocDesc\\DocDesc.rsd.etf<Set document tags>",
+            "Enabled": true,
+            "Object": {
+              "SetStringTag": {
+                "TagName": null,
+                "Generator": "None",
+                "SpecifiedValue": "",
+                "ValuesFromTag": "",
+                "AttributeSelector": {
+                  "Type": null,
+                  "Object": null
+                },
+                "Delimiter": ";"
+              },
+              "SetObjectTag": {
+                "TagName": "DocDesc",
+                "Generator": "FromAttributes",
+                "SpecifiedValue": "",
+                "AttributeSelector": {
+                  "Type": "QueryBasedAS",
+                  "Object": {
+                    "QueryText": "DocumentType"
+                  }
+                }
+              },
+              "NoTagsIfEmpty": true,
+              "GenerateSourceAttributesWithRSDFile": true,
+              "SourceAttributeRSDFile": "<RSDFileDir>\\ML\\DocDesc\\DocDesc.rsd.etf"
+            }
+          }
+        ]
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "CSN": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Regular expression rule",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "RegExprRule",
+              "Object": {
+                "IsRegExpFromFile": false,
+                "RegExpFileName": "",
+                "Pattern": "CSN\\s*(?'num'(\\d\\s*){10})",
+                "IsCaseSensitive": true,
+                "FirstMatchOnly": true,
+                "CreateSubAttributesFromNamedMatches": true,
+                "OnlyCreateOneSubAttributePerGroup": false
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "MoveAndModifyAttributes",
+                    "Description": "<Move and modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AddAttributeNameToType": false,
+                      "AddRootOrParentAttributeType": false,
+                      "AddSpecifiedAttributeType": false,
+                      "AttributeQuery": "*/*",
+                      "DeleteRootOrParentIfAllChildrenMoved": true,
+                      "MoveAttributeLevel": "MoveToRoot",
+                      "OverwriteAttributeName": "DoNotOverwrite",
+                      "RetainAttributeType": true,
+                      "SpecifiedAttributeName": "",
+                      "SpecifiedAttributeType": ""
+                    }
+                  },
+                  {
+                    "Type": "RemoveCharacters",
+                    "Description": "<Remove characters>",
+                    "Enabled": true,
+                    "Object": {
+                      "Characters": " \t\r\n",
+                      "IsCaseSensitive": false,
+                      "RemoveAll": true,
+                      "Consolidate": false,
+                      "TrimLeading": false,
+                      "TrimTrailing": false
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "DocumentDate": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find DocumentDate",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [
+                  "DocumentDate"
+                ],
+                "RSDFileName": "<RSDFileDir>\\DocumentDate\\main.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "DocumentDescription": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "set <DocDesc>",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<DocDesc>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "DocumentType": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "set <DocType>",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "CreateValue",
+              "Object": {
+                "ValueString": "<DocType>",
+                "TypeString": ""
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      },
+      "PatientInfo": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Find PatientInfo",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "RunObjectOnAttributes",
+                    "Description": "Split on PatientInfo main<Run object on attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "AttributeSelector": {
+                        "Type": null,
+                        "Object": null
+                      },
+                      "UseAttributeSelector": false,
+                      "Type": "Splitter",
+                      "Object": {
+                        "Type": "RSDSplitter",
+                        "Object": {
+                          "RSDFileName": "<RSDFileDir>\\PatientInfo\\main.rsd.etf"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "Clear top level<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": false,
+                      "AttributeName": "",
+                      "SetAttributeName": false,
+                      "AttributeType": "",
+                      "SetAttributeType": false,
+                      "AttributeValue": "",
+                      "SetAttributeValue": true
+                    }
+                  },
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "Set to N/A<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": false,
+                      "AttributeName": "",
+                      "SetAttributeName": false,
+                      "AttributeType": "",
+                      "SetAttributeType": false,
+                      "AttributeValue": "N/A",
+                      "SetAttributeValue": true
+                    }
+                  },
+                  {
+                    "Type": "ChangeCase",
+                    "Description": "<Change case>",
+                    "Enabled": true,
+                    "Object": {
+                      "CaseType": "MakeUpperCase"
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "CreateAttribute",
+            "Description": "Create DocumentInfo<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "DocumentInfo",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "N/A",
+                  "ValueContainsXPath": false,
+                  "DoNotCreateIfValueIsEmpty": false
+                }
+              ]
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Create DocumentInfo/DocumentDate<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*/DocumentInfo",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "DocumentDate",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "../DocumentDate",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                }
+              ]
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Create DocumentInfo/DocumentDescription<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*/DocumentInfo",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "DocumentDescription",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "../DocumentDescription",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                }
+              ]
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Create EMREncounterInfo<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "EMREncounterInfo",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "N/A",
+                  "ValueContainsXPath": false,
+                  "DoNotCreateIfValueIsEmpty": false
+                }
+              ]
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Create EMREncounterInfo/Encounter<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*/EMREncounterInfo",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "Encounter",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "N/A",
+                  "ValueContainsXPath": false,
+                  "DoNotCreateIfValueIsEmpty": false
+                }
+              ]
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Create EMREncounterInfo/Encounter/CSN<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*/EMREncounterInfo/Encounter",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "CSN",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "/*/CSN",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": true
+                }
+              ]
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Move up PatientInfo/Name/PatientNameCount<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "PatientInfo/Name/PatientNameCount",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Create PatientNameCount if missing<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*[not(PatientNameCount)]",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "PatientNameCount",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "0",
+                  "ValueContainsXPath": false,
+                  "DoNotCreateIfValueIsEmpty": false
+                }
+              ]
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove leftovers<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "DocumentDate|DocumentInfo|DocumentDescription|_DocumentCC|CSN|EMREncounterInfo/Encounter"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove leftovers #2<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "EMREncounterInfo"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*{*}"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

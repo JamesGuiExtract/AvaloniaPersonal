@@ -1,0 +1,181 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "19.2.0.34",
+    "ForInternalUseOnly": false,
+    "IsSwipingRule": true,
+    "OCRParameters": [],
+    "RunMode": "PassInputVOAToOutput",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Filename",
+    "InsertParentValue": "<SourceDocName>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {},
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "CreateAttribute",
+            "Description": "Create sub FilenameTest<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*/Filename/Filename",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "FilenameTest",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "/*/Filename",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": false
+                }
+              ]
+            }
+          },
+          {
+            "Type": "CreateAttribute",
+            "Description": "Create sub FileNoExtOfTmp<Create attribute>",
+            "Enabled": true,
+            "Object": {
+              "Root": "/*/Filename/DocumentInfo/FileNoExtOf",
+              "SubAttributesToCreate": [
+                {
+                  "Name": "FileNoExtOfTmp",
+                  "NameContainsXPath": false,
+                  "DoNotCreateIfNameIsEmpty": false,
+                  "TypeOfAttribute": "",
+                  "TypeContainsXPath": false,
+                  "DoNotCreateIfTypeIsEmpty": false,
+                  "Value": "/*/Filename",
+                  "ValueContainsXPath": true,
+                  "DoNotCreateIfValueIsEmpty": false
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Use Filename value from sub<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Filename/Filename",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%FilenameTest%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Use FileNoExtOf value from sub<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Filename/DocumentInfo/FileNoExtOf",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "",
+              "SetAttributeType": false,
+              "AttributeValue": "%FileNoExtOfTmp%",
+              "SetAttributeValue": true
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Trim FileNoExtOf<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "Filename/DocumentInfo/FileNoExtOf",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "RegExprRule",
+                "Object": {
+                  "IsRegExpFromFile": false,
+                  "RegExpFileName": "",
+                  "Pattern": "(?<=\\\\)[^\\\\.]+(?=\\.)",
+                  "IsCaseSensitive": false,
+                  "FirstMatchOnly": true,
+                  "CreateSubAttributesFromNamedMatches": false,
+                  "OnlyCreateOneSubAttributePerGroup": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove tmp subs<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "Filename/Filename/FilenameTest|Filename/DocumentInfo/FileNoExtOf/FileNoExtOfTmp"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToParent",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "OutputToVOA",
+            "Description": "<Output data to VOA file>",
+            "Enabled": true,
+            "Object": {
+              "FileName": "<SourceDocName>.voa"
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

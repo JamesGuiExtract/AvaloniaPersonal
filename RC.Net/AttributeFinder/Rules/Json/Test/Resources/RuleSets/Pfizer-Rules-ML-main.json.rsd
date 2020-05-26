@@ -1,0 +1,633 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [
+      {
+        "Key": 0,
+        "Value": 0
+      },
+      {
+        "Key": 3,
+        "Value": 1
+      },
+      {
+        "Key": "Kernel.Img.Max.Pix.X",
+        "Value": 32000
+      },
+      {
+        "Key": "Kernel.Img.Max.Pix.Y",
+        "Value": 32000
+      },
+      {
+        "Key": 4,
+        "Value": 0
+      },
+      {
+        "Key": 27,
+        "Value": 1
+      },
+      {
+        "Key": 26,
+        "Value": 1
+      },
+      {
+        "Key": 5,
+        "Value": 0
+      },
+      {
+        "Key": 25,
+        "Value": 0
+      },
+      {
+        "Key": 9,
+        "Value": 1
+      },
+      {
+        "Key": 10,
+        "Value": 1
+      },
+      {
+        "Key": 11,
+        "Value": -1
+      },
+      {
+        "Key": 12,
+        "Value": 100
+      },
+      {
+        "Key": 13,
+        "Value": 0
+      },
+      {
+        "Key": 14,
+        "Value": 0
+      },
+      {
+        "Key": 15,
+        "Value": 1
+      },
+      {
+        "Key": 16,
+        "Value": 240000
+      },
+      {
+        "Key": "Kernel.OcrMgr.PreferAccurateEngine",
+        "Value": 1
+      },
+      {
+        "Key": 17,
+        "Value": 1
+      },
+      {
+        "Key": 18,
+        "Value": 1
+      },
+      {
+        "Key": 19,
+        "Value": 0
+      },
+      {
+        "Key": 20,
+        "Value": 1
+      },
+      {
+        "Key": 21,
+        "Value": 1
+      },
+      {
+        "Key": 22,
+        "Value": 1
+      },
+      {
+        "Key": 6,
+        "Value": 0
+      },
+      {
+        "Key": 7,
+        "Value": 0
+      }
+    ],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "_DELETE",
+    "InsertParentValue": "<PageContent>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "SelectPageRegion",
+      "Description": "*off*<Select page region>",
+      "Enabled": false,
+      "Object": {
+        "IncludeRegionDefined": true,
+        "PageSelectionType": "SelectSpecified",
+        "SpecificPages": "6",
+        "RegExpPageSelectionType": "SelectAllPagesWithRegExp",
+        "Pattern": "",
+        "IsRegExp": false,
+        "IsCaseSensitive": false,
+        "HorizontalStart": -1,
+        "HorizontalEnd": -1,
+        "VerticalStart": -1,
+        "VerticalEnd": -1,
+        "SelectPageRegionReturnType": "ReturnText",
+        "IncludeIntersectingText": true,
+        "TextIntersectionType": "Character",
+        "SelectedRegionRotation": -1,
+        "TextToAssignToRegion": ""
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "currency": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "currency-general",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": "AdvancedReplaceString",
+              "Description": "Remove \\A__EMPTYPAGE__\\z<Advanced replace string>",
+              "Enabled": true,
+              "Object": {
+                "StrToBeReplaced": "\\A__EMPTYPAGE__\\z",
+                "AsRegularExpression": true,
+                "IsCaseSensitive": false,
+                "Replacement": "",
+                "ReplacementOccurrenceType": "First",
+                "SpecifiedOccurrence": 0
+              }
+            },
+            "AttributeFindingRule": {
+              "Type": "NERFinder",
+              "Object": {
+                "NameFinderType": "OpenNLP",
+                "SplitIntoSentences": false,
+                "SentenceDetectorPath": "<ComponentDataDir>\\NER\\sentence-detector.nlp.etf",
+                "TokenizerType": "LearnableTokenizer",
+                "TokenizerPath": "<ComponentDataDir>\\NER\\tokenizer.nlp.etf",
+                "NameFinderPath": "<RSDFileDir>\\currency-general\\currency.nlp.etf",
+                "EntityTypes": "",
+                "OutputConfidenceSubAttribute": true,
+                "ApplyLogFunctionToConfidence": false,
+                "LogBase": 2.0,
+                "LogSteepness": 10.0,
+                "LogXValueOfMiddle": 0.1,
+                "ConvertConfidenceToPercent": true
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "AdvancedReplaceString",
+                  "Description": "Remove if only a dollar sign or 0 value<Advanced replace string>",
+                  "Enabled": true,
+                  "Object": {
+                    "StrToBeReplaced": "\\A\\D*[$][^1-9]*\\z",
+                    "AsRegularExpression": true,
+                    "IsCaseSensitive": false,
+                    "Replacement": "",
+                    "ReplacementOccurrenceType": "All",
+                    "SpecifiedOccurrence": 0
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "RemoveSubAttributes",
+              "Description": "Remove if confidence < 70%<Remove attributes>",
+              "Enabled": true,
+              "Object": {
+                "AttributeSelector": {
+                  "Type": "QueryBasedAS",
+                  "Object": {
+                    "QueryText": "*{Confidence}"
+                  }
+                },
+                "ConditionalRemove": true,
+                "DataScorer": {
+                  "Type": "RSDDataScorer",
+                  "Description": "Score using confidence subattribute<RSD data scorer>",
+                  "Enabled": true,
+                  "Object": {
+                    "RSDFileName": "<RSDFileDir>\\..\\getSubattributes.rsd.etf",
+                    "ScoreExpression": "#Confidence.average()"
+                  }
+                },
+                "ScoreCondition": "LT",
+                "CompareConditionType": "ValueOf",
+                "ScoreToCompare": 70
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          },
+          {
+            "Enabled": true,
+            "Description": "currency-cellClassifier",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "FindFromRSD",
+              "Object": {
+                "AttributeNames": [],
+                "RSDFileName": "<RSDFileDir>\\currency-cellClassifier\\getTableCellsWithFeatures.rsd.etf"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": true,
+              "ObjectsVector": [
+                {
+                  "Type": "AdvancedReplaceString",
+                  "Description": "Remove if only a dollar sign or 0 value<Advanced replace string>",
+                  "Enabled": true,
+                  "Object": {
+                    "StrToBeReplaced": "\\A\\D*[$][^1-9]*\\z",
+                    "AsRegularExpression": true,
+                    "IsCaseSensitive": false,
+                    "Replacement": "",
+                    "ReplacementOccurrenceType": "All",
+                    "SpecifiedOccurrence": 0
+                  }
+                }
+              ]
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": "OutputHandlerSequence",
+              "Description": "<Select multiple output handlers>",
+              "Enabled": true,
+              "Object": {
+                "ObjectsVector": [
+                  {
+                    "Type": "LearningMachineOutputHandler",
+                    "Description": "<Learning machine output handler>",
+                    "Enabled": true,
+                    "Object": {
+                      "SavedMachinePath": "<RSDFileDir>\\currency-cellClassifier\\currency-cellClassifier.lm",
+                      "PreserveInputAttributes": false
+                    }
+                  },
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "Set type to %AttributeType%<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": false,
+                      "AttributeName": "",
+                      "SetAttributeName": false,
+                      "AttributeType": "%AttributeType%",
+                      "SetAttributeType": true,
+                      "AttributeValue": "",
+                      "SetAttributeValue": false
+                    }
+                  },
+                  {
+                    "Type": "RemoveSubAttributes",
+                    "Description": "Remove *@<Remove attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeSelector": {
+                        "Type": "QueryBasedAS",
+                        "Object": {
+                          "QueryText": "*@"
+                        }
+                      },
+                      "ConditionalRemove": false,
+                      "DataScorer": {
+                        "Type": null,
+                        "Description": "",
+                        "Enabled": true,
+                        "Object": null
+                      },
+                      "ScoreCondition": "EQ",
+                      "CompareConditionType": "ValueOf",
+                      "ScoreToCompare": 0
+                    }
+                  },
+                  {
+                    "Type": "ModifyAttributeValueOH",
+                    "Description": "Set type to Tables<Modify attributes>",
+                    "Enabled": true,
+                    "Object": {
+                      "AttributeQuery": "*",
+                      "CreateSubAttribute": false,
+                      "AttributeName": "",
+                      "SetAttributeName": false,
+                      "AttributeType": "Tables",
+                      "SetAttributeType": true,
+                      "AttributeValue": "",
+                      "SetAttributeValue": false
+                    }
+                  }
+                ]
+              }
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "Promote _DELETE/*<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "_DELETE/*",
+              "DeleteRootOrParentIfAllChildrenMoved": false,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Delete _DELETE<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "_DELETE"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RunObjectOnAttributes",
+            "Description": "Extract text from *@Tables<Run object on attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*@Tables",
+              "AttributeSelector": {
+                "Type": null,
+                "Object": null
+              },
+              "UseAttributeSelector": false,
+              "Type": "Modifier",
+              "Object": {
+                "Type": "ExtractOcrTextInImageArea",
+                "Object": {
+                  "IncludeTextOnBoundary": true,
+                  "SpatialEntityType": "Character",
+                  "UseOriginalDocumentOcr": false,
+                  "UseOverallBounds": false
+                }
+              }
+            }
+          },
+          {
+            "Type": "MergeAttributes",
+            "Description": "Merge, preserve subattributes<Merge attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateMergedRegion": false,
+              "NameMergeMode": "SpecifyField",
+              "NameMergePriority": [],
+              "OverlapPercent": 75.0,
+              "PreserveAsSubAttributes": true,
+              "PreserveType": false,
+              "SpecifiedName": "Merged",
+              "SpecifiedType": "Currency",
+              "SpecifiedValue": "$0,000.00",
+              "TreatNameListAsRegex": false,
+              "TreatTypeListAsRegex": false,
+              "TreatValueListAsRegex": true,
+              "TypeFromName": false,
+              "TypeMergeMode": "SpecifyField",
+              "TypeMergePriority": [],
+              "ValueMergeMode": "SpecifyField",
+              "ValueMergePriority": []
+            }
+          },
+          {
+            "Type": "OutputHandlerSequence",
+            "Description": "Set value to one of the subattributes<Select multiple output handlers>",
+            "Enabled": true,
+            "Object": {
+              "ObjectsVector": [
+                {
+                  "Type": "RunObjectOnAttributes",
+                  "Description": "Remove spatial info from Merged/*<Run object on attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Merged/*",
+                    "AttributeSelector": {
+                      "Type": null,
+                      "Object": null
+                    },
+                    "UseAttributeSelector": false,
+                    "Type": "OutputHandler",
+                    "Object": {
+                      "Type": "RemoveSpatialInfo",
+                      "Object": "RemoveSpatialInfo"
+                    }
+                  }
+                },
+                {
+                  "Type": "ModifyAttributeValueOH",
+                  "Description": "Set value of Merged{currency} to %currency%<Modify attributes>",
+                  "Enabled": true,
+                  "Object": {
+                    "AttributeQuery": "Merged{currency}",
+                    "CreateSubAttribute": false,
+                    "AttributeName": "",
+                    "SetAttributeName": false,
+                    "AttributeType": "",
+                    "SetAttributeType": false,
+                    "AttributeValue": "%currency%",
+                    "SetAttributeValue": true
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "Type": "ModifyAttributeValueOH",
+            "Description": "Set type<Modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeQuery": "*",
+              "CreateSubAttribute": false,
+              "AttributeName": "",
+              "SetAttributeName": false,
+              "AttributeType": "Currency",
+              "SetAttributeType": true,
+              "AttributeValue": "",
+              "SetAttributeValue": false
+            }
+          },
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "*off* Promote */*/Confidence<Move and modify attributes>",
+            "Enabled": false,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*/Confidence",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToParent",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "*off* Remove subattributes that aren't confidence<Remove attributes>",
+            "Enabled": false,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "MultipleCriteriaSelector",
+                "Object": {
+                  "Selectors": [
+                    {
+                      "Select": "Matching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "*/*<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "*/*"
+                        }
+                      }
+                    },
+                    {
+                      "Select": "NonMatching",
+                      "With": {
+                        "Type": "QueryBasedAS",
+                        "Description": "Confidence<Query attribute selector>",
+                        "Enabled": true,
+                        "Object": {
+                          "QueryText": "Confidence"
+                        }
+                      }
+                    }
+                  ],
+                  "CombineBy": "Chain"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "*off* Remove if avg of Confidence subattrr < 70%<Remove attributes>",
+            "Enabled": false,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*{Confidence}"
+                }
+              },
+              "ConditionalRemove": true,
+              "DataScorer": {
+                "Type": "RSDDataScorer",
+                "Description": "Score using confidence subattribute<RSD data scorer>",
+                "Enabled": true,
+                "Object": {
+                  "RSDFileName": "<RSDFileDir>\\..\\getSubattributes.rsd.etf",
+                  "ScoreExpression": "#Confidence.average()"
+                }
+              },
+              "ScoreCondition": "LT",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 70
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove subattributes<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "*/*"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          },
+          {
+            "Type": "SpatiallySortAttributes",
+            "Description": "Sort for easier debugging<Spatially sort attributes>",
+            "Enabled": true,
+            "Object": "SpatiallySortAttributes"
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

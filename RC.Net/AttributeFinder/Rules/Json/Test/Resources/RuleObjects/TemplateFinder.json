@@ -1,0 +1,11 @@
+[
+  {
+    "Type": "TemplateFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "TemplateLibrary": "<RSDFileDir>\\Templates.zip.etf",
+      "RedactionPredictorOptions": ""
+    }
+  }
+]

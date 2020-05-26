@@ -1,0 +1,30 @@
+[
+  {
+    "Type": "DocPreprocessorSequence",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ObjectsVector": [
+        {
+          "Type": "ReplaceStrings",
+          "Description": "Remove FPs<Replace strings>",
+          "Enabled": true,
+          "Object": {
+            "Replacements": [
+              {
+                "Pattern": "Reference\\s*(?:[#N]|.{0,3})\\s*\\d+",
+                "Replacement": ""
+              },
+              {
+                "Pattern": "CPI\\s*(?:[#N]|.{0,3})\\s*\\d+",
+                "Replacement": ""
+              }
+            ],
+            "AsRegularExpr": true,
+            "IsCaseSensitive": false
+          }
+        }
+      ]
+    }
+  }
+]

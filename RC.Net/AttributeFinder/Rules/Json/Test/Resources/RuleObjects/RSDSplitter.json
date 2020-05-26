@@ -1,0 +1,802 @@
+[
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\CheckForTabs.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\DLN10\\NCData.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\findInitial.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Bank\\FullPageClues.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\NineDigitNumbers.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\OffenseReport_AdminInfo.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Rules\\Master.rsd"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\otherFields.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Templates\\TMaster.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\findName.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\CustomRules\\CDPI.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Trim\\trim.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Grantor.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\commonOH.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Validators\\InvalidZipCode.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\textToDigits.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Misc\\containsTab.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\DOB\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\run_HIM.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\util\\isTooDark.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\UpperLeftSplitter.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\..\\Common\\isChecked.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\CustomRules\\VORIC.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\decrement.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\scoringRules.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\..\\Utils\\twiceAlphaOfDigits.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getDeletedPages.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\walkRight.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\utils\\clean_and_chop.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Dates\\monthsBeforeCurrent.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\combFields.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\SplitSanFranciscoCOD.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Splitter - MilitaryTime.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\findFirstAddressOnEachPage.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Rules\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\expand.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\DischargeSummary\\Translate.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Passport\\NCData.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Find\\MinorName\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\matchTestPatterns.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\splitSeperateNumbers.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\OrgID\\NCData.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\FR_Parser.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\..\\Common\\TrustSplitter.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Seperate.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Certificate\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Date_Parser.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\FindLD.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\GetUnits.rsd"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\LegalDescription\\LegalDescription.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\TooSmall.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Utils\\twiceAlphaOfDigits.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\translate.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\findPathology.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\TargetWord.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\MIN\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\PreSplitSplitting.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\..\\Common\\SpecialTrustSplitter.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\parts.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\files\\queryDB.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\replaceNewlines.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Sticker_find.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\..\\Date\\Date.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\IDNumber\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\UccFS\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Cert.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\RemoveUnitsIfContainsTest.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Common\\widen.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\OFRD.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\DocumentType\\DocumentType_Main.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\Indexing\\ParcelIDNumber\\PINSplitter.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Common\\ShrinkRay.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\CustomRules\\TGLB.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Rules\\Master-DLN.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\LegalSplitter.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\UseSewerSplitter.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\SplitReleaseForm2.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\BrideOrGroom2.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<ComponentDataDir>\\Indexing\\ConsiderationAmount\\Master.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\CBASyn.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\SewerLienSplitter.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\allText.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\SplitOnNewline.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\City\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\findRepeats.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\valueAndRange.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Utils\\PageCC.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\splitGG.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\MultiTitle\\Reconveyance\\main.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Loan\\NCData.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\twiceAlphaOfOther.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\AudPlat\\AudPlat.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\Splitters\\DefendantPlantiffSplitter.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\getUnits.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\removeInvalid.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\..\\Misc\\utils\\clean_and_chop.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\clues.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\mergeTrees.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\rightHalf.rsd.etf"
+    }
+  },
+  {
+    "Type": "RSDSplitter",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "RSDFileName": "<RSDFileDir>\\DOB3\\NCData.rsd.etf"
+    }
+  }
+]

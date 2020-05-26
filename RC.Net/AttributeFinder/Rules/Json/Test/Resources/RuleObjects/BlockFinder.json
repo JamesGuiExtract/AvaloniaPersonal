@@ -1,0 +1,2567 @@
+[
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#",
+      "Clues": [
+        "(?~<>Custodial\\sParent)[\\s\\S]*",
+        "(?~<>Print\\sor\\sType\\spreparer)[\\s\\S]*",
+        "(?-i)(?~<error=2>CONFIDENTIAL\\sINFORMATION)[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "~&~&~&~&~&~&~&~&~&~&~&~&~&~&~&~&~",
+      "Clues": [
+        "(?>(?~<>CASE\\x20NUMBER)\\b[\\s\\S]*)",
+        "(?>(?~<error=2>Disbursement)\\b[\\s\\S]*)",
+        "(?>(?~<error=2>Return\\x20Service\\x20Requested)\\b[\\s\\S]*)"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^ššš",
+      "Clues": [
+        "(?:Kind\\W*of\\W*Tax|Name\\W*of\\W*Taxpayer|Tax\\W*Period\\W*Ended|Place\\W*of\\W*Filing|Unpaid\\W*Balance)[\\s\\S]*",
+        "(?~<>Form)\\W*668(?!.*C)",
+        "(?~<error=2>IMPORTANT)\\W*(?~<>RELEASE)\\W*(?~<error=3>INFORMATION)",
+        "^(?~<error=2>Notice)\\W*(?:o.|.f)\\W*(?~<error=2>Federal)[\\s\\S]*",
+        "Federal\\W*Tax\\W*lien",
+        "lien\\W*provided\\W*by\\W*Code\\W*section\\W*5321[\\s\\S]{10,50}released[\\s\\S]*",
+        "notice\\W*of\\W*internal\\W*revenue\\W*tax\\W*lien\\W*was\\W*filed[\\s\\S]*",
+        "This\\W*notice\\W*was\\W*prepar"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [
+        "file://<RSDFileDir>\\WarrantType1Clues.dat.etf"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 5,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "~!~!~!~!~!~!~!~!~!~!~!~!~!~!",
+      "Clues": [
+        "^L\\.?W\\.?C\\.?C\\.?\\r\\n[\\s\\S]*",
+        "MEDICAL\\sRECORDS",
+        "PO\\sBOX\\s98052[\\s\\S]*",
+        "Signature\\son\\sfile"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "SOMETHINGTHATWILLNEVERAPPEAR",
+      "Clues": [
+        "PROPERTY.{0,3}OWNER.{0,5}GRANTOR",
+        "SERIES.{0,3}BLOCK.{0,3}LOT",
+        "SERVICE.{0,3}MAILING.{0,3}ADDRESS"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "S1o2m3e4t5h6i7n8g9",
+      "Clues": [
+        "2\\d[\\s\\S]{0,5}Ident",
+        "2\\d[\\s\\S]{0,5}Release",
+        "2\\d[\\s\\S]{0,5}Ride",
+        "2\\d[\\s\\S]{0,5}Subst"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 250,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 430,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 259,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": true,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": false,
+      "MinNumberOfClues": 0,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^«",
+      "Clues": [
+        "(?>(?~<>Nursing))[\\s\\S]?\\W*(?>(?~<>Diagnosis))[\\s\\S]*",
+        "(?>(?~<error=3>Patient\\WOutcome\\WGoals))[\\s\\S]*",
+        "(?-i:(?>(?~<>CENTRE))[\\s\\S]?\\W*(?>(?~<error=2>COMMUNITY))[\\s\\S]{0,2}\\W*(?>(?~<error=2>HOSPITAL)))[\\s\\S]*",
+        "MENTAL\\W*HEALTH\\W*UNIT[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "asdfasdfasdf",
+      "Clues": [
+        "20. Lessor to have first option",
+        "21. Restoration shall",
+        "In Its Entirety Without Written Approval",
+        "This Lease Shall Not Be Assigned"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": false,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "BlaBlaBlaNeverFoundBlaBla",
+      "Clues": [
+        "Eastern\\W*New\\W*Mexico\\W*Medical\\W*Center",
+        "V\\d{8,10}(?:\\W*\\d{1,2}\\D{0,3}\\d{1,2}\\D{0,3}(?:\\d{4}|\\d{2}))+"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "©©©®®®NeverFoundText©©©®®®",
+      "Clues": [
+        "Benefit\\W*Period",
+        "Claim\\W*Number",
+        "Claim\\W*Rep",
+        "Date\\W*of\\W*Loss",
+        "Payee\\W*Provider",
+        "Previous\\W*Cumulative\\W*Amount",
+        "Starting\\W*With\\W*Date\\W*Paid\\W*Of"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 5,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^šš",
+      "Clues": [
+        "(?:o.|.f)\\W*(?>(?~<error=2>Federal)).{0,2}\\W*(?>(?~<>Tax)).?\\W*(?~<>Lien)[\\s\\S]*",
+        "(?>(?~<>Code)).?\\W*(?>(?~<error=2>section)).{0,2}\\W*(?~<>8321)[\\s\\S]*",
+        "(?>(?~<>internal)).?\\W*(?~<>revenue)[\\s\\S]*",
+        "(?>(?~<>Tax)).?\\W*(?>(?~<error=2>Revenue)).{0,2}\\W*(?~<error=2>Officer)[\\s\\S]*",
+        "(?>(?~<>This)).?\\W*(?>(?~<error=2>certificate)).{0,2}\\W*(?>(?~<error=2>was)).{0,2}\\W*(?>(?~<error=2>prepared)).{0,2}\\W*(?>(?~<>and)).?\\W*(?~<error=2>signed)[\\s\\S]*",
+        "(?>(?~<>this)).?\\W*(?>(?~<error=2>notice)).{0,2}\\W*(?>(?~<>shall)).?\\W*(?:o.|.n)\\W*(?>(?~<>the)).?\\W*(?~<error=2>follow)[\\s\\S]*",
+        "(?>(?~<>where)).?\\W*(?>(?~<>the)).?\\W*(?>(?~<>notice)).?\\W*(?:o.|.f)\\W*(?~<error=2>internal)[\\s\\S]*",
+        "(?>(?~<error=2>Notice)).{0,2}\\W*(?:o.|.f)\\W*(?>(?~<error=2>federal)).{0,2}\\W*(?>(?~<>tax)).?\\W*(?~<>lien)[\\s\\S]*",
+        "(?>(?~<error=2>unless)).{0,2}\\W*(?>(?~<error=2>notice)).{0,2}\\W*(?:o.|.f)\\W*(?>(?~<>lien)).?\\W*(?:i.|.s)\\W*(?~<error=2>refiled)[\\s\\S]*",
+        "(?>(?~<error=3>Serial)).{0,3}\\W*(?>(?~<error=2>Number)).*(?>(?~<error=4>Recording)).{0,4}\\W*(?>(?~<error=2>Office)).{0,4}(?=[\\r\\n]|$)[\\s\\S]*",
+        "(?>(?~<error=4>Certificate)).{0,4}[\\s\\S]{1,6}(?>(?~<error=4>Release)).{0,4}[\\s\\S]{1,6}(?>(?~<error=3>Federal)).{0,3}\\W*(?>(?~<>Tax)).?\\W*(?~<>Lien)[\\s\\S]*",
+        "(?-i:^.{0,4}(?>(?~<error=3>IMPORTANT)).{0,3}\\W*(?>(?~<error=2>RELEASE)).{0,2}\\W*(?~<error=4>INFORMATION))[\\s\\S]*",
+        "^(?~<error=2>Revenue\\WOfficer)[\\s\\S]*",
+        "^(?~<error=2>Signature)(?=[\\r\\n]|$)[\\s\\S]*",
+        "^(?~<error=2>Tax\\WPeriod)|Tax\\W*period[\\s\\S]*",
+        "^(?~<error=2>Unpaid)\\W*(?~<error=2>Balance)[\\s\\S]*",
+        "^(?~<error=3>Place\\Wof\\Wfiling)[\\s\\S]*",
+        "^(?>(?~<>FORM)).{2,15}[29]\\W*83[\\s\\S]*",
+        "^(?>(?~<error=2>Form\\W668)).{2,16}2\\W*83[\\s\\S]*",
+        "^(?>(?~<error=2>Identifying)).{0,2}\\W*(?>(?~<error=2>Number)).{0,4}(?=[\\r\\n]|$)[\\s\\S]*",
+        "^(?>(?~<error=2>Name)).{1,8}(?~<error=2>taxpayer)[\\s\\S]*",
+        "^.{0,3}(?~<>Residence)[\\s\\S]*",
+        "^.{0,3}(?-i:NOTE\\W*Certif)[\\s\\S]*",
+        "^.{0,4}Form.{0,6}Rev\\W*9\\W*83[\\s\\S]*",
+        "^.{0,5}Kind\\W*(?:o.|.f)\\W*Tax[\\s\\S]*",
+        "^.{0,5}Place(?:.{0,3}|\\W*)of(?:.{0,3}|\\W*)(?~<error=2>Filing)[\\s\\S]*",
+        "^1040\\s+(?=.*[*\\d])[\\s\\S]*",
+        "^Name\\W*of\\W*(?~<>taxpayer)[\\s\\S]*",
+        "^Total[\\r\\n]+County[\\s\\S]*",
+        "Form.{0,4}88[\\s\\S]*",
+        "NOTE\\W*(?~<error=4>certificate)\\W*of\\W*officer[\\s\\S]*",
+        "Rev\\W*4.84[\\s\\S]*",
+        "Rev\\W*Sept\\W*1983[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 400,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^šš",
+      "Clues": [
+        "(?:(?:drilling|testing|completing|reworking|recompleting|deepening)[\\s\\S]{0,5}){4}",
+        "(?:^|\\r\\n)Oil.?\\s*Gas\\s*and\\s*Mineral\\s*Lease\\s*-\\s*Paid\\s*-?\\s*Up\\s*\\r\\n",
+        "(?:^|\\r\\n)OIL.{0,2}\\s*GAS.{0,2}\\s*AND\\s*MINERAL\\s*LEASE\\s*\\r\\n",
+        "(?:^|\\r\\n)OIL\\s*(?:&|AND)\\s*GAS\\s*LEASE\\s*\\r\\n",
+        "(?:^|\\r\\n)PAID\\s*UP\\s*OIL\\s*AND\\s*GAS\\s*LEASE\\s*\\r\\n",
+        "(?:deepest\\s*depth|depth\\s*penetrated).*(?:oil|gas).*well",
+        "(?:other\\s*minerals[\\s\\S]*?){3}",
+        "\\bgas\\s*or\\s*other\\s*mineral[\\s\\S]{0,7}prod",
+        "\\bOIL.{0,2}\\s*GAS.{0,2}\\s*AND\\s*MINERAL\\s*LEASE\\b",
+        "\\bPAID\\s*UP\\s*OIL\\s*AND\\s*GAS\\s*LEASE\\b",
+        "^.{0,4}oil\\s*and\\s*gas\\s*mineral\\s*lease",
+        "^.{0,4}POOL\\W*UNIT\\W*CLAUSE",
+        "applies\\s*to\\s*oil\\s*and\\s*gas",
+        "coal[\\s\\S]{0,2}lignite[\\s\\S]{0,2}less(?:or|ee)",
+        "coal[\\s\\S]{0,2}lignite[\\s\\S]{0,6}iron",
+        "cost\\s*of\\s*any\\s*pipe\\s*line",
+        "drilling[\\s\\S]{0,10}reworking[\\s\\S]{0,25}(?:well|operations)",
+        "drilling[\\s\\S]{0,3}production[\\s\\S]{0,5}other\\s*operations",
+        "drilling[\\s\\S]{0,5}maximum[\\s\\S]{0,5}allowable[\\s\\S]{0,5}unit",
+        "form[\\s\\S]{0,6}pooled\\W*unit[\\s\\S]{0,6}units",
+        "FORM\\W*79[\\W_]*5290",
+        "injection[\\s\\S]{0,5}of[\\s\\S]{0,5}water[\\s\\S]{0,5}brine",
+        "interest[\\s\\S]{0,5}in[\\s\\S]{0,5}oil",
+        "interest\\s*in[\\s\\S]{0,14}(?:coal|lignite)",
+        "land\\W*herein\\W*leased[\\s\\S]{0,6}pooled[\\s\\S]{0,6}unitized",
+        "lease[\\s\\S]{0,2}shall.*?(?:coal|lignite|iron|\\bore\\b)",
+        "oil[\\s\\S]{0,15}sulphur[\\s\\S]{0,25}mineral",
+        "oil[\\s\\S]{0,5}gas[\\s\\S]{0,25}water[\\s\\S]{0,5}from[\\s\\S]{0,5}said",
+        "OIL\\s*(?:&|AND)\\s*GAS\\s*LEASE",
+        "oil\\s*or\\s*gas\\s*well\\s*drilled",
+        "other\\s*minerals(?=.*\\blease\\b)",
+        "payable[\\s\\S]{0,25}only[\\s\\S]{0,15}~such[\\s\\S]{0,5}gas[\\s\\S]{0,15}liquids",
+        "pooled[\\s\\S]{0,6}unitized\\W*with\\W*other\\W*Land",
+        "pooled\\W*unit[\\s\\S]{0,6}units\\W*embracing",
+        "production[\\s\\S]{0,5}oil[\\s\\S]{0,3}gas[\\s\\S]{0,5}other\\s*minerals",
+        "production\\W*from[\\s\\S]{0,6}pooled\\W*unit",
+        "prospect\\s*for\\s*coal\\s*and\\s*lignite",
+        "sink\\s*such\\s*shafts\\s*and\\s*drill",
+        "square[\\s\\S]{0,5}centered[\\s\\S]{0,15}well[\\s\\S]{0,25}shape",
+        "which\\s*said\\*minerals\\s*are\\s*excepted"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 1,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "BlaBlaNeverFoundBlaBlaBla",
+      "Clues": [
+        "file://<RSDFileDir>\\HasCODClues2.dat.etf"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [
+        "(?-i)(?>(?~<error=2>INHERITANCE))[\\s\\S]{0,2}\\W*(?>(?~<>TAX))[\\s\\S]?\\W*(?>(?~<>LIEN)).{0,4}(?=[\\r\\n]|$)",
+        "^.{0,4}(?>(?~<error=2>INSTRUCTIONS))[\\s\\S]{0,2}\\W*In\\W*the\\W*space"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^¶¶",
+      "Clues": [
+        "^.{0,4}(?:TYP|YPE).{0,5}[OFE].{0,8}(?:FIL|ING).{0,7}[:;.]",
+        "^.{0,5}(?:ADDR|DRESS).{0,7}[:;.]",
+        "^.{0,8}(?:JUDG|MENT).{0,12}(?:AMOU|OUNT).{0,7}[:;.]",
+        "^[\\s\\S]{0,2}CASE\\s?[.:;]",
+        "^[\\s\\S]{0,2}CLERK\\s?OF\\s?COURT\\s?[.:;]",
+        "^[\\s\\S]{0,2}DATE\\s?OF\\s?JUDGE?MENT\\s?[.:;]",
+        "^[\\s\\S]{0,2}DEFENDANT\\s?NAME\\s?[:.;]",
+        "^[\\s\\S]{0,2}DOB\\s?[:.;]",
+        "^[\\s\\S]{0,2}JUDGE?MENT\\s?NOTES\\s?[:.;]",
+        "^[\\s\\S]{0,2}PLAINTIFF\\s?[:.;]"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 5,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "šššš",
+      "Clues": [
+        "(?:.D.C.T..N|.?DUCATION|E.?UCATION|ED.?CATION|EDU.?ATION|EDUC.?TION|EDUCA.?ION|EDUCAT.?ON|EDUCATI.?N|EDUCATIO.?|\\b(?:EDUC.|.UCATI.|.ATION)\\b)\\W*(?:O.|.F)\\W*(?:D.C.D.NT|.?ECEDENT|D.?CEDENT|DE.?EDENT|DEC.?DENT|DECE.?ENT|DECED.?NT|DECEDE.?T|DECEDEN.?|\\b(?:DECE.|.CEDE.|.DENT)\\b)",
+        "(?:C..NTY|.?OUNTY|C.?UNTY|CO.?NTY|COU.?TY|COUN.?Y|COUNT.?|\\b(?:COU.|.OUNT.|.NTY)\\b)\\W*(?:O.|.F)\\W*(?:D..TH|.EATH|D.ATH|DE.TH|DEA.H|DEAT.)[\\s\\S]*",
+        "(?:C..S.|.AUSE|C.USE|CA.SE|CAU.E|CAUS.)\\W*(?:O.|.F)\\W*(?:D..TH|.EATH|D.ATH|DE.TH|DEA.H|DEAT.)[\\s\\S]*",
+        "(?:C.RT.F..D|.?ERTIFIED|C.?RTIFIED|CE.?TIFIED|CER.?IFIED|CERT.?FIED|CERTI.?IED|CERTIF.?ED|CERTIFI.?D|CERTIFIE.?|\\b(?:CERT.|.RTIFI.|.IFIED)\\b)\\W*(?:C.P.|.OPY|C.PY|CO.Y|COP.)\\W*(?:O.|.F)\\W*(?:V.T.L|.ITAL|V.TAL|VI.AL|VIT.L|VITA.)\\W*(?:R.C.RDS|.?ECORDS|R.?CORDS|RE.?ORDS|REC.?RDS|RECO.?DS|RECOR.?S|RECORD.?|\\b(?:REC.|.ECORD.|.ORDS)\\b)",
+        "(?:H..R|.OUR|H.UR|HO.R|HOU.)\\W*(?:O.|.F)\\W*(?:D..TH|.EATH|D.ATH|DE.TH|DEA.H|DEAT.)[\\s\\S]*",
+        "(?:L.C.T..N|.?OCATION|L.?CATION|LO.?ATION|LOC.?TION|LOCA.?ION|LOCAT.?ON|LOCATI.?N|LOCATIO.?|\\b(?:LOCA.|.CATI.|.TION)\\b)\\W*(?:O.|.F)\\W*(?:D..TH|.EATH|D.ATH|DE.TH|DEA.H|DEAT.)[\\s\\S]*",
+        "(?:M.NN.R|.?ANNER|M.?NNER|MA.?NER|MAN.?ER|MANN.?R|MANNE.?|\\b(?:MAN.|.ANNE.|.NER)\\b)\\W*(?:O.|.F)\\W*(?:D..TH|.EATH|D.ATH|DE.TH|DEA.H|DEAT.)[\\s\\S]*",
+        "(?:PL.C.|.LACE|P.ACE|PL.CE|PLA.E|PLAC.)\\W*(?:O.|.F)\\W*(?:D..TH|.EATH|D.ATH|DE.TH|DEA.H|DEAT.)[\\s\\S]*",
+        "(?:PR.N..NC.D|.?RONOUNCED|P.?ONOUNCED|PR.?NOUNCED|PRO.?OUNCED|PRON.?UNCED|PRONO.?NCED|PRONOU.?CED|PRONOUN.?ED|PRONOUNC.?D|PRONOUNCE.?|\\b(?:PRONO.|.ONOUNC.|.UNCED)\\b)\\W*DEAD",
+        "(?:T.M.|.IME|T.ME|TI.E|TIM.)\\W*(?:O.|.F)\\W*(?:D..TH|.EATH|D.ATH|DE.TH|DEA.H|DEAT.)[\\s\\S]*",
+        "\\d.{0,2}(?:D.T.|.ATE|D.TE|DA.E|DAT.)\\W*(?:O.|.F)\\W*(?:D..TH|.EATH|D.ATH|DE.TH|DEA.H|DEAT.)",
+        "WAS\\W*(?:D.C.D.NT|.?ECEDENT|D.?CEDENT|DE.?EDENT|DEC.?DENT|DECE.?ENT|DECED.?NT|DECEDE.?T|DECEDEN.?|\\b(?:DECE.|.CEDE.|.DENT)\\b)\\W*(?:PR.GN.NT|.?REGNANT|P.?EGNANT|PR.?GNANT|PRE.?NANT|PREG.?ANT|PREGN.?NT|PREGNA.?T|PREGNAN.?|\\b(?:PREG.|.EGNA.|.NANT)\\b)"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [
+        "(?nx) (?'_EdgeGarbage'){12} ^((?'-_EdgeGarbage')[^\\r\\n])*?  ( CHANGE\\sOF\\sADDRESS\\sFORM) ((?'-_EdgeGarbage')[^\\r\\n])*\\r?$[\\S\\s]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 1,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "~&~&~&~&~&~&~&~&~&~&~&~&~&~&~&~&~&~&~",
+      "Clues": [
+        "(?~<error=2>form\\sis\\sto\\sbe\\sused\\sin\\sinjury\\scases)",
+        "(?~<error=2>No\\scompensation\\sfor\\slost\\stime)",
+        "Accident\\sLocation",
+        "Describe\\sAccident",
+        "Nature\\sof\\sInjury",
+        "Witnesses"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 4,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\r\n",
+      "Clues": [
+        "granted\\s{1,3}to"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": false,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 1,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "%*%*%*%*%*%*%*%*%*%*%*%*%*%",
+      "Clues": [
+        "affiant[\\s\\S]*",
+        "affidavit[\\s\\S]*",
+        "arrest\\swarrant[\\s\\S]*",
+        "magistrate[\\s\\S]*",
+        "probable\\scause(?!\\W*Affidavit)[\\s\\S]*",
+        "undersigned\\sauthority[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 4,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\r\n\r\n",
+      "Clues": [
+        "any\\sremedies\\spermitted\\sby|invoke\\s[\\S\\s]{1,4}\\sremedies\\spermitted\\sby|invoke\\sany\\s[\\S\\s]{6,10}\\spermitted\\sby|invoke\\sany\\sremedies\\s[\\S\\s]{7,11}\\sby|invoke\\sany\\sremedies\\spermitted",
+        "any\\ssuch\\sloan\\scharge\\salready\\scollected\\sfrom\\sYou\\sor|b\\s[\\S\\s]{1,4}\\ssuch\\sloan\\scharge\\salready\\scollected\\sfrom\\sYou\\sor|b\\sany\\s[\\S\\s]{2,5}\\sloan\\scharge\\salready\\scollected\\sfrom\\sYou\\sor|b\\sany\\ssuch\\s[\\S\\s]{2,5}\\scharge\\salready\\scollected\\sfrom\\sYou\\sor|b\\sany\\ssuch\\sloan\\s[\\S\\s]{4,8}\\salready\\scollected\\sfrom\\sYou\\sor|b\\sany\\ssuch\\sloan\\scharge\\s[\\S\\s]{5,9}\\scollected\\sfrom\\sYou\\sor|b\\sany\\ssuch\\sloan\\scharge\\salready\\s[\\S\\s]{7,11}\\sfrom\\sYou\\sor|b\\sany\\ssuch\\sloan\\scharge\\salready\\scollected\\s[\\S\\s]{2,5}\\sYou\\sor|b\\sany\\ssuch\\sloan\\scharge\\salready\\scollected\\sfrom\\s[\\S\\s]{1,4}\\sor|b\\sany\\ssuch\\sloan\\scharge\\salready\\scollected\\sfrom\\sYou",
+        "applicable\\slaws\\shas\\sthe\\seffect\\sof\\srendering\\sany\\sprovision|of\\s[\\S\\s]{8,12}\\slaws\\shas\\sthe\\seffect\\sof\\srendering\\sany\\sprovision|of\\sapplicable\\s[\\S\\s]{2,5}\\shas\\sthe\\seffect\\sof\\srendering\\sany\\sprovision|of\\sapplicable\\slaws\\s[\\S\\s]{1,4}\\sthe\\seffect\\sof\\srendering\\sany\\sprovision|of\\sapplicable\\slaws\\shas\\s[\\S\\s]{1,4}\\seffect\\sof\\srendering\\sany\\sprovision|of\\sapplicable\\slaws\\shas\\sthe\\s[\\S\\s]{4,8}\\sof\\srendering\\sany\\sprovision|of\\sapplicable\\slaws\\shas\\sthe\\seffect\\s[\\S\\s]{0,2}\\srendering\\sany\\sprovision|of\\sapplicable\\slaws\\shas\\sthe\\seffect\\sof\\s[\\S\\s]{7,11}\\sany\\sprovision|of\\sapplicable\\slaws\\shas\\sthe\\seffect\\sof\\srendering\\s[\\S\\s]{1,4}\\sprovision|of\\sapplicable\\slaws\\shas\\sthe\\seffect\\sof\\srendering\\sany",
+        "Borrower\\sWe\\smay\\schoose\\sto\\smake\\sthis\\srefund\\sby|or\\s[\\S\\s]{6,10}\\sWe\\smay\\schoose\\sto\\smake\\sthis\\srefund\\sby|or\\sBorrower\\s[\\S\\s]{0,2}\\smay\\schoose\\sto\\smake\\sthis\\srefund\\sby|or\\sBorrower\\sWe\\s[\\S\\s]{1,4}\\schoose\\sto\\smake\\sthis\\srefund\\sby|or\\sBorrower\\sWe\\smay\\s[\\S\\s]{4,8}\\sto\\smake\\sthis\\srefund\\sby|or\\sBorrower\\sWe\\smay\\schoose\\s[\\S\\s]{0,2}\\smake\\sthis\\srefund\\sby|or\\sBorrower\\sWe\\smay\\schoose\\sto\\s[\\S\\s]{2,5}\\sthis\\srefund\\sby|or\\sBorrower\\sWe\\smay\\schoose\\sto\\smake\\s[\\S\\s]{2,5}\\srefund\\sby|or\\sBorrower\\sWe\\smay\\schoose\\sto\\smake\\sthis\\s[\\S\\s]{4,8}\\sby|or\\sBorrower\\sWe\\smay\\schoose\\sto\\smake\\sthis\\srefund",
+        "direct\\spayment\\sto\\sYou\\sor\\sBorrower\\sIf\\sa\\srefund|a\\s[\\S\\s]{4,8}\\spayment\\sto\\sYou\\sor\\sBorrower\\sIf\\sa\\srefund|a\\sdirect\\s[\\S\\s]{5,9}\\sto\\sYou\\sor\\sBorrower\\sIf\\sa\\srefund|a\\sdirect\\spayment\\s[\\S\\s]{0,2}\\sYou\\sor\\sBorrower\\sIf\\sa\\srefund|a\\sdirect\\spayment\\sto\\s[\\S\\s]{1,4}\\sor\\sBorrower\\sIf\\sa\\srefund|a\\sdirect\\spayment\\sto\\sYou\\s[\\S\\s]{0,2}\\sBorrower\\sIf\\sa\\srefund|a\\sdirect\\spayment\\sto\\sYou\\sor\\s[\\S\\s]{6,10}\\sIf\\sa\\srefund|a\\sdirect\\spayment\\sto\\sYou\\sor\\sBorrower\\s[\\S\\s]{0,2}\\sa\\srefund|a\\sdirect\\spayment\\sto\\sYou\\sor\\sBorrower\\sIf\\s[\\S\\s]{0,1}\\srefund|a\\sdirect\\spayment\\sto\\sYou\\sor\\sBorrower\\sIf\\sa",
+        "Loan\\sCharges\\sLegislation\\sAffecting\\sOur\\sRights\\sIf\\sthe\\sAgreement|25\\s[\\S\\s]{2,5}\\sCharges\\sLegislation\\sAffecting\\sOur\\sRights\\sIf\\sthe\\sAgreement|25\\sLoan\\s[\\S\\s]{5,9}\\sLegislation\\sAffecting\\sOur\\sRights\\sIf\\sthe\\sAgreement|25\\sLoan\\sCharges\\s[\\S\\s]{9,13}\\sAffecting\\sOur\\sRights\\sIf\\sthe\\sAgreement|25\\sLoan\\sCharges\\sLegislation\\s[\\S\\s]{7,11}\\sOur\\sRights\\sIf\\sthe\\sAgreement|25\\sLoan\\sCharges\\sLegislation\\sAffecting\\s[\\S\\s]{1,4}\\sRights\\sIf\\sthe\\sAgreement|25\\sLoan\\sCharges\\sLegislation\\sAffecting\\sOur\\s[\\S\\s]{4,8}\\sIf\\sthe\\sAgreement|25\\sLoan\\sCharges\\sLegislation\\sAffecting\\sOur\\sRights\\s[\\S\\s]{0,2}\\sthe\\sAgreement|25\\sLoan\\sCharges\\sLegislation\\sAffecting\\sOur\\sRights\\sIf\\s[\\S\\s]{1,4}\\sAgreement|25\\sLoan\\sCharges\\sLegislation\\sAffecting\\sOur\\sRights\\sIf\\sthe",
+        "of\\sall\\ssums\\ssecured\\sby\\sthis\\sMortgage\\sand\\smay|full\\s[\\S\\s]{0,2}\\sall\\ssums\\ssecured\\sby\\sthis\\sMortgage\\sand\\smay|full\\sof\\s[\\S\\s]{1,4}\\ssums\\ssecured\\sby\\sthis\\sMortgage\\sand\\smay|full\\sof\\sall\\s[\\S\\s]{2,5}\\ssecured\\sby\\sthis\\sMortgage\\sand\\smay|full\\sof\\sall\\ssums\\s[\\S\\s]{5,9}\\sby\\sthis\\sMortgage\\sand\\smay|full\\sof\\sall\\ssums\\ssecured\\s[\\S\\s]{0,2}\\sthis\\sMortgage\\sand\\smay|full\\sof\\sall\\ssums\\ssecured\\sby\\s[\\S\\s]{2,5}\\sMortgage\\sand\\smay|full\\sof\\sall\\ssums\\ssecured\\sby\\sthis\\s[\\S\\s]{6,10}\\sand\\smay|full\\sof\\sall\\ssums\\ssecured\\sby\\sthis\\sMortgage\\s[\\S\\s]{1,4}\\smay|full\\sof\\sall\\ssums\\ssecured\\sby\\sthis\\sMortgage\\sand",
+        "other\\sloan\\scharges\\scollected\\sor\\sto\\sbe\\scollected\\sin|or\\s[\\S\\s]{3,6}\\sloan\\scharges\\scollected\\sor\\sto\\sbe\\scollected\\sin|or\\sother\\s[\\S\\s]{2,5}\\scharges\\scollected\\sor\\sto\\sbe\\scollected\\sin|or\\sother\\sloan\\s[\\S\\s]{5,9}\\scollected\\sor\\sto\\sbe\\scollected\\sin|or\\sother\\sloan\\scharges\\s[\\S\\s]{7,11}\\sor\\sto\\sbe\\scollected\\sin|or\\sother\\sloan\\scharges\\scollected\\s[\\S\\s]{0,2}\\sto\\sbe\\scollected\\sin|or\\sother\\sloan\\scharges\\scollected\\sor\\s[\\S\\s]{0,2}\\sbe\\scollected\\sin|or\\sother\\sloan\\scharges\\scollected\\sor\\sto\\s[\\S\\s]{0,2}\\scollected\\sin|or\\sother\\sloan\\scharges\\scollected\\sor\\sto\\sbe\\s[\\S\\s]{7,11}\\sin|or\\sother\\sloan\\scharges\\scollected\\sor\\sto\\sbe\\scollected",
+        "principal\\sthe\\sreduction\\swill\\sbe\\streated\\sas\\sa\\spartial|reduces\\s[\\S\\s]{7,11}\\sthe\\sreduction\\swill\\sbe\\streated\\sas\\sa\\spartial|reduces\\sprincipal\\s[\\S\\s]{1,4}\\sreduction\\swill\\sbe\\streated\\sas\\sa\\spartial|reduces\\sprincipal\\sthe\\s[\\S\\s]{7,11}\\swill\\sbe\\streated\\sas\\sa\\spartial|reduces\\sprincipal\\sthe\\sreduction\\s[\\S\\s]{2,5}\\sbe\\streated\\sas\\sa\\spartial|reduces\\sprincipal\\sthe\\sreduction\\swill\\s[\\S\\s]{0,2}\\streated\\sas\\sa\\spartial|reduces\\sprincipal\\sthe\\sreduction\\swill\\sbe\\s[\\S\\s]{5,9}\\sas\\sa\\spartial|reduces\\sprincipal\\sthe\\sreduction\\swill\\sbe\\streated\\s[\\S\\s]{0,2}\\sa\\spartial|reduces\\sprincipal\\sthe\\sreduction\\swill\\sbe\\streated\\sas\\s[\\S\\s]{0,1}\\spartial|reduces\\sprincipal\\sthe\\sreduction\\swill\\sbe\\streated\\sas\\sa",
+        "subject\\sto\\sa\\slaw\\swhich\\ssets\\smaximum\\sloan\\scharges|is\\s[\\S\\s]{5,9}\\sto\\sa\\slaw\\swhich\\ssets\\smaximum\\sloan\\scharges|is\\ssubject\\s[\\S\\s]{0,2}\\sa\\slaw\\swhich\\ssets\\smaximum\\sloan\\scharges|is\\ssubject\\sto\\s[\\S\\s]{0,1}\\slaw\\swhich\\ssets\\smaximum\\sloan\\scharges|is\\ssubject\\sto\\sa\\s[\\S\\s]{1,4}\\swhich\\ssets\\smaximum\\sloan\\scharges|is\\ssubject\\sto\\sa\\slaw\\s[\\S\\s]{3,6}\\ssets\\smaximum\\sloan\\scharges|is\\ssubject\\sto\\sa\\slaw\\swhich\\s[\\S\\s]{2,5}\\smaximum\\sloan\\scharges|is\\ssubject\\sto\\sa\\slaw\\swhich\\ssets\\s[\\S\\s]{5,9}\\sloan\\scharges|is\\ssubject\\sto\\sa\\slaw\\swhich\\ssets\\smaximum\\s[\\S\\s]{2,5}\\scharges|is\\ssubject\\sto\\sa\\slaw\\swhich\\ssets\\smaximum\\sloan",
+        "such\\sloan\\scharge\\sshall\\sbe\\sreduced\\sby\\sthe\\samount|any\\s[\\S\\s]{2,5}\\sloan\\scharge\\sshall\\sbe\\sreduced\\sby\\sthe\\samount|any\\ssuch\\s[\\S\\s]{2,5}\\scharge\\sshall\\sbe\\sreduced\\sby\\sthe\\samount|any\\ssuch\\sloan\\s[\\S\\s]{4,8}\\sshall\\sbe\\sreduced\\sby\\sthe\\samount|any\\ssuch\\sloan\\scharge\\s[\\S\\s]{3,6}\\sbe\\sreduced\\sby\\sthe\\samount|any\\ssuch\\sloan\\scharge\\sshall\\s[\\S\\s]{0,2}\\sreduced\\sby\\sthe\\samount|any\\ssuch\\sloan\\scharge\\sshall\\sbe\\s[\\S\\s]{5,9}\\sby\\sthe\\samount|any\\ssuch\\sloan\\scharge\\sshall\\sbe\\sreduced\\s[\\S\\s]{0,2}\\sthe\\samount|any\\ssuch\\sloan\\scharge\\sshall\\sbe\\sreduced\\sby\\s[\\S\\s]{1,4}\\samount|any\\ssuch\\sloan\\scharge\\sshall\\sbe\\sreduced\\sby\\sthe",
+        "that\\slaw\\sis\\sfinally\\sinterpreted\\sso\\sthat\\sthe\\sinterest|and\\s[\\S\\s]{2,5}\\slaw\\sis\\sfinally\\sinterpreted\\sso\\sthat\\sthe\\sinterest|and\\sthat\\s[\\S\\s]{1,4}\\sis\\sfinally\\sinterpreted\\sso\\sthat\\sthe\\sinterest|and\\sthat\\slaw\\s[\\S\\s]{0,2}\\sfinally\\sinterpreted\\sso\\sthat\\sthe\\sinterest|and\\sthat\\slaw\\sis\\s[\\S\\s]{5,9}\\sinterpreted\\sso\\sthat\\sthe\\sinterest|and\\sthat\\slaw\\sis\\sfinally\\s[\\S\\s]{9,13}\\sso\\sthat\\sthe\\sinterest|and\\sthat\\slaw\\sis\\sfinally\\sinterpreted\\s[\\S\\s]{0,2}\\sthat\\sthe\\sinterest|and\\sthat\\slaw\\sis\\sfinally\\sinterpreted\\sso\\s[\\S\\s]{2,5}\\sthe\\sinterest|and\\sthat\\slaw\\sis\\sfinally\\sinterpreted\\sso\\sthat\\s[\\S\\s]{1,4}\\sinterest|and\\sthat\\slaw\\sis\\sfinally\\sinterpreted\\sso\\sthat\\sthe",
+        "the\\sAgreement\\sor\\sthis\\sMortgage\\sunenforceable\\saccording\\sto\\sits|of\\s[\\S\\s]{1,4}\\sAgreement\\sor\\sthis\\sMortgage\\sunenforceable\\saccording\\sto\\sits|of\\sthe\\s[\\S\\s]{7,11}\\sor\\sthis\\sMortgage\\sunenforceable\\saccording\\sto\\sits|of\\sthe\\sAgreement\\s[\\S\\s]{0,2}\\sthis\\sMortgage\\sunenforceable\\saccording\\sto\\sits|of\\sthe\\sAgreement\\sor\\s[\\S\\s]{2,5}\\sMortgage\\sunenforceable\\saccording\\sto\\sits|of\\sthe\\sAgreement\\sor\\sthis\\s[\\S\\s]{6,10}\\sunenforceable\\saccording\\sto\\sits|of\\sthe\\sAgreement\\sor\\sthis\\sMortgage\\s[\\S\\s]{11,15}\\saccording\\sto\\sits|of\\sthe\\sAgreement\\sor\\sthis\\sMortgage\\sunenforceable\\s[\\S\\s]{7,11}\\sto\\sits|of\\sthe\\sAgreement\\sor\\sthis\\sMortgage\\sunenforceable\\saccording\\s[\\S\\s]{0,2}\\sits|of\\sthe\\sAgreement\\sor\\sthis\\sMortgage\\sunenforceable\\saccording\\sto",
+        "the\\sprincipal\\sowed\\sunder\\sthe\\sAgreement\\sor\\sby\\smaking|reducing\\s[\\S\\s]{1,4}\\sprincipal\\sowed\\sunder\\sthe\\sAgreement\\sor\\sby\\smaking|reducing\\sthe\\s[\\S\\s]{7,11}\\sowed\\sunder\\sthe\\sAgreement\\sor\\sby\\smaking|reducing\\sthe\\sprincipal\\s[\\S\\s]{2,5}\\sunder\\sthe\\sAgreement\\sor\\sby\\smaking|reducing\\sthe\\sprincipal\\sowed\\s[\\S\\s]{3,6}\\sthe\\sAgreement\\sor\\sby\\smaking|reducing\\sthe\\sprincipal\\sowed\\sunder\\s[\\S\\s]{1,4}\\sAgreement\\sor\\sby\\smaking|reducing\\sthe\\sprincipal\\sowed\\sunder\\sthe\\s[\\S\\s]{7,11}\\sor\\sby\\smaking|reducing\\sthe\\sprincipal\\sowed\\sunder\\sthe\\sAgreement\\s[\\S\\s]{0,2}\\sby\\smaking|reducing\\sthe\\sprincipal\\sowed\\sunder\\sthe\\sAgreement\\sor\\s[\\S\\s]{0,2}\\smaking|reducing\\sthe\\sprincipal\\sowed\\sunder\\sthe\\sAgreement\\sor\\sby",
+        "to\\sreduce\\sthe\\scharge\\sto\\sthe\\spermitted\\slimit\\sand|necessary\\s[\\S\\s]{0,2}\\sreduce\\sthe\\scharge\\sto\\sthe\\spermitted\\slimit\\sand|necessary\\sto\\s[\\S\\s]{4,8}\\sthe\\scharge\\sto\\sthe\\spermitted\\slimit\\sand|necessary\\sto\\sreduce\\s[\\S\\s]{1,4}\\scharge\\sto\\sthe\\spermitted\\slimit\\sand|necessary\\sto\\sreduce\\sthe\\s[\\S\\s]{4,8}\\sto\\sthe\\spermitted\\slimit\\sand|necessary\\sto\\sreduce\\sthe\\scharge\\s[\\S\\s]{0,2}\\sthe\\spermitted\\slimit\\sand|necessary\\sto\\sreduce\\sthe\\scharge\\sto\\s[\\S\\s]{1,4}\\spermitted\\slimit\\sand|necessary\\sto\\sreduce\\sthe\\scharge\\sto\\sthe\\s[\\S\\s]{7,11}\\slimit\\sand|necessary\\sto\\sreduce\\sthe\\scharge\\sto\\sthe\\spermitted\\s[\\S\\s]{3,6}\\sand|necessary\\sto\\sreduce\\sthe\\scharge\\sto\\sthe\\spermitted\\slimit",
+        "We\\smay\\sat\\sOur\\soption\\srequire\\simmediate\\spayment\\sin|terms\\s[\\S\\s]{0,2}\\smay\\sat\\sOur\\soption\\srequire\\simmediate\\spayment\\sin|terms\\sWe\\s[\\S\\s]{1,4}\\sat\\sOur\\soption\\srequire\\simmediate\\spayment\\sin|terms\\sWe\\smay\\s[\\S\\s]{0,2}\\sOur\\soption\\srequire\\simmediate\\spayment\\sin|terms\\sWe\\smay\\sat\\s[\\S\\s]{1,4}\\soption\\srequire\\simmediate\\spayment\\sin|terms\\sWe\\smay\\sat\\sOur\\s[\\S\\s]{4,8}\\srequire\\simmediate\\spayment\\sin|terms\\sWe\\smay\\sat\\sOur\\soption\\s[\\S\\s]{5,9}\\simmediate\\spayment\\sin|terms\\sWe\\smay\\sat\\sOur\\soption\\srequire\\s[\\S\\s]{7,11}\\spayment\\sin|terms\\sWe\\smay\\sat\\sOur\\soption\\srequire\\simmediate\\s[\\S\\s]{5,9}\\sin|terms\\sWe\\smay\\sat\\sOur\\soption\\srequire\\simmediate\\spayment",
+        "which\\sexceeded\\spermitted\\slimits\\swill\\sbe\\srefunded\\sto\\sYou|Borrower\\s[\\S\\s]{3,6}\\sexceeded\\spermitted\\slimits\\swill\\sbe\\srefunded\\sto\\sYou|Borrower\\swhich\\s[\\S\\s]{6,10}\\spermitted\\slimits\\swill\\sbe\\srefunded\\sto\\sYou|Borrower\\swhich\\sexceeded\\s[\\S\\s]{7,11}\\slimits\\swill\\sbe\\srefunded\\sto\\sYou|Borrower\\swhich\\sexceeded\\spermitted\\s[\\S\\s]{4,8}\\swill\\sbe\\srefunded\\sto\\sYou|Borrower\\swhich\\sexceeded\\spermitted\\slimits\\s[\\S\\s]{2,5}\\sbe\\srefunded\\sto\\sYou|Borrower\\swhich\\sexceeded\\spermitted\\slimits\\swill\\s[\\S\\s]{0,2}\\srefunded\\sto\\sYou|Borrower\\swhich\\sexceeded\\spermitted\\slimits\\swill\\sbe\\s[\\S\\s]{6,10}\\sto\\sYou|Borrower\\swhich\\sexceeded\\spermitted\\slimits\\swill\\sbe\\srefunded\\s[\\S\\s]{0,2}\\sYou|Borrower\\swhich\\sexceeded\\spermitted\\slimits\\swill\\sbe\\srefunded\\sto",
+        "with\\sthe\\sAgreement\\sexceed\\sthe\\spermitted\\slimits\\sthen\\sa|connection\\s[\\S\\s]{2,5}\\sthe\\sAgreement\\sexceed\\sthe\\spermitted\\slimits\\sthen\\sa|connection\\swith\\s[\\S\\s]{1,4}\\sAgreement\\sexceed\\sthe\\spermitted\\slimits\\sthen\\sa|connection\\swith\\sthe\\s[\\S\\s]{7,11}\\sexceed\\sthe\\spermitted\\slimits\\sthen\\sa|connection\\swith\\sthe\\sAgreement\\s[\\S\\s]{4,8}\\sthe\\spermitted\\slimits\\sthen\\sa|connection\\swith\\sthe\\sAgreement\\sexceed\\s[\\S\\s]{1,4}\\spermitted\\slimits\\sthen\\sa|connection\\swith\\sthe\\sAgreement\\sexceed\\sthe\\s[\\S\\s]{7,11}\\slimits\\sthen\\sa|connection\\swith\\sthe\\sAgreement\\sexceed\\sthe\\spermitted\\s[\\S\\s]{4,8}\\sthen\\sa|connection\\swith\\sthe\\sAgreement\\sexceed\\sthe\\spermitted\\slimits\\s[\\S\\s]{2,5}\\sa|connection\\swith\\sthe\\sAgreement\\sexceed\\sthe\\spermitted\\slimits\\sthen",
+        "without\\sany\\sprepayment\\scharge\\sdue\\sIf\\senactment\\sor\\sexpiration|prepayment\\s[\\S\\s]{5,9}\\sany\\sprepayment\\scharge\\sdue\\sIf\\senactment\\sor\\sexpiration|prepayment\\swithout\\s[\\S\\s]{1,4}\\sprepayment\\scharge\\sdue\\sIf\\senactment\\sor\\sexpiration|prepayment\\swithout\\sany\\s[\\S\\s]{8,12}\\scharge\\sdue\\sIf\\senactment\\sor\\sexpiration|prepayment\\swithout\\sany\\sprepayment\\s[\\S\\s]{4,8}\\sdue\\sIf\\senactment\\sor\\sexpiration|prepayment\\swithout\\sany\\sprepayment\\scharge\\s[\\S\\s]{1,4}\\sIf\\senactment\\sor\\sexpiration|prepayment\\swithout\\sany\\sprepayment\\scharge\\sdue\\s[\\S\\s]{0,2}\\senactment\\sor\\sexpiration|prepayment\\swithout\\sany\\sprepayment\\scharge\\sdue\\sIf\\s[\\S\\s]{7,11}\\sor\\sexpiration|prepayment\\swithout\\sany\\sprepayment\\scharge\\sdue\\sIf\\senactment\\s[\\S\\s]{0,2}\\sexpiration|prepayment\\swithout\\sany\\sprepayment\\scharge\\sdue\\sIf\\senactment\\sor"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^»",
+      "Clues": [
+        "(?>(?~<error=4>ownership\\Wof\\Wsaid\\Wland\\Wor\\Wof\\Wthe\\Wroyalties))",
+        "(?>(?~<error=8>wells\\Wand\\Wthe\\Wmeasurement\\Wof\\Wproduction))"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 1,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "ÆÆ",
+      "Clues": [
+        "[âä]"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\r\n\r\n",
+      "Clues": [
+        "additions provided by section",
+        "I hereby certify that as to the following",
+        "Internal Revenue Code",
+        "internal revenue tax",
+        "proper officer in the office",
+        "satisfied with respect to the taxes",
+        "taxpayer the requirements",
+        "that the lien for such taxes",
+        "together with all statutory"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": false,
+      "MinNumberOfClues": 4,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 336,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "asdfasdfasdf",
+      "Clues": [
+        "^(?:A.{0,3}CONTINUATION|C.{0,3}ASSIGNMENT|D.{0,3}TERMINATION|E.{0,3}AMENDMENT)\\x20*-\\x20*The",
+        "^B.{0,3}RELEASE\\x20*-\\x20*From",
+        "^F.{0,3}OTHER.{0,2}$",
+        "1\\x20*\\.?\\x20*FILE\\x20*NO",
+        "1\\x20*A\\.?\\x20*DATE\\x20*OF\\x20*FILING",
+        "1\\x20*B\\.?\\x20*DATE",
+        "1\\x20*C\\.?\\x20*PLACE\\x20*OF\\x20*FILING",
+        "2\\x20*\\.?\\x20*DEBTOR",
+        "3\\x20*\\.?\\x20*(?:ADDITIONAL|.*LAST\\s*NAME|.*NAME\\s*FIRST)",
+        "3\\x20*A\\.?\\x20*SOCIAL",
+        "3\\x20*B\\.?\\x20*MAILING",
+        "3\\x20*C\\.\\x20*CITY",
+        "3\\x20*D\\.?\\x20*ZIP",
+        "9\\.?\\s*This\\s*Space"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "SOMETHING THAT NEVER APPEARS",
+      "Clues": [
+        "\\bcalculi\\b",
+        "\\bnidus\\b",
+        "Calcium[\\s\\S]{0,4}Oxalate[\\s\\S]{0,4}Monohydrate",
+        "compact[\\s\\S]{0,4}mass",
+        "microcrystalline",
+        "PRINCIPAL\\x20STONE",
+        "Protein[\\s\\S]{0,4}matrices"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 7,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "SomethingThatWouldNeverAppearInADocuemtn",
+      "Clues": [
+        "\\b(?:CERTI.{6,7}|.{1,3}RTIFICA.{1,3}|.{5,6}FICATE)[\\s\\S]{0,6}(?:MARR.{3,5}|.{1,3}RRIA.{1,3}|.{3,5}IAGE)\\b",
+        "BRIDE",
+        "GROOM"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [
+        "\\bAssignment and Assumption Agreement dated as of the date hereof"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 1,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^ššš",
+      "Clues": [
+        "(?~<>NEW)\\W*(?~<error=2>ADDRESS)\\W*(?:O.|.F)\\W*(?~<error=3>REGISTERED)\\W*(?~<>OFFICE)[\\s\\S]*",
+        "(?~<>NEW)\\W*(?~<error=3>REGISTERED)\\W*(?~<>AGENT)\\W*(?~<>NAME)[\\s\\S]*",
+        "(?~<>see)\\W*(?~<error=2>reverse)\\W*(?~<>side)\\W*(?~<>for)[\\s\\S]*",
+        "(?-i)1.{0,4}(?~<error=2>CORPORATE)\\W*(?~<>NAME)[\\s\\S]*",
+        "(?-i)2.{0,4}(?~<error=2>FEDERAL)\\W*(?~<>TAX)[\\s\\S]*",
+        "(?-i)3.{0,4}(?~<error=3>REGISTERED)\\W*(?~<>AGENT)\\W*(?~<>NAME)[\\s\\S]*",
+        "(?-i)4.{0,3}(?~<error=3>REGISTERED)\\W*(?~<>OFFICE)\\W*(?~<error=2>ADDRESS)[\\s\\S]*",
+        "^.{0,2}(?~<>The)\\W*(?~<error=3>Corporation)\\W*(?~<>has)\\W*(?~<>been)[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "THISTEXTISCRAAAAAAAAAZZZZYYYYYYYYYYYYYYY",
+      "Clues": [
+        "(?>(?~<error=2>Child[\\s\\S]{3}name\\sthat\\sappears)[\\s\\S]*)|(?>(?~<error=2>Child[\\s\\S]{3}name\\swho\\sappears)[\\s\\S]*)",
+        "(?>(?~<error=3>narrative\\sdescribing\\sthe\\sreasons\\sfor\\sthis\\sFINS\\spetition)[\\s\\S]*)"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "zzzASDFZZZ",
+      "Clues": [
+        "\\b(?-i)AGAP\\b[\\s\\S]*",
+        "\\bAnion[\\s\\S]{0,2}Gap[\\s\\S]*",
+        "\\bCO2\\b[\\s\\S]*",
+        "Chloride[\\s\\S]*",
+        "Potassium[\\s\\S]*",
+        "Sodium[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 260,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "BlaBlaBlaNeverFoundText",
+      "Clues": [
+        "BRIDE",
+        "CERTIFY|CERTIFICATION",
+        "DIVORCE",
+        "GROOM",
+        "LICENSE",
+        "MARRIAGE"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": false,
+      "MinNumberOfClues": 6,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "SOMETHINGTHATWILLNEVERBEFOUND",
+      "Clues": [
+        "^(?~<error=4>Customer\\x20Bank\\x20ACCOUNT\\x20Number:)",
+        "^(?~<error=4>Customer\\x20Bank\\x20Routing\\x20Number:)",
+        "^.{0,3}(?:BI)?WEEKLY.{0,2}[:;]",
+        "^.{0,3}(?:SEMI-)?MONTHLY.{0,2}[:;]",
+        "^.{0,3}CUSTOMERS.{0,2}[:;]",
+        "^.{0,3}Mortgage.{0,2}Representative.{0,2}[:;]"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 5,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^šš",
+      "Clues": [
+        "(?:6[\\s\\S]{0,5})(?:.SS.GN.|.?SSIGNEE|A.?SIGNEE|AS.?IGNEE|ASS.?GNEE|ASSI.?NEE|ASSIG.?EE|ASSIGN.?E|ASSIGNE.?|ASSI.{3,5}|.{1,3}SIGN.{1,3}|.{3,5}GNEE)",
+        "(?:6[\\s\\S]{10,18})(?:S.C.R.D|\\b.{1,2}ECURE.{1,2}\\b|\\b.{3,4}URED|.?ECURED|S.?CURED|SE.?URED|SEC.?RED|SECU.?ED|SECUR.?D|SECURE.?)",
+        "(?:6[\\s\\S]{18,27})(?:P.RTY|PA.{3,4}|\\b.{1,2}ART.{1,2}\\b|\\b.{1,3}RTY|.?ARTY|P.?RTY|PA.?TY|PAR.?Y|PART.?)",
+        "^.{0,5}1[02]\\W*Th.s\\W*sp.c.",
+        "^.{0,5}7\\W*Th.s\\W*F.n.n",
+        "^[^\\r\\n\\d]{0,5}6\\W*(?:ASS|SEC)",
+        "3A(?=.*(?:FED.{4,5}|.?EDERAL|F.?DERAL|FE.?ERAL|FED.?RAL|FEDE.?AL|FEDER.?L|FEDERA.?|.{1,2}EDERA.{1,2}|.{3,4}ERAL|T.X\\W*NO))",
+        "6[\\s\\S]{0,5}(?:S.C.R.D|\\b.{1,2}ECURE.{1,2}\\b|\\b.{3,4}URED|.?ECURED|S.?CURED|SE.?URED|SEC.?RED|SECU.?ED|SECUR.?D|SECURE.?)",
+        "6A(?=.*(?:s.c..l|soc.{2,4}|.{1,2}ocia.{1,2}|.{2,4}ial|.?ocial|s.?cial|so.?ial|soc.?al|soci.?l|socia.?|s.c.r.ty|secu.{3,5}|.{1,3}curi.{1,3}|.{3,5}rity|.?ecurity|s.?curity|se.?urity|sec.?rity|secu.?ity|secur.?ty|securi.?y|securit.?|fed.{4,5}|.?ederal|f.?deral|fe.?eral|fed.?ral|fede.?al|feder.?l|federa.?|.{1,2}edera.{1,2}|.{3,4}eral|T.X\\W*NO))",
+        "6A(?=.*(?:S.C..L|SOC.{2,4}|.{1,2}OCIA.{1,2}|.{2,4}IAL|.?OCIAL|S.?CIAL|SO.?IAL|SOC.?AL|SOCI.?L|SOCIA.?|S.C.R.TY|SECU.{3,5}|.{1,3}CURI.{1,3}|.{3,5}RITY|.?ECURITY|S.?CURITY|SE.?URITY|SEC.?RITY|SECU.?ITY|SECUR.?TY|SECURI.?Y|SECURIT.?|FED.{4,5}|.?EDERAL|F.?DERAL|FE.?ERAL|FED.?RAL|FEDE.?AL|FEDER.?L|FEDERA.?|.{1,2}EDERA.{1,2}|.{3,4}ERAL|T.X\\W*NO))"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 1,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^»",
+      "Clues": [
+        "(?:\\boils?\\b|\\bgas(es)?\\b|mineral)"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 5,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "~&~&~&~&~&~&~&~&~&~&~&~&~&~&",
+      "Clues": [
+        "FBI\\x20IDENTIFICATION\\x20RECORD",
+        "FEDERAL\\x20BUREAU\\x20OF\\x20INVESTIGATION",
+        "FINGERPRINT\\x20CLASS\\x20PATTERN"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^šš",
+      "Clues": [
+        ".F\\W*TH.\\W*R..L\\W*.ST.T.\\W*N.",
+        ".G..NST\\W*TH.\\W*R.C.RD\\W*",
+        ".n\\W*.ll\\W*s.bs.q..nt\\W*st.t.m.nts",
+        ".ND.X.D\\W*.G..NST",
+        ".R.G.N.L\\W*F.N.NC.NG\\W*ST.T.M.NT",
+        "D.S.R.S\\W*TH.S\\W*F.N.NC.NG",
+        "F.l.\\W*N.mb.r\\W*.n\\W*th.\\W*.r.g.n.l",
+        "F.RM\\W*F.R\\W*.R.G.N.L\\W*F.N.NC.NG",
+        "N.M.\\W*.F\\W*R.C.RD",
+        "p.rty\\W*m.st\\W*pl.c.\\W*th.s",
+        "pl.c.\\W*th.s\\W*s.m.\\W*n.mb.r",
+        "PR.NT\\W*.R\\W*TYP.",
+        "S.C.R.D\\W*P.RTY\\W*D.S.R.S",
+        "s.m.\\W*n.mb.r\\W*.n\\W*.ll\\W*s.b",
+        "st.mps\\W*th.\\W*F.l.\\W*N.mb.r",
+        "ST.T.\\W*C.RP.R.T..N\\W*C.MM.SS..N",
+        "ST.T.M.NT\\W*.ND\\W*S.BS.Q..NT",
+        "ST.T.M.NT\\W*T.\\W*B.\\W*.ND.X.D",
+        "Th.\\W*C.mm.ss..n\\W*st.mps",
+        "TYP.\\W*.LL\\W*.NF.RM"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 1,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^šš",
+      "Clues": [
+        "(?:COMMON|WEALTH).{0,22}(?:PENNS|YLVANIA).{0,12}\\r?$[\\s\\S]*",
+        "(?:POL|LICE)[\\s\\S]{0,10}(?:CRIM|MINAL)[\\s\\S]{0,13}(?:COMPL|PLAINT).{0,8}\\r?$[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^šš",
+      "Clues": [
+        "(?~<error=2>thereafter)\\W*(?~<>until)\\W*(?~<>further)\\W*(?~<>order)",
+        "(?~<error=4>that\\Wa\\Wwage\\Wassignment)",
+        "(?~<error=6>Dependent\\Wof\\Wthe\\WRespondent)",
+        "(?~<error=6>named\\Win\\Wthe\\Wpetition\\Wfor\\Wsupport)",
+        "(?~<error=6>or\\Win\\Wemployment\\Wstatus)",
+        "(?~<error=6>Order\\Wto\\WShow\\WCause\\Wwhy)",
+        "(?~<error=6>payable\\Was\\Wpreviously\\Worder)",
+        "(?~<error=6>pursuant\\Wto\\Wa\\Wpetition\\Wfor\\Wsupport)",
+        "(?~<error=6>repondent\\Wappearing\\Wupon)",
+        "(?~<error=6>shall\\Wbe\\Wmade\\Wpayable\\Wto)",
+        "(?~<error=6>shall\\Wnotify\\Wthe\\WFamily\\WSupport)",
+        "(?~<error=6>under\\Wthe\\WUniform\\WReciprocal\\WEnforce)",
+        "(?~<error=6>why\\Wan\\Worder\\Wof\\Wsupport)",
+        "(?~<error=8>Enforcement\\Wof\\WSupport\\WAct\\Wthe\\WPetitioner)",
+        "(?~<error=8>payments\\Wnereinbefore\\Wordered)",
+        "(?~<error=8>the\\WRespondent\\Wappearing\\Win\\Wperson)",
+        "(?-i:(?~<error=4>ORDER\\WOF\\WSUPPORT))",
+        "(?-i:(?~<error=4>PETITIONER))\\s*:",
+        "(?-i:(?~<error=4>RESPONDENT))\\s*:",
+        "(?-i:(?~<error=6>ENFORCEMENT\\WOF\\WSUPPORT))",
+        "(?-i:(?~<error=8>DEPARTMENT\\WOF\\WSOCIAL\\WSERVICES))",
+        "\\b(?~<error=3>received).{0,2}(?~<error=2>under).{0,2}(?~<>Writ)",
+        "and\\W*was\\W*in\\W*the\\W*custody\\W*of"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\r\n",
+      "Clues": [
+        "(?:avenue|ave|av.{0,3}ue|aven.{0,3})",
+        "(?:boulevard|b.{0,3}levard|boul.{0,3}ard|boulev.{0,3}d|blvd)",
+        "(?:highway|hwy)",
+        "(?:lane|\\bln\\b)",
+        "(?:parkway|pkwy)",
+        "(?:street|s.{0,3}eet|str.{0,3}t|\\bst\\b)",
+        "\\b(?:ALABAMA|AL|ALASKA|AK|AMERICAN\\s+SAMOA|AS|ARIZONA|AZ|ARKANSAS|AR|CALIFORNIA|CA|COLORADO|CO|CONNECTICUT|CT|DELAWARE|DE|DISTRICT\\s+OF\\s+COLUMBIA|DC|FEDERATED\\s+STATES\\s+OF\\s+MICRONESIA|FM|FLORIDA|FL|GEORGIA|GA|GUAM|GU|HAWAII|HI|IDAHO|ILLINOIS|IL|INDIANA|IN|IOWA|IA|KANSAS|KS|KENTUCKY|KY|LOUISIANA|LA|MAINE|ME|MARSHALL\\s+ISLANDS|MH|MARYLAND|MD|MASSACHUSETTS|MA|MICHIGAN|MI|MINNESOTA|MN|MISSISSIPPI|MS|MISSOURI|MO|MONTANA|MT|NEBRASKA|NE|NEVADA|NV|NEW\\s+HAMPSHIRE|NH|NEW\\s+JERSEY|NJ|NEW\\s+MEXICO|NM|NEW\\s+YORK|NY|NORTH\\s+CAROLINA|NC|NORTH\\s+DAKOTA|ND|NORTHERN\\s+MARIANA\\s+ISLANDS|MP|OHIO|OH|OKLAHOMA|OK|OREGON|OR|PALAU|PW|PENNSYLVANIA|PA|PUERTO\\s+RICO|PR|RHODE\\s+ISLAND|RI|SOUTH\\s+CAROLINA|SC|SOUTH\\s+DAKOTA|SD|TENNESSEE|TN|TEXAS|TX|UTAH|UT|VERMONT|VT|VIRGIN\\s+ISLANDS|VI|VIRGINIA|VA|WASHINGTON|WA|WEST\\s+VIRGINIA|WV|WISCONSIN|WI|WYOMING|WY)\\b",
+        "\\d{5}"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": false,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [
+        "file://<RSDFileDir>\\patientInfoClues.dat.etf"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "SOMETHING THAT WILL NEVER APPEAR",
+      "Clues": [
+        "(?~<error=3>CLERK\\x20OF\\x20SWEETWATER)",
+        "\\bat\\b\\x20?\\d{1,2}\\x20?[:;]\\x20?\\d{2}.{0,2}\\b[AP]M\\b",
+        "\\bPAGE.{0,3}\\d{1,2}.{0,3}of.{0,3}\\d{1,2}"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "¦¦¦",
+      "Clues": [
+        "\\baverage\\s+balance[\\S\\s]*",
+        "\\bbeginning\\s+balance[\\S\\s]*",
+        "\\bbeginning\\sdate[\\S\\s]*",
+        "\\bending\\s+balance[\\S\\s]*",
+        "\\bending\\sdate[\\S\\s]*",
+        "\\binterest\\searned[\\S\\s]*",
+        "\\binterest\\spaid[\\S\\s]*",
+        "\\bstatement[\\S\\s]*",
+        "\\bthis\\speriod[\\S\\s]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "¦¦¦",
+      "Clues": [
+        "\\bFairfield\\sHarbour\\b[\\S\\s]*",
+        "\\bInstallment\\sNote\\b[\\S\\s]*",
+        "\\bInterval\\sOwnership\\b[\\S\\s]*",
+        "\\bPurchase\\sAgreement\\b[\\S\\s]*",
+        "\\bUnit\\sOwnership\\b[\\S\\s]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "«»",
+      "Clues": [
+        "(?-i:(?>(?~<error=3>CENTRE))[\\s\\S]{0,3}\\W*(?>(?~<error=3>COMMUNITY\\WHOSPITAL)))[\\s\\S]*",
+        "^.{0,4}(?-i:(?>(?~<error=2>NEUROLOGICAL\\WCHECKLIST)))[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "šš",
+      "Clues": [
+        "(?:CR.D.T|.?REDIT|C.?EDIT|CR.?DIT|CRE.?IT|CRED.?T|CREDI.?|\\b(?:CRE.{2,4}|.{1,2}REDI.{1,2}|.{2,4}DIT)\\b)\\W*(?:.ppl.c.t..n|.?pplication|a.?plication|ap.?lication|app.?ication|appl.?cation|appli.?ation|applic.?tion|applica.?ion|applicat.?on|applicati.?n|applicatio.?|appli.{6,7}|.{1,3}plicati.{1,3}|.{5,6}cation)"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 1,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [
+        "(?~<>Pursuant\\sto\\ss\\.\\s72.2501)[\\S\\s]*",
+        "(?~<error=2>appearing\\sbelow\\sthis\\sstamp\\sVOIDS\\sthe\\slien\\srelease)[\\S\\s]*",
+        "(?~<error=3>Decedent's\\sSocial)[\\S\\s]*",
+        "(?~<error=3>NOTICE:\\sThe\\sDepartment\\shas\\sissued\\sa\\slien\\srelease)[\\S\\s]*",
+        "(?~<error=3>Wisconsin\\sDepartment\\sof\\sRevenue\\shereby\\sreleases\\sthe\\slien)[\\S\\s]*",
+        "^(?~<error=3>RELEASE\\sOF\\sINHERITANCE\\sTAX\\sLIEN)[\\S\\s]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 4,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "«»",
+      "Clues": [
+        "((?-i:HEALTH)|1\\W*800\\W*802\\W*949)(?s:.*)",
+        "(?~<error=3>Citbank\\WLife\\WAdvance\\WPlan)(?s:.*)",
+        "application(?s:.*)"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "¬",
+      "Clues": [
+        "^Cashier\\x20Name",
+        "thank\\x20you\\x20for\\x20shopping\\x20at"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 224,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^ššš",
+      "Clues": [
+        "^.{0,4}(?:.ATE|D.TE|DA.E|DAT.)\\W*(?:O.|.F)\\W*(?:(?:V..L.T..N|.?IOLATION|V.?OLATION|VI.?LATION|VIO.?ATION|VIOL.?TION|VIOLA.?ION|VIOLAT.?ON|VIOLATI.?N|VIOLATIO.?|.IOLATION|V.OLATION|VI.LATION|VIO.ATION|VIOL.TION|VIOLA.ION|VIOLAT.ON|VIOLATI.N|VIOLATIO.|\\b(?:VIOL.{5,6}|.{1,3}OLATI.{1,3}|.{4,5}ATION)\\b)|(?:C.NV.CT..N|.?ONVICTION|C.?NVICTION|CO.?VICTION|CON.?ICTION|CONV.?CTION|CONVI.?TION|CONVIC.?ION|CONVICT.?ON|CONVICTI.?N|CONVICTIO.?|.ONVICTION|C.NVICTION|CO.VICTION|CON.ICTION|CONV.CTION|CONVI.TION|CONVIC.ION|CONVICT.ON|CONVICTI.N|CONVICTIO.|\\b(?:CONVI.{4,6}|.{1,3}NVICTI.{1,3}|.{4,6}CTION)\\b)|(?:.CQ..T.L|.?CQUITAL|A.?QUITAL|AC.?UITAL|ACQ.?ITAL|ACQU.?TAL|ACQUI.?AL|ACQUIT.?L|ACQUITA.?|.CQUITAL|A.QUITAL|AC.UITAL|ACQ.ITAL|ACQU.TAL|ACQUI.AL|ACQUIT.L|ACQUITA.|\\b(?:ACQU.{3,5}|.{1,3}QUIT.{1,3}|.{3,5}ITAL)\\b)).{0,4}\\r?$",
+        "^.{0,4}(?:C.NV.CT.D|.?ONVICTED|C.?NVICTED|CO.?VICTED|CON.?ICTED|CONV.?CTED|CONVI.?TED|CONVIC.?ED|CONVICT.?D|CONVICTE.?|.ONVICTED|C.NVICTED|CO.VICTED|CON.ICTED|CONV.CTED|CONVI.TED|CONVIC.ED|CONVICT.D|CONVICTE.|\\b(?:CONV.{5,6}|.{1,3}NVICT.{1,3}|.{4,5}ICTED)\\b)\\W*(?:O.|.F)[\\s\\S]*",
+        "^.{0,4}(?:TH.|T.E|.HE)\\W*(?:V.H.CL.|.?EHICLE|V.?HICLE|VE.?ICLE|VEH.?CLE|VEHI.?LE|VEHIC.?E|VEHICL.?|.EHICLE|V.HICLE|VE.ICLE|VEH.CLE|VEHI.LE|VEHIC.E|VEHICL.|\\b(?:VEH.{4,5}|.{1,2}EHICL.{1,2}|.{3,4}ICLE)\\b)\\W*(?:.ODE|C.DE|CO.E|COD.)[\\s\\S]*",
+        "^.{0,4}(?:V..L.T..N|.?IOLATION|V.?OLATION|VI.?LATION|VIO.?ATION|VIOL.?TION|VIOLA.?ION|VIOLAT.?ON|VIOLATI.?N|VIOLATIO.?|.IOLATION|V.OLATION|VI.LATION|VIO.ATION|VIOL.TION|VIOLA.ION|VIOLAT.ON|VIOLATI.N|VIOLATIO.|\\b(?:VIOL.{5,6}|.{1,3}OLATI.{1,3}|.{4,5}ATION)\\b)\\W*(?:.NF.RM.T..N|.?NFORMATION|I.?FORMATION|IN.?ORMATION|INF.?RMATION|INFO.?MATION|INFOR.?ATION|INFORM.?TION|INFORMA.?ION|INFORMAT.?ON|INFORMATI.?N|INFORMATIO.?|.NFORMATION|I.FORMATION|IN.ORMATION|INF.RMATION|INFO.MATION|INFOR.ATION|INFORM.TION|INFORMA.ION|INFORMAT.ON|INFORMATI.N|INFORMATIO.).{0,4}\\r?$[\\s\\S]*",
+        "^.{0,4}(?:V..L.T..N|.?IOLATION|V.?OLATION|VI.?LATION|VIO.?ATION|VIOL.?TION|VIOLA.?ION|VIOLAT.?ON|VIOLATI.?N|VIOLATIO.?|.IOLATION|V.OLATION|VI.LATION|VIO.ATION|VIOL.TION|VIOLA.ION|VIOLAT.ON|VIOLATI.N|VIOLATIO.|\\b(?:VIOL.{5,6}|.{1,3}OLATI.{1,3}|.{4,5}ATION)\\b)\\W*(?:C.MM.TT.D|.?OMMITTED|C.?MMITTED|CO.?MITTED|COM.?ITTED|COMM.?TTED|COMMI.?TED|COMMIT.?ED|COMMITT.?D|COMMITTE.?|.OMMITTED|C.MMITTED|CO.MITTED|COM.ITTED|COMM.TTED|COMMI.TED|COMMIT.ED|COMMITT.D|COMMITTE.|\\b(?:COMM.{5,6}|.{1,3}MMITT.{1,3}|.{4,5}ITTED)\\b)[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "QWERTYUIOP",
+      "Clues": [
+        "(?~<error=2>have\\Wbeen\\Wsatisfied)[\\s\\S]*",
+        "(?-i:TAXPAYER\\r\\n[\\s\\S]{0,150}\\r\\nUNPAID)[\\s\\S]*",
+        "^PART\\W*3[\\s\\S]*",
+        "ASSESSMENT[\\s\\S]*",
+        "Federal\\W*tax\\W*lien[\\s\\S]*",
+        "Identifying[\\s\\S]*",
+        "Kind\\W*of\\W*tax[\\s\\S]*",
+        "Name\\W*of\\W*taxpayer[\\s\\S]*",
+        "Place\\W*of\\W*filing[\\s\\S]*",
+        "Tax\\W*period\\W*ended[\\s\\S]*",
+        "Unpaid\\W*balance[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "SomethingThatWillNeverAppearInADocument",
+      "Clues": [
+        "\\bdrill(?:ing|s|ed)?\\b",
+        "\\bgas\\b",
+        "\\boil\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 5,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "˜v§v˜",
+      "Clues": [],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": true,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": false,
+      "MinNumberOfClues": 0,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [
+        "(AFFIDAVIT|Affiant)[\\S\\s]*",
+        "\\bis\\s+the\\s+surviving\\s+joint\\s+tenant[\\S\\s]+",
+        "\\bName\\sOf\\sThe\\sSurviv(or)?ing\\s[\\S\\s]{0,20}\\sIs[\\S\\s]*",
+        "\\bnamed\\s+in\\s+the\\s+Deed\\s+who\\s+survived\\b[\\S\\s]{0,6}\\bDecedent[\\S\\s]*",
+        "\\bThe\\s+Name(\\W?s\\W?)?\\s+Of\\s+The\\s+Survivor[\\S\\s]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "Somethingthatwillneverappearinadocument",
+      "Clues": [
+        "(?~<error=1>ARUP\\x20ID)",
+        "(?~<error=1>PRINTED)",
+        "(?~<error=2>ADMITTING\\x20MD)",
+        "(?~<error=2>REQUISITION\\x20\\#)",
+        "(?~<error=3>CLIENT\\x20SUPPLIED\\x20ID)"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 4,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [
+        "(?>(?~<error=3>power.of.attorney))[\\s\\S]*\\z",
+        "(?>(signature|\\bsign|witness))[\\s\\S]*\\z"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "¦¦¦",
+      "Clues": [
+        "\\b((?~<>INCOME)|(?~<>R\\.O\\.T\\.)|(?~<>Excise))\\sTAX\\b[\\S\\s]*",
+        "\\b(?~<>Certificate\\sOf)[\\S\\s]*",
+        "\\b(?~<>Income\\sTax)[\\S\\s]*",
+        "\\b(?~<>TAX\\sLIEN)[\\S\\s]*",
+        "\\b(?~<>Taxpayer)[\\S\\s]*",
+        "\\b(?~<error=6>Illinois\\sDepartment\\sOf\\sRevenue)[\\S\\s]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 4,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "qwertyqwertyqwerty",
+      "Clues": [
+        "ank.{0,3}you\\b|thank.{0,3}y",
+        "Master.{0,3}Card|\\bVisa\\b|\\bAmex\\b|American.{0,3}Express",
+        "satisfaction.{0,3}guaranteed|your.{0,3}money.{0,3}back"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "asdfasdfasdfasdf",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 10,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 77,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "~&~&~&~&~&~&~&~&~&~&~&~&~&~&~&~&~",
+      "Clues": [
+        "(?>ACCOUNT[\\s\\S]{0,3}NUMBER[\\s\\S]*)",
+        "(?>ACCOUNT\\x20STATEMENT\\x20HISTORY[\\s\\S]*)",
+        "(?>STMT\\x20DATE[\\s\\S]*)",
+        "(?>TOTAL\\x20INTEREST[\\s\\S]*)"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 4,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^ššš",
+      "Clues": [
+        "(?:Kind\\W*of\\W*Tax|Name\\W*of\\W*Taxpayer|Tax\\W*Period\\W*Ended|Place\\W*of\\W*Filing)[\\s\\S]*",
+        "^(?~<error=3>Certificate)\\W*(?:o.|.f)\\W*(?~<error=2>Release)[\\s\\S]*",
+        "668\\W*\\(\\W*C\\W*\\)[\\s\\S]*",
+        "Federal\\W*Tax\\W*lien",
+        "lien\\W*provided\\W*by\\W*Code\\W*section\\W*5321[\\s\\S]{10,50}released[\\s\\S]*",
+        "notice\\W*of\\W*internal\\W*revenue\\W*tax\\W*lien\\W*was\\W*filed[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "asdfasdfasdf",
+      "Clues": [
+        "(Seal)",
+        "All parties signing",
+        "Notary Public",
+        "passed before me",
+        "presence of me, Notary",
+        "SIGNED at my office",
+        "Thus done and signed",
+        "THUS DONE, READ AND PASSED",
+        "undersigned competent witnesses",
+        "undersigned Notary"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": false,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [
+        "file://<RSDFileDir>\\FailPatterns\\PatientInfoLeftBF.dat.etf"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^ššš",
+      "Clues": [
+        "(?~<>FORM)\\W*[8B]\\W*(?~<>FILING)\\W*(?~<>FEE).{0,3}25[\\s\\S]*",
+        "(?~<>MARK)\\W*(?~<error=3>APPROPRIATE)[\\s\\S]*",
+        "(?~<>NAME)\\W*(?:O.|.F)\\W*(?~<>NEW)\\W*(?~<error=3>REGISTERED)\\W*(?~<>AGENT)[\\s\\S]*",
+        "(?~<>THE)\\W*(?~<error=3>CORPORATION)\\W*(?~<>HAS)\\W*(?~<>BEEN)[\\s\\S]*",
+        "(?<![68].{0,3})(?~<>NEW)\\W*(?~<>STREET)\\W*(?~<error=2>ADDRESS)\\W*(?:O.|.F)\\W*(?~<error=3>REGISTERED)[\\s\\S]*",
+        "(?-i)(?:FE.|F.E|.EE)\\W*(?:O.|.F)?\\W*25[\\s\\S]*",
+        "(?-i)(?~<>NAME)\\W*(?:O.|.F)\\W*(?~<error=2>CORPORATION)\\W*[\\s\\S]*",
+        "(?-i)(?~<>NEW)\\W*(?~<error=2>STREET)\\W*(?~<error=2>ADDRESS)[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^«»",
+      "Clues": [
+        "(?:ARMED\\W*FORCES.{7,15}UNITED\\W*STATES[\\s\\S]{0,6}REPORT.{3,18}DISCHARGE)[\\s\\S]*",
+        "(?:ARMOR|MARKSMAN|INFANTRY)[\\s\\S]*",
+        "(?:HONORABLE|DISHONORABLE|MEDAL)[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "¬",
+      "Clues": [
+        "^FULL\\x20RECONVEYANCE\\r?$",
+        "^Original\\x20(?:Trustee|BENEFICIARY|BORROWER)\\x20?[:;]\\r?$"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "SomethingThatWillNeverAppear",
+      "Clues": [
+        "(?nx)\\b(drill(ing)?|gas|minerals?|oil|water|wells?)\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 5,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^ššš",
+      "Clues": [
+        "(?:(?~<>Form)\\W*668(?!.*C)|668\\W*\\(\\W*C\\W*\\))[\\s\\S]*",
+        "(?:Kind\\W*of\\W*Tax|Name\\W*of\\W*Taxpayer|Tax\\W*Period\\W*Ended|Place\\W*of\\W*Filing|Unpaid\\W*Balance)[\\s\\S]*",
+        "(?~<error=2>IMPORTANT)\\W*(?~<>RELEASE)\\W*(?~<error=3>INFORMATION)[\\s\\S]*",
+        "^(?~<error=2>Notice)\\W*(?:o.|.f|.t)\\W*(?~<error=2>Federal)[\\s\\S]*",
+        "^(?~<error=3>Certificate)\\W*(?:o.|.f)\\W*(?~<error=2>Release)[\\s\\S]*",
+        "Federal\\W*Tax\\W*lien[\\s\\S]*",
+        "lien\\W*provided\\W*by\\W*Code\\W*section\\W*5321[\\s\\S]{10,50}released[\\s\\S]*",
+        "notice\\W*of\\W*internal\\W*revenue\\W*tax\\W*lien\\W*was\\W*filed[\\s\\S]*",
+        "This\\W*notice\\W*was\\W*prepar[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "¬",
+      "Clues": [],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": true,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": false,
+      "MinNumberOfClues": 0,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "^«",
+      "Clues": [
+        "^Wyoming\\W*Department\\W*of\\W*Revenue\\W*Tax\\W*Lien"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 1,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "¦¦¦",
+      "Clues": [
+        "(?:\\bApplication\\sFor\\sWaiver|Occupation|Married|OHIO\\sREVISED\\sCODE)[\\S\\s]*",
+        "(?~<error=2>^Application\\sFor\\sMarriage\\sLicense)[\\S\\s]*",
+        "\\bBride[\\S\\s]*",
+        "\\bGroom\\b[\\S\\s]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "~&~&~&~&~&~&~&~&~&~&~&~&~&~&~",
+      "Clues": [
+        "(?>ED\\x20Patient\\x20Report\\b[\\s\\S]*)",
+        "(?>Hanover\\x20EDM\\b[\\s\\S]*)",
+        "(?>HANOVER\\x20HOSPITAL[\\s\\S]*)",
+        "(?>PATIENT[\\s\\S]*)",
+        "(?>RADIOLOGY\\x20REPORT[\\s\\S]*)",
+        "(?>SCAN\\x20REPORT\\b[\\s\\S]*)"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "asdfasdfasdf",
+      "Clues": [
+        "Attorney in fact deems necessary to properly",
+        "buildings, and the like",
+        "business affairs",
+        "debts, rents, interest, sums of money",
+        "drafts, warrants, acknowledgmennts",
+        "execute, endorse, accept",
+        "further, to possess, enter",
+        "hereafter to become due and owing",
+        "instruments of title to land",
+        "other instruments in writing",
+        "sell real estate on his behalf",
+        "to act in full capacity for him",
+        "To ask, demand, sue for, recover"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": false,
+      "MinNumberOfClues": 6,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "asdasdasd",
+      "Clues": [
+        "23\\.\\s*Waivers",
+        "24\\.\\s*Redemption\\s*Period",
+        "25\\.\\s*Riders\\s*to\\s*this\\s*Security\\s*Instrument",
+        "Adjustable\\s*Rate\\s*Rider",
+        "Biweekly\\s*Payment\\s*Rider",
+        "Condominium\\s*Rider",
+        "Family\\s*Rider",
+        "Graduated\\s*Payment\\s*Rider",
+        "Planned\\s*Unit\\s*Development\\s*Rider"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 4,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "©©©®®®NeverFoundText©©©®®®",
+      "Clues": [
+        "\\b\\w{0,2}?(?:Th|he)[\\s\\S]{0,9}?(?:def|end|ant)[\\s\\S]{0,9}?(?:i|s)[\\s\\S]{0,4}?(?:t|o)[\\s\\S]{0,4}?(?:b|e)[\\s\\S]{0,8}?(?:rel|eas|sed)[\\s\\S]{0,8}?(?:b|y)[\\s\\S]{0,4}?(?:th|he)[\\s\\S]{0,9}?(?:fol|low|ing)[\\s\\S]{0,11}?(?:met|hod)[\\s\\S]{0,6}?(?:o|f)[\\s\\S]{0,4}?(?:bai|ail)[\\s\\S]{0,4}?(?:an|nd)[\\s\\S]{0,4}?(?:an|ny)[\\s\\S]{0,10}?(?:con|dit|ion|ons)[\\s\\S]{0,10}?(?:th|he)[\\s\\S]{0,5}?(?:Cou|urt)[\\s\\S]{0,5}?(?:ma|ay)[\\s\\S]{0,6}?(?:imp|ose)\\w{0,4}?\\b",
+        "\\b\\w{0,3}?(?:An|ny)[\\s\\S]{0,4}?(?:bai|ail)[\\s\\S]{0,5}?(?:mon|ney)[\\s\\S]{0,11}?(?:ref|und|abl|ble)[\\s\\S]{0,11}?(?:aft|ter)[\\s\\S]{0,5}?(?:cas|ase)[\\s\\S]{0,4}?(?:i|s)[\\s\\S]{0,9}?(?:com|ple|ted)[\\s\\S]{0,9}?(?:ma|ay)[\\s\\S]{0,4}?(?:b|e)[\\s\\S]{0,8}?(?:ret|urn|ned)[\\s\\S]{0,8}?(?:b|y)[\\s\\S]{0,4}?(?:th|he)[\\s\\S]{0,5}?(?:Cle|erk)[\\s\\S]{0,7}?(?:Mon|day)[\\s\\S]{0,9}?(?:thr|oug|ugh)[\\s\\S]{0,9}?(?:Fri|day)\\w{0,5}?\\b",
+        "\\b\\w{0,3}?(?:Bai|ail)[\\s\\S]{0,5}?(?:mon|ney)[\\s\\S]{0,5}?(?:wil|ill)[\\s\\S]{0,4}?(?:b|e)[\\s\\S]{0,8}?(?:ref|und|ded)[\\s\\S]{0,8}?(?:t|o)[\\s\\S]{0,4}?(?:th|he)[\\s\\S]{0,6}?(?:bai|lor)[\\s\\S]{0,15}?(?:dep|osi|tor)[\\s\\S]{0,18}?(?:def|end|ant)[\\s\\S]{0,9}?(?:i|n)[\\s\\S]{0,10}?(?:acc|ord|anc|nce)[\\s\\S]{0,10}?(?:wit|ith)\\w{0,3}?\\b",
+        "\\b\\w{0,5}?(?:her|eby)[\\s\\S]{0,6}?(?:giv|ive)[\\s\\S]{0,7}?(?:con|sen|ent)[\\s\\S]{0,7}?(?:t|o)[\\s\\S]{0,4}?(?:hav|ave)[\\s\\S]{0,4}?(?:m|y)[\\s\\S]{0,4}?(?:bon|ond)[\\s\\S]{0,5}?(?:mon|ney)[\\s\\S]{0,7}?(?:pos|ted)[\\s\\S]{0,6}?(?:i|n)[\\s\\S]{0,4}?(?:th|he)[\\s\\S]{0,4}?(?:nam|ame)\\w{0,3}?\\b",
+        "SOR[\\s\\S]{0,4}MOR[\\s\\S]{0,7}(?:Fed|era|ral)[\\s\\S]{0,8}?(?:Cou|urt)[\\s\\S]{0,6}?(?:Ord|der)[\\s\\S]{0,5}Cash"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 4,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\r\n\r\n",
+      "Clues": [
+        "(?-i)\\b[A-Z]?[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": false,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 100,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "asdfasdfasdf",
+      "Clues": [
+        "\\b[a-z]{2,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 5,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 294,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "dafafasdfsda",
+      "Clues": [
+        "acknowledges\\sthe\\sexecution\\sof\\sthe\\sforegoing\\sinstrument",
+        "has\\sbeen\\sfully\\spaid\\sand\\ssatisfied",
+        "hereby\\sand\\sherewith\\sfully\\srelease\\sand\\sdischarge",
+        "hereby\\sreleases\\sthe\\sLien",
+        "hereby\\swaive\\sand\\srelease\\sany\\slien\\srights\\sto",
+        "I\\sfurther\\scertify\\sthat\\sthe\\sLiens\\sdescribed\\sin\\ssubject\\sdocument\\shave\\sbeen\\ssatisfied",
+        "NOTICE\\sOF\\sLIEN\\sRELEASE",
+        "RELEASE\\sOF\\sLIEN",
+        "RELEASE\\sOF\\sMECHANIC'S\\sLIEN",
+        "said\\slien\\sis\\shereby\\sreleased",
+        "This\\sinstrument\\sconstitutes\\sa\\scomplete\\srelease\\sof\\ssuch\\sMechanic's\\sLien",
+        "This\\sis\\sto\\scertify\\sthat",
+        "TO\\sALL\\sTO\\sWHOM\\sIT\\sMAY\\sCONCERN",
+        "WAIVER[\\s\\S]{0,4}OF[\\s\\S]{0,4}FINAL[\\s\\S]{0,4}LIEN",
+        "WAIVER\\sOF\\sLIEN"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "zzzASDFZZZ",
+      "Clues": [
+        "Ampicillin[\\s\\S]*",
+        "Cefazolin[\\s\\S]*",
+        "Ciprofloxacin[\\s\\S]*",
+        "Nitrofurantoin[\\s\\S]*",
+        "Sulfamethoxazole[\\s\\S]*",
+        "Trimethoprim[\\s\\S]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\r\n",
+      "Clues": [
+        "\\b(?:ALABAMA|AL|ALASKA|AK|AMERICAN\\s+SAMOA|AS|ARIZONA|AZ|ARKANSAS|AR|CALIFORNIA|CA|COLORADO|CO|CONNECTICUT|CT|DELAWARE|DE|DISTRICT\\s+OF\\s+COLUMBIA|DC|FEDERATED\\s+STATES\\s+OF\\s+MICRONESIA|FM|FLORIDA|FL|GEORGIA|GA|GUAM|GU|HAWAII|HI|IDAHO|ILLINOIS|IL|INDIANA|IN|IOWA|IA|KANSAS|KS|KENTUCKY|KY|LOUISIANA|LA|MAINE|ME|MARSHALL\\s+ISLANDS|MH|MARYLAND|MD|MASSACHUSETTS|MA|MICHIGAN|MI|MINNESOTA|MN|MISSISSIPPI|MS|MISSOURI|MO|MONTANA|MT|NEBRASKA|NE|NEVADA|NV|NEW\\s+HAMPSHIRE|NH|NEW\\s+JERSEY|NJ|NEW\\s+MEXICO|NM|NEW\\s+YORK|NY|NORTH\\s+CAROLINA|NC|NORTH\\s+DAKOTA|ND|NORTHERN\\s+MARIANA\\s+ISLANDS|MP|OHIO|OH|OKLAHOMA|OK|OREGON|OR|PALAU|PW|PENNSYLVANIA|PA|PUERTO\\s+RICO|PR|RHODE\\s+ISLAND|RI|SOUTH\\s+CAROLINA|SC|SOUTH\\s+DAKOTA|SD|TENNESSEE|TN|TEXAS|TX|UTAH|UT|VERMONT|VT|VIRGIN\\s+ISLANDS|VI|VIRGINIA|VA|WASHINGTON|WA|WEST\\s+VIRGINIA|WV|WISCONSIN|WI|WYOMING|WY)\\b",
+        "\\b\\d{5}\\b",
+        "phone|ph.ne|.{1,2}one"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": false,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "asdfasdfasdfasdfasdfasdfasdf",
+      "Clues": [
+        "file://<RSDFileDir>\\isJudgmentType1BF.dat.etf"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 5,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\u0002\u0002\u0002\u0002\u0002",
+      "Clues": [
+        "\\b[a-z]{4,}\\b"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 165,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "«««",
+      "Clues": [
+        "(?nx) (^|\\s) \\W?\\d{3}\\W{0,2}\\d{3}\\W?\\d{4} (\\s|$)",
+        "(?nx) \\b(Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s\\d{1,2}\\s\\d{2,4}\\b",
+        "\\b\\d{2}\\s?[:;]\\s?\\d{2}\\s?[ap]m?",
+        "\\bP\\W+\\d+"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "hokay,so,hereisthisearth.damn,thatisasweetearthyoumightsay.wrong!",
+      "Clues": [
+        "1-800-877-7016",
+        "accession.{0,3}#",
+        "client.{0,3}information",
+        "collection.{0,3}site",
+        "comprehensive.{0,3}final.{0,3}report",
+        "referring.{0,3}client",
+        "specimen.{0,3}type",
+        "test.{0,3}performed.{0,3}at"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": false,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 4,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "òó",
+      "Clues": [
+        "(^.{0,4}1500.{0,4}\\r|^.?1\\W?5\\W?0\\W?0.?\\r)[\\S\\s]*",
+        "LWCC[\\S\\s]*"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "«»",
+      "Clues": [
+        "(?-i:DIVORCE\\W*PROCESSING\\W*FORM)",
+        "(?-i:Sherif.*Complaint\\W*(?:i.|.n)\\W*Divorce)",
+        "^(?:1\\W*)?have\\W*there\\W*been.*family\\W*related",
+        "^(?:2\\W*)?are\\W*(?:any\\W*)?related\\W*claims\\W*requested\\W*in\\W*this\\W*action",
+        "^(?:3\\W*)?Is\\W*immediate\\W*action.*(?:child\\W*support|alimony)",
+        "^(?:4\\W*)?is\\W*marriage\\W*counseling\\W*req"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 1,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "SomethingThatWillNeverAppear",
+      "Clues": [
+        "(?~<>statement\\x20date)",
+        "\\baccount\\x20activity\\x20by\\x20date\\b",
+        "\\bactivity\\x20type\\b",
+        "\\bdays\\x20in\\x20billing\\x20(?:cycle|period)\\b",
+        "\\bDetach\\x20and\\x20mail\\x20this\\x20portion\\b",
+        "\\bLAST\\x20PMT\\x20AMT\\b",
+        "\\bminimum\\x20finance\\x20charge\\b",
+        "\\bnext\\x20due\\x20date\\b",
+        "\\bno.{0,3}annual.{0,3}fee.{0,3}platinum.{0,3}card",
+        "\\bprevious\\x20balance\\b",
+        "\\btotal\\x20deposit\\x20balance\\b",
+        "\\btype\\x20of\\x20balance\\b",
+        "\\byour\\x20annual\\x20percentage\\x20rate\\b",
+        "account\\x20(?:summary|statement)",
+        "Activity\\x20Summary",
+        "amount\\x20invested",
+        "annual\\x20percentage\\x20yield\\x20earned\\b",
+        "Card\\x20?member\\x20Services",
+        "Current\\x20Minimum\\x20Due",
+        "For\\x20account\\x20information\\x20call",
+        "Interest\\x20Paid\\x20Year\\x20To\\x20Date",
+        "mastercard\\x20activity",
+        "mastercard\\x20purchases",
+        "minimum\\s{0,4}payment\\s{0,4}due",
+        "minimum\\x20balance",
+        "online\\x20banking",
+        "report\\x20your\\x20card\\x20lost\\x20or\\x20stolen.",
+        "statement\\x20period",
+        "total\\x20points\\x20balance",
+        "your\\x20account\\x20is\\x20seriously\\x20delinquent",
+        "your\\x20activity",
+        "your\\x20portfolio"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": true,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "ññññ",
+      "Clues": [
+        "(?:FINA.{5,6}|.{1,3}NANCI.{1,3}|.{4,5}NCING)\\s{0,4}(?:STAT.{5,6}|.{1,3}ATEME.{1,3}|.{4,5}EMENT).{2,5}(?:pres.{5,6}|.{1,3}esent.{1,3}|.{4,5}ented).{4,7}(?:Fil.{2,4}|.{1,2}ilin.{1,2}|.{2,4}ing)\\s{0,4}(?:Off.{4,5}|.{1,2}ffice.{1,2}|.{3,4}icer)",
+        "(?:pursu|SUant)[\\s\\S]{0,20}(Unif|iform)[\\s\\S]{0,10}(?:Comm|mercial)[\\s\\S]{0,12}(?:CO|DE)",
+        "(?:Th|is)[\\s\\S]{0,11}(?:Finan|ancing)[\\s\\S]{0,13}(?:State|atement)[\\s\\S]{0,10}cover",
+        "[53].{1,3}This[\\s\\S]{0,10}(Finan|ancing)[\\s\\S]{0,12}(State|atement)",
+        "\\b6.{1,3}Assignee",
+        "\\bUCC-?[14]",
+        "^.{0,3}TERMINATION\\s?STATEMENT",
+        "^[\\s\\S]{0,3}FOR\\s?FILING\\s?OFFI",
+        "^2.{1,3}secured.*(?:party|address)",
+        "1.{0,2}Debtor.{3,15}(?:Last|Name|First)",
+        "4.{1,3}For\\x20Filling",
+        "Filing[\\s\\S]{0,3}Officer.{0,10}(?:requested|copy)",
+        "INDIANA\\s?UNIFORM\\s?COMMERCIAL\\s?CODE",
+        "No.{1,4}Filing\\x20Office",
+        "Officer.{1,3}Date.{1,3}Time",
+        "U?CC[\\s\\S]{0,4}[I123][\\s\\S]{0,5}Indiana",
+        "Uniform\\x20Commercial\\x20Code.{1,4}FINANCING\\x20STATEMENT.{1,4}Form\\x20UCC.1"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 2,
+      "PairBeginAndEnd": false
+    }
+  },
+  {
+    "Type": "BlockFinder",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "BlockBegin": "",
+      "BlockEnd": "",
+      "BlockSeparator": "\r\n\r\n",
+      "Clues": [
+        "file://<RSDFileDir>\\BF1Clues.dat.etf"
+      ],
+      "DefineBlocksType": "SeparatorString",
+      "FindAllBlocks": false,
+      "GetMaxOnly": false,
+      "InputAsOneBlock": true,
+      "IsCluePartOfAWord": true,
+      "IsClueRegularExpression": true,
+      "MinNumberOfClues": 3,
+      "PairBeginAndEnd": false
+    }
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\GoLiveBaselineSolution\\UWTransplantCenter.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\Solution\\UWTransplantCenter.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\Duke_DEP - PreloaderProd.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\Solution\\UITransplantCenter.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\Solution\\ProHealth_DEP_RW.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\RW.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\Solution\\Duke_DEP_AllowSaveWithErrors.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\Solution\\UVA_DEP.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\Solution\\FairviewDEP.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\Duke_DEP - PreloaderTest.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\Solution\\NWMemorialDEP.config"
+    }
+  },
+  {
+    "Type": "DataEntryPreloader",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ConfigFileName": "<RSDFileDir>\\..\\Solution\\UWClinic_DEP.config"
+    }
+  }
+]

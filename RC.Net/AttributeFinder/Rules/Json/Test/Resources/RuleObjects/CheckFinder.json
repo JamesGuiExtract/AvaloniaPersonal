@@ -1,0 +1,8 @@
+[
+  {
+    "Type": "CheckFinder",
+    "Description": "Find checks",
+    "Enabled": true,
+    "Object": "CheckFinder"
+  }
+]

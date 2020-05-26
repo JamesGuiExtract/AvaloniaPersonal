@@ -1,0 +1,527 @@
+[
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.DocRef.NLP.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.Grantor.oneline.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<XMLOutputFile>",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "$DirOf(<SourceDocName>)\\CopyPastaRules\\$FileOf(<SourceDocName>).Parties.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.casenumber.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "asdf",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<XMLOutputFile>",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": true,
+      "SchemaName": "../030306.xsd",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.Grantee.oneline.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.judgment.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<XMLOutputFile>",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": true,
+      "SchemaName": "WaukeshaXML.xsd",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.statement.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.name.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<XMLOutputFile>",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<XMLOutputFile>.v1.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.dategranted.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.address.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "sdf",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": false,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.account.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<XMLOutputFile>",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": true,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.LegalDescription.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": true,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<XMLOutputFile>",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.classification.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.originator.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.LD.oneline.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SplitterOutputXML>",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": true,
+      "SchemaName": "WaukeshaXML.xsd",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.pages.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.datacapture.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": true
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.Payment.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": false,
+      "RemoveEmptyNodes": true,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "$DirOf(<SourceDocName>)\\..\\output\\$FileOf(<SourceDocName>).xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.xml",
+      "Format": "XMLOriginal",
+      "NamedAttributes": false,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": true,
+      "RemoveEmptyNodes": false,
+      "RemoveSpatialInfo": false
+    }
+  },
+  {
+    "Type": "OutputToXML",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FileName": "<SourceDocName>.BirthMonth.xml",
+      "Format": "XMLSchema",
+      "NamedAttributes": true,
+      "UseSchemaName": false,
+      "SchemaName": "",
+      "ValueAsFullText": false,
+      "RemoveEmptyNodes": true,
+      "RemoveSpatialInfo": false
+    }
+  }
+]
