@@ -63,6 +63,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Dashboard.Forms.Tes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Extract.Interop.Zip", "..\Interop\Zip\Code\Extract.Interop.Zip.vcxproj", "{B6C67039-DF95-4BC8-AEE7-533919A33778}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportDesigner", "ReportDesigner\Core\Code\ReportDesigner.csproj", "{C3FF846A-3820-4768-957E-2067A1BDF007}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -402,6 +404,18 @@ Global
 		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|Any CPU.Build.0 = Release|Win32
 		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|x86.ActiveCfg = Release|Win32
 		{B6C67039-DF95-4BC8-AEE7-533919A33778}.Template|x86.Build.0 = Release|Win32
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Debug|x86.Build.0 = Debug|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Release|x86.ActiveCfg = Release|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Release|x86.Build.0 = Release|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Template|Any CPU.ActiveCfg = Release|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Template|Any CPU.Build.0 = Release|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Template|x86.ActiveCfg = Release|Any CPU
+		{C3FF846A-3820-4768-957E-2067A1BDF007}.Template|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

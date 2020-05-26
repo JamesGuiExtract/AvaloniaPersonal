@@ -210,7 +210,7 @@ namespace Extract.Dashboard.Utilities
 
         #region Private methods
 
-        private XElement CreateGridComponentElement(string componentName, GridDetailConfiguration configuration)
+        static private XElement CreateGridComponentElement(string componentName, GridDetailConfiguration configuration)
         {
             string dataMemberUsedForFileName = string.IsNullOrWhiteSpace(configuration.DataMemberUsedForFileName)
                 ? "FileName" : configuration.DataMemberUsedForFileName;
