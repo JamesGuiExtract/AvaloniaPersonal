@@ -24,6 +24,7 @@ namespace Extract.AttributeFinder.Test
         static TestFileManager<TestSpatialString> _testFiles;
 
         const string _EXAMPLE05_TIF_FILE = "Resources.Example05.tif";
+        const string _BLANK_PAGE_IMAGE = "Resources.BlankPage.tif";
         const string _BLANK_PAGE_GCV_FILE = "Resources.BlankPage.tif.gcv.uss";
 
         #endregion Fields
@@ -92,12 +93,14 @@ namespace Extract.AttributeFinder.Test
 
         /// <summary>
         /// Test that loading pages from file works the same as loading whole file and then getting pages
-        /// TODO: Decide whether this should pass. See below LoadPagesFromFile test.
         /// </summary>
         [Test, Category("SpatialString")]        
         public static void LoadPagesFromFileEmptyPageIncluded()
         {
-            string ussPath = _testFiles.GetFile(_BLANK_PAGE_GCV_FILE);
+            // Get the image so that this test works when the original source doc is not available
+            // https://extract.atlassian.net/browse/ISSUE-17062
+            string sdn = _testFiles.GetFile(_BLANK_PAGE_IMAGE);
+            string ussPath = _testFiles.GetFile(_BLANK_PAGE_GCV_FILE, sdn + ".uss");
             var ss = new SpatialStringClass();
 
             ss.LoadFrom(ussPath, false);
