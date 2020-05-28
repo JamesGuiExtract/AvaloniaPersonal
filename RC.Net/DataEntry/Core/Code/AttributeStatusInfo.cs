@@ -1511,7 +1511,14 @@ namespace Extract.DataEntry
                 statusInfo._owningControl = owningControl;
                 statusInfo._isMapped = (owningControl !=null);
 
-                if (owningControl != null && displayOrder == null)
+                // https://extract.atlassian.net/browse/ISSUE-17052
+                // If this attribute was previously initizialized, statusInfo.DisplayOrder may have more
+                // detailed order info than available from displayOrder (that takes into account table column
+                // indices applied when loaded into the table). In the case an undo operation is being processed
+                // the table will use cached row data rather than re-apply column ordering info. Therefore if
+                // statusInfo.DisplayOrder is already available, don't try to apply displayOrder.
+                if (string.IsNullOrWhiteSpace(statusInfo.DisplayOrder) &&
+                    owningControl != null && displayOrder == null) 
                 {
                     displayOrder = DataEntryMethods.GetTabIndices((Control)owningControl);
                 }

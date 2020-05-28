@@ -190,6 +190,41 @@ namespace Extract.Database
         /// </summary>
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
         /// <param name="query">The query to execute.</param>
+        /// <returns>A <see cref="DataTable"/> representing the results of the query.</returns>
+        public static DataTable ExecuteDBQuery(DbConnection dbConnection, string query)
+        {
+            try
+            {
+                return ExecuteDBQuery(dbConnection, query, parameters: null, transaction: null);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34571");
+            }
+        }
+        
+        /// <summary>
+        /// Executes the supplied <see paramref="query"/> on the specified
+        /// <see paramref="dbConnection"/>.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+        /// <param name="query">The query to execute.</param>
+        /// <param name="parameters">Parameters to be used in the query. They key for each parameter
+        /// must begin with the appropriate symbol ("@" for T-SQL and SQL CE, ":" for Oracle) and
+        /// that key should appear in the <see paramref="query"/>.</param>
+        /// <returns>A <see cref="DataTable"/> representing the results of the query.</returns>
+        public static DataTable ExecuteDBQuery(DbConnection dbConnection, string query,
+            Dictionary<string, string> parameters)
+        {
+            return ExecuteDBQuery(dbConnection, query, parameters, transaction: null);
+        }
+
+        /// <summary>
+        /// Executes the supplied <see paramref="query"/> on the specified
+        /// <see paramref="dbConnection"/>.
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
+        /// <param name="query">The query to execute.</param>
         /// <param name="parameters">Parameters to be used in the query. They key for each parameter
         /// must begin with the appropriate symbol ("@" for T-SQL and SQL CE, ":" for Oracle) and
         /// that key should appear in the <see paramref="query"/>.</param>
@@ -197,7 +232,7 @@ namespace Extract.Database
         /// should run.</param>
         /// <returns>A <see cref="DataTable"/> representing the results of the query.</returns>
         public static DataTable ExecuteDBQuery(DbConnection dbConnection, string query,
-            Dictionary<string, string> parameters = null, DbTransaction transaction = null)
+            Dictionary<string, string> parameters, DbTransaction transaction)
         {
             try
             {
