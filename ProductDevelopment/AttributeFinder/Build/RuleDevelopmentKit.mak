@@ -109,6 +109,7 @@ CopyFilesToInstallFolder: CreateDestinationFolders
  	@COPY /V /Y  "$(BinariesFolder)\NERAnnotator.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V /Y  "$(BinariesFolder)\TestAppForSystemMethods.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
  	@COPY /V /Y  "$(BinariesFolder)\DiffLib.dll" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
+	@COPY /V /Y  "$(BinariesFolder)\DatabaseMigrationWizard.Test.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.nl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"
