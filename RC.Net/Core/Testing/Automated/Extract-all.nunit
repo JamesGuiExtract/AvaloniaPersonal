@@ -27,7 +27,7 @@
 	<assembly path="Extract.Dashboard.Utilities.Test.dll" />
 	<assembly path="Extract.Dashboard.Forms.Test.dll" />
   </Config>
-  <Config name="Release" binpathtype="Auto" runtimeFramework="any" appbase="C:\Engineering\binaries\release">
+  <Config name="Release" binpathtype="Auto" runtimeFramework="any">
     <assembly path="Extract.AttributeFinder.OutputHandlers.Test.dll" />
     <assembly path="Extract.AttributeFinder.Test.dll" />
     <assembly path="Extract.AttributeFinder.Rules.Json.Test.dll" />
