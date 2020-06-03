@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:core="clr-namespace:System;assembly=mscorlib"
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             Style="{StaticResource FooterUserControlStyle}"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 

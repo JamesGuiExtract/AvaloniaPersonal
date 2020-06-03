@@ -7,6 +7,7 @@
              xmlns:pages="clr-namespace:DatabaseMigrationWizard.Pages"
              xmlns:pages1="clr-namespace:DatabaseMigrationWizard.Pages.Utility"
              mc:Ignorable="d" 
+             Style="{StaticResource FooterUserControlStyle}"
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <Style x:Key="TextBoxInError" TargetType="{x:Type TextBox}">

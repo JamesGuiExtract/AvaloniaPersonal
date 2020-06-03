@@ -1,0 +1,63 @@
+﻿<ResourceDictionary xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <Style x:Key="FooterUserControlStyle" TargetType="UserControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type UserControl}">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Body -->
+                        <ContentPresenter Grid.Row="0"/>
+
+                        <!-- Footer -->
+                        <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Ellipse Grid.Column="0" Height="15" Stroke="Black" Width="15" HorizontalAlignment="Left">
+                                    <Ellipse.Style>
+                                        <Style>
+                                            <Setter Property="Ellipse.Fill" Value="Red"></Setter>
+
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding MainWindow.ConnectionInformation.ConnectionInfoValidated}" Value="True">
+                                                    <Setter Property="Ellipse.Fill" Value="Green" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
+                                <TextBlock Margin="20,0,0,0" Grid.Column="0" Text="Connection Status"></TextBlock>
+
+                                <TextBlock Grid.Column="1" Text="Server:"/>
+                                <TextBlock Margin="42,0,0,0" Grid.Column="1">
+                                    <TextBlock.Style>
+                                        <Style>
+                                            <Setter Property="TextBlock.Text" Value="{Binding MainWindow.ConnectionInformation.DatabaseServer}"/>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <TextBlock Grid.Column="2" Text="Database:"/>
+                                <TextBlock Margin="60,0,0,0" Grid.Column="2">
+                                    <TextBlock.Style>
+                                        <Style>
+                                            <Setter Property="TextBlock.Text" Value="{Binding MainWindow.ConnectionInformation.DatabaseName}"/>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
