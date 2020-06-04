@@ -28,7 +28,7 @@ namespace Extract.SetOperations.Test
 
             // Find the path to SetOperations
             var assembly = Assembly.GetAssembly(typeof(TemporaryFile));
-            _SET_OPERATIONS_PATH = Path.Combine(Path.GetDirectoryName(assembly.CodeBase),
+            _SET_OPERATIONS_PATH = Path.Combine(new Uri(Path.GetDirectoryName(assembly.CodeBase)).LocalPath,
                 "SetOperations.exe");
         }
 
@@ -62,12 +62,7 @@ namespace Extract.SetOperations.Test
                 var info = new ProcessStartInfo(_SET_OPERATIONS_PATH,
                     string.Concat("\"", fileA.FileName, "\" Union \"",
                     fileB.FileName, "\" \"", fileResult.FileName, "\""));
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var setResult = new HashSet<string>(File.ReadAllLines(fileResult.FileName),
                     StringComparer.OrdinalIgnoreCase);
@@ -104,12 +99,7 @@ namespace Extract.SetOperations.Test
                 var info = new ProcessStartInfo(_SET_OPERATIONS_PATH,
                     string.Concat("\"", fileA.FileName, "\" Union \"",
                     fileB.FileName, "\" \"", fileResult.FileName, "\" /c"));
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var setResult = new HashSet<string>(File.ReadAllLines(fileResult.FileName),
                     StringComparer.Ordinal);
@@ -146,12 +136,7 @@ namespace Extract.SetOperations.Test
                 var info = new ProcessStartInfo(_SET_OPERATIONS_PATH,
                     string.Concat("\"", fileA.FileName, "\" Intersect \"",
                     fileB.FileName, "\" \"", fileResult.FileName, "\""));
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var setResult = new HashSet<string>(File.ReadAllLines(fileResult.FileName),
                     StringComparer.OrdinalIgnoreCase);
@@ -188,12 +173,7 @@ namespace Extract.SetOperations.Test
                 var info = new ProcessStartInfo(_SET_OPERATIONS_PATH,
                     string.Concat("\"", fileA.FileName, "\" Intersect \"",
                     fileB.FileName, "\" \"", fileResult.FileName, "\" /c"));
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var setResult = new HashSet<string>(File.ReadAllLines(fileResult.FileName),
                     StringComparer.Ordinal);
@@ -230,12 +210,7 @@ namespace Extract.SetOperations.Test
                 var info = new ProcessStartInfo(_SET_OPERATIONS_PATH,
                     string.Concat("\"", fileA.FileName, "\" Complement \"",
                     fileB.FileName, "\" \"", fileResult.FileName, "\""));
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var setResult = new HashSet<string>(File.ReadAllLines(fileResult.FileName),
                     StringComparer.OrdinalIgnoreCase);
@@ -272,12 +247,7 @@ namespace Extract.SetOperations.Test
                 var info = new ProcessStartInfo(_SET_OPERATIONS_PATH,
                     string.Concat("\"", fileA.FileName, "\" Complement \"",
                     fileB.FileName, "\" \"", fileResult.FileName, "\" /c"));
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var setResult = new HashSet<string>(File.ReadAllLines(fileResult.FileName),
                     StringComparer.Ordinal);
@@ -309,12 +279,7 @@ namespace Extract.SetOperations.Test
                     string.Concat("\"", fileA.FileName, "\" Union \"",
                     fileB.FileName, "\" \"", fileResult.FileName, "\" /ef \"",
                     fileException.FileName, "\""));
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var fileInfo = new FileInfo(fileException.FileName);
                 string eliCode = "ELI31797";
@@ -346,12 +311,7 @@ namespace Extract.SetOperations.Test
                     string.Concat("\"", fileA.FileName, "\" Union \"",
                     fileB.FileName, "\" \"", fileResult.FileName, "\" /c /ef \"",
                     fileException.FileName, "\""));
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var fileInfo = new FileInfo(fileException.FileName);
                 string eliCode = "ELI31798";
@@ -383,12 +343,7 @@ namespace Extract.SetOperations.Test
                     string.Concat("\"", fileA.FileName, "\" Union \"",
                     fileB.FileName, "\" \"", fileResult.FileName, "\" /i /ef \"",
                     fileException.FileName, "\""));
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var fileInfo = new FileInfo(fileException.FileName);
                 Assert.That(fileInfo.Length == 0);
@@ -414,16 +369,12 @@ namespace Extract.SetOperations.Test
                 File.WriteAllLines(fileA.FileName, listA);
                 File.WriteAllLines(fileB.FileName, listB);
 
+
                 var info = new ProcessStartInfo(_SET_OPERATIONS_PATH,
                     string.Concat("\"", fileA.FileName, "\" Union \"",
                     fileB.FileName, "\" \"", fileResult.FileName, "\" /c /i /ef \"",
                     fileException.FileName, "\""));
-                using (var process = new Process())
-                {
-                    process.StartInfo = info;
-                    process.Start();
-                    process.WaitForExit();
-                }
+                RunProcess(info);
 
                 var fileInfo = new FileInfo(fileException.FileName);
                 Assert.That(fileInfo.Length == 0);
@@ -454,6 +405,19 @@ namespace Extract.SetOperations.Test
 
             return set;
         }
+
+        static void RunProcess(ProcessStartInfo info)
+        {
+            info.UseShellExecute = false;
+            info.CreateNoWindow = true;
+            using (var process = new Process())
+            {
+                process.StartInfo = info;
+                process.Start();
+                process.WaitForExit();
+            }
+        }
+
 
         #endregion Helper Methods
     }
