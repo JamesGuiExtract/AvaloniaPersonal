@@ -133,7 +133,7 @@
       "IDBox": {
         "AttributeRules": [
           {
-            "IsEnabled": true,
+            "Enabled": true,
             "Description": "Select page region",
             "IgnorePreprocessorErrors": false,
             "RuleSpecificDocPreprocessor": {
