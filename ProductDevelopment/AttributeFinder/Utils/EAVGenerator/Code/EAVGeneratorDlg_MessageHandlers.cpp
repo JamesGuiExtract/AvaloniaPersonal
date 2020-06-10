@@ -75,36 +75,69 @@ BOOL CEAVGeneratorDlg::OnInitDialog()
             // Create tooltip control
             m_ToolTipCtrl.Create(this, TTS_ALWAYSTIP);
 
-            // get command line if any
-            string	strCmdLine;
-            strCmdLine = AfxGetApp()->m_lpCmdLine;
-            if (!strCmdLine.empty())
+            // First arg is the exe name
+            // Second, optional, arg is fileName
+            // If fileName is specified then /select <rowIdx> is allowed
+            if (!(__argc == 1 || __argc == 2 || __argc == 4))
             {
-                // remove leading and trailing quotes
-                strCmdLine = ::trim(strCmdLine, "\"", "\"");
+                showUsage();
+				EndDialog(IDCANCEL);
+				return TRUE;
+            }
+
+            long selectRowIdx = -1;
+            if (__argc > 1)
+            {
+                string positionalArg = __argv[1];
+                
+                if (positionalArg == "/?" || positionalArg == "/h" || positionalArg == "-h")
+                {
+					showUsage();
+					EndDialog(IDCANCEL);
+					return TRUE;
+                }
+
+                string fileName = positionalArg;
 
                 // make sure it is the file name and the file exists
-                validateFileOrFolderExistence( strCmdLine );
+                validateFileOrFolderExistence(fileName);
 
                 // Check file type
-                string strExt = getExtensionFromFullPath( strCmdLine, true );
+                string strExt = getExtensionFromFullPath(fileName, true);
                 if (strExt == ".eav")
                 {
                     // open the eav file
-                    openEAVFile(strCmdLine.c_str());
+                    openEAVFile(fileName.c_str());
                 }
                 else if (strExt == ".voa" || strExt == ".evoa")
                 {
                     // Open the voa file
-                    openVOAFile( strCmdLine.c_str() );
+                    openVOAFile(fileName.c_str());
                 }
                 else
                 {
                     // Throw exception
                     UCLIDException ue( "ELI07885", "Unable to open file.");
-                    ue.addDebugInfo( "File To Open", strCmdLine );
+                    ue.addDebugInfo( "File To Open", fileName);
                     throw ue;
                 }
+
+				if (__argc == 4)
+				{
+					string command = __argv[2];
+					string commandValue = __argv[3];
+					makeLowerCase(command);
+					if (command == "/select" || command == "-select" || command == "--select")
+					{
+						selectRowIdx = asLong(commandValue);
+					}
+					else
+					{
+						showUsage();
+						EndDialog(IDCANCEL);
+						return TRUE;
+					}
+				}
             }
 
             // Save original window width/height
@@ -120,6 +153,16 @@ BOOL CEAVGeneratorDlg::OnInitDialog()
 
             // Restore previous position if available
             m_wMgr.RestoreWindowPosition();
+
+			if (selectRowIdx >= 0 && selectRowIdx < m_listAttributes.GetItemCount())
+			{
+				CRect rect;
+				m_listAttributes.GetItemRect(0, rect, LVIR_BOUNDS);
+				long scrollPos = selectRowIdx * rect.Height();
+				m_listAttributes.Scroll(CSize(0, scrollPos));
+				selectListItem(selectRowIdx);
+				highlightAttributeInRow(false);
+			}
         }
         CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI06220");
     }
@@ -1188,3 +1231,10 @@ void CEAVGeneratorDlg::OnSize(UINT nType, int cx, int cy)
     CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI37589");
 }
 //-------------------------------------------------------------------------------------------------
+void CEAVGeneratorDlg::showUsage()
+{
+    string strUsage =
+        "USAGE:\r\n"
+        "VOAFileViewer [<fileName> [/select <rowIndex>]]";
+	AfxMessageBox(strUsage.c_str());
+}

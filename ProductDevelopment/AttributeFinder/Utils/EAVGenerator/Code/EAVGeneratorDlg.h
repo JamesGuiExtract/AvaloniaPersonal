@@ -361,6 +361,8 @@ private:
 	// PURPOSE: To add attribute instanceGUID's to the set of GUID's and log an exception if
 	// a GUID is duplicated
 	void addGUIDToSet(IIdentifiableObjectPtr ipIdentityObject);
+
+	void showUsage();
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
