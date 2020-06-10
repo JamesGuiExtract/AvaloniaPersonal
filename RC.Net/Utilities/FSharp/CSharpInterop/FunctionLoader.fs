@@ -13,10 +13,12 @@ module Evaluator =
     // Assumes the functions are in a module with the same name as the file name, minus extension
     let evaluate path functionNames includeDirectories =
         let fullPath = Path.GetFullPath path
+        let scriptDir = Path.GetDirectoryName fullPath
         Extract.ExtractException.Assert("ELI46985", "Path is not a full path", (path = fullPath), "Path", path);
 
         let includeDirectories =
           seq {
+            yield scriptDir
             yield Extract.Utilities.FileSystemMethods.CommonComponentsPath
             yield! includeDirectories
           }
