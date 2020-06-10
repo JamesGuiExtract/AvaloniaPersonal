@@ -1785,6 +1785,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW);
 		vecQueries.push_back(gstrCREATE_PROCESSING_DATA_VIEW);
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW_LEGACY_166);
+		vecQueries.push_back(gstrCREATE_GET_CLUSTER_NAME_PROCEDURE);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -6724,12 +6725,12 @@ bool CFileProcessingDB::isFileInPagination(_ConnectionPtr ipConnection, long nFi
 	return bResult;
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema171(_ConnectionPtr ipConnection)
+void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(_ConnectionPtr ipConnection)
 {
 	try
 	{
-		// To prevent against this being called outside of a schema udpate that includes version 171.
-		ASSERT_RUNTIME_CONDITION("ELI46481", m_iDBSchemaVersion > 0 && m_iDBSchemaVersion < 171,
+		// To prevent against this being called outside of a schema udpate that includes version 183.
+		ASSERT_RUNTIME_CONDITION("ELI46481", m_iDBSchemaVersion > 0 && m_iDBSchemaVersion < 183,
 			"Invalid counter operation");
 
 		TransactionGuard tg(ipConnection, adXactChaos, __nullptr);

@@ -82,7 +82,7 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 	SYSTEMTIME stCreationDate, stRestoreDate;
 	string strDatabaseName = ipConnection->DefaultDatabase;
 	
-	getDatabaseInfo(ipConnection, strDatabaseName, strServer, stCreationDate, stRestoreDate);
+	bool clustered = getDatabaseInfo(ipConnection, strDatabaseName, strServer, stCreationDate, stRestoreDate);
 
 	makeLowerCase(strDatabaseName);
 	makeLowerCase(strServer);
@@ -93,8 +93,8 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 	makeLowerCase(tmp.m_strName);
 
 	if (tmp.m_strServer == strServer && tmp.m_strName == strDatabaseName
-		&& asULongLong(m_stCreated) == asULongLong(stCreationDate)
-		&& asULongLong(m_stRestored) == asULongLong(stRestoreDate))
+		&& (clustered || (asULongLong(m_stCreated) == asULongLong(stCreationDate)
+		&& asULongLong(m_stRestored) == asULongLong(stRestoreDate))))
 	{
 		return true;
 	}

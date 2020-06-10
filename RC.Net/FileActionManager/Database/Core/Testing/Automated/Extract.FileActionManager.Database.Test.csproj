@@ -234,7 +234,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\DBWithCounters.bak" />
-    <EmbeddedResource Include="Resources\DBWithCountersVer171.bak" />
+    <EmbeddedResource Include="Resources\DBWithCountersVer183.bak" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

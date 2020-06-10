@@ -38,7 +38,7 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 182;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 183;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2756,6 +2756,33 @@ int UpdateToSchemaVersion182(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49823");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion183(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 183;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_GET_CLUSTER_NAME_PROCEDURE);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49859");
+} 
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -7889,7 +7916,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 179:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion180);
 				case 180:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion181);
 				case 181:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion182);
-				case 182:
+				case 182:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion183);
+				case 183:
 					break;
 
 				default:
@@ -8013,11 +8041,11 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 
 			tg.CommitTrans();
 
-			if (nOriginalSchemaVersion < 171)
+			if (nOriginalSchemaVersion < 183)
 			{
 				// Changes to how the database ID and counters are persisted mean they will be
 				// corrupted at this point; restore them.
-				updateDatabaseIDAndSecureCounterTablesSchema171(ipConnection);
+				updateDatabaseIDAndSecureCounterTablesSchema183(ipConnection);
 			}
 
 			UCLIDException ue("ELI32551", "Application Trace: Database schema updated.");

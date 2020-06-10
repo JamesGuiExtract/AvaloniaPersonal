@@ -1278,8 +1278,8 @@ private:
 	// Checks if the file was created in a currently active FAMSession thru pagination.
 	bool isFileInPagination(_ConnectionPtr ipConnection, long nFileID);
 
-	// Method to update DatabaseID and Secure Counter tables after schema updated to 171
-	void updateDatabaseIDAndSecureCounterTablesSchema171(_ConnectionPtr ipConnection);
+	// Method to update DatabaseID and Secure Counter tables after schema updated to 183
+	void updateDatabaseIDAndSecureCounterTablesSchema183(_ConnectionPtr ipConnection);
 
 	// Gets the specified workflow definition
 	UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr getWorkflowDefinition(_ConnectionPtr ipConnection, long nID);

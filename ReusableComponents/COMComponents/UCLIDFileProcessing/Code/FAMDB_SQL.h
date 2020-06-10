@@ -2617,3 +2617,28 @@ static const string gstrALTER_DATABASE_MIGRATION_WIZARD_REPORTING =
 	" ALTER TABLE dbo.ReportingDatabaseMigrationWizard ADD Old_Value NVARCHAR(64);"
 	" ALTER TABLE dbo.ReportingDatabaseMigrationWizard ADD New_Value NVARCHAR(64);"
 	" ALTER TABLE dbo.ReportingDatabaseMigrationWizard ADD Command NVARCHAR(64); ";
+
+
+static const string gstrCREATE_GET_CLUSTER_NAME_PROCEDURE =
+"IF(													\r\n"
+"	NOT EXISTS(											\r\n"
+"		SELECT 1										\r\n"
+"		FROM Information_schema.Routines				\r\n"
+"		WHERE Specific_schema = 'dbo'					\r\n"
+"		AND specific_name = 'sp_GetClusterName'			\r\n"
+"		AND Routine_Type = 'Procedure'					\r\n"
+"	)													\r\n"
+")														\r\n"
+"BEGIN													\r\n"
+"   													\r\n"
+"	EXEC ('												\r\n"
+"	CREATE PROCEDURE[dbo].[sp_GetClusterName]  			\r\n"
+"														\r\n"
+"	AS													\r\n"
+"	BEGIN												\r\n"
+"		SET NOCOUNT ON;									\r\n"
+"														\r\n"
+"		SELECT cluster_name								\r\n"
+"		FROM sys.dm_hadr_cluster;						\r\n"
+"	END;')												\r\n"
+"END;";

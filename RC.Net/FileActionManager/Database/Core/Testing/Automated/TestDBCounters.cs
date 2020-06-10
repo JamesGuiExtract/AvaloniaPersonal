@@ -17,7 +17,7 @@ namespace Extract.FileActionManager.Database.Test
         #region Constants
 
         static readonly string _DB_WITH_COUNTERS = "Resources.DBWithCounters.bak";
-        static readonly string _DB_WITH_COUNTERS_V171 = "Resources.DBWithCountersVer171.bak";
+        static readonly string _DB_WITH_COUNTERS_V183 = "Resources.DBWithCountersVer183.bak";
 
 
         #endregion
@@ -79,7 +79,7 @@ namespace Extract.FileActionManager.Database.Test
             string testDBName = "Test_RestoreDatabaseCorrupt";
             try
             {
-                var fileProcessingDb = _testDbManager.GetDatabase(_DB_WITH_COUNTERS_V171, testDBName);
+                var fileProcessingDb = _testDbManager.GetDatabase(_DB_WITH_COUNTERS_V183, testDBName);
 
                 IIUnknownVector secureCounters = fileProcessingDb.GetSecureCounters(true);
                 var secureCounterList = secureCounters.ToIEnumerable<ISecureCounter>().ToList();

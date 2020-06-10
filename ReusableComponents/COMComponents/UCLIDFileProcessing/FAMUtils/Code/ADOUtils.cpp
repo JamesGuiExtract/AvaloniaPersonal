@@ -27,6 +27,25 @@ static const string gstrGET_SQL_SERVER_TIME = "SELECT GETDATE() as CurrDateTime"
 static const string gstrGET_SQL_SERVER_DATETIMEOFFSET = "SELECT SYSDATETIMEOFFSET() as CurrDateTimeOffset";
 
 //-------------------------------------------------------------------------------------------------
+string getClusterName(const  _ConnectionPtr& ipDBConnection)
+{
+	try
+	{
+		string strClusterNameQuery = "EXEC ('sp_GetClusterName')";
+		_RecordsetPtr clusterResult = ipDBConnection->Execute(strClusterNameQuery.c_str(), NULL, adCmdText);
+		if (!clusterResult->adoEOF)
+		{
+			FieldsPtr ipFields = clusterResult->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI49860", ipFields != __nullptr);
+
+			return getStringField(clusterResult->Fields, "cluster_name");
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI49861");
+	return "";
+}
+
+//-------------------------------------------------------------------------------------------------
 long getLongField( const FieldsPtr& ipFields, const string& strFieldName )
 {
 	// Use double try catch so that the field name can be added to the debug info
@@ -1212,11 +1231,13 @@ FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& i
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20156");
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
+FAMUTILS_API bool getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
 	string &strServerName, string &strCreateDate, string &strLastRestoreDate)
 {
 	try
 	{
+		string clusterName = getClusterName(ipDBConnection);
+
 		string strQuery = "select db.name, @@ServerName as ServerName, convert(nvarchar(30), db.create_date,121) as create_date, "
 			" convert(nvarchar(30), coalesce( max(rh.restore_date), db.create_date), 121) as restore_date "
 			"from master.sys.databases db "
@@ -1233,7 +1254,7 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 
 			strCreateDate = getStringField(ipFields, "create_date");
 			strLastRestoreDate = getStringField(ipFields, "restore_date");
-			strServerName = getStringField(ipFields, "ServerName");
+			strServerName = (clusterName.empty()) ? getStringField(ipFields, "ServerName"): clusterName;
 		}
 		else
 		{
@@ -1244,12 +1265,15 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38757");
 }
+
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
+FAMUTILS_API bool getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
 	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate)
 {
 	try
 	{
+		string clusterName = getClusterName(ipDBConnection);
+
 		string strQuery = "select db.name, @@ServerName as ServerName, create_date, "
 			" coalesce( max(rh.restore_date), db.create_date) as restore_date "
 			"from master.sys.databases db "
@@ -1267,7 +1291,7 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 
 			ctCreateDate = getTimeDateField(ipFields, "create_date");
 			ctLastRestoreDate = getTimeDateField(ipFields, "restore_date");
-			strServerName = getStringField(ipFields, "ServerName");
+			strServerName = (clusterName.empty()) ? getStringField(ipFields, "ServerName") : clusterName;
 		}
 		else
 		{
