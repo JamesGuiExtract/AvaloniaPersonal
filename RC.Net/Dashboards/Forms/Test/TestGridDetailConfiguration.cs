@@ -19,13 +19,13 @@ namespace Extract.Dashboard.Forms.Test
 
         #region Overhead
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void FinalCleanup()
         {
         }

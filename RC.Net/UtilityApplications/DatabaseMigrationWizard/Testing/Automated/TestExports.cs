@@ -79,7 +79,7 @@ namespace DatabaseMigrationWizard.Test
         /// <summary>
         /// Setup method to initialize the testing environment.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
@@ -96,7 +96,7 @@ namespace DatabaseMigrationWizard.Test
         /// TearDown method to destory testing environment.
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", Justification = "Nunit made me")]
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void TearDown()
         {
             FamTestDbManager.RemoveDatabase(DatabaseName);

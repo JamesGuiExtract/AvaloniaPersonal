@@ -27,7 +27,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Initializes the test fixture for testing these methods
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Initialize()
         {
             GeneralMethods.TestSetup();
@@ -36,7 +36,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Performs post test execution cleanup.
         /// </summary>
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void Cleanup()
         {
         }

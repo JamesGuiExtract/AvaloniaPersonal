@@ -78,7 +78,7 @@ namespace Extract.Imaging.Forms.Test
         /// <summary>
         /// Performs initialization needed for the entire test run.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Initialize()
         {
             GeneralMethods.TestSetup();
@@ -87,7 +87,7 @@ namespace Extract.Imaging.Forms.Test
         /// <summary>
         /// Cleanup after all tests have run.
         /// </summary>
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void FinalCleanup()
         {
             if (_imageViewerForm != null)

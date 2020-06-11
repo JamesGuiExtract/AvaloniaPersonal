@@ -82,7 +82,7 @@ namespace Extract.ETL.Test
         /// <summary>
         /// Initializes the test fixture.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();
@@ -94,7 +94,7 @@ namespace Extract.ETL.Test
         /// <summary>
         /// Cleanup after all tests have run.
         /// </summary>
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void FinalCleanup()
         {
             if (_testDbManager != null)

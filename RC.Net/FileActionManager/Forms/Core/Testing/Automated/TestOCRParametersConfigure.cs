@@ -33,7 +33,7 @@ namespace Extract.FileActionManager.Forms.Test
         /// <summary>
         /// Performs initialization needed for the entire test run.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Initialize()
         {
             GeneralMethods.TestSetup();

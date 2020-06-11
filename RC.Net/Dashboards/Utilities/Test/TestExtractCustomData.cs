@@ -37,14 +37,14 @@ namespace Extract.Dashboard.Utilities.Test
 
         #region Overhead
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();
             testFileManager = new TestFileManager<TestExtractCustomData>();
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void FinalCleanup()
         {
             testFileManager?.Dispose();

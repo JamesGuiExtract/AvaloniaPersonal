@@ -246,12 +246,14 @@ namespace Extract.Test
         /// which has "Test Assert!" as part of its message.
         /// </summary>
         [Test]
-        [ExpectedException(typeof(ExtractException), ExpectedMessage = "Test Assert!",
-            MatchType = MessageMatch.Contains)]
         public static void ExtractAssert()
         {
-           ExtractException.Assert("ELI00000", "Test Assert!", false, 
-               "FakeDebugDataName", "FakeDebugDataValue");
+            var ex = Assert.Throws<ExtractException>(() =>
+            {
+                ExtractException.Assert("ELI00000", "Test Assert!", false,
+                "FakeDebugDataName", "FakeDebugDataValue");
+            });
+            StringAssert.Contains("Test Assert!", ex.Message);
         }
 
         /// <summary>
@@ -260,12 +262,14 @@ namespace Extract.Test
         /// which has "Test Assert!" as part of its message.
         /// </summary>
         [Test]
-        [ExpectedException(typeof(ExtractException), ExpectedMessage = "Test Assert!",
-            MatchType = MessageMatch.Contains)]
         public static void ExtractAssertOnePair()
         {
-           ExtractException.Assert("ELI00000", "Test Assert!", false, 
-               "FakeDebugDataName", "FakeDebugDataValue");
+            var ex = Assert.Throws<ExtractException>(() =>
+            {
+                ExtractException.Assert("ELI00000", "Test Assert!", false,
+                "FakeDebugDataName", "FakeDebugDataValue");
+            });
+            StringAssert.Contains("Test Assert!", ex.Message);
         }
 
         /// <summary>
@@ -274,13 +278,15 @@ namespace Extract.Test
         /// which has "Test Assert!" as part of its message.
         /// </summary>
         [Test]
-        [ExpectedException(typeof(ExtractException), ExpectedMessage = "Test Assert!",
-            MatchType = MessageMatch.Contains)]
         public static void ExtractAssertTwoPairs()
         {
-            ExtractException.Assert("ELI00000", "Test Assert!", false, 
-                "FakeDebugDataName1", "FakeDebugDataValue1", 
-                "FakeDebugDataName2", "FakeDebugDataValue2");
+            var ex = Assert.Throws<ExtractException>(() =>
+            {
+                ExtractException.Assert("ELI00000", "Test Assert!", false,
+                                        "FakeDebugDataName1", "FakeDebugDataValue1",
+                                        "FakeDebugDataName2", "FakeDebugDataValue2");
+            });
+            StringAssert.Contains("Test Assert!", ex.Message);
         }
 
         /// <summary>
@@ -289,14 +295,16 @@ namespace Extract.Test
         /// which has "Test Assert!" as part of its message.
         /// </summary>
         [Test]
-        [ExpectedException(typeof(ExtractException), ExpectedMessage = "Test Assert!",
-            MatchType = MessageMatch.Contains)]
         public static void ExtractAssertThreePairs()
         {
-            ExtractException.Assert("ELI00000", "Test Assert!", false, 
-                "FakeDebugDataName1", "FakeDebugDataValue1", 
-                "FakeDebugDataName2", "FakeDebugDataValue2", "FakeDebugDataName3", 
+            var ex = Assert.Throws<ExtractException>(() =>
+            {
+                ExtractException.Assert("ELI00000", "Test Assert!", false,
+                "FakeDebugDataName1", "FakeDebugDataValue1",
+                "FakeDebugDataName2", "FakeDebugDataValue2", "FakeDebugDataName3",
                 "FakeDebugDataValue3");
+            });
+            StringAssert.Contains("Test Assert!", ex.Message);
         }
 
         /// <summary>
@@ -305,14 +313,16 @@ namespace Extract.Test
         /// which has "Test Assert!" as part of its message.
         /// </summary>
         [Test]
-        [ExpectedException(typeof(ExtractException), ExpectedMessage = "Test Assert!",
-            MatchType = MessageMatch.Contains)]
         public static void ExtractAssertFourPairs()
         {
-            ExtractException.Assert("ELI00000", "Test Assert!", false, 
-                "FakeDebugDataName1", "FakeDebugDataValue1", 
-                "FakeDebugDataName2", "FakeDebugDataValue2", "FakeDebugDataName3", 
+            var ex = Assert.Throws<ExtractException>(() =>
+            {
+                ExtractException.Assert("ELI00000", "Test Assert!", false,
+                "FakeDebugDataName1", "FakeDebugDataValue1",
+                "FakeDebugDataName2", "FakeDebugDataValue2", "FakeDebugDataName3",
                 "FakeDebugDataValue3", "FakeDebugDataName4", "FakeDebugDataValue4");
+            });
+            StringAssert.Contains("Test Assert!", ex.Message);
         }
 
         /// <summary>

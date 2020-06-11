@@ -427,7 +427,7 @@ namespace Extract.AttributeFinder.Test
         /// <summary>
         /// Initializes the test fixture
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();

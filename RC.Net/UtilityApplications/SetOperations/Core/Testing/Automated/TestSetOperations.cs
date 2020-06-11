@@ -21,7 +21,7 @@ namespace Extract.SetOperations.Test
         /// <summary>
         /// Setup code that must be run before any tests can execute.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();

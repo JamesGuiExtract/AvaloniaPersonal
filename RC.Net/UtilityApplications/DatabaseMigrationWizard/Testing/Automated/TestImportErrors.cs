@@ -25,7 +25,7 @@ namespace DatabaseMigrationWizard.Test
         /// 3. Rerun the import with those renames
         /// 4. Ensure those records got renamed.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());

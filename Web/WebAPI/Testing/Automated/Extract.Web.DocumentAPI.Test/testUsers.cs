@@ -26,7 +26,7 @@ namespace Extract.Web.WebAPI.Test
 
         #region Setup and Teardown
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();
@@ -34,7 +34,7 @@ namespace Extract.Web.WebAPI.Test
             _testDbManager = new FAMTestDBManager<TestUsers>();
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void FinalCleanup()
         {
             if (_testDbManager != null)

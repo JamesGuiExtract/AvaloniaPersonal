@@ -18,7 +18,7 @@ namespace Extract.Encryption
         /// <summary>
         /// Setup method to initalize the testing environment.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();

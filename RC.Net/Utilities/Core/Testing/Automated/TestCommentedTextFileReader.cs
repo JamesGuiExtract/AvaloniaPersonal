@@ -52,7 +52,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Performs initialization needed for the entire test run.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Initialize()
         {
             GeneralMethods.TestSetup();
@@ -62,7 +62,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Performs tear down needed after entire test run.
         /// </summary>
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void Teardown()
         {
             if (_asciiFile != null)

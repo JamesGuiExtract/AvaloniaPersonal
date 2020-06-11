@@ -57,7 +57,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         /// <summary>
         /// Setup method to initialize the testing environment.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
 
         public static void Setup()
         {
@@ -69,7 +69,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         /// <summary>
         /// Cleanup after all tests have run.
         /// </summary>
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void FinalCleanup()
         {
             // Dispose of the test image manager

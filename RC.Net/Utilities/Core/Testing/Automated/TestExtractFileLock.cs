@@ -20,7 +20,7 @@ namespace Extract.Utilities.Test
         /// <summary>
         /// Setup method to initialize the testing environment.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();

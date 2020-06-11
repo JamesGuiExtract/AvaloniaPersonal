@@ -123,7 +123,7 @@ namespace Extract.Web.WebAPI.Test
 
         #endregion Fields
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();
@@ -132,7 +132,7 @@ namespace Extract.Web.WebAPI.Test
             _testFiles = new TestFileManager<TestDocument>();
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void FinalCleanup()
         {
             if (_testDbManager != null)
@@ -302,7 +302,7 @@ namespace Extract.Web.WebAPI.Test
                     result = controller.PostDocument(formFile);
                     var submitResult = result.AssertGoodResult<DocumentIdResult>();
 
-                    Assert.IsNullOrEmpty(fileProcessingDb.GetMetadataFieldValue(submitResult.Id, "OriginalFileName"));
+                    Assert.IsTrue(string.IsNullOrEmpty(fileProcessingDb.GetMetadataFieldValue(submitResult.Id, "OriginalFileName")));
                 }
             }
             finally
@@ -331,7 +331,7 @@ namespace Extract.Web.WebAPI.Test
                 var submitResult = result.AssertGoodResult<DocumentIdResult>();
 
                 var sourceFilename = fileProcessingDb.GetFileNameFromFileID(submitResult.Id);
-                Assert.IsNotNullOrEmpty(sourceFilename, "Failed to post text");
+                Assert.IsTrue(!string.IsNullOrEmpty(sourceFilename), "Failed to post text");
             }
             finally
             {
@@ -358,7 +358,7 @@ namespace Extract.Web.WebAPI.Test
                 var submitResult = result.AssertGoodResult<DocumentIdResult>();
 
                 var sourceFilename = fileProcessingDb.GetFileNameFromFileID(submitResult.Id);
-                Assert.IsNotNullOrEmpty(sourceFilename, "Failed to post text");
+                Assert.IsTrue(!string.IsNullOrEmpty(sourceFilename), "Failed to post text");
 
                 result = controller.GetText(submitResult.Id);
                 var textResult = result.AssertGoodResult<PageTextResult>();

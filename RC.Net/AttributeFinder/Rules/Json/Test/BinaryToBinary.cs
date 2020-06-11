@@ -22,14 +22,14 @@ namespace Extract.AttributeFinder.Rules.Json.Test
 
         #region Setup and Teardown
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();
             _testFiles = new TestFileManager<BinaryToBinary>();
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void FinalCleanup()
         {
             if (_testFiles != null)

@@ -57,7 +57,7 @@ namespace Extract.AttributeFinder.OutputHandlers.Test
         /// <summary>
         /// Initializes the test fixture
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();

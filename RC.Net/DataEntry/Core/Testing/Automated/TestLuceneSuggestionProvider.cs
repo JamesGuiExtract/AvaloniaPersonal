@@ -32,7 +32,7 @@ namespace Extract.DataEntry.Test
         /// <summary>
         /// Setup method to initialize the testing environment.
         /// </summary>
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Setup()
         {
             GeneralMethods.TestSetup();
@@ -42,7 +42,7 @@ namespace Extract.DataEntry.Test
         /// <summary>
         /// Cleanup after all tests have run.
         /// </summary>
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void FinalCleanup()
         {
             if (_testFiles != null)
