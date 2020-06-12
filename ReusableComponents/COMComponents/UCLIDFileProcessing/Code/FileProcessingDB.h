@@ -966,8 +966,9 @@ private:
 	void storeEncryptedPasswordAndUserName(const string& strUser, const string& strEncryptedPW,
 		bool bFailIfUserDoesNotExist = false, bool bCreateTransactionGuard = true);
 
-	// Returns the result of encrypting the input string
-	string getEncryptedString(const string strInput);
+	// Returns the result of encrypting the input
+	template <typename T>
+	string getEncryptedString(const T input);
 
 	// Throws and exception if the DBSchemaVersion in the DB is different from the current DBSchemaVersion
 	void validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles = false);

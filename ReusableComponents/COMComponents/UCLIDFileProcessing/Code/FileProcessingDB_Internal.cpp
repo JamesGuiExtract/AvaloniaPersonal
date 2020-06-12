@@ -3177,13 +3177,14 @@ void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strUser,
 	}
 }
 //--------------------------------------------------------------------------------------------------
-string CFileProcessingDB::getEncryptedString(const string strInput)
+template <typename T>
+string CFileProcessingDB::getEncryptedString(const T input)
 {
 	// Put the input string into the byte manipulator
 	ByteStream bytes;
 	ByteStreamManipulator bytesManipulator(ByteStreamManipulator::kWrite, bytes);
 
-	bytesManipulator << strInput;
+	bytesManipulator << input;
 
 	// Convert information to a stream of bytes
 	// with length divisible by 8 (in variable called 'bytes')
@@ -3380,11 +3381,9 @@ string CFileProcessingDB::getOneTimePassword(_ConnectionPtr ipConnection)
 	
 	// Generate and encrypt a hash specific to this database and m_nFAMSessionID.
 	long hash = m_nFAMSessionID ^ m_DatabaseIDValues.m_nHashValue;
-	string strEncrypted = getEncryptedString(asString(hash));
+	string strEncrypted = getEncryptedString(hash);
 	
-	// Return last 16 chars of the of the 32 char encypted value, representing the second two bytes of
-	// the hash, as the password. (The first 16 chars will always be the same for a given DB).
-	return strEncrypted.substr(16);
+	return strEncrypted;
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isBlankDB()
