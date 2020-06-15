@@ -320,9 +320,9 @@ FAMUTILS_API void setIPersistObjToField(const FieldsPtr& ipFields, const string&
 //				strServerName
 //				strCreateDate
 //				strLastRestoreDate
-// Return: true if the Database is on a Cluster and false if it is not
-FAMUTILS_API bool getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
-	string &strServerName, string &strCreateDate, string &strLastRestoreDate);
+//              isCluster true if the Database is on a Cluster and false if it is not
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
+	string &strServerName, string &strCreateDate, string &strLastRestoreDate, bool &isCluster);
 
 // PROMISE: To return the Server name, creation date and last restore date of the database as strings
 // NOTE:	If the database has never been restored the last restore date will equal the creation date
@@ -330,9 +330,9 @@ FAMUTILS_API bool getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 //				strServerName
 //				ctCreateDate
 //				ctLastRestoreDate
-// Return: true if the Database is on a Cluster and false if it is not
-FAMUTILS_API bool getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
-	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate);
+//              isCluster true if the Database is on a Cluster and false if it is not
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
+	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate, bool &isCluster);
 
 // PROMISE: To return the bsDatabaseID ByteStream that contains the following:
 //				<DatabaseGUID>,<DatabaseServer>,<DatabaseName>,<DatabaseCreationDate>,<DatabaseRestoreDate><LastUpdateTime>

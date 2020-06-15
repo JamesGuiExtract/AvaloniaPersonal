@@ -82,7 +82,8 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 	SYSTEMTIME stCreationDate, stRestoreDate;
 	string strDatabaseName = ipConnection->DefaultDatabase;
 	
-	bool clustered = getDatabaseInfo(ipConnection, strDatabaseName, strServer, stCreationDate, stRestoreDate);
+	bool clustered;
+    getDatabaseInfo(ipConnection, strDatabaseName, strServer, stCreationDate, stRestoreDate, clustered);
 
 	makeLowerCase(strDatabaseName);
 	makeLowerCase(strServer);

@@ -10602,9 +10602,10 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 
 				if (!bValid)
 				{
+                    bool clustered;
 					// Modify the DBIdValue to have corrected values (m_GUID and m_stLastUpdated will be the same)
 					getDatabaseInfo(ipConnection, m_strDatabaseName, DBIDValue.m_strServer,
-						DBIDValue.m_stCreated, DBIDValue.m_stRestored);
+						DBIDValue.m_stCreated, DBIDValue.m_stRestored, clustered);
 					DBIDValue.m_strName = m_strDatabaseName;
 				}
 

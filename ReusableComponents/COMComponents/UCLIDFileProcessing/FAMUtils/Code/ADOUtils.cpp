@@ -1231,12 +1231,13 @@ FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& i
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20156");
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API bool getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
-	string &strServerName, string &strCreateDate, string &strLastRestoreDate)
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
+	string &strServerName, string &strCreateDate, string &strLastRestoreDate, bool &isCluster)
 {
 	try
 	{
 		string clusterName = getClusterName(ipDBConnection);
+        isCluster = !clusterName.empty();
 
 		string strQuery = "select db.name, @@ServerName as ServerName, convert(nvarchar(30), db.create_date,121) as create_date, "
 			" convert(nvarchar(30), coalesce( max(rh.restore_date), db.create_date), 121) as restore_date "
@@ -1267,12 +1268,13 @@ FAMUTILS_API bool getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 }
 
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API bool getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
-	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate)
+FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const string &strDBName,
+	string &strServerName, SYSTEMTIME &ctCreateDate, SYSTEMTIME &ctLastRestoreDate, bool &isCluster)
 {
 	try
 	{
 		string clusterName = getClusterName(ipDBConnection);
+        isCluster = !clusterName.empty();
 
 		string strQuery = "select db.name, @@ServerName as ServerName, create_date, "
 			" coalesce( max(rh.restore_date), db.create_date) as restore_date "
@@ -1318,7 +1320,8 @@ FAMUTILS_API void createDatabaseID(const _ConnectionPtr& ipConnection, ByteStrea
 
 		ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, bsDatabaseID);
 
-		getDatabaseInfo(ipConnection, strDBName, strServer, stDBCreatedDate, stDBRestoreDate);
+		bool clustered;
+		getDatabaseInfo(ipConnection, strDBName, strServer, stDBCreatedDate, stDBRestoreDate, clustered);
 		
 		GUID guidDatabaseID;
 		CoCreateGuid(&guidDatabaseID);
