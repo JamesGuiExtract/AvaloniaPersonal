@@ -41,7 +41,6 @@ namespace DatabaseMigrationWizard.Test
             var database = FamTestDbManager.GetNewDatabase("EnsureRollback");
             ImportOptions ImportOptions = new ImportOptions()
             {
-                ClearDatabase = false,
                 ImportPath = Path.GetTempPath() + $"EnsureRollback\\",
                 ConnectionInformation = new Database.ConnectionInformation() { DatabaseName = "EnsureRollback", DatabaseServer = "(local)" }
             };

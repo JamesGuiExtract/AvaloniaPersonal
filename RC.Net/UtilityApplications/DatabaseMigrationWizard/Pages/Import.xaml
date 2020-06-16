@@ -60,7 +60,9 @@
                         </Button.IsEnabled>
                     </Button>
                 </Grid>
-                <CheckBox IsChecked="{Binding ImportOptions.ClearDatabase}" Content="Clear the database?" Margin="0,0,0,8" IsEnabled="{Binding MainWindow.UIEnabled}"/>
+                <CheckBox Content="Import Core Tables" IsChecked="{Binding ImportOptions.ImportCoreTables}" IsEnabled="{Binding MainWindow.UIEnabled}"></CheckBox>
+                <CheckBox Margin="0,0,0,8" Content="Import LabDE Tables" IsChecked="{Binding ImportOptions.ImportLabDETables}" IsEnabled="{Binding MainWindow.UIEnabled}"></CheckBox>
+                <Button x:Name="ClearDatabase" Content="ClearDatabase" Margin="0,0,0,8" Click="ClearDatabase_Click" IsEnabled="{Binding MainWindow.UIEnabled}"></Button>
                 <Button x:Name="ImportButton" Content="Import" Margin="0,0,0,8" Click="Import_Click" >
                     <Button.IsEnabled>
                         <MultiBinding Converter="{StaticResource booleanAndConverter}">
@@ -71,14 +73,14 @@
                 </Button>
             </StackPanel>
         </ScrollViewer>
-        <ScrollViewer Margin="0,150,0,0">
+        <ScrollViewer Margin="0,170,0,0">
             <StackPanel>
                 <TextBlock Text="Processing" Style="{StaticResource Heading2}" Margin="0,0,0,8" HorizontalAlignment="Left"/>
                 <ListBox ItemsSource="{Binding Processing}" Margin="0,0,0,32" HorizontalAlignment="Left" DisplayMemberPath=".">
                 </ListBox>
             </StackPanel>
         </ScrollViewer>
-        <ScrollViewer Margin="0,150,0,0">
+        <ScrollViewer Margin="0,170,0,0">
             <StackPanel>
                 <TextBlock Text="Completed" Style="{StaticResource Heading2}" Margin="0,0,10,8" HorizontalAlignment="Right"/>
                 <ListBox ItemsSource="{Binding Completed}" Margin="0,0,10,8" HorizontalAlignment="Right">

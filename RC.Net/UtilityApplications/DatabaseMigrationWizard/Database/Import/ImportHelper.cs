@@ -109,7 +109,6 @@ namespace DatabaseMigrationWizard.Database.Input
             try
             {
                 IEnumerable<ISequence> instances = FilteredInstances();
-                ClearDatabase();
                 ExecutePriority(instances);
             }
             catch(Exception e)
@@ -131,44 +130,56 @@ namespace DatabaseMigrationWizard.Database.Input
         }
 
         /// <summary>
+        /// Clears the database.
+        /// </summary>
+        public void ClearDatabase()
+        {
+            var fileProcessingDb = new FileProcessingDB()
+            {
+                DatabaseServer = this.ImportOptions.ConnectionInformation.DatabaseServer,
+                DatabaseName = this.ImportOptions.ConnectionInformation.DatabaseName
+            };
+
+            fileProcessingDb.Clear(false);
+        }
+
+        /// <summary>
         /// Checks to see if the labde tables are present, and if they are not filter them out
         /// If tables are missing throw an exception.
         /// </summary>
         /// <returns></returns>
         private IEnumerable<ISequence> FilteredInstances()
         {
-            string[] files = System.IO.Directory.GetFiles(this.ImportOptions.ImportPath);
-            bool hasLabDeTables = files.Where(file => Path.GetFileName(file).ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")).Any();
             IEnumerable<ISequence> instances = Universal.GetClassesThatImplementInterface<ISequence>();
-            if(!hasLabDeTables)
+
+            if(!this.ImportOptions.ImportCoreTables)
             {
-                instances = instances.Where(instance => !instance.TableName.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE"));
+                IEnumerable<ISequence> coreTables =  instances.Where(instance => !instance.TableName.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE"));
+                instances = instances.Except(coreTables);
             }
-            IEnumerable<ISequence> missingFiles = instances.Where(instance => !File.Exists(this.ImportOptions.ImportPath + "\\" + instance.TableName + ".json"));
-            if(missingFiles.Any())
+            if(!this.ImportOptions.ImportLabDETables)
             {
-                ExtractException extractException = new ExtractException("ELI49697", "You are missing required files to run this import!");
-                foreach(ISequence sequence in missingFiles)
-                {
-                    extractException.AddDebugData("FileMissing", sequence.TableName);
-                }
-                
-                throw extractException;
+                IEnumerable<ISequence> labDeTables = instances.Where(instance => instance.TableName.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE"));
+                instances = instances.Except(labDeTables);
             }
+            
+            this.CheckForMissingJsonFiles(instances);
+
             return instances;
         }
 
-        private void ClearDatabase()
+        private void CheckForMissingJsonFiles(IEnumerable<ISequence> instances)
         {
-            if(ImportOptions.ClearDatabase)
+            IEnumerable<ISequence> missingFiles = instances.Where(instance => !File.Exists(this.ImportOptions.ImportPath + "\\" + instance.TableName + ".json"));
+            if (missingFiles.Any())
             {
-                var fileProcessingDb = new FileProcessingDB()
+                ExtractException extractException = new ExtractException("ELI49697", "You are missing required files to run this import!");
+                foreach (ISequence sequence in missingFiles)
                 {
-                    DatabaseServer = this.ImportOptions.ConnectionInformation.DatabaseServer,
-                    DatabaseName = this.ImportOptions.ConnectionInformation.DatabaseName
-                };
+                    extractException.AddDebugData("FileMissing", sequence.TableName);
+                }
 
-                fileProcessingDb.Clear(false);
+                throw extractException;
             }
         }
 
@@ -188,54 +199,12 @@ namespace DatabaseMigrationWizard.Database.Input
                     this.Progress.Report(instanceName);
                 });
 
-                try
-                {
-                    instance.ExecuteSequence(this.ImportOptions);
-                }
-                catch (Exception ex)
-                {
-                    LogError(ex, instanceName);
-
-                    throw ex.AsExtract("ELI49843");
-                }
+                instance.ExecuteSequence(this.ImportOptions);
 
                 App.Current?.Dispatcher.Invoke(delegate
                 {
                     this.Progress.Report(instanceName);
                 });
-            }
-        }
-
-        /// <summary>
-        /// Logs the specified exception both to the ReportingDatabaseMigrationWizard databse table and the
-        /// Extract exception log file.
-        /// </summary>
-        void LogError(Exception ex, string tableName)
-        {
-            try
-            {
-                var errorMessages = new List<string>();
-                for (Exception innerEx = ex; innerEx != null; innerEx = innerEx.InnerException)
-                {
-                    errorMessages.Add(innerEx.Message);
-                }
-
-                string query = Invariant($@"INSERT INTO
-                            dbo.ReportingDatabaseMigrationWizard(Classification, TableName, Message)
-                            VALUES ('Error', @0, @1)");
-
-                var parameters = new Dictionary<string, string>() {
-                                { "@0", tableName },
-                                { "@1", string.Join("; ", errorMessages) }
-                            };
-
-                DBMethods.ExecuteDBQuery(ImportOptions.SqlConnection, query, parameters, ImportOptions.Transaction);
-
-                ex.ExtractLog("ELI49841");
-            }
-            catch (Exception ex2)
-            {
-                ex2.ExtractLog("ELI49842");
             }
         }
 

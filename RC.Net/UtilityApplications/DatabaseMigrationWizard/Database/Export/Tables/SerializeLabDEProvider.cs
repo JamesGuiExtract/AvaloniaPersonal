@@ -9,7 +9,7 @@ namespace DatabaseMigrationWizard.Database.Output
     {
         public void SerializeTable(DbConnection dbConnection, TextWriter writer)
         {
-            new ExportHelper().WriteTableInBatches(GetBatchSQL(), writer, dbConnection, "SELECT COUNT(*) AS COUNT FROM [dbo].[LabDEProvider]");
+            ExportHelper.WriteTableInBatches(GetBatchSQL(), writer, dbConnection, "SELECT COUNT(*) AS COUNT FROM [dbo].[LabDEProvider]");
         }
 
         private static string GetBatchSQL()

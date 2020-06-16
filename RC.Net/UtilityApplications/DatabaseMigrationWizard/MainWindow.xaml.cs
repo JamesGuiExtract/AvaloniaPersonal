@@ -248,23 +248,26 @@ namespace DatabaseMigrationWizard
         {
             this.ImportReporting.Clear();
 
-            if (reports == null)
+            foreach (Report report in reports)
             {
-                Import?.ResetProgress();
-                this.ImportStatusMessage = "";
-                this.ImportHasErrorsOrWarnings = false;
-                UpdateLinks();
+                this.ImportReporting.Add(report);
             }
-            else
-            {
-                foreach (Report report in reports)
-                {
-                    this.ImportReporting.Add(report);
-                }
 
-                ImportHasErrorsOrWarnings = reports.Any(m =>
-                    m.Classification.Equals("Warning") || m.Classification.Equals("Error"));
-            }
+            this.ImportHasErrorsOrWarnings = reports.Any(m =>
+                m.Classification.Equals("Warning") || m.Classification.Equals("Error"));
+
+        }
+
+        /// <summary>
+        /// Clears out the reporting and removes status messages/links.
+        /// </summary>
+        internal void ResetImportReporting()
+        {
+            this.ImportReporting.Clear();
+            Import?.ResetProgress();
+            this.ImportStatusMessage = "";
+            this.ImportHasErrorsOrWarnings = false;
+            UpdateLinks();
         }
 
         /// <summary>
@@ -381,7 +384,7 @@ namespace DatabaseMigrationWizard
                 else
                 {
                     // TODO: Set "Not connected" in status bar here
-                    ApplyImportReport(null);
+                    this.ResetImportReporting();
                 }
 
                 UpdateLinks();

@@ -22,9 +22,19 @@ namespace DatabaseMigrationWizard.Database.Input
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ImportPath"));
             }
         }
-        public bool ClearDatabase { get; set; }
 
         public ConnectionInformation ConnectionInformation { get; set; }
+
+        /// <summary>
+        /// Used to determine if we want to import LabDE tables.
+        /// </summary>
+        public bool ImportLabDETables { get; set; } = false;
+
+        /// <summary>
+        /// Used to determine if we want to import everything that is not a labde tables
+        /// Or in other words the tables required for setting up our software.
+        /// </summary>
+        public bool ImportCoreTables { get; set; } = true;
 
         /// <summary>
         /// Handles every time the property changes.

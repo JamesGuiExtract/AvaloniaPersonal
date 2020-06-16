@@ -481,7 +481,7 @@ namespace DatabaseMigrationWizard.Test
             string[] files;
             exportOptions.ConnectionInformation.DatabaseServer = "(local)";
             exportOptions.ConnectionInformation.DatabaseName = DatabaseName;
-            exportOptions.IncludeLabDETables = false;
+            exportOptions.ExportLabDETables = false;
             exportOptions.ExportPath = Path.GetTempPath() + "TableExports\\";
             Directory.CreateDirectory(exportOptions.ExportPath);
 
@@ -491,7 +491,7 @@ namespace DatabaseMigrationWizard.Test
             Assert.IsFalse(files.Where(file => file.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")).Any());
 
             // Ensure LabDE tables are exported
-            exportOptions.IncludeLabDETables = true;
+            exportOptions.ExportLabDETables = true;
             ExportHelper.Export(exportOptions, new Progress<string>((garbage) => { }));
             files = System.IO.Directory.GetFiles(exportOptions.ExportPath);
             Assert.IsTrue(files.Where(file => file.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE")).Any());

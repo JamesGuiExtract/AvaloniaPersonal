@@ -24,9 +24,14 @@ namespace DatabaseMigrationWizard.Database.Output
             } }
 
         /// <summary>
-        /// Include labde tables?
+        /// Bool used to control if labde tables are exported
         /// </summary>
-        public bool IncludeLabDETables { get; set; } = false;
+        public bool ExportLabDETables { get; set; } = false;
+
+        /// <summary>
+        /// Bool used to control if core tables are exported.
+        /// </summary>
+        public bool ExportCoreTables { get; set; } = true;
 
         /// <summary>
         /// Database connection information.

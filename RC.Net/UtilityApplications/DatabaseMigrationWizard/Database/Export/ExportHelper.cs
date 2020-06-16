@@ -20,7 +20,7 @@ namespace DatabaseMigrationWizard.Database.Output
         /// WriteTablesInBatches, but the less likely you are to get memory issues. So this number should be as big as you can get it
         /// Without getting a memory issue.
         /// </summary>
-        private readonly int batchSize = 50000;
+        private static readonly int batchSize = 50000;
 
         /// <summary>
         /// Writes a table in one go (loads entire table in memory then writes it).
@@ -63,7 +63,7 @@ namespace DatabaseMigrationWizard.Database.Output
         /// <param name="writer">The streamwriter to write the file to</param>
         /// <param name="dbConnection">The database to obtain the data from</param>
         /// <param name="rowCountSql">Select the number of rows in the table, must label the count as "COUNT". See a calling example.</param>
-        public void WriteTableInBatches(string orderBySql, TextWriter writer, DbConnection dbConnection, string rowCountSql )
+        public static void WriteTableInBatches(string orderBySql, TextWriter writer, DbConnection dbConnection, string rowCountSql )
         {
             try
             {
@@ -99,9 +99,15 @@ namespace DatabaseMigrationWizard.Database.Output
             {
                 IEnumerable<ISerialize> instances = Universal.GetClassesThatImplementInterface<ISerialize>();
 
-                if (!exportOptions.IncludeLabDETables)
+                if (!exportOptions.ExportCoreTables)
                 {
-                    instances = instances.Where(m => !m.ToString().ToUpper(CultureInfo.InvariantCulture).Contains("LABDE"));
+                    IEnumerable<ISerialize> coreTables = instances.Where(m => !m.ToString().ToUpper(CultureInfo.InvariantCulture).Contains("LABDE"));
+                    instances = instances.Except(coreTables);
+                }
+                if (!exportOptions.ExportLabDETables)
+                {
+                    IEnumerable<ISerialize> labDeTables = instances.Where(m => m.ToString().ToUpper(CultureInfo.InvariantCulture).Contains("LABDE"));
+                    instances = instances.Except(labDeTables);
                 }
 
                 foreach (ISerialize instance in instances)

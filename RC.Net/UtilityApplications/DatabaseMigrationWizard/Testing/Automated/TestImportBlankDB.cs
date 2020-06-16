@@ -45,7 +45,7 @@ namespace DatabaseMigrationWizard.Test
 
             ImportOptions = new ImportOptions()
             {
-                ClearDatabase = false,
+                ImportLabDETables = true,
                 ImportPath = Path.GetTempPath() + $"{DatabaseName}\\",
                 ConnectionInformation = new Database.ConnectionInformation() { DatabaseName = DatabaseName, DatabaseServer = "(local)" }
             };

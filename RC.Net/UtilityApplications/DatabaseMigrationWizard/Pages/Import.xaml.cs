@@ -5,11 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Automation.Peers;
-using System.Windows.Automation.Provider;
 
 namespace DatabaseMigrationWizard.Pages
 {
@@ -61,23 +58,12 @@ namespace DatabaseMigrationWizard.Pages
             this.ImportHelper = new ImportHelper(this.ImportOptions, GetProgressTracker());
             try
             {
-                this.MainWindow.ApplyImportReport(null);
+                this.MainWindow.ResetImportReporting();
                 this.Processing.Clear();
                 this.Completed.Clear();
                 this.MainWindow.UIEnabled = false;
-                if (ImportOptions.ClearDatabase)
-                {
-                    MessageBoxResult result = System.Windows.MessageBox.Show($"DatabaseServer: {this.ImportOptions.ConnectionInformation.DatabaseServer} \nDatabaseName:{this.ImportOptions.ConnectionInformation.DatabaseName}\nAre you 100% sure you want to clear this database? This action cannot be undone!", "Database Migration Wizard", MessageBoxButton.YesNo);
-                    switch (result)
-                    {
-                        case MessageBoxResult.No:
-                            return;
-                        case MessageBoxResult.Yes:
-                            break;
-                    }
-                }
 
-                ExecuteImport();
+                this.ExecuteImport();
             }
             catch (Exception ex)
             {
@@ -285,6 +271,35 @@ namespace DatabaseMigrationWizard.Pages
             }
 
             this.MainWindow.ApplyImportReport(reports);
+        }
+
+        /// <summary>
+        /// Prompts the user validating they want to clear the database. If they do execute it.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ClearDatabase_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                this.MainWindow.UIEnabled = false;
+                MessageBoxResult result = MessageBox.Show($"DatabaseServer: {this.ImportOptions.ConnectionInformation.DatabaseServer} \nDatabaseName:{this.ImportOptions.ConnectionInformation.DatabaseName}\nAre you 100% sure you want to clear this database? This action cannot be undone!", "Database Migration Wizard", MessageBoxButton.YesNo);
+                switch (result)
+                {
+                    case MessageBoxResult.No:
+                        break;
+                    case MessageBoxResult.Yes:
+                        new ImportHelper(this.ImportOptions, GetProgressTracker()).ClearDatabase();
+                        MessageBox.Show("Database has been cleared!");
+                        break;
+                }
+
+                this.MainWindow.UIEnabled = true;
+            }
+            catch(Exception ex)
+            {
+                ex.AsExtract("ELI49882").Display();
+            }
         }
     }
 }

@@ -58,6 +58,7 @@ namespace DatabaseMigrationWizard.Pages
         {
             try
             {
+                this.PasswordButton.IsEnabled = false;
                 ConnectionInformation.ValidateConnection(PasswordBox.Password);
 
                 this.PasswordStatus.Background = Brushes.Green;
@@ -66,6 +67,7 @@ namespace DatabaseMigrationWizard.Pages
             catch(Exception)
             {
                 MessageBox.Show("Invalid password, or the connection is invalid (red box up above). Please try again.");
+                this.PasswordButton.IsEnabled = true;
             }
         }
 
@@ -118,6 +120,7 @@ namespace DatabaseMigrationWizard.Pages
 
             this.PasswordStatus.Background = Brushes.Red;
             this.PasswordBox.Password = string.Empty;
+            this.PasswordButton.IsEnabled = true;
 
             bool validServerName = false;
             bool validDatabaseName = false;

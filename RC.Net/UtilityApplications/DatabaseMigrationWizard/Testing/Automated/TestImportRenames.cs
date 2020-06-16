@@ -56,7 +56,7 @@ namespace DatabaseMigrationWizard.Test
 
             ImportOptions = new ImportOptions()
             {
-                ClearDatabase = false,
+                ImportLabDETables = true,
                 ImportPath = Path.GetTempPath() + $"{DatabaseName}\\",
                 ConnectionInformation = new Database.ConnectionInformation() { DatabaseName = DatabaseName, DatabaseServer = "(local)" }
             };
@@ -87,7 +87,7 @@ namespace DatabaseMigrationWizard.Test
         [OneTimeTearDown]
         public static void TearDown()
         {
-            SqlConnection.Close();
+            SqlConnection?.Close();
             FamTestDbManager.RemoveDatabase(DatabaseName);
             Directory.Delete(ImportOptions.ImportPath, true);
         }
