@@ -35,14 +35,26 @@
                     <Button x:Name="WarningButton" Grid.Column="1" Content="Warnings" BorderThickness="2" Click="WarningButton_Click" Focusable="False"></Button>
                     <Button x:Name="InfoButton" Grid.Column="2" Content="Info" BorderThickness="2" Click="InfoButton_Click" Focusable="False"></Button>
                 </Grid>
-                <DataGrid Name="DataGrid1" ItemsSource="{Binding}" AutoGenerateColumns="False" Margin="0,5,0,0" MaxHeight="500px" HorizontalScrollBarVisibility="Visible">
+                <DataGrid Name="DataGrid1" ItemsSource="{Binding}" AutoGenerateColumns="False" Margin="0,5,0,0" MaxHeight="500px" HorizontalScrollBarVisibility="Visible" AlternatingRowBackground="LightGray" AlternationCount="2">
                     <DataGrid.Columns>
                         <mui:DataGridTextColumn Header="Classification" Binding="{Binding Classification}" />
                         <mui:DataGridTextColumn Header="Command" Binding="{Binding Command}" />
                         <mui:DataGridTextColumn Header="TableName" Binding="{Binding TableName}" />
                         <mui:DataGridTextColumn Header="Message" Binding="{Binding Message}" />
-                        <mui:DataGridTextColumn Header="Old Value" Binding="{Binding Old_Value}" />
-                        <mui:DataGridTextColumn Header="New Value" Binding="{Binding New_Value}" />
+                        <mui:DataGridTextColumn Header="Old Value" Binding="{Binding Old_Value}" >
+                            <mui:DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="{x:Type TextBox}">
+                                    <Setter Property="MaxLength" Value="60"></Setter>
+                                </Style>
+                            </mui:DataGridTextColumn.EditingElementStyle>
+                        </mui:DataGridTextColumn>
+                        <mui:DataGridTextColumn Header="New Value" Binding="{Binding New_Value}">
+                            <mui:DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="{x:Type TextBox}">
+                                    <Setter Property="MaxLength" Value="60"></Setter>
+                                </Style>
+                            </mui:DataGridTextColumn.EditingElementStyle>
+                        </mui:DataGridTextColumn>
                         <mui:DataGridTextColumn Header="DateTime" Binding="{Binding DateTime}" />
                     </DataGrid.Columns>
                 </DataGrid>

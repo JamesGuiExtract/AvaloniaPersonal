@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 184;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 185;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2807,8 +2807,8 @@ int UpdateToSchemaVersion184(_ConnectionPtr ipConnection,
 		// but not if the database is updated from before the MetadataField table was created with the constraint
 		vecQueries.push_back(gstrADD_METADATAFIELD_UNIQUE_NAME_CONSTRAINT);
 
-        // This was missing in some DEMO databases, this will create it if it doesn't exist
-        vecQueries.push_back(gstrCREATE_PROCESSING_DATA_VIEW);
+		// This was missing in some DEMO databases, this will create it if it doesn't exist
+		vecQueries.push_back(gstrCREATE_PROCESSING_DATA_VIEW);
 
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_WITH_FILEID_VIEW);
 
@@ -2819,7 +2819,34 @@ int UpdateToSchemaVersion184(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49875");
-} 
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion185(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 185;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrALTER_DATABASE_MIGRATION_WIZARD_REPORTING_COLUMN_SIZES);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49883");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -7956,7 +7983,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 181:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion182);
 				case 182:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion183);
 				case 183:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion184);
-				case 184:
+				case 184:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion185);
+				case 185:
 					break;
 
 				default:
