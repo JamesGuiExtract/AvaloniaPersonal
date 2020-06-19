@@ -104,7 +104,7 @@ CopyFilesToInstallFolder: CreateDestinationFolders
  	@COPY /V /Y  "$(BinariesFolder)\LearningMachineEditor.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V /Y  "$(BinariesFolder)\ExpressionAndQueryTester.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\Extract*test*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\*.nunit" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\Extract-RDT-ConsoleRunner.ps1" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\Extract.DataEntry.DEP.*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V /Y  "$(BinariesFolder)\NERAnnotator.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V /Y  "$(BinariesFolder)\TestAppForSystemMethods.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
