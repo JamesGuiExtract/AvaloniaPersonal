@@ -111,7 +111,8 @@ CopyFilesToInstallFolder: CreateDestinationFolders
  	@COPY /V /Y  "$(BinariesFolder)\DiffLib.dll" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V /Y  "$(BinariesFolder)\DatabaseMigrationWizard.Test.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	
-	@XCOPY "$(RCDotNetDir))\APIs\NUnit.ConsoleRunner.3.11.1\tools\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /s /e /y /I
+	@COPY /V /Y  "$(BinariesFolder)\nunit.framework.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+	@XCOPY "$(RCDotNetDir)\APIs\NUnit.ConsoleRunner.3.11.1\tools\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /y /I
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.nl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"
