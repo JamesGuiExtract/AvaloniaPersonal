@@ -104,15 +104,17 @@ CopyFilesToInstallFolder: CreateDestinationFolders
  	@COPY /V /Y  "$(BinariesFolder)\LearningMachineEditor.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V /Y  "$(BinariesFolder)\ExpressionAndQueryTester.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\Extract*test*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\Extract-RDT-ConsoleRunner.ps1" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\Extract.DataEntry.DEP.*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V /Y  "$(BinariesFolder)\NERAnnotator.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V /Y  "$(BinariesFolder)\TestAppForSystemMethods.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
  	@COPY /V /Y  "$(BinariesFolder)\DiffLib.dll" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V /Y  "$(BinariesFolder)\DatabaseMigrationWizard.Test.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
-	
+
+	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\NUnitConsoleRunner.ps1" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\RunInteractiveNunitTestsFromInstall.bat" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\RunNonInteractiveNunitTestsFromInstall.bat" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\nunit.framework.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@XCOPY "$(RCDotNetDir)\APIs\NUnit.ConsoleRunner.3.11.1\tools\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /y /I
+	@XCOPY "$(RCDotNetDir)\APIs\NUnit.ConsoleRunner.3.11.1\tools\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.nl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"
