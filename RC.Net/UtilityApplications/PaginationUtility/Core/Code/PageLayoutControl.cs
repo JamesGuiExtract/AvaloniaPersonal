@@ -415,6 +415,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         PageLayoutControlUpdateLock _updateLock = null;
 
         /// <summary>
+        /// To execute code upon next time UI goes idle.
+        /// </summary>
+        OnIdleHandler _onIdleHandler;
+
+        /// <summary>
         /// Indicates whether <see cref="UpdateCommandStates"/> has been invoked to execute on a
         /// following windows message.
         /// </summary>
@@ -1797,6 +1802,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         additionalControls: selectedControls,
                         select: true,
                         modifierKeys: Keys.None);
+
+                    _flowLayoutPanel.RequestScrollToControl(outputDocument.PaginationSeparator);
                 }
                 else
                 {
@@ -1970,14 +1977,50 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .Except(DocumentInDataEdit.PageControls.Concat(new PaginationControl[] { DocumentInDataEdit.PaginationSeparator }))
                         .ToList()
                         .ForEach(control => control.Visible = false);
-                
-                    _flowLayoutPanel.ScrollControlIntoViewManual(DocumentInDataEdit.PaginationSeparator,
-                        flushWithTop: true);
+
+                    _flowLayoutPanel.RequestScrollToControl(
+                        DocumentInDataEdit.PaginationSeparator, 
+                        topAlignmentOffset: 0, 
+                        activateScrollToControlForEvent: true);
                 }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45750");
+            }
+        }
+
+        /// <summary>
+        /// Scrolls the <see cref="PrimarySelection"/> control into view if necessary to be visible.
+        /// </summary>
+        public void ScrollToPrimarySelection()
+        {
+            try
+            {
+                if (PrimarySelection.Visible
+                    && _flowLayoutPanel.Controls.Contains(PrimarySelection))
+                {
+                    _flowLayoutPanel.RequestScrollToControl(PrimarySelection, null, activateScrollToControlForEvent: true);
+                }
+            } 
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49887");
+            }
+        }
+
+        /// <summary>
+        /// Disregards any active scroll request for the ongoing event (message chain)
+        /// </summary>
+        public void CancelScrollRequest()
+        {
+            try
+            {
+                _flowLayoutPanel.CancelScrollRequest();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49903");
             }
         }
 
@@ -2157,6 +2200,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         _updateLock.Dispose();
                         _updateLock = null;
+                    }
+
+                    if (_onIdleHandler != null)
+                    {
+                        _onIdleHandler.Dispose();
+                        _onIdleHandler = null;
                     }
 
                     // Allows a much quick response to remove and dispose of the controls first
@@ -2905,6 +2954,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         (DocumentInDataEdit != null) &&
                         (DocumentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document);
 
+                    // https://extract.atlassian.net/browse/ISSUE-17098
+                    // Save the current scroll position so it can be restored once the DEP is closed.
+                    var separatorControl = (Control)sender;
+                    _flowLayoutPanel.SetScrollRestorePosition(separatorControl);
+
                     // https://extract.atlassian.net/browse/ISSUE-15414
                     // When a DEP has been opened, "snap" it to the top of the panel to help ensure the
                     // is clear about which data is currently being edited.
@@ -2947,10 +3001,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
-                // The separator will have been flush with the top while the panel was open; to prevent
-                // disorienting shifts, ensure this separator remains right where it is when the rest
-                // of the documents/pages are re-displayed.
-                _flowLayoutPanel.ScrollControlIntoViewManual(sender as Control, flushWithTop: true);
+                _flowLayoutPanel.RequestScrollPositionRestore();
             }
             catch (Exception ex)
             {
@@ -3010,14 +3061,37 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 // https://extract.atlassian.net/browse/ISSUE-14326
                 // Ensure that collapsing/expanding a document doesn't cause it to scroll out of view.
-                // TODO: Bug- After tabbing thru a couple docs, shift tabbing to top, then hitting tab,
-                // below call fails to position the newly expanded top document in view.
                 var separator = (PaginationSeparator)sender;
-                _flowLayoutPanel.ScrollControlIntoViewManual(separator, flushWithTop: false);
+                
+                // However it was activated, when collapsing/expanding a document, make sure the document
+                // is scrolled into view as a result.
+                _flowLayoutPanel.RequestScrollToControl
+                    (separator, 
+                     topAlignmentOffset: null,
+                     activateScrollToControlForEvent: true);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40219");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ShortcutsManager.ProcessingShortcut"/> event of <see cref="Shortcuts"/>.
+        /// </summary>
+        void HandleShortcuts_ProcessingShortcut(object sender, EventArgs e)
+        {
+            try
+            {
+                // Not all ScrollToControl requests should be honored by default. As an example, if a document
+                // separator is at the bottom the panel, an attempted double-click may be interrupted, by a scroll
+                // to position the first page in view before the 2nd click is registered. Therefore, only enable
+                // across-the-board handling of scroll requests when processing a keyboard event.
+                _flowLayoutPanel.EnableScrollToControlForEvent();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49904");
             }
         }
 
@@ -3483,7 +3557,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     control.Visible &&
                     Rectangle.Intersect(ClientRectangle, control.Bounds) != control.Bounds)
                 {
-                    _flowLayoutPanel.ScrollControlIntoViewManual(control, flushWithTop: false);
+                    _flowLayoutPanel.RequestScrollToControl(control);
                 }
             }
             else
@@ -3758,6 +3832,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Return focus to the DEP if the up arrow is pressed from the top row of thumbnails
                     if (!forward && DocumentDataPanel.Editable)
                     {
+                        _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
                         DocumentDataPanel.ActiveDataControl?.Focus();
                     }
                 }
@@ -3823,7 +3898,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (nextDocument == null)
             {
                 return null;
-                //nextDocument = activeDocument;
             }
 
             // Select the selectionTarget and the pageControls that make up the document it is in.
@@ -3835,7 +3909,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 select: true,
                 modifierKeys: Keys.None);
 
-            _flowLayoutPanel.ScrollControlIntoViewManual(nextDocument.PaginationSeparator, flushWithTop: false);
+            _flowLayoutPanel.RequestScrollToControl(nextDocument.PaginationSeparator);
 
             return nextDocument;
         }
@@ -4032,6 +4106,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             _pasteCommand.Enabled = false;
             _toggleDocumentSeparatorCommand.Enabled = false;
             _outputDocumentCommand.Enabled = false;
+
+            Shortcuts.ProcessingShortcut += HandleShortcuts_ProcessingShortcut;
 
             Shortcuts[Keys.Space] = HandleToggleSelectDocumentForCommit;
             Shortcuts[Keys.Tab] = HandleTabNavigateForward;
@@ -4511,8 +4587,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         activeDocument.Collapsed = true;
 
-                        _flowLayoutPanel.ScrollControlIntoViewManual(
-                            activeDocument.PaginationSeparator, flushWithTop: false);
+                        _flowLayoutPanel.RequestScrollToControl(activeDocument.PaginationSeparator);
                     }
                 }
                 else
@@ -4703,24 +4778,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Move to next document after tabbing to last page with DEP open
                 else if (DocumentInDataEdit != null && !(activeControl.NextControl is PageThumbnailControl))
                 {
-                    if (activeSeparator != null)
-                    {
-                        CloseAndSelectDocumentForCommit(activeDocument);
-                    }
-
-                    var nextDocument = SelectNextDocument(true);
-                    if (nextDocument == null)
-                    {
-                        // TODO: Prompt whether to commit batch. Until then, clear control selection when
-                        // there are no more documents to prevent tab loop at end.
-                        ClearSelection();
-                    }
-                    else
-                    {
-                        nextDocument.Collapsed = false;
-                        _flowLayoutPanel.ScrollControlIntoViewManual(activeSeparator, flushWithTop: true);
-                        _flowLayoutPanel.Focus();
-                    }
+                    TabNavigateNextDocument(activeDocument);
                 }
                 else
                 {
@@ -4730,6 +4788,40 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI49869");
+            }
+        }
+
+        /// <summary>
+        /// Handles the case tab navigation needs to navigate to the next document.
+        /// </summary>
+        /// <param name="activeDocument"></param>
+        void TabNavigateNextDocument(OutputDocument activeDocument)
+        {
+            OutputDocument nextDocument = null;
+
+            // Use of the update lock masks a couple of scrolling shifts that can be a distracting/disorienting.
+            using (new PageLayoutControlUpdateLock(this))
+            {
+                if (activeDocument?.PaginationSeparator != null)
+                {
+                    CloseAndSelectDocumentForCommit(activeDocument);
+                }
+
+                nextDocument = SelectNextDocument(true);
+                if (nextDocument == null)
+                {
+                    // TODO: Prompt whether to commit batch. Until then, clear control selection when
+                    // there are no more documents to prevent tab loop at end.
+                    ClearSelection();
+                }
+                else
+                {
+                    nextDocument.Collapsed = false;
+
+                    _flowLayoutPanel.RequestScrollToControl(nextDocument.PageControls.First());
+                }
+
+                _flowLayoutPanel.Focus();
             }
         }
 
@@ -4772,6 +4864,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Return focus to the DEP from the page controls
                 else if (previousControlDocument != currentDocument && DocumentInDataEdit != null)
                 {
+                    _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
                     DocumentDataPanel.EnsureFieldSelection();
                     DocumentDataPanel.ActiveDataControl?.Focus();
                 }

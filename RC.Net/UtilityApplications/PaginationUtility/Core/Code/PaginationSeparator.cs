@@ -522,7 +522,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, forEditing: !Document.OutputProcessed);
 
-                        args.DocumentDataPanel.DataPanelChanged += DocumentDataPanel_DataPanelChanged;
+                        args.DocumentDataPanel.DataPanelChanged += DocumentDataPanel_DataPanelChanged;  
                         var activeDataPanel = ((DataEntryPanelContainer)args.DocumentDataPanel).ActiveDataEntryPanel;
                         activeDataPanel.NavigatedOut += HandleDEP_NavigatedOut;
 
@@ -584,8 +584,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     var activeDataPanel = ((DataEntryPanelContainer)documentDataPanel).ActiveDataEntryPanel;
+                    activeDataPanel.EnsureFieldSelection();
                     activeDataPanel.NavigatedOut -= HandleDEP_NavigatedOut;
-                    documentDataPanel.DataPanelChanged -= DocumentDataPanel_DataPanelChanged;
 
                     // Report the DEP to be closed before it is removed so that events that trigger
                     // as part of its removal do not assume the DEP to be open and usable.
@@ -969,9 +969,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles the <see cref="DocumentDataPanel.DataPanelChanged"/> event of the active panel.
         /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void DocumentDataPanel_DataPanelChanged(object sender, EventArgs e)
+        private void DocumentDataPanel_DataPanelChanged(object sender, DataPanelChangedEventArgs e)
         {
             try
             {
@@ -979,8 +977,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Ensure this control gets sized based upon the added _documentDataPanelControl.
                 PerformLayout();
 
-                var activeDataPanel = ((DataEntryPanelContainer)_documentDataPanelControl).ActiveDataEntryPanel;
-                activeDataPanel.NavigatedOut += HandleDEP_NavigatedOut;
+                e.OldDataPanel.NavigatedOut -= HandleDEP_NavigatedOut;
+                e.NewDataPanel.NavigatedOut += HandleDEP_NavigatedOut;
             }
             catch (Exception ex)
             {
@@ -1035,10 +1033,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
-                if (documentDataPanel.SaveData(_outputDocument.DocumentData, validateData: true))
+                if (IsDataPanelOpen)
                 {
-                    DocumentDataPanelNavigatedOut?.Invoke(this, new EventArgs());
+                    var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
+                    if (documentDataPanel.SaveData(_outputDocument.DocumentData, validateData: true))
+                    {
+                        DocumentDataPanelNavigatedOut?.Invoke(this, new EventArgs());
+                    }
+                }
+                else
+                {
+                    // It is proving difficult to ensure NavigatedOut is properly unregistered.
+                    // In the case this event is encountered but it is not this separator that is active
+                    // do not handle the event; unregister the event instead.
+                    ((DataEntryDocumentDataPanel)sender).NavigatedOut -= HandleDEP_NavigatedOut;
                 }
             }
             catch (Exception ex)

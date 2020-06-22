@@ -1,4 +1,5 @@
-﻿using Extract.Imaging.Forms;
+﻿using Extract.DataEntry;
+using Extract.Imaging.Forms;
 using System;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -37,7 +38,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Indicates that the displayed panel has been changed such as for document type specific
         /// panels when the document type field changes.
         /// </summary>
-        event EventHandler<EventArgs> DataPanelChanged;
+        event EventHandler<DataPanelChangedEventArgs> DataPanelChanged;
 
         /// <summary>
         /// The <see cref="UserControl"/> to be displayed for viewing/editing of document data.

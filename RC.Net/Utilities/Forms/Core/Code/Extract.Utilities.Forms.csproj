@@ -171,6 +171,7 @@
     <Compile Include="InvisibleForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="OnIdleHandler.cs" />
     <Compile Include="SchedulerControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -11,7 +11,7 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// <summary>
     /// A <see cref="LayoutEngine"/> that manages the layout of <see cref="PaginationControl"/>s.
     /// </summary>
-    internal class PaginationLayoutEngine : LayoutEngine, IDisposable
+    internal class PaginationLayoutEngine : LayoutEngine
     {
         #region Events
 
@@ -31,16 +31,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _layoutInvoked;
 
         /// <summary>
-        /// In order to allow SnapToControl to be able to snap all the way to the top, extra space
-        /// may need to be added to the bottom so that there is enough scrolling available to get the
-        /// control to the top.
+        /// Recursion protection for UpdateScrollPosition.
         /// </summary>
-        Panel _bottomMarginControl = null;
-
-        /// <summary>
-        /// Recursion protection for UpdateBottomMargin.
-        /// </summary>
-        bool _updatingMargin;
+        bool _updatingScrollPosition;
 
         #endregion Fields
 
@@ -71,10 +64,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets the control which should be snapped to the top of the pane (<c>null</c> if
-        /// no control should be snapped to the top.
+        /// Gets or sets the <see cref="ScrollTarget"/> describing a scroll operation to be executed.
         /// </summary>
-        public Control SnapToControl
+        public ScrollTarget ScrollTarget
         {
             get;
             set;
@@ -159,44 +151,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #endregion Overrides
 
-        #region IDisposable Members
-
-        /// <summary>
-        /// Releases all resources used by the <see cref="PaginationLayoutEngine"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <overloads>Releases resources used by the <see cref="PaginationLayoutEngine"/>.</overloads>
-        /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="PaginationLayoutEngine"/>.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
-        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                try
-                {
-                    // Dispose of managed resources
-                    if (_bottomMarginControl != null)
-                    {
-                        _bottomMarginControl.Dispose();
-                        _bottomMarginControl = null;
-                    }
-                }
-                catch { }
-            }
-
-            // Dispose of unmanaged resources
-        }
-
-        #endregion IDisposable Members
-
         #region Private Members
 
         /// <summary>
@@ -220,7 +174,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // visible ClientRectangle, abort the layout to avoid unnecessary repeated layouts as
             // a large number of documents/pages are loading.
             if (!ForceNextLayout &&
-                SnapToControl == null &&
+                ScrollTarget?.Control == null &&
                 layoutEventArgs?.AffectedControl != null &&
                 layoutEventArgs?.AffectedControl != parent &&
                 !layoutEventArgs.AffectedProperty.Equals("Visible") &&
@@ -346,98 +300,37 @@ namespace Extract.UtilityApplications.PaginationUtility
                 redundantControls.Add(lastControl);
             }
 
-            UpdateBottomMargin((FlowLayoutPanel)parent, layoutEventArgs);
+            UpdateScrollPosition((FlowLayoutPanel)parent);
         }
 
         /// <summary>
-        /// Updates the size and position of _bottomMarginControl based on SnapToControl and
-        /// current control positions.
+        /// Updates the scroll position per SnapToControl.
         /// </summary>
         /// <param name="flowLayoutPanel">The <see cref="FlowLayoutPanel"/> for which the layout is occurring.</param>
-        /// <param name="layoutEventArgs">The <see cref="LayoutEventArgs"/> instance containing the event data.</param>
-        void UpdateBottomMargin(FlowLayoutPanel flowLayoutPanel, LayoutEventArgs layoutEventArgs)
+        void UpdateScrollPosition(FlowLayoutPanel flowLayoutPanel)
         {
-            if (_updatingMargin)
+            if (_updatingScrollPosition || ScrollTarget == null)
             {
                 return;
             }
 
             try
             {
-                _updatingMargin = true;
+                _updatingScrollPosition = true;
 
-                if (_bottomMarginControl?.Parent == flowLayoutPanel)
+                var newScrollPos = flowLayoutPanel.VerticalScroll.Value + ScrollTarget.Control.Top - ScrollTarget.TopAlignmentOffset ?? 0;
+                newScrollPos = Math.Max(newScrollPos, flowLayoutPanel.VerticalScroll.Minimum);
+                newScrollPos = Math.Min(newScrollPos, flowLayoutPanel.VerticalScroll.Maximum);
+                if (newScrollPos != flowLayoutPanel.VerticalScroll.Value)
                 {
-                    if (flowLayoutPanel.Controls.IndexOf(_bottomMarginControl) != flowLayoutPanel.Controls.Count - 1)
-                    {
-                        flowLayoutPanel.Controls.SetChildIndex(_bottomMarginControl, flowLayoutPanel.Controls.Count - 1);
-                    }
+                    flowLayoutPanel.VerticalScroll.Value = newScrollPos;
+                    flowLayoutPanel.PerformLayout();
                 }
-                else
-                {
-                    if (_bottomMarginControl == null)
-                    {
-                        _bottomMarginControl = new Panel();
-                        _bottomMarginControl.Margin = new Padding();
-                    }
-
-                    flowLayoutPanel.Controls.Add(_bottomMarginControl);
-                }
-
-                var lastVisibleControlBottom = flowLayoutPanel.Controls
-                    .OfType<PaginationControl>()
-                    .LastOrDefault(control => control.Visible)?.Bottom ?? flowLayoutPanel.Top;
-
-                if (SnapToControl == null)
-                {
-                    if (_bottomMarginControl != null)
-                    {
-                        _bottomMarginControl.Location = new Point(0, lastVisibleControlBottom);
-                        _bottomMarginControl.Width = flowLayoutPanel.Width - SystemInformation.VerticalScrollBarWidth;
-                    }
-                }
-                else
-                {
-                    bool newlyVisible = !flowLayoutPanel.VerticalScroll.Visible;
-
-                    var currentHeight = flowLayoutPanel.VerticalScroll.Visible 
-                        ? flowLayoutPanel.VerticalScroll.Maximum
-                        : flowLayoutPanel.Height;
-                    var scrollPosition = flowLayoutPanel.VerticalScroll.Visible
-                        ? flowLayoutPanel.VerticalScroll.Value
-                        : 0;
-                    var currentMargin = _bottomMarginControl?.Height ?? 0;
-
-                    var bottomMargin = Math.Max(0,
-                        SnapToControl.Top -
-                            (currentHeight
-                                - flowLayoutPanel.Height
-                                - scrollPosition
-                                - currentMargin));
-
-                    if (bottomMargin != _bottomMarginControl.Height)
-                    {
-                        _bottomMarginControl.Width = flowLayoutPanel.Width - SystemInformation.VerticalScrollBarWidth;
-                        _bottomMarginControl.Height = bottomMargin;
-                        _bottomMarginControl.Location = new Point(0, lastVisibleControlBottom);
-                    }
-
-                    if (bottomMargin > 0 && newlyVisible)
-                    {
-                        DoLayout(flowLayoutPanel, layoutEventArgs, out List<PaginationControl> _);
-                    }
-                    else
-                    {
-                        flowLayoutPanel.VerticalScroll.Value =
-                            flowLayoutPanel.VerticalScroll.Value + SnapToControl.Top;
-
-                        SnapToControl = null;
-                    }
-                }
+                ScrollTarget = null;
             }
             finally
             {
-                _updatingMargin = false;
+                _updatingScrollPosition = false;
             }
         }
 

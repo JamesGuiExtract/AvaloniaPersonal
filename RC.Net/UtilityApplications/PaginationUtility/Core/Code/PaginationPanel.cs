@@ -2688,6 +2688,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 bool collapse = !AllDocumentsCollapsed;
 
                 CollapseAll(collapse);
+
+                // If there is any current control selection, ensure it is visible after expanding all documents.
+                if (_primaryPageLayoutControl.PrimarySelection != null)
+                {
+                    _primaryPageLayoutControl.ScrollToPrimarySelection();
+                }
+                else
+                {
+                    // If there is no primary control to scroll into view, the handler for each document expansion
+                    // will end up trying to adjust scroll to the last document expanded. That is not appropriate
+                    // in the expand-all scenario; leave the scroll position as it currently is.
+                    _primaryPageLayoutControl.CancelScrollRequest();
+                }
             }
             catch (Exception ex)
             {

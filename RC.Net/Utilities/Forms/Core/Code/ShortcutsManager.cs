@@ -51,6 +51,12 @@ namespace Extract.Utilities.Forms
         /// <seealso cref="ShortcutsManager.Clear"/>
         public event EventHandler<ShortcutKeyChangedEventArgs> ShortcutKeyChanged;
 
+        /// <summary>
+        /// Raised when a registered shortcut key or key combo is entered, before calling the registered
+        /// ShortcutHandler.
+        /// </summary>
+        public event EventHandler<EventArgs> ProcessingShortcut;
+
         #endregion
 
         #region Shortcuts Manager Constructors
@@ -228,6 +234,8 @@ namespace Extract.Utilities.Forms
                 ShortcutHandler shortcutHandler;
                 if (_shortcuts.TryGetValue(key, out shortcutHandler))
                 {
+                    ProcessingShortcut?.Invoke(this, new EventArgs());
+
                     // Run the shortcut handler and return true
                     shortcutHandler();
                     return true;

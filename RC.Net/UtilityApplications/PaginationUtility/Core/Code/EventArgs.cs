@@ -530,6 +530,33 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
+    /// Event arguments for the <see cref="DataEntryPanelContainer.DataPanelChangedEventArgs"/> event.
+    /// </summary>
+    /// <seealso cref="EventArgs" />
+    public class DataPanelChangedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataPanelChangedEventArgs"/> class.
+        /// </summary>
+        public DataPanelChangedEventArgs(DataEntryDocumentDataPanel oldDataPanel,
+            DataEntryDocumentDataPanel newDataPanel)
+        {
+            OldDataPanel = oldDataPanel;
+            NewDataPanel = newDataPanel;
+        }
+
+        public DataEntryDocumentDataPanel OldDataPanel
+        {
+            get;
+        }
+
+        public DataEntryDocumentDataPanel NewDataPanel
+        {
+            get;
+        }
+    }
+
+    /// <summary>
     /// The event arguments for the <see cref="PaginationPanel.CommittingChanges"/>
     /// event.
     /// </summary>
