@@ -58,7 +58,7 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 // IProductSpecificDBMgr Methods
-	STDMETHOD(raw_AddProductSpecificSchema)(IFileProcessingDB *pDB, VARIANT_BOOL bOnlyTables,
+	STDMETHOD(raw_AddProductSpecificSchema)(_Connection* pConnection, IFileProcessingDB *pDB, VARIANT_BOOL bOnlyTables,
 		VARIANT_BOOL bAddUserTables);
 	STDMETHOD(raw_AddProductSpecificSchema80)(IFileProcessingDB *pDB);
 	STDMETHOD(raw_RemoveProductSpecificSchema)(IFileProcessingDB *pDB,
@@ -91,9 +91,6 @@ private:
 
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
-
-	// Indicates where the user has opted to add LabDE DB schema elements as part of a schema update.
-	bool m_bAddLabDESchemaElements;
 
 	//////////////
 	// Methods

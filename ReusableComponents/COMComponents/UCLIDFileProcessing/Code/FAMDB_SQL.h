@@ -2642,3 +2642,45 @@ static const string gstrCREATE_GET_CLUSTER_NAME_PROCEDURE =
 "		FROM sys.dm_hadr_cluster;						\r\n"
 "	END;')												\r\n"
 "END;";
+
+static const string gstrADD_METADATAFIELD_UNIQUE_NAME_CONSTRAINT =
+"IF(                                                       \r\n"
+"	NOT EXISTS(											\r\n"
+"		SELECT 1										\r\n"
+"		FROM Information_schema.TABLE_CONSTRAINTS		\r\n"
+"		WHERE CONSTRAINT_NAME = 'IX_MetadataFieldName'	\r\n"
+"	)													\r\n"
+")														\r\n"
+"BEGIN													\r\n"
+"   ALTER TABLE [dbo].[MetadataField]                   \r\n"
+"       ADD CONSTRAINT [IX_MetadataFieldName]           \r\n"
+"    UNIQUE NONCLUSTERED ([Name] ASC)                   \r\n"
+"END;";
+
+
+static const string gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_WITH_FILEID_VIEW =
+"IF OBJECT_ID('[dbo].[vFAMUserInputWithFileID]', 'V') IS NULL \r\n"
+"	EXECUTE( \r\n"
+"'CREATE VIEW [dbo].[vFAMUserInputWithFileID]                                             \r\n"
+"AS \r\n"
+"SELECT dbo.FAMSession.FAMUserID \r\n"
+"	,CAST(dbo.FileTaskSession.DateTimeStamp AS DATE) AS InputDate \r\n"
+"	,SUM(dbo.FileTaskSession.ActivityTime / 60.0) AS TotalMinutes \r\n"
+"	,dbo.FileTaskSession.FileID \r\n"
+"FROM dbo.FAMSession \r\n"
+"INNER JOIN dbo.FileTaskSession ON dbo.FAMSession.ID = dbo.FileTaskSession.FAMSessionID \r\n"
+"INNER JOIN dbo.TaskClass ON dbo.FileTaskSession.TaskClassID = dbo.TaskClass.ID \r\n"
+"WHERE ( \r\n"
+"		dbo.TaskClass.GUID IN ( \r\n"
+"			''FD7867BD-815B-47B5-BAF4-243B8C44AABB'' \r\n"
+"			,''59496DF7-3951-49B7-B063-8C28F4CD843F'' \r\n"
+"			,''AD7F3F3F-20EC-4830-B014-EC118F6D4567'' \r\n"
+"			,''DF414AD2-742A-4ED7-AD20-C1A1C4993175'' \r\n"
+"			,''8ECBCC95-7371-459F-8A84-A2AFF7769800'' \r\n"
+"			) \r\n"
+"		) \r\n"
+"	AND (dbo.FileTaskSession.DateTimeStamp IS NOT NULL) \r\n"
+"GROUP BY dbo.FAMSession.FAMUserID \r\n"
+"	,CAST(dbo.FileTaskSession.DateTimeStamp AS DATE) \r\n"
+"	,dbo.FileTaskSession.FileID') \r\n";
+ 

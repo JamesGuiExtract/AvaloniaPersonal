@@ -276,7 +276,8 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_IsLicensed(VARIANT_BOOL  * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IProductSpecificDBMgr Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB *pDB,
+STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(_Connection* pConnection,
+                                                                  IFileProcessingDB *pDB,
 																  VARIANT_BOOL bOnlyTables,
 																  VARIANT_BOOL bAddUserTables)
 {
@@ -289,16 +290,8 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema(IFileProcessin
 		ASSERT_RESOURCE_ALLOCATION("ELI28990", ipDB != __nullptr);
 
 		// Create the connection object
-		_ConnectionPtr ipDBConnection(__uuidof( Connection ));
+		_ConnectionPtr ipDBConnection(pConnection);
 		ASSERT_RESOURCE_ALLOCATION("ELI28991", ipDBConnection != __nullptr);
-
-		string strDatabaseServer = asString(ipDB->DatabaseServer);
-		string strDatabaseName = asString(ipDB->DatabaseName);
-
-		// create the connection string
-		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-
-		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
 
 		// Retrieve the queries for creating DataEntry DB table(s).
 		const vector<string> vecTableCreationQueries = getTableCreationQueries(asCppBool(bAddUserTables));
@@ -463,7 +456,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_ValidateSchema(IFileProcessingDB* pDB)
 			m_ipDBConnection = __nullptr;
 		}
 
-		validateDataEntrySchemaVersion(false);
+		validateDataEntrySchemaVersion(true);
 
 		return S_OK;
 	}
@@ -555,9 +548,23 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProces
 			// If the DataEntry specific components are missing, there is nothing to do.
 			if (strVersion.empty())
 			{
+				// if FAMDBSchemaVersion is 184 all product specific schemas should exist so add the product schema
+				if (nFAMDBSchemaVersion == 184)
+				{
+					if (pnNumSteps != __nullptr)
+					{
+						*pnNumSteps = 8;
+						*pnProdSchemaVersion = 0;
+					}
+					else
+					{
+						IProductSpecificDBMgrPtr ipThis(this);
+						ipThis->AddProductSpecificSchema(ipConnection, ipDB, VARIANT_FALSE, VARIANT_TRUE);
+						*pnProdSchemaVersion = glDATAENTRY_DB_SCHEMA_VERSION;
+					}
+				}
 				return S_OK;
 			}
-
 			*pnProdSchemaVersion = asLong(strVersion);
 		}
 
@@ -715,7 +722,7 @@ ADODB::_ConnectionPtr CDataEntryProductDBMgr::getDBConnection(bool bReset)
 void CDataEntryProductDBMgr::validateLicense()
 {
 	// May eventually want to create & use a gnDATA_ENTRY_CORE_OBJECTS license ID.
-	VALIDATE_LICENSE( gnDATA_ENTRY_CORE_COMPONENTS, "ELI29004", gstrDESCRIPTION);
+	VALIDATE_LICENSE(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI29004", gstrDESCRIPTION);
 }
 //-------------------------------------------------------------------------------------------------
 void CDataEntryProductDBMgr::getDataEntryTables(vector<string>& rvecTables)

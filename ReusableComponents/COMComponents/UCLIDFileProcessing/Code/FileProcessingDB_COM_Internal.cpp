@@ -38,7 +38,10 @@ using namespace ADODB;
 // This must be updated when the DB schema changes
 // !!!ATTENTION!!!
 // An UpdateToSchemaVersion method must be added when checking in a new schema version.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 183;
+// Version 184 First schema that includes all product specific schema regardless of license
+//		Also fixes up some missing elements between updating schema and creating
+//		All product schemas are also done withing the same transaction.
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 184;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2782,6 +2785,40 @@ int UpdateToSchemaVersion183(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49859");
+} 
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion184(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 184;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// This fixes a missing contraint on the MetadataField table, it is on the table if the table is created,
+		// but not if the database is updated from before the MetadataField table was created with the constraint
+		vecQueries.push_back(gstrADD_METADATAFIELD_UNIQUE_NAME_CONSTRAINT);
+
+        // This was missing in some DEMO databases, this will create it if it doesn't exist
+        vecQueries.push_back(gstrCREATE_PROCESSING_DATA_VIEW);
+
+		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_WITH_FILEID_VIEW);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49875");
 } 
 
 //-------------------------------------------------------------------------------------------------
@@ -7799,6 +7836,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			BEGIN_CONNECTION_RETRY();
 
 			ipConnection = getDBConnection();
+            ipConnection->CommandTimeout = 0;
 
 			assertNotActiveBeforeSchemaUpdate();
 
@@ -7917,7 +7955,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 180:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion181);
 				case 181:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion182);
 				case 182:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion183);
-				case 183:
+				case 183:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion184);
+				case 184:
 					break;
 
 				default:
@@ -8056,6 +8095,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 			// Force the DBInfo values (including schema version) to be reloaded on the next call to
 			// validateDBSchemaVersion
 			m_iDBSchemaVersion = 0; 
+            ipConnection->CommandTimeout = m_iCommandTimeout;
 
 			END_CONNECTION_RETRY(ipConnection, "ELI31404");
 		}

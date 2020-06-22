@@ -1786,6 +1786,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_PROCESSING_DATA_VIEW);
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW_LEGACY_166);
 		vecQueries.push_back(gstrCREATE_GET_CLUSTER_NAME_PROCEDURE);
+		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_WITH_FILEID_VIEW);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -3987,7 +3988,8 @@ IIUnknownVectorPtr CFileProcessingDB::removeProductSpecificDB(bool bOnlyTables, 
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27610")
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::addProductSpecificDB(IIUnknownVectorPtr ipProdSpecMgrs,
+void CFileProcessingDB::addProductSpecificDB(_ConnectionPtr ipConnection,
+										     IIUnknownVectorPtr ipProdSpecMgrs,
 											 bool bOnlyTables, bool bAddUserTables)
 {
 	try
@@ -4000,7 +4002,7 @@ void CFileProcessingDB::addProductSpecificDB(IIUnknownVectorPtr ipProdSpecMgrs,
 			ASSERT_RESOURCE_ALLOCATION("ELI19791", ipMgr != __nullptr);
 
 			// Add the schema from the product specific db manager
-			ipMgr->AddProductSpecificSchema(getThisAsCOMPtr(),
+			ipMgr->AddProductSpecificSchema(ipConnection, getThisAsCOMPtr(),
 				asVariantBool(bOnlyTables), asVariantBool(bAddUserTables));
 		}
 	}
@@ -4364,8 +4366,6 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 				storeEncryptedPasswordAndUserName(gstrADMIN_USER, strAdminPW, false, false);
 			}
 
-			tg.CommitTrans();
-
 			if (bInitializing)
 			{
 				// https://extract.atlassian.net/browse/ISSUE-12686
@@ -4378,8 +4378,9 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 				ASSERT_RESOURCE_ALLOCATION("ELI38284", ipProdSpecMgrs != __nullptr);
 			}
 
-			// Add the Product specific db after the base tables have been committed
-			addProductSpecificDB(ipProdSpecMgrs, !bInitializing, !retainUserValues);
+			// Add the Product specific db 
+			addProductSpecificDB(ipConnection, ipProdSpecMgrs, !bInitializing, !retainUserValues);
+			tg.CommitTrans();
 
 			// Reset the database connection
 			resetDBConnection();

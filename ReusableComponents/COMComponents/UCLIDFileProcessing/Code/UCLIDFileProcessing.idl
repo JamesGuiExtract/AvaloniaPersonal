@@ -2176,7 +2176,7 @@ library UCLID_FILEPROCESSINGLib
 		//			implementing this interface.  
 		// ARGS:	bOnlyTables- VARIANT_TRUE if only tables are to be added (and not stored procedures, etc).
 		// ARGS:	bAddUserTables- VARIANT_TRUE if user tables need to be added.
-		[id(1), helpstring("method AddProductSpecificSchema")] HRESULT AddProductSpecificSchema(
+		[id(1), helpstring("method AddProductSpecificSchema")] HRESULT AddProductSpecificSchema([in] _Connection* pConnection,
 			[in] IFileProcessingDB* pDB, [in] VARIANT_BOOL bOnlyTables, [in] VARIANT_BOOL bAddUserTables);
 
 		// PROMISE: To remove any relationships and tables that were added in a call to AddProductSpecificSchema

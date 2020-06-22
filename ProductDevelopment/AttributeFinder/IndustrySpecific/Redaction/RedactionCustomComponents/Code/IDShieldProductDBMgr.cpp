@@ -274,7 +274,8 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_IsLicensed(VARIANT_BOOL  * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IProductSpecificDBMgr Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB *pDB,
+STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema(_Connection* pConnection, 
+																 IFileProcessingDB *pDB,
 																 VARIANT_BOOL bOnlyTables,
 																 VARIANT_BOOL bAddUserTables)
 {
@@ -287,16 +288,8 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_AddProductSpecificSchema(IFileProcessing
 		ASSERT_RESOURCE_ALLOCATION("ELI18823", ipDB != __nullptr);
 
 		// Create the connection object
-		ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
+		ADODB::_ConnectionPtr ipDBConnection(pConnection);
 		ASSERT_RESOURCE_ALLOCATION("ELI18824", ipDBConnection != __nullptr);
-
-		string strDatabaseServer = asString(ipDB->DatabaseServer);
-		string strDatabaseName = asString(ipDB->DatabaseName);
-
-		// create the connection string
-		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-
-		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
 
 		// Retrieve the queries for creating IDShield DB table(s).
 		const vector<string> vecTableCreationQueries = getTableCreationQueries();
@@ -442,7 +435,7 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_ValidateSchema(IFileProcessingDB* pDB)
 			m_ipDBConnection = __nullptr;
 		}
 
-		validateIDShieldSchemaVersion(false);
+		validateIDShieldSchemaVersion(true);
 
 		return S_OK;
 	}
@@ -532,9 +525,25 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcess
 			// If the IDShield specific components are missing, there is nothing to do.
 			if (strVersion.empty())
 			{
+				// if FAMDBSchemaVersion is 184 all product specific schemas should exist so add the product schema
+				if (nFAMDBSchemaVersion == 184)
+				{
+					if (pnNumSteps != __nullptr)
+					{
+						*pnNumSteps = 2;
+						*pnProdSchemaVersion = 0;
+						strVersion = "0";
+					}
+					else
+					{
+						IProductSpecificDBMgrPtr ipThis(this);
+						ipThis->AddProductSpecificSchema(ipConnection, ipDB, VARIANT_FALSE, VARIANT_TRUE);
+
+						*pnProdSchemaVersion= glIDShieldDBSchemaVersion;
+					}
+				}
 				return S_OK;
 			}
-
 			*pnProdSchemaVersion = asLong(strVersion);
 		}
 
@@ -745,7 +754,7 @@ ADODB::_ConnectionPtr CIDShieldProductDBMgr::getDBConnection(bool bReset)
 //-------------------------------------------------------------------------------------------------
 void CIDShieldProductDBMgr::validateLicense()
 {
-	VALIDATE_LICENSE( gnIDSHIELD_CORE_OBJECTS, "ELI18688", "ID Shield DB Manager" );
+	VALIDATE_LICENSE(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI18688", "ID Shield DB Manager" );
 }
 //-------------------------------------------------------------------------------------------------
 void CIDShieldProductDBMgr::getIDShieldTables(vector<string>& rvecTables)

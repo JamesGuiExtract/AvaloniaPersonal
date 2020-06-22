@@ -707,7 +707,6 @@ CLabDEProductDBMgr::CLabDEProductDBMgr()
 , m_ipDBConnection(__nullptr)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
-, m_bAddLabDESchemaElements(false)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -807,7 +806,8 @@ STDMETHODIMP CLabDEProductDBMgr::raw_IsLicensed(VARIANT_BOOL  * pbValue)
 //-------------------------------------------------------------------------------------------------
 // IProductSpecificDBMgr Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB *pDB,
+STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(_Connection* pConnection, 
+                                                              IFileProcessingDB *pDB,
                                                               VARIANT_BOOL bOnlyTables,
                                                               VARIANT_BOOL bAddUserTables)
 {
@@ -820,16 +820,8 @@ STDMETHODIMP CLabDEProductDBMgr::raw_AddProductSpecificSchema(IFileProcessingDB 
         ASSERT_RESOURCE_ALLOCATION("ELI37847", ipDB != __nullptr);
 
         // Create the connection object
-        _ConnectionPtr ipDBConnection(__uuidof( Connection ));
+        _ConnectionPtr ipDBConnection(pConnection);
         ASSERT_RESOURCE_ALLOCATION("ELI37848", ipDBConnection != __nullptr);
-
-        string strDatabaseServer = asString(ipDB->DatabaseServer);
-        string strDatabaseName = asString(ipDB->DatabaseName);
-
-        // create the connection string
-        string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-
-        ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
 
         // Retrieve the queries for creating LabDE DB table(s).
         const vector<string> vecTableCreationQueries = getTableCreationQueries(asCppBool(bAddUserTables));
@@ -978,7 +970,7 @@ STDMETHODIMP CLabDEProductDBMgr::raw_ValidateSchema(IFileProcessingDB* pDB)
             m_ipDBConnection = __nullptr;
         }
 
-        validateLabDESchemaVersion(false);
+        validateLabDESchemaVersion(true);
 
         return S_OK;
     }
@@ -1069,42 +1061,27 @@ STDMETHODIMP CLabDEProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcessing
             // schema is upgraded beyond FAMDBSchemaVersion 123.
             if (nFAMDBSchemaVersion == 123 && strVersion.empty())
             {
-                // When pnNumSteps is not null, this is the pass at the beginning of the schema
-                // update to gather the number of steps. Prompt the user at this point whether they
-                // want to be adding the LabDE schema elements.
-                if (pnNumSteps != __nullptr)
+                // If adding the LabDE schema elements, treat this as schema version "0" rather
+                // than non-existent so that if falls into the update code.
+                strVersion = "0";
+            }
+            else if (strVersion.empty())
+            {
+                // if FAMDBSchemaVersion is 184 all product specific schemas should exist so add the product schema
+                if (nFAMDBSchemaVersion == 184)
                 {
-                    CWnd *pWnd = AfxGetMainWnd();
-                    HWND hParent = (pWnd == __nullptr) ? NULL : pWnd->m_hWnd;
-
-                    int iResult = ::MessageBox(hParent,
-                        "There are new LabDE specific database elements available. These elements "
-                        "are needed if this database is to be used for LabDE.\r\n\r\n"
-                        "Do you want to add the LabDE specific database elements?", 
-                        "Add LabDE specific database elements?", MB_YESNO);
-
-                    m_bAddLabDESchemaElements = (iResult == IDYES);
-                    if (m_bAddLabDESchemaElements)
+                    if (pnNumSteps != __nullptr)
                     {
-                        // If adding the LabDE schema elements, treat this as schema version "0"
-                        // rather than non-existent so that if falls into the update code.
-                        strVersion = "0";
+                        *pnNumSteps = 8;
+                        *pnProdSchemaVersion = 0;
+                    }
+                    else
+                    {
+                        IProductSpecificDBMgrPtr ipThis(this);
+                        ipThis->AddProductSpecificSchema(ipConnection, ipDB, VARIANT_FALSE, VARIANT_TRUE);
+                        *pnProdSchemaVersion = glLABDE_DB_SCHEMA_VERSION;
                     }
                 }
-                // Use the result of the prompt in the first pass to determine whether to add the
-                // LabDE schema elements.
-                else if (m_bAddLabDESchemaElements)
-                {
-                    // If adding the LabDE schema elements, treat this as schema version "0" rather
-                    // than non-existent so that if falls into the update code.
-                    strVersion = "0";
-                }
-            }
-
-            // If the LabDE specific components are missing and the user had not chosen to add them,
-            // there is nothing to do.
-            if (strVersion.empty())
-            {
                 return S_OK;
             }
 
@@ -1324,7 +1301,7 @@ ADODB::_ConnectionPtr CLabDEProductDBMgr::getDBConnection()
 void CLabDEProductDBMgr::validateLicense()
 {
     // May eventually want to create & use a gnLABDE_CORE_OBJECTS license ID.
-    VALIDATE_LICENSE( gnLABDE_CORE_OBJECTS, "ELI37867", gstrDESCRIPTION);
+    VALIDATE_LICENSE(gnFLEXINDEX_IDSHIELD_CORE_OBJECTS, "ELI37867", gstrDESCRIPTION);
 }
 //-------------------------------------------------------------------------------------------------
 void CLabDEProductDBMgr::getLabDETables(vector<string>& rvecTables)

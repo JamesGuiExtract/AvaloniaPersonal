@@ -59,7 +59,7 @@ public:
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
 
 // IProductSpecificDBMgr Methods
-	STDMETHOD(raw_AddProductSpecificSchema)(IFileProcessingDB *pDB,
+	STDMETHOD(raw_AddProductSpecificSchema)(_Connection* pConnection, IFileProcessingDB *pDB,
 		VARIANT_BOOL bOnlyTables, VARIANT_BOOL bAddUserTables);
 	STDMETHOD(raw_AddProductSpecificSchema80)(IFileProcessingDB *pDB);
 	STDMETHOD(raw_RemoveProductSpecificSchema)(IFileProcessingDB *pDB,

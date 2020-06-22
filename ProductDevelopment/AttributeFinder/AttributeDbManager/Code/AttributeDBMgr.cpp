@@ -775,7 +775,8 @@ STDMETHODIMP CAttributeDBMgr::raw_IsLicensed(VARIANT_BOOL* pbValue)
 //-------------------------------------------------------------------------------------------------
 // IProductSpecificDBMgr Methods
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CAttributeDBMgr::raw_AddProductSpecificSchema( IFileProcessingDB* pDB,
+STDMETHODIMP CAttributeDBMgr::raw_AddProductSpecificSchema( _Connection* pConnection,
+                                                            IFileProcessingDB* pDB,
 															VARIANT_BOOL /*bOnlyTables*/,
 															VARIANT_BOOL bAddUserTables )
 {
@@ -788,13 +789,8 @@ STDMETHODIMP CAttributeDBMgr::raw_AddProductSpecificSchema( IFileProcessingDB* p
 		ASSERT_RESOURCE_ALLOCATION("ELI38522", ipDB != __nullptr);
 
 		// Create the connection object
-		_ConnectionPtr ipDBConnection(__uuidof( Connection ));
+		_ConnectionPtr ipDBConnection(pConnection);
 		ASSERT_RESOURCE_ALLOCATION("ELI38523", ipDBConnection != __nullptr);
-
-		string strDatabaseServer = asString(ipDB->DatabaseServer);
-		string strDatabaseName = asString(ipDB->DatabaseName);
-		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
 
 		VectorOfString tableCreationQueries = GetCurrentSchema( asCppBool(bAddUserTables) );
 		executeVectorOfSQL(ipDBConnection, tableCreationQueries);
@@ -1034,7 +1030,7 @@ CAttributeDBMgr::raw_UpdateSchemaForFAMDBVersion( IFileProcessingDB* pDB,
 				break;
 
 			case 7:
-				if (nFAMDBSchemaVersion == 171)
+				if (nFAMDBSchemaVersion <= 171)
 				{
 					*pnProdSchemaVersion = UpdateToSchemaVersion8(ipConnection, pnNumSteps);
 				}
