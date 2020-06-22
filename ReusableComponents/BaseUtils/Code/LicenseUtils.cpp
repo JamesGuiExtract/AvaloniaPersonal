@@ -32,18 +32,13 @@ const unsigned long	gulUCLIDKey14 = 0x498075C5;
 const unsigned long	gulUCLIDKey15 = 0x3C6D1A3E;
 const unsigned long	gulUCLIDKey16 = 0x6EDC5C7D;
 
-// Disk Serial Number expected for Extract Network drive
-const unsigned long gulDOMAIN_PATH_SERIAL_NUMBER_FNP = 1558792743;		// for FNP
-//const unsigned long gulDOMAIN_PATH_SERIAL_NUMBER_ESITDC01 = 15240731;		// for es-it-dc-01  - Jake's replacement
 
-// Since the DFS shares can be provided by different domain server, currently FNP2 and Lofton, the both volume serial number are needed
+// Since the DFS shares can be provided by different domain server, currently DC1 and Megatron, the both volume serial number are needed
 // If another domain server is added -- hex value of Volume Serial number is displayed when dir \\<domain server>\All is ran from cmd prompt
-//const unsigned long gulDOMAIN_PATH_ALL_LOFTON = 0x9E5F882D; // For extract.local\all 
 const unsigned long gulDOMAIN_PATH_ALL_MEGATRON = 0xA4D4BD53; // For extract.local\all
-const unsigned long gulDOMAIN_PATH_ALL_FNP2 = 0x1CFA8C0A; // For extract.local\all 
+const unsigned long gulDOMAIN_PATH_ALL_DC1 = 0xF4582397; // For extract.local\all
 
 // Associated Network path
-const string gstrDOMAIN_PATH_FNP = "\\fnp2\\internal";		// for FNP
 const string gstrDOMAIN_PATH_ALL = "\\extract.local\\all"; // DFS share that contains the license utility
 
 //-------------------------------------------------------------------------------------------------
@@ -121,26 +116,8 @@ void getUEPassword(ByteStream& rPasswordBytes)
 //-------------------------------------------------------------------------------------------------
 bool isInternalToolsLicensed()
 {
-	// Check FNP
-	string strDrive = getMappedDrive( gstrDOMAIN_PATH_FNP );
-	if (strDrive.length() > 0)
-	{
-		// Append backslash character
-		strDrive += "\\";
-
-		// Get FNP's disk serial number
-		unsigned long	ulTemp = 0;
-		GetVolumeInformation( strDrive.c_str(), NULL, NULL, &ulTemp, NULL, NULL, NULL, NULL );
-
-		// Compare serial numbers
-		if (ulTemp == gulDOMAIN_PATH_SERIAL_NUMBER_FNP)
-		{
-			return true;
-		}
-	}
-
-	// Check Extract.local\All if FNP check failed
-	strDrive = getMappedDrive(gstrDOMAIN_PATH_ALL);
+	// Check Extract.local\All 
+	string strDrive = getMappedDrive(gstrDOMAIN_PATH_ALL);
 	if (strDrive.length() > 0)
 	{
 		// Append a backslash character
@@ -151,7 +128,7 @@ bool isInternalToolsLicensed()
 		GetVolumeInformation(strDrive.c_str(), NULL, NULL, &ulTemp, NULL, NULL, NULL, NULL);
 
 		// Compare serial numbers
-		if (ulTemp == gulDOMAIN_PATH_ALL_FNP2 || ulTemp == gulDOMAIN_PATH_ALL_MEGATRON)
+		if (ulTemp == gulDOMAIN_PATH_ALL_DC1 || ulTemp == gulDOMAIN_PATH_ALL_MEGATRON)
 		{
 			return true;
 		}
