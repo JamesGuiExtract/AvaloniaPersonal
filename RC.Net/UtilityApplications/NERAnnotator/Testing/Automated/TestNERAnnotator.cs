@@ -83,6 +83,9 @@ namespace Extract.UtilityApplications.NERAnnotation.Test
                 _testFiles.Dispose();
             }
 
+            // Change out of directory before attempting to delete it
+            Directory.SetCurrentDirectory(Path.GetTempPath());
+
             // This class is haunted; The first temp folder keeps existing after it has been deleted so to
             // safe, remove them from the list so as not to attempt to delete them more than once if you run
             // test twice (they do go away after closing nunit).
