@@ -2161,6 +2161,8 @@ library UCLID_FILEPROCESSINGLib
 		// be re-used. The password will only be usable on the machine it was created and by the Windows
 		// user making this call. To use the password, call LoginUser with the username "<Admin>".
 		[id(210), helpstring("method GetOneTimePassword")] HRESULT GetOneTimePassword([out, retval] BSTR* pVal);
+
+		[propget, id(211), helpstring("property CurrentDBSchemaVersion")] HRESULT CurrentDBSchemaVersion([out, retval] LONG* pVal);
 	};
 
 	[

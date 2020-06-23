@@ -1,7 +1,9 @@
 ﻿using DatabaseMigrationWizard.Database.Input.DataTransformObject;
 using Extract.Database;
+using System;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
+using UCLID_FILEPROCESSINGLib;
 
 namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 {
@@ -81,7 +83,24 @@ WHERE
 	AND
 	dbo.DBInfo.Name <> 'DatabaseID'
 	AND
-	dbo.DBInfo.Value != ##DBInfo.Value";
+	dbo.DBInfo.Value != ##DBInfo.Value
+;
+INSERT INTO
+	dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+SELECT
+	'N/A'
+	, 'Warning'
+	, 'DBInfo'
+	, CONCAT(dbo.DBInfo.Name, ' has a value of ', ##DBInfo.Value, ' in the importing source but a value of ', dbo.DBInfo.Value, ' in the destination. It is possible that the import may not behave as expected (missing tables/columns) if you proceed.')
+FROM
+	dbo.DBInfo
+		LEFT OUTER JOIN ##DBInfo
+			ON dbo.DBInfo.Name = ##DBInfo.Name
+WHERE
+	LOWER(dbo.DBInfo.Name) LIKE '%schema%'
+	AND
+	dbo.DBInfo.Value != ##DBInfo.Value
+";
 
         public Priorities Priority => Priorities.Low;
 
@@ -94,8 +113,40 @@ WHERE
             ImportHelper.PopulateTemporaryTable<DBInfo>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
 			importOptions.ExecuteCommand(this.ReportingSQL);
+			importOptions.ExecuteCommand(this.GetSchemaCheckQuery(importOptions));
 
             importOptions.ExecuteCommand(this.insertSQL);
         }
+
+		private int GetDBSchemaVersion(ImportOptions importOptions)
+		{
+			var fileProcessingDb = new FileProcessingDB()
+			{
+				DatabaseServer = importOptions.ConnectionInformation.DatabaseServer,
+				DatabaseName = importOptions.ConnectionInformation.DatabaseName
+			};
+
+			return fileProcessingDb.CurrentDBSchemaVersion;
+		}
+
+		private string GetSchemaCheckQuery(ImportOptions importOptions)
+		{
+			return $@"
+INSERT INTO
+	dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+SELECT
+	'N/A'
+	, 'Warning'
+	, 'DBInfo'
+	, 'Version mismatch! ApplicationVersion: {GetDBSchemaVersion(importOptions)} Database Version: ' + dbo.DBInfo.Value
+
+FROM
+	dbo.DBInfo
+WHERE
+	dbo.DBInfo.Name = 'FAMDBSchemaVersion'
+	AND
+	dbo.DBInfo.Value != { GetDBSchemaVersion(importOptions)}
+";
+		}
     }
 }

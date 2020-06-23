@@ -906,6 +906,21 @@ STDMETHODIMP CFileProcessingDB::get_DBSchemaVersion(LONG* pVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15148");
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_CurrentDBSchemaVersion(LONG* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI49890", pVal != __nullptr);
+
+		*pVal = CFileProcessingDB::ms_lFAMDBSchemaVersion;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49897");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::ChangeLogin(VARIANT_BOOL bChangeAdmin, VARIANT_BOOL* pbChangeCancelled, 
 												 VARIANT_BOOL* pbChangeValid)
 {

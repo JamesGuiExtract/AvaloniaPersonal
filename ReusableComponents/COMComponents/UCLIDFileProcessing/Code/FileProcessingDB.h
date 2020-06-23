@@ -383,6 +383,7 @@ public:
 		BSTR bstrExceptIfMoreRecentAttributeSetName, IIUnknownVector** ppUncommittedPagesOfData);
 	STDMETHOD(DiscardOldCacheData)(long nFileID, long nActionID, long nExceptFileTaskSessionID);
 	STDMETHOD(GetOneTimePassword)(BSTR* pVal);
+	STDMETHOD(get_CurrentDBSchemaVersion)(LONG* pVal);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
