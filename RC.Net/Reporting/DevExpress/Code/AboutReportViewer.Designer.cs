@@ -1,4 +1,4 @@
-namespace Extract.ReportViewer
+namespace Extract.ReportingDevExpress
 {
     partial class AboutReportViewer
     {

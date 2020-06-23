@@ -182,6 +182,8 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Database.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Database.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\SQLServerInfo.exe" /mapout:"$(BinariesFolder)\Map\SQLServerInfo.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ReportViewer.exe" /mapout:"$(BinariesFolder)\Map\ReportViewer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\ReportViewer.exe"
+	sn -Ra "$(BinariesFolder)\Obfuscated\ReportViewer.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.AttributeFinder.dll" /mapout:"$(BinariesFolder)\Map\Extract.AttributeFinder.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.AttributeFinder.Tabula.dll" /mapout:"$(BinariesFolder)\Map\Extract.AttributeFinder.Tabula.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.FileActionManager.FileProcessors.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileActionManager.FileProcessors.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
@@ -275,7 +277,12 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Utilities.FSharp.CSharpInterop.dll" /mapout:"$(BinariesFolder)\Map\Extract.Utilities.FSharp.CSharpInterop.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Utilities.FSharp.NERAnnotation.dll" /mapout:"$(BinariesFolder)\Map\Extract.Utilities.FSharp.NERAnnotation.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Dashboard.ETL.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Dashboard.ETL.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Reporting.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Reporting.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.ReportingDevExpress.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.ReportingDevExpress.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ReportDesigner.exe" /mapout:"$(BinariesFolder)\Map\mapReportDesigner.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\ReportDesigner.exe"
+	sn -Ra "$(BinariesFolder)\Obfuscated\ReportDesigner.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
+
 
 	@ECHO.
     @DATE /T

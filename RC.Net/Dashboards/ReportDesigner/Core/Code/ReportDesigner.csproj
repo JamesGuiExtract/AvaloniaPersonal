@@ -131,7 +131,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\ReportDesignerIcon.ico" />
+    <EmbeddedResource Include="Resources\ReportDesignerIcon.ico" />
     <Content Include="Resources\ReportDesignerIcon.svg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -144,10 +144,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\ReportViewer\Core\Code\ReportViewer.csproj">
-      <Project>{5853AB0D-6C4B-452E-A576-F85361C3A769}</Project>
-      <Name>ReportViewer</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
       <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
       <Name>Extract.Imaging.Forms</Name>
@@ -159,6 +155,10 @@
     <ProjectReference Include="..\..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Reporting\Core\Code\Extract.Reporting.csproj">
+      <Project>{3a0fa1ac-f8aa-477a-b0b0-3630091e520b}</Project>
+      <Name>Extract.Reporting</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj">
       <Project>{DC72C952-D6ED-42F6-893D-8262BC9D183E}</Project>

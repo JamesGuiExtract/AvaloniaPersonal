@@ -1,23 +1,27 @@
+using DevExpress.XtraBars.Ribbon;
+using DevExpress.XtraPrinting;
+using DevExpress.XtraReports.UI;
+using DevExpress.XtraRichEdit.Import.Rtf;
 using Extract.Licensing;
-using Extract.ReportViewer.Properties;
+using Extract.Reporting;
+using Extract.ReportingDevExpress.Properties;
 using Extract.Utilities;
-using Extract.Utilities.Email;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
-using UCLID_COMUTILSLib;
 
-namespace Extract.ReportViewer
+namespace Extract.ReportingDevExpress
 {
     /// <summary>
-    /// A form for displaying a crystal report document.
+    /// A form for displaying a report document.
     /// </summary>
-    public partial class ReportViewerForm : Form
+    public partial class ReportViewerForm : RibbonForm
     {
         #region Constants
 
@@ -70,7 +74,7 @@ namespace Extract.ReportViewer
         /// The <see cref="ExtractReport"/> object that contains the report to
         /// be displayed.
         /// </summary>
-        ExtractReport _report;
+        IExtractReport _report;
 
         /// <summary>
         /// List that will contain the names of all the standard reports.  This is used
@@ -85,6 +89,211 @@ namespace Extract.ReportViewer
         List<TemporaryFile> _temporaryFiles = new List<TemporaryFile>();
 
         #endregion Fields
+
+        private class SendFileTemplateCommandHandler : ICommandHandler
+        {
+            ReportViewerForm ReportForm { get; }
+
+            public SendFileTemplateCommandHandler(ReportViewerForm reportViewerForm)
+            {
+                ReportForm = reportViewerForm;
+            }
+            public bool CanHandleCommand(PrintingSystemCommand command, IPrintControl printControl)
+            {
+                return command == PrintingSystemCommand.SendFile ||
+                    command == PrintingSystemCommand.SendPdf ||
+                    command == PrintingSystemCommand.SendCsv ||
+                    command == PrintingSystemCommand.SendDocx ||
+                    command == PrintingSystemCommand.SendGraphic ||
+                    command == PrintingSystemCommand.SendMht ||
+                    command == PrintingSystemCommand.SendRtf ||
+                    command == PrintingSystemCommand.SendTxt ||
+                    command == PrintingSystemCommand.SendXls ||
+                    command == PrintingSystemCommand.SendXlsx ||
+                    command ==  PrintingSystemCommand.SendXps ||
+                    command == PrintingSystemCommand.ExportCsv ||
+                    command == PrintingSystemCommand.ExportDocx ||
+                    command == PrintingSystemCommand.ExportFile ||
+                    command == PrintingSystemCommand.ExportGraphic ||
+                    command == PrintingSystemCommand.ExportHtm ||
+                    command == PrintingSystemCommand.ExportMht ||
+                    command == PrintingSystemCommand.ExportPdf ||
+                    command == PrintingSystemCommand.ExportRtf ||
+                    command == PrintingSystemCommand.ExportTxt ||
+                    command == PrintingSystemCommand.ExportXls ||
+                    command == PrintingSystemCommand.ExportXlsx ||
+                    command == PrintingSystemCommand.ExportXps;
+            }
+
+            public void HandleCommand(PrintingSystemCommand command,
+                                      object[] args,
+                                      IPrintControl printControl,
+                                      ref bool handled)
+            {
+                if (!CanHandleCommand(command, printControl))
+                    return;
+                try
+                {
+                    var reportName = Path.GetFileNameWithoutExtension(ReportForm._reportFileName);
+                    var options = ReportForm.documentViewer.PrintingSystem.ExportOptions;
+                    options.PrintPreview.DefaultFileName = reportName;
+                    options.Email.Subject =
+                        string.Concat("Report: ",
+                                      reportName,
+                                      " ",
+                                      DateTime.Now.ToString("g", CultureInfo.CurrentCulture));
+                    // do not mark as handled since this is just setting the options
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractDisplay("ELI49906");
+                }
+            }
+        }
+
+
+        private class SaveTemplateCommandHandler : ICommandHandler
+        {
+            ReportViewerForm ReportForm { get; }
+
+            public SaveTemplateCommandHandler(ReportViewerForm reportViewerForm)
+            {
+                ReportForm = reportViewerForm;
+            }
+            public bool CanHandleCommand(PrintingSystemCommand command, IPrintControl printControl)
+            {
+                return command == PrintingSystemCommand.Save;
+            }
+
+            public void HandleCommand(PrintingSystemCommand command, object[] args, IPrintControl printControl, ref bool handled)
+            {
+                if (!CanHandleCommand(command, printControl))
+                    return;
+                
+                try
+                {
+                    string baseSavedName = GetSaveName();
+                    if (string.IsNullOrEmpty(baseSavedName))
+                        return;
+
+                    try
+                    {
+                        // Copy the report and preview file (overwriting if necessary)
+                        string previewName = Path.Combine(ExtractReportUtils.StandardReportFolder,
+                            Path.GetFileNameWithoutExtension(ReportForm._reportFileName) + _PREVIEW_EXTENSION);
+                        File.Copy(ReportForm._report.FileName, baseSavedName + ".repx", true);
+                        if (File.Exists(previewName))
+                        {
+                            File.Copy(previewName, baseSavedName + _PREVIEW_EXTENSION, true);
+                        }
+
+                        // Write the xml file
+                        ReportForm._report.WriteXmlFile(baseSavedName + ".xml", true);
+                    }
+                    catch (Exception ex)
+                    {
+
+                        // Ensure all files are cleaned up since copying failed
+                        // Delete report file
+                        string tempName = baseSavedName + ".repx";
+                        if (File.Exists(tempName))
+                        {
+                            FileSystemMethods.TryDeleteFile(tempName);
+                        }
+                        // Delete preview file
+                        tempName = baseSavedName + _PREVIEW_EXTENSION;
+                        if (File.Exists(tempName))
+                        {
+                            FileSystemMethods.TryDeleteFile(tempName);
+                        }
+                        // Delete xml file
+                        tempName = baseSavedName + ".xml";
+                        if (File.Exists(tempName))
+                        {
+                            FileSystemMethods.TryDeleteFile(tempName);
+                        }
+
+                        ExtractException ee = new ExtractException("ELI23866",
+                            "Failed saving report template!", ex);
+                        ee.AddDebugData("Base Template Name", baseSavedName, false);
+
+                        throw ee;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExtractException ee = ExtractException.AsExtractException("ELI23749", ex);
+                    ee.Display();
+                }
+                finally
+                {
+                    handled = true;
+                }
+            }
+
+            private string GetSaveName()
+            {
+                string response = null;
+                string baseSavedName = null;
+                do
+                {
+                    if (InputBox.Show(ReportForm, "Report name", "Save Report Template", ref response) !=
+                        DialogResult.OK)
+                    {
+                        // User canceled, just return empty string
+                        return "";
+                    }
+
+                    // Build the file name from the response
+                    baseSavedName = Path.Combine(ExtractReportUtils.SavedReportFolder, response);
+
+                    // Check if there is a standard report with the same name
+                    if (ReportForm.IsSameNameAsStandardReport(response))
+                    {
+                        MessageBox.Show("The specified report name already exists in the " +
+                            "Standard reports folder. Please specify a different " +
+                            "name.",
+                                        "Invalid Report Name",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error,
+                                        MessageBoxDefaultButton.Button1,
+                                        0);
+                    }
+                    // Validate the file name
+                    else if (!FileSystemMethods.IsFileNameValid(response + ".repx"))
+                    {
+                        MessageBox.Show("The specified report name contains invalid characters." +
+                            " The following characters are not valid:" +
+                            Environment.NewLine +
+                            "* \\ | / : \" < > ?",
+                                        "Invalid Report Name",
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Error,
+                                        MessageBoxDefaultButton.Button1,
+                                        0);
+                    }
+                    else
+                    {
+                        // If the file does not exist or the user wants to overwrite then
+                        // break from the loop
+                        if (!File.Exists(baseSavedName + ".repx") ||
+                            MessageBox.Show("There is already a saved report with that name." +
+                                " Would you like to overwrite it?",
+                                            "Overwrite Existing Report",
+                                            MessageBoxButtons.YesNo,
+                                            MessageBoxIcon.Warning,
+                                            MessageBoxDefaultButton.Button1,
+                                            0) ==
+                            DialogResult.Yes)
+                        {
+                            return baseSavedName;
+                        }
+                    }
+                }
+                while (true);
+            }
+        }
+
 
         #region Constructors
 
@@ -106,7 +315,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="report">The <see cref="ExtractReport"/> report to
         /// attach to.</param>
-        public ReportViewerForm(ExtractReport report)
+        public ReportViewerForm(IExtractReport report)
             : this (report, report.DatabaseServer, report.DatabaseName, report.WorkflowName)
         {
         }
@@ -119,7 +328,7 @@ namespace Extract.ReportViewer
         /// <param name="serverName">The database server to attach the report to.</param>
         /// <param name="databaseName">The database name to attach the report to.</param>
         /// <param name="workflowName">The workflow to run the report on.</param>
-        public ReportViewerForm(ExtractReport report, string serverName, string databaseName, string workflowName)
+        public ReportViewerForm(IExtractReport report, string serverName, string databaseName, string workflowName)
         {
             try
             {
@@ -134,8 +343,19 @@ namespace Extract.ReportViewer
                     "ELI23504", _OBJECT_NAME);
 
                 InitializeComponent();
-                
-                _report = report;
+
+                // This is a work around for a problem specifically in 19.2.3 of the DevExpress tools, it is fixed in 
+                // later versions. The problem is that the icons for the prev and next buttons are reversed
+                var ver = AssemblyName.GetAssemblyName(typeof(ReportPrintTool).Assembly.Location).Version; 
+                var swapPageNavigation = ver.Major == 19 && ver.Minor == 2 && ver.Build <= 3;
+                if (swapPageNavigation)
+                {
+                    var temp = printPreviewBarItem19.ImageOptions.DefaultSvgImage;
+                    printPreviewBarItem19.ImageOptions.DefaultSvgImage = printPreviewBarItem20.ImageOptions.DefaultSvgImage;
+                    printPreviewBarItem20.ImageOptions.DefaultSvgImage = temp;
+                }
+
+                _report = report as IExtractReport;
 
                 // Store the report and database information
                 _reportFileName = report != null ? report.FileName : "";
@@ -143,12 +363,6 @@ namespace Extract.ReportViewer
                 _databaseName = databaseName;
                 _workflowName = workflowName;
 
-                // Enable/disable the save template menu item depending on whether the
-                // report is a standard report or not
-                _saveReportTemplateToolStripMenuItem.Enabled =
-                    !string.IsNullOrEmpty(_reportFileName)
-                     && ExtractReport.StandardReportFolder.Equals(
-                    Path.GetDirectoryName(_reportFileName), StringComparison.OrdinalIgnoreCase);
             }
             catch (Exception ex)
             {
@@ -178,7 +392,7 @@ namespace Extract.ReportViewer
                 else
                 {
                     // Show the open report dialog (click the menu item)
-                    _openReportToolStripMenuItem.PerformClick();
+                    OpenReportBarButton.PerformClick();
                 }
             }
             catch (Exception ex)
@@ -269,16 +483,16 @@ namespace Extract.ReportViewer
             {
                 if (msg.Msg == WindowsMessage.KeyDown
                     && (keyData != Keys.Control || keyData != Keys.Alt || keyData != Keys.Shift)
-                    && _crystalReportViewer.ReportSource != null)
+                    && documentViewer.DocumentSource != null)
                 {
                     if (keyData == Keys.PageDown)
                     {
-                        _crystalReportViewer.ShowNextPage();
+                        documentViewer.SelectNextPage();
                         return true;
                     }
                     else if (keyData == Keys.PageUp)
                     {
-                        _crystalReportViewer.ShowPreviousPage();
+                        documentViewer.SelectPrevPage();
                         return true;
                     }
                 }
@@ -298,7 +512,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        private void HandleFileExitClick(object sender, EventArgs e)
+        private void HandleFileExitClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
             try
             {
@@ -328,7 +542,7 @@ namespace Extract.ReportViewer
                     if (openReport.ShowDialog() == DialogResult.OK)
                     {
                         // Clear the report viewer
-                        _crystalReportViewer.ReportSource = null;
+                        documentViewer.DocumentSource = null;
 
                         // Set the title bar back to default
                         this.Text = _FORM_CAPTION;
@@ -350,10 +564,6 @@ namespace Extract.ReportViewer
                         _report = new ExtractReport(_serverName, _databaseName, _workflowName, _reportFileName,
                             openReport.StandardReport);
 
-                        // Enable/disable the save template menu item depending on whether the
-                        // report is a standard report or a saved report
-                        _saveReportTemplateToolStripMenuItem.Enabled = openReport.StandardReport;
-
                         // Attach the report to the viewer (if the user did not cancel)
                         if (_report != null && !_report.CanceledInitialization)
                         {
@@ -370,116 +580,7 @@ namespace Extract.ReportViewer
             }
         }
 
-        /// <summary>
-        /// Handles the <see cref="Control.Click"/> event.
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        private void HandleFileSaveReportTemplateClick(object sender, EventArgs e)
-        {
-            try
-            {
-                string response = null;
-                string baseSavedName = null;
-                do
-                {
-                    if (InputBox.Show(this, "Report name",
-                        "Save Report Template", ref response) != DialogResult.OK)
-                    {
-                        // User canceled, just return
-                        return;
-                    }
-
-                    // Build the file name from the response
-                    baseSavedName = Path.Combine(ExtractReport.SavedReportFolder, response);
-                    
-                    // Check if there is a standard report with the same name
-                    if (IsSameNameAsStandardReport(response))
-                    {
-                        MessageBox.Show("The specified report name already exists in the "
-                            + "Standard reports folder. Please specify a different "
-                            + "name.", "Invalid Report Name", MessageBoxButtons.OK,
-                            MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
-                    }
-                    // Validate the file name
-                    else if (!FileSystemMethods.IsFileNameValid(response + ".rpt"))
-                    {
-                        MessageBox.Show("The specified report name contains invalid characters."
-                            + " The following characters are not valid:" + Environment.NewLine
-                            + "* \\ | / : \" < > ?", "Invalid Report Name", MessageBoxButtons.OK,
-                            MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
-                    }
-                    else
-                    {
-                        // If the file does not exist or the user wants to overwrite then
-                        // break from the loop
-                        if (!File.Exists(baseSavedName + ".rpt")
-                            || MessageBox.Show("There is already a saved report with that name."
-                                + " Would you like to overwrite it?", "Overwrite Existing Report",
-                                MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
-                                MessageBoxDefaultButton.Button1, 0) == DialogResult.Yes)
-                        {
-                            break;
-                        }
-                    }
-                }
-                while(true);
-
-                // Ensure baseSavedName is not null
-                ExtractException.Assert("ELI23861", "Base name was null!", baseSavedName != null);
-
-                try
-                {
-                    // Copy the report and preview file (overwriting if necessary)
-                    string previewName = Path.Combine(ExtractReport.StandardReportFolder,
-                        Path.GetFileNameWithoutExtension(_reportFileName) + _PREVIEW_EXTENSION);
-                    File.Copy(_report.FileName, baseSavedName + ".rpt", true);
-                    if (File.Exists(previewName))
-                    {
-                        File.Copy(previewName, baseSavedName + _PREVIEW_EXTENSION, true);
-                    }
-
-                    // Write the xml file
-                    _report.WriteXmlFile(baseSavedName + ".xml", true);
-                }
-                catch (Exception ex)
-                {
-
-                    // Ensure all files are cleaned up since copying failed
-                    // Delete report file
-                    string tempName = baseSavedName + ".rpt";
-                    if (File.Exists(tempName))
-                    {
-                        FileSystemMethods.TryDeleteFile(tempName);
-                    }
-                    // Delete preview file
-                    tempName = baseSavedName + _PREVIEW_EXTENSION;
-                    if (File.Exists(tempName))
-                    {
-                        FileSystemMethods.TryDeleteFile(tempName);
-                    }
-                    // Delete xml file
-                    tempName = baseSavedName + ".xml";
-                    if (File.Exists(tempName))
-                    {
-                        FileSystemMethods.TryDeleteFile(tempName);
-                    }
-
-                    ExtractException ee = new ExtractException("ELI23866",
-                        "Failed saving report template!", ex);
-                    ee.AddDebugData("Base Template Name", baseSavedName, false);
-
-                    throw ee;
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI23749", ex);
-                ee.AddDebugData("Event Arguments", e, false);
-                ee.Display();
-            }
-        }
-
+ 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event.
         /// </summary>
@@ -511,71 +612,11 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
-        /// Handles the <see cref="Control.Click"/> event for the export report file menu item.
-        /// </summary>
-        /// <param name="sender">The object which sent the event.</param>
-        /// <param name="e">The data associated with the event.</param>
-        private void HandleFileExportReportClick(object sender, EventArgs e)
-        {
-            try
-            {
-                // Open the export report dialog
-                _crystalReportViewer.ExportReport();
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI24991", ex);
-                ee.AddDebugData("Event Arguments", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
-        /// Handles the email report clicked.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        private void HandleFileEmailReportClicked(object sender, EventArgs e)
-        {
-            try
-            {
-                if (_report == null)
-                {
-                    return;
-                }
-
-                using (var wait = new TemporaryWaitCursor())
-                {
-                    var tempFileName = GetTemporaryPdfEmailReportFileName(_report.FileName);
-                    _temporaryFiles.Add(new TemporaryFile(new FileInfo(tempFileName), false));
-
-                    _report.ExportReportToFile(tempFileName, true);
-
-                    var attachments = new VariantVector();
-                    attachments.PushBack(tempFileName);
-
-                    // Build email message with subject -
-                    // Report: <ReportName> mm/dd/yyyy hh:mm AM/PM"
-                    var message = new ExtractEmailMessage();
-                    message.Subject = string.Concat("Report: ",
-                        Path.GetFileNameWithoutExtension(_report.FileName),
-                        " ", DateTime.Now.ToString("g", CultureInfo.CurrentCulture));
-                    message.Attachments = attachments;
-                    message.ShowInClient(false);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI32550");
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="Control.Click"/> event.
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        private void HandleHelpAboutClick(object sender, EventArgs e)
+        private void HandleHelpAboutClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
             try
             {
@@ -596,8 +637,8 @@ namespace Extract.ReportViewer
         /// Handles the refresh open document.
         /// </summary>
         /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        private void HandleRefreshOpenDocument(object sender, EventArgs e)
+        /// <param name="e">The <see cref="DevExpress.XtraBars.ItemClickEventArgs"/> instance containing the event data.</param>
+        private void HandleRefreshBarButton_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
             try
             {
@@ -627,46 +668,28 @@ namespace Extract.ReportViewer
             ExtractException.Assert("ELI23751", "Report object cannot be null!",
                 _report != null);
 
-            // Hide the report viewer and show progress bar while the report is loaded
-            _crystalReportViewer.Visible = false;
-            _pleaseWaitLabel.Visible = true;
-            _progressBar.Visible = true;
+            var reportAsXtraReport = _report.ReportDocument as XtraReport;
+            reportAsXtraReport.CreateDocument();
+            documentViewer.DocumentSource = reportAsXtraReport;
 
-            // [DotNetRCAndUtils:762]
-            // Implmented the idea suggested in this thread to prevent exceptions from Crystal
-            // Reports mouse move events:
-            // http://social.msdn.microsoft.com/Forums/en/vscrystalreports/thread/98bb4330-e3e5-46e2-abbb-76c730dddeab
-            _crystalReportViewer.Dock = DockStyle.None;
-
-            Refresh();
-
-            // Attach the report to the control and move to the first page
-            // (this forces the data to be loaded into the control)
-            // NOTE: The UI will be unresponsive at this point, the progress
-            // marquee will continue to scroll but the user will be unable to
-            // interact with the UI.
-            _crystalReportViewer.ReportSource = _report.ReportDocument;
-            _crystalReportViewer.ShowFirstPage();
-            _crystalReportViewer.Zoom(75);
+            documentViewer.SelectFirstPage();
 
             // Set the title based on the report file
             this.Text = _FORM_CAPTION + " - " + Path.GetFileNameWithoutExtension(_reportFileName);
+            bool saveEnabled = !string.IsNullOrEmpty(_reportFileName)
+                 && ExtractReport.StandardReportFolder.Equals(
+                Path.GetDirectoryName(_reportFileName), StringComparison.OrdinalIgnoreCase);
 
-            // Show viewer and hide progress bar now that report is loaded
-            _crystalReportViewer.Visible = true;
-            _pleaseWaitLabel.Visible = false;
-            _progressBar.Visible = false;
+            // Add overrides for the Save and SendFile commands
+            documentViewer.PrintingSystem.AddCommandHandler(new SaveTemplateCommandHandler(this));
+            documentViewer.PrintingSystem.AddCommandHandler(new SendFileTemplateCommandHandler(this));
 
-            _exportReportToPDFToolStripMenuItem.Enabled = true;
-            _exportReportToolStripMenuItem.Enabled = true;
-            _emailReportToolStripMenuItem.Enabled = true;
-            _refreshToolStripMenuItem.Enabled = true;
+            // Enable / disable the save template menu item depending on whether the
+            // report is a standard report or not
+            documentViewer.PrintingSystem
+                .SetCommandVisibility(PrintingSystemCommand.Save, (saveEnabled) ? CommandVisibility.All : CommandVisibility.None);
+            
 
-            // First, refresh the form with _crystalReportViewer.Dock == None.
-            Refresh();
-
-            // Now, re-apply the Fill dock style
-            _crystalReportViewer.Dock = DockStyle.Fill;
             Invalidate();
         }
 

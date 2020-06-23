@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace Extract.ReportViewer
+namespace Extract.ReportingDevExpress
 {
     /// <summary>
     /// The about box for the Report Viewer application.

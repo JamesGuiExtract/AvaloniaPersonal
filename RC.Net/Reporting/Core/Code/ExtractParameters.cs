@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Text;
 using System.Xml;
 
-namespace Extract.ReportViewer
+namespace Extract.Reporting
 {
     /// <summary>
     /// An interface that all extract parameter controls must implement
@@ -204,7 +204,7 @@ namespace Extract.ReportViewer
         /// <see cref="XmlWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="XmlWriter"/> to write the
-        /// paramter to.</param>
+        /// parameter to.</param>
         public abstract void WriteToXml(XmlWriter writer);
 
         /// <summary>
@@ -316,7 +316,7 @@ namespace Extract.ReportViewer
         /// <see cref="XmlWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="XmlWriter"/> to write the
-        /// paramter to.</param>
+        /// parameter to.</param>
         public override void WriteToXml(XmlWriter writer)
         {
             try
@@ -383,7 +383,7 @@ namespace Extract.ReportViewer
         /// <see cref="XmlWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="XmlWriter"/> to write the
-        /// paramter to.</param>
+        /// parameter to.</param>
         public override void WriteToXml(XmlWriter writer)
         {
             try
@@ -402,7 +402,7 @@ namespace Extract.ReportViewer
     }
 
     /// <summary>
-    /// Represents a date report paremeter.
+    /// Represents a date report parameter.
     /// </summary>
     public class DateParameter : ExtractReportParameter<DateTime>
     {
@@ -431,7 +431,7 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to show the time time.
+        /// Gets or sets a value indicating whether to show the time.
         /// </summary>
         /// <value><see langword="true"/> to show the date and time; <see langword="false"/> to show
         /// only the date.
@@ -465,7 +465,7 @@ namespace Extract.ReportViewer
         /// <see cref="XmlWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="XmlWriter"/> to write the
-        /// paramter to.</param>
+        /// parameter to.</param>
         public override void WriteToXml(XmlWriter writer)
         {
             try
@@ -1132,7 +1132,7 @@ namespace Extract.ReportViewer
         /// <see cref="XmlWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="XmlWriter"/> to write the
-        /// paramter to.</param>
+        /// parameter to.</param>
         public override void WriteToXml(XmlWriter writer)
         {
             try
@@ -1366,7 +1366,7 @@ namespace Extract.ReportViewer
         /// <see cref="XmlWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="XmlWriter"/> to write the
-        /// paramter to.</param>
+        /// parameter to.</param>
         public override void WriteToXml(XmlWriter writer)
         {
             try

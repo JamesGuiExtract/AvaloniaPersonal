@@ -1,5 +1,8 @@
-using CrystalDecisions.CrystalReports.Engine;
-using CrystalDecisions.Shared;
+using DevExpress.DataAccess.ConnectionParameters;
+using DevExpress.DataAccess.Sql;
+using DevExpress.XtraReports.Parameters;
+using DevExpress.XtraReports.UI;
+using Extract.Reporting;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -11,38 +14,20 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-namespace Extract.ReportViewer
+namespace Extract.ReportingDevExpress
 {
     /// <summary>
     /// Represents a report class that contains a <see cref="ReportDocument"/> and the associated
     /// database connection and parameter information.
     /// </summary>
-    public class ExtractReport : IDisposable
+    public class ExtractReport : IDisposable, IExtractReport
     {
         #region Constants
 
         /// <summary>
-        /// Relative path to the reports folder (relative to the current applications directory).
-        /// </summary>
-        static readonly string _REPORT_FOLDER_PATH =
-            Path.Combine(FileSystemMethods.CommonApplicationDataPath, "Reports");
-
-        /// <summary>
-        /// Folder which contains the standard reports
-        /// </summary>
-        static readonly string _STANDARD_REPORT_FOLDER =
-            Path.Combine(_REPORT_FOLDER_PATH, "Standard reports");
-
-        /// <summary>
-        /// Folder which contains the saved reports
-        /// </summary>
-        static readonly string _SAVED_REPORT_FOLDER =
-            Path.Combine(_REPORT_FOLDER_PATH, "Saved reports");
-
-        /// <summary>
         /// The current version of the <see cref="ExtractReport"/> object.
         /// </summary>
-        static readonly int _VERSION = 2;
+        static readonly int _VERSION = 3;
 
         /// <summary>
         /// The root node of the XML data contained in the parameter file associated
@@ -86,9 +71,9 @@ namespace Extract.ReportViewer
         string _reportFileName;
 
         /// <summary>
-        /// The <see cref="ReportDocument"/> for this <see cref="ExtractReport"/> instance.
+        /// The <see cref="XtraReport"/> for this <see cref="ExtractReport"/> instance.
         /// </summary>
-        ReportDocument _report;
+        XtraReport _report;
 
         /// <summary>
         /// The collection of parameters for this report.
@@ -105,18 +90,6 @@ namespace Extract.ReportViewer
         #endregion Fields
 
         #region Constructors
-
-        /// <overloads>Initializes a new <see cref="ExtractReport"/> class.</overloads>
-        /// <summary>
-        /// Initializes a new <see cref="ExtractReport"/> class.
-        /// </summary>
-        /// <param name="serverName">The server to connect to.</param>
-        /// <param name="databaseName">The database to connect to.</param>
-        /// <param name="fileName">The name of the report file to load.</param>
-        public ExtractReport(string serverName, string databaseName, string fileName, string workflowName)
-            : this(serverName, databaseName, fileName, workflowName, true)
-        {
-        }
 
         /// <summary>
         /// Initializes a new <see cref="ExtractReport"/> class.
@@ -139,12 +112,11 @@ namespace Extract.ReportViewer
                 ExtractException.Assert("ELI23717", "File does not exist!",
                     File.Exists(fileName), "Report File Name", fileName);
 
-                _report = new ReportDocument();
+                _report = XtraReport.FromFile(fileName);
                 _serverName = serverName;
                 _databaseName = databaseName;
                 _workflowName = workflowName;
                 _reportFileName = fileName;
-                _report.FileName = fileName;
 
                 SetDatabaseConnection();
 
@@ -152,7 +124,13 @@ namespace Extract.ReportViewer
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI23718", ex);
+                var ee = ExtractException.AsExtractException("ELI23718", ex);
+                ee.AddDebugData("Server name", serverName, false);
+                ee.AddDebugData("Database name", databaseName, false);
+                ee.AddDebugData("Workflow name", workflowName, false);
+                ee.AddDebugData("FileName", fileName, false);
+                ee.AddDebugData("Prompt for parameters", promptForParameters, false);
+                throw ee;
             }
         }
 
@@ -180,7 +158,29 @@ namespace Extract.ReportViewer
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI36066");
+                var ee = ex.AsExtract("ELI36066");
+                ee.AddDebugData("File name", fileName, false);
+                throw ee;
+            }
+        }
+
+        public ExtractReport(ExtractReport extractReport)
+        {
+            try
+            {
+                _report = XtraReport.FromFile(extractReport._reportFileName);
+                _serverName = extractReport._serverName;
+                _databaseName = extractReport._databaseName;
+                _workflowName = extractReport._workflowName;
+                _reportFileName = extractReport._reportFileName;
+
+                SetDatabaseConnection();
+
+                _parameters.AddRange(extractReport._parameters);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49914");
             }
         }
 
@@ -246,7 +246,7 @@ namespace Extract.ReportViewer
         /// Gets the <see cref="ReportDocument"/>.
         /// </summary>
         /// <returns>The <see cref="ReportDocument"/>.</returns>
-        public ReportDocument ReportDocument
+        public object ReportDocument
         {
             get
             {
@@ -272,7 +272,7 @@ namespace Extract.ReportViewer
         /// hit cancel while entering parameters). If <see langword="true"/> the
         /// initialization was canceled; <see langword="false"/> otherwise.
         /// </summary>
-        /// <returns><see langword="true"/> if intialization was canceled and
+        /// <returns><see langword="true"/> if initialization was canceled and
         /// <see langword="false"/> otherwise.</returns>
         public bool CanceledInitialization
         {
@@ -293,12 +293,12 @@ namespace Extract.ReportViewer
                 try
                 {
                     // Ensure the directory exists, if not create it
-                    if (!Directory.Exists(_SAVED_REPORT_FOLDER))
+                    if (!Directory.Exists(ExtractReportUtils.SavedReportFolder))
                     {
-                        Directory.CreateDirectory(_SAVED_REPORT_FOLDER);
+                        Directory.CreateDirectory(ExtractReportUtils.SavedReportFolder);
                     }
 
-                    return _SAVED_REPORT_FOLDER;
+                    return ExtractReportUtils.SavedReportFolder;
                 }
                 catch (Exception ex)
                 {
@@ -318,12 +318,12 @@ namespace Extract.ReportViewer
                 try
                 {
                     // Ensure the directory exists, if not create it
-                    if (!Directory.Exists(_STANDARD_REPORT_FOLDER))
+                    if (!Directory.Exists(ExtractReportUtils.StandardReportFolder))
                     {
-                        Directory.CreateDirectory(_STANDARD_REPORT_FOLDER);
+                        Directory.CreateDirectory(ExtractReportUtils.StandardReportFolder);
                     }
 
-                    return _STANDARD_REPORT_FOLDER;
+                    return ExtractReportUtils.StandardReportFolder;
                 }
                 catch (Exception ex)
                 {
@@ -337,7 +337,7 @@ namespace Extract.ReportViewer
         #region Methods
 
         /// <summary>
-        /// Exports the crystal report object to the specified file.
+        /// Exports the report object to the specified file.
         /// <para><b>Note:</b></para>
         /// The export format is determined from the file extension of <paramref name="fileName"/>.
         /// If the extension is '.pdf' then the output format will be pdf if the extension is
@@ -385,11 +385,19 @@ namespace Extract.ReportViewer
 
                 if (extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
-                    _report.ExportToDisk(ExportFormatType.PortableDocFormat, fileName);
+                    _report.ExportToPdf(fileName);
                 }
                 else if (extension.Equals(".xls", StringComparison.OrdinalIgnoreCase))
                 {
-                    _report.ExportToDisk(ExportFormatType.Excel, fileName);
+                    _report.ExportToXls(fileName);
+                }
+                else if  (extension.Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+                {
+                    _report.ExportToXlsx(fileName);
+                }
+                else if (extension.Equals(".html", StringComparison.OrdinalIgnoreCase))
+                {
+                    _report.ExportToHtml(fileName);
                 }
                 else
                 {
@@ -423,12 +431,7 @@ namespace Extract.ReportViewer
             {
                 if (_report == null)
                 {
-                    _report = new ReportDocument();
-                    _report.FileName = _reportFileName;
-                }
-                else
-                {
-                    _report.Refresh();
+                    _report = XtraReport.FromFile(_reportFileName);
                 }
 
                 _serverName = serverName;
@@ -437,6 +440,8 @@ namespace Extract.ReportViewer
 
                 SetDatabaseConnection();
                 _canceledInitialization = !SetParameters(promptForParameters, true);
+                if (!_canceledInitialization)
+                    _report.CreateDocument();
             }
             catch (Exception ex)
             {
@@ -451,7 +456,6 @@ namespace Extract.ReportViewer
         {
             try
             {
-                _report.Refresh();
                 SetDatabaseConnection();
                 SetParameters(false, true);
             }
@@ -466,16 +470,13 @@ namespace Extract.ReportViewer
         /// </summary>
         void SetDatabaseConnection()
         {
-            // Set up the log on info for the report
-            TableLogOnInfo logOnInfo = new TableLogOnInfo();
-            logOnInfo.ConnectionInfo.ServerName = _serverName;
-            logOnInfo.ConnectionInfo.DatabaseName = _databaseName;
-            logOnInfo.ConnectionInfo.IntegratedSecurity = true;
-
-            // Apply the log on info for all tables in the report
-            foreach (Table table in _report.Database.Tables)
+            var sqlConnection = _report.DataSource as SqlDataSource;
+            var connectionParameters = sqlConnection?.ConnectionParameters as MsSqlConnectionParameters;
+            if (connectionParameters != null)
             {
-                table.ApplyLogOnInfo(logOnInfo);
+                connectionParameters.DatabaseName = _databaseName;
+                connectionParameters.ServerName = _serverName;
+                connectionParameters.AuthorizationType = MsSqlAuthorizationType.Windows;
             }
         }
 
@@ -489,7 +490,7 @@ namespace Extract.ReportViewer
         /// <param name="promptForParameters">Whether to force a prompt for parameter values
         /// or not.</param>
         /// <param name="isRefresh"><see langword="true"/> parameters are being set for a report
-        /// refresh, <see langword="false"/> if they are being set for the inital load.</param>
+        /// refresh, <see langword="false"/> if they are being set for the initial load.</param>
         /// <returns><see langword="true"/> if parameters have been set and
         /// <see langword="false"/> otherwise.</returns>
         bool SetParameters(bool promptForParameters, bool isRefresh)
@@ -518,7 +519,7 @@ namespace Extract.ReportViewer
                 }
 
                 // Get the collection of parameters
-                ParameterFieldDefinitions reportParameters = _report.DataDefinition.ParameterFields;
+                ParameterCollection reportParameters = _report.Parameters;
 
                 // Count of parameters that have been set
                 int numberOfParametersSet = 0;
@@ -616,7 +617,7 @@ namespace Extract.ReportViewer
         /// Parses the parameter XML.
         /// </summary>
         /// <param name="isRefresh"><see langword="true"/> parameters are being set for a report
-        /// refresh, <see langword="false"/> if they are being set for the inital load.</param>
+        /// refresh, <see langword="false"/> if they are being set for the initial load.</param>
         void ParseParameterXml(bool isRefresh)
         {
             // Show the wait cursor while parsing the parameter file
@@ -640,7 +641,7 @@ namespace Extract.ReportViewer
         /// <overload>Sets all parameter fields that have the specified parameter name
         /// on the report (and any sub-reports).</overload>
         /// <summary>
-        /// Sets the specified Crystal reports parameter to the specified value.
+        /// Sets the specified report parameter to the specified value.
         /// </summary>
         /// <param name="parameters">The collection of report parameters.</param>
         /// <param name="parameterName">The name of the parameter to set.</param>
@@ -648,14 +649,14 @@ namespace Extract.ReportViewer
         /// <returns>The number of parameters that were set.</returns>
         /// <exception cref="ExtractException">If the specified parameter was not
         /// set on the report.</exception>
-        int SetParameterValues(ParameterFieldDefinitions parameters,
+        int SetParameterValues(ParameterCollection parameters,
             string parameterName, object value)
         {
             return SetParameterValues(parameters, parameterName, value, true);
         }
 
         /// <summary>
-        /// Sets the specified Crystal reports parameter to the specified value.
+        /// Sets the specified report parameter to the specified value.
         /// </summary>
         /// <param name="parameters">The collection of report parameters.</param>
         /// <param name="parameterName">The name of the parameter to set.</param>
@@ -665,17 +666,17 @@ namespace Extract.ReportViewer
         /// If <see langword="false"/> then no exception will be thrown and the
         /// return value will be 0.</param>
         /// <returns>The number of parameters that were set.</returns>
-        int SetParameterValues(ParameterFieldDefinitions parameters,
+        int SetParameterValues(ParameterCollection parameters,
             string parameterName, object value, bool exceptionIfNotSet)
         {
             // Loop through all the parameters on the report looking for
             // parameters with a matching name.  Count each one that is set.
             int numSet = 0;
-            foreach (ParameterFieldDefinition parameter in parameters)
+            foreach (var parameter in parameters)
             {
                 // Only set non-linked parameters (linked parameters are automatically
                 // set at run time).
-                if (parameter.ParameterFieldName == parameterName && !parameter.IsLinked())
+                if (parameter.Name == parameterName)
                 {
                     SetParameterValue(parameter, value);
                     numSet++;
@@ -696,20 +697,15 @@ namespace Extract.ReportViewer
         }
 
         /// <summary>
-        /// Sets the specified Crystal reports parameter to the specified value.
+        /// Sets the specified report parameter to the specified value.
         /// </summary>
         /// <param name="parameter">The parameter to set.</param>
         /// <param name="value">The value to set on the parameter.</param>
-        static void SetParameterValue(ParameterFieldDefinition parameter, object value)
+        static void SetParameterValue(Parameter parameter, object value)
         {
             try
             {
-                ParameterDiscreteValue newValue = new ParameterDiscreteValue();
-                newValue.Value = value;
-                ParameterValues currentValues = parameter.CurrentValues;
-                currentValues.Clear();
-                currentValues.Add(newValue);
-                parameter.ApplyCurrentValues(currentValues);
+                parameter.Value = value;
             }
             catch (Exception ex)
             {
@@ -775,7 +771,7 @@ namespace Extract.ReportViewer
                 // Read the version number
                 if (xmlReader.Name != _ROOT_NODE_NAME)
                 {
-                    ExtractException ee =  new ExtractException("ELI23726",
+                    ExtractException ee = new ExtractException("ELI23726",
                         "Invalid report parameter xml file!");
                     ee.AddDebugData("XML File Name", ComputeXmlFileName(), false);
                     throw ee;
@@ -1018,7 +1014,7 @@ namespace Extract.ReportViewer
                                 }
                         }
 
-                        // If the paramter had an existing value, set it.
+                        // If the parameter had an existing value, set it.
                         if (existingValue != null)
                         {
                             param.Value = existingValue;
@@ -1157,7 +1153,7 @@ namespace Extract.ReportViewer
                 }
 
                 xmlWriter = new XmlTextWriter(fileName, Encoding.ASCII);
-                xmlWriter.Formatting = Formatting.Indented;
+                xmlWriter.Formatting = System.Xml.Formatting.Indented;
                 xmlWriter.Indentation = 4;
 
                 // Write the root node
@@ -1224,11 +1220,11 @@ namespace Extract.ReportViewer
                 xmlWriter = null;
 
                 return xmlString.ToString();
-	        }
-	        catch (Exception ex)
-	        {
-		        throw ex.AsExtract("ELI34318");
-	        }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI34318");
+            }
             finally
             {
                 if (xmlWriter != null)
@@ -1266,20 +1262,12 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="parameters">The collection of parameters to count.</param>
         /// <returns>The count of "non-linked" parameters on the report.</returns>
-        static int GetNonLinkedParameterCount(ParameterFieldDefinitions parameters)
+        static int GetNonLinkedParameterCount(ParameterCollection parameters)
         {
             try
             {
-                int countOfParameters = 0;
-                foreach (ParameterFieldDefinition parameter in parameters)
-                {
-                    if (!parameter.IsLinked())
-                    {
-                        countOfParameters++;
-                    }
-                }
-
-                return countOfParameters;
+                // The Base DevExpress report ParameterCollection only includes the non linked parameters
+                return parameters.Count;
             }
             catch (Exception ex)
             {
@@ -1306,7 +1294,7 @@ namespace Extract.ReportViewer
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        void Dispose(bool disposing)
+        virtual protected void Dispose(bool disposing)
         {
             // Dispose of managed objects
             if (disposing)

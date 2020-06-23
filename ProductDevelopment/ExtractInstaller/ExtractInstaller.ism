@@ -2050,10 +2050,7 @@
 		<row><td>SetupFile13</td><td>RegisterExtensionDotNet40.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_LOGICNP_FILES&gt;\RegisterExtensionDotNet40.exe</td></row>
 		<row><td>SetupFile15</td><td>RegisterExtensionDotNet40_x64.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_LOGICNP_FILES&gt;\RegisterExtensionDotNet40_x64.exe</td></row>
 		<row><td>SetupFile2</td><td>license.txt</td><td/><td>0</td><td>0</td><td>&lt;ISProjectDataFolder&gt;\support files\license.txt</td></row>
-		<row><td>SetupFile3</td><td>CbSetup.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITEKEYINSTAL_FILES&gt;\CbSetup.exe</td></row>
-		<row><td>SetupFile4</td><td>ClearImagePDK.7_0_3253.exe</td><td/><td>0</td><td>0</td><td>&lt;INLINE_INSTALLER_PATH&gt;\ClearImagePDK.7_0_3253.exe</td></row>
 		<row><td>SetupFile5</td><td>o2007pia.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_OFFICEREDIST_FILES&gt;\o2007pia.msi</td></row>
-		<row><td>SetupFile8</td><td>CRRuntime_12_1_mlb.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_CRYSTAL_REPORTS12&gt;\CRRuntime_12_1_mlb.msi</td></row>
 	</table>
 
 	<table name="ISSetupPrerequisites">

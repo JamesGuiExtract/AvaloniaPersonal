@@ -1,15 +1,10 @@
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Data;
-using System.Globalization;
-using System.Text;
 using System.Windows.Forms;
 
-namespace Extract.ReportViewer
+namespace Extract.Reporting
 {
     /// <summary>
     /// A user control for managing a <see cref="DateParameter"/>.

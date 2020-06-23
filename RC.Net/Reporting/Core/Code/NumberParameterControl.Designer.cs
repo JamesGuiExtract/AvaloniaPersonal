@@ -1,6 +1,6 @@
-namespace Extract.ReportViewer
+namespace Extract.Reporting
 {
-    partial class TextParameterControl
+    partial class NumberParameterControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -39,7 +39,7 @@ namespace Extract.ReportViewer
             this._parameterValue.Name = "_parameterValue";
             this._parameterValue.Size = new System.Drawing.Size(341, 20);
             this._parameterValue.TabIndex = 1;
-            this._parameterValue.TextChanged += new System.EventHandler(this.HandleTextChanged);
+            this._parameterValue.KeyDown += new System.Windows.Forms.KeyEventHandler(this.HandleKeyDown);
             // 
             // _parameterName
             // 
@@ -51,13 +51,13 @@ namespace Extract.ReportViewer
             this._parameterName.TabStop = false;
             this._parameterName.Text = "ParameterName";
             // 
-            // TextParameterControl
+            // NumberParameterControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this._parameterName);
             this.Margin = new System.Windows.Forms.Padding(5);
-            this.Name = "TextParameterControl";
+            this.Name = "NumberParameterControl";
             this.Size = new System.Drawing.Size(359, 51);
             this._parameterName.ResumeLayout(false);
             this._parameterName.PerformLayout();

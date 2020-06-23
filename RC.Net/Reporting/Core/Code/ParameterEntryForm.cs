@@ -2,12 +2,10 @@ using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
-namespace Extract.ReportViewer
+namespace Extract.Reporting
 {
     /// <summary>
     /// A form for entering report parameters that will dynamically add the appropriate
@@ -31,16 +29,16 @@ namespace Extract.ReportViewer
 
         #region Constructors
 
-        /// <overloads>Intializes a new <see cref="ParameterEntryForm"/> class.</overloads>
+        /// <overloads>Initializes a new <see cref="ParameterEntryForm"/> class.</overloads>
         /// <summary>
-        /// Intializes a new <see cref="ParameterEntryForm"/> class.
+        /// Initializes a new <see cref="ParameterEntryForm"/> class.
         /// </summary>
         public ParameterEntryForm() : this(null)
         {
         }
 
         /// <summary>
-        /// Intializes a new <see cref="ParameterEntryForm"/> class.
+        /// Initializes a new <see cref="ParameterEntryForm"/> class.
         /// </summary>
         /// <param name="parameters">A collection of parameters to add entry controls for.</param>
         public ParameterEntryForm(IEnumerable<IExtractReportParameter> parameters)

@@ -1,4 +1,4 @@
-namespace Extract.ReportViewer
+namespace Extract.ReportingDevExpress
 {
     partial class OpenReportForm
     {
@@ -28,6 +28,7 @@ namespace Extract.ReportViewer
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OpenReportForm));
             this._tabReportsList = new System.Windows.Forms.TabControl();
             this._tabStandardReports = new System.Windows.Forms.TabPage();
             this._standardReportList = new System.Windows.Forms.ListBox();
@@ -46,9 +47,11 @@ namespace Extract.ReportViewer
             this._tabSavedReports.SuspendLayout();
             this._groupReportPreview.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._reportPreview)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._topPanelSplitContainer)).BeginInit();
             this._topPanelSplitContainer.Panel1.SuspendLayout();
             this._topPanelSplitContainer.Panel2.SuspendLayout();
             this._topPanelSplitContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._formSplitPanel)).BeginInit();
             this._formSplitPanel.Panel1.SuspendLayout();
             this._formSplitPanel.Panel2.SuspendLayout();
             this._formSplitPanel.SuspendLayout();
@@ -83,10 +86,10 @@ namespace Extract.ReportViewer
             this._standardReportList.FormattingEnabled = true;
             this._standardReportList.Location = new System.Drawing.Point(3, 3);
             this._standardReportList.Name = "_standardReportList";
-            this._standardReportList.Size = new System.Drawing.Size(359, 368);
+            this._standardReportList.Size = new System.Drawing.Size(359, 372);
             this._standardReportList.TabIndex = 0;
-            this._standardReportList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.HandleReportDoubleClick);
             this._standardReportList.SelectedIndexChanged += new System.EventHandler(this.HandleStandardReportSelectedIndexChanged);
+            this._standardReportList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.HandleReportDoubleClick);
             // 
             // _tabSavedReports
             // 
@@ -105,10 +108,10 @@ namespace Extract.ReportViewer
             this._savedReportList.FormattingEnabled = true;
             this._savedReportList.Location = new System.Drawing.Point(3, 3);
             this._savedReportList.Name = "_savedReportList";
-            this._savedReportList.Size = new System.Drawing.Size(359, 368);
+            this._savedReportList.Size = new System.Drawing.Size(359, 372);
             this._savedReportList.TabIndex = 0;
-            this._savedReportList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.HandleReportDoubleClick);
             this._savedReportList.SelectedIndexChanged += new System.EventHandler(this.HandleSavedReportSelectedIndexChanged);
+            this._savedReportList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.HandleReportDoubleClick);
             // 
             // _groupReportPreview
             // 
@@ -128,7 +131,7 @@ namespace Extract.ReportViewer
             this._labelNoPreview.AutoSize = true;
             this._labelNoPreview.Location = new System.Drawing.Point(59, 186);
             this._labelNoPreview.Name = "_labelNoPreview";
-            this._labelNoPreview.Size = new System.Drawing.Size(197, 13);
+            this._labelNoPreview.Size = new System.Drawing.Size(203, 13);
             this._labelNoPreview.TabIndex = 1;
             this._labelNoPreview.Text = "No preview available for selected report.";
             this._labelNoPreview.Visible = false;
@@ -136,9 +139,9 @@ namespace Extract.ReportViewer
             // _reportPreview
             // 
             this._reportPreview.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._reportPreview.Location = new System.Drawing.Point(3, 16);
+            this._reportPreview.Location = new System.Drawing.Point(3, 17);
             this._reportPreview.Name = "_reportPreview";
-            this._reportPreview.Size = new System.Drawing.Size(296, 385);
+            this._reportPreview.Size = new System.Drawing.Size(296, 384);
             this._reportPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this._reportPreview.TabIndex = 0;
             this._reportPreview.TabStop = false;
@@ -164,9 +167,9 @@ namespace Extract.ReportViewer
             // 
             // _formSplitPanel
             // 
-            this._formSplitPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._formSplitPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._formSplitPanel.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this._formSplitPanel.IsSplitterFixed = true;
             this._formSplitPanel.Location = new System.Drawing.Point(14, 14);
@@ -228,8 +231,9 @@ namespace Extract.ReportViewer
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(707, 466);
             this.Controls.Add(this._formSplitPanel);
+            this.IconOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("OpenReportForm.IconOptions.SvgImage")));
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(715, 500);
+            this.MinimumSize = new System.Drawing.Size(709, 498);
             this.Name = "OpenReportForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Open Report";
@@ -241,9 +245,11 @@ namespace Extract.ReportViewer
             ((System.ComponentModel.ISupportInitialize)(this._reportPreview)).EndInit();
             this._topPanelSplitContainer.Panel1.ResumeLayout(false);
             this._topPanelSplitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this._topPanelSplitContainer)).EndInit();
             this._topPanelSplitContainer.ResumeLayout(false);
             this._formSplitPanel.Panel1.ResumeLayout(false);
             this._formSplitPanel.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this._formSplitPanel)).EndInit();
             this._formSplitPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 

@@ -1,15 +1,11 @@
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Data;
 using System.Globalization;
-using System.Text;
 using System.Windows.Forms;
 
-namespace Extract.ReportViewer
+namespace Extract.Reporting
 {
     /// <summary>
     /// A user control for managing a <see cref="NumberParameter"/>.
@@ -224,7 +220,7 @@ namespace Extract.ReportViewer
         /// keys; <see langword="false"/> otherwise.</returns>
         private static bool IsNonPrintableKeypress(int keyValue)
         {
-            // Check if the keypress is a non printable character such as space/backspace, etc.
+            // Check if the key press is a non printable character such as space/backspace, etc.
             // (0-31)
             bool digitPress = (keyValue > 0 && keyValue < 31);
 

@@ -13,11 +13,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <ApplicationIcon>ReportViewer.ico</ApplicationIcon>
-    <SccProjectName>ReportViewer</SccProjectName>
-    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
-    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
-    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
+    <ApplicationIcon>Resources\ReportViewer.ico</ApplicationIcon>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileUpgradeFlags />
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -67,28 +63,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=12.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
-      <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\APIs\CrystalReports\DotNet\CrystalDecisions.CrystalReports.Engine.dll</HintPath>
-    </Reference>
-    <Reference Include="CrystalDecisions.Enterprise.Framework, Version=12.0.1100.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
-    <Reference Include="CrystalDecisions.Enterprise.InfoStore, Version=12.0.1100.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
-    <Reference Include="CrystalDecisions.ReportSource, Version=12.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
-      <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\APIs\CrystalReports\DotNet\CrystalDecisions.ReportSource.dll</HintPath>
-    </Reference>
-    <Reference Include="CrystalDecisions.Shared, Version=12.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
-      <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\APIs\CrystalReports\DotNet\CrystalDecisions.Shared.dll</HintPath>
-    </Reference>
-    <Reference Include="CrystalDecisions.VSDesigner, Version=12.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
-      <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\APIs\CrystalReports\DotNet\CrystalDecisions.VSDesigner.dll</HintPath>
-    </Reference>
-    <Reference Include="CrystalDecisions.Windows.Forms, Version=12.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
-      <SpecificVersion>True</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\APIs\CrystalReports\DotNet\CrystalDecisions.Windows.Forms.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -99,92 +73,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutReportViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AboutReportViewer.Designer.cs">
-      <DependentUpon>AboutReportViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DateParameterControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DateParameterControl.Designer.cs">
-      <DependentUpon>DateParameterControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DateRangeParameterControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DateRangeParameterControl.Designer.cs">
-      <DependentUpon>DateRangeParameterControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ExtractParameters.cs" />
-    <Compile Include="ExtractReport.cs" />
-    <Compile Include="NumberParameterControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="NumberParameterControl.Designer.cs">
-      <DependentUpon>NumberParameterControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="OpenReportForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="OpenReportForm.Designer.cs">
-      <DependentUpon>OpenReportForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ParameterEntryForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ParameterEntryForm.Designer.cs">
-      <DependentUpon>ParameterEntryForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ReportViewerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ReportViewerForm.Designer.cs">
-      <DependentUpon>ReportViewerForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="AboutReportViewer.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>AboutReportViewer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DateParameterControl.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DateParameterControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DateRangeParameterControl.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DateRangeParameterControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NumberParameterControl.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>NumberParameterControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="OpenReportForm.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>OpenReportForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ParameterEntryForm.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>ParameterEntryForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ReportViewerForm.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>ReportViewerForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TextParameterControl.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>TextParameterControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ValueListParameterControl.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>ValueListParameterControl.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -202,18 +96,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="TextParameterControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TextParameterControl.Designer.cs">
-      <DependentUpon>TextParameterControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ValueListParameterControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="ValueListParameterControl.Designer.cs">
-      <DependentUpon>ValueListParameterControl.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
@@ -228,25 +110,20 @@
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Reporting\Core\Code\Extract.Reporting.csproj">
+      <Project>{3a0fa1ac-f8aa-477a-b0b0-3630091e520b}</Project>
+      <Name>Extract.Reporting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Email\Core\Code\Extract.Utilities.Email.csproj">
-      <Project>{1B3DED27-DBF9-478A-9E31-FFA479621F5C}</Project>
-      <Name>Extract.Utilities.Email</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="ReportViewer.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
@@ -283,6 +160,10 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ReportViewer.ico" />
+    <Content Include="Resources\ReportViewer.svg" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

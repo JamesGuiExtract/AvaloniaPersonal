@@ -6,7 +6,7 @@ using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Interop;
 using Extract.Licensing;
-using Extract.ReportViewer;
+using Extract.Reporting;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Extract.Utilities.Parsers;
@@ -371,7 +371,7 @@ namespace Extract.FileActionManager.Utilities
         /// Maps context menu options to a DocumentName based <see cref="ExtractReport"/> for the
         /// currently selected file.
         /// </summary>
-        Dictionary<ToolStripMenuItem, ExtractReport> _reportMenuItems;
+        Dictionary<ToolStripMenuItem, IExtractReport> _reportMenuItems;
 
         /// <summary>
         /// Context menu option that is a parent to all menu items in <see cref="_reportMenuItems"/>.
@@ -1238,7 +1238,7 @@ namespace Extract.FileActionManager.Utilities
                 _copyFilesMenuItem = new ToolStripMenuItem("Copy file(s)");
                 _copyFilesAndDataMenuItem = new ToolStripMenuItem("Copy file(s) and data");
                 _openFileLocationMenuItem = new ToolStripMenuItem("Open file location");
-                _reportMenuItems = new Dictionary<ToolStripMenuItem, ExtractReport>();
+                _reportMenuItems = new Dictionary<ToolStripMenuItem, IExtractReport>();
                 _reportMainMenuItem = new ToolStripMenuItem("Reports");
                 _setFlagMenuItem = new ToolStripMenuItem("Set flag");
                 _clearFlagMenuItem = new ToolStripMenuItem("Clear flag");
@@ -2851,8 +2851,8 @@ namespace Extract.FileActionManager.Utilities
 	        {
                 using (new TemporaryWaitCursor())
                 {
-                    ExtractReport report = _reportMenuItems[(ToolStripMenuItem)sender];
-
+                    IExtractReport report = ExtractReportUtils.CreateExtractReport(_reportMenuItems[(ToolStripMenuItem)sender]);
+                   
                     string fileName = GetSelectedFileNames().Single();
                     report.ParametersCollection["DocumentName"].SetValueFromString(fileName);
 
@@ -2865,7 +2865,7 @@ namespace Extract.FileActionManager.Utilities
                     // thread needs to be STA
                     ThreadingMethods.RunInBackgroundThread("ELI36059", () =>
                     {
-                        using (ReportViewerForm reportViewer = new ReportViewerForm(report))
+                        using (var reportViewer = ExtractReportUtils.CreateReportViewerForm(report))
                         {
                             reportViewer.ShowDialog();
                         }
@@ -3432,8 +3432,8 @@ namespace Extract.FileActionManager.Utilities
         {
             bool openTopDockableWindow = false;
 
-            // _formToolStripContainer = the toolstrip container for the form as a whole
-            // _mainToolStripContainer = the toolstrip container for the left pane
+            // _formToolStripContainer = the ToolStrip container for the form as a whole
+            // _mainToolStripContainer = the ToolStrip container for the left pane
             //                           (non-image viewer controls).
             // _customSearchTopDockableWindow = pane across the top that FileSelectorPane can be
             //                           configured to occupy, hidden otherwise.
@@ -3662,17 +3662,17 @@ namespace Extract.FileActionManager.Utilities
         /// Creates a <see cref="ToolStripMenuItem"/> for every available report with a DocumentName
         /// parameter.
         /// </summary>
-        Dictionary<ToolStripMenuItem, ExtractReport> CreateReportMenuItems()
+        Dictionary<ToolStripMenuItem, IExtractReport> CreateReportMenuItems()
         {
-            Dictionary<ToolStripMenuItem, ExtractReport> reportMenuItems =
-                new Dictionary<ToolStripMenuItem, ExtractReport>();
+            Dictionary<ToolStripMenuItem, IExtractReport> reportMenuItems =
+                new Dictionary<ToolStripMenuItem, IExtractReport>();
 
             // Search all standard and saved reports
             foreach (string reportFileName in
-                Directory.EnumerateFiles(ExtractReport.StandardReportFolder, "*.rpt", SearchOption.AllDirectories)
-                .Union(Directory.EnumerateFiles(ExtractReport.SavedReportFolder, "*.rpt", SearchOption.AllDirectories)))
+                Directory.EnumerateFiles(ExtractReportUtils.StandardReportFolder, "*.repx", SearchOption.AllDirectories)
+                .Union(Directory.EnumerateFiles(ExtractReportUtils.SavedReportFolder, "*.repx", SearchOption.AllDirectories)))
             {
-                var report = new ExtractReport(reportFileName);
+                var report = ExtractReportUtils.CreateExtractReport(reportFileName);
 
                 // If the report takes a "DocumentName" parameter that is not specified by default,
                 // this report is eligible to be available via a context menu option.
@@ -3713,7 +3713,7 @@ namespace Extract.FileActionManager.Utilities
                     // Populate all pre-defined search terms from the database's FieldSearch table.
                     adoRecordset = FileProcessingDB.GetResultsForQuery(query);
 
-                    // Convert the ADODB Recordset to a DataTable.
+                    // Convert the ADODB RecordSet to a DataTable.
                     using (OleDbDataAdapter adapter = new System.Data.OleDb.OleDbDataAdapter())
                     {
                         adapter.Fill(queryResults, adoRecordset);

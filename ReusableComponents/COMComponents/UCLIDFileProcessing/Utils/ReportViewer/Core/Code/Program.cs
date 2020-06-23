@@ -1,4 +1,5 @@
 using Extract.Licensing;
+using Extract.Reporting;
 using Extract.ReportViewer.Properties;
 using Extract.Utilities;
 using System;
@@ -37,13 +38,10 @@ namespace Extract.ReportViewer
         {
             string exceptionLogFile = null;
             bool logException = false;
-            ExtractReport report = null;
+            IExtractReport report = null;
             try
             {
-                // Make sure user.config file is not corrupt - This is needed because if the file
-                // is corrupt an exception will be thrown by the Crystal reports dlls when they are
-                // loaded and attempt to get settings. Using the UserConfigChecker Class will have
-                // the file checked now and when the application exists
+                // Make sure user.config file is not corrupt 
                 // related to https://extract.atlassian.net/browse/ISSUE-12830
                 UserConfigChecker _userConfigChecker = new UserConfigChecker();
 
@@ -96,10 +94,6 @@ namespace Extract.ReportViewer
                 bool prompt = false;
                 if (args.Length > 3)
                 {
-                    // Fourth argument must be report file, attempt to get the report file
-                    // from the command line parameter
-                    reportFile = GetReportFileName(args[3]);
-
                     for (int i = 4; i < args.Length; i++)
                     {
                         if (args[i].Equals("/f", StringComparison.OrdinalIgnoreCase))
@@ -226,24 +220,27 @@ namespace Extract.ReportViewer
                         ShowUsage("Cannot specify /subject without /mailto <recipient_list>!");
                         return;
                     }
+                    // Fourth argument must be report file, attempt to get the report file
+                    // from the command line parameter
+                    reportFile = GetReportFileName(args[3]);
                 }
 
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
 
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
-                    "ELI23508", "Crystal Report Viewer");
+                    "ELI23508", "Report Viewer");
 
                 if (!string.IsNullOrEmpty(reportFile))
                 {
-                    // Ensure the report file exists and has .rpt extension
+                    // Ensure the report file exists and has .repx extension
                     ExtractException.Assert("ELI23509",
                         "Report file does not exist or does not have proper extension!",
                         File.Exists(reportFile) &&
-                        Path.GetExtension(reportFile).Equals(".rpt", StringComparison.OrdinalIgnoreCase),
+                        Path.GetExtension(reportFile).Equals(".repx", StringComparison.OrdinalIgnoreCase),
                         "Report File Name", reportFile);
 
                     // Prepare the report object
-                    report = new ExtractReport(serverName, databaseName, workflowName, reportFile, prompt);
+                    report = ExtractReportUtils.CreateExtractReport(serverName, databaseName, workflowName, reportFile, prompt);
                 }
 
                 // If an output file was specified and the report object exists
@@ -287,7 +284,7 @@ namespace Extract.ReportViewer
                         report = null;
                     }
 
-                    ReportViewerForm reportViewer = new ReportViewerForm(report,
+                    var reportViewer = ExtractReportUtils.CreateReportViewerForm(report,
                         serverName, databaseName, workflowName);
 
                     Application.Run(reportViewer);
@@ -350,7 +347,7 @@ namespace Extract.ReportViewer
             // Add the command line syntax
             usage.Append(Environment.GetCommandLineArgs()[0]);
             usage.AppendLine(" /? | /reset | <ServerName> <DatabaseName> <WorkflowName> "
-                + "[<CrystalReportFile> "
+                + "[<ReportFile> "
                 + "/f <OutputPDFName> /ow /prompt /mailto <recipient_list> /subject <mail_subject> "
                 + "/senderAddress <sender_address> /senderName <sender_name> "
                 + "/ef (ExceptionLogFile)]");
@@ -363,7 +360,7 @@ namespace Extract.ReportViewer
             usage.AppendLine();
             usage.AppendLine("<WorkflowName> - The name of the workflow to use for the report");
             usage.AppendLine();
-            usage.AppendLine("<CrystalReportFile> - The path to the crystal report file to run");
+            usage.AppendLine("<ReportFile> - The path to the report file to run");
             usage.AppendLine();
             usage.AppendLine("/f <OutputPDFName> - The path to the pdf file that will be output");
             usage.AppendLine();
@@ -490,14 +487,14 @@ namespace Extract.ReportViewer
             else
             {
                 // Check for standard report
-                string tempReport = Path.Combine(ExtractReport.StandardReportFolder, reportFile) + ".rpt";
+                string tempReport = Path.Combine(ExtractReportUtils.StandardReportFolder, reportFile) + ".repx";
                 if (File.Exists(tempReport))
                 {
                     return tempReport;
                 }
 
                 // Check for saved report
-                tempReport = Path.Combine(ExtractReport.SavedReportFolder, reportFile) + ".rpt";
+                tempReport = Path.Combine(ExtractReportUtils.SavedReportFolder, reportFile) + ".repx";
                 if (File.Exists(tempReport))
                 {
                     return tempReport;

@@ -1,22 +1,20 @@
+using DevExpress.XtraEditors;
 using Extract.Imaging;
-using Extract.ReportViewer.Properties;
+using Extract.ReportingDevExpress.Properties;
 using Extract.Utilities;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
-namespace Extract.ReportViewer
+namespace Extract.ReportingDevExpress
 {
     /// <summary>
     /// Form for listing all available reports and allowing the user to choose which one
     /// to open.
     /// </summary>
-    public partial class OpenReportForm : Form
+    public partial class OpenReportForm : XtraForm
     {
         #region Constants
 
@@ -92,7 +90,7 @@ namespace Extract.ReportViewer
                     UpdatePreviewImage(reportPreviewImageName);
 
                     // Update the report file name value and set standard report to true
-                    _reportFileName = baseReport + ".rpt";
+                    _reportFileName = baseReport + ".repx";
                     _standardReport = true;
                 }
                 else
@@ -132,7 +130,7 @@ namespace Extract.ReportViewer
                     UpdatePreviewImage(reportPreviewImageName);
 
                     // Update the report file name value and set standard report to false
-                    _reportFileName = baseReport + ".rpt";
+                    _reportFileName = baseReport + ".repx";
                     _standardReport = false;
                 }
                 else
@@ -254,7 +252,7 @@ namespace Extract.ReportViewer
 
                 // Delete the report, preview, and (if it exists) the xml file
                 bool deleteSuccessful =
-                    FileSystemMethods.TryDeleteFile(selectedReport + ".rpt");
+                    FileSystemMethods.TryDeleteFile(selectedReport + ".repx");
                 deleteSuccessful &= FileSystemMethods.TryDeleteFile(selectedReport +
                     _PREVIEW_IMAGE_EXTENSION);
                 if (File.Exists(selectedReport + ".xml"))
@@ -558,16 +556,16 @@ namespace Extract.ReportViewer
             string standardReportDir = ExtractReport.StandardReportFolder;
             string savedReportDir = ExtractReport.SavedReportFolder;
 
-            // Get a list of files in the standard report directory that have a .rpt extension
+            // Get a list of files in the standard report directory that have a .repx extension
             foreach (string fileName in
-                Directory.EnumerateFiles(standardReportDir, "*.rpt", SearchOption.TopDirectoryOnly))
+                Directory.EnumerateFiles(standardReportDir, "*.repx", SearchOption.TopDirectoryOnly))
             {
                 _standardReportList.Items.Add(Path.GetFileNameWithoutExtension(fileName));
             }
 
-            // Get a list of files in the saved report directory that have a .rpt extension
+            // Get a list of files in the saved report directory that have a .repx extension
             foreach (string fileName in
-                Directory.EnumerateFiles(savedReportDir, "*.rpt", SearchOption.TopDirectoryOnly))
+                Directory.EnumerateFiles(savedReportDir, "*.repx", SearchOption.TopDirectoryOnly))
             {
                 _savedReportList.Items.Add(Path.GetFileNameWithoutExtension(fileName));
             }
@@ -576,7 +574,7 @@ namespace Extract.ReportViewer
         /// <summary>
         /// Gets the current list box from the tab control
         /// </summary>
-        /// <returns>The currently visible listbox from the tab control.</returns>
+        /// <returns>The currently visible ListBox from the tab control.</returns>
         private ListBox GetCurrentListBox()
         {
             ListBox listBox = _tabReportsList.SelectedIndex == _STANDARD_REPORT_TAB_INDEX ?
