@@ -853,6 +853,13 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 			string strPassword = dlgPW.m_zNewPassword;
 			encryptAndStoreUserNamePassword(strUser, strPassword, !bUseAdmin);
 
+			// Consider the user now logged-in as strUser.
+			m_strFAMUserName = strUser;
+			if (bUseAdmin)
+			{
+				m_bLoggedInAsAdmin = true;
+			}
+
 			// Just added password to the db so it is valid
 			*pbLoginValid = VARIANT_TRUE;
 			return S_OK;

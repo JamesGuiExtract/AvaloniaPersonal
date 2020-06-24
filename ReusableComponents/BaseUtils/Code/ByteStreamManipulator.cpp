@@ -117,10 +117,11 @@ void ByteStreamManipulator::flushToByteStream(unsigned long ulRequiredNumberToBe
 	}
 
 	// set the total size to be a multiplier of the required number
-	unsigned long ulExtraChars = ulTotalSize % ulRequiredNumberToBeMultiplierOf;
-	if (ulExtraChars > 0)
+	unsigned long ulUnusedTrailingChars = ulTotalSize % ulRequiredNumberToBeMultiplierOf;
+	if (ulUnusedTrailingChars > 0)
 	{
-		ulTotalSize += ulRequiredNumberToBeMultiplierOf - ulExtraChars;
+		ulUnusedTrailingChars = ulRequiredNumberToBeMultiplierOf - ulUnusedTrailingChars;
+		ulTotalSize += ulUnusedTrailingChars;
 	}
 
 	// ensure that the bytestream's size is initialized as required
@@ -260,6 +261,10 @@ void ByteStreamManipulator::flushToByteStream(unsigned long ulRequiredNumberToBe
 			break;
 		};
 	}
+
+	// Ensure remaining space in buffer cleared; otherwise random chars may have unexpected effect
+	// on encrypted output.
+	memset(pszDataCursor, 0, ulUnusedTrailingChars);
 }
 //--------------------------------------------------------------------------------------------------
 ByteStreamManipulator& operator << (ByteStreamManipulator& rManipulator, long lData)

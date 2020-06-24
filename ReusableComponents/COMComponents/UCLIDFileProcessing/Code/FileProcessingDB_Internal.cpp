@@ -3120,7 +3120,7 @@ void CFileProcessingDB::encryptAndStoreUserNamePassword(const string& strUser,
 														bool bFailIfUserDoesNotExist)
 {
 	// Get the encrypted version of the combined string
-	string strEncryptedCombined = getEncryptedString(strUser + strPassword);
+	string strEncryptedCombined = getEncryptedString(1, strUser + strPassword);
 
 	storeEncryptedPasswordAndUserName(strUser, strEncryptedCombined, bFailIfUserDoesNotExist);
 }
@@ -3179,13 +3179,19 @@ void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strUser,
 }
 //--------------------------------------------------------------------------------------------------
 template <typename T>
-string CFileProcessingDB::getEncryptedString(const T input)
+string CFileProcessingDB::getEncryptedString(size_t nCount, const T input, ...)
 {
 	// Put the input string into the byte manipulator
 	ByteStream bytes;
 	ByteStreamManipulator bytesManipulator(ByteStreamManipulator::kWrite, bytes);
-
-	bytesManipulator << input;
+	
+	va_list vaList;
+	va_start(vaList, nCount);
+	for (size_t i = 0; i < nCount; i++)
+	{
+		bytesManipulator << va_arg(vaList, T);
+	}
+	va_end(vaList);
 
 	// Convert information to a stream of bytes
 	// with length divisible by 8 (in variable called 'bytes')
@@ -3378,11 +3384,10 @@ string CFileProcessingDB::getOneTimePassword(_ConnectionPtr ipConnection)
 		"Not authorized to generate password");
 
 	checkDatabaseIDValid(ipConnection, false);
-	string strDatabaseID = asString(m_DatabaseIDValues.m_GUID);
 	
-	// Generate and encrypt a hash specific to this database and m_nFAMSessionID.
-	long hash = m_nFAMSessionID ^ m_DatabaseIDValues.m_nHashValue;
-	string strEncrypted = getEncryptedString(hash);
+	// Generate an encrypted string specific to this database and m_nFAMSessionID.
+	string strEncrypted = getEncryptedString(
+		2, (long)m_nFAMSessionID, m_DatabaseIDValues.m_nHashValue);
 	
 	return strEncrypted;
 }

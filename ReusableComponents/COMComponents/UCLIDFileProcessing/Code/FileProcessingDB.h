@@ -968,7 +968,7 @@ private:
 
 	// Returns the result of encrypting the input
 	template <typename T>
-	string getEncryptedString(const T input);
+	string getEncryptedString(size_t nCount, const T input, ...);
 
 	// Throws and exception if the DBSchemaVersion in the DB is different from the current DBSchemaVersion
 	void validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles = false);

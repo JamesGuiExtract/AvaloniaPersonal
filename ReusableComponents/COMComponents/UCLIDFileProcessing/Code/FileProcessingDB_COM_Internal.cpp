@@ -72,38 +72,6 @@ string buildUpdateSchemaVersionQuery(int nSchemaVersion)
 	return strQuery;
 }
 
-inline string getEncryptedString(string strInput)
-{
-	// Put the input string into the byte manipulator
-	ByteStream bytes;
-	ByteStreamManipulator bytesManipulator(ByteStreamManipulator::kWrite, bytes);
-
-	bytesManipulator << strInput;
-
-	// Convert information to a stream of bytes
-	// with length divisible by 8 (in variable called 'bytes')
-	bytesManipulator.flushToByteStream(8);
-
-	// Get the password 'key' based on the 4 hex global variables
-	ByteStream pwBS;
-	ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, pwBS);
-
-	bsm << gulFAMKey1;
-	bsm << gulFAMKey2;
-	bsm << gulFAMKey3;
-	bsm << gulFAMKey4;
-	bsm.flushToByteStream(8);
-	
-
-	// Do the encryption
-	ByteStream encryptedBS;
-	MapLabel encryptionEngine;
-	encryptionEngine.setMapLabel(encryptedBS, bytes, pwBS);
-
-	// Return the encrypted value
-	return encryptedBS.asString();
-}
-
 //-------------------------------------------------------------------------------------------------
 // Schema update functions
 // 
