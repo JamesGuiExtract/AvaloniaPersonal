@@ -2530,16 +2530,16 @@ namespace Extract.DataEntry
         /// the point at which the scan should be started with each attribute further down the
         /// the stack being a descendant to the previous <see cref="IAttribute"/> in the stack.
         /// </param>
-        /// <param name="unPropagatedAttributes">A stack of <see cref="IAttribute"/>s
+        /// <param name="nonPropagatedAttributes">A stack of <see cref="IAttribute"/>s
         /// where the first attribute in the stack represents the root-level attribute
         /// the first unpropagated attribute is descended from, and each successive attribute 
         /// represents a sub-attribute to the previous until the final attribute is the first 
         /// unpropagated attribute.
         /// </param>
-        /// <returns><c>true</c> if unpropagated <see cref="IAttribute"/>s were found; otherwise, <c>false</c>.
+        /// <returns><c>true</c> if non-propagated <see cref="IAttribute"/>s were found; otherwise, <c>false</c>.
         [ComVisible(false)]
-        public static bool GetUnPropagatedAttributes(IUnknownVector attributes,
-            Stack<IAttribute> startingPoint, Stack<IAttribute> unPropagatedAttributes)
+        public static bool GetNonPropagatedAttributes(IUnknownVector attributes,
+            Stack<IAttribute> startingPoint, Stack<IAttribute> nonPropagatedAttributes)
         {
             try
             {
@@ -2547,7 +2547,7 @@ namespace Extract.DataEntry
                     argument: false, // search for unpropagated
                     forward: true, 
                     loop: true,
-                    unPropagatedAttributes);
+                    nonPropagatedAttributes);
             }
             catch (Exception ex)
             {

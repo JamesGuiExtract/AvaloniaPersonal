@@ -3,6 +3,7 @@ using Extract.Imaging;
 using Extract.Utilities.Forms;
 using Extract.UtilityApplications.PaginationUtility.Properties;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -88,6 +89,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _controlUpdatePending;
 
         /// <summary>
+        /// Indicates whether indicator that pages can be dropped into the separator are being displayed.
+        /// </summary>
+        bool _showDragHints;
+
+        /// <summary>
         /// The current color of the separator bar.
         /// </summary>
         Color _currentColor;
@@ -128,6 +134,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 InitializeComponent();
+
+                // Initialize drag/drop indicator columns to hidden.
+                if (LicenseManager.UsageMode != LicenseUsageMode.Designtime)
+                {
+                    _tableLayoutPanel.ColumnStyles[3].Width = 0;
+                    _tableLayoutPanel.ColumnStyles[6].Width = 0;
+                }
 
                 _showSelectionCheckBox = showSelectionCheckBox;
                 if (!_showSelectionCheckBox)
@@ -360,6 +373,40 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Indicates whether indicator that pages can be dropped into the separator are being displayed.
+        /// </summary>
+        public bool ShowDragHints
+        {
+            get
+            {
+                return _showDragHints;
+            }
+
+            set
+            {
+                if (value != _showDragHints)
+                {
+                    _showDragHints = value;
+                    UpdateDragHints();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Shows/hides drag/drop indicator depending on the current state of ShowDragHints
+        /// </summary>
+        void UpdateDragHints()
+        {
+            if (_leftArrowPictureBox.Visible != ShowDragHints)
+            {
+                _tableLayoutPanel.ColumnStyles[3].Width = ShowDragHints ? 21 : 0;
+                _tableLayoutPanel.ColumnStyles[6].Width = ShowDragHints ? 21 : 0;
+                _leftArrowPictureBox.Visible = ShowDragHints;
+                _rightArrowPictureBox.Visible = ShowDragHints;
+            }
+        }
+
         #endregion Properties
 
         #region Public Members
@@ -368,7 +415,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Gets the <see cref="OutputDocument"/> with which this separator is associated.
         /// </summary>
         /// <returns></returns>
-        public OutputDocument Document
+        public override OutputDocument Document
         {
             get
             {
@@ -466,12 +513,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         if (Document != null)
                         {
-                            if (value)
+                            if (value && IsDataPanelOpen)
                             {
-                                if (!CloseDataPanel(true, false))
-                                {
-                                    return;
-                                }
+                                CloseDataPanel(true, false);
+                                return;
                             }
 
                             _collapsed = value;
@@ -733,12 +778,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             // Determine what the separator color should be based on whether the current document
             // has a page displayed in the image viewer and whether the document has already been applied.
+            // Gray = Processed
+            // White = Unselected
+            // LightGray = Selected, but not containing the active page selection
+            // LightOrange = Selected, with active page selection.
             var newColor = (Document?.OutputProcessed == true)
                 ? Color.Gray
                 : (Document?.PageControls.Any(pageControl =>
                         pageControl.PageIsDisplayed && pageControl.Highlighted) == true)
                     ? ExtractColors.LightOrange
-                    : ExtractColors.White;
+                    : Selected || (Document?.PageControls.Any(pageControl => pageControl.Selected) == true)
+                        ? Color.LightGray
+                        : ExtractColors.White;
             
             // Update the BackColor of the separator itself, as well as any controls except the edit button.
             if (newColor != _currentColor)
@@ -1103,6 +1154,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _collapseDocumentButton.Image = Document.Collapsed
                     ? Properties.Resources.Expand
                     : Properties.Resources.Collapse;
+
+                UpdateDragHints();
+
                 _summaryLabel.Visible = true;
                 _summaryLabel.Text = Document.Summary
                     + (Document.OutputProcessed ? " (PROCESSED)" : "");
@@ -1116,6 +1170,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // To fix cases where the width has no updated properly
                     _pagesLabel.PerformLayout();
                 }
+
                 _newDocumentGlyph.Visible = !Document.InSourceDocForm && !Document.OutputProcessed
                     && Document.PageControls.Any(page => !page.Deleted);
                 _editedPaginationGlyph.Visible = !Document.InOriginalForm && !Document.OutputProcessed;
@@ -1137,13 +1192,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _hasAppliedStatus = false;
                     _collapseDocumentButton.Visible = false;
                     _selectedCheckBox.Visible = false;
+                    _leftArrowPictureBox.Visible = false;
                     _summaryLabel.Text = "";
                     _pagesLabel.Text = "";
+                    _rightArrowPictureBox.Visible = false;
                     _newDocumentGlyph.Visible = false;
                     _editedPaginationGlyph.Visible = false;
                     _reprocessDocumentPictureBox.Visible = false;
                     _editedDataPictureBox.Visible = false;
                     _dataValidityPictureBox.Visible = false;
+
+                    // Initialize drag/drop indicator columns to hidden.
+                    _tableLayoutPanel.ColumnStyles[3].Width = 0;
+                    _tableLayoutPanel.ColumnStyles[6].Width = 0;
                 }
 
                 return false;

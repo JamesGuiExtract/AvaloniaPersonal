@@ -1873,12 +1873,12 @@ namespace Extract.DataEntry
                     // subattributes so that all attributes that can be are mapped into controls.
                     // This enables the entire attribute tree to be navigated forward and backward 
                     // for all types of AttributeStatusInfo scans).
-                    Stack<IAttribute> unpropagatedAttributeGenealogy = new Stack<IAttribute>();
-                    while (AttributeStatusInfo.GetUnPropagatedAttributes(_attributes, null,
-                        unpropagatedAttributeGenealogy))
+                    Stack<IAttribute> nonPropagatedAttributeGenealogy = new Stack<IAttribute>();
+                    while (AttributeStatusInfo.GetNonPropagatedAttributes(_attributes, null,
+                        nonPropagatedAttributeGenealogy))
                     {
-                        PropagateAttributes(unpropagatedAttributeGenealogy, false, false);
-                        unpropagatedAttributeGenealogy.Clear();
+                        PropagateAttributes(nonPropagatedAttributeGenealogy, false, false);
+                        nonPropagatedAttributeGenealogy.Clear();
                     }
 
                     // [DataEntry:166]

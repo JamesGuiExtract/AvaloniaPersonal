@@ -694,6 +694,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (!_pageControls.Contains(pageControl))
                 {
                     pageControl.PageStateChanged += HandlePageControl_PageStateChanged;
+                    pageControl.SelectedStateChanged += HandlePageControl_SelectedStateChanged;
                 }
 
                 if (pageIndex < _pageControls.Count)
@@ -722,11 +723,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        /// <summary>
-        /// Handles the PageStateChanged event of the pageControl control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         void HandlePageControl_PageStateChanged(object sender, EventArgs e)
         {
             try
@@ -741,6 +737,19 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        void HandlePageControl_SelectedStateChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                Invalidate();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49889");
+            }
+        }
+
+
         /// <summary>
         /// Removes the specified <see paramref="pageControl"/> from the document.
         /// </summary>
@@ -754,6 +763,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_pageControls.Remove(pageControl))
                 {
                     pageControl.PageStateChanged -= HandlePageControl_PageStateChanged;
+                    pageControl.SelectedStateChanged -= HandlePageControl_SelectedStateChanged;
                 }
     
                 pageControl.Document = null;

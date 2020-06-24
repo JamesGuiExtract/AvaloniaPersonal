@@ -85,7 +85,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _controlUpdateLock =
                         new LockControlUpdates(_pageLayoutControl._flowLayoutPanel, true, true);
 
-                    
+
                 }
             }
 
@@ -171,11 +171,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         static readonly string _OBJECT_NAME = typeof(PageLayoutControl).ToString();
 
         /// <summary>
-        /// The name of the data format for drag and drop operations.
-        /// </summary>
-        static readonly string _DRAG_DROP_DATA_FORMAT = "ExtractPaginationDragDropDataFormat";
-
-        /// <summary>
         /// The name of the custom clipboard data format to use.
         /// </summary>
         static readonly string _CLIPBOARD_DATA_FORMAT = "ExtractPaginationClipboardDataFormat";
@@ -184,12 +179,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// The number of times clipboard copy operations should be attempted before giving up.
         /// </summary>
         internal static readonly int _CLIPBOARD_RETRY_COUNT = 10;
-
-        /// <summary>
-        /// The number of pixels from the top or bottom of the control where scrolling will be
-        /// triggered during a drag/drop operation.
-        /// </summary>
-        static readonly int _DRAG_DROP_SCROLL_AREA = 50;
 
         #endregion Constants
 
@@ -201,23 +190,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         IPaginationUtility _paginationUtility;
 
         /// <summary>
-        /// Indicates where <see cref="PaginationControl"/>s will be dropped during a
-        /// drag-and-drop operation.
-        /// </summary>
-        DropLocationIndicator _dropLocationIndicator = new DropLocationIndicator();
-
-        /// <summary>
         /// Button that appears as the last <see cref="PaginationControl"/> and that causes the next
         /// document to be loaded when pressed.
         /// </summary>
         LoadNextDocumentButtonControl _loadNextDocumentButtonControl =
             new LoadNextDocumentButtonControl();
-
-        /// <summary>
-        /// Indicates the control index at which controls should be dropped during a
-        /// drag-and-drop operation.
-        /// </summary>
-        int _dropLocationIndex = -1;
 
         /// <summary>
         /// The <see cref="PaginationControl"/> that is currently the primarily selected
@@ -342,26 +319,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         ApplicationCommand _outputDocumentCommand;
 
         /// <summary>
-        /// A <see cref="Timer"/> which fires to trigger scrolling during drag/drop operation while
-        /// the cursor is close to either the top or bottom of the control.
-        /// </summary>
-        Timer _dragDropScrollTimer;
-
-        /// <summary>
-        /// The number of pixels per <see cref="_dragDropScrollTimer"/> fire the control should
-        /// scroll while drag/drop scrolling is active.
-        /// </summary>
-        int _scrollSpeed;
-
-        /// <summary>
-        /// The last scroll position that was set programmatically during drag/drop scrolling. There
-        /// are situations outside of the code here that cause the scroll position to be adjusted
-        /// after we have set it. By keeping track of what we last wanted it to be we can prevent
-        /// the scroll position from jumping around in an unexpected fashion.
-        /// </summary>
-        int _dragDropScrollPos;
-
-        /// <summary>
         /// Indicates whether an operation that re-organizes controls in the panel is taking place.
         /// </summary>
         bool _inUpdateOperation;
@@ -435,6 +392,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _pendingSnapDataPanelToTop;
 
+        /// <summary>
+        /// Inidicates whether all documents are currently being displayed. Will be <c>false</c>
+        /// when SnapDataPanelToTop is called and other documents are hidden to emphacize the document
+        /// actively being edited.
+        /// </summary>
+        bool _allDocumentsShowing = true;
+
         #endregion Fields
 
         #region Constructors
@@ -444,9 +408,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="paginationUtility">The <see cref="IPaginationUtility"/> to which this
         /// instance belongs.</param>
-        // We do not need to worry about preventing sleep mode with the _dragDropScrollTimer as it
-        // will be active only during a drag/drop operation.
-        [SuppressMessage("Microsoft.Mobility", "CA1601:DoNotUseTimersThatPreventPowerStateChanges")]
         public PageLayoutControl(IPaginationUtility paginationUtility)
             : base()
         {
@@ -459,17 +420,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 this.SetStyle(ControlStyles.Selectable, true);
 
-                // When dragging files in from the Windows shell, _dropLocationIndicator receives
-                // drag/drop events if the mouse is over the indicator.
-                _dropLocationIndicator.DragDrop += Handle_DragDrop;
-                _dropLocationIndicator.DragEnter += Handle_DragEnter;
-                _dropLocationIndicator.DragOver += Handle_DragOver;
-                _dropLocationIndicator.DragLeave += Handle_DragLeave;
-
-                // Set scrolling during a drag/drop scroll event to occur 20 times / sec.
-                _dragDropScrollTimer = new Timer();
-                _dragDropScrollTimer.Interval = 50;
-                _dragDropScrollTimer.Tick += HandleDragDropScrollTimer_Tick;
+                DragDrop_Init();
 
                 _toolTip.AutoPopDelay = 0;
                 _toolTip.InitialDelay = 500;
@@ -572,7 +523,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     throw ex.AsExtract("ELI44705");
                 }
             }
-        } 
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="ImageViewer"/> that is to display the images from selected
@@ -921,7 +872,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             // it has loaded.
                             DocumentDataPanel.PrimaryPageIsForActiveDocument =
                                 (DocumentInDataEdit != null) &&
-                                DocumentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document;
+                                DocumentInDataEdit == _primarySelection.Document;
                         }
 
                         SetHighlightedAndDisplayed(_primarySelection, true);
@@ -1072,7 +1023,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="insertSeparator"><see langword="true"/> if a separator should be inserted
         /// before creating the new; otherwise, <see langword="false"/>.</param>
         /// <returns>The <see cref="OutputDocument"/> that was created.</returns>
-        public OutputDocument CreateOutputDocument(SourceDocument sourceDocument, 
+        public OutputDocument CreateOutputDocument(SourceDocument sourceDocument,
             Page[] pages, int position, bool insertSeparator,
             IEnumerable<int> deletedPages = null, IEnumerable<int> viewedPages = null)
         {
@@ -1978,9 +1929,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .ToList()
                         .ForEach(control => control.Visible = false);
 
+                    _allDocumentsShowing = false;
+
                     _flowLayoutPanel.RequestScrollToControl(
-                        DocumentInDataEdit.PaginationSeparator, 
-                        topAlignmentOffset: 0, 
+                        DocumentInDataEdit.PaginationSeparator,
+                        topAlignmentOffset: 0,
                         activateScrollToControlForEvent: true);
                 }
             }
@@ -2002,7 +1955,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _flowLayoutPanel.RequestScrollToControl(PrimarySelection, null, activateScrollToControlForEvent: true);
                 }
-            } 
+            }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI49887");
@@ -2167,7 +2120,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // Allow page up/down to change pages while DEP is open/active
                         return base.ProcessCmdKey(ref msg, keyData);
                     }
-                    
+
                     IgnoreShortcutKey = true;
                 }
 
@@ -2228,18 +2181,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         components = null;
                     }
 
-                    if (_dropLocationIndicator != null)
-                    {
-                        _dropLocationIndicator.Dispose();
-                        _dropLocationIndicator = null;
-                    }
-
-                    if (_dragDropScrollTimer != null)
-                    {
-                        _dragDropScrollTimer.Dispose();
-                        _dragDropScrollTimer = null;
-                    }
-
                     if (_loadNextDocumentButtonControl != null)
                     {
                         _loadNextDocumentButtonControl.Dispose();
@@ -2252,6 +2193,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _toolTip.Dispose();
                         _toolTip = null;
                     }
+
+                    DragDrop_Dispose();
                 }
                 catch { }
             }
@@ -2333,20 +2276,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 var originControl = sender as PaginationControl;
 
-                // Do not allow drag events to start by dragging over a separator.
-                if (originControl is PaginationSeparator)
-                {
-                    return;
-                }
-
-                // Do not allow modification of documents that have already been output.
-                if (SelectedControls
-                        .OfType<PageThumbnailControl>()
-                        .Any(pageControl => pageControl.Document.OutputProcessed))
-                {
-                    return;
-                }
-
                 // Assigning a ToolTip instance for all page controls uses a lot of GDI handles.
                 // Instead, dynamically assign a single _toolTip instance the control the mouse is
                 // currently over.
@@ -2365,212 +2294,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _toolTipControl.SetToolTip(_toolTip);
                 }
 
-                // If the mouse button is down and the sending control is already selected, start a
-                // drag-and-drop operation.
-                if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
-                {
-                    if (originControl != null && originControl != _loadNextDocumentButtonControl)
-                    {
-                        // Don't start a drag and drop operation unless the user has dragged out of
-                        // the origin control to help prevent accidental drag/drops.
-                        Point mouseLocation = PointToClient(Control.MousePosition);
-                        var pageThumbnailControl = GetControlAtPoint<PageThumbnailControl>(mouseLocation);
-                        var originThumbnailControl = sender as PageThumbnailControl;
-
-                        if (pageThumbnailControl != null
-                            && pageThumbnailControl != originControl
-                            && originThumbnailControl?.Document?.OutputProcessed != true
-                            && !pageThumbnailControl.Document.OutputProcessed)
-                        {
-                            // [DotNetRCAndUtils:968]
-                            // If the control where the drag originated is not selected, imply
-                            // selection of that control when starting the drag operation.
-                            if (!originControl.Selected)
-                            {
-                                ProcessControlSelection(originControl);
-                            }
-
-                            var dataObject = new DataObject(_DRAG_DROP_DATA_FORMAT, this);
-
-                            try
-                            {
-                                DoDragDrop(dataObject, DragDropEffects.Move);
-                            }
-                            finally
-                            {
-                                if (_dropLocationIndex >= 0)
-                                {
-                                    _dropLocationIndex = -1;
-                                    Controls.Remove(_dropLocationIndicator);
-                                }
-
-                                // If drag/drop scrolling was active when the drag/drop event ends,
-                                // stop the scrolling now.
-                                if (_dragDropScrollTimer.Enabled)
-                                {
-                                    _dragDropScrollTimer.Stop();
-                                }
-                            }
-                        }
-                    }
-                }
+                DragDrop_HandleMouseMove(originControl, e, displayException: false);
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35446");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.DragEnter"/> event of a child control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.DragEventArgs"/> instance containing
-        /// the event data.</param>
-        void Handle_DragEnter(object sender, DragEventArgs e)
-        {
-            try
-            {
-                if (e.Data.GetDataPresent(_DRAG_DROP_DATA_FORMAT))
-                {
-                    // Controls from within this application
-                    e.Effect = DragDropEffects.Move;
-                }
-                else
-                {
-                    // No data or unsupported data type.
-                    e.Effect = DragDropEffects.None;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35447");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.DragLeave"/> event of a child control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void Handle_DragLeave(object sender, EventArgs e)
-        {
-            try
-            {
-                EnableDragScrolling(Control.MousePosition);
-
-                if (_dropLocationIndex >= 0)
-                {
-                    _dropLocationIndex = -1;
-                    Controls.Remove(_dropLocationIndicator);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35448");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.DragOver"/> event of a child control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.DragEventArgs"/> instance
-        /// containing the event data.</param>
-        void Handle_DragOver(object sender, DragEventArgs e)
-        {
-            try
-            {
-                EnableDragScrolling(new Point(e.X, e.Y));
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractLog("ELI35449");
-            }
-
-            try
-            {
-                Point dragLocation = PointToClient(new Point(e.X, e.Y));
-                var pageThumbnailControl = GetControlAtPoint<PageThumbnailControl>(dragLocation);
-
-                if (pageThumbnailControl != null
-                    && pageThumbnailControl.Visible
-                    && pageThumbnailControl.Document.OutputProcessed != true)
-                {
-                    _dropLocationIndex = _flowLayoutPanel.Controls.IndexOf(pageThumbnailControl);
-                    Point location;
-
-                    // Because a lot of padding may be added to extend a page control out to the end
-                    // of a row, take the padding into account when deciding whether a drop should
-                    // occur before or after the page.
-                    int left = pageThumbnailControl.Left + pageThumbnailControl.Padding.Left;
-                    int right = pageThumbnailControl.Right - pageThumbnailControl.Padding.Right;
-                    int center = (right - left) / 2;
-
-                    if ((dragLocation.X - pageThumbnailControl.Left) > center)
-                    {
-                        _dropLocationIndex++;
-                        location = pageThumbnailControl.TrailingInsertionPoint;
-                    }
-                    else
-                    {
-                        location = pageThumbnailControl.PreceedingInsertionPoint;
-                    }
-
-                    ShowDropLocationIndicator(location, pageThumbnailControl.Height);
-                    e.Effect = e.AllowedEffect;
-                }
-                else
-                {
-                    _dropLocationIndex = -1;
-                    Controls.Remove(_dropLocationIndicator);
-                    e.Effect = DragDropEffects.None;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35450");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="Control.DragDrop"/> event of a child control.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.Windows.Forms.DragEventArgs"/> instance containing
-        /// the event data.</param>
-        void Handle_DragDrop(object sender, DragEventArgs e)
-        {
-            try
-            {
-                if (_dropLocationIndex >= 0)
-                {
-                    var sourceLayoutControl =
-                        e.Data.GetData(_DRAG_DROP_DATA_FORMAT) as PageLayoutControl;
-                    if (sourceLayoutControl != null)
-                    {
-                        MoveSelectedControls(sourceLayoutControl, _dropLocationIndex);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35451");
-            }
-            finally
-            {
-                try
-                {
-                    if (_dropLocationIndex >= 0)
-                    {
-                        _dropLocationIndex = -1;
-                        Controls.Remove(_dropLocationIndicator);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI35619");
-                }
             }
         }
 
@@ -2829,46 +2557,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the <see cref="Timer.Tick"/> event of the <see cref="_dragDropScrollTimer"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
-        /// </param>
-        void HandleDragDropScrollTimer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                // Determine the existing scroll position (or what it should be as a result of the
-                // last tick event).
-                int lastScrollPos = _flowLayoutPanel.VerticalScroll.Value;
-                if (_dragDropScrollPos >= 0)
-                {
-                    lastScrollPos = (_scrollSpeed > 0)
-                        ? Math.Max(_dragDropScrollPos, lastScrollPos)
-                        : Math.Min(_dragDropScrollPos, lastScrollPos);
-                }
-
-                _dragDropScrollPos = lastScrollPos + _scrollSpeed;
-
-                // Ensure the scroll position stays within range.
-                if (_dragDropScrollPos < _flowLayoutPanel.VerticalScroll.Minimum)
-                {
-                    _dragDropScrollPos = _flowLayoutPanel.VerticalScroll.Minimum;
-                }
-                else if (_dragDropScrollPos > _flowLayoutPanel.VerticalScroll.Maximum)
-                {
-                    _dragDropScrollPos = _flowLayoutPanel.VerticalScroll.Maximum;
-                }
-
-                _flowLayoutPanel.VerticalScroll.Value = _dragDropScrollPos;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35581");
-            }
-        }
-
-        /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
         /// <see cref="_loadNextDocumentButtonControl"/>.
         /// </summary>
@@ -2952,7 +2640,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // it has loaded.
                     DocumentDataPanel.PrimaryPageIsForActiveDocument =
                         (DocumentInDataEdit != null) &&
-                        (DocumentInDataEdit == (_primarySelection as PageThumbnailControl)?.Document);
+                        (DocumentInDataEdit == _primarySelection.Document);
 
                     // https://extract.atlassian.net/browse/ISSUE-17098
                     // Save the current scroll position so it can be restored once the DEP is closed.
@@ -2988,17 +2676,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Redisplay controls from other documents that were hidden while a DEP was in edit.
                 using (new PageLayoutControlUpdateLock(this))
                 {
-                    foreach (var separator in _flowLayoutPanel.Controls.OfType<PaginationSeparator>())
-                    {
-                        separator.Visible = true;
-                        if (!separator.Collapsed)
-                        {
-                            foreach (var pageControl in separator.Document.PageControls)
-                            {
-                                pageControl.Visible = true;
-                            }
-                        }
-                    }
+                    RedisplayAllDocuments();
                 }
 
                 _flowLayoutPanel.RequestScrollPositionRestore();
@@ -3059,16 +2737,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 UpdateCommandStates();
 
-                // https://extract.atlassian.net/browse/ISSUE-14326
-                // Ensure that collapsing/expanding a document doesn't cause it to scroll out of view.
                 var separator = (PaginationSeparator)sender;
-                
-                // However it was activated, when collapsing/expanding a document, make sure the document
-                // is scrolled into view as a result.
-                _flowLayoutPanel.RequestScrollToControl
-                    (separator, 
-                     topAlignmentOffset: null,
-                     activateScrollToControlForEvent: true);
+
+                if (!DragDrop_HandleDocumentCollapsedChanged(separator))
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-14326
+                    // However it was activated, when collapsing/expanding a document, make sure the document
+                    // is scrolled into view as a result.
+                    _flowLayoutPanel.RequestScrollToControl
+                        (separator,
+                         topAlignmentOffset: null,
+                         activateScrollToControlForEvent: true);
+                }
             }
             catch (Exception ex)
             {
@@ -3309,58 +2989,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Shows the <see cref="_dropLocationIndicator"/> at the specified
-        /// <see paramref="location"/>.
-        /// </summary>
-        /// <param name="location">The <see cref="Point"/> where the location indicator should be
-        /// drawn.</param>
-        /// <param name="height">The height the location indicator should be</param>
-        void ShowDropLocationIndicator(Point location, int height)
-        {
-            location.Offset(-_dropLocationIndicator.Width / 2, 0);
-
-            // If the _dropLocationIndicator is already visible, but needs to be moved, remove it
-            // completely, otherwise the background may retain some artifacts from the controls it
-            // was previously over.
-            if (Controls.Contains(_dropLocationIndicator) &&
-                _dropLocationIndicator.Location != location)
-            {
-                Controls.Remove(_dropLocationIndicator);
-            }
-
-            if (!Controls.Contains(_dropLocationIndicator))
-            {
-                Controls.Add(_dropLocationIndicator);
-                _dropLocationIndicator.BringToFront();
-            }
-            _dropLocationIndicator.Location = location;
-            _dropLocationIndicator.Height = height;
-
-            // Make sure the rectangle we are updating is large enough to intersect with bordering
-            // controls.
-            Rectangle updateRect = _dropLocationIndicator.Bounds;
-            updateRect.Inflate(5, 5);
-
-            // To make the background of _dropLocationIndicator "transparent", update the region of
-            // this control under the _dropLocationIndicator.
-            Invalidate(updateRect, true);
-            Update();
-
-            // Now, the pagination controls under it should be refreshed as well.
-            foreach (Control paginationControl in _flowLayoutPanel.Controls)
-            {
-                if (updateRect.IntersectsWith(paginationControl.Bounds))
-                {
-                    paginationControl.Refresh();
-                }
-            }
-
-            // Finally, trigger the _dropLocationIndicator itself to paint on top of the
-            // "background" that has just been drawn.
-            _dropLocationIndicator.Invalidate();
-        }
-
-        /// <summary>
         /// Applies/toggles selection based on the specified <see paramref="activeControl"/> and the
         /// currently depressed modifier keys.
         /// </summary>
@@ -3526,6 +3154,29 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     ImageViewer.CloseImage();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Displays all documents; Used to counter the documents hidden by SnapDataPanelToTop.
+        /// </summary>
+        void RedisplayAllDocuments()
+        {
+            if (!_allDocumentsShowing)
+            {
+                foreach (var separator in _flowLayoutPanel.Controls.OfType<PaginationSeparator>())
+                {
+                    separator.Visible = true;
+                    if (!separator.Collapsed)
+                    {
+                        foreach (var pageControl in separator.Document.PageControls)
+                        {
+                            pageControl.Visible = true;
+                        }
+                    }
+                }
+
+                _allDocumentsShowing = true;
             }
         }
 
@@ -4338,48 +3989,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 additionalControls: insertedPaginationControls,
                 select: true,
                 modifierKeys: Keys.None);
-        }
-
-        /// <summary>
-        /// Starts/stops scrolling during a drag event based upon the location of the mouse.
-        /// </summary>
-        /// <param name="mouseLocation">The current mouse location in screen coordinates.</param>
-        void EnableDragScrolling(Point mouseLocation)
-        {
-            // Determine if scrolling should occur based upon the mouse location being close to
-            // the top/bottom of the screen
-            Point screenLocation = PointToScreen(Location);
-            int topScrollZone = screenLocation.Y + _DRAG_DROP_SCROLL_AREA;
-            int bottomScrollZone =
-                screenLocation.Y + DisplayRectangle.Height - _DRAG_DROP_SCROLL_AREA;
-
-            // If the control should scroll up
-            if (mouseLocation.Y <= topScrollZone)
-            {
-                _scrollSpeed = -Math.Min(topScrollZone - mouseLocation.Y, _DRAG_DROP_SCROLL_AREA);
-
-                if (!_dragDropScrollTimer.Enabled)
-                {
-                    _dragDropScrollPos = -1;
-                    _dragDropScrollTimer.Start();
-                }
-            }
-            // If the control should scroll down
-            else if (mouseLocation.Y >= bottomScrollZone)
-            {
-                _scrollSpeed = Math.Min(mouseLocation.Y - bottomScrollZone, _DRAG_DROP_SCROLL_AREA);
-
-                if (!_dragDropScrollTimer.Enabled)
-                {
-                    _dragDropScrollPos = -1;
-                    _dragDropScrollTimer.Start();
-                }
-            }
-            // If scrolling should be stopped
-            else if (_dragDropScrollTimer.Enabled)
-            {
-                _dragDropScrollTimer.Stop();
-            }
         }
 
         /// <summary>

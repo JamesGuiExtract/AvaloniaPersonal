@@ -112,6 +112,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         public void CancelScrollRequest()
         {
             _scrollToControlTarget = null;
+            _scrollRestorePosition = null;
         }
 
         /// <summary>
@@ -120,10 +121,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public void SetScrollRestorePosition(Control control)
         {
-            _scrollRestorePosition = new ScrollTarget() {
-                Control = control,
-                TopAlignmentOffset = control.Location.Y
-            };
+            _scrollRestorePosition = (control == null)
+                ? null
+                : new ScrollTarget() {
+                    Control = control,
+                    TopAlignmentOffset = control.Location.Y
+                };
         }
 
         /// <summary>
@@ -155,7 +158,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="topAlignmentOffset">The number of pixels vertically the <see paramref="control"/>
         /// should appear from the top of the panel or <c>null</c> to scroll the control into view if
         /// necessary but not modify the scroll position any more than necessary to do so.</param>
-        void ScrollControlIntoViewManual(Control control, int? topAlignmentOffset)
+        public void ScrollControlIntoViewManual(Control control, int? topAlignmentOffset)
         {
             try
             {

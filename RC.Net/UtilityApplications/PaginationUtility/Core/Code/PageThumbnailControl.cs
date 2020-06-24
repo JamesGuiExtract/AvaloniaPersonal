@@ -164,20 +164,33 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<EventArgs> PageStateChanged;
 
+        /// <summary>
+        /// Raised when the <see cref="Selected"/> property changes.
+        /// </summary>
+        public event EventHandler<EventArgs> SelectedStateChanged;
+
         #endregion Events
 
         #region Properties
 
         /// <summary>
         /// Gets or sets the <see cref="OutputDocument"/> to which this instance belongs.
+        /// NOTE: This replaces the base class member to allow the property to be writable.
         /// </summary>
         /// <value>
         /// The <see cref="OutputDocument"/> to which this instance belongs.
         /// </value>
-        public OutputDocument Document
+        public new OutputDocument Document
         {
-            get;
-            set;
+            get
+            {
+                return base.Document;
+            }
+
+            set
+            {
+                base.Document = value;
+            }
         }
 
         /// <summary>
@@ -523,7 +536,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     base.Selected = value;
 
-                    _contentsPanel?.OnSelectedStateChanged();
+                    OnSelectedStateChanged();
                 }
             }
         }
@@ -679,6 +692,17 @@ namespace Extract.UtilityApplications.PaginationUtility
         internal void OnPageStateChanged()
         {
             var eventHandler = PageStateChanged;
+            if (eventHandler != null)
+            {
+                eventHandler(this, new EventArgs());
+            }
+        }
+
+        internal void OnSelectedStateChanged()
+        {
+            _contentsPanel?.OnSelectedStateChanged();
+
+            var eventHandler = SelectedStateChanged;
             if (eventHandler != null)
             {
                 eventHandler(this, new EventArgs());

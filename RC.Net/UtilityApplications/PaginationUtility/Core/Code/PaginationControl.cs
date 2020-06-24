@@ -167,6 +167,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Gets the <see cref="OutputDocument"/> to which this instance belongs.
+        /// </summary>
+        public virtual OutputDocument Document
+        {
+            get;
+            protected set;
+        }
+
         #endregion Properties
 
         #region Overrides
