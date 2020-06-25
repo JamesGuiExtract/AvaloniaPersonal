@@ -161,7 +161,8 @@ namespace DatabaseMigrationWizard.Test
             Assert.AreEqual(new DateTime(2020, 3, 11).Date, DateTime.Parse(dashboard.LastImportedDate, CultureInfo.InvariantCulture).Date);
             Assert.AreEqual(true, dashboard.UseExtractedData);
             Assert.NotNull(dashboard.DashboardGuid);
-            Assert.NotNull(dashboard.FAMUserGuid);
+            Assert.AreEqual(dashboard.FullUserName, "McBoberson");
+            Assert.NotNull(dashboard.UserName, "Bob");
             // XML is being auto converted to its shortened form. Below is fine even if it does not 100% match insert statement.
             Assert.AreEqual("<SomeDefinition />", dashboard.Definition);
             Assert.AreEqual("<SomeDefinition2 />", dashboard.ExtractedDataDefinition);
@@ -227,7 +228,6 @@ namespace DatabaseMigrationWizard.Test
 
             Assert.AreEqual("Bob", famUser.UserName);
             Assert.AreEqual("McBoberson", famUser.FullUserName);
-            Assert.NotNull(famUser.Guid);
         }
 
         /// <summary>

@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 185;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 186;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2815,7 +2815,33 @@ int UpdateToSchemaVersion185(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49883");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion186(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 186;
 
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrALTER_FAMUSER_REMOVE_GUID);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49891");
+}
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
 //-------------------------------------------------------------------------------------------------
@@ -7952,7 +7978,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 182:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion183);
 				case 183:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion184);
 				case 184:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion185);
-				case 185:
+				case 185:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion186);
+				case 186:
 					break;
 
 				default:

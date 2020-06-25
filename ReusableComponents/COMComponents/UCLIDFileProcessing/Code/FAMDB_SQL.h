@@ -126,7 +126,6 @@ static const string gstrCREATE_FAM_USER_TABLE = "CREATE TABLE [dbo].[FAMUser]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NULL, "
 	"[FullUserName] [nvarchar](128) NULL,"
-	"[Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"CONSTRAINT [PK_FAMUser] PRIMARY KEY CLUSTERED ([ID] ASC), "
 	"CONSTRAINT [IX_UserName] UNIQUE NONCLUSTERED ([UserName] ASC))";
 
@@ -2689,3 +2688,23 @@ static const string gstrALTER_DATABASE_MIGRATION_WIZARD_REPORTING_COLUMN_SIZES =
 	" ALTER COLUMN Old_Value NVARCHAR(MAX) "
 	" ALTER TABLE dbo.ReportingDatabaseMigrationWizard "
 	" ALTER COLUMN New_Value NVARCHAR(MAX) ";
+
+static const string gstrALTER_FAMUSER_REMOVE_GUID =
+" DECLARE @ConstraintName nvarchar(200) "
+" SELECT @ConstraintName = Name FROM SYS.DEFAULT_CONSTRAINTS "
+" WHERE PARENT_OBJECT_ID = OBJECT_ID('FAMUser') "
+" AND PARENT_COLUMN_ID = (SELECT column_id FROM sys.columns "
+" 	WHERE NAME = N'Guid' "
+" 	AND object_id = OBJECT_ID(N'FAMUser')) "
+" 	IF @ConstraintName IS NOT NULL "
+" 	EXEC('ALTER TABLE FAMUser DROP CONSTRAINT ' + @ConstraintName) "
+
+" 	IF EXISTS(SELECT 1 "
+" 		FROM   INFORMATION_SCHEMA.COLUMNS "
+" 		WHERE  TABLE_NAME = 'FAMUser' "
+" 		AND COLUMN_NAME = 'Guid' "
+" 		AND TABLE_SCHEMA = 'DBO') "
+" 	BEGIN "
+" 	ALTER TABLE FAMUser "
+" 	DROP COLUMN[Guid] "
+" 	END ";

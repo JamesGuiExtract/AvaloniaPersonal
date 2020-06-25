@@ -15,7 +15,8 @@ namespace DatabaseMigrationWizard.Database.Output
 	                            , Dashboard.UseExtractedData
 	                            , Dashboard.ExtractedDataDefinition
                                 , Dashboard.GUID AS DashboardGuid
-	                            , FAMUser.GUID AS FAMUserGuid
+                                , FAMUser.FullUserName
+	                            , FAMUser.UserName
                             FROM 
 	                            [dbo].[Dashboard]
 		                            LEFT OUTER JOIN dbo.FAMUser

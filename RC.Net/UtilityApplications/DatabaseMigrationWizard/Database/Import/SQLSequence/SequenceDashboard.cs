@@ -16,7 +16,8 @@ CREATE TABLE [dbo].[##Dashboard](
 [UseExtractedData] [bit] NULL,
 [ExtractedDataDefinition] [xml] NULL,
 [DashboardGuid] uniqueidentifier NOT NULL,
-[FAMUserGuid] uniqueidentifier NOT NULL,
+[UserName] NVARCHAR(MAX) NULL,
+[FullUserName] NVARCHAR(MAX) NULL
 )";
 
         private readonly string insertSQL = @"
@@ -32,7 +33,16 @@ SET
 FROM
 	##Dashboard AS UpdatingDashboard
 				LEFT OUTER JOIN dbo.FAMUser
-					ON dbo.FAMUser.Guid = UpdatingDashboard.FAMUserGuid
+					ON dbo.FAMUser.UserName = UpdatingDashboard.UserName
+					AND (
+							dbo.FAMUser.FullUserName = UpdatingDashboard.FullUserName
+							OR
+							(
+								UpdatingDashboard.FullUserName IS NULL
+								AND
+								dbo.FAMUser.FullUserName IS NULL
+							)
+						)
 WHERE
 	dbo.Dashboard.Guid = UpdatingDashboard.DashboardGuid
 ;
@@ -46,15 +56,25 @@ SELECT
 	, UpdatingDashboard.UseExtractedData
 	, UpdatingDashboard.ExtractedDataDefinition
 	, UpdatingDashboard.DashboardGuid
+
 FROM 
 	##Dashboard AS UpdatingDashboard
 			LEFT OUTER JOIN dbo.FAMUser
-				ON dbo.FAMUser.Guid = UpdatingDashboard.FAMUserGuid
+				ON dbo.FAMUser.UserName = UpdatingDashboard.UserName
+				AND (
+						dbo.FAMUser.FullUserName = UpdatingDashboard.FullUserName
+						OR
+						(
+							UpdatingDashboard.FullUserName IS NULL
+							AND
+							dbo.FAMUser.FullUserName IS NULL
+						)
+					)
 WHERE
 	UpdatingDashboard.DashboardGuid NOT IN (SELECT Guid FROM dbo.Dashboard)";
 
         private readonly string insertTempTableSQL = @"
-INSERT INTO ##Dashboard (DashboardName, Definition, LastImportedDate, UseExtractedData, ExtractedDataDefinition, DashboardGuid, FAMUserGuid)
+INSERT INTO ##Dashboard (DashboardName, Definition, LastImportedDate, UseExtractedData, ExtractedDataDefinition, DashboardGuid, UserName, FullUserName)
 VALUES
 ";
 
@@ -150,7 +170,16 @@ SELECT
 FROM
 	##Dashboard AS UpdatingDashboard
 		LEFT OUTER JOIN dbo.FAMUser
-			ON dbo.FAMUser.Guid = UpdatingDashboard.FAMUserGuid
+			ON dbo.FAMUser.UserName = UpdatingDashboard.UserName
+			AND (
+					dbo.FAMUser.FullUserName = UpdatingDashboard.FullUserName
+					OR
+					(
+						UpdatingDashboard.FullUserName IS NULL
+						AND
+						dbo.FAMUser.FullUserName IS NULL
+					)
+				)
 		
 		INNER JOIN dbo.Dashboard
 			ON dbo.Dashboard.Guid = UpdatingDashboard.DashboardGuid

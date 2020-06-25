@@ -417,7 +417,8 @@ namespace DatabaseMigrationWizard.Test
                 UseExtractedData = true,
                 ExtractedDataDefinition = null,
                 DashboardGuid = Guid.Parse("05e7d279-49c2-467c-975c-dc8e96db48dc"),
-                FAMUserGuid = Guid.Parse("9e51eda3-d4d3-4d06-aca5-4319eee9015d")
+                FullUserName = "Legend",
+                UserName = "SuperVerifier"
             });
 
             DatabaseMigrationWizardTestHelper.DatabaseServices.Add(new DatabaseService()
@@ -437,7 +438,7 @@ namespace DatabaseMigrationWizard.Test
                 Guid = Guid.Parse("0d4bf118-65a5-40a5-bc2d-c45ba65d6166")
             });
 
-            DatabaseMigrationWizardTestHelper.FAMUsers.Add(new FAMUser() { UserName = "SuperVerifier", FullUserName = "Legend", Guid = Guid.Parse("99b0eef1-5941-4c3e-80ef-05b9fa8823ea") });
+            DatabaseMigrationWizardTestHelper.FAMUsers.Add(new FAMUser() { UserName = "SuperVerifier", FullUserName = "Legend" });
 
             DatabaseMigrationWizardTestHelper.FieldSearches.Add(new FieldSearch() { Enabled = true, FieldName = "FunestField", AttributeQuery = "SELECT", Guid = Guid.Parse("9daf1bd1-abd0-4fed-9db0-37dbd5fc510a") });
 

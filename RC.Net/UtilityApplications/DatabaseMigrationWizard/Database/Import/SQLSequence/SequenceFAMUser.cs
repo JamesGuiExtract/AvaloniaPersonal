@@ -11,35 +11,49 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
         private readonly string CreateTempTableSQL = @"
 CREATE TABLE [dbo].[##FAMUser](
 [UserName] [nvarchar](50) NULL,
-[FullUserName] [nvarchar](128) NULL,
-[Guid] uniqueidentifier NOT NULL,
+[FullUserName] [nvarchar](128) NULL
 )";
 
         private readonly string insertSQL = @"
-UPDATE
-	dbo.FAMUser
-SET
-	FullUserName = UpdatingFAMUser.FullUserName
-	, UserName = UpdatingFAMUser.UserName
-FROM
-	##FAMUser AS UpdatingFAMUser
-WHERE
-	UpdatingFAMUser.Guid = dbo.FAMUser.Guid
-;
-INSERT INTO dbo.FAMUser(UserName, FullUserName, Guid)
+ INSERT INTO dbo.FAMUser(UserName, FullUserName)
 
 SELECT
 	UserName
 	, FullUserName
-	, Guid
 FROM 
 	##FAMUser AS UpdatingFAMUser
 WHERE
-	UpdatingFAMUser.Guid NOT IN (SELECT Guid FROM dbo.FAMUser)
+	NOT EXISTS
+	(
+	SELECT
+		*
+	FROM
+		dbo.FAMUser
+	WHERE
+		(
+			dbo.FAMUser.FullUserName = UpdatingFAMUser.FullUserName
+			OR
+			(
+				dbo.FAMUser.FullUserName IS NULL
+				AND
+				UpdatingFAMUser.FullUserName IS NULL
+			)
+		)
+		AND
+		(
+			dbo.FAMUser.UserName = UpdatingFAMUser.UserName
+			OR
+			(
+				dbo.FAMUser.UserName IS NULL
+				AND
+				UpdatingFAMUser.UserName IS NULL
+			)
+		)
+	)
 ";
 
         private readonly string insertTempTableSQL = @"
-INSERT INTO ##FAMUser (UserName, FullUserName, Guid)
+INSERT INTO ##FAMUser (UserName, FullUserName)
 VALUES
 ";
 
@@ -53,10 +67,28 @@ SELECT
 	, CONCAT('The FAMUser ', dbo.FAMUser.UserName, ' is present in the destination database, but NOT in the importing source.')
 FROM
 	dbo.FAMUser
-		LEFT OUTER JOIN ##FAMUser
-			ON dbo.FAMUser.Guid = ##FAMUser.GUID
+		LEFT OUTER JOIN ##FAMUser AS UpdatingFAMUser
+			ON dbo.FAMUser.FullUserName = UpdatingFAMUser.FullUserName
+			OR
+			(
+				dbo.FAMUser.FullUserName IS NULL
+				AND
+				UpdatingFAMUser.FullUserName IS NULL
+			)
+			AND
+			(
+				dbo.FAMUser.UserName = UpdatingFAMUser.UserName
+				OR
+				(
+					dbo.FAMUser.UserName IS NULL
+					AND
+					UpdatingFAMUser.UserName IS NULL
+				)
+			)
 WHERE
-	##FAMUser.GUID IS NULL
+	UpdatingFAMUser.UserName IS NULL
+	AND
+	UpdatingFAMUser.FullUserName IS NULL
 ;
 INSERT INTO
 	dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
@@ -64,51 +96,37 @@ SELECT
 	'Insert'
 	, 'Info'
 	, 'FAMUser'
-	, CONCAT('The FAMUser ', ##FAMUser.UserName, ' will be added to the database')
-FROM
-	##FAMUser
-		LEFT OUTER JOIN dbo.FAMUser
-			ON dbo.FAMUser.Guid = ##FAMUser.GUID
-WHERE
-	dbo.FAMUser.Guid IS NULL";
-
-		private readonly string UpdateReportingSQL = @"
-INSERT INTO
-	dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
-SELECT
-	'Update'
-	, 'Info'
-	, 'FAMUser'
-	, 'The Full username will be updated'
-	, dbo.FAMUser.FullUserName
-	, UpdatingFAMUser.FullUserName
+	, CONCAT('The FAMUser ', UpdatingFAMUser.UserName, ' will be added to the database')
 FROM
 	##FAMUser AS UpdatingFAMUser
-		
-		INNER JOIN dbo.FAMUser
-			ON dbo.FAMUser.Guid = UpdatingFAMUser.Guid
-
 WHERE
-	ISNULL(UpdatingFAMUser.FullUserName, '') <> ISNULL(dbo.FAMUser.FullUserName, '')
-;
-INSERT INTO
-	dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
-SELECT
-	'Update'
-	, 'Info'
-	, 'FAMUser'
-	, 'The username will be updated'
-	, dbo.FAMUser.UserName
-	, UpdatingFAMUser.UserName
-FROM
-	##FAMUser AS UpdatingFAMUser
-		
-		INNER JOIN dbo.FAMUser
-			ON dbo.FAMUser.Guid = UpdatingFAMUser.Guid
-
-WHERE
-	ISNULL(UpdatingFAMUser.UserName, '') <> ISNULL(dbo.FAMUser.UserName, '')
-;";
+	NOT EXISTS
+	(
+	SELECT
+		*
+	FROM
+		dbo.FAMUser
+	WHERE
+		(
+			dbo.FAMUser.FullUserName = UpdatingFAMUser.FullUserName
+			OR
+			(
+				dbo.FAMUser.FullUserName IS NULL
+				AND
+				UpdatingFAMUser.FullUserName IS NULL
+			)
+		)
+		AND
+		(
+			dbo.FAMUser.UserName = UpdatingFAMUser.UserName
+			OR
+			(
+				dbo.FAMUser.UserName IS NULL
+				AND
+				UpdatingFAMUser.UserName IS NULL
+			)
+		)
+	)";
 
 		public Priorities Priority => Priorities.High;
 
@@ -121,7 +139,6 @@ WHERE
             ImportHelper.PopulateTemporaryTable<FAMUser>($"{importOptions.ImportPath}\\{TableName}.json", this.insertTempTableSQL, importOptions);
 
 			importOptions.ExecuteCommand(this.InsertReportingSQL);
-			importOptions.ExecuteCommand(this.UpdateReportingSQL);
 
             importOptions.ExecuteCommand(this.insertSQL);
         }

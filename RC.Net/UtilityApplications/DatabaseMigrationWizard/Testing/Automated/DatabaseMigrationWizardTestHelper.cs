@@ -114,7 +114,8 @@ namespace DatabaseMigrationWizard.Test
                 UseExtractedData = false,
                 ExtractedDataDefinition = null,
                 DashboardGuid = Guid.Parse("e9ecb43e-2ff4-42a3-82c0-6cfc4e09e100"),
-                FAMUserGuid = Guid.Parse("9e51eda3-d4d3-4d06-aca5-4319eee9015d")
+                UserName = "Trever_Gannon",
+                FullUserName = "DataMaster"
             });
             Dashboards.Add(new Dashboard()
             {
@@ -124,7 +125,8 @@ namespace DatabaseMigrationWizard.Test
                 UseExtractedData = true,
                 ExtractedDataDefinition = "<test />",
                 DashboardGuid = Guid.Parse("2fe484cd-3e10-45a8-9c0c-1bcee4da4491"),
-                FAMUserGuid = Guid.Parse("9e51eda3-d4d3-4d06-aca5-4319eee9015d")
+                UserName = "Trever_Gannon",
+                FullUserName = "DataMaster"
             });
 
             DatabaseServices.Add(new DatabaseService() { 
@@ -197,8 +199,8 @@ namespace DatabaseMigrationWizard.Test
             DBInfos.Add(new DBInfo() { Name = "MaxMillisecondsBetweenCheckForFilesToProcess", Value = "2000" });
             DBInfos.Add(new DBInfo() { Name = "MinMillisecondsBetweenCheckForFilesToProcess", Value = "2000" });
 
-            FAMUsers.Add(new FAMUser() { UserName = "Trever_Gannon", FullUserName = "DataMaster", Guid = Guid.Parse("9e51eda3-d4d3-4d06-aca5-4319eee9015d") });
-            FAMUsers.Add(new FAMUser() { UserName = "Reassign", FullUserName = "ToReassign", Guid = Guid.Parse("56120c51-d604-4cdd-8328-16a79ac8c882") });
+            FAMUsers.Add(new FAMUser() { UserName = "Trever_Gannon", FullUserName = "DataMaster"});
+            FAMUsers.Add(new FAMUser() { UserName = "Reassign", FullUserName = "ToReassign" });
 
             FieldSearches.Add(new FieldSearch() { Enabled = true, FieldName = "FunField", AttributeQuery = "SELECT", Guid = Guid.Parse("78b081d6-6a7c-4d60-a3b0-1218f5e726f4") });
 

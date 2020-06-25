@@ -419,7 +419,8 @@ namespace DatabaseMigrationWizard.Test
             DatabaseMigrationWizardTestHelper.Dashboards[0].ExtractedDataDefinition = @"<Extract />";
             DatabaseMigrationWizardTestHelper.Dashboards[0].LastImportedDate = DateTime.Now.ToString(CultureInfo.InvariantCulture);
             DatabaseMigrationWizardTestHelper.Dashboards[0].UseExtractedData = false;
-            DatabaseMigrationWizardTestHelper.Dashboards[0].FAMUserGuid = Guid.Parse("56120c51-d604-4cdd-8328-16a79ac8c882");
+            DatabaseMigrationWizardTestHelper.Dashboards[0].FullUserName = "NewUsername";
+            DatabaseMigrationWizardTestHelper.Dashboards[0].UserName = "Weee";
 
             DatabaseMigrationWizardTestHelper.DatabaseServices[0].Description = "NewerDefinition";
             DatabaseMigrationWizardTestHelper.DatabaseServices[0].Enabled = false;

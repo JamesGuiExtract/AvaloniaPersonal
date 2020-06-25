@@ -10,14 +10,11 @@ namespace DatabaseMigrationWizard.Database.Input.DataTransformObject
 
         public string FullUserName { get; set; }
 
-        public Guid Guid { get; set; }
-
         public override bool Equals(object obj)
         {
             return obj is FAMUser user &&
                    UserName == user.UserName &&
-                   FullUserName == user.FullUserName &&
-                   Guid.Equals(user.Guid);
+                   FullUserName == user.FullUserName;
         }
 
         public override int GetHashCode()
@@ -25,13 +22,12 @@ namespace DatabaseMigrationWizard.Database.Input.DataTransformObject
             var hashCode = -435663247;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(UserName);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FullUserName);
-            hashCode = hashCode * -1521134295 + Guid.GetHashCode();
             return hashCode;
         }
 
         public override string ToString()
         {
-            return Invariant($"('{UserName}', '{FullUserName}', '{Guid}')");
+            return Invariant($"('{UserName}', '{FullUserName}')");
         }
     }
 }
