@@ -35,6 +35,7 @@ namespace DatabaseMigrationWizard.Pages
         {
             this.MainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
             InitializeComponent();
+            this.DataContext = this;
             this.DataGrid1.DataContext = this.FilteredReport;
             this.MainWindow.ReportWindow = this;
         }
