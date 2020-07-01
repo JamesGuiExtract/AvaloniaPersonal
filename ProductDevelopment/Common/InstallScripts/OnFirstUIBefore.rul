@@ -109,9 +109,6 @@ Dlg_SdStartCopy:
    	// Install .NET if required
    	InstallDotNET();
    	
-	// Install Crystal Reports
-   	InstallCrystalReports();
-   	
    	// Install SQLCE
    	InstallSQLCE();
    	

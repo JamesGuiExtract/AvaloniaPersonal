@@ -132,19 +132,7 @@ Dlg_SdStartCopy:
 	// Move old reg keys before setup moves files but the ui is finished
    	MoveRegKeys();
    	CopyLicFiles();
-   	
-   	// Install .net if not installed
-   	//InstallDotNET();
-   	                                
-	// Install Inlite Key drivers
-   	//InstallInliteKeyDrivers();
-   	                        
-	// Install Crystal Reports
-   	InstallCrystalReports();  
-   	               
-	// Install SQL CE   	               
-   	//InstallSQLCE();
-   	                      
+   	 	                      
 	// Install Office Redist
    	InstallOfficeRedist();
    	

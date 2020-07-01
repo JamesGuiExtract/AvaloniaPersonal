@@ -30,8 +30,6 @@
     #define EXTRACT_LM_PRODUCT_CODE "{EB8DE231-8B66-4DE6-A56D-39452D8CF35F}"
     #define LABDE_PRODUCT_CODE "{0E412937-E4FA-4737-A321-00AED69497C7}"
     #define LOG_FILE_PATH CommonAppDataFolder ^ "\\Extract Systems\\LogFiles"
-    #define CRYSTAL_REPORTS_GUID "{C484CC8D-03CF-4022-89C4-DB4F02E8A15B}"
-    #define INLITE_INSTALLER_EXE "ClearImagePDK.7_0_3253.exe"
     #define EXCEPTION_FILE_NAME "ExtractException.uex"
     #define UCLID_EXCEPTION_FILE_NAME "UCLIDException.uex"
     #define REG_PATH_DOT_NET_40_INSTALL "\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full"  
@@ -39,8 +37,6 @@
     #define CLASS_INSTALLER_REG_PATH "Software\\Classes\\Installer\\Products"
     #define SQL_COMPACT_35_SP2_32_INSTALLER_KEY CLASS_INSTALLER_REG_PATH ^ "D30CF9A3586C138449FCE4FD3D474979"  
     #define SQL_COMPACT_35_SP2_64_INSTALLER_KEY CLASS_INSTALLER_REG_PATH ^ "DA93DA4DE19033D4BBB2956FCF8BDA3C"    
-    #define CLEAR_IMAGE_UNINSTALL_KEY REG_PATH_UNINSTALL ^ "ClearImage 7 PDK"  
-    #define CLEAR_IMAGE_UNINSTALL_KEY_64 REG_PATH_UNINSTALL_WOW64 ^ "ClearImage 7 PDK"    
     #define RDT_PRODUCT_CODE "{735E1622-3990-445F-9E5D-B0D7FDE292A3}"
     #define IDSHIELD_CUSTOMER_RDT_PRODUCT_CODE "{EAA7E74D-09C3-42EB-949F-C8F02D075B45}"  
     #define FLEX_INDEX_CUSTOMER_RDT_PRODUCT_CODE "{0096DE46-974F-48D5-956C-695B2E4A30F6}"
@@ -78,10 +74,7 @@
 	prototype InstallDotNET();
     prototype CheckOtherExtractProducts();
     prototype RenameUEXFile();
-    prototype UninstallInliteKeyDrivers();
-    prototype InstallCrystalReports();
     prototype CloseApps();
-    prototype UninstallCrystalReports12();
     prototype BOOL CheckProductKeyInstalled(STRING, STRING, BYREF STRING, BOOL);
     prototype InstallSQLCE();
     prototype DetectDotNET_4_6();	
@@ -367,71 +360,6 @@ begin
 	endif;
 end;
 
-///////////////////////////////////////////////////////////////////////////////
-//
-// Function: UninstallInliteKeyDrivers
-//
-//  Purpose: This function uninstalls the drivers for the Inlite Key
-///////////////////////////////////////////////////////////////////////////////
-function UninstallInliteKeyDrivers()
-	string szProgram, clearImagePath;
-begin       
-  	SdShowMsg("Setup is Uninstalling Inlite drivers.", TRUE);
-   
-	if (SYSINFO.nOSMajor >= 6)  then
-		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-	endif;
-	
-   	szProgram = SUPPORTDIR ^ "\\CBSetup.exe";
-	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
-
-	// Don't uninstall in silent mode - the uninstallextract.bat file will take care of the uninstall.
-	// if ran here if the INSTALL.LOG file doen't exist a dialog will displayed which is not good if
-	// uninstalling silently
-	if (MODE != SILENTMODE) then
-		// Call uninstall for ClearImage on 32 bit
-		if ( !SYSINFO.bIsWow64 ) then
-			clearImagePath = "C:\\Program Files\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
-			LongPathToShortPath(clearImagePath);
-			LaunchAppAndWait("\"C:\\Program Files\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, 
-				LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
-		else
-			// Call uninstall for ClearImage on 64 bit
-			clearImagePath = "C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\INSTALL.LOG";
-			LongPathToShortPath(clearImagePath);
-			LaunchAppAndWait("\"C:\\Program Files (x86)\\Inlite\\ClearImage 7 PDK\\UNWISE.EXE\"", "/s " + clearImagePath, 
-				LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN );
-		endif;
-
-	endif;
-	
- 	SdShowMsg("Setup is Uninstalling Inlite drivers.", FALSE);
-end;
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Function: InstallCrystalReports
-//
-//  Purpose: This function installs the Crystal Reports Runtime.
-//	Returns 0 if no errors
-///////////////////////////////////////////////////////////////////////////////
-function InstallCrystalReports()
-STRING szProgram, szCmdLine;
-int nResult, svServiceState;
-begin
-	SdShowMsg("Setup is Installing Crystal Reports 12 Runtime", TRUE);
-
-	if (SYSINFO.nOSMajor >= 6)  then
-		LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-	endif;
-		
-	// Install Crystal Reports
-	szProgram = "msiexec";
-	szCmdLine = " /qn /norestart /i " + SUPPORTDIR ^ "\\CRRuntime_12_1_mlb.msi";
-	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
-	
-	SdShowMsg("Setup is Installing Crystal Reports 12 Runtime", FALSE);
-end;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -448,36 +376,6 @@ begin
 	ServiceStopService("Extract Systems FDRS Service");
 	ServiceStopService("Extract Systems IPC Service");    
 	ServiceStopService("Nuance Licensing Service");
-end;
-
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Function: UninstallCrystalReports
-//
-//  Purpose: This function uninstalls the Crystal Reports Runtime.
-//	Returns 0 if no errors
-///////////////////////////////////////////////////////////////////////////////
-function UninstallCrystalReports12()
-STRING szProgram, szCmdLine;
-int nResult, svServiceState;
-begin
-		// Ask user if they wish to unintall CrystalReports
-	nResult = MessageBox("Do you wish to uninstall Crystal Reports 12 Runtime?" + 
-		"\r\nOther installed applications may use this and uninstalling " + 
-		" will cause those applications to work incorrectly." , MB_YESNO );
-
-	if (nResult = IDYES) then
-		if (SYSINFO.nOSMajor >= 6)  then
-			LAAW_SHELLEXECUTEVERB = "runas";                                                                                                                      //
-		endif;
-			
-		// Install Crystal Reports
-		szProgram = "msiexec";
-		szCmdLine = " /qn /norestart /x" + CRYSTAL_REPORTS_GUID;
-		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_USE_SHELLEXECUTE | LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
-	    
-  	endif;
 end;
 
 
@@ -1069,14 +967,11 @@ begin
 		
 		if (MODE != SILENTMODE) then
 			// Uninstall Crystal Reports
-			UninstallCrystalReports12();
 			UninstallSQLCE ();
 		endif;
 		
 		// Register the shell extension
 		UnregisterLoginNPShellExtension("Extract.Utilities.ShellExtensions.dll");
-		
-		UninstallInliteKeyDrivers();
 
 		UnRegisterAll();
 		
