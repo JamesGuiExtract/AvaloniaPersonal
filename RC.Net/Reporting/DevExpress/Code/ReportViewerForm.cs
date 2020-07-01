@@ -707,7 +707,7 @@ namespace Extract.ReportingDevExpress
             {
                 _standardReports = new List<string>();
                 foreach (string fileName in
-                    Directory.GetFiles(ExtractReport.StandardReportFolder, "*.rpt"))
+                    Directory.GetFiles(ExtractReport.StandardReportFolder, "*.repx"))
                 {
                     _standardReports.Add(
                         Path.GetFileNameWithoutExtension(fileName).ToUpperInvariant());
