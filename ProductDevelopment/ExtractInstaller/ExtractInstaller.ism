@@ -316,6 +316,7 @@
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>AllOtherFiles</td><td>{BF13F1DD-ACE5-414A-97D2-8A7CEE2DAC71}</td><td>COMMON_COMPONENTS</td><td>8</td><td>VersionNT&gt;=600</td><td>labde.rl</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>CoreDashboards</td><td>{2257297D-A15A-42E8-B488-342A43009DC2}</td><td>DASHBOARDS_CORE</td><td>8</td><td/><td/><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ExemptionCodes</td><td>{E5331F67-A907-472C-BC93-B4B8CAAD38BB}</td><td>EXEMPTION_CODES_DIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.LabResultsCustomComponents</td><td>{39AF42D5-575F-4A4F-8BF0-0C3319DAE366}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.labresultscu</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.CustomComponentsHelper.dll</td><td>{BC1778CF-1B0D-4DB8-A811-8F3213EA5016}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.customcomp</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -455,6 +456,8 @@
 		<row><td>CommonAppDataFolder</td><td>TARGETDIR</td><td>.:Common~1|CommonAppData</td><td/><td>0</td><td/></row>
 		<row><td>CommonFiles64Folder</td><td>TARGETDIR</td><td>.:Common64</td><td/><td>0</td><td/></row>
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
+		<row><td>DASHBOARDS</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>DASHBO~1|Dashboards</td><td/><td>0</td><td/></row>
+		<row><td>DASHBOARDS_CORE</td><td>DASHBOARDS</td><td>Core</td><td/><td>0</td><td/></row>
 		<row><td>DATABASE_DIR</td><td>INSTALLDIR</td><td>Database</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXEMPTION_CODES_DIR</td><td>IDSHIELD</td><td>EXEMPT~1|ExemptionCodes</td><td/><td>0</td><td/></row>
@@ -1183,6 +1186,7 @@
 		<row><td>Documentation</td><td>IDShieldHelp</td></row>
 		<row><td>Documentation</td><td>LabDEHelp</td></row>
 		<row><td>SDKMain</td><td>AllOtherFiles</td></row>
+		<row><td>SDKMain</td><td>CoreDashboards</td></row>
 		<row><td>SDKMain</td><td>ExemptionCodes</td></row>
 		<row><td>SDKMain</td><td>Extract.LabResultsCustomComponents</td></row>
 		<row><td>SDKMain</td><td>Extract.Redaction.CustomComponentsHelper.dll</td></row>
@@ -1374,6 +1378,7 @@
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
 		<row><td>AllOtherFiles</td><td/><td/><td>_2609E52D_0837_45AF_AB4E_609D37B72624_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>CoreDashboards</td><td/><td/><td>_F3AE4ECC_9069_4545_B90B_6BE5C7F1742C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ExemptionCodes</td><td/><td/><td>_DC4F41A0_2184_486F_85BC_827E04CF07BD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.LabResultsCustomComponents</td><td/><td/><td>_778BE2D2_CB4F_4383_9D0D_3A3DDEE5587C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.CustomComponentsHelper.dll</td><td/><td/><td>_01E0B1D8_4082_473F_AA8B_C078BA868206_FILTER</td><td/><td/><td/><td/></row>
@@ -1454,6 +1459,7 @@
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
 		<row><td>AllOtherFiles</td><td>&lt;PATH_TO_LABDENONSELFREGFILES_FI&gt;</td><td>4</td><td/><td>LabDE.rl</td><td>10</td></row>
+		<row><td>CoreDashboards</td><td>&lt;PATH_TO_CORE_DASHBOARD_FILES&gt;</td><td>4</td><td/><td/><td>10</td></row>
 		<row><td>ExemptionCodes</td><td>&lt;PATH_TO_EXEMPTIONCODES_FILES&gt;</td><td>4</td><td>*.xml</td><td/><td>2</td></row>
 		<row><td>FlexIndexHelp</td><td>&lt;PATH_TO_HELP_FLEXINDEX&gt;</td><td>4</td><td/><td>FLEXIndex.chm</td><td>10</td></row>
 		<row><td>IDShieldComponents</td><td>&lt;PATH_TO_NONSELFREGCOMPO_FILES&gt;</td><td>4</td><td/><td/><td>0</td></row>
@@ -1716,6 +1722,7 @@
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
 		<row><td>PATH_TO_COMMON_INSTALL_SCRIPTS</td><td>&lt;ISProjectFolder&gt;..\Common\InstallScripts</td><td/><td>2</td></row>
+		<row><td>PATH_TO_CORE_DASHBOARD_FILES</td><td>&lt;ISProjectFolder&gt;..\..\Rules\Dashboards\Core</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CORE_DOTNET</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CRYSTAL_REPORTS12</td><td>P:\AttributeFinder\RequiredInstalls\CrystalReports12</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DATABASEFILES_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DatabaseFiles</td><td/><td>2</td></row>
