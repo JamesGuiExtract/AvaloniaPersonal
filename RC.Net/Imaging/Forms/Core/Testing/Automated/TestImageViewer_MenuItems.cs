@@ -381,14 +381,15 @@ namespace Extract.Imaging.Forms.Test
                 FormMethods.GetFormComponent<FitToWidthToolStripMenuItem>(_imageViewerForm);
             clickMe.PerformClick();
 
-            // Check that exactly one FitModeChanged and one ZoomChanged event were raised
-            Assert.That(eventCounters.EventCounter == 1 && eventCounters.EventCounter2 == 1);
+            // Check that exactly one FitModeChanged and one or more ZoomChanged events were raised
+            Assert.That(eventCounters.EventCounter == 1 && eventCounters.EventCounter2 >= 1);
+            var previousZoomEventCount = eventCounters.EventCounter2;
 
             // Click the FitToWidthToolStripMenuItem again
             clickMe.PerformClick();
 
-            // Check that exactly two FitModeChanged and two ZoomChanged events were raised
-            Assert.That(eventCounters.EventCounter == 2 && eventCounters.EventCounter2 == 2);
+            // Check that exactly two FitModeChanged and more ZoomChanged events were raised
+            Assert.That(eventCounters.EventCounter == 2 && eventCounters.EventCounter2 > previousZoomEventCount);
         }
 
         #endregion FitToWidth
@@ -570,8 +571,8 @@ namespace Extract.Imaging.Forms.Test
                 FormMethods.GetFormComponent<ZoomInToolStripMenuItem>(_imageViewerForm);
             clickMe.PerformClick();
 
-            // Check that exactly one ZoomChanged event was raised
-            Assert.That(eventCounters.EventCounter == 1);
+            // Check that one or more ZoomChanged events were raised
+            Assert.That(eventCounters.EventCounter >= 1);
         }
 
         /// <summary>
@@ -722,12 +723,19 @@ namespace Extract.Imaging.Forms.Test
             // Open the test image
             OpenTestImage(imageViewer);
 
-            // Get the zoom level
-            double zoomLevel = imageViewer.ZoomInfo.ScaleFactor;
-
             // Get the Zoom Out menu item
             ZoomOutToolStripMenuItem zoomOut =
                 FormMethods.GetFormComponent<ZoomOutToolStripMenuItem>(_imageViewerForm);
+
+            // Due to changes in the zooming code, you can no longer zoom out
+            // Past the size of the page. I believe this is the JIRA that orignally broke this: https://extract.atlassian.net/browse/ISSUE-14420
+            // Added a zoom in, so it can zoom out.
+            ZoomInToolStripMenuItem zoomIn =
+                FormMethods.GetFormComponent<ZoomInToolStripMenuItem>(_imageViewerForm);
+            zoomIn.PerformClick();
+
+            // Get the zoom level
+            double zoomLevel = imageViewer.ZoomInfo.ScaleFactor;
 
             // Zoom out
             zoomOut.PerformClick();
@@ -781,6 +789,13 @@ namespace Extract.Imaging.Forms.Test
 
             // Open the test image
             OpenTestImage(imageViewer);
+
+            // Due to changes in the zooming code, you can no longer zoom out
+            // Past the size of the page. I believe this is the JIRA that orignally broke this: https://extract.atlassian.net/browse/ISSUE-14420
+            // Added a zoom in, so it can zoom out.
+            ZoomInToolStripMenuItem zoomIn =
+                FormMethods.GetFormComponent<ZoomInToolStripMenuItem>(_imageViewerForm);
+            zoomIn.PerformClick();
 
             // Get the current Zoom history count
             int zoomHistoryCount = imageViewer.ZoomHistoryCount;
@@ -998,8 +1013,8 @@ namespace Extract.Imaging.Forms.Test
                 FormMethods.GetFormComponent<ZoomPreviousToolStripMenuItem>(_imageViewerForm);
             clickMe.PerformClick();
 
-            // Check that exactly one ZoomChanged event was raised
-            Assert.That(eventCounters.EventCounter == 1);
+            // Check that one or more zoom events were raised.
+            Assert.That(eventCounters.EventCounter >= 1);
         }
 
         /// <summary>
@@ -1186,8 +1201,9 @@ namespace Extract.Imaging.Forms.Test
                 FormMethods.GetFormComponent<ZoomNextToolStripMenuItem>(_imageViewerForm);
             clickMe.PerformClick();
 
-            // Check that exactly one ZoomChanged event was raised
-            Assert.That(eventCounters.EventCounter == 1);
+            // Zoom events are fired based on any changes now.
+            // It is safest to assume 1 or more zoom events will fire.
+            Assert.That(eventCounters.EventCounter >= 1);
         }
 
         #endregion Zoom Next
@@ -1326,14 +1342,15 @@ namespace Extract.Imaging.Forms.Test
                 FormMethods.GetFormComponent<PreviousTileToolStripMenuItem>(_imageViewerForm);
             imageViewer.PerformClick(previousTile);
 
-            // Ensure that exactly one ZoomChanged and PageChanged event were raised
-            Assert.That(eventCounters.EventCounter == 1 && eventCounters.EventCounter2 == 1);
+            // Ensure that one or more ZoomChanged events fire and one PageChanged event was raised
+            Assert.That(eventCounters.EventCounter >= 1 && eventCounters.EventCounter2 == 1);
+            var previousZoomEventCount = eventCounters.EventCounter;
 
             // Go to the previous tile
             imageViewer.PerformClick(previousTile);
 
-            // Ensure that exactly one more ZoomChanged event was raised
-            Assert.That(eventCounters.EventCounter == 2 && eventCounters.EventCounter2 == 1);
+            // Ensure that more ZoomChanged events were raised
+            Assert.That(eventCounters.EventCounter > previousZoomEventCount && eventCounters.EventCounter2 == 1);
         }
 
         /// <summary>
@@ -1492,27 +1509,30 @@ namespace Extract.Imaging.Forms.Test
             NextTileToolStripMenuItem nextTile = FormMethods.GetFormComponent<NextTileToolStripMenuItem>(_imageViewerForm);
             imageViewer.PerformClick(nextTile);
 
-            // Ensure that exactly one ZoomChanged event was raised
-            Assert.That(eventCounters.EventCounter == 1 && eventCounters.EventCounter2 == 0);
+            // Ensure that ZoomChanged events were raised
+            Assert.That(eventCounters.EventCounter >= 1 && eventCounters.EventCounter2 == 0);
+            var previousZoomEventCount = eventCounters.EventCounter;
 
             // Go to the next tile
             imageViewer.PerformClick(nextTile);
 
-            // Ensure that exactly one more ZoomChanged event was raised
-            Assert.That(eventCounters.EventCounter == 2 && eventCounters.EventCounter2 == 0);
+            // Ensure that more ZoomChanged events were raised
+            Assert.That(eventCounters.EventCounter > previousZoomEventCount && eventCounters.EventCounter2 == 0);
+            previousZoomEventCount = eventCounters.EventCounter;
 
             // Go to the next tile
             imageViewer.PerformClick(nextTile);
 
-            // Ensure that exactly one more ZoomChanged event was raised
-            Assert.That(eventCounters.EventCounter == 3 && eventCounters.EventCounter2 == 0);
+            // Ensure that more ZoomChanged events were raised
+            Assert.That(eventCounters.EventCounter > previousZoomEventCount && eventCounters.EventCounter2 == 0);
+            previousZoomEventCount = eventCounters.EventCounter;
 
             // Go to the next tile
             imageViewer.PerformClick(nextTile);
 
-            // Ensure that exactly one more ZoomChanged event and one more PageChanged event was 
+            // Ensure that more ZoomChanged events were fired and one more PageChanged event was 
             // raised.
-            Assert.That(eventCounters.EventCounter == 4 && eventCounters.EventCounter2 == 1);
+            Assert.That(eventCounters.EventCounter > previousZoomEventCount && eventCounters.EventCounter2 == 1);
         }
 
         /// <summary>

@@ -831,24 +831,6 @@ namespace Extract.Imaging.Forms.Test
         }
 
         /// <summary>
-        /// Tests that an <see cref="ExtractException"/> is thrown if <see cref="ImageViewer.UseAntiAliasing"/>
-        /// is set to <see langword="true"/> and anti-aliasing is not licensed.
-        /// </summary>
-        [Test, Category("Automated")]
-        public void Automated_ExceptionIfAntiAliasingNotLicensedAndSetAntiAliasingToTrueTest()
-        {
-            // Disable the anti-aliasing license Ids
-            LicenseUtilities.DisableId(LicenseIdName.AnnotationFeature);
-            LicenseUtilities.DisableId(LicenseIdName.AntiAliasingFeature);
-
-            // Get the image viewer
-            ImageViewer imageViewer = FormMethods.GetFormComponent<ImageViewer>(_imageViewerForm);
-
-            Assert.Throws(typeof(ExtractException),
-                delegate() { imageViewer.UseAntiAliasing = true; });
-        }
-
-        /// <summary>
         /// Tests that images are anti-aliased if <see cref="ImageViewer.UseAntiAliasing"/>
         /// is <see langword="true"/>.
         /// </summary>
@@ -954,24 +936,6 @@ namespace Extract.Imaging.Forms.Test
             Assert.That(MessageBox.Show("Are the annotations currently displayed?",
                 "Are annotations displayed?", MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question, MessageBoxDefaultButton.Button1, 0) == DialogResult.Yes);
-        }
-
-        /// <summary>
-        /// Tests that an <see cref="ExtractException"/> is thrown if
-        /// <see cref="ImageViewer.DisplayAnnotations"/> is set to <see langword="true"/>
-        /// and annotations are not licensed.
-        /// </summary>
-        [Test, Category("Automated")]
-        public void Automated_ExceptionIfAnnotationsNotLicensedAndSetDisplayAnnotationsToTrueTest()
-        {
-            // Disable the annotation license Ids
-            LicenseUtilities.DisableId(LicenseIdName.AnnotationFeature);
-
-            // Get the image viewer
-            ImageViewer imageViewer = FormMethods.GetFormComponent<ImageViewer>(_imageViewerForm);
-
-            Assert.Throws(typeof(ExtractException),
-                delegate() { imageViewer.DisplayAnnotations = true; });
         }
 
         /// <summary>
