@@ -1,4 +1,5 @@
 ﻿using ADODB;
+using Extract.Dashboard.Forms;
 using Extract.Drawing;
 using Extract.FileActionManager.Forms;
 using Extract.FileActionManager.Utilities.Properties;
@@ -372,6 +373,17 @@ namespace Extract.FileActionManager.Utilities
         /// currently selected file.
         /// </summary>
         Dictionary<ToolStripMenuItem, IExtractReport> _reportMenuItems;
+
+        /// <summary>
+        /// Maps context menu options to a DocumentName based Dashboard for the
+        /// currently selected file.
+        /// </summary>
+        Dictionary<ToolStripMenuItem, SourceLink> dashboardMenuItems;
+
+        /// <summary>
+        /// Context menu option that is a parent to all menu items in <see cref="dashboardMenuItems"/>
+        /// </summary>
+        ToolStripMenuItem dashboardMainMenuItem;
 
         /// <summary>
         /// Context menu option that is a parent to all menu items in <see cref="_reportMenuItems"/>.
@@ -1240,6 +1252,7 @@ namespace Extract.FileActionManager.Utilities
                 _openFileLocationMenuItem = new ToolStripMenuItem("Open file location");
                 _reportMenuItems = new Dictionary<ToolStripMenuItem, IExtractReport>();
                 _reportMainMenuItem = new ToolStripMenuItem("Reports");
+                dashboardMainMenuItem = new ToolStripMenuItem("Dashboards");
                 _setFlagMenuItem = new ToolStripMenuItem("Set flag");
                 _clearFlagMenuItem = new ToolStripMenuItem("Clear flag");
 
@@ -1300,6 +1313,27 @@ namespace Extract.FileActionManager.Utilities
                         newContextMenuStrip.Items.Add(new ToolStripSeparator());
                         _reportMainMenuItem.DropDownItems.AddRange(_reportMenuItems.Keys.ToArray());
                         newContextMenuStrip.Items.Add(_reportMainMenuItem);
+                    }
+
+                    dashboardMenuItems = CreateDashboardMenuItems();
+                    if (dashboardMenuItems.Count > 0)
+                    {
+                        newContextMenuStrip.Items.Add(new ToolStripSeparator());
+
+                        var databaseDashboards = dashboardMenuItems.Where(kp => !kp.Value.IsFile)
+                            .Select(p => p.Key)
+                            .ToArray();
+                        if (databaseDashboards.Length > 0)
+                        {
+                            // Add Dashboard menu items from the database
+                            dashboardMainMenuItem.DropDownItems
+                                .AddRange(databaseDashboards);
+                            dashboardMainMenuItem.DropDownItems.Add(new ToolStripSeparator());
+                        }
+
+                        // Add Dashboard menu items from the ProgramData core location
+                        dashboardMainMenuItem.DropDownItems.AddRange(dashboardMenuItems.Where(kp => kp.Value.IsFile).Select(p => p.Key).ToArray());
+                        newContextMenuStrip.Items.Add(dashboardMainMenuItem);
                     }
                 }
 
@@ -2690,6 +2724,12 @@ namespace Extract.FileActionManager.Utilities
                     _reportMainMenuItem.Enabled = (selectionCount == 1);
                 }
 
+                // Dashboard context menu options should be available for single selection only.
+                if (dashboardMainMenuItem != null)
+                {
+                    dashboardMainMenuItem.Enabled = (selectionCount == 1);
+                }
+
                 // Enable/disable custom column value choices based on the current selection.
                 UpdateCustomColumnMenuEnabledStates();
 
@@ -3690,6 +3730,74 @@ namespace Extract.FileActionManager.Utilities
             }
 
             return reportMenuItems;
+        }
+
+        Dictionary<ToolStripMenuItem, SourceLink>CreateDashboardMenuItems()
+        {
+            Dictionary<ToolStripMenuItem, SourceLink> dashboardMenuItems = 
+                new Dictionary<ToolStripMenuItem, SourceLink>();
+
+            if (!UseDatabaseMode)
+                return dashboardMenuItems;
+
+            var dashboards = DashboardMethods.GetAllDashboards(FileProcessingDB.DatabaseServer,
+                                                                        FileProcessingDB.DatabaseName,
+                                                                        true);
+
+            dashboards.OrderBy(d => d.IsFile);
+
+            foreach (var data in dashboards)
+            {
+
+                // Create a context menu option and add a handler for it.
+                var menuItem = new ToolStripMenuItem(data.DisplayName);
+                menuItem.Click += HandleDashboardMenuItem_Click;
+
+                dashboardMenuItems[menuItem] = data;
+            }
+
+            return dashboardMenuItems;
+        }
+
+        private void HandleDashboardMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string fileName = GetSelectedFileNames().Single();
+                Dictionary<string, object> filterValues = new Dictionary<string, object>();
+                filterValues["DocumentName"] = fileName;
+                filterValues["FileName"] = fileName;
+                filterValues["Workflow"] = WorkflowName;
+                filterValues["WorkflowName"] = WorkflowName;
+
+                // Show report on another thread so that the report is not modal to the FFI. The
+                // thread needs to be STA
+                ThreadingMethods.RunInBackgroundThread("ELI36059",
+                    () =>
+                    {
+                        var moduleDir = AppDomain.CurrentDomain.BaseDirectory;
+                        var assemplyPath = Path.Combine(moduleDir, "DashboardViewer.exe");
+
+                        SourceLink data = dashboardMenuItems[(ToolStripMenuItem)sender];
+
+                        using (var DashboardViewer = UtilityMethods.CreateTypeFromTypeNameAndAssembly(assemplyPath, "Extract.DashboardViewer.DashboardViewerForm",
+                                                                                data.SourceName,
+                                                                                !data.IsFile,
+                                                                                DatabaseServer,
+                                                                                DatabaseName,
+                                                                                filterValues) as Form)
+                        {
+                            DashboardViewer.ShowDialog();
+                        }
+                    },
+                    true,
+                    ApartmentState.STA);
+
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49918");
+            }
         }
 
         /// <summary>
@@ -5464,6 +5572,22 @@ namespace Extract.FileActionManager.Utilities
             {
                 _reportMainMenuItem.Dispose();
                 _reportMainMenuItem = null;
+            }
+
+            if (dashboardMenuItems != null)
+            {
+                foreach ( var keypair in dashboardMenuItems)
+                {
+                    keypair.Key?.Dispose();
+                }
+                dashboardMenuItems.Clear();
+                dashboardMenuItems = null;
+            }
+
+            if (dashboardMainMenuItem != null)
+            {
+                dashboardMainMenuItem.Dispose();
+                dashboardMainMenuItem = null;
             }
 
             if (_setFlagMenuItem != null)

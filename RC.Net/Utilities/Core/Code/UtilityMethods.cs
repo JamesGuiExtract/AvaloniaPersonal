@@ -159,8 +159,9 @@ namespace Extract.Utilities
         /// Creates the type from type name.
         /// </summary>
         /// <param name="typeName">Name of the type.</param>
+        /// <param name="args">Arguments to pass to the constructor</param>
         /// <returns>An instance of the specified type.</returns>
-        public static object CreateTypeFromTypeName(string typeName)
+        public static object CreateTypeFromTypeName(string typeName, params object[] args)
         {
             try
             {
@@ -187,12 +188,39 @@ namespace Extract.Utilities
                 // Load the assembly if needed
                 var assembly = LoadAssemblyIfNotLoaded(assemblyName);
 
+                var typeToCreate = assembly.GetType(typeName, true, true);
+
                 // Create the type and return it
-                return assembly.CreateInstance(typeName, true);
+                return Activator.CreateInstance(typeToCreate, args);
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI31149", ex);
+            }
+        }
+
+        /// <summary>
+        /// Creates the type from type name.
+        /// </summary>
+        /// <param name="assemblyPath">Full path to the assembly</param>
+        /// <param name="typeName">Name of the type.</param>
+        /// <param name="args">Arguments to pass to the constructor</param>
+        /// <returns>An instance of the specified type.</returns>
+        public static object CreateTypeFromTypeNameAndAssembly(string assemblyPath, string typeName, params object[] args)
+        {
+            try
+            {
+                // This will only load the assembly if it is not loaded
+                var assembly = Assembly.LoadFrom(assemblyPath);
+
+                var typeToCreate = assembly.GetType(typeName, true, true);
+
+                // Create the type and return it
+                return Activator.CreateInstance(typeToCreate, args);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI49934", ex);
             }
         }
 

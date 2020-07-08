@@ -16,6 +16,19 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            DevExpress.XtraEditors.TableLayout.ItemTemplateBase itemTemplateBase1 = new DevExpress.XtraEditors.TableLayout.ItemTemplateBase();
+            DevExpress.XtraEditors.TableLayout.TableColumnDefinition tableColumnDefinition1 = new DevExpress.XtraEditors.TableLayout.TableColumnDefinition();
+            DevExpress.XtraEditors.TableLayout.TableColumnDefinition tableColumnDefinition2 = new DevExpress.XtraEditors.TableLayout.TableColumnDefinition();
+            DevExpress.XtraEditors.TableLayout.TemplatedItemElement templatedItemElement1 = new DevExpress.XtraEditors.TableLayout.TemplatedItemElement();
+            DevExpress.XtraEditors.TableLayout.TemplatedItemElement templatedItemElement2 = new DevExpress.XtraEditors.TableLayout.TemplatedItemElement();
+            DevExpress.XtraEditors.TableLayout.TableRowDefinition tableRowDefinition1 = new DevExpress.XtraEditors.TableLayout.TableRowDefinition();
+            DevExpress.XtraEditors.TableLayout.ItemTemplateBase itemTemplateBase2 = new DevExpress.XtraEditors.TableLayout.ItemTemplateBase();
+            DevExpress.XtraEditors.TableLayout.TableColumnDefinition tableColumnDefinition3 = new DevExpress.XtraEditors.TableLayout.TableColumnDefinition();
+            DevExpress.XtraEditors.TableLayout.TableColumnDefinition tableColumnDefinition4 = new DevExpress.XtraEditors.TableLayout.TableColumnDefinition();
+            DevExpress.XtraEditors.TableLayout.TableColumnDefinition tableColumnDefinition5 = new DevExpress.XtraEditors.TableLayout.TableColumnDefinition();
+            DevExpress.XtraEditors.TableLayout.TemplatedItemElement templatedItemElement3 = new DevExpress.XtraEditors.TableLayout.TemplatedItemElement();
+            DevExpress.XtraEditors.TableLayout.TemplatedItemElement templatedItemElement4 = new DevExpress.XtraEditors.TableLayout.TemplatedItemElement();
+            DevExpress.XtraEditors.TableLayout.TableRowDefinition tableRowDefinition2 = new DevExpress.XtraEditors.TableLayout.TableRowDefinition();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DashboardViewerForm));
             this.dashboardViewerMain = new DevExpress.DashboardWin.DashboardViewer(this.components);
             this.splitContainerControl1 = new DevExpress.XtraEditors.SplitContainerControl();
@@ -47,10 +60,12 @@
             // 
             // dashboardViewerMain
             // 
+            this.dashboardViewerMain.Appearance.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(160)))), ((int)(((byte)(160)))), ((int)(((byte)(160)))));
+            this.dashboardViewerMain.Appearance.Options.UseBackColor = true;
             this.dashboardViewerMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dashboardViewerMain.Location = new System.Drawing.Point(0, 0);
             this.dashboardViewerMain.Name = "dashboardViewerMain";
-            this.dashboardViewerMain.Size = new System.Drawing.Size(944, 418);
+            this.dashboardViewerMain.Size = new System.Drawing.Size(939, 418);
             this.dashboardViewerMain.TabIndex = 0;
             this.dashboardViewerMain.DashboardChanged += new System.EventHandler(this.HandleDashboardViewerMainDashboardChanged);
             this.dashboardViewerMain.ConfigureDataConnection += new DevExpress.DashboardCommon.DashboardConfigureDataConnectionEventHandler(this.HandleDashboardViewerMainConfigureDataConnection);
@@ -103,10 +118,54 @@
             // _dashboardsInDBListBoxControl
             // 
             this._dashboardsInDBListBoxControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._dashboardsInDBListBoxControl.ItemHeight = 34;
             this._dashboardsInDBListBoxControl.Location = new System.Drawing.Point(2, 2);
             this._dashboardsInDBListBoxControl.Name = "_dashboardsInDBListBoxControl";
             this._dashboardsInDBListBoxControl.Size = new System.Drawing.Size(185, 424);
             this._dashboardsInDBListBoxControl.TabIndex = 1;
+            tableColumnDefinition1.Length.Value = 148D;
+            tableColumnDefinition2.Length.Value = 48D;
+            itemTemplateBase1.Columns.Add(tableColumnDefinition1);
+            itemTemplateBase1.Columns.Add(tableColumnDefinition2);
+            templatedItemElement1.FieldName = "DisplayMember";
+            templatedItemElement1.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            templatedItemElement1.ImageOptions.ImageScaleMode = DevExpress.XtraEditors.TileItemImageScaleMode.ZoomInside;
+            templatedItemElement1.Text = "DisplayMember";
+            templatedItemElement1.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleLeft;
+            templatedItemElement2.ColumnIndex = 1;
+            templatedItemElement2.FieldName = null;
+            templatedItemElement2.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            templatedItemElement2.ImageOptions.ImageScaleMode = DevExpress.XtraEditors.TileItemImageScaleMode.ZoomInside;
+            templatedItemElement2.Text = "";
+            templatedItemElement2.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            itemTemplateBase1.Elements.Add(templatedItemElement1);
+            itemTemplateBase1.Elements.Add(templatedItemElement2);
+            itemTemplateBase1.Name = "DatabaseDashboardTemplate";
+            itemTemplateBase1.Rows.Add(tableRowDefinition1);
+            tableColumnDefinition3.Length.Value = 163D;
+            tableColumnDefinition4.Length.Value = 33D;
+            tableColumnDefinition5.Length.Value = 0D;
+            itemTemplateBase2.Columns.Add(tableColumnDefinition3);
+            itemTemplateBase2.Columns.Add(tableColumnDefinition4);
+            itemTemplateBase2.Columns.Add(tableColumnDefinition5);
+            templatedItemElement3.FieldName = "DisplayMember";
+            templatedItemElement3.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            templatedItemElement3.ImageOptions.ImageScaleMode = DevExpress.XtraEditors.TileItemImageScaleMode.ZoomInside;
+            templatedItemElement3.Text = "DisplayMember";
+            templatedItemElement3.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleLeft;
+            templatedItemElement4.ColumnIndex = 1;
+            templatedItemElement4.FieldName = null;
+            templatedItemElement4.ImageOptions.ImageAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            templatedItemElement4.ImageOptions.ImageScaleMode = DevExpress.XtraEditors.TileItemImageScaleMode.ZoomInside;
+            templatedItemElement4.Text = "Core";
+            templatedItemElement4.TextAlignment = DevExpress.XtraEditors.TileItemContentAlignment.MiddleCenter;
+            itemTemplateBase2.Elements.Add(templatedItemElement3);
+            itemTemplateBase2.Elements.Add(templatedItemElement4);
+            itemTemplateBase2.Name = "CoreDashboardTemplate";
+            itemTemplateBase2.Rows.Add(tableRowDefinition2);
+            this._dashboardsInDBListBoxControl.Templates.Add(itemTemplateBase1);
+            this._dashboardsInDBListBoxControl.Templates.Add(itemTemplateBase2);
+            this._dashboardsInDBListBoxControl.CustomItemTemplate += new DevExpress.XtraEditors.CustomItemTemplateEventHandler(this.HandleDashboardsInDBListBoxControl_CustomItemTemplate);
             this._dashboardsInDBListBoxControl.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.HandleDashboardsInDBListBoxControlMouseDoubleClick);
             // 
             // menuStripMain
@@ -196,7 +255,7 @@
             this._toolStripTextBoxlastRefresh.Name = "_toolStripTextBoxlastRefresh";
             this._toolStripTextBoxlastRefresh.Padding = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this._toolStripTextBoxlastRefresh.ReadOnly = true;
-            this._toolStripTextBoxlastRefresh.Size = new System.Drawing.Size(130, 25);
+            this._toolStripTextBoxlastRefresh.Size = new System.Drawing.Size(106, 25);
             // 
             // toolStripButtonClearMasterFilter
             // 
@@ -216,7 +275,7 @@
             this.Controls.Add(this.splitContainerControl1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.menuStripMain);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.IconOptions.Icon = ((System.Drawing.Icon)(resources.GetObject("DashboardViewerForm.IconOptions.Icon")));
             this.MainMenuStrip = this.menuStripMain;
             this.Name = "DashboardViewerForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

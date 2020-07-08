@@ -68,6 +68,7 @@ protected:
 	afx_msg void OnManageMetadataFields();
 	afx_msg void OnManageAttributeSets();
 	afx_msg void OnManageRuleCounters();
+	afx_msg void OnManageDashboards();
 	afx_msg void OnCbnSelchangeWorkflowCombo();
 	afx_msg void OnToolsMoveFilesToWorkflow();
 	afx_msg void OnManageDatabaseServices();

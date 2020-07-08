@@ -140,6 +140,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Dashboards\Forms\Core\Code\Extract.Dashboard.Forms.csproj">
+      <Project>{d53a71cf-51a4-45f3-9644-fed8faf49d3c}</Project>
+      <Name>Extract.Dashboard.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
       <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
       <Name>Extract.Imaging.Forms</Name>

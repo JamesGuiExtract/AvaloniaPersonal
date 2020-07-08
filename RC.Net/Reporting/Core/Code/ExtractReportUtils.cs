@@ -1,4 +1,5 @@
 ﻿using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -9,14 +10,21 @@ namespace Extract.Reporting
 {
     static public class ExtractReportUtils
     {
-        // Load the assembly needed to create ExtractReport and ReportViewerForm
-        static private Assembly ReportingDevExpressAssembly = Assembly.LoadFrom("Extract.ReportingDevExpress.dll");
-
         /// <summary>
         /// Relative path to the reports folder (relative to the current applications directory).
         /// </summary>
         static public readonly string ReportFolderPath =
             Path.Combine(FileSystemMethods.CommonApplicationDataPath, "Reports");
+
+        /// <summary>
+        /// Full type name of the ExtractReport class
+        /// </summary>
+        static public readonly string ExtractReportTypeName = "Extract.ReportingDevExpress.ExtractReport";
+
+        /// <summary>
+        /// Full type name of the ReportViewerForm class
+        /// </summary>
+        static public readonly string ReportViewerTypeName = "Extract.ReportingDevExpress.ReportViewerForm";
 
         /// <summary>
         /// Folder which contains the standard reports
@@ -44,10 +52,12 @@ namespace Extract.Reporting
         {
             try
             {
-                var typeExtractReport = ReportingDevExpressAssembly.GetType("Extract.ReportingDevExpress.ExtractReport");
-
-                var args = new object[] { serverName, databaseName, workflowName, fileName, promptForParameters };
-                return Activator.CreateInstance(typeExtractReport, args) as IExtractReport;
+                return UtilityMethods.CreateTypeFromTypeName(ExtractReportTypeName,
+                                                      serverName,
+                                                      databaseName,
+                                                      workflowName,
+                                                      fileName,
+                                                      promptForParameters) as IExtractReport;
             }
             catch (Exception ex)
             {
@@ -70,14 +80,7 @@ namespace Extract.Reporting
         {
             try
             {
-                //Debugger.Launch();
-                //Debugger.Break();
-
-                var typeExtractReport = ReportingDevExpressAssembly.GetType("Extract.ReportingDevExpress.ExtractReport");
-
-
-                var args = new object[] { fileName };
-                return Activator.CreateInstance(typeExtractReport, args) as IExtractReport;
+                return UtilityMethods.CreateTypeFromTypeName(ExtractReportTypeName, fileName) as IExtractReport;
             }
             catch (Exception ex)
             {
@@ -96,10 +99,7 @@ namespace Extract.Reporting
         {
             try
             {
-                var typeExtractReport = ReportingDevExpressAssembly.GetType("Extract.ReportingDevExpress.ExtractReport");
-
-                var args = new object[] { extractReport };
-                return Activator.CreateInstance(typeExtractReport, args) as IExtractReport;
+                return UtilityMethods.CreateTypeFromTypeName(ExtractReportTypeName, extractReport) as IExtractReport;
             }
             catch (Exception ex)
             {
@@ -116,9 +116,7 @@ namespace Extract.Reporting
         {
             try
             {
-                var typeReportViewerForm = ReportingDevExpressAssembly.GetType("Extract.ReportingDevExpress.ReportViewerForm");
-                var args = new object[] { extractReport };
-                return Activator.CreateInstance(typeReportViewerForm, args) as Form;
+                return UtilityMethods.CreateTypeFromTypeName(ReportViewerTypeName, extractReport) as Form;
             }
             catch (Exception ex)
             {
@@ -137,9 +135,7 @@ namespace Extract.Reporting
         {
             try
             {
-                var typeReportViewerForm = ReportingDevExpressAssembly.GetType("Extract.ReportingDevExpress.ReportViewerForm");
-                var args = new object[] { serverName, databaseName, workflowName };
-                return Activator.CreateInstance(typeReportViewerForm, args) as Form;
+                return UtilityMethods.CreateTypeFromTypeName(ReportViewerTypeName, serverName, databaseName, workflowName) as Form;
             }
             catch (Exception ex)
             {
@@ -163,9 +159,11 @@ namespace Extract.Reporting
         {
             try
             {
-                var typeReportViewerForm = ReportingDevExpressAssembly.GetType("Extract.ReportingDevExpress.ReportViewerForm");
-                var args = new object[] { report, serverName, databaseName, workflowName };
-                return Activator.CreateInstance(typeReportViewerForm, args) as Form;
+                return UtilityMethods.CreateTypeFromTypeName(ReportViewerTypeName,
+                                                             report,
+                                                             serverName,
+                                                             databaseName,
+                                                             workflowName) as Form;
             }
             catch (Exception ex)
             {

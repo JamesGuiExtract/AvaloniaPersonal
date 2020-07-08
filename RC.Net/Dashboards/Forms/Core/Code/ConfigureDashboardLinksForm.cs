@@ -105,7 +105,7 @@ namespace Extract.Dashboard.Forms
                 string value = string.Empty;
                 var selectDashboardForm = new SelectFromListInputBox();
                 selectDashboardForm.SelectionStrings = _existingDashboards
-                    .Except(DashboardLinks, StringComparer.OrdinalIgnoreCase).ToList();
+                    .Except(listBoxDashboardLinks.Items.OfType<string>(), StringComparer.OrdinalIgnoreCase).ToList();
                 selectDashboardForm.Prompt = "Dashboard Name";
                 selectDashboardForm.Title = "Add Dashboard link";
                 selectDashboardForm.DropDownStyle = ComboBoxStyle.DropDown;

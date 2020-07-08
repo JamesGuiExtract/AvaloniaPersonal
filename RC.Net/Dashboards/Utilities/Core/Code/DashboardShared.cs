@@ -393,29 +393,14 @@ namespace Extract.Dashboard.Utilities
         }
 
         /// <summary>
-        /// Returns a list of dashboard names from the current database
+        /// Returns a list of SourceLinks for the dashboards from the current database
         /// </summary>
-        /// <returns>IList of dashboard names</returns>
-        public IList<string> DashboardListFromDatabase()
+        /// <returns>IList of SourceLinks</returns>
+        public IList<SourceLink> DashboardList()
         {
             try
             {
-                using (var connection = NewSqlDBConnection())
-                using (var command = connection.CreateCommand())
-                {
-                    connection.Open();
-
-                    command.CommandText = "SELECT DashboardName FROM Dashboard ";
-
-                    using (var reader = command.ExecuteReader())
-                    using (DataTable dataTable = new DataTable())
-                    {
-                        dataTable.Locale = CultureInfo.CurrentCulture;
-                        dataTable.Load(reader);
-
-                        return dataTable.AsEnumerable().Select(dr => dr.Field<string>(0)).ToList();
-                    }
-                }
+                return DashboardMethods.GetAllDashboards(_dashboardForm.ServerName, _dashboardForm.DatabaseName);
             }
             catch (Exception ex)
             {
@@ -538,12 +523,14 @@ namespace Extract.Dashboard.Utilities
                     { "DashboardMenuItem", true } ,
                     { _BEGIN_GROUP, false }
                 };
-                var missingDashboards = GetMissingDashboardsInDatabase(dashboardLinks);
+                var missingDashboards = GetMissingDashboards(dashboardLinks);
                 foreach (var link in dashboardLinks.Except(missingDashboards, StringComparer.OrdinalIgnoreCase))
                 {
                     var newItem = new BarButtonItem();
-                    newItem.Caption = link;
-                    newItem.Tag = singleItemDict;
+                    newItem.Caption = Path.GetFileNameWithoutExtension(link);
+                    var ItemDict = new Dictionary<string, object>(singleItemDict);
+                    ItemDict["DashboardReportName"] = link;
+                    newItem.Tag = ItemDict;
                     newItem.ItemClick += HandleOpenDashboardMenuClick;
                     _dashboardOpenSubMenu.AddItem(newItem);
                 }
@@ -574,20 +561,14 @@ namespace Extract.Dashboard.Utilities
         /// </summary>
         /// <param name="dashboardLinks">Set of dashboards</param>
         /// <returns>A list of dashboards that are not in the database that were in the <paramref name="dashboardLinks"/></returns>
-        private IList<string> GetMissingDashboardsInDatabase(HashSet<string> dashboardLinks)
+        private IList<string> GetMissingDashboards(HashSet<string> dashboardLinks)
         {
             try
             {
-                using (var connection = NewSqlDBConnection())
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = "Select DashboardName FROM dbo.Dashboard";
-                    connection.Open();
-                    var dashboardsInDatabase = cmd.ExecuteReader()
-                        .Cast<IDataRecord>()
-                        .Select(r => r.GetString(0));
-                    return dashboardLinks.Except(dashboardsInDatabase, StringComparer.OrdinalIgnoreCase).ToList();
-                }
+                var dashboards = DashboardMethods.GetAllDashboards(_dashboardForm.ServerName,
+                                                                  _dashboardForm.DatabaseName);
+                return dashboardLinks.Except(dashboards.Select(d => d.SourceName), StringComparer.OrdinalIgnoreCase)
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -677,7 +658,9 @@ namespace Extract.Dashboard.Utilities
         {
             try
             {
-                _dashboardForm.OpenDashboardForm(e.Item.Caption, _dashboardForm.CurrentFilteredDimensions);
+                var menuItemData = e.Item.Tag as Dictionary<string, object>;
+                if (menuItemData != null)
+                _dashboardForm.OpenDashboardForm(menuItemData["DashboardReportName"] as string, _dashboardForm.CurrentFilteredDimensions);
             }
             catch (Exception ex)
             {

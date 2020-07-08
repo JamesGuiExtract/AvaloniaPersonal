@@ -171,8 +171,8 @@ namespace DashboardCreator
         {
             try
             {
-                DashboardViewerForm form = new DashboardViewerForm(dashboardName, true, ServerName, DatabaseName);
-                form.ParameterValues.AddRange(filterData);
+                bool isFile = string.IsNullOrWhiteSpace(Path.GetExtension(dashboardName));
+                DashboardViewerForm form = new DashboardViewerForm(dashboardName, isFile, ServerName, DatabaseName, filterData);
                 form.Show();
             }
             catch (Exception ex)
@@ -281,8 +281,15 @@ namespace DashboardCreator
 
                 GridDetailConfiguration configurationData = GetDetailConfigurationData(component);
                 var existingDashboards = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                existingDashboards.AddRange(_dashboardShared.DashboardListFromDatabase());
-
+                existingDashboards.AddRange(_dashboardShared.DashboardList().Select(d => d.SourceName));
+                if (grid.InteractivityOptions.MasterFilterMode == DashboardItemMasterFilterMode.None)
+                {
+                    MessageBox.Show("Grid must be part of a Master filter",
+                                    "No Master Filter",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information);
+                    return;
+                }
                 var linksForm = new ConfigureDashboardLinksForm(configurationData.DashboardLinks, existingDashboards);
                 linksForm.ShowDialog();
                 if (!configurationData.DashboardLinks.SetEquals(linksForm.DashboardLinks))

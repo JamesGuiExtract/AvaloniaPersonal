@@ -5,6 +5,7 @@ using DevExpress.DashboardWin.Native;
 using DevExpress.XtraEditors;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Grid;
+using Extract.Dashboard.Forms;
 using Extract.Dashboard.Utilities;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -285,8 +286,8 @@ namespace Extract.DashboardViewer
         {
             try
             {
-                DashboardViewerForm form = new DashboardViewerForm(dashboardName, true, ServerName, DatabaseName);
-                form.ParameterValues.AddRange(filterData);
+                bool isFile = string.IsNullOrWhiteSpace(Path.GetExtension(dashboardName));
+                DashboardViewerForm form = new DashboardViewerForm(dashboardName, isFile, ServerName, DatabaseName, filterData);
                 form.Show();
             }
             catch (Exception ex)
@@ -351,7 +352,7 @@ namespace Extract.DashboardViewer
         }
 
         /// <summary>
-        /// Constructs DashboardViewerform and opening the given file
+        /// Constructs DashboardViewerForm and opening the given file
         /// </summary>
         /// <param name="fileName">File containing dashboard to open</param>
         public DashboardViewerForm(string fileName)
@@ -368,7 +369,7 @@ namespace Extract.DashboardViewer
         }
 
         /// <summary>
-        /// Constructs DashboardViewerform and opening indicated dashboard using the server and database.
+        /// Constructs DashboardViewerForm and opening indicated dashboard using the server and database.
         /// </summary>
         /// <param name="dashboard">File or name of dashboard in database to open</param>
         /// <param name="inDatabase">Specifies that the dashboard is to be loaded from the database</param>
@@ -391,7 +392,31 @@ namespace Extract.DashboardViewer
         }
 
         /// <summary>
-        /// Constructs DashboardViewerform that allows dashboards to be opened from the database
+        /// Constructs DashboardViewerForm and opening indicated dashboard using the server and database.
+        /// </summary>
+        /// <param name="dashboard">File or name of dashboard in database to open</param>
+        /// <param name="inDatabase">Specifies that the dashboard is to be loaded from the database</param>
+        /// <param name="serverName">Server name to use when opening a dashboard.</param>
+        /// <param name="databaseName">Database name to use when opening a dashboard</param>
+        public DashboardViewerForm(string dashboard, bool inDatabase, string serverName, string databaseName, Dictionary<string, object> filterValues)
+            : this()
+        {
+            try
+            {
+                ServerName = serverName;
+                DatabaseName = databaseName;
+                _dashboardName = dashboard;
+                _inDatabase = inDatabase;
+                ParameterValues.AddRange(filterValues);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45310");
+            }
+        }
+
+        /// <summary>
+        /// Constructs DashboardViewerForm that allows dashboards to be opened from the database
         /// </summary>
         /// <param name="serverName">Server name to use when opening a dashboard.</param>
         /// <param name="databaseName">Database name to use when opening a dashboard</param>
@@ -412,6 +437,22 @@ namespace Extract.DashboardViewer
         #endregion
 
         #region Event Handlers
+   
+        private void HandleDashboardsInDBListBoxControl_CustomItemTemplate(object sender, CustomItemTemplateEventArgs e)
+        {
+            try
+            {
+                var data = e.Item as SourceLink;
+                if (data?.IsFile == true)
+                {
+                    e.Template = e.Templates["CoreDashboardTemplate"];
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49923");
+            }
+        }
 
         void DashboardViewerForm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -515,7 +556,22 @@ namespace Extract.DashboardViewer
             {
                 if (_dashboardsInDBListBoxControl.SelectedIndex >= 0)
                 {
-                    LoadDashboardFromDatabase(_dashboardsInDBListBoxControl.SelectedValue as string);
+                    var selected = _dashboardsInDBListBoxControl.SelectedValue as string;
+                    if (string.IsNullOrWhiteSpace(selected))
+                        return;
+
+                    if (Path.GetExtension(selected).Equals(".esdx", StringComparison.OrdinalIgnoreCase))
+                    {
+                        dashboardViewerMain.DashboardSource = string.Empty;
+                        _dashboardName = selected;
+                        var xdoc = XDocument.Load(_dashboardName);
+                        dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
+                        UpdateMainTitle();
+                    }
+                    else
+                    {
+                        LoadDashboardFromDatabase(_dashboardsInDBListBoxControl.SelectedValue as string);
+                    }
                 }
             }
             catch (Exception ex)
@@ -731,6 +787,21 @@ namespace Extract.DashboardViewer
                     }
                 }
 
+                if (!string.IsNullOrWhiteSpace(DatabaseName) &&
+                    !string.IsNullOrWhiteSpace(ServerName) &&
+                    string.IsNullOrWhiteSpace(_dashboardName))
+                {
+                    // Toggle the dashboard fly-out panel - if it is displayed hide it if it is not displayed show it
+                    if (!dashboardFlyoutPanel.IsPopupOpen)
+                    {
+                        LoadDashboardList();
+                        if (_dashboardsInDBListBoxControl.ItemCount > 0)
+                        {
+                            dashboardFlyoutPanel.ShowPopup();
+                        }
+                    }
+                }
+
                 dashboardToolStripMenuItem.Visible = AllowDatabaseDashboardSelection;
                 fileToolStripMenuItem.Visible = !_inDatabase || !AllowDatabaseDashboardSelection;
 
@@ -914,7 +985,9 @@ namespace Extract.DashboardViewer
                     return;
                 }
 
-                _dashboardsInDBListBoxControl.DataSource = _dashboardShared.DashboardListFromDatabase();
+                _dashboardsInDBListBoxControl.DataSource = _dashboardShared.DashboardList();
+                _dashboardsInDBListBoxControl.DisplayMember = "DisplayName";
+                _dashboardsInDBListBoxControl.ValueMember = "DashboardName";
             }
             catch (Exception ex)
             {

@@ -143,6 +143,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_MANAGE_ATTRIBUTESETS, &CFAMDBAdminDlg::OnManageAttributeSets)
 	ON_COMMAND(ID_MANAGE_RULE_COUNTERS, &CFAMDBAdminDlg::OnManageRuleCounters)
 	ON_COMMAND(ID_MANAGE_DATABASESERVICES, &CFAMDBAdminDlg::OnManageDatabaseServices)
+	ON_COMMAND(ID_MANAGE_DASHBOARDS, &CFAMDBAdminDlg::OnManageDashboards)
 	//}}AFX_MSG_MAP
 	ON_CBN_SELCHANGE(IDC_WORKFLOW_COMBO, &CFAMDBAdminDlg::OnCbnSelchangeWorkflowCombo)
 	ON_COMMAND(ID_TOOLS_MOVE_FILES_TO_WORKFLOW, &CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow)
@@ -1154,7 +1155,7 @@ void CFAMDBAdminDlg::OnManageMLModels()
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45742");
 }
 //-------------------------------------------------------------------------------------------------
-void CFAMDBAdminDlg::OnToolsDashboards()
+void CFAMDBAdminDlg::OnManageDashboards()
 {
 	try
 	{
@@ -1181,6 +1182,26 @@ void CFAMDBAdminDlg::OnToolsDashboards()
 		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI45766");
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45767");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnToolsDashboards()
+{
+	try
+	{
+		String^ pathEXE = marshal_as<String^>( getCurrentProcessEXEDirectory() + "\\DashboardViewer.exe");
+
+		Form ^dashboardForm =  safe_cast<Form^>( UtilityMethods::CreateTypeFromTypeNameAndAssembly(
+			pathEXE,"Extract.DashboardViewer.DashboardViewerForm", 
+			marshal_as<String^>(m_ipFAMDB->DatabaseServer),
+			marshal_as<String^>(m_ipFAMDB->DatabaseName)));
+		dashboardForm->Show();
+	}
+	// This is needed because .net exception causes crash if not handled
+	catch (Exception^ ex)
+	{
+		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI49924");
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI49925");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -146,6 +146,7 @@
     <Compile Include="ExtractSettingsBase.cs" />
     <Compile Include="ScheduledEvent.cs" />
     <Compile Include="SourceDocumentPathTags.cs" />
+    <Compile Include="SourceLink.cs" />
     <Compile Include="StreamMethods.cs" />
     <Compile Include="StringPair.cs" />
     <Compile Include="SystemMethods.cs" />
