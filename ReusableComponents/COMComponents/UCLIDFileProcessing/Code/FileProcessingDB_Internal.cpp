@@ -3392,6 +3392,40 @@ string CFileProcessingDB::getOneTimePassword(_ConnectionPtr ipConnection)
 	return strEncrypted;
 }
 //--------------------------------------------------------------------------------------------------
+bool CFileProcessingDB::isExistingDB()
+{
+	_ConnectionPtr dbConnection(__uuidof(Connection)); 
+
+	try
+	{
+		try
+		{
+			dbConnection->Open(createConnectionString(m_strDatabaseServer, "master").c_str(), "", "", adConnectUnspecified);
+
+			string dbExistsQuery = "IF DB_ID('" + m_strDatabaseName + "') IS NOT NULL SELECT 1";
+			_RecordsetPtr results = dbConnection->Execute(dbExistsQuery.c_str(), NULL, adCmdText);
+
+			// The query returns a closed recordset if the DB does not exist but check for not EOF just in case
+			bool dbExists = results->State == adStateOpen && !results->adoEOF;
+
+			dbConnection->Close();
+
+			return dbExists;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49935")
+	}
+	catch (UCLIDException &ex)
+	{
+		try
+		{
+			dbConnection->Close();
+		}
+		catch (...) { }
+
+		throw ex;
+	}
+}
+//--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isBlankDB()
 {
 	try
@@ -3402,11 +3436,7 @@ bool CFileProcessingDB::isBlankDB()
 		{
 			ipConnection = getDBConnection();
 		}
-		catch (...)
-		{
-			// If the database doesn't exist, its not blank.
-			return false;
-		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49933")
 
 		// Get the tables that exist in the database
 		_RecordsetPtr ipTables = ipConnection->OpenSchema(adSchemaTables);
@@ -3437,43 +3467,35 @@ bool CFileProcessingDB::isBlankDB()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33400");
 }
 //--------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::initializeIfBlankDB(bool initWithoutPrompt, string strAdminPassword)
+bool CFileProcessingDB::initializeDB(bool initWithoutPrompt, string strAdminPassword)
 {
 	try
 	{
-		bool bBlank = isBlankDB();
-	
-		// If blank flag is set clear the database
-		if (bBlank)
+		if (initWithoutPrompt)
 		{
-			if (initWithoutPrompt)
+			clear(false, true, false);
+
+			encryptAndStoreUserNamePassword(gstrADMIN_USER, strAdminPassword, false);
+
+			return true;
+		}
+		else
+		{
+			// Default to using the desktop as the parent for the messagebox below
+			HWND hParent = getAppMainWndHandle();
+
+			int iResult = ::MessageBox(hParent,
+				"This database exists but has not been initialized for use.\r\n\r\n"
+				"Do you wish to initialize it now?", "Initialize Database?", MB_YESNO);
+			if (iResult == IDYES)
 			{
 				clear(false, true, false);
 
-				encryptAndStoreUserNamePassword(gstrADMIN_USER, strAdminPassword, false);
-
 				return true;
 			}
-			else
-			{
-				// Default to using the desktop as the parent for the messagebox below
-				HWND hParent = getAppMainWndHandle();
 
-				int iResult = ::MessageBox(hParent,
-					"This database exists but has not been initialized for use.\r\n\r\n"
-					"Do you wish to initialize it now?", "Initialize Database?", MB_YESNO);
-				if (iResult == IDYES)
-				{
-					clear(false, true, false);
-
-					return true;
-				}
-
-				return false;
-			}
+			return false;
 		}
-
-		return true;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI33401");
 }

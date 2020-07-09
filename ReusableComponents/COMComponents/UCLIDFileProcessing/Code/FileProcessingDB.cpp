@@ -794,7 +794,7 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 
 		// [LegacyRCAndUtils:6168]
 		// Initialize the DB if it is blank
-		if (!initializeIfBlankDB(false, ""))
+		if (isBlankDB() && !initializeDB(false, ""))
 		{
 			// If the user chose not to initialize an empty database, treat as a cancelled login.
 			*pbLoginValid = VARIANT_FALSE;
@@ -1105,11 +1105,11 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 
 		// [LegacyRCAndUtils:6168]
 		// Check for an existing, blank database.
-		if (isBlankDB())
+		if (isExistingDB() && isBlankDB())
 		{
 			if (!strInitWithPassword.empty())
 			{
-				initializeIfBlankDB(true, strInitWithPassword);
+				initializeDB(true, strInitWithPassword);
 			}
 
 			// If this is a blank database, return without an exception; this will result in
@@ -1161,7 +1161,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 
 		if (!strInitWithPassword.empty())
 		{
-			initializeIfBlankDB(true, strInitWithPassword);
+			initializeDB(true, strInitWithPassword);
 		}
 		else
 		{

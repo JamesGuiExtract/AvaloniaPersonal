@@ -994,18 +994,19 @@ private:
 	// m_bLoggedInAsAdmin must also be true for call to succeed.
 	string getOneTimePassword(_ConnectionPtr ipConnection);
 
-	// Returns true if the configured database exists and is blank.
-	// Returns false if the configured database doesn't exist or is not blank.
-	// NOTE: This method will attempt a database connection, but eat any exception thrown attempting
-	// to do so and return false instead.
+	// Returns true if the configured DB exists and false if it does not
+	bool isExistingDB();
+
+	// Returns true if the configured database exists but has no tables
+	// Returns false if the configured database exists and has tables
 	bool isBlankDB();
 
-	// Checks for blank database and if it is blank will clear the database to set it up.
-	// Returns true if the database is not blank or it was initialized.
+	// Clears the database to set it up.
+	// Returns true if the database has been initialized.
 	// Returns false if the user was prompted to initialize the database, but declined.
 	// initWithoutPrompt-	If true, the database will be initialized with the specified strAdminPassword.
 	//						If false, a prompt will be displayed for the admin password following initialization.
-	bool initializeIfBlankDB(bool initWithoutPrompt, string strAdminPassword);
+	bool initializeDB(bool initWithoutPrompt, string strAdminPassword);
 
 	// Fills the rvecTables vector with the Extract Tables
 	void getExpectedTables(vector<string>& rvecTables);
