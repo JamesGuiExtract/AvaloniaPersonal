@@ -72,6 +72,11 @@
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
             this._emailTestButton = new System.Windows.Forms.Button();
+            this.tabDashboard = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
+            this.textBoxDashboardIncludeFilter = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.textBoxDashboardExcludeFilter = new System.Windows.Forms.TextBox();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -88,6 +93,7 @@
             this._productSpecificLayout.SuspendLayout();
             this._groupDataEntry.SuspendLayout();
             this._tabEmail.SuspendLayout();
+            this.tabDashboard.SuspendLayout();
             this.SuspendLayout();
             // 
             // label2
@@ -163,6 +169,7 @@
             this._tabControlSettings.Controls.Add(this._tabSecurity);
             this._tabControlSettings.Controls.Add(this._tabProductSpecific);
             this._tabControlSettings.Controls.Add(this._tabEmail);
+            this._tabControlSettings.Controls.Add(this.tabDashboard);
             this._tabControlSettings.Location = new System.Drawing.Point(13, 13);
             this._tabControlSettings.Name = "_tabControlSettings";
             this._tabControlSettings.SelectedIndex = 0;
@@ -589,6 +596,58 @@
             this._emailTestButton.Visible = false;
             this._emailTestButton.Click += new System.EventHandler(this.HandleEmailTestButton_Click);
             // 
+            // tabDashboard
+            // 
+            this.tabDashboard.Controls.Add(this.textBoxDashboardExcludeFilter);
+            this.tabDashboard.Controls.Add(this.label9);
+            this.tabDashboard.Controls.Add(this.textBoxDashboardIncludeFilter);
+            this.tabDashboard.Controls.Add(this.label1);
+            this.tabDashboard.Location = new System.Drawing.Point(4, 22);
+            this.tabDashboard.Name = "tabDashboard";
+            this.tabDashboard.Padding = new System.Windows.Forms.Padding(3);
+            this.tabDashboard.Size = new System.Drawing.Size(458, 325);
+            this.tabDashboard.TabIndex = 7;
+            this.tabDashboard.Text = "Dashboard";
+            this.tabDashboard.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 7);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(122, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Dashboard Include Filter";
+            // 
+            // textBoxDashboardIncludeFilter
+            // 
+            this.textBoxDashboardIncludeFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxDashboardIncludeFilter.Location = new System.Drawing.Point(10, 24);
+            this.textBoxDashboardIncludeFilter.Multiline = true;
+            this.textBoxDashboardIncludeFilter.Name = "textBoxDashboardIncludeFilter";
+            this.textBoxDashboardIncludeFilter.Size = new System.Drawing.Size(442, 121);
+            this.textBoxDashboardIncludeFilter.TabIndex = 1;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(7, 153);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(125, 13);
+            this.label9.TabIndex = 0;
+            this.label9.Text = "Dashboard Exclude Filter";
+            // 
+            // textBoxDashboardExcludeFilter
+            // 
+            this.textBoxDashboardExcludeFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxDashboardExcludeFilter.Location = new System.Drawing.Point(10, 170);
+            this.textBoxDashboardExcludeFilter.Multiline = true;
+            this.textBoxDashboardExcludeFilter.Name = "textBoxDashboardExcludeFilter";
+            this.textBoxDashboardExcludeFilter.Size = new System.Drawing.Size(442, 121);
+            this.textBoxDashboardExcludeFilter.TabIndex = 1;
+            // 
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -620,6 +679,8 @@
             this._groupDataEntry.ResumeLayout(false);
             this._groupDataEntry.PerformLayout();
             this._tabEmail.ResumeLayout(false);
+            this.tabDashboard.ResumeLayout(false);
+            this.tabDashboard.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -663,6 +724,11 @@
         private System.Windows.Forms.TabPage _tabEmail;
         private Utilities.Email.EmailSettingsControl _emailSettingsControl;
         private System.Windows.Forms.Button _emailTestButton;
+        private System.Windows.Forms.TabPage tabDashboard;
+        private System.Windows.Forms.TextBox textBoxDashboardExcludeFilter;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox textBoxDashboardIncludeFilter;
+        private System.Windows.Forms.Label label1;
     }
 }
 

@@ -1,13 +1,15 @@
-﻿using System;
+﻿using Extract.Licensing;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using Extract.Licensing;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 using UCLID_COMUTILSLib;
 
 namespace Extract.Utilities
@@ -504,6 +506,50 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI31812");
+            }
+        }
+
+        /// <summary>
+        /// Returns a list filtered with a regular expression
+        /// </summary>
+        /// <typeparam name="T">The type contained in the list</typeparam>
+        /// <param name="list">List of items to filter</param>
+        /// <param name="regularExpression">Regular expression to use for filtering</param>
+        /// <param name="stringToFilter">Provides what to test the regularExpression against"/>"/></param>
+        /// <returns>Filtered IEnumerable</returns>
+        public static IEnumerable<T> FilterWithRegex<T>(this IEnumerable<T> list, string regularExpression, Func<T,string> stringToFilter)
+        {
+            try
+            {
+                Regex filterSearch = new Regex(regularExpression);
+                return list.Where(p => filterSearch.IsMatch(stringToFilter(p)));
+            }
+            catch ( Exception ex)
+            {
+                throw ex.AsExtract("ELI49936");
+            }
+        }
+
+        /// <summary>
+        /// Returns a list that is Filtered by an includeFilter and ExcludeFilter
+        /// </summary>
+        /// <typeparam name="T">The type contained in the list</typeparam>
+        /// <param name="list">List of items to filter</param>
+        /// <param name="includeRegex">Regular expression to use to filter items to include in list</param>
+        /// <param name="excludeRegex">Regular expression to use to filter items to exclude from list</param>
+        /// <param name="stringToFilter">Provides what to test the regular expressions against</param>
+        /// <returns>List filtered to include items that match includeRegEx but exclude excludeRegEx</returns>
+        public static IEnumerable<T> FilterWithRegex<T>(this IEnumerable<T> list, string includeRegex, string excludeRegex, Func<T,string> stringToFilter)
+        {
+            try
+            {
+                return list
+                    .FilterWithRegex(includeRegex, stringToFilter)
+                    .Except(list.FilterWithRegex(excludeRegex, stringToFilter));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49937");
             }
         }
 

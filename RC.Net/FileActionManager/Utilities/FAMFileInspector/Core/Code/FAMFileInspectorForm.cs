@@ -3740,11 +3740,7 @@ namespace Extract.FileActionManager.Utilities
             if (!UseDatabaseMode)
                 return dashboardMenuItems;
 
-            var dashboards = DashboardMethods.GetAllDashboards(FileProcessingDB.DatabaseServer,
-                                                                        FileProcessingDB.DatabaseName,
-                                                                        true);
-
-            dashboards.OrderBy(d => d.IsFile);
+            var dashboards = DashboardsForMenu();
 
             foreach (var data in dashboards)
             {
@@ -3757,6 +3753,23 @@ namespace Extract.FileActionManager.Utilities
             }
 
             return dashboardMenuItems;
+        }
+
+        private IList<SourceLink> DashboardsForMenu()
+        {
+            var dashboards = DashboardMethods.GetAllDashboards(FileProcessingDB.DatabaseServer,
+                                                                        FileProcessingDB.DatabaseName,
+                                                                        true).ToList();
+
+            var includeFilter = _fileProcessingDB.GetDBInfoSetting("DashboardIncludeFilter", false);
+            if (string.IsNullOrWhiteSpace(includeFilter))
+                includeFilter = ".+";
+
+            var excludeFilter = _fileProcessingDB.GetDBInfoSetting("DashboardExcludeFilter", false);
+
+            return dashboards.FilterWithRegex(includeFilter, excludeFilter, d => d.SourceName)
+                .OrderBy(d => d.IsFile)
+                .ToList();
         }
 
         private void HandleDashboardMenuItem_Click(object sender, EventArgs e)

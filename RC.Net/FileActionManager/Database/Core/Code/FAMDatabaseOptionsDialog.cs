@@ -64,6 +64,10 @@ namespace Extract.FileActionManager.Database
         const double _MIN_DB_CHECK_FOR_FILES_VALUE = 500.0;
         const double _MAX_DB_CHECK_FOR_FILES_VALUE = 300000.0;
 
+        // Constants for Dashboard tab
+        const string _DASHBOARD_INCLUDE_FILTER = "DashboardIncludeFilter";
+        const string _DASHBOARD_EXCLUDE_FILTER = "DashboardExcludeFilter";
+
         #endregion Constants
 
         #region Fields
@@ -169,6 +173,9 @@ namespace Extract.FileActionManager.Database
 
                 var settings = db.DBInfoSettings;
 
+                if (AddMissingSettings(db, settings))
+                    settings = db.DBInfoSettings;
+
                 // Use a FAMDatabaseSettings instance to persist the email settings so that the
                 // EmailSettingsControl can be re-used to configure the settings.
                 _emailSettings.LoadSettings(
@@ -244,12 +251,34 @@ namespace Extract.FileActionManager.Database
 
                 _emailSettingsControl.LoadSettings(_emailSettings);
 
+                // Update Dashboard Settings
+                textBoxDashboardIncludeFilter.Text = settings.GetValue(_DASHBOARD_INCLUDE_FILTER);
+                textBoxDashboardExcludeFilter.Text = settings.GetValue(_DASHBOARD_EXCLUDE_FILTER);
+
                 UpdateEnabledStates();
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI31914");
             }
+        }
+
+        private bool AddMissingSettings(FileProcessingDB db, StrToStrMap settings)
+        {
+            bool added = false;
+            // Check for the DashboardSettings
+            if (!settings.Contains(_DASHBOARD_INCLUDE_FILTER))
+            {
+                // Set the include filter and default it to include all
+                db.SetDBInfoSetting(_DASHBOARD_INCLUDE_FILTER, ".+", false, true);
+                added = true;
+            }
+            if (!settings.Contains(_DASHBOARD_EXCLUDE_FILTER))
+            {
+                db.SetDBInfoSetting(_DASHBOARD_EXCLUDE_FILTER, "", false, true);
+                added = true;
+            }
+            return added;
         }
 
         /// <summary>
@@ -509,6 +538,9 @@ namespace Extract.FileActionManager.Database
                     string.Join(";", _listMachinesToAuthenticate.Items.Cast<string>()) :
                     string.Empty;
                 map.Set(_SKIP_AUTHENTICATION_ON_MACHINES, machines);
+
+                map.Set(_DASHBOARD_INCLUDE_FILTER, textBoxDashboardIncludeFilter.Text);
+                map.Set(_DASHBOARD_EXCLUDE_FILTER, textBoxDashboardExcludeFilter.Text);
 
                 // Add product specific data if the group boxes are visible
 

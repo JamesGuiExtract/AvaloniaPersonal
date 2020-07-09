@@ -36,6 +36,9 @@ namespace Extract.Dashboard.Forms
             {
                 var CoreDashboards = new Collection<SourceLink>();
 
+                if (!Directory.Exists(CoreDashboardPath))
+                    return CoreDashboards;
+
                 // Search all core dashboards
                 foreach (string DashboardFileName in
                     Directory.EnumerateFiles(CoreDashboardPath, "*.esdx", SearchOption.AllDirectories))

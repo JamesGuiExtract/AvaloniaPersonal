@@ -984,10 +984,12 @@ namespace Extract.DashboardViewer
                 {
                     return;
                 }
+                var filters = GetFiltersFromDatabase();
+                _dashboardsInDBListBoxControl.DataSource = _dashboardShared.DashboardList()
+                    .FilterWithRegex(filters.includeFilter, filters.excludeFilter, d => d.SourceName).ToList();
 
-                _dashboardsInDBListBoxControl.DataSource = _dashboardShared.DashboardList();
                 _dashboardsInDBListBoxControl.DisplayMember = "DisplayName";
-                _dashboardsInDBListBoxControl.ValueMember = "DashboardName";
+                _dashboardsInDBListBoxControl.ValueMember = "SourceName";
             }
             catch (Exception ex)
             {
@@ -1130,6 +1132,33 @@ namespace Extract.DashboardViewer
 
             };
         }
-        #endregion
-    }
+
+        private (string includeFilter, string excludeFilter) GetFiltersFromDatabase()
+        {
+            try
+            {
+                using(var connection = NewSqlDBConnection())
+                using (var cmd = connection.CreateCommand())
+                {
+                    connection.Open();
+                    cmd.CommandText = "SELECT Value FROM DBInfo WHERE [Name] = @SettingName";
+                    cmd.Parameters.AddWithValue("@SettingName", "DashboardIncludeFilter");
+                    var includeFilter = cmd.ExecuteScalar() as string ?? "";
+                    includeFilter = string.IsNullOrWhiteSpace(includeFilter) ? "(?=)" : includeFilter;
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.AddWithValue("@SettingName", "DashboardExcludeFilter");
+                    var excludeFilter = cmd.ExecuteScalar() as string ?? "";
+                    excludeFilter = string.IsNullOrWhiteSpace(excludeFilter) ? "(?!)" : excludeFilter;
+
+                    return (includeFilter, excludeFilter);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49940");
+            }
+        }
+
+    #endregion
+}
 }
