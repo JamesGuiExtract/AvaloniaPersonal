@@ -68,8 +68,11 @@ void UnlockLeadtools::UnlockLeadToolsSupport()
 			LicenseKey = marshal_as<String^>(gstrLEADTOOLS_DEVELOPER_KEY);
 		}
 
-		RasterSupport::SetLicense(LicenseFileName, LicenseKey);
-		LicenseInitialized = true;
+		if (File::Exists(LicenseFileName))
+		{
+			RasterSupport::SetLicense(LicenseFileName, LicenseKey);
+			LicenseInitialized = true;
+		}
 	}
 	catch (Exception^ ex)
 	{

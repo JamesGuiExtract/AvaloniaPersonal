@@ -160,9 +160,17 @@ namespace Extract.Imaging.Forms
         /// </returns>
         static RasterImage GetLoadingImage()
         {
-            using (Image image = new Bitmap(typeof(ThumbnailViewer), "Resources.Loading.png"))
+            try
             {
-                return RasterImageConverter.ConvertFromImage(image, ConvertFromImageOptions.None);
+                using (Image image = new Bitmap(typeof(ThumbnailViewer), "Resources.Loading.png"))
+                {
+                    return RasterImageConverter.ConvertFromImage(image, ConvertFromImageOptions.None);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49938");
+                return null;
             }
         }
 
@@ -173,9 +181,17 @@ namespace Extract.Imaging.Forms
         /// </returns>
         static RasterImage GetErrorImage()
         {
-            using (Image image = new Bitmap(typeof(ThumbnailViewer), "Resources.Error.png"))
+            try
             {
-                return RasterImageConverter.ConvertFromImage(image, ConvertFromImageOptions.None);
+                using (Image image = new Bitmap(typeof(ThumbnailViewer), "Resources.Error.png"))
+                {
+                    return RasterImageConverter.ConvertFromImage(image, ConvertFromImageOptions.None);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49939");
+                return null;
             }
         }
 
