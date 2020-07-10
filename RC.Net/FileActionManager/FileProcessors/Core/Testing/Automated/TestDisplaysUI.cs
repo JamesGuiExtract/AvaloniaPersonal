@@ -113,12 +113,17 @@ namespace Extract.FileActionManager.FileProcessors.Test
             var processorsProgIDs = fileProcessorsProgIDs.ComToDictionary();
 
             // Checks to see if any new licenses were created, if so it asks you to add them to this test.
-            var licensedButNotInTest = fileProcessors.Where(m => !processorsProgIDs.Any(m2 => m2.Key == m.Key)).ToDictionary(x => x.Key, x=> x.Value);
-            Assert.IsTrue(licensedButNotInTest.Count == 0, "Please add the following item to the fileProcessors dictionary (in the test class) as its a new license: " + licensedButNotInTest.Keys.FirstOrDefault() + " " + licensedButNotInTest.Values.FirstOrDefault());
+            var licensedButNotInTest = processorsProgIDs.Keys.Except(fileProcessors.Keys).ToList();
+            Assert.AreEqual(0, licensedButNotInTest.Count,
+                "Please add the following lines to the fileProcessors dictionary in TestDisplaysUI.cs: "
+                + String.Join("\r\n",
+                    licensedButNotInTest.Select(description => "\"" + description + "\", \"" + processorsProgIDs[description] + "\"")));
 
             // Checks to see if any items are not licensed.
-            var notlicensed = processorsProgIDs.Where(m => !fileProcessors.Any(m2 => m2.Key == m.Key)).ToDictionary(x => x.Key, x => x.Value);
-            Assert.IsTrue(notlicensed.Count == 0, "You Need to license this file: " + notlicensed.Keys.FirstOrDefault() + " " + notlicensed.Values.FirstOrDefault());
+            var notLicensed = fileProcessors.Keys.Except(processorsProgIDs.Keys).ToList();
+            Assert.AreEqual(0, notLicensed.Count,
+                "You Need to license these (and/or fix dll registration) and then run 'check for new components' to update the cache file: "
+                + String.Join("\r\n", notLicensed.Select(description => fileProcessors[description])));
 
             // Test the Tasks that have a UI           
             var uiTasks = processorsProgIDs.Where(t => _UI_SELECTION_LIST.Any(w => t.Key.Contains(w)));
