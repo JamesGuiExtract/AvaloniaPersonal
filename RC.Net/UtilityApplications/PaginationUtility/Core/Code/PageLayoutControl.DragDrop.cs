@@ -618,6 +618,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     && !_allDocumentsShowing
                     && (scrolledToTop || scrolledToBottom))
                 {
+                    var scrollPosition = DocumentInDataEdit.PaginationSeparator.Location.Y;
+
                     // If dragging to top/bottom of panel while a single document is displayed via
                     // SnapDataPanelToTop, redisplay all other documents to allow the pages being
                     // dragged to be dropped into other documents.
@@ -626,15 +628,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                         RedisplayAllDocuments();
                     }
 
-                    // Ideally, the scroll position would remain such that, as much as possible, the pagination
-                    // separator is still at the top of the panel after displaying the other docs (may not be possible
-                    // depending on the document position and how many documents are expanded.
-                    // TODO: I haven't been able to find a way to make this happen without initially seeing the panel
-                    // scrolled all the way to the top before this corrects the scroll position back into view.
-                    // Adding this as a note to https://extract.atlassian.net/browse/ISSUE-17098, but since this
-                    // probably isn't something frequently done, going to let it be until it is brought up by others
-                    // as an issue.
-                    _flowLayoutPanel.ScrollControlIntoViewManual(DocumentInDataEdit.PaginationSeparator, 0);
+                    // After displaying all documents, the panel will be scrolled to the top; restore
+                    // scroll position relative to the top of the document from which we are dragging.
+                    _flowLayoutPanel.ScrollControlIntoViewManual(DocumentInDataEdit.PaginationSeparator, scrollPosition);
 
                     return;
                 }
