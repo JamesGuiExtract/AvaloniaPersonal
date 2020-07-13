@@ -1,5 +1,8 @@
+using DevExpress.XtraBars.Docking;
 using DevExpress.XtraBars.Ribbon;
 using DevExpress.XtraPrinting;
+using DevExpress.XtraReports.Parameters;
+using DevExpress.XtraPrinting.Localization;
 using DevExpress.XtraReports.UI;
 using DevExpress.XtraRichEdit.Import.Rtf;
 using Extract.Licensing;
@@ -12,6 +15,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
@@ -293,7 +297,6 @@ namespace Extract.ReportingDevExpress
                 while (true);
             }
         }
-
 
         #region Constructors
 
@@ -655,6 +658,38 @@ namespace Extract.ReportingDevExpress
             }
         }
 
+        private void HandleXtraReportParametersRequestBeforeShow(object sender, ParametersRequestEventArgs e)
+        {
+            try
+            {
+                // By setting all of the parameters to be not visible the Parameter panel will not be displayed
+                // the Parameters are set in our parameter dialog
+                foreach (var p in e.ParametersInformation)
+                {
+                    p.Parameter.Visible = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49978");
+            }
+
+        }
+
+        private void HandleBarButtonItemParameters_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            try
+            {
+                var report = _report as ExtractReport;
+                report.SetParameters(true, true);
+                AttachReportToReportViewer();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI49979");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Methods
@@ -669,9 +704,12 @@ namespace Extract.ReportingDevExpress
                 _report != null);
 
             var reportAsXtraReport = _report.ReportDocument as XtraReport;
+            reportAsXtraReport.RequestParameters = false;
+            reportAsXtraReport.ParametersRequestBeforeShow += HandleXtraReportParametersRequestBeforeShow;
             reportAsXtraReport.CreateDocument();
             documentViewer.DocumentSource = reportAsXtraReport;
 
+            barButtonItemParameters.Enabled = UserParametersExist(reportAsXtraReport);
             documentViewer.SelectFirstPage();
 
             // Set the title based on the report file
@@ -680,17 +718,29 @@ namespace Extract.ReportingDevExpress
                  && ExtractReport.StandardReportFolder.Equals(
                 Path.GetDirectoryName(_reportFileName), StringComparison.OrdinalIgnoreCase);
 
-            // Add overrides for the Save and SendFile commands
-            documentViewer.PrintingSystem.AddCommandHandler(new SaveTemplateCommandHandler(this));
-            documentViewer.PrintingSystem.AddCommandHandler(new SendFileTemplateCommandHandler(this));
-
             // Enable / disable the save template menu item depending on whether the
             // report is a standard report or not
             documentViewer.PrintingSystem
                 .SetCommandVisibility(PrintingSystemCommand.Save, (saveEnabled) ? CommandVisibility.All : CommandVisibility.None);
+            documentViewer.PrintingSystem.SetCommandVisibility(PrintingSystemCommand.Parameters, CommandVisibility.None);
             
+            // Add overrides for the Save and SendFile commands
+            documentViewer.PrintingSystem.AddCommandHandler(new SaveTemplateCommandHandler(this));
+            documentViewer.PrintingSystem.AddCommandHandler(new SendFileTemplateCommandHandler(this));
 
             Invalidate();
+        }
+
+        private bool UserParametersExist(XtraReport report)
+        {
+            int numberOfExtractParameters = 0;
+            foreach ( var p in report.Parameters)
+            {
+                if (p.Name.StartsWith("ES_"))
+                    numberOfExtractParameters++;
+            }
+
+            return report.Parameters.Count > numberOfExtractParameters;
         }
 
         /// <summary>

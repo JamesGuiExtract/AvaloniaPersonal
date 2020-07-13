@@ -493,7 +493,7 @@ namespace Extract.ReportingDevExpress
         /// refresh, <see langword="false"/> if they are being set for the initial load.</param>
         /// <returns><see langword="true"/> if parameters have been set and
         /// <see langword="false"/> otherwise.</returns>
-        bool SetParameters(bool promptForParameters, bool isRefresh)
+        public bool SetParameters(bool promptForParameters, bool isRefresh)
         {
             try
             {
@@ -549,13 +549,9 @@ namespace Extract.ReportingDevExpress
 
                     if (parameter is DateRangeParameter dateRange)
                     {
-                        string minParam = dateRange.ParameterName + "_Min";
-                        string maxParam = dateRange.ParameterName + "_Max";
+                        var dr = new Range<DateTime>(dateRange.Minimum, dateRange.Maximum);
+                        numberOfParametersSet += SetParameterValues(reportParameters, dateRange.ParameterName, dr);
 
-                        numberOfParametersSet += SetParameterValues(reportParameters,
-                            minParam, dateRange.Minimum);
-                        numberOfParametersSet += SetParameterValues(reportParameters,
-                            maxParam, dateRange.Maximum);
                         continue;
                     }
 
@@ -705,7 +701,22 @@ namespace Extract.ReportingDevExpress
         {
             try
             {
-                parameter.Value = value;
+                if (parameter.ValueSourceSettings is RangeParametersSettings rangeParameterSettings)
+                {
+                    if (parameter.Type == typeof(DateTime))
+                    {
+                        if (value is Range<DateTime> dateRangeValue)
+                        {
+                            // Range parameters have start and end parameters named in
+                            rangeParameterSettings.StartParameter.Value = dateRangeValue.Start;
+                            rangeParameterSettings.EndParameter.Value = dateRangeValue.End;
+                        }
+                    }
+                }
+                else
+                {
+                    parameter.Value = value;
+                }
             }
             catch (Exception ex)
             {
