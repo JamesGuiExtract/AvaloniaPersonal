@@ -123,19 +123,6 @@ BuildPDUtils: BuildAttributeFinderCore
     @TIME /T
     @ECHO.
 
-BuildLearningMachineTrainer: 
-	@ECHO Building Learning Machine Trainer...
-    @ECHO.
-    @DATE /T
-    @TIME /T
-    @ECHO.
-    @CD "$(RCNETDir)\UtilityApplications\LearningMachineTrainer\Code"
-    @devenv LearningMachineTrainer.sln /BUILD $(BuildConfig) 
-    @ECHO.
-    @DATE /T
-    @TIME /T
-    @ECHO.	
-	
 CopyAPIFiles:
 	@ECHO Copying API files to Release
 	IF NOT EXIST "$(BinariesFolder)" @MKDIR "$(BinariesFolder)"
@@ -655,7 +642,7 @@ BuildDataEntryMergeModule: BuildAFCoreMergeModule
 
 MakeMergeModules: CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule 
 
-DoBuilds: SetupBuildEnv SetVersions BuildPDUtils CopyFKB BuildLearningMachineTrainer
+DoBuilds: SetupBuildEnv SetVersions BuildPDUtils CopyFKB
 
 DoEverythingNoGet: DoBuilds MakeMergeModules RegisterClearImage_7_0 CopyCommonFiles
     @ECHO.
