@@ -3778,8 +3778,11 @@ namespace Extract.FileActionManager.Utilities
             {
                 string fileName = GetSelectedFileNames().Single();
                 Dictionary<string, object> filterValues = new Dictionary<string, object>();
-                filterValues["DocumentName"] = fileName;
-                filterValues["FileName"] = fileName;
+                // Add FileName for all of the aliases
+                foreach( var alias in DashboardMethods.DocumentNameAliases)
+                {
+                    filterValues[alias] = fileName;
+                }
                 filterValues["Workflow"] = WorkflowName;
                 filterValues["WorkflowName"] = WorkflowName;
 

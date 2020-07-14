@@ -18,10 +18,11 @@ namespace Extract.Dashboard.Forms
 
         static readonly string DashboardsQuery = "SELECT [DashboardName], [Definition] FROM [dbo].[Dashboard] ";
 
-        static readonly string DashboardsWithDocumentOrFileNameQuery = DashboardsQuery +
-            " WHERE " +
-            @" [Definition].[exist]('/Dashboard/Parameters/Parameter[@Name=""FileName""]') = 1 " +
-            @" OR [Definition].[exist] ('/Dashboard/Parameters/Parameter[@Name=""DocumentName""]') = 1";
+        public static ReadOnlyCollection<string> DocumentNameAliases
+        {
+            get;
+        } = new ReadOnlyCollection<string>(new[]
+            { "File", "Document", "FileName", "DocumentName", "SourceDocument", "SourceDocumentName", "SourceDocName" });
 
         /// <summary>
         /// Gets collection of all dashboards in the "c:\ProgramData\Extract Systems\Dashboards\Core" folder
@@ -77,7 +78,7 @@ namespace Extract.Dashboard.Forms
                 using (var command = connection.CreateCommand())
                 {
                     connection.Open();
-                    command.CommandText = withDocumentParameter ? DashboardsWithDocumentOrFileNameQuery : DashboardsQuery;
+                    command.CommandText = withDocumentParameter ? GetDashboardsWithDocumentOrFileNameQuery() : DashboardsQuery;
 
                     DataTable dataTable = new DataTable();
                     dataTable.Locale = CultureInfo.CurrentCulture;
@@ -101,6 +102,18 @@ namespace Extract.Dashboard.Forms
             {
                 throw ex.AsExtract("ELI49928");
             }
+        }
+
+        private static string GetDashboardsWithDocumentOrFileNameQuery()
+        {
+            var definitionString = @" [Definition].[exist]('/Dashboard/Parameters/Parameter[@Name=""{0}""]') = 1 ";
+
+            var WhereList = DocumentNameAliases.Select(s => string.Format(CultureInfo.InvariantCulture,
+                                                                          definitionString,
+                                                                          s));
+            return DashboardsQuery +
+                string.Format(CultureInfo.InvariantCulture, " WHERE {0}", string.Join(" OR ", WhereList));
+
         }
 
         /// <summary>
@@ -143,13 +156,12 @@ namespace Extract.Dashboard.Forms
 
         private static bool HasDocumentParameter(XDocument xDocument)
         {
-            var FileNameElement = xDocument.XPathSelectElement("/Dashboard/Parameters/Parameter[@Name=\"FileName\"]");
-            var DocumentNameElement = xDocument.XPathSelectElement("/Dashboard/Parameters/Parameter[@Name=\"DocumentName\"]");
+            var ParameterElements = xDocument.XPathSelectElements("/Dashboard/Parameters/Parameter[@Name]");
 
-            return FileNameElement != null &&
-                string.IsNullOrWhiteSpace(FileNameElement.Value) ||
-                DocumentNameElement != null &&
-                string.IsNullOrWhiteSpace(DocumentNameElement.Value);
+            var v = ParameterElements.Where(e => DocumentNameAliases.Contains(e.Attribute("Name").Value) &&
+                string.IsNullOrWhiteSpace(e.Attribute("Value").Value));
+
+            return v != null && v.Count() == 1;
         }
     }
 }
