@@ -2493,6 +2493,15 @@ namespace Extract.FileActionManager.FileProcessors
             ShowAllHighlightsChanged?.Invoke(this, new EventArgs());
         }
 
+        /// <summary>
+        /// Shows the shortcuts dialog.
+        /// </summary>
+        private void shortcutsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PaginationShortcutsForm shortcuts = new PaginationShortcutsForm();
+            shortcuts.ShowDialog();
+        }
+
         #endregion Private Members
     }
 }

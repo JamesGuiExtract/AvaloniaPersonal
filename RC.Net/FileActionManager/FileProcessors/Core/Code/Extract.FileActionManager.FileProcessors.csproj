@@ -139,6 +139,12 @@
     <Compile Include="AutoPaginateTaskSettingsDialog.Designer.cs">
       <DependentUpon>AutoPaginateTaskSettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="PaginationShortcutsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PaginationShortcutsForm.Designer.cs">
+      <DependentUpon>PaginationShortcutsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SplitMultipageDocumentTask.cs" />
     <Compile Include="PaginationTaskForm.FormStateManager.cs">
       <DependentUpon>PaginationTaskForm.cs</DependentUpon>
@@ -498,6 +504,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="SetMetadataTaskSettingsDialog.resx">
       <DependentUpon>SetMetadataTaskSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PaginationShortcutsForm.resx">
+      <DependentUpon>PaginationShortcutsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SplitMultipageDocumentTaskSettingsDialog.resx">
       <DependentUpon>SplitMultipageDocumentTaskSettingsDialog.cs</DependentUpon>

@@ -75,14 +75,12 @@ namespace Extract.FileActionManager.FileProcessors
             this._toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._zoomWindowToolStripMenuItem = new Extract.Imaging.Forms.ZoomWindowToolStripMenuItem();
             this._panToolStripMenuItem = new Extract.Imaging.Forms.PanToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.shortcutsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._basicImageViewerToolStrip = new System.Windows.Forms.ToolStrip();
             this._printImageToolStripButton = new Extract.Imaging.Forms.PrintImageToolStripButton();
             this._zoomWindowToolStripButton = new Extract.Imaging.Forms.ZoomWindowToolStripButton();
             this._panToolStripButton = new Extract.Imaging.Forms.PanToolStripButton();
-            this._highlightToolsToolStrip = new System.Windows.Forms.ToolStrip();
-            this._rectangularHighlightToolStripButton = new Extract.Imaging.Forms.RectangularHighlightToolStripButton();
-            this._angularHighlightToolStripButton = new Extract.Imaging.Forms.AngularHighlightToolStripButton();
-            this._wordHighlightToolStripButton = new Extract.Imaging.Forms.WordHighlightToolStripButton();
             this._viewCommandsToolStrip = new System.Windows.Forms.ToolStrip();
             this._zoomInToolStripButton = new Extract.Imaging.Forms.ZoomInToolStripButton();
             this._zoomOutToolStripButton = new Extract.Imaging.Forms.ZoomOutToolStripButton();
@@ -93,6 +91,10 @@ namespace Extract.FileActionManager.FileProcessors
             this._oneToOneZoomToolStripButton = new Extract.Imaging.Forms.OneToOneZoomToolStripButton();
             this._rotateCounterclockwiseToolStripButton = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton();
             this._rotateClockwiseToolStripButton = new Extract.Imaging.Forms.RotateClockwiseToolStripButton();
+            this._highlightToolsToolStrip = new System.Windows.Forms.ToolStrip();
+            this._rectangularHighlightToolStripButton = new Extract.Imaging.Forms.RectangularHighlightToolStripButton();
+            this._angularHighlightToolStripButton = new Extract.Imaging.Forms.AngularHighlightToolStripButton();
+            this._wordHighlightToolStripButton = new Extract.Imaging.Forms.WordHighlightToolStripButton();
             this._advancedCommandsToolStrip = new System.Windows.Forms.ToolStrip();
             this._toggleShowAllHighlightsButton = new System.Windows.Forms.ToolStripButton();
             this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
@@ -115,8 +117,8 @@ namespace Extract.FileActionManager.FileProcessors
             this._imageViewerContextMenu.SuspendLayout();
             this._menuStrip.SuspendLayout();
             this._basicImageViewerToolStrip.SuspendLayout();
-            this._highlightToolsToolStrip.SuspendLayout();
             this._viewCommandsToolStrip.SuspendLayout();
+            this._highlightToolsToolStrip.SuspendLayout();
             this._advancedCommandsToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -142,9 +144,9 @@ namespace Extract.FileActionManager.FileProcessors
             // 
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._menuStrip);
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._basicImageViewerToolStrip);
-            imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._highlightToolsToolStrip);
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._viewCommandsToolStrip);
             imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._advancedCommandsToolStrip);
+            imageViewerToolStripContainer.TopToolStripPanel.Controls.Add(this._highlightToolsToolStrip);
             // 
             // _imageViewerStatusStrip
             // 
@@ -175,13 +177,15 @@ namespace Extract.FileActionManager.FileProcessors
             // 
             // _paginationPanel
             // 
+            this._paginationPanel.AutoRotateImages = false;
+            this._paginationPanel.AutoSelectForReprocess = false;
             this._paginationPanel.BackColor = System.Drawing.Color.Transparent;
             this._paginationPanel.CacheImages = false;
             this._paginationPanel.CommitOnlySelection = true;
             this._paginationPanel.CreateDocumentOnOutput = false;
+            this._paginationPanel.DefaultToCollapsed = false;
             this._paginationPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._paginationPanel.ExpectedPaginationAttributesPath = null;
-            this._paginationPanel.AutoSelectForReprocess = false;
             this._paginationPanel.ImageViewer = null;
             this._paginationPanel.LoadNextDocumentVisible = true;
             this._paginationPanel.Location = new System.Drawing.Point(0, 0);
@@ -189,20 +193,23 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.MinimumSize = new System.Drawing.Size(454, 0);
             this._paginationPanel.Name = "_paginationPanel";
             this._paginationPanel.OutputExpectedPaginationAttributesFile = false;
+            this._paginationPanel.RequireAllPagesToBeViewed = false;
+            this._paginationPanel.SaveButtonVisible = false;
+            this._paginationPanel.SelectAllCheckBoxVisible = true;
             this._paginationPanel.Size = new System.Drawing.Size(528, 787);
             this._paginationPanel.SuspendUIUpdates = false;
             this._paginationPanel.TabIndex = 1;
             this._paginationPanel.ToolBarVisible = true;
-            this._paginationPanel.AcceptedSourcePagination += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.AcceptedSourcePaginationEventArgs>(this.HandlePaginationPanel_AcceptedSourcePagination);
             this._paginationPanel.DocumentDataRequest += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.DocumentDataRequestEventArgs>(this.HandlePaginationPanel_DocumentDataRequest);
             this._paginationPanel.CreatingOutputDocument += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CreatingOutputDocumentEventArgs>(this.HandlePaginationPanel_CreatingOutputDocument);
             this._paginationPanel.OutputDocumentDeleted += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.OutputDocumentDeletedEventArgs>(this.HandlePaginationPanel_OutputDocumentDeleted);
+            this._paginationPanel.AcceptedSourcePagination += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.AcceptedSourcePaginationEventArgs>(this.HandlePaginationPanel_AcceptedSourcePagination);
             this._paginationPanel.Paginated += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.PaginatedEventArgs>(this.HandlePaginationPanel_Paginated);
             this._paginationPanel.PaginationError += new System.EventHandler<Extract.ExtractExceptionEventArgs>(this.HandlePaginationPanel_PaginationError);
             this._paginationPanel.StateChanged += new System.EventHandler<System.EventArgs>(this.HandlePaginationPanel_StateChanged);
             this._paginationPanel.CommittingChanges += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.CommittingChangesEventArgs>(this.HandlePaginationPanel_CommittingChanges);
-            this._paginationPanel.PanelResetting += new System.EventHandler<System.EventArgs>(HandlePaginationPanel_PanelResetting);
-            this._paginationPanel.RevertedChanges += new System.EventHandler<System.EventArgs>(HandlePaginationPanel_RevertedChanges);
+            this._paginationPanel.PanelResetting += new System.EventHandler<System.EventArgs>(this.HandlePaginationPanel_PanelResetting);
+            this._paginationPanel.RevertedChanges += new System.EventHandler<System.EventArgs>(this.HandlePaginationPanel_RevertedChanges);
             // 
             // _imageViewer
             // 
@@ -213,6 +220,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._imageViewer.InvertColors = false;
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
+            this._imageViewer.MaintainZoomLevelForNewPages = true;
             this._imageViewer.MinimumAngularHighlightHeight = 4;
             this._imageViewer.Name = "_imageViewer";
             this._imageViewer.OcrTradeoff = Extract.Imaging.OcrTradeoff.Accurate;
@@ -362,7 +370,8 @@ namespace Extract.FileActionManager.FileProcessors
             this._menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._fileToolStripMenuItem,
             this._viewToolStripMenuItem,
-            this._toolsToolStripMenuItem});
+            this._toolsToolStripMenuItem,
+            this.helpToolStripMenuItem});
             this._menuStrip.Location = new System.Drawing.Point(0, 0);
             this._menuStrip.Name = "_menuStrip";
             this._menuStrip.Size = new System.Drawing.Size(1592, 24);
@@ -657,7 +666,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._zoomWindowToolStripMenuItem,
             this._panToolStripMenuItem});
             this._toolsToolStripMenuItem.Name = "_toolsToolStripMenuItem";
-            this._toolsToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
+            this._toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this._toolsToolStripMenuItem.Text = "Tools";
             // 
             // _zoomWindowToolStripMenuItem
@@ -679,6 +688,21 @@ namespace Extract.FileActionManager.FileProcessors
             this._panToolStripMenuItem.ShortcutKeyDisplayString = "";
             this._panToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             this._panToolStripMenuItem.Text = "P&an";
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.shortcutsToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "Help";
+            // 
+            // shortcutsToolStripMenuItem
+            // 
+            this.shortcutsToolStripMenuItem.Name = "shortcutsToolStripMenuItem";
+            this.shortcutsToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+            this.shortcutsToolStripMenuItem.Text = "Shortcuts";
+            this.shortcutsToolStripMenuItem.Click += new System.EventHandler(this.shortcutsToolStripMenuItem_Click);
             // 
             // _basicImageViewerToolStrip
             // 
@@ -724,49 +748,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._panToolStripButton.Name = "_panToolStripButton";
             this._panToolStripButton.Size = new System.Drawing.Size(36, 36);
             // 
-            // _highlightToolsToolStrip
-            // 
-            this._highlightToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this._highlightToolsToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this._highlightToolsToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._rectangularHighlightToolStripButton,
-            this._angularHighlightToolStripButton,
-            this._wordHighlightToolStripButton});
-            this._highlightToolsToolStrip.Location = new System.Drawing.Point(477, 24);
-            this._highlightToolsToolStrip.Name = "_highlightToolsToolStrip";
-            this._highlightToolsToolStrip.Size = new System.Drawing.Size(120, 39);
-            this._highlightToolsToolStrip.TabIndex = 4;
-            // 
-            // _rectangularHighlightToolStripButton
-            // 
-            this._rectangularHighlightToolStripButton.BaseToolTipText = "Swipe text in rectangular zone";
-            this._rectangularHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._rectangularHighlightToolStripButton.Enabled = false;
-            this._rectangularHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._rectangularHighlightToolStripButton.ImageViewer = null;
-            this._rectangularHighlightToolStripButton.Name = "_rectangularHighlightToolStripButton";
-            this._rectangularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
-            // 
-            // _angularHighlightToolStripButton
-            // 
-            this._angularHighlightToolStripButton.BaseToolTipText = "Swipe text in angular zone";
-            this._angularHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._angularHighlightToolStripButton.Enabled = false;
-            this._angularHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._angularHighlightToolStripButton.ImageViewer = null;
-            this._angularHighlightToolStripButton.Name = "_angularHighlightToolStripButton";
-            this._angularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
-            // 
-            // _wordHighlightToolStripButton
-            // 
-            this._wordHighlightToolStripButton.BaseToolTipText = "Swipe words(s)";
-            this._wordHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._wordHighlightToolStripButton.Enabled = false;
-            this._wordHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this._wordHighlightToolStripButton.ImageViewer = null;
-            this._wordHighlightToolStripButton.Name = "_wordHighlightToolStripButton";
-            this._wordHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
-            // 
             // _viewCommandsToolStrip
             // 
             this._viewCommandsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -784,7 +765,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._rotateCounterclockwiseToolStripButton,
             this._rotateClockwiseToolStripButton,
             toolStripSeparator10});
-            this._viewCommandsToolStrip.Location = new System.Drawing.Point(123, 24);
+            this._viewCommandsToolStrip.Location = new System.Drawing.Point(126, 24);
             this._viewCommandsToolStrip.Name = "_viewCommandsToolStrip";
             this._viewCommandsToolStrip.Size = new System.Drawing.Size(354, 39);
             this._viewCommandsToolStrip.TabIndex = 2;
@@ -903,6 +884,49 @@ namespace Extract.FileActionManager.FileProcessors
             toolStripSeparator10.Name = "toolStripSeparator10";
             toolStripSeparator10.Size = new System.Drawing.Size(6, 39);
             // 
+            // _highlightToolsToolStrip
+            // 
+            this._highlightToolsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._highlightToolsToolStrip.ImageScalingSize = new System.Drawing.Size(32, 32);
+            this._highlightToolsToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._rectangularHighlightToolStripButton,
+            this._angularHighlightToolStripButton,
+            this._wordHighlightToolStripButton});
+            this._highlightToolsToolStrip.Location = new System.Drawing.Point(484, 24);
+            this._highlightToolsToolStrip.Name = "_highlightToolsToolStrip";
+            this._highlightToolsToolStrip.Size = new System.Drawing.Size(120, 39);
+            this._highlightToolsToolStrip.TabIndex = 4;
+            // 
+            // _rectangularHighlightToolStripButton
+            // 
+            this._rectangularHighlightToolStripButton.BaseToolTipText = "Swipe text in rectangular zone";
+            this._rectangularHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._rectangularHighlightToolStripButton.Enabled = false;
+            this._rectangularHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._rectangularHighlightToolStripButton.ImageViewer = null;
+            this._rectangularHighlightToolStripButton.Name = "_rectangularHighlightToolStripButton";
+            this._rectangularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
+            // 
+            // _angularHighlightToolStripButton
+            // 
+            this._angularHighlightToolStripButton.BaseToolTipText = "Swipe text in angular zone";
+            this._angularHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._angularHighlightToolStripButton.Enabled = false;
+            this._angularHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._angularHighlightToolStripButton.ImageViewer = null;
+            this._angularHighlightToolStripButton.Name = "_angularHighlightToolStripButton";
+            this._angularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
+            // 
+            // _wordHighlightToolStripButton
+            // 
+            this._wordHighlightToolStripButton.BaseToolTipText = "Swipe words(s)";
+            this._wordHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this._wordHighlightToolStripButton.Enabled = false;
+            this._wordHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._wordHighlightToolStripButton.ImageViewer = null;
+            this._wordHighlightToolStripButton.Name = "_wordHighlightToolStripButton";
+            this._wordHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
+            // 
             // _advancedCommandsToolStrip
             // 
             this._advancedCommandsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -962,10 +986,10 @@ namespace Extract.FileActionManager.FileProcessors
             this._menuStrip.PerformLayout();
             this._basicImageViewerToolStrip.ResumeLayout(false);
             this._basicImageViewerToolStrip.PerformLayout();
-            this._highlightToolsToolStrip.ResumeLayout(false);
-            this._highlightToolsToolStrip.PerformLayout();
             this._viewCommandsToolStrip.ResumeLayout(false);
             this._viewCommandsToolStrip.PerformLayout();
+            this._highlightToolsToolStrip.ResumeLayout(false);
+            this._highlightToolsToolStrip.PerformLayout();
             this._advancedCommandsToolStrip.ResumeLayout(false);
             this._advancedCommandsToolStrip.PerformLayout();
             this.ResumeLayout(false);
@@ -1043,5 +1067,7 @@ namespace Extract.FileActionManager.FileProcessors
         private Imaging.Forms.WordHighlightToolStripButton _wordHighlightToolStripButton;
         private System.Windows.Forms.ToolStrip _advancedCommandsToolStrip;
         private System.Windows.Forms.ToolStripButton _toggleShowAllHighlightsButton;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem shortcutsToolStripMenuItem;
     }
 }
