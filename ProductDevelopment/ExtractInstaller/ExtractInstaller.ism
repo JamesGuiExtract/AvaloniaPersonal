@@ -327,7 +327,7 @@
 		<row><td>IDShieldHelp</td><td>{D0D6E5DA-8D44-45F0-8FDD-325E3C7EE9D6}</td><td>HELP</td><td>8</td><td/><td>idshield.chm</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldOnDemand.exe</td><td>{A37823A6-23A8-4DA3-9B9A-CB7214FD898B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldondemand.exe</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldOnDemandShortcut</td><td>{2076706E-8F56-4516-93C0-5ADBB4C8FC10}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>IDShieldReports</td><td>{EBD8982B-68E8-41A2-AF73-CC50371C0B4B}</td><td>REPORTS_IDSHIELD</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>IDShieldReports</td><td>{EBD8982B-68E8-41A2-AF73-CC50371C0B4B}</td><td>STANDARD_REPORTS1</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldStatisticsReporter.exe</td><td>{E4593422-EE49-4A44-94A0-0FC9C230817E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldstatisticsreporter.e</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISRegistryComponent</td><td>{BB5CF529-C4A7-46DD-AC5A-F35EB2E1E0E6}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>{B8FF0255-1CA6-48A0-8BD5-3CFB7A976086}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>interop.extractredactiontest</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -335,7 +335,7 @@
 		<row><td>LabDECppCC.dll</td><td>{54078BE4-C4A4-4FD6-8E5F-4DBAC7C61893}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>labdecppcc.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>LabDEFolder</td><td>{F8B0585C-259A-4172-8687-7838FC3DBF95}</td><td>LAB_DE</td><td>8</td><td/><td>alternatetestnamemanager.plu</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>LabDEHelp</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td>labde.chm</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>LabDEReports</td><td>{54169BEE-5EA8-44BD-A6E1-2AC7380B9DDA}</td><td>REPORTS_LABDE</td><td>8</td><td/><td>labde_high_effort_files_by_u</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>LabDEReports</td><td>{54169BEE-5EA8-44BD-A6E1-2AC7380B9DDA}</td><td>STANDARD_REPORTS</td><td>8</td><td/><td>labde_high_effort_files_by_u</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionCC.dll</td><td>{609DD8EB-6620-4A9E-AE69-452AE7A103C8}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>RedactionCC.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SDKComponents</td><td>{520CC137-57D4-420C-AF6E-B3F95C8BD13B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -489,6 +489,7 @@
 		<row><td>REPORTS_LABDE</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA</td><td>Reports</td><td/><td>0</td><td/></row>
 		<row><td>SQL_CE_EDITOR</td><td>ProgramFilesFolder</td><td>SQLCEE~1|SQL CE Editor</td><td/><td>0</td><td/></row>
 		<row><td>STANDARD_REPORTS</td><td>REPORTS</td><td>STANDA~1|Standard reports</td><td/><td>0</td><td/></row>
+		<row><td>STANDARD_REPORTS1</td><td>REPORTS_IDSHIELD</td><td>STANDA~1|Standard Reports</td><td/><td>0</td><td/></row>
 		<row><td>SendToFolder</td><td>TARGETDIR</td><td>.:SendTo</td><td/><td>3</td><td/></row>
 		<row><td>StartMenuFolder</td><td>TARGETDIR</td><td>.:STARTM~1|Start Menu</td><td/><td>3</td><td/></row>
 		<row><td>StartupFolder</td><td>TARGETDIR</td><td>.:StartUp</td><td/><td>3</td><td/></row>
