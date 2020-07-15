@@ -2231,7 +2231,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	CTime ct = CTime::GetCurrentTime();
 	mapDefaultValues[gstrETL_RESTART] = ct.Format(_T("%Y-%m-%dT%H:%M:%S")).operator LPCSTR();
 
-	mapDefaultValues[gstrDASHBOARD_INCLUDE_FILTER] = ".+";
+	mapDefaultValues[gstrDASHBOARD_INCLUDE_FILTER] = "";
 	mapDefaultValues[gstrDASHBOARD_EXCLUDE_FILTER] = "";
 
 	// Create a new database ID  or use existing if it has been set

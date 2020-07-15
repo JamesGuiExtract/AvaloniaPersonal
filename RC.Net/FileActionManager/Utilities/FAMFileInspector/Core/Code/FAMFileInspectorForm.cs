@@ -3761,11 +3761,11 @@ namespace Extract.FileActionManager.Utilities
                                                                         FileProcessingDB.DatabaseName,
                                                                         true).ToList();
 
-            var includeFilter = _fileProcessingDB.GetDBInfoSetting("DashboardIncludeFilter", false);
-            if (string.IsNullOrWhiteSpace(includeFilter))
-                includeFilter = ".+";
+            var includeFilter = _fileProcessingDB.GetDBInfoSetting("DashboardIncludeFilter", false) ?? "";
 
             var excludeFilter = _fileProcessingDB.GetDBInfoSetting("DashboardExcludeFilter", false);
+            if (string.IsNullOrWhiteSpace(excludeFilter))
+                excludeFilter = "(?!)";
 
             return dashboards.FilterWithRegex(includeFilter, excludeFilter, d => d.SourceName)
                 .OrderBy(d => d.IsFile)
