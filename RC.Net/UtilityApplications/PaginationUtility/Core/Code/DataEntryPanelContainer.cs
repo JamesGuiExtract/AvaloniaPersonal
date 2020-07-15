@@ -462,6 +462,26 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// <c>true</c> indicates the next tab navigation should be trigger the <see cref="NavigatedOut"/>
+        /// event.
+        /// </summary>
+        public bool NavigateOutPending
+        {
+            get
+            {
+                return ActiveDataEntryPanel?.NavigateOutPending == true;
+            }
+
+            set
+            {
+                if (ActiveDataEntryPanel != null)
+                {
+                    ActiveDataEntryPanel.NavigateOutPending = value;
+                }
+            }
+        }        
+
+        /// <summary>
         /// Loads the specified <see paramref="data" />.
         /// </summary>
         /// <param name="data">The data to load.</param>

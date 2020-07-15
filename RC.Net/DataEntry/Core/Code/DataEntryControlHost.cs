@@ -744,6 +744,11 @@ namespace Extract.DataEntry
         /// </summary>
         Icon _blankIcon;
 
+        /// <summary>
+        /// Indicates the next tab navigation should be trigger the <see cref="NavigatedOut"/> event.
+        /// </summary>
+        bool _navigateOutPending;
+
         #endregion Fields
 
         #region Delegates
@@ -1465,6 +1470,23 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// <c>true</c> indicates the next tab navigation should be trigger the <see cref="NavigatedOut"/>
+        /// event.
+        /// </summary>
+        public bool NavigateOutPending
+        {
+            get
+            {
+                return _navigateOutPending && NavigatedOut != null;
+            }
+
+            set
+            {
+                _navigateOutPending = value && NavigatedOut != null;
+            }
+        }
+
         #endregion Properties
 
         #region IImageViewerControl Members
@@ -1911,8 +1933,8 @@ namespace Extract.DataEntry
                     _controlUpdateReferenceCount = 0;
                     _refreshActiveControlHighlights = false;
                     _dirty = false;
-
                     _changingData = false;
+                    NavigateOutPending = false;
 
                     if (imageIsAvailable)
                     {
@@ -5830,6 +5852,18 @@ namespace Extract.DataEntry
             // depend on an auto-update.
             AttributeStatusInfo.EndEdit();
 
+            // If NavigateOutPending, once tab navigation is used again, execute the pending NavigatedOut
+            // call or reset it.
+            if (NavigateOutPending)
+            {
+                NavigateOutPending = false;
+                if (_isDocumentLoaded && forward)
+                {
+                    NavigatedOut?.Invoke(this, new EventArgs());
+                }
+                return;
+            }
+
             // Tab navigation should loop if there is no handler to process tabbing out of DEP.
             bool tabLoop = NavigatedOut == null;
             IAttribute originalActiveAttribute = GetActiveAttribute(!forward);
@@ -5857,10 +5891,10 @@ namespace Extract.DataEntry
                     // the NavigatedOut event, raise the event to allow it to assume control of tab navigation
                     if (NavigatedOut != null
                         && _isDocumentLoaded
-                        && forward
-                        && GetNextUnviewedAttribute(tabStopsOnly: true) == null)
+                        && forward)
                     {
                         NavigatedOut?.Invoke(this, new EventArgs());
+                        return;
                     }
                 }
                 else

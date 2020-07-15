@@ -1091,6 +1091,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         DocumentDataPanelNavigatedOut?.Invoke(this, new EventArgs());
                     }
+                    else
+                    {
+                        // Inform the panel that once the user uses tab navigation again, NavigatedOut
+                        // should be raised.
+                        documentDataPanel.NavigateOutPending = true;
+                    }
                 }
                 else
                 {
