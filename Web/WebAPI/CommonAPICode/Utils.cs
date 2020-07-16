@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Caching;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
@@ -446,5 +448,62 @@ namespace WebAPI
                 throw ex.AsExtract("ELI49579");
             }
         }
+
+        /// <summary>
+        /// Gets or creates an object based on source paths and a creator function
+        /// </summary>
+        /// <typeparam name="T">The type of the cached object</typeparam>
+        /// <param name="creator">A function to create the cached object</param>
+        /// <param name="paths">The paths of the files that the cached object is derived from</param>
+        /// <param name="slidingExpiration">The time after last access before the cache entry is removed</param>
+        /// <param name="removedCallback">A function that will be called when the cache entry is removed</param>
+        public static T GetCachedObject<T>(Func<T> creator, IEnumerable<string> paths,
+            TimeSpan? slidingExpiration = null,
+            CacheEntryRemovedCallback removedCallback = null)
+            where T : class
+        {
+            try
+            {
+                List<string> monitorPaths = new List<string>();
+                List<string> etfPaths = new List<string>();
+
+                string key = typeof(T).AssemblyQualifiedName;
+                foreach (var p in paths.OrderBy(p=>p))
+                {
+                    string fullPath = Path.GetFullPath(p);
+                    key += fullPath;
+                    monitorPaths.Add(fullPath);
+                }
+
+                var cache = MemoryCache.Default;
+                if (!(cache.Get(key) is T result))
+                {
+                    var existingPaths = monitorPaths.Where(p => File.Exists(p)).ToList();
+                    ExtractException.Assert("ELI49948", "No file found", existingPaths.Count > 0,
+                        "Paths", string.Join(", ", paths));
+                    CacheItemPolicy policy = new CacheItemPolicy();
+                    policy.ChangeMonitors.Add(new HostFileChangeMonitor(existingPaths));
+
+                    if (slidingExpiration.HasValue)
+                    {
+                        policy.SlidingExpiration = slidingExpiration.Value;
+                    }
+                    if (removedCallback != null)
+                    {
+                        policy.RemovedCallback = removedCallback;
+                    }
+
+                    result = creator();
+                    cache.Set(key, result, policy);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI49949");
+            }
+        }
+
     }
 }

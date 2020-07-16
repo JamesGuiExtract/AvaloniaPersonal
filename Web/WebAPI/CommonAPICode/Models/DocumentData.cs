@@ -22,6 +22,7 @@ using ComAttribute = UCLID_AFCORELib.Attribute;
 using EActionStatus = UCLID_FILEPROCESSINGLib.EActionStatus;
 using System.Text.RegularExpressions;
 using System.Linq;
+using org.apache.pdfbox.pdmodel;
 
 namespace WebAPI.Models
 {
@@ -2331,8 +2332,13 @@ namespace WebAPI.Models
 
         private static byte[] GetPageFromPdf(string pdfFileName, int pageNumber)
         {
-            using (var entireDoc = org.apache.pdfbox.pdmodel.PDDocument.load(new java.io.File(pdfFileName)))
-            using (var pageDoc = new org.apache.pdfbox.pdmodel.PDDocument())
+            var entireDoc = GetCachedObject(
+                creator: () => PDDocument.load(new java.io.File(pdfFileName)),
+                paths: new[] { pdfFileName },
+                slidingExpiration: TimeSpan.FromMinutes(1),
+                removedCallback: entry => ((PDDocument)entry.CacheItem.Value).close());
+
+            using (var pageDoc = new PDDocument())
             using (var pageStream = new java.io.ByteArrayOutputStream())
             {
                 pageDoc.addPage(entireDoc.getPage(pageNumber - 1));
