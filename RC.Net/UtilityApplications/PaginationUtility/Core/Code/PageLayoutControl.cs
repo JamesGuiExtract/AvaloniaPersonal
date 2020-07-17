@@ -4477,7 +4477,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else if (previousControlDocument != currentDocument && DocumentInDataEdit != null)
                 {
                     _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
-                    DocumentDataPanel.EnsureFieldSelection();
+                    DocumentDataPanel.EnsureFieldSelection(resetToFirstField: false);
                     DocumentDataPanel.ActiveDataControl?.Focus();
                 }
                 // No previous documents; ensure the panel is scrolled all the way up so the first document is showing.

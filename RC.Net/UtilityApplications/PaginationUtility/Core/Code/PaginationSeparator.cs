@@ -576,7 +576,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // Ensure this control gets sized based upon the added _documentDataPanelControl.
                         PerformLayout();
 
-                        DocumentDataPanel.EnsureFieldSelection();
+                        DocumentDataPanel.EnsureFieldSelection(resetToFirstField: true);
                     }
                 }
             }
@@ -629,7 +629,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     var activeDataPanel = ((DataEntryPanelContainer)documentDataPanel).ActiveDataEntryPanel;
-                    activeDataPanel.EnsureFieldSelection();
+                    activeDataPanel.EnsureFieldSelection(resetToFirstField: false);
                     activeDataPanel.NavigatedOut -= HandleDEP_NavigatedOut;
 
                     // Report the DEP to be closed before it is removed so that events that trigger
@@ -1081,22 +1081,30 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Handles case when tab navigation reaches the last control in the DEP. At this point, DEP
         /// data should be saved and navigation focus should be returned to the PageLayouControl.
         /// </summary>
-        void HandleDEP_NavigatedOut(object sender, EventArgs e)
+        void HandleDEP_NavigatedOut(object sender, NavigatedOutEventArgs e)
         {
             try
             {
                 if (IsDataPanelOpen)
                 {
                     var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
-                    if (documentDataPanel.SaveData(_outputDocument.DocumentData, validateData: true))
+
+                    if (e.Forward)
                     {
-                        DocumentDataPanelNavigatedOut?.Invoke(this, new EventArgs());
+                        if (documentDataPanel.SaveData(_outputDocument.DocumentData, validateData: true))
+                        {
+                            DocumentDataPanelNavigatedOut?.Invoke(this, new EventArgs());
+                        }
+                        else
+                        {
+                            // Inform the panel that once the user uses tab navigation again, NavigatedOut
+                            // should be raised.
+                            documentDataPanel.PendingNavigateOutEventArgs = e;
+                        }
                     }
                     else
                     {
-                        // Inform the panel that once the user uses tab navigation again, NavigatedOut
-                        // should be raised.
-                        documentDataPanel.NavigateOutPending = true;
+                        CloseDataPanel(saveData: true, validateData: false);
                     }
                 }
                 else

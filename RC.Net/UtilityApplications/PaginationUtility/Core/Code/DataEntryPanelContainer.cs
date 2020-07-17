@@ -462,21 +462,21 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// <c>true</c> indicates the next tab navigation should be trigger the <see cref="NavigatedOut"/>
-        /// event.
+        /// <see cref="NavigatedOutEventArgs"/> indicating a deferred <see cref="NavigatedOut"/>
+        /// event that should be executed on the next tab navigation operation.
         /// </summary>
-        public bool NavigateOutPending
+        public NavigatedOutEventArgs PendingNavigateOutEventArgs
         {
             get
             {
-                return ActiveDataEntryPanel?.NavigateOutPending == true;
+                return ActiveDataEntryPanel?.PendingNavigateOutEventArgs;
             }
 
             set
             {
                 if (ActiveDataEntryPanel != null)
                 {
-                    ActiveDataEntryPanel.NavigateOutPending = value;
+                    ActiveDataEntryPanel.PendingNavigateOutEventArgs = value;
                 }
             }
         }        
@@ -707,11 +707,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Ensures a field is selected by selecting the first field if necessary.
         /// </summary>
-        public void EnsureFieldSelection()
+        /// <param name="resetToFirstField"><c>true</c> to select the first field regardless of any
+        /// active selection.</param>
+        public void EnsureFieldSelection(bool resetToFirstField)
         {
             try
             {
-                ActiveDataEntryPanel?.EnsureFieldSelection();
+                ActiveDataEntryPanel?.EnsureFieldSelection(resetToFirstField);
             }
             catch (Exception ex)
             {

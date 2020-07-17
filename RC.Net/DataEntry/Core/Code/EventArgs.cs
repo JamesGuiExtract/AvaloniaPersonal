@@ -955,4 +955,27 @@ namespace Extract.DataEntry
             get;
         }
     }
+
+    /// <summary>
+    /// Event arguments for <see cref="DataEntryControlHost.NavigatedOut"/>
+    /// </summary>
+    public class NavigatedOutEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new <see cref="NavigatedOutEventArgs"/> instance.
+        /// </summary>
+        /// <param name="forward"><c>true</c> if navigating forward out of the DEP; <c>false</c> if navigating backward.</param>
+        public NavigatedOutEventArgs(bool forward)
+        {
+            Forward = forward;
+        }
+
+        /// <summary>
+        /// <c>true</c> if navigating forward out of the DEP; <c>false</c> if navigating backward.
+        /// </summary>
+        public bool Forward
+        {
+            get;
+        }
+    }
 }

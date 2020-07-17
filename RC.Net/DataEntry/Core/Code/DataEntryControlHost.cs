@@ -745,9 +745,10 @@ namespace Extract.DataEntry
         Icon _blankIcon;
 
         /// <summary>
-        /// Indicates the next tab navigation should be trigger the <see cref="NavigatedOut"/> event.
+        /// Indicates a deferred <see cref="NavigatedOut"/> event that should be executed on the next
+        /// tab navigation operation.
         /// </summary>
-        bool _navigateOutPending;
+        NavigatedOutEventArgs _pendingNavigateOutEventArgs;
 
         #endregion Fields
 
@@ -1471,19 +1472,19 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// <c>true</c> indicates the next tab navigation should be trigger the <see cref="NavigatedOut"/>
-        /// event.
+        /// <see cref="NavigatedOutEventArgs"/> indicating a deferred <see cref="NavigatedOut"/>
+        /// event that should be executed on the next tab navigation operation.
         /// </summary>
-        public bool NavigateOutPending
+        public NavigatedOutEventArgs PendingNavigateOutEventArgs
         {
             get
             {
-                return _navigateOutPending && NavigatedOut != null;
+                return _pendingNavigateOutEventArgs;
             }
 
             set
             {
-                _navigateOutPending = value && NavigatedOut != null;
+                _pendingNavigateOutEventArgs = value;
             }
         }
 
@@ -1934,7 +1935,7 @@ namespace Extract.DataEntry
                     _refreshActiveControlHighlights = false;
                     _dirty = false;
                     _changingData = false;
-                    NavigateOutPending = false;
+                    _pendingNavigateOutEventArgs = null;
 
                     if (imageIsAvailable)
                     {
@@ -2895,16 +2896,28 @@ namespace Extract.DataEntry
         /// <summary>
         /// Ensures a field is selected by selecting the first field if necessary.
         /// </summary>
-        public void EnsureFieldSelection()
+        /// <param name="resetToFirstField"><c>true</c> to select the first field regardless of any
+        /// active selection.</param>
+        public void EnsureFieldSelection(bool resetToFirstField)
         {
             try
             {
-                Stack<IAttribute> currentlySelectedAttribute = ActiveAttributeGenealogy(true, null);
-                if (currentlySelectedAttribute == null || !currentlySelectedAttribute.Any())
+                if (resetToFirstField)
                 {
-                    AdvanceToNextTabStop(true);
-                    OnItemSelectionChanged();
+                    _activeDataControl?.IndicateActive(false, ActiveSelectionColor);
+                    _activeDataControl = null;
                 }
+                else
+                {
+                    var selectedAttribute = ActiveAttributeGenealogy(true, null);
+                    if (selectedAttribute?.Any() == true)
+                    {
+                        return;
+                    }
+                }
+
+                AdvanceToNextTabStop(true);
+                OnItemSelectionChanged();
             }
             catch (Exception ex)
             {
@@ -2994,11 +3007,12 @@ namespace Extract.DataEntry
         public event EventHandler<DataEntryControlEventArgs> ControlUnregistered;
 
         /// <summary>
-        /// Raised when tab navigation reaches the last control; if handled, the application hosting the
-        /// DEP should implement the UI response to the navigation. If not handled, focus will loop back
-        /// to the top of the DEP.
+        /// Raised when forward tab navigation is activated on the last tab stop or shift+tab navigation
+        /// is activated on the first; if handled, the application hosting the DEP should implement the
+        /// UI response to the navigation. If not handled, focus will loop around to the first/last tab
+        /// stop of the DEP.
         /// </summary>
-        public event EventHandler<EventArgs> NavigatedOut;
+        public event EventHandler<NavigatedOutEventArgs> NavigatedOut;
 
         #endregion Events
 
@@ -3087,6 +3101,13 @@ namespace Extract.DataEntry
                 base.OnEnter(e);
 
                 _regainingFocus = true;
+
+                // https://extract.atlassian.net/browse/ISSUE-17127
+                // The panel may not have been able to track all shift/tab key changes in the case
+                // that is was closed in the Pagination UI
+                // Re-initialize shift/tab key status every time focus is regained in the DEP.
+                _shiftKeyDown = ModifierKeys.HasFlag(Keys.Shift);
+                _tabKeyDown = ModifierKeys.HasFlag(Keys.Tab);
 
                 // https://extract.atlassian.net/browse/ISSUE-13981
                 // Ensure _regainingFocus only remains set for the duration of the action that
@@ -5852,16 +5873,17 @@ namespace Extract.DataEntry
             // depend on an auto-update.
             AttributeStatusInfo.EndEdit();
 
-            // If NavigateOutPending, once tab navigation is used again, execute the pending NavigatedOut
-            // call or reset it.
-            if (NavigateOutPending)
+            // If there are _pendingNavigateOutEventArgs, once tab navigation is used again, execute
+            // the pending NavigatedOut call or reset it.
+            if (_pendingNavigateOutEventArgs != null)
             {
-                NavigateOutPending = false;
-                if (_isDocumentLoaded && forward)
+                bool? pendingForward = _pendingNavigateOutEventArgs?.Forward;
+                _pendingNavigateOutEventArgs = null;
+                if (_isDocumentLoaded && (forward == pendingForward))
                 {
-                    NavigatedOut?.Invoke(this, new EventArgs());
+                    NavigatedOut?.Invoke(this, new NavigatedOutEventArgs(pendingForward.Value));
+                    return;
                 }
-                return;
             }
 
             // Tab navigation should loop if there is no handler to process tabbing out of DEP.
@@ -5890,10 +5912,9 @@ namespace Extract.DataEntry
                     // If no further tab stops were found and the hosting application has registered for
                     // the NavigatedOut event, raise the event to allow it to assume control of tab navigation
                     if (NavigatedOut != null
-                        && _isDocumentLoaded
-                        && forward)
+                        && _isDocumentLoaded)
                     {
-                        NavigatedOut?.Invoke(this, new EventArgs());
+                        NavigatedOut?.Invoke(this, new NavigatedOutEventArgs(forward));
                         return;
                     }
                 }

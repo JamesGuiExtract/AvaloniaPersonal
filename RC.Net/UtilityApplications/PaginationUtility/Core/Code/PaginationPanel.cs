@@ -3482,7 +3482,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         doc.DocumentData != null && doc.DocumentData.Modified);
                     bool documentCopyExists = nonEmptyDocs.Count > _originalDocuments.Count();
 
-                    bool dataEntryPanelOpen = DocumentDataPanel.ActiveDataControl != null;
+                    bool dataEntryPanelOpen = DocumentDataPanel?.ActiveDataControl != null;
 
                     // Removed check of doc.PaginationSuggested here so that auto-rotated images can also
                     // register as if it is a pagination suggestion in terms of reverting.

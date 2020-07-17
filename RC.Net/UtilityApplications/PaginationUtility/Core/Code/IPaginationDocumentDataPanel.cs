@@ -116,10 +116,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// <c>true</c> indicates the next tab navigation should be trigger the <see cref="NavigatedOut"/>
-        /// event.
+        /// <see cref="NavigatedOutEventArgs"/> indicating a deferred <see cref="NavigatedOut"/>
+        /// event that should be executed on the next tab navigation operation.
         /// </summary>
-        bool NavigateOutPending
+        NavigatedOutEventArgs PendingNavigateOutEventArgs
         {
             get;
             set;
@@ -228,7 +228,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Ensures a field is selected by selecting the first field if necessary.
         /// </summary>
-        void EnsureFieldSelection();
+        /// <param name="resetToFirstField"><c>true</c> to select the first field regardless of any
+        /// active selection.</param>
+        void EnsureFieldSelection(bool resetToFirstField);
 
         /// <summary>
         /// Performs an undo operation.
