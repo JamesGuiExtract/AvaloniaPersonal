@@ -49,7 +49,8 @@ volatile long CAFUtility::ms_nNextProfilerHandle = 0;
 // CAFUtility
 //-------------------------------------------------------------------------------------------------
 CAFUtility::CAFUtility()
-: ma_pUserCfgMgr(new RegistryPersistenceMgr(HKEY_CURRENT_USER, gstrAF_REG_ROOT_FOLDER_PATH))
+: ma_pUserCfgMgr(make_unique<RegistryPersistenceMgr>(HKEY_CURRENT_USER, gstrAF_REG_ROOT_FOLDER_PATH))
+, ma_pMachineCfgMgr(make_unique<RegistryPersistenceMgr>(HKEY_LOCAL_MACHINE, gstrAF_REG_ROOT_FOLDER_PATH))
 , m_ipMiscUtils(CLSID_MiscUtils)
 , m_ipEngine(CLSID_AttributeFinderEngine)
 , m_ipParser(__nullptr)
@@ -57,6 +58,7 @@ CAFUtility::CAFUtility()
 	try
 	{
 		ASSERT_RESOURCE_ALLOCATION("ELI19181", ma_pUserCfgMgr.get() != __nullptr );
+		ASSERT_RESOURCE_ALLOCATION("ELI49951", ma_pMachineCfgMgr.get() != __nullptr );
 		ASSERT_RESOURCE_ALLOCATION("ELI07623", m_ipMiscUtils != __nullptr);
 		ASSERT_RESOURCE_ALLOCATION("ELI32488", m_ipEngine != __nullptr);
 		m_strINIFileName = getModuleDirectory(_Module.m_hInst);
@@ -849,20 +851,23 @@ STDMETHODIMP CAFUtility::get_ShouldCacheRSD(VARIANT_BOOL *pvbCacheRSD)
 	try
 	{	
 		// Check if the registry setting exists
-		if (ma_pUserCfgMgr->keyExists(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY))
+		if (ma_pMachineCfgMgr->keyExists(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY))
 		{
 			// Check the registry setting
-			string strValue = ma_pUserCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER,
+			string strValue = ma_pMachineCfgMgr->getKeyValue(gstrAF_REG_SETTINGS_FOLDER,
 				gstrAF_CACHE_RSD_KEY, gstrAF_DEFAULT_CACHE_RSD);
 			*pvbCacheRSD = asVariantBool(strValue == "1");
 		}
 		else
 		{
-			// Default to disabling RSD caching [FIDSC #3979]
-			ma_pUserCfgMgr->createKey(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY,
+			// Default to enabling RSD caching (https://extract.atlassian.net/browse/ISSUE-17019)
+			ma_pMachineCfgMgr->createKey(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY,
 				gstrAF_DEFAULT_CACHE_RSD);
 			*pvbCacheRSD = asVariantBool(asCppBool(gstrAF_DEFAULT_CACHE_RSD));
 		}
+
+		// Per ISSUE-17019, The old key should be deleted to help avoid confusion as to which setting is controlling behavior
+		ma_pUserCfgMgr->deleteKey(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY);
 
 		return S_OK;
 	}	

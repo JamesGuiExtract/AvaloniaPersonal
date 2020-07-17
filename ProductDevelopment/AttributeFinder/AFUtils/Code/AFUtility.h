@@ -365,8 +365,11 @@ private:
 	// The handle to assign to the next profiling call.
 	volatile static long ms_nNextProfilerHandle;
 
-	// Handles registry settings
+	// Handles current user registry settings
 	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+
+	// Handles local machine registry settings
+	unique_ptr<IConfigurationSettingsPersistenceMgr> ma_pMachineCfgMgr;
 
 	// pointer to the utility object that deals with encryption
 	IMiscUtilsPtr m_ipMiscUtils;

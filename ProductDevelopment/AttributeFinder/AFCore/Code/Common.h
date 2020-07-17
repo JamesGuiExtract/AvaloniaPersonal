@@ -18,7 +18,7 @@ const std::string gstrAF_AFCORE_KEY = "AFCore";
 const std::string gstrAF_AFCORE_KEY_PATH = gstrAF_REG_ROOT_FOLDER_PATH + std::string("\\") + gstrAF_AFCORE_KEY;
 
 const std::string gstrAF_CACHE_RSD_KEY = "CacheRSD";
-const std::string gstrAF_DEFAULT_CACHE_RSD = "0";
+const std::string gstrAF_DEFAULT_CACHE_RSD = "1";
 
 const std::string gstrRULE_EXEC_ID_TAG_NAME = "RuleExecutionID";
 const std::string gstrRULE_EXEC_ID_TAG = "<" + gstrRULE_EXEC_ID_TAG_NAME + ">";
