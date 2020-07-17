@@ -3482,25 +3482,29 @@ namespace Extract.UtilityApplications.PaginationUtility
                         doc.DocumentData != null && doc.DocumentData.Modified);
                     bool documentCopyExists = nonEmptyDocs.Count > _originalDocuments.Count();
 
+                    bool dataEntryPanelOpen = DocumentDataPanel.ActiveDataControl != null;
+
                     // Removed check of doc.PaginationSuggested here so that auto-rotated images can also
                     // register as if it is a pagination suggestion in terms of reverting.
                     RevertToSuggestedEnabled =
                         nonEmptyDocs.Any(doc => isDocDataEdited || documentCopyExists || !doc.InOriginalForm);
-                    _revertToOriginalToolStripButton.Enabled = RevertToSuggestedEnabled;
+                    _revertToOriginalToolStripButton.Enabled = RevertToSuggestedEnabled && !dataEntryPanelOpen;
 
                     RevertToSourceEnabled = !_displayedDocuments.Any(doc => doc.OutputProcessed) &&
                         (isDocDataEdited || documentCopyExists || nonEmptyDocs.Any(doc => !doc.InSourceDocForm));
-                    _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled;
+                    _revertToSourceToolStripButton.Enabled = RevertToSourceEnabled && !dataEntryPanelOpen;
 
                     _saveToolStripButton.Enabled = PendingDocuments.Any();
-                    _submitToolStripButton.Enabled = CommitEnabled;
+                    _submitToolStripButton.Enabled = CommitEnabled && !dataEntryPanelOpen;
                     _collapseAllToolStripButton.Image =
                         AllDocumentsCollapsed
                             ? Properties.Resources.Expand
                             : Properties.Resources.Collapse;
+                    _collapseAllToolStripButton.Enabled = !dataEntryPanelOpen;
+                    
                     if (CommitOnlySelection)
                     {
-                        _selectAllToCommitCheckBox.Enabled = PendingDocuments.Any();
+                        _selectAllToCommitCheckBox.Enabled = PendingDocuments.Any() && !dataEntryPanelOpen;
                         _selectAllToCommitCheckBox.Checked = AllDocumentsSelected;
                     }
                 }
