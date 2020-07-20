@@ -197,7 +197,7 @@ namespace Extract.UtilityApplications.MachineLearning
 
                 var modelName = _modelNameComboBox.Text;
                 _modelNameComboBox.Focus();
-                ExtractException.Assert("ELI45127", "Model name is undefined", ValidateModel(), "Model name", modelName);
+                ExtractException.Assert("ELI50055", "Model name is undefined", ValidateModel(), "Model name", modelName);
 
                 var attributeSet = _attributeSetNameComboBox.Text;
                 _attributeSetNameComboBox.Focus();

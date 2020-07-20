@@ -39,12 +39,12 @@ namespace WebAPI.Controllers
         {
             try
             {
-                HTTPError.AssertRequest("ELI45196", file != null, "Null file has been submitted");
-                HTTPError.AssertRequest("ELI45197", file.Length > 0, "Zero length file has been submitted");
-                HTTPError.AssertRequest("ELI45198", !string.IsNullOrWhiteSpace(file.FileName), "Empty filename");
+                HTTPError.AssertRequest("ELI50007", file != null, "Null file has been submitted");
+                HTTPError.AssertRequest("ELI50008", file.Length > 0, "Zero length file has been submitted");
+                HTTPError.AssertRequest("ELI50009", !string.IsNullOrWhiteSpace(file.FileName), "Empty filename");
 
                 var fileStream = file.OpenReadStream();
-                HTTPError.Assert("ELI46331", fileStream != null, "Null filestream");
+                HTTPError.Assert("ELI50010", fileStream != null, "Null filestream");
 
                 using (var data = new DocumentData(User, requireSession: true))
                 {
@@ -67,7 +67,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI43654");
+                return this.GetAsHttpError(ex, "ELI50011");
             }
         }
 
@@ -92,15 +92,15 @@ namespace WebAPI.Controllers
             {
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    data.AssertRequestFileId("ELI45191", Id);
-                    data.AssertFileExists("ELI45192", Id);
+                    data.AssertRequestFileId("ELI50012", Id);
+                    data.AssertFileExists("ELI50013", Id);
 
                     var fileName = data.GetSourceFileName(Id);
                     var fileContentType = FileContentType(fileName);
                     var fileDownloadName = Path.GetFileName(fileName);
                     fileDownloadName = RemoveGUIDFromName(fileDownloadName);
 
-                    HTTPError.Assert("ELI46359", !String.IsNullOrWhiteSpace(fileDownloadName),
+                    HTTPError.Assert("ELI50014", !String.IsNullOrWhiteSpace(fileDownloadName),
                         "Failed to parse download filename", ("Filename", fileName, false));
 
                     return PhysicalFile(fileName, fileContentType, fileDownloadName);
@@ -108,7 +108,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI43656");
+                return this.GetAsHttpError(ex, "ELI50015");
             }
         }
 
@@ -134,7 +134,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI43656");
+                return this.GetAsHttpError(ex, "ELI50016");
             }
         }
 
@@ -152,7 +152,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                HTTPError.AssertRequest("ELI45194", !string.IsNullOrEmpty(textData),
+                HTTPError.AssertRequest("ELI50017", !string.IsNullOrEmpty(textData),
                     "Submitted text is empty");
 
                 using (var data = new DocumentData(User, requireSession: true))
@@ -176,7 +176,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI43655");
+                return this.GetAsHttpError(ex, "ELI50018");
             }
         }
 
@@ -200,7 +200,7 @@ namespace WebAPI.Controllers
             {
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    data.AssertRequestFileId("ELI46279", Id);
+                    data.AssertRequestFileId("ELI50019", Id);
 
                     var textResult = data.GetText(Id);
 
@@ -209,7 +209,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI46280");
+                return this.GetAsHttpError(ex, "ELI50020");
             }
         }
 
@@ -229,7 +229,7 @@ namespace WebAPI.Controllers
             {
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    data.AssertRequestFileId("ELI45193", Id);
+                    data.AssertRequestFileId("ELI50021", Id);
 
                     var result = data.GetStatus(Id);
                     return Ok(result);
@@ -237,7 +237,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI43652");
+                return this.GetAsHttpError(ex, "ELI50022");
             }
         }
 
@@ -264,7 +264,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI46274");
+                return this.GetAsHttpError(ex, "ELI50023");
             }
         }
 
@@ -286,14 +286,14 @@ namespace WebAPI.Controllers
             {
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    data.AssertRequestFileId("ELI46305", Id);
+                    data.AssertRequestFileId("ELI50024", Id);
 
                     return Ok(data.GetText(Id, Page));
                 }
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI46306");
+                return this.GetAsHttpError(ex, "ELI50025");
             }
         }
 
@@ -321,7 +321,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI45357");
+                return this.GetAsHttpError(ex, "ELI50026");
             }
         }
 
@@ -342,7 +342,7 @@ namespace WebAPI.Controllers
             {
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    data.AssertRequestFileId("ELI45205", Id);
+                    data.AssertRequestFileId("ELI50027", Id);
 
                     var result = data.GetDocumentType(Id);
                     return Ok(result);
@@ -350,7 +350,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI43659");
+                return this.GetAsHttpError(ex, "ELI50028");
             }
         }
 
@@ -371,7 +371,7 @@ namespace WebAPI.Controllers
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    data.AssertRequestFileId("ELI45199", Id);
+                    data.AssertRequestFileId("ELI50029", Id);
 
                     var result = data.GetDocumentData( Id, includeNonSpatial: true,
                         verboseSpatialData: true, splitMultiPageAttributes: false, cacheData: false);
@@ -381,7 +381,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI43653");
+                return this.GetAsHttpError(ex, "ELI50030");
             }
         }
 
@@ -402,7 +402,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                this.AssertModel("ELI46284");
+                this.AssertModel("ELI50031");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(User, requireSession: true))
@@ -432,7 +432,7 @@ namespace WebAPI.Controllers
                         }
                         catch { }
 
-                        throw ex.AsExtract("ELI46286");
+                        throw ex.AsExtract("ELI50032");
                     }
 
                     return NoContent();
@@ -440,7 +440,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI43653");
+                return this.GetAsHttpError(ex, "ELI50033");
             }
         }
 
@@ -461,7 +461,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                this.AssertModel("ELI46317");
+                this.AssertModel("ELI50034");
 
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(User, requireSession: true))
@@ -489,7 +489,7 @@ namespace WebAPI.Controllers
                         }
                         catch { }
 
-                        throw ex.AsExtract("ELI46318");
+                        throw ex.AsExtract("ELI50035");
                     }
 
                     return NoContent();
@@ -497,7 +497,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI46319");
+                return this.GetAsHttpError(ex, "ELI50036");
             }
         }
 
@@ -523,10 +523,10 @@ namespace WebAPI.Controllers
             {
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    data.AssertRequestFileId("ELI45202", Id);
+                    data.AssertRequestFileId("ELI50037", Id);
 
                     var (filename, isError, errMessage) = data.GetResult(Id);
-                    HTTPError.Assert("ELI46417", StatusCodes.Status404NotFound,
+                    HTTPError.Assert("ELI50038", StatusCodes.Status404NotFound,
                         System.IO.File.Exists(filename),
                         "Output document not found", ("ID", Id, true));
 
@@ -534,7 +534,7 @@ namespace WebAPI.Controllers
                     var fileDownloadName = Path.GetFileName(filename);
                     fileDownloadName = RemoveGUIDFromName(fileDownloadName);
 
-                    HTTPError.Assert("ELI46360", !String.IsNullOrWhiteSpace(fileDownloadName),
+                    HTTPError.Assert("ELI50039", !String.IsNullOrWhiteSpace(fileDownloadName),
                         "Failed to parse download filename", ("Filename", filename, false));
 
                     return PhysicalFile(filename, fileContentType, fileDownloadName);
@@ -542,7 +542,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI43657");
+                return this.GetAsHttpError(ex, "ELI50040");
             }
         }
 
@@ -562,14 +562,14 @@ namespace WebAPI.Controllers
             {
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    data.AssertRequestFileId("ELI45204", Id);
+                    data.AssertRequestFileId("ELI50041", Id);
 
                     return Ok(data.GetTextResult(Id));
                 }
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI43658");
+                return this.GetAsHttpError(ex, "ELI50042");
             }
         }
 
@@ -589,10 +589,10 @@ namespace WebAPI.Controllers
         /// </remarks>
         static string FileContentType(string filename)
         {
-            HTTPError.Assert("ELI46361", !String.IsNullOrWhiteSpace(filename), "Missing filename");
+            HTTPError.Assert("ELI50043", !String.IsNullOrWhiteSpace(filename), "Missing filename");
 
             var ext = Path.GetExtension(filename);
-            HTTPError.Assert("ELI46362", !String.IsNullOrWhiteSpace(ext), "Missing file extension",
+            HTTPError.Assert("ELI50044", !String.IsNullOrWhiteSpace(ext), "Missing file extension",
                 ("Filename", filename, false));
 
             if (ext.IsEquivalent(".tif") || ext.IsEquivalent(".tiff"))

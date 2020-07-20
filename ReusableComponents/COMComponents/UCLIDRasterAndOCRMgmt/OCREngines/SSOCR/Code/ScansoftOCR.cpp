@@ -839,7 +839,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	EPageDecompositionMethod eDecompositionMethod[3];
 
 	IScansoftOCR2Ptr ipOcrEngine = getOCREngine();
-	ASSERT_RESOURCE_ALLOCATION("ELI25216", ipOcrEngine != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI49963", ipOcrEngine != __nullptr);
 
 	// Set the parameters (either from registry or parameters object)
 	// Re-apply the settings in case they have changed since the engine was created

@@ -1699,7 +1699,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
                         catch (Exception ex)
                         {
-                            var ee = ex.AsExtract("ELI45580");
+                            var ee = ex.AsExtract("ELI50068");
                             documentStatus.StringizedError = ee.AsStringizedByteStream();
                         }
 

@@ -566,7 +566,7 @@ namespace Extract.UtilityApplications.MachineLearning
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45724");
+                throw ex.AsExtract("ELI50073");
             }
         }
 
@@ -896,7 +896,7 @@ namespace Extract.UtilityApplications.MachineLearning
             {
                 if (Version > _CURRENT_VERSION)
                 {
-                    ExtractException ee = new ExtractException("ELI45712", "Settings were saved with a newer version.");
+                    ExtractException ee = new ExtractException("ELI50072", "Settings were saved with a newer version.");
                     ee.AddDebugData("SavedVersion", Version, false);
                     ee.AddDebugData("CurrentVersion", _CURRENT_VERSION, false);
                     throw ee;

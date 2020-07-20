@@ -744,7 +744,7 @@ namespace Extract.Utilities.Parsers
                             case "FINDIFXOF":
                                 if (!uint.TryParse(val, out _findIfXOfRequirement))
                                 {
-                                    var parseException = new ExtractException("ELI41703",
+                                    var parseException = new ExtractException("ELI49994",
                                         "Could not parse FindIfXOf value (expected a positive integer)");
                                     parseException.AddDebugData("Value", val, true);
                                     throw parseException;

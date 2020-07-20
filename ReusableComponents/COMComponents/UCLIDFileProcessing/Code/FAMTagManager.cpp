@@ -522,7 +522,7 @@ STDMETHODIMP CFAMTagManager::raw_ExpandFunction(BSTR bstrFunctionName, IVariantV
 		}
 		else if(_strcmpi(strFunctionName.c_str(), strATTRIBUTE.c_str()) == 0)
 		{
-			ASSERT_RUNTIME_CONDITION("ELI43495", ipArgs->Size == 3,
+			ASSERT_RUNTIME_CONDITION("ELI50006", ipArgs->Size == 3,
 				"The $" + strATTRIBUTE + " path tag function requires three arguments.");
 
 			_bstr_t bstrOutput = ipFAMDB->GetAttributeValue(

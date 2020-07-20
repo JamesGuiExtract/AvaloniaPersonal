@@ -317,7 +317,7 @@ namespace Extract.DataEntry.LabDE
 
                     if (!DataEntryApplication.RequestFile(newId))
                     {
-                        new ExtractException("ELI37565",
+                        new ExtractException("ELI49972",
                             "Specified current file is not available for processing.").Display();
                     }
                 }

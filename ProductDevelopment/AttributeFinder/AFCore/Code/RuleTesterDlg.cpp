@@ -1747,7 +1747,7 @@ void RuleTesterDlg::showMenuForSelectedAttribute()
 		pContextMenu->TrackPopupMenu( TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_RIGHTBUTTON, 
 			point.x, point.y, this );
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09386")
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI49956")
 }
 //-------------------------------------------------------------------------------------------------
 bool RuleTesterDlg::isAttributeUnderCursor()

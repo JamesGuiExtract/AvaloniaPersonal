@@ -187,7 +187,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45129");
+                throw ex.AsExtract("ELI50056");
             }
         }
 

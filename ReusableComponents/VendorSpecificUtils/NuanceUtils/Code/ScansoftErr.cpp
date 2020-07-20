@@ -13,7 +13,7 @@ void addPageSizeDebugInfo(UCLIDException& ue, HIMGFILE hImgFile, int iPageIndex)
 		RECERR rc = kRecGetImgFilePageInfo(0, hImgFile, iPageIndex, &imgInfo, NULL);
 		if (rc != REC_OK)
 		{
-			UCLIDException ue2("ELI18612", "Unable to get page size information.");
+			UCLIDException ue2("ELI49960", "Unable to get page size information.");
 			loadScansoftRecErrInfo(ue2, rc);
 			throw ue;
 		}

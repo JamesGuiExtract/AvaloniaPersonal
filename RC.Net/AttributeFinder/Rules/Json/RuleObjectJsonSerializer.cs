@@ -162,7 +162,7 @@ namespace Extract.AttributeFinder.Rules.Json
             }
             catch (Exception ex)
             {
-                var uex = new ExtractException("ELI49663", "Could not convert DTO to specified type!", ex);
+                var uex = new ExtractException("ELI50092", "Could not convert DTO to specified type!", ex);
                 uex.AddDebugData("DTO type", dtoType.Name);
                 uex.AddDebugData("Specified type", typeof(TDomain).Name);
                 throw uex;

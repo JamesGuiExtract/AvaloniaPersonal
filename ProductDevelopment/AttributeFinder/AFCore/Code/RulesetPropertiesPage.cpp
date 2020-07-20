@@ -376,7 +376,7 @@ void CRuleSetPropertiesPage::OnBnClickedBtnImportOcrParameters()
 			}
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45938");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI50079");
 }
 
 //-------------------------------------------------------------------------------------------------

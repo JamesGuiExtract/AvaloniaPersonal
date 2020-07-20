@@ -4838,7 +4838,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     throw ee;
                 }
 
-                ExtractException.Assert("ELI40385",
+                ExtractException.Assert("ELI49988",
                     "Cannot set pagination sources back to pending in same action",
                     sourceActionID != _actionId);
             }
@@ -4859,7 +4859,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     throw ee;
                 }
 
-                ExtractException.Assert("ELI40386",
+                ExtractException.Assert("ELI49989",
                     "Cannot set pagination output back to pending in same action",
                     outputActionID != _actionId);
             }

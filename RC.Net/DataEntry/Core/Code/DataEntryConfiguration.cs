@@ -686,7 +686,7 @@ namespace Extract.DataEntry
                 DataEntryControlHost dataEntryControlHost =
                     UtilityMethods.CreateTypeFromAssembly<DataEntryControlHost>(dataEntryPanelFileName);
 
-                ExtractException.Assert("ELI23676",
+                ExtractException.Assert("ELI49961",
                     "Failed to find data entry control host implementation!", dataEntryControlHost != null);
 
                 dataEntryControlHost.Config = Config;
@@ -697,7 +697,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI23677",
+                ExtractException ee = new ExtractException("ELI49962",
                     "Unable to initialize data entry control host!", ex);
                 throw ee;
             }

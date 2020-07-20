@@ -1260,7 +1260,7 @@ namespace Extract.Dashboard.Utilities
                     }
                     catch (Exception ex)
                     {
-                        exceptions.Add(ex.AsExtract("ELI35820"));
+                        exceptions.Add(ex.AsExtract("ELI49970"));
                     }
                 }
 
@@ -1280,7 +1280,7 @@ namespace Extract.Dashboard.Utilities
                         // making the quickly making the app appear hung. Aggregate a maximum of 10
                         // exceptions.
                         var exceptionsToAggregate = exceptions.Take(10).Union(new[] {
-                            new ExtractException("ELI35819",
+                            new ExtractException("ELI49969",
                                 string.Format(CultureInfo.CurrentCulture,
                                 "{0:D} file(s) failed {1}", exceptionCount, fileHanderItem.Name.Quote())) });
 
@@ -1302,7 +1302,7 @@ namespace Extract.Dashboard.Utilities
                 // UI thread is blocked.
                 _dashboardForm.Invoke((MethodInvoker)(() =>
                 {
-                    ex.ExtractDisplay("ELI35811");
+                    ex.ExtractDisplay("ELI49968");
                 }), null);
             }
         }

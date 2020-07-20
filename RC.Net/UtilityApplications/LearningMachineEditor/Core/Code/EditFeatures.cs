@@ -306,7 +306,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI41813");
+                ex.ExtractDisplay("ELI49996");
             }
         }
 
@@ -341,7 +341,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI41839");
+                ex.ExtractDisplay("ELI49997");
             }
         }
 

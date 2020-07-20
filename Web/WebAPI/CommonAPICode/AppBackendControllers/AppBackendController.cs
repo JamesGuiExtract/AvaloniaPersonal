@@ -556,8 +556,8 @@ namespace WebAPI.Controllers
                     ExtractException.Assert("ELI46703", "The supplied document ID doesn't match the open session's document ID",
                         docID == data.DocumentSessionFileId);
 
-                    data.AssertRequestFileId("ELI45172", docID);
-                    data.AssertFileExists("ELI45173", docID);
+                    data.AssertRequestFileId("ELI50057", docID);
+                    data.AssertFileExists("ELI50058", docID);
 
                     data.GetSourceFileName(docID);
                     var pagesInfo = data.GetPagesInfo(docID);
@@ -747,7 +747,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI45271");
+                return this.GetAsHttpError(ex, "ELI50062");
             }
         }
 

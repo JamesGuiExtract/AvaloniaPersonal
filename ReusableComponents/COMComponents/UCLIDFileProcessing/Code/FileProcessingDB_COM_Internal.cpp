@@ -2041,7 +2041,7 @@ int UpdateToSchemaVersion159(_ConnectionPtr ipConnection,
 
 		return nNewSchemaVersion;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45330");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50065");
 }
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion160(_ConnectionPtr ipConnection,
@@ -2310,7 +2310,7 @@ int UpdateToSchemaVersion167(_ConnectionPtr ipConnection,
 
 		return nNewSchemaVersion;
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46054");
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50080");
 }
 //-------------------------------------------------------------------------------------------------
 int UpdateToSchemaVersion168(_ConnectionPtr ipConnection,
@@ -7114,7 +7114,7 @@ bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked, VARIANT_B
 
 			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
 				getCachedWorkflowDefinition(ipConnection);
-			ASSERT_RESOURCE_ALLOCATION("ELI43187", ipWorkflowDefinition != __nullptr);
+			ASSERT_RESOURCE_ALLOCATION("ELI50004", ipWorkflowDefinition != __nullptr);
 
 			string strActionName = bForQueuing
 				? asString(ipWorkflowDefinition->StartAction)
@@ -12326,9 +12326,9 @@ bool CFileProcessingDB::LoadWebAppSettings_Internal(bool bDBLocked, long nWorkfl
 
 			*pbstrSettings = _bstr_t(strSettings.c_str()).Detach();
 
-			END_CONNECTION_RETRY(ipConnection, "ELI45060");
+			END_CONNECTION_RETRY(ipConnection, "ELI50052");
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45061");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50053");
 	}
 	catch (UCLIDException &ue)
 	{
@@ -12617,7 +12617,7 @@ bool CFileProcessingDB::AbortFAMSession_Internal(bool bDBLocked, long nFAMSessio
 
 			END_CONNECTION_RETRY(ipConnection, "ELI46241");
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45532");
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50067");
 	}
 	catch (UCLIDException &ue)
 	{
@@ -12901,7 +12901,7 @@ bool CFileProcessingDB::GetCachedFileTaskSessionData_Internal(bool bDBLocked, lo
 
 				if (!bFoundCacheData)
 				{
-					UCLIDException ue("ELI49539", "Unable to retrieve crucial cached data");
+					UCLIDException ue("ELI50091", "Unable to retrieve crucial cached data");
 					ue.addDebugInfo("SessionID", asString(nFileTaskSessionID), false);
 					ue.addDebugInfo("Page", asString(nPage), false);
 					throw ue;
@@ -12952,7 +12952,7 @@ bool CFileProcessingDB::GetCachedFileTaskSessionData_InternalHelper(ADODB::_Conn
 		replaceVariable(strCursorQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
 
 		_RecordsetPtr ipCachedDataRows(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI48308", ipCachedDataRows != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI50089", ipCachedDataRows != __nullptr);
 
 		ipCachedDataRows->Open(strCursorQuery.c_str(),
 			_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
@@ -13254,7 +13254,7 @@ bool CFileProcessingDB::GetUncommittedAttributeData_Internal(bool bDBLocked, lon
 	{
 		try
 		{
-			ASSERT_ARGUMENT("ELI41990", ppUncommittedPagesOfData != __nullptr);
+			ASSERT_ARGUMENT("ELI50000", ppUncommittedPagesOfData != __nullptr);
 
 			IIUnknownVectorPtr ipUncommittedPagesOfData(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI49526", ipUncommittedPagesOfData != __nullptr);

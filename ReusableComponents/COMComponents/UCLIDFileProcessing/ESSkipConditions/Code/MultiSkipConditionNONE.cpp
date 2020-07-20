@@ -277,7 +277,7 @@ STDMETHODIMP CMultiFAMConditionNONE::raw_CopyFrom(IUnknown *pObject)
 		ASSERT_RESOURCE_ALLOCATION("ELI13911", ipMultiFAMCond != __nullptr);
 
 		IPaginationConditionPtr ipPaginationCondition(pObject);
-		ASSERT_RESOURCE_ALLOCATION("ELI47153", ipPaginationCondition != __nullptr);
+		ASSERT_RESOURCE_ALLOCATION("ELI50088", ipPaginationCondition != __nullptr);
 		m_bIsPaginationCondition = asVariantBool(ipPaginationCondition->IsPaginationCondition);
 
 		// copy the vector of FAM conditions

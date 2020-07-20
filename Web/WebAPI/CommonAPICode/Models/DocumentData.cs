@@ -698,7 +698,7 @@ namespace WebAPI.Models
             try
             {
                 AssertDocumentSession("ELI49465");
-                AssertRequestFileId("ELI46349", fileId);
+                AssertRequestFileId("ELI50082", fileId);
 
                 FileApi.FileProcessingDB.CacheFileTaskSessionData(FileApi.DocumentSession.Id, page,
                     null, null, null, JsonConvert.SerializeObject(inputData), null, vbCrucialUpdate: true);
@@ -840,7 +840,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw CreateException(ex, "ELI44889", fileId);
+                throw CreateException(ex, "ELI50049", fileId);
             }
         }
 
@@ -1052,7 +1052,7 @@ namespace WebAPI.Models
             }
             catch (Exception ex)
             {
-                throw CreateException(ex, "ELI42124", fileId, page);
+                throw CreateException(ex, "ELI50003", fileId, page);
             }
             finally
             {

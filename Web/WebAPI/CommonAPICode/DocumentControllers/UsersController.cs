@@ -34,8 +34,8 @@ namespace WebAPI.Controllers
         {
             try
             {
-                HTTPError.AssertRequest("ELI45185", !string.IsNullOrEmpty(user.Username), "Username is empty");
-                HTTPError.AssertRequest("ELI45186", !string.IsNullOrEmpty(user.Password), "Password is empty");
+                HTTPError.AssertRequest("ELI50059", !string.IsNullOrEmpty(user.Username), "Username is empty");
+                HTTPError.AssertRequest("ELI50060", !string.IsNullOrEmpty(user.Password), "Password is empty");
 
                 // The user may have specified a workflow - if so then ensure that the API context uses
                 // the specified workflow.
@@ -50,7 +50,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI45212");
+                return this.GetAsHttpError(ex, "ELI50061");
             }
         }
     }

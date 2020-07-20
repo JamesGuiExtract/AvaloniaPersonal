@@ -80,7 +80,7 @@ namespace Extract.DocumentSummary
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI41376");
+                throw ex.AsExtract("ELI49991");
             }
         }
 

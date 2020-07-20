@@ -410,7 +410,7 @@ void CSetActionStatusFileProcessorPP::loadActionCombo(string strActionName)
 
 	// add entries to the combo box for actions
 	IStrToStrMapPtr ipActionIDToNameMap = m_ipFAMDB->GetActions();
-	ASSERT_RESOURCE_ALLOCATION("ELI15132", ipActionIDToNameMap != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI49957", ipActionIDToNameMap != __nullptr);
 
 	long lSize = ipActionIDToNameMap->Size;
 	for (long i = 0; i < lSize; i++)

@@ -4163,7 +4163,7 @@ STDMETHODIMP CFileProcessingDB::GetAllActions(IStrToStrMap** pmapActionNameToID)
 		}
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42085");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI50002");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetWorkflowStatus(long nFileID, EActionStatus* peaStatus)

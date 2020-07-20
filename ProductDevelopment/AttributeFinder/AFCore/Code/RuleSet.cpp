@@ -231,7 +231,7 @@ STDMETHODIMP CRuleSet::LoadFrom(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlag
 					getRuleSetSerializer()->InitializeUnmodified(getThisAsCOMPtr());
 				}
 			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49691")
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50093")
 		}
 		catch (UCLIDException & ue)
 		{
@@ -1293,7 +1293,7 @@ STDMETHODIMP CRuleSet::get_IsDirty(VARIANT_BOOL *pbIsDirty)
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04768");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49953");
 }
 
 //-------------------------------------------------------------------------------------------------

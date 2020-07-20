@@ -497,7 +497,7 @@ STDMETHODIMP CAFDocument::GetCurrentRSDFileDir(BSTR *pstrRSDFileDir)
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07457")
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49955")
 
 }
 //-------------------------------------------------------------------------------------------------
@@ -661,7 +661,7 @@ STDMETHODIMP CAFDocument::IsDirty(void)
 
 		return hr;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04773");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49954");
 
 	return S_OK;
 }
@@ -745,7 +745,7 @@ STDMETHODIMP CAFDocument::Load(IStream *pStream)
 			m_ipStringTags = ipObj;
 			if (m_ipStringTags == __nullptr)
 			{
-				throw UCLIDException("ELI41964", "String tags could not be read from stream!");
+				throw UCLIDException("ELI49999", "String tags could not be read from stream!");
 			}
 		}
 

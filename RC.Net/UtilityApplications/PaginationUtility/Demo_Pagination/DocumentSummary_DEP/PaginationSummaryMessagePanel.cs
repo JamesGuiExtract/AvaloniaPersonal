@@ -26,7 +26,7 @@ namespace Extract.DocumentSummary
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI41366");
+                throw ex.AsExtract("ELI49990");
             }
         }
 

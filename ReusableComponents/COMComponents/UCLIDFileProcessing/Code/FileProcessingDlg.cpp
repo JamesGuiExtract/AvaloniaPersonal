@@ -3169,7 +3169,7 @@ void FileProcessingDlg::updateUIForCurrentDBStatus()
 				{
 					string currentActionName = getDBPointer()->GetActionName(m_nCurrActionID);
 					ipActionStats = getDBPointer()->GetStatsAllWorkflows(currentActionName.c_str(), VARIANT_FALSE);
-					ASSERT_RESOURCE_ALLOCATION("ELI43480", ipActionStats != __nullptr);
+					ASSERT_RESOURCE_ALLOCATION("ELI50005", ipActionStats != __nullptr);
 				}
 				else
 				{

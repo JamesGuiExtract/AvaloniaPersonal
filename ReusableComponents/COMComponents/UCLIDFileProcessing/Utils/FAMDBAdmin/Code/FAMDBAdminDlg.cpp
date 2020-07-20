@@ -1092,7 +1092,7 @@ void CFAMDBAdminDlg::OnToolsMoveFilesToWorkflow()
 	// This is needed because .net exception causes crash if not handled
 	catch (Exception ^ex)
 	{
-		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI45603");
+		Extract::ExceptionExtensionMethods::ExtractDisplay(ex, "ELI50069");
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI43362");
 }
@@ -1476,7 +1476,7 @@ void CFAMDBAdminDlg::loadWorkflowComboBox()
 	m_comboBoxWorkflow.ResetContent();
 
 	IStrToStrMapPtr ipWorkflows = m_ipFAMDB->GetWorkflows();
-	ASSERT_RESOURCE_ALLOCATION("ELI42072", ipWorkflows != __nullptr);
+	ASSERT_RESOURCE_ALLOCATION("ELI50001", ipWorkflows != __nullptr);
 
 	IIUnknownVectorPtr ipItemPairs = ipWorkflows->GetAllKeyValuePairs();
 

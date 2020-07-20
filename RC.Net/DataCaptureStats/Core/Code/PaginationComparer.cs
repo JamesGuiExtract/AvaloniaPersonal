@@ -136,7 +136,7 @@ namespace Extract.DataCaptureStats
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI41504");
+                throw ex.AsExtract("ELI49992");
             }
         }
 

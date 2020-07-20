@@ -227,7 +227,7 @@ namespace Extract.UtilityApplications.NERAnnotation
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI46970");
+                throw ex.AsExtract("ELI50086");
             }
         }
 
@@ -258,7 +258,7 @@ namespace Extract.UtilityApplications.NERAnnotation
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI46970");
+                throw ex.AsExtract("ELI50087");
             }
         }
 

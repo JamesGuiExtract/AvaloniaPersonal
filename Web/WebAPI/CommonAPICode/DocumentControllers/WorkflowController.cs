@@ -38,7 +38,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI46397");
+                return this.GetAsHttpError(ex, "ELI50083");
             }
         }
 
@@ -59,7 +59,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return this.GetAsHttpError(ex, "ELI46413");
+                return this.GetAsHttpError(ex, "ELI50084");
             }
         }
     }

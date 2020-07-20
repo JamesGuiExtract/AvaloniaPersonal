@@ -91,7 +91,7 @@ namespace Extract.UtilityApplications.MachineLearning
                                     }
                                     catch (Exception ex)
                                     {
-                                        var ue = new ExtractException("ELI45038", "Unable to set property", ex);
+                                        var ue = new ExtractException("ELI50050", "Unable to set property", ex);
                                         ue.AddDebugData("Property", val, false);
                                         ue.AddDebugData("Value", args[argNum], false);
                                         ue.Log();
@@ -99,7 +99,7 @@ namespace Extract.UtilityApplications.MachineLearning
                                 }
                                 else
                                 {
-                                    var ue = new ExtractException("ELI45039", "No value given for property");
+                                    var ue = new ExtractException("ELI50051", "No value given for property");
                                     ue.AddDebugData("Property", val, false);
                                     ue.Log();
                                     return usage(error: true);

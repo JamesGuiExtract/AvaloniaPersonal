@@ -76,7 +76,7 @@ namespace Extract {
 		Void MoveToWorkflowForm::loadWorkflowCombos()
 		{
 			IStrToStrMapPtr workflows = _ipfamDatabase->GetWorkflows();
-			ASSERT_RESOURCE_ALLOCATION("ELI41935", workflows != __nullptr);
+			ASSERT_RESOURCE_ALLOCATION("ELI49998", workflows != __nullptr);
 
 			_sourceWorkflowComboBox->Items->Clear();
 

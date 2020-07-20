@@ -378,7 +378,7 @@ namespace LearningMachineTrainer
             }
             catch (Exception e)
             {
-                throw e.AsExtract("ELI40265");
+                throw e.AsExtract("ELI49987");
             }
         }
 

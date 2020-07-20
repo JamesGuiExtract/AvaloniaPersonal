@@ -481,7 +481,7 @@ namespace LearningMachineTrainer
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI45690");
+                throw ex.AsExtract("ELI50071");
             }
         }
 
@@ -806,7 +806,7 @@ namespace LearningMachineTrainer
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI39499");
+                throw ex.AsExtract("ELI49976");
             }
         }
 
@@ -1115,7 +1115,7 @@ namespace LearningMachineTrainer
             }
             catch (Exception e)
             {
-                throw e.AsExtract("ELI39809");
+                throw e.AsExtract("ELI49986");
             }
             finally
             {

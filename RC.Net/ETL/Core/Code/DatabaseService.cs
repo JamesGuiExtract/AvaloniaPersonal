@@ -358,7 +358,7 @@ namespace Extract.ETL
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected < 1)
                         {
-                            ExtractException ee = new ExtractException("ELI46294", "Unable to Record process start");
+                            ExtractException ee = new ExtractException("ELI50081", "Unable to Record process start");
                             ee.AddDebugData("SQL", cmd.CommandText, false);
                             ee.AddDebugData("@DatabaseServiceID", DatabaseServiceID, false);
                             ee.AddDebugData("@ActiveFAMID", _activeFAMID, false);

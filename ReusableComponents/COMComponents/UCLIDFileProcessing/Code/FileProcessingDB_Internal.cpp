@@ -6767,7 +6767,7 @@ void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(_Connect
 		m_strEncryptedDatabaseID = "";
 		createAndStoreNewDatabaseID(ipConnection);
 
-		UCLIDException ueLog("ELI39143", "Database counters updated");
+		UCLIDException ueLog("ELI49974", "Application Trace: Database counters updated.");
 		vector<string> vecQueries;
 
 		// Get map with the key as CounterId and the counter as a CounterOperation with operation set to kNone

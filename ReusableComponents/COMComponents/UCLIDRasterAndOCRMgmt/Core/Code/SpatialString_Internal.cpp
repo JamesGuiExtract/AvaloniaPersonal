@@ -1254,12 +1254,10 @@ void CSpatialString::validateAndMergeSourceDocName(const string& strSourceDocNam
 		// For the time being, making this a logged application trace to avoid exceptions being
 		// thrown in the DE framework when rules were run against the document when it had a
 		// different source doc name.
-        //UCLIDException ue("ELI06806", "Cannot operate on spatial strings from different sources!");
 		UCLIDException ue("ELI06806",
 			"Application trace: Cannot operate on spatial strings from different sources!");
         ue.addDebugInfo("this.SourceDocName", m_strSourceDocName);
         ue.addDebugInfo("other.SourceDocName", strSourceDocName);
-        //throw ue;
 		ue.log();
 		m_strSourceDocName = strSourceDocName;
 		return;
@@ -4715,7 +4713,7 @@ void CSpatialString::savePagesToArchive(const string& strOutputFile, IIUnknownVe
 			ASSERT_RESOURCE_ALLOCATION("ELI46781", pageInfo != __nullptr)
 
 			pageInfos.CreateInstance(CLSID_LongToObjectMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI46782", pageInfos != __nullptr)
+			ASSERT_RESOURCE_ALLOCATION("ELI50085", pageInfos != __nullptr)
 
 			pageInfos->Set(pageNumber, pageInfo);
 			page->PutSpatialPageInfos(pageInfos);

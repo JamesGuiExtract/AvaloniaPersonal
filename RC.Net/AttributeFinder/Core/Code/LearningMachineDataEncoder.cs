@@ -1445,12 +1445,12 @@ namespace Extract.AttributeFinder
                 }
                 else
                 {
-                    throw new ExtractException("ELI40372", "Unsupported LearningMachineUsage: " + MachineUsage.ToString());
+                    throw new ExtractException("ELI49980", "Unsupported LearningMachineUsage: " + MachineUsage.ToString());
                 }
             }
             catch (Exception e)
             {
-                throw e.AsExtract("ELI39544");
+                throw e.AsExtract("ELI49981");
             }
         }
 
@@ -2279,7 +2279,7 @@ namespace Extract.AttributeFinder
                             int code;
                             if (!AnswerNameToCode.TryGetValue(answer, out code))
                             {
-                                var ex = new ExtractException("ELI39627", "Internal logic error: unknown category");
+                                var ex = new ExtractException("ELI49982", "Internal logic error: unknown category");
                                 ex.AddDebugData("Category name", answer, false);
                                 throw ex;
                             }
@@ -2309,7 +2309,7 @@ namespace Extract.AttributeFinder
             }
             catch (Exception e)
             {
-                throw e.AsExtract("ELI39713");
+                throw e.AsExtract("ELI49983");
             }
         }
 

@@ -537,7 +537,7 @@ STDMETHODIMP CScansoftOCR2::SetOCRParameters(IOCRParameters* pOCRParameters, VAR
 
 		return S_OK;	
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16762");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49958");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CScansoftOCR2::WriteOCRSettingsToFile(BSTR bstrFileName, VARIANT_BOOL vbWriteDefaults,
@@ -580,7 +580,7 @@ STDMETHODIMP CScansoftOCR2::WriteOCRSettingsToFile(BSTR bstrFileName, VARIANT_BO
 
 		return S_OK;	
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16762");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49959");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CScansoftOCR2::GetPDFImage(BSTR bstrFileName, int nPage, VARIANT* pImageData)
@@ -2948,7 +2948,7 @@ void CScansoftOCR2::applySettingsFromRegistry()
 		THROW_UE_ON_ERROR("ELI03417", "Unable to set image despeckling mode in the OCR engine!",
 			kRecSetImgDespeckleMode(0, m_bEnableDespeckleMode ? TRUE : FALSE));
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45914")
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50076")
 }
 //-------------------------------------------------------------------------------------------------
 void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameters)
@@ -3085,13 +3085,13 @@ void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameter
 			else if (vtKey.vt == VT_BSTR)
 			{
 				string strKey = asString(vtKey.bstrVal);
-				THROW_UE_ON_ERROR("ELI45929", "Unable to get OCR setting.",
+				THROW_UE_ON_ERROR("ELI50077", "Unable to get OCR setting.",
 					kRecSettingGetHandle(NULL, strKey.c_str(), &hSetting, NULL));
 
 				if (vtValue.vt == VT_I4)
 				{
 					long nValue = vtValue;
-					THROW_UE_ON_ERROR("ELI45930", "Unable to set " + strKey + " option",
+					THROW_UE_ON_ERROR("ELI50078", "Unable to set " + strKey + " option",
 						kRecSettingSetInt(0, hSetting, nValue));
 				}
 				else if (vtValue.vt == VT_R8)
