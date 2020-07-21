@@ -11,8 +11,11 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace Extract.ReportingDevExpress
 {
@@ -44,11 +47,6 @@ namespace Extract.ReportingDevExpress
         #endregion Constants
 
         #region Fields
-
-        /// <summary>
-        /// Indicates whether the parameters have all been set.
-        /// </summary>
-        bool _canceledInitialization;
 
         /// <summary>
         /// The name of the server to connect to.
@@ -102,7 +100,7 @@ namespace Extract.ReportingDevExpress
         /// enter in new values for the parameters or to use the values
         /// stored in the XML file.</param>
         public ExtractReport(string serverName, string databaseName, string workflowName,
-            string fileName, bool promptForParameters)
+            string fileName)
         {
             try
             {
@@ -119,8 +117,6 @@ namespace Extract.ReportingDevExpress
                 _reportFileName = fileName;
 
                 SetDatabaseConnection();
-
-                _canceledInitialization = !SetParameters(promptForParameters, false);
             }
             catch (Exception ex)
             {
@@ -129,7 +125,6 @@ namespace Extract.ReportingDevExpress
                 ee.AddDebugData("Database name", databaseName, false);
                 ee.AddDebugData("Workflow name", workflowName, false);
                 ee.AddDebugData("FileName", fileName, false);
-                ee.AddDebugData("Prompt for parameters", promptForParameters, false);
                 throw ee;
             }
         }
@@ -154,7 +149,7 @@ namespace Extract.ReportingDevExpress
 
                 _reportFileName = fileName;
 
-                ParseParameterXml(false);
+                _report = XtraReport.FromFile(fileName);
             }
             catch (Exception ex)
             {
@@ -268,21 +263,6 @@ namespace Extract.ReportingDevExpress
         }
 
         /// <summary>
-        /// Gets whether the initialization was canceled or not (means the user
-        /// hit cancel while entering parameters). If <see langword="true"/> the
-        /// initialization was canceled; <see langword="false"/> otherwise.
-        /// </summary>
-        /// <returns><see langword="true"/> if initialization was canceled and
-        /// <see langword="false"/> otherwise.</returns>
-        public bool CanceledInitialization
-        {
-            get
-            {
-                return _canceledInitialization;
-            }
-        }
-
-        /// <summary>
         /// Gets the absolute path to the saved report folder (will not end in '\').
         /// </summary>
         /// <returns>The absolute path to the saved report folder (will not end in '\').</returns>
@@ -335,6 +315,47 @@ namespace Extract.ReportingDevExpress
         #endregion Properties
 
         #region Methods
+
+        /// <summary>
+        /// Checks if a parameter exists
+        /// </summary>
+        /// <param name="parameterName">The parameter to check</param>
+        /// <param name="withDefault">If true the parameter must have a default values, if false the must be an empty default value</param>
+        /// <returns>false if the parameter does not exist, true if parameter exists and meets the conditions withDefault</returns>
+        public bool ParameterExists(string parameterName, bool withDefault)
+        {
+            string fileName = ComputeXmlFileName();
+
+            // if the Extract parameter collection is empty there was no xml file so no defaults
+            // for the parameter names need to look in the loaded XtraReport for the names
+            if (!File.Exists(fileName))
+            {
+                if (withDefault)
+                    return false;
+
+                foreach (var p in _report?.Parameters)
+                {
+                    if (p.Name == parameterName)
+                        return true;
+                }
+            }
+            else
+            {
+                // This is read directly from the xml because loading the parameters from the XML could require the
+                // database server and name to have been set, which is not always the case when this is called.
+                XDocument parameterFile = XDocument.Load(fileName);
+                var parameterNameElement = parameterFile
+                    .XPathSelectElement($"/ExtractReportParameterData/ReportParameters/*[@Name=\"{parameterName}\"]");
+
+                if (parameterNameElement is null)
+                    return false;
+
+                var defaultValue = parameterNameElement.Attribute("Default").Value;
+                return withDefault == !string.IsNullOrWhiteSpace(defaultValue);
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Exports the report object to the specified file.
@@ -421,11 +442,7 @@ namespace Extract.ReportingDevExpress
         /// <param name="serverName">The server to connect to.</param>
         /// <param name="databaseName">The database to connect to.</param>
         /// <param name="workflowName">The workflow to report on.</param>
-        /// <param name="promptForParameters">Whether to prompt the user to
-        /// enter in new values for the parameters or to use the values
-        /// stored in the XML file.</param>
-        public void Initialize(string serverName, string databaseName, string workflowName,
-            bool promptForParameters)
+        public void Initialize(string serverName, string databaseName, string workflowName)
         {
             try
             {
@@ -439,9 +456,8 @@ namespace Extract.ReportingDevExpress
                 _workflowName = workflowName;
 
                 SetDatabaseConnection();
-                _canceledInitialization = !SetParameters(promptForParameters, true);
-                if (!_canceledInitialization)
-                    _report.CreateDocument();
+
+                ParseParameterXml(false);
             }
             catch (Exception ex)
             {
@@ -481,11 +497,11 @@ namespace Extract.ReportingDevExpress
         }
 
         /// <summary>
-        /// Sets the parameters (after loading them from the XML file).  If
-        /// <paramref name="promptForParameters"/> is <see langword="true"/> then
+        /// Sets the parameters.  If <paramref name="promptForParameters"/> is <see langword="true"/> then
         /// will display a prompt to enter in new values for the parameters, otherwise
         /// if all the values have been specified in the XML then will just load the defaults
-        /// from the XML file.
+        /// from the XML file, if no XML file exists parameters are generated from the report definition with defaults
+        /// that are in the definition
         /// </summary>
         /// <param name="promptForParameters">Whether to force a prompt for parameter values
         /// or not.</param>
@@ -715,7 +731,12 @@ namespace Extract.ReportingDevExpress
                 }
                 else
                 {
-                    parameter.Value = value;
+                    if (parameter.MultiValue)
+                    {
+                        parameter.Value = ((string)value).Split(new char[] { ',', ' ' });
+                    }
+                    else
+                        parameter.Value = value;
                 }
             }
             catch (Exception ex)
@@ -748,7 +769,8 @@ namespace Extract.ReportingDevExpress
         /// <summary>
         /// Parses the parameter XML file.
         /// </summary>
-        void ParseParameterFile()
+        /// <returns>If there was an xml file returns true if not returns false</returns>
+        bool ParseParameterFile()
         {
             string xmlFileName = ComputeXmlFileName();
 
@@ -756,13 +778,123 @@ namespace Extract.ReportingDevExpress
             // parameters to prompt for
             if (!File.Exists(xmlFileName))
             {
-                return;
+                LoadDefaultsFromReport();
+                return false;
             }
 
             // Load the XML file into a string
             string xml = File.ReadAllText(xmlFileName, Encoding.ASCII);
 
             ParseParameterXml(xml);
+            return true;
+        }
+
+        private void LoadDefaultsFromReport()
+        {
+            if (_report is null)
+                return;
+
+            foreach (var parameter in _report.Parameters)
+            {
+                if (parameter.Name.StartsWith("ES_"))
+                    continue;
+
+                var existingValue = GetExistingValue(parameter.Name);
+
+                var extractParameter = CreateStaticValueListParameter(parameter, existingValue) ??
+                    CreateDynamicValueListParameter(parameter, existingValue) ??
+                    CreateDateRangeParameter(parameter, existingValue);
+
+                if (extractParameter is null)
+                {
+                    if (parameter.Type == typeof(string))
+                    {
+                        extractParameter= new TextParameter(parameter.Name, (existingValue.Value ?? parameter.Value) as string);
+                    }
+                    else if (parameter.Type == typeof (DateTime))
+                    {
+                        extractParameter = new DateParameter(parameter.Name,
+                                                                        existingValue.Value as DateTime? ?? DateTime.Now,
+                                                                        true);
+                    }
+                    else if (parameter.Type.IsNumericType())
+                    {
+                        extractParameter = new NumberParameter(parameter.Name, (double)(existingValue.Value ?? parameter.Value));
+                    }
+                }
+                if (extractParameter is null)
+                {
+                    ExtractException ee = new ExtractException("ELI50124", "Unable to create Extract report parameter.");
+                    ee.AddDebugData("ReportParameter", parameter.Name);
+                    throw ee;
+                }
+                _parameters[parameter.Name] = extractParameter;
+            }
+        }
+
+        IExtractReportParameter CreateStaticValueListParameter(Parameter parameter, (object Value, Range<DateTime>? RangeValue) existingValue)
+        {
+            var staticSettings = parameter.ValueSourceSettings as StaticListLookUpSettings;
+            if (staticSettings is null)
+                return null;
+            return new ValueListParameter( parameter.Name,
+                staticSettings.LookUpValues
+                    .Select(v => v.Value)
+                    .OfType<string>(),
+                (existingValue.Value ?? parameter.Value) as string,
+                parameter.MultiValue);
+        }
+
+        IExtractReportParameter CreateDynamicValueListParameter(Parameter parameter, (object Value, Range<DateTime>? RangeValue) existingValue)
+        {
+            var dynamicSettings = parameter.ValueSourceSettings as DynamicListLookUpSettings;
+            if (dynamicSettings is null)
+                return null;
+
+            var queryName = dynamicSettings.DataMember;
+            var source = dynamicSettings.DataSource as SqlDataSource;
+            if (source is null)
+            {
+                var ee = new ExtractException("ELI50108", "Invalid data source for lookup list");
+                ee.AddDebugData("Parameter name", parameter.Name);
+                throw ee;
+            }
+            var query = source.Queries[queryName] as SelectQuery;
+            source.RebuildResultSchema();
+            var queryString = query.GetSql(source.DBSchema);
+
+            var valueList = new ValueListParameter(parameter.Name,
+                                                   BuildValueListFromQuery(queryString),
+                                                   (existingValue.Value ?? parameter.Value) as string,
+                                                   parameter.MultiValue);
+            valueList.ListQuery = queryString;
+            return valueList;
+        }
+
+        IExtractReportParameter CreateDateRangeParameter(Parameter parameter, (object Value, Range<DateTime>? RangeValue) existingValue)
+        {
+            var rangeSettings = parameter.ValueSourceSettings as RangeParametersSettings;
+            if (rangeSettings is null)
+                return null;
+            if (parameter.Type != typeof(DateTime))
+            {
+                var ee = new ExtractException("ELI50107", "Unknown range type.");
+                ee.AddDebugData("Parameter name", parameter.Name);
+                ee.AddDebugData("Parameter type", parameter.Type.FullName);
+                throw ee;
+            }
+
+            var dateRangeParameter = new DateRangeParameter(parameter.Name, DateRangeValue.All);
+            if (existingValue.Value != null)
+            {
+                dateRangeParameter.Value = existingValue.Value;
+                if (existingValue.Value as DateRangeValue? == DateRangeValue.Custom)
+                {
+                    dateRangeParameter.Maximum = existingValue.RangeValue?.End ?? DateTime.Now;
+                    dateRangeParameter.Minimum = existingValue.RangeValue?.Start ?? DateTime.Now;
+                }
+            }
+            return dateRangeParameter;
         }
 
         /// <summary>
@@ -827,6 +959,28 @@ namespace Extract.ReportingDevExpress
         }
 
         /// <summary>
+        /// Gets the current value of the parameter with the name <paramref name="parameterName"/>
+        /// </summary>
+        /// <param name="parameterName">The name of the parameter to return the value of</param>
+        /// <returns>Returns a tuple containing the value of the parameter and the Range Value if it is
+        /// a date range parameter that has a custom value</returns>
+        (object Value, Range<DateTime>? RangeValue) GetExistingValue(string parameterName)
+        {
+            object existingValue = null;
+            Range<DateTime>? existingRange = null;
+            
+            if (ParametersCollection.TryGetValue(parameterName, out var existingParameter)
+                && existingParameter.HasValueSet())
+            {
+                existingValue = existingParameter.Value;
+                var dateRange = existingParameter as DateRangeParameter;
+                if (dateRange != null && dateRange.ParameterValue == DateRangeValue.Custom)
+                    existingRange = new Range<DateTime>(dateRange.Minimum, dateRange.Maximum);
+            }
+            return (existingValue, existingRange);
+        }
+
+        /// <summary>
         /// Reads the parameters from the specified <see cref="XmlTextReader"/>.
         /// </summary>
         /// <param name="xmlReader">The <see cref="XmlTextReader"/> to
@@ -846,17 +1000,11 @@ namespace Extract.ReportingDevExpress
                     string paramName = xmlReader.Value;
 
                     string defaultVal = null;
-                    object existingValue = null;
+                    var existingValue = GetExistingValue(paramName);
 
                     // Check whether the parameter already has a value. If so, it will be assigned
                     // in place of any default value.
-                    IExtractReportParameter existingParameter = null;
-                    if (ParametersCollection.TryGetValue(paramName, out existingParameter)
-                        && existingParameter.HasValueSet())
-                    {
-                        existingValue = existingParameter.Value;
-                    }
-                    else
+                    if (existingValue.Value is null )
                     {
                         // Move to the default attribute and store it (ensure the default
                         // attribute exists)
@@ -878,157 +1026,168 @@ namespace Extract.ReportingDevExpress
                         switch (paramType)
                         {
                             case "TextParameter":
+                                if (string.IsNullOrEmpty(defaultVal))
                                 {
-                                    if (string.IsNullOrEmpty(defaultVal))
-                                    {
-                                        param = new TextParameter(paramName);
-                                    }
-                                    else
-                                    {
-                                        param = new TextParameter(paramName, defaultVal);
-                                    }
+                                    param = new TextParameter(paramName);
+                                }
+                                else
+                                {
+                                    param = new TextParameter(paramName, defaultVal);
                                 }
                                 break;
 
                             case "NumberParameter":
+                                if (string.IsNullOrEmpty(defaultVal))
                                 {
-                                    if (string.IsNullOrEmpty(defaultVal))
-                                    {
-                                        param = new NumberParameter(paramName);
-                                    }
-                                    else
-                                    {
-                                        double temp = Convert.ToDouble(defaultVal,
-                                            CultureInfo.InvariantCulture);
-                                        param = new NumberParameter(paramName, temp);
-                                    }
+                                    param = new NumberParameter(paramName);
+                                }
+                                else
+                                {
+                                    double temp = Convert.ToDouble(defaultVal, CultureInfo.InvariantCulture);
+                                    param = new NumberParameter(paramName, temp);
                                 }
                                 break;
 
                             case "DateParameter":
+                                // Get whether to show the time (or just the date).
+                                xmlReader.MoveToAttribute("ShowTime");
+                                bool showTime = true;
+
+                                if (xmlReader.Name.Equals("ShowTime", StringComparison.Ordinal))
                                 {
-                                    // Get whether to show the time (or just the date).
-                                    xmlReader.MoveToAttribute("ShowTime");
-                                    bool showTime = true;
+                                    showTime = Convert.ToBoolean(xmlReader.Value, CultureInfo.InvariantCulture);
+                                }
 
-                                    if (xmlReader.Name.Equals("ShowTime", StringComparison.Ordinal))
-                                    {
-                                        showTime = Convert.ToBoolean(xmlReader.Value,
-                                            CultureInfo.InvariantCulture);
-                                    }
+                                if (string.IsNullOrEmpty(defaultVal))
+                                {
+                                    param = new DateParameter(paramName, DateTime.Now, showTime);
+                                }
+                                else
+                                {
+                                    DateTime temp = Convert.ToDateTime(defaultVal, CultureInfo.InvariantCulture);
 
-                                    if (string.IsNullOrEmpty(defaultVal))
-                                    {
-                                        param = new DateParameter(paramName, DateTime.Now, showTime);
-                                    }
-                                    else
-                                    {
-                                        DateTime temp = Convert.ToDateTime(defaultVal,
-                                            CultureInfo.InvariantCulture);
-
-                                        param = new DateParameter(paramName, temp, showTime);
-                                    }
+                                    param = new DateParameter(paramName, temp, showTime);
                                 }
                                 break;
 
                             case "DateRangeParameter":
+                                if (string.IsNullOrEmpty(defaultVal))
                                 {
-                                    if (string.IsNullOrEmpty(defaultVal))
-                                    {
-                                        param = new DateRangeParameter(paramName);
-                                    }
-                                    else if (defaultVal == "Custom")
-                                    {
-                                        // Get the min and max values
-                                        xmlReader.MoveToAttribute("Min");
-                                        ExtractException.Assert("ELI23855",
-                                            "Custom date range missing 'Min' attribute!",
-                                            xmlReader.Name.Equals("Min", StringComparison.Ordinal),
-                                            "Parameter Name", paramName);
-                                        DateTime min = Convert.ToDateTime(xmlReader.Value,
-                                            CultureInfo.InvariantCulture);
-
-                                        xmlReader.MoveToAttribute("Max");
-                                        ExtractException.Assert("ELI23856",
-                                            "Custom date range missing 'Max' attribute!",
-                                            xmlReader.Name.Equals("Max", StringComparison.Ordinal),
-                                            "Parameter Name", paramName);
-                                        DateTime max = Convert.ToDateTime(xmlReader.Value,
-                                            CultureInfo.InvariantCulture);
-
-                                        param = new DateRangeParameter(paramName, min, max);
-                                    }
-                                    else
-                                    {
-                                        DateRangeValue value = (DateRangeValue)Enum.Parse(
-                                            typeof(DateRangeValue), defaultVal, true);
-                                        param = new DateRangeParameter(paramName, value);
-                                    }
-
+                                    param = new DateRangeParameter(paramName);
                                 }
+                                else if (defaultVal == "Custom")
+                                {
+                                    // Get the min and max values
+                                    xmlReader.MoveToAttribute("Min");
+                                    ExtractException.Assert("ELI23855",
+                                                            "Custom date range missing 'Min' attribute!",
+                                                            xmlReader.Name.Equals("Min", StringComparison.Ordinal),
+                                                            "Parameter Name",
+                                                            paramName);
+                                    DateTime min = Convert.ToDateTime(xmlReader.Value, CultureInfo.InvariantCulture);
+
+                                    xmlReader.MoveToAttribute("Max");
+                                    ExtractException.Assert("ELI23856",
+                                                            "Custom date range missing 'Max' attribute!",
+                                                            xmlReader.Name.Equals("Max", StringComparison.Ordinal),
+                                                            "Parameter Name",
+                                                            paramName);
+                                    DateTime max = Convert.ToDateTime(xmlReader.Value, CultureInfo.InvariantCulture);
+
+                                    param = new DateRangeParameter(paramName, min, max);
+                                }
+                                else
+                                {
+                                    DateRangeValue value = (DateRangeValue)Enum.Parse(typeof(DateRangeValue),
+                                                                                      defaultVal,
+                                                                                      true);
+                                    param = new DateRangeParameter(paramName, value);
+                                }
+
                                 break;
 
                             case "ValueListParameter":
+                                string[] values = null;
+                                bool allowOtherValues = false;
+                                bool multipleSelect = false;
+                                string query = "";
+
+                                // Check if the value list parameter is using a value list
+                                // or a query
+                                if (xmlReader.MoveToAttribute("Query"))
                                 {
-                                    string[] values = null;
-                                    bool allowOtherValues = false;
-
-                                    // Check if the value list parameter is using a value list
-                                    // or a query
-                                    if (xmlReader.MoveToAttribute("Query"))
-                                    {
-                                        string query = xmlReader.Value;
-                                        values = BuildValueListFromQuery(query);
-                                    }
-                                    else if (xmlReader.MoveToAttribute("Values"))
-                                    {
-                                        // Get the list values
-                                        values = xmlReader.Value.Split(new string[] { "," },
-                                            StringSplitOptions.RemoveEmptyEntries);
-
-                                        // Get the editable attribute
-                                        ExtractException.Assert("ELI23858",
-                                            "Value list missing 'Editable' attribute!",
-                                            xmlReader.MoveToAttribute("Editable"),
-                                            "Parameter Name", paramName);
-                                        if (!bool.TryParse(xmlReader.Value, out allowOtherValues))
-                                        {
-                                            ExtractException ee = new ExtractException("ELI23729",
-                                                "Editable attribute has invalid value!");
-                                            ee.AddDebugData("Attribute Value", xmlReader.Value, false);
-                                            throw ee;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        ExtractException ee = new ExtractException("ELI28200",
-                                            "Value list must contain either a 'Values' or 'Query' setting.");
-                                        ee.AddDebugData("Parameter Name", paramName, false);
-                                        throw ee;
-                                    }
-
-                                    // If the report has not been initialized, allow the parameter
-                                    // value to be set without verification that it is a valid value
-                                    // for now. Validity of the value will be confirmed during the
-                                    // call to Initialize.
-                                    param = new ValueListParameter(paramName, values, defaultVal,
-                                        allowOtherValues || (_report == null));
+                                    query = xmlReader.Value;
+                                    values = BuildValueListFromQuery(query);
                                 }
+                                else if (xmlReader.MoveToAttribute("Values"))
+                                {
+                                    // Get the list values
+                                    values = xmlReader.Value
+                                        .Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+                                    // Get the editable attribute
+                                    ExtractException.Assert("ELI23858",
+                                                            "Value list missing 'Editable' attribute!",
+                                                            xmlReader.MoveToAttribute("Editable"),
+                                                            "Parameter Name",
+                                                            paramName);
+                                    if (!bool.TryParse(xmlReader.Value, out allowOtherValues))
+                                    {
+                                        ExtractException ee1 = new ExtractException("ELI23729",
+                                                                                   "Editable attribute has invalid value!");
+                                        ee1.AddDebugData("Attribute Value", xmlReader.Value, false);
+                                        throw ee1;
+                                    }
+                                }
+                                else
+                                {
+                                    ExtractException ee2 = new ExtractException("ELI28200",
+                                                                               "Value list must contain either a 'Values' or 'Query' setting.");
+                                    ee2.AddDebugData("Parameter Name", paramName, false);
+                                    throw ee2;
+                                }
+
+                                if (xmlReader.MoveToAttribute("MultipleSelect"))
+                                {
+                                    if (!bool.TryParse(xmlReader.Value, out multipleSelect))
+                                    {
+                                        ExtractException ee3 = new ExtractException("ELI50106",
+                                                                                   "MultipleSelect attribute has invalid value!");
+                                        ee3.AddDebugData("Attribute Value", xmlReader.Value, false);
+                                        throw ee3;
+                                    }
+                                }
+
+                                // If the report has not been initialized, allow the parameter
+                                // value to be set without verification that it is a valid value
+                                // for now. Validity of the value will be confirmed during the
+                                // call to Initialize.
+                                var valueList = new ValueListParameter(paramName,
+                                                                       values,
+                                                                       defaultVal as string,
+                                                                       allowOtherValues || (_report == null),
+                                                                       multipleSelect);
+                                valueList.ListQuery = query;
+                                param = valueList;
                                 break;
 
                             default:
-                                {
-                                    ExtractException ee = new ExtractException("ELI23730",
-                                        "Unrecognized parameter type in XML file!");
-                                    ee.AddDebugData("Parameter Type", xmlReader.Name, false);
-                                    throw ee;
-                                }
+                                ExtractException ee4 = new ExtractException("ELI23730",
+                                                                           "Unrecognized parameter type in XML file!");
+                                ee4.AddDebugData("Parameter Type", xmlReader.Name, false);
+                                throw ee4;
                         }
 
                         // If the parameter had an existing value, set it.
-                        if (existingValue != null)
+                        if (existingValue.Value != null)
                         {
-                            param.Value = existingValue;
+                            param.Value = existingValue.Value;
+                            var dateParameter = param as DateRangeParameter;
+                            if (dateParameter != null && dateParameter.ParameterValue == DateRangeValue.Custom)
+                            {
+                                dateParameter.Minimum = existingValue.RangeValue.Value.Start;
+                                dateParameter.Maximum = existingValue.RangeValue.Value.End;
+                            }
                         }
 
                         // Add the parameter to the collection

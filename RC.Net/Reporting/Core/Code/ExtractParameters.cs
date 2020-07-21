@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Xml;
 
@@ -1178,8 +1179,9 @@ namespace Extract.Reporting
         /// <param name="name">The name of the parameter.</param>
         /// <param name="values">An <see cref="IEnumerable{T}"/> of strings that
         /// define the possible values for this <see cref="ValueListParameter"/>.</param>
-        public ValueListParameter(string name, IEnumerable<string> values)
-            : this(name, values, null, false)
+        /// <param name="multipleSelect">If true, multiple items can be selected in list. If false only one item can be selected</param>
+        public ValueListParameter(string name, IEnumerable<string> values, bool multipleSelect)
+            : this(name, values, null, false, multipleSelect)
         {
         }
 
@@ -1191,8 +1193,9 @@ namespace Extract.Reporting
         /// define the possible values for this <see cref="ValueListParameter"/>.</param>
         /// <param name="allowOtherValues">Indicates whether the <see cref="ValueListParameter"/>
         /// will allow values other than the ones specified in the list.</param>
-        public ValueListParameter(string name, IEnumerable<string> values, bool allowOtherValues)
-            : this(name, values, null, allowOtherValues)
+        /// <param name="multipleSelect">If true, multiple items can be selected in list. If false only one item can be selected</param>
+        public ValueListParameter(string name, IEnumerable<string> values, bool allowOtherValues, bool multipleSelect)
+            : this(name, values, null, allowOtherValues, multipleSelect)
         {
         }
 
@@ -1204,8 +1207,9 @@ namespace Extract.Reporting
         /// define the possible values for this <see cref="ValueListParameter"/>.</param>
         /// <param name="defaultValue">The default value for this <see cref="ValueListParameter"/>
         /// .  Note: This value muse be included in the <paramref name="values"/> list.</param>
-        public ValueListParameter(string name, IEnumerable<string> values, string defaultValue)
-            : this(name, values, defaultValue, false)
+        /// <param name="multipleSelect">If true, multiple items can be selected in list. If false only one item can be selected</param>
+        public ValueListParameter(string name, IEnumerable<string> values, string defaultValue, bool multipleSelect)
+            : this(name, values, defaultValue, false, multipleSelect)
         {
         }
 
@@ -1219,8 +1223,9 @@ namespace Extract.Reporting
         /// .  Note: This value must be included in the <paramref name="values"/> list.</param>
         /// <param name="allowOtherValues">Indicates whether the <see cref="ValueListParameter"/>
         /// will allow values other than the ones specified in the list.</param>
+        /// <param name="multipleSelect">If true, multiple items can be selected in list. If false only one item can be selected</param>
         public ValueListParameter(string name, IEnumerable<string> values, string defaultValue,
-             bool allowOtherValues)
+             bool allowOtherValues, bool multipleSelect)
             : base(name)
         {
             try
@@ -1239,10 +1244,24 @@ namespace Extract.Reporting
                 ExtractException.Assert("ELI23711",
                     "Value collection must contain at least one item!", _valueList.Count > 0);
 
+                MultipleSelect = multipleSelect;
+
                 // Check if default value has been specified
                 if (!string.IsNullOrEmpty(defaultValue))
                 {
-                    if (!_valueList.Contains(defaultValue))
+                    if (MultipleSelect)
+                    {
+                        var selectedItems = defaultValue.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        var missingItems = selectedItems.Except(Values).ToList();
+                        if (missingItems.Count > 0)
+                        {
+                            ExtractException ee = new ExtractException("ELI50094",
+                                "Default values must all be contained in value list!");
+                            ee.AddDebugData("MissingItems", string.Join(",", missingItems));
+                            throw ee;
+                        }
+                    }
+                    else if (!_valueList.Contains(defaultValue))
                     {
                         if (!allowOtherValues)
                         {
@@ -1302,6 +1321,17 @@ namespace Extract.Reporting
         }
 
         /// <summary>
+        /// Gets or sets whether the <see cref="ValueListParameter"/> allows selection of multiple values
+        /// </summary>
+        public bool MultipleSelect { get; }
+
+        /// <summary>
+        /// Query to get the list items from the database
+        /// If this value is empty the the list is expected to be filled from values
+        /// </summary>
+        public string ListQuery { get; set; }
+
+        /// <summary>
         /// Sets the value of the parameter with the <see langword="string"/>
         /// <see paramref="value"/>.
         /// </summary>
@@ -1334,8 +1364,20 @@ namespace Extract.Reporting
             {
                 try
                 {
+                    if (MultipleSelect)
+                    {
+                        var selectedItems = value.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        var missingItems = selectedItems.Except(_valueList).ToList();
+                        if (missingItems.Count > 0)
+                        {
+                            ExtractException ee = new ExtractException("ELI50105",
+                                                                       "All values must be in value list!");
+                            ee.AddDebugData("MissingItems", string.Join(",", missingItems));
+                            throw ee;
+                        }
+                    }
                     // Check if the specified value is contained in the list
-                    if (!_valueList.Contains(value))
+                    else if (!_valueList.Contains(value))
                     {
                         // If values are restricted to the list then throw exception
                         if (!_allowOtherValues)
@@ -1381,12 +1423,19 @@ namespace Extract.Reporting
                     sb.Append(",");
                     sb.Append(_valueList[i]);
                 }
-                // Write the list of values
-                writer.WriteAttributeString("Values", sb.ToString());
-
+                if (!string.IsNullOrWhiteSpace(ListQuery) && !_allowOtherValues)
+                {
+                    writer.WriteAttributeString("Query", ListQuery);
+                }
+                else
+                {
+                    // Write the list of values
+                    writer.WriteAttributeString("Values", sb.ToString());
+                }
                 // Write the remaining values
                 writer.WriteAttributeString("Editable", _allowOtherValues.ToString());
                 writer.WriteAttributeString("Default", this.ParameterValue);
+                writer.WriteAttributeString("MultipleSelect", MultipleSelect.ToString());
                 writer.WriteEndElement();
             }
             catch (Exception ex)

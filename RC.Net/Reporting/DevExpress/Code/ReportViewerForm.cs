@@ -564,11 +564,12 @@ namespace Extract.ReportingDevExpress
                         this.Refresh();
 
                         // Load the new report
-                        _report = new ExtractReport(_serverName, _databaseName, _workflowName, _reportFileName,
-                            openReport.StandardReport);
+                        _report = new ExtractReport(_serverName, _databaseName, _workflowName, _reportFileName);
+
+                        bool parametersSet = _report.SetParameters(openReport.StandardReport, false);
 
                         // Attach the report to the viewer (if the user did not cancel)
-                        if (_report != null && !_report.CanceledInitialization)
+                        if (_report != null && parametersSet)
                         {
                             AttachReportToReportViewer();
                         }
@@ -731,7 +732,7 @@ namespace Extract.ReportingDevExpress
             Invalidate();
         }
 
-        private bool UserParametersExist(XtraReport report)
+        private static bool UserParametersExist(XtraReport report)
         {
             int numberOfExtractParameters = 0;
             foreach ( var p in report.Parameters)

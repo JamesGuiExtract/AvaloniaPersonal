@@ -2894,12 +2894,22 @@ namespace Extract.FileActionManager.Utilities
                     IExtractReport report = ExtractReportUtils.CreateExtractReport(_reportMenuItems[(ToolStripMenuItem)sender]);
                    
                     string fileName = GetSelectedFileNames().Single();
-                    report.ParametersCollection["DocumentName"].SetValueFromString(fileName);
 
+                    report.Initialize(DatabaseServer, DatabaseName, WorkflowName);
+
+                    var parametersToSet = DashboardMethods.DocumentNameAliases
+                        .Where(a => report.ParameterExists(a, false)).ToList();   
+                    
                     // If the report takes any parameters in addition to DocumentName, display a
                     // prompt so the user can specify them.
-                    bool promptForParameters = report.ParametersCollection.Count > 1;
-                    report.Initialize(DatabaseServer, DatabaseName, WorkflowName, promptForParameters);
+                    bool promptForParameters = report.ParametersCollection.Count > parametersToSet.Count;     
+
+                    foreach (var name in parametersToSet)
+                    {
+                        report.ParametersCollection[name].SetValueFromString(fileName);
+                    }
+
+                    report.SetParameters(promptForParameters, false);
 
                     // Show report on another thread so that the report is not modal to the FFI. The
                     // thread needs to be STA
@@ -3714,11 +3724,9 @@ namespace Extract.FileActionManager.Utilities
             {
                 var report = ExtractReportUtils.CreateExtractReport(reportFileName);
 
-                // If the report takes a "DocumentName" parameter that is not specified by default,
+                // If the report takes a document name alias parameter that is not specified by default,
                 // this report is eligible to be available via a context menu option.
-                IExtractReportParameter documentNameParameter = null;
-                if (report.ParametersCollection.TryGetValue("DocumentName", out documentNameParameter) &&
-                    !documentNameParameter.HasValueSet())
+                if (DashboardMethods.DocumentNameAliases.Any(a => report.ParameterExists(a, false)))
                 {
                     // Create a context menu option and add a handler for it.
                     string reportName = Path.GetFileNameWithoutExtension(reportFileName);

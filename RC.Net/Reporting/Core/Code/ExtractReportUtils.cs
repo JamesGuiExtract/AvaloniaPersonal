@@ -46,9 +46,8 @@ namespace Extract.Reporting
         /// <param name="databaseName">Database used in the report</param>
         /// <param name="workflowName">Workflow used in the report</param>
         /// <param name="fileName">Report file name</param>
-        /// <param name="promptForParameters">If true will be prompted for parameters</param>
         /// <returns><see cref="IExtractReport"/> interface of the created ExtractReport</returns>
-        static public IExtractReport CreateExtractReport(string serverName, string databaseName, string workflowName, string fileName, bool promptForParameters)
+        static public IExtractReport CreateExtractReport(string serverName, string databaseName, string workflowName, string fileName)
         {
             try
             {
@@ -56,8 +55,8 @@ namespace Extract.Reporting
                                                       serverName,
                                                       databaseName,
                                                       workflowName,
-                                                      fileName,
-                                                      promptForParameters) as IExtractReport;
+                                                      fileName
+                                                      ) as IExtractReport;
             }
             catch (Exception ex)
             {
@@ -66,7 +65,6 @@ namespace Extract.Reporting
                 ee.AddDebugData("Database name", databaseName, false);
                 ee.AddDebugData("Workflow name", workflowName, false);
                 ee.AddDebugData("File name", fileName, false);
-                ee.AddDebugData("Prompt for parameters", promptForParameters, false);
                 throw ee;
             }
         }

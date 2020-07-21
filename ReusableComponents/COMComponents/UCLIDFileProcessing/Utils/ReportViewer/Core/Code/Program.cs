@@ -230,6 +230,8 @@ namespace Extract.ReportViewer
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
                     "ELI23508", "Report Viewer");
 
+                bool parametersSet = false;
+
                 if (!string.IsNullOrEmpty(reportFile))
                 {
                     // Ensure the report file exists and has .repx extension
@@ -240,14 +242,15 @@ namespace Extract.ReportViewer
                         "Report File Name", reportFile);
 
                     // Prepare the report object
-                    report = ExtractReportUtils.CreateExtractReport(serverName, databaseName, workflowName, reportFile, prompt);
+                    report = ExtractReportUtils.CreateExtractReport(serverName, databaseName, workflowName, reportFile);
+                    parametersSet = report.SetParameters(prompt, false);
                 }
 
                 // If an output file was specified and the report object exists
                 // and all the settings are correct then output the report
                 if (!string.IsNullOrEmpty(outputFile)
                     && report != null
-                    && !report.CanceledInitialization)
+                    && parametersSet)
                 {
                     report.ExportReportToFile(outputFile, overwrite);
                 }
@@ -277,7 +280,7 @@ namespace Extract.ReportViewer
                 else
                 {
                     // User canceled the initialization of the report object
-                    if (report != null && report.CanceledInitialization)
+                    if (report != null && !parametersSet)
                     {
                         // Dispose of the report and set it to null
                         report.Dispose();

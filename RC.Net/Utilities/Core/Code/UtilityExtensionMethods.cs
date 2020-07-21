@@ -346,6 +346,30 @@ namespace Extract.Utilities
             return map;
         }
 
+        /// <summary>
+        /// Returns true of the type of the object is a numeric type
+        /// </summary>
+        /// <param name="t>Type to check the type of</param>
+        /// <returns>Returns true of the type of the object is a numeric type, false if not</returns>
+        public static bool IsNumericType(this Type t)
+        {
+            HashSet<Type> NumericTypes = new HashSet<Type>
+            {
+                typeof(Decimal),
+                typeof(Single),
+                typeof(Double),
+                typeof(Byte),
+                typeof(SByte),
+                typeof(Int16),
+                typeof(Int32),
+                typeof(Int64),
+                typeof(UInt16),
+                typeof(UInt32),
+                typeof(UInt64)
+            };
+            return NumericTypes.Contains(t);
+        }
+
         #endregion Methods
 
         #region Helper Methods

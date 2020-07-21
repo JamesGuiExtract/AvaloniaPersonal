@@ -125,6 +125,14 @@
       <Project>{212e31d9-5f02-43aa-8625-bcb86b15cf8f}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Reporting\Core\Code\Extract.Reporting.csproj">
+      <Project>{3a0fa1ac-f8aa-477a-b0b0-3630091e520b}</Project>
+      <Name>Extract.Reporting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Reporting\DevExpress\Code\Extract.ReportingDevExpress.csproj">
+      <Project>{88d004ae-f674-46d8-9b95-524481472fa2}</Project>
+      <Name>Extract.ReportingDevExpress</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
       <Name>Extract.Utilities</Name>

@@ -49,31 +49,49 @@
     <Compile Include="DateParameterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="DateParameterControl.Designer.cs" />
+    <Compile Include="DateParameterControl.Designer.cs">
+      <DependentUpon>DateParameterControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="DateRangeParameterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="DateRangeParameterControl.Designer.cs" />
+    <Compile Include="DateRangeParameterControl.Designer.cs">
+      <DependentUpon>DateRangeParameterControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="ExtractParameters.cs" />
     <Compile Include="ExtractReportUtils.cs" />
     <Compile Include="IExtractReport.cs" />
+    <Compile Include="MultipleSelectValueListParameterControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="MultipleSelectValueListParameterControl.Designer.cs">
+      <DependentUpon>MultipleSelectValueListParameterControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="NumberParameterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="NumberParameterControl.Designer.cs" />
+    <Compile Include="NumberParameterControl.Designer.cs">
+      <DependentUpon>NumberParameterControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="ParameterEntryForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ParameterEntryForm.Designer.cs" />
+    <Compile Include="ParameterEntryForm.Designer.cs">
+      <DependentUpon>ParameterEntryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextParameterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TextParameterControl.Designer.cs" />
+    <Compile Include="TextParameterControl.Designer.cs">
+      <DependentUpon>TextParameterControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="ValueListParameterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ValueListParameterControl.Designer.cs" />
+    <Compile Include="ValueListParameterControl.Designer.cs">
+      <DependentUpon>ValueListParameterControl.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
@@ -94,12 +112,27 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="DateParameterControl.resx" />
-    <EmbeddedResource Include="DateRangeParameterControl.resx" />
-    <EmbeddedResource Include="NumberParameterControl.resx" />
-    <EmbeddedResource Include="ParameterEntryForm.resx" />
-    <EmbeddedResource Include="TextParameterControl.resx" />
-    <EmbeddedResource Include="ValueListParameterControl.resx" />
+    <EmbeddedResource Include="DateParameterControl.resx">
+      <DependentUpon>DateParameterControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DateRangeParameterControl.resx">
+      <DependentUpon>DateRangeParameterControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MultipleSelectValueListParameterControl.resx">
+      <DependentUpon>MultipleSelectValueListParameterControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NumberParameterControl.resx">
+      <DependentUpon>NumberParameterControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ParameterEntryForm.resx">
+      <DependentUpon>ParameterEntryForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextParameterControl.resx">
+      <DependentUpon>TextParameterControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ValueListParameterControl.resx">
+      <DependentUpon>ValueListParameterControl.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

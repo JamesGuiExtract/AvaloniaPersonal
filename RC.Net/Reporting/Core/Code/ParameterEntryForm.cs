@@ -136,9 +136,17 @@ namespace Extract.Reporting
                 ValueListParameter valueListParameter = parameter as ValueListParameter;
                 if (valueListParameter != null)
                 {
-                    ValueListParameterControl control =
-                        new ValueListParameterControl(valueListParameter);
-                    AddControlToPanel(control, ref nextControlLocation);
+                    Control valueListControl;
+                    if (valueListParameter.MultipleSelect)
+                    {
+                        valueListControl = new MultipleSelectValueListParameterControl(valueListParameter);
+                    }
+                    else
+                    {
+                        valueListControl =
+                            new ValueListParameterControl(valueListParameter);
+                    }
+                    AddControlToPanel(valueListControl, ref nextControlLocation);
                     continue;
                 }
 
