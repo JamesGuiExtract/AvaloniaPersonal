@@ -1298,18 +1298,21 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 int docPosition = GetDocumentPosition(outputDocument);
-                DeleteControls(outputDocument.PageControls.ToArray());
-                outputDocument.DocumentOutput -= HandleOutputDocument_DocumentOutput;
 
                 // Delete and remove association with separator when removing from layout to ensure
                 // proper associations of separators to documents and to avoid bad selection states
                 // https://extract.atlassian.net/browse/ISSUE-13916
                 // https://extract.atlassian.net/browse/ISSUE-15293
+                // Do this before deleting the page controls because afterwards the separator will have been dissociated from this output document.
+                // Not deleting the separator will cause null references later as in https://extract.atlassian.net/browse/ISSUE-17106
                 if (outputDocument.PaginationSeparator != null)
                 {
                     DeleteControls(new[] { outputDocument.PaginationSeparator });
                     outputDocument.PaginationSeparator = null;
                 }
+
+                DeleteControls(outputDocument.PageControls.ToArray());
+                outputDocument.DocumentOutput -= HandleOutputDocument_DocumentOutput;
 
                 return docPosition;
             }
