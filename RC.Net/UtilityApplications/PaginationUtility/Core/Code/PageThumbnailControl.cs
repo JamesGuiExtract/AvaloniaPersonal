@@ -670,15 +670,9 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     _contentsPanel = contentsPanel;
                 }
-                else if (!visible && _contentsPanel != null)
-                {
-                    var contentsPanel = _contentsPanel;
-                    UnRegisterForEvents(contentsPanel);
-                    contentsPanel.ImageClosed -= HandleContentsPanel_ImageClosed;
-                    Controls.Remove(contentsPanel);
-                    contentsPanel.Dispose();
-                    _contentsPanel = null;
-                }
+                // Don't dispose of the ContentsPanel when it is no longer visible because
+                // it is responsible for painting the deleted page overlay
+                // https://extract.atlassian.net/browse/ISSUE-17104
             }
             finally
             {
