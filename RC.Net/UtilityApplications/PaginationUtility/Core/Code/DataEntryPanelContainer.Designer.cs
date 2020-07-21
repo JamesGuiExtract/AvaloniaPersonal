@@ -62,7 +62,6 @@
             // 
             this._documentTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._documentTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._documentTypeComboBox.Enabled = false;
             this._documentTypeComboBox.Location = new System.Drawing.Point(92, 3);
             this._documentTypeComboBox.MaxDropDownItems = 25;

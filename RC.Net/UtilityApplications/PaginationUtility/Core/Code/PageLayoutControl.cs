@@ -59,9 +59,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             bool _forceFullLayout;
 
             #endregion Fields
-
+             
             #region Constructors
-
+             
             /// <summary>
             /// Initializes a new instance of the <see cref="PageLayoutControlUpdateLock"/> class.
             /// </summary>
@@ -1495,8 +1495,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         HandlePaginationSeparator_DocumentDataPanelRequest;
                     separator.DocumentDataPanelClosed -=
                         HandlePaginationSeparator_DocumentDataPanelClosed;
-                    separator.DocumentDataPanelNavigatedOut -=
-                        HandlePaginationSeparator_DocumentDataPanelNavigatedOut;
+                    separator.TabNavigation -=
+                        HandlePaginationSeparator_TabNavigation;
                     separator.DocumentCollapsedChanged -=
                         HandlePaginationSeparator_DocumentCollapsedChanged;
                     separator.DocumentSelectedToCommitChanged -=
@@ -2695,12 +2695,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// opposed to explicitly closing the panel). 
         /// NOTE: <see cref="DocumentDataPanelClosed"/> will still be raised as the data panel closes.
         /// </summary>
-        void HandlePaginationSeparator_DocumentDataPanelNavigatedOut(object sender, EventArgs e)
+        void HandlePaginationSeparator_TabNavigation(object sender, TabNavigationEventArgs e)
         {
             try
             {
-                SelectControl(DocumentInDataEdit.PageControls.First(), true, true, true);
-                _flowLayoutPanel.Focus();
+                if (e.Forward && e.LastStop)
+                {
+                    if (!IndicateFocus)
+                    {
+                        SelectControl(DocumentInDataEdit.PageControls.First(), true, true, true);
+                        _flowLayoutPanel.Focus();
+                    }
+                    else
+                    {
+                        TabNavigateNextDocument(GetActiveDocument(null));
+                    }
+
+                    e.Handled = true;
+                }
             }
             catch (Exception ex)
             {
@@ -2902,8 +2914,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     HandlePaginationSeparator_DocumentDataPanelRequest;
                 asPaginationSeparator.DocumentDataPanelClosed +=
                     HandlePaginationSeparator_DocumentDataPanelClosed;
-                asPaginationSeparator.DocumentDataPanelNavigatedOut +=
-                    HandlePaginationSeparator_DocumentDataPanelNavigatedOut;
+                asPaginationSeparator.TabNavigation +=
+                    HandlePaginationSeparator_TabNavigation;
                 asPaginationSeparator.DocumentCollapsedChanged +=
                     HandlePaginationSeparator_DocumentCollapsedChanged;
                 asPaginationSeparator.DocumentSelectedToCommitChanged +=
@@ -4376,25 +4388,32 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var activeDocument = GetActiveDocument(true);
                 var activeSeparator = activeDocument?.PaginationSeparator;
 
-                // Expand collapsed document
+                // Tabbing into a collapsed document
                 if (pageThumbnailIsActive && activeSeparator.Collapsed)
                 {
                     activeSeparator.Collapsed = false;
                 }
-                // Open DEP for expanded document
+                // Tabbing from an expandedd document with a DEP configuration that is not open
                 else if (pageThumbnailIsActive && AllowDataEdit && !activeSeparator.IsDataPanelOpen)
                 {
-                    activeSeparator.OpenDataPanel();
                     activeSeparator.Collapsed = false;
+                    activeSeparator.OpenDataPanel();
+
+                    if (!DocumentDataPanel.DocumentTypeAvailable)
+                    {
+                        DocumentDataPanel.EnsureFieldSelection(
+                            resetToFirstField: true, resetToLastField: false);
+                    }
                 }
-                // Move to next document after tabbing to last page with DEP open
-                else if (DocumentInDataEdit != null && !(activeControl.NextControl is PageThumbnailControl))
-                {
-                    TabNavigateNextDocument(activeDocument);
-                }
-                else
+                // Tabbing from no selection or any page but the last page of a document
+                else if (PrimarySelection == null || activeControl?.NextControl is PageThumbnailControl)
                 {
                     HandleSelectNextPage();
+                }
+                // Tabbing from the last page of a document
+                else
+                {
+                    TabNavigateNextDocument(activeDocument);
                 }
             }
             catch (Exception ex)
@@ -4477,8 +4496,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else if (previousControlDocument != currentDocument && DocumentInDataEdit != null)
                 {
                     _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
-                    DocumentDataPanel.EnsureFieldSelection(resetToFirstField: false);
-                    DocumentDataPanel.ActiveDataControl?.Focus();
+                    DocumentDataPanel.EnsureFieldSelection(resetToFirstField: false, resetToLastField: true);
+                    if (DocumentDataPanel.ActiveDataControl == null)
+                    {
+                        // If there is no tab stop in the DEP, select the document type (if available)
+                        if (DocumentDataPanel.DocumentTypeAvailable)
+                        {
+                            DocumentDataPanel.FocusDocumentType();
+                        }
+                        // Otherwise, close the DEP
+                        else
+                        {
+                            DocumentInDataEdit.PaginationSeparator.CloseDataPanel(saveData: true, validateData: false);
+                        }
+                    }
                 }
                 // No previous documents; ensure the panel is scrolled all the way up so the first document is showing.
                 else if (previousPageThumbnailControl == null)

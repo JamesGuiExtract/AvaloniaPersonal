@@ -913,7 +913,6 @@ namespace Extract.DataEntry
         public DataEntryConfiguration OldDataEntryConfiguration
         {
             get;
-            private set;
         }
 
         /// <summary>
@@ -925,7 +924,6 @@ namespace Extract.DataEntry
         public DataEntryConfiguration NewDataEntryConfiguration
         {
             get;
-            private set;
         }
     }
 
@@ -957,17 +955,26 @@ namespace Extract.DataEntry
     }
 
     /// <summary>
-    /// Event arguments for <see cref="DataEntryControlHost.NavigatedOut"/>
+    /// Event arguments for <see cref="DataEntryControlHost.TabNavigation"/>
     /// </summary>
-    public class NavigatedOutEventArgs : EventArgs
+    public class TabNavigationEventArgs : EventArgs
     {
+        public TabNavigationEventArgs(TabNavigationEventArgs eventArgs)
+        {
+            Forward = eventArgs.Forward;
+            LastStop = eventArgs.LastStop;
+        }
+
         /// <summary>
         /// Initializes a new <see cref="NavigatedOutEventArgs"/> instance.
         /// </summary>
         /// <param name="forward"><c>true</c> if navigating forward out of the DEP; <c>false</c> if navigating backward.</param>
-        public NavigatedOutEventArgs(bool forward)
+        /// <param name="lastStop"><c>true</c> if the tab navigation is leaving (or has already left) the sending control.
+        /// <c>false</c> if navigation is advancing to another field in the control.</param>
+        public TabNavigationEventArgs(bool forward, bool lastStop)
         {
             Forward = forward;
+            LastStop = lastStop;
         }
 
         /// <summary>
@@ -976,6 +983,26 @@ namespace Extract.DataEntry
         public bool Forward
         {
             get;
+        }
+
+        /// <summary>
+        /// <c>true</c> if the tab navigation is leaving (or has already left) the sending control.
+        /// <c>false</c> if navigation is advancing to another field in the control.
+        /// </summary>
+        public bool LastStop
+        {
+            get;
+        }
+
+        /// <summary>
+        /// An event handler should set this value to <c>true</c> to indicate it has handled the event
+        /// to indicate to the sending control that it should not process with its own navigation
+        /// implementation.
+        /// </summary>
+        public bool Handled
+        {
+            get;
+            set;
         }
     }
 }

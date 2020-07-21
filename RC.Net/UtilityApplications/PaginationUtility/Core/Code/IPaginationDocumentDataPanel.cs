@@ -35,10 +35,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         event EventHandler<EventArgs> RedoAvailabilityChanged;
 
         /// <summary>
+        /// Occurs when a document has finished loading.
+        /// </summary>
+        event EventHandler<EventArgs> DocumentLoaded;
+
+        /// <summary>
         /// Indicates that the displayed panel has been changed such as for document type specific
         /// panels when the document type field changes.
         /// </summary>
         event EventHandler<DataPanelChangedEventArgs> DataPanelChanged;
+
+        /// <summary>
+        /// Raised when tab navigation is activated; if handled, the control hosting this panel
+        /// should implement the UI response to the navigation. If not handled, this class (or the
+        /// underlying DataEntryControlHost) will.
+        /// </summary>
+        event EventHandler<TabNavigationEventArgs> TabNavigation;
 
         /// <summary>
         /// The <see cref="UserControl"/> to be displayed for viewing/editing of document data.
@@ -83,6 +95,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets the active <see cref="DataEntryDocumentDataPanel"/> or <c>null//c> if there
+        /// is no DEP currently displayed.
+        /// </summary>
+        DataEntryDocumentDataPanel ActiveDataEntryPanel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Gets the current "active" data entry. This is the last data entry control to have
         /// received input focus (but doesn't necessarily mean the control currently has input
         /// focus).
@@ -116,10 +137,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// <see cref="NavigatedOutEventArgs"/> indicating a deferred <see cref="NavigatedOut"/>
+        /// <see cref="TabNavigationEventArgs"/> indicating a deferred <see cref="TabNavigation"/>
         /// event that should be executed on the next tab navigation operation.
         /// </summary>
-        NavigatedOutEventArgs PendingNavigateOutEventArgs
+        TabNavigationEventArgs PendingTabNavigationEventArgs
         {
             get;
             set;
@@ -230,7 +251,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="resetToFirstField"><c>true</c> to select the first field regardless of any
         /// active selection.</param>
-        void EnsureFieldSelection(bool resetToFirstField);
+        /// <param name="resetToLastField"><c>true</c> to select the last field regardless of any
+        /// active selection.</param>
+        void EnsureFieldSelection(bool resetToFirstField, bool resetToLastField);
 
         /// <summary>
         /// Performs an undo operation.
@@ -251,5 +274,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Refreshes the state of the control.
         /// </summary>
         void RefreshControlState();
+
+        /// <summary>
+        /// <c>true</c> if a document type field is available to select from document-type specific
+        /// configurations.
+        /// </summary>
+        bool DocumentTypeAvailable { get; }
+
+        /// <summary>
+        /// <c>true</c> if a document type field current has focus; otherwise, <c>false</c>.
+        /// </summary>
+        bool DocumentTypeFocused { get; }
+
+        /// <summary>
+        /// Sets focus to the document type field.
+        /// </summary>
+        bool FocusDocumentType();
+
+        /// <summary>
+        /// Attempts to apply the current text of _documentTypeComboBox as the active document type.
+        /// </summary>
+        /// <returns><c>true</c> if the document type was successfully applied; <c>false</c> if the 
+        /// document type was not successfully applied.</returns>
+        bool ApplyDocumentType();
     }
 }

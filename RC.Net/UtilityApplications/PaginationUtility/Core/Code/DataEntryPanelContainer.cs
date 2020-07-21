@@ -218,6 +218,28 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // To hide column that had _documentTypeComboBox.
                     _tableLayoutPanel.ColumnStyles[1].SizeType = SizeType.AutoSize;
                 }
+                else
+                {
+                    // Initialize the auto-complete list that will be available for free-form typing
+                    // in the combobox.
+                    // The auto-complete list should include copies of all items prefixed with space so
+                    // that the space bar displays the document type list just like in data entry controls.
+                    var docTypeList = _configManager.RegisteredDocumentTypes
+                        .Concat(_configManager.RegisteredDocumentTypes.Select(s => " " + s))
+                        .ToArray();
+
+                    var autoCompleteList = new AutoCompleteStringCollection();
+                    autoCompleteList.AddRange(docTypeList);
+
+                    _documentTypeComboBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+                    _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                    _documentTypeComboBox.AutoCompleteCustomSource = autoCompleteList;
+
+                    _documentTypeComboBox.GotFocus += HandleDocumentTypeComboBox_GotFocus;
+                    _documentTypeComboBox.LostFocus += HandleDocumentTypeComboBox_LostFocus;
+                    _documentTypeComboBox.DropDown += HandleDocumentTypeComboBox_DropDown;
+                    _documentTypeComboBox.DropDownClosed += HandleDocumentTypeComboBox_DropDownClosed;
+                }
             }
             catch (Exception ex)
             {
@@ -306,6 +328,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<DuplicateDocumentsAppliedEventArgs> DuplicateDocumentsApplied;
 
+        /// <summary>
+        /// Occurs when a document has finished loading.
+        /// </summary>
+        public event EventHandler<EventArgs> DocumentLoaded;
+
+        /// <summary>
+        /// Raised when tab navigation is activated; if handled, the control hosting this panel
+        /// should implement the UI response to the navigation. If not handled, this class (or the
+        /// underlying DataEntryControlHost) will.
+        /// </summary>
+        public event EventHandler<TabNavigationEventArgs> TabNavigation;
+
         #endregion Events
 
         #region IPaginationDocumentDataPanel
@@ -388,6 +422,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Gets the active data entry panel.
+        /// </summary>
+        /// <value>
+        /// The active data entry panel.
+        /// </value>
+        public DataEntryDocumentDataPanel ActiveDataEntryPanel
+        {
+            get
+            {
+                return _configManager
+                    ?.ActiveDataEntryConfiguration
+                    ?.DataEntryControlHost
+                    as DataEntryDocumentDataPanel;
+            }
+        }
+
+        /// <summary>
         /// Gets the current "active" data entry. This is the last data entry control to have
         /// received input focus (but doesn't necessarily mean the control currently has input
         /// focus).
@@ -462,24 +513,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// <see cref="NavigatedOutEventArgs"/> indicating a deferred <see cref="NavigatedOut"/>
+        /// <see cref="TabNavigationEventArgs"/> indicating a deferred <see cref="TabNavigation"/>
         /// event that should be executed on the next tab navigation operation.
         /// </summary>
-        public NavigatedOutEventArgs PendingNavigateOutEventArgs
+        public TabNavigationEventArgs PendingTabNavigationEventArgs
         {
             get
             {
-                return ActiveDataEntryPanel?.PendingNavigateOutEventArgs;
+                return ActiveDataEntryPanel?.PendingTabNavigationEventArgs;
             }
 
             set
             {
                 if (ActiveDataEntryPanel != null)
                 {
-                    ActiveDataEntryPanel.PendingNavigateOutEventArgs = value;
+                    ActiveDataEntryPanel.PendingTabNavigationEventArgs = value;
                 }
             }
-        }        
+        }
 
         /// <summary>
         /// Loads the specified <see paramref="data" />.
@@ -508,7 +559,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _configManager.LoadCorrectConfigForData(_documentData.WorkingAttributes);
                 _configManager.ActiveDataEntryConfiguration.OpenDatabaseConnections();
 
-                ActiveDataEntryPanel.LoadData(data, forEditing);
+                var initializeDEPSelection = Editable && forEditing && !_documentTypeComboBox.Visible;
+                ActiveDataEntryPanel.LoadData(data, forEditing, initializeDEPSelection);
 
                 _documentTypeComboBox.Enabled = true;
                 _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeComboBox_SelectedIndexChanged;
@@ -709,11 +761,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="resetToFirstField"><c>true</c> to select the first field regardless of any
         /// active selection.</param>
-        public void EnsureFieldSelection(bool resetToFirstField)
+        /// <param name="resetToLastField"><c>true</c> to select the last field regardless of any
+        /// active selection.</param>
+        public void EnsureFieldSelection(bool resetToFirstField, bool resetToLastField)
         {
             try
             {
-                ActiveDataEntryPanel?.EnsureFieldSelection(resetToFirstField);
+                ActiveDataEntryPanel?.EnsureFieldSelection(resetToFirstField, resetToLastField);
             }
             catch (Exception ex)
             {
@@ -788,6 +842,41 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// <c>true</c> if a document type field is available to select from document-type specific
+        /// configurations.
+        /// </summary>
+        public bool DocumentTypeAvailable
+        {
+            get
+            {
+                return _documentTypeComboBox.Visible;
+            }
+        }
+
+        public bool DocumentTypeFocused
+        {
+            get
+            {
+                return _documentTypeComboBox.Focused;
+            }
+        }
+
+        public bool FocusDocumentType()
+        {
+            return _documentTypeComboBox.Focus();
+        }
+
+        /// <summary>
+        /// Attempts to apply the current text of _documentTypeComboBox as the active document type.
+        /// </summary>
+        /// <returns><c>true</c> if the document type was successfully applied; <c>false</c> if the 
+        /// document type was not successfully applied.</returns>
+        public bool ApplyDocumentType()
+        {
+            return _configManager.ApplyDocumentType();
+        }
+
         #endregion IPaginationDocumentDataPanel
 
         #region Overrides
@@ -813,6 +902,74 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 ex.ExtractDisplay("ELI41630");
             }
+        }
+
+        /// <summary>
+        /// Allows handling of command keys before the native controls do.
+        /// </summary>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            try
+            {
+                if (_documentTypeComboBox.Visible)
+                {
+                    // Allow up/down arrow to open document type dropdown.
+                    if ((keyData == Keys.Up || keyData == Keys.Down)
+                            && _documentTypeComboBox.Focused
+                            && !_documentTypeComboBox.DroppedDown
+                            && !FormsMethods.IsAutoCompleteDisplayed())
+                    {
+                        _documentTypeComboBox.DroppedDown = true;
+                        return true;
+                    }
+
+                    // Escape key should closed auto-complete and/or drop down and restore the
+                    // document type to what it was before the auto-complete/drop list were displayed
+                    if (keyData == Keys.Escape && (_documentTypeComboBox.DroppedDown ||
+                        (_documentTypeComboBox.Focused && FormsMethods.IsAutoCompleteDisplayed())))
+                    {
+                        _documentTypeComboBox.Text = _configManager?.ActiveDocumentType;
+                        _documentTypeComboBox.DroppedDown = false;
+                        return true;
+                    }
+
+                    // Enter key should apply the currently selected valud in the auto-complete and/or
+                    // drop down list
+                    if (keyData == Keys.Enter && (_documentTypeComboBox.DroppedDown ||
+                        (_documentTypeComboBox.Focused && FormsMethods.IsAutoCompleteDisplayed())))
+                    {
+                        // When programmatically closing an open drop-down, the text property will be
+                        // overriden with the last valid selection in the drop down. In order to process
+                        // the current text (whether or not valid), lock the current document type as
+                        // the menu is closed, then attempt to manually process after the close.
+                        var currentText = _documentTypeComboBox.Text;
+
+                        try
+                        {
+                            _configManager.LockDocumentType = true;
+                            _documentTypeComboBox.DroppedDown = false;
+                        }
+                        finally
+                        {
+                            _configManager.LockDocumentType = false;
+                        }
+
+                        _documentTypeComboBox.Text = currentText;
+
+                        ApplyDocumentType();
+
+                        _documentTypeComboBox.SelectAll();
+
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50117");
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         /// <summary> 
@@ -916,27 +1073,30 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <exception cref="System.NotImplementedException"></exception>
         void HandleConfigManager_ConfigurationChanged(object sender, ConfigurationChangedEventArgs e)
         {
-            var oldDatEntryControlHost = e.OldDataEntryConfiguration?.DataEntryControlHost as DataEntryDocumentDataPanel;
+            var oldDataEntryControlHost = e.OldDataEntryConfiguration?.DataEntryControlHost as DataEntryDocumentDataPanel;
             var newDataEntryControlHost = e.NewDataEntryConfiguration?.DataEntryControlHost as DataEntryDocumentDataPanel;
 
-            if (oldDatEntryControlHost != newDataEntryControlHost)
+            if (oldDataEntryControlHost != newDataEntryControlHost)
             {
-                if (oldDatEntryControlHost != null)
+                if (oldDataEntryControlHost != null)
                 {
                     // Set Active = false for the old DEP so that it no longer tracks image
                     // viewer events.
-                    oldDatEntryControlHost.Active = false;
+                    oldDataEntryControlHost.Active = false;
 
-                    oldDatEntryControlHost.PageLoadRequest -= DataEntryControlHost_PageLoadRequest;
-                    oldDatEntryControlHost.UndoAvailabilityChanged -= DataEntryControlHost_UndoAvailabilityChanged;
-                    oldDatEntryControlHost.RedoAvailabilityChanged -= DataEntryControlHost_RedoAvailabilityChanged;
+                    oldDataEntryControlHost.PageLoadRequest -= DataEntryControlHost_PageLoadRequest;
+                    oldDataEntryControlHost.UndoAvailabilityChanged -= DataEntryControlHost_UndoAvailabilityChanged;
+                    oldDataEntryControlHost.RedoAvailabilityChanged -= DataEntryControlHost_RedoAvailabilityChanged;
+                    oldDataEntryControlHost.DuplicateDocumentsApplied -= HandleDataEntryControlHost_DuplicateDocumentsApplied;
+                    oldDataEntryControlHost.TabNavigation -= HandleDataEntryControlHost_TabNavigation;
+                    oldDataEntryControlHost.DocumentLoaded -= HandleDataEntryControlHost_DocumentLoaded;
 
-                    oldDatEntryControlHost.ClearData();
+                    oldDataEntryControlHost.ClearData();
 
                     // Don't preserve undo state between DEPs, but do if the change is during data loading,
                     // e.g., switching between documents
                     // https://extract.atlassian.net/browse/ISSUE-14335
-                    if (!_loading)
+                    if (!_loading && _documentData != null)
                     {
                         _documentData.UndoState = null;
 
@@ -968,7 +1128,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                             // from being marked permanently dirty.
                             _documentData.SetPermanentlyModified();
                         }
-                        newDataEntryControlHost.LoadData(_documentData, forEditing: Editable);
+
+                        bool initializeDEPSelection = Editable && !_documentTypeComboBox.Visible;
+                        newDataEntryControlHost.LoadData(_documentData, forEditing: Editable, initializeDEPSelection);
 
                         _undoButton.Enabled = UndoOperationAvailable;
                         _redoButton.Enabled = RedoOperationAvailable;
@@ -978,6 +1140,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     newDataEntryControlHost.UndoAvailabilityChanged += DataEntryControlHost_UndoAvailabilityChanged;
                     newDataEntryControlHost.RedoAvailabilityChanged += DataEntryControlHost_RedoAvailabilityChanged;
                     newDataEntryControlHost.DuplicateDocumentsApplied += HandleDataEntryControlHost_DuplicateDocumentsApplied;
+                    newDataEntryControlHost.TabNavigation += HandleDataEntryControlHost_TabNavigation;
+                    newDataEntryControlHost.DocumentLoaded += HandleDataEntryControlHost_DocumentLoaded;
 
                     // Set Active = true for the new DEP so that it tracks image viewer events.
                     newDataEntryControlHost.Active = Editable;
@@ -985,25 +1149,34 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
 
                 DataPanelChanged?.Invoke(this,
-                    new DataPanelChangedEventArgs(oldDatEntryControlHost, newDataEntryControlHost));
+                    new DataPanelChangedEventArgs(oldDataEntryControlHost, newDataEntryControlHost));
             }
         }
 
-        /// <summary>
-        /// Handles the DuplicateDocumentsApplied event of the active <see cref="DataEntryDocumentDataPanel"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="DuplicateDocumentsAppliedEventArgs"/> instance containing the event data.</param>
-        void HandleDataEntryControlHost_DuplicateDocumentsApplied(object sender, DuplicateDocumentsAppliedEventArgs e)
-        {
-            try
+            /// <summary>
+            /// Handles the DuplicateDocumentsApplied event of the active <see cref="DataEntryDocumentDataPanel"/>.
+            /// </summary>
+            /// <param name="sender">The source of the event.</param>
+            /// <param name="e">The <see cref="DuplicateDocumentsAppliedEventArgs"/> instance containing the event data.</param>
+            void HandleDataEntryControlHost_DuplicateDocumentsApplied(object sender, DuplicateDocumentsAppliedEventArgs e)
             {
                 DuplicateDocumentsApplied?.Invoke(sender, e);
             }
-            catch (Exception ex)
+
+            /// <summary>
+            /// Handles the <see cref="DataEntryControlHost.DocumentLoaded"/> event of the active 
+            /// <see cref="DataEntryDocumentDataPanel"/>.
+            void HandleDataEntryControlHost_DocumentLoaded(object sender, EventArgs e)
             {
-                throw ex.AsExtract("ELI46497");
+                DocumentLoaded.Invoke(sender, e);
             }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryControlHost.TabNavigation"/> event of the active 
+        /// <see cref="DataEntryDocumentDataPanel"/>.
+        void HandleDataEntryControlHost_TabNavigation(object sender, TabNavigationEventArgs e)
+        {
+            TabNavigation?.Invoke(sender, e);
         }
 
         /// <summary>
@@ -1130,26 +1303,78 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Control.GotFocus"/> event of <see cref="_documentTypeComboBox"/>
+        /// in order to indicate focus with the DEP selection color. 
+        /// </summary>
+        void HandleDocumentTypeComboBox_GotFocus(object sender, EventArgs e)
+        {
+            try
+            {
+                _documentTypeComboBox.BackColor = ActiveDataEntryPanel.ActiveSelectionColor;
+                ActiveDataEntryPanel.ClearSelection();
+                _documentTypeComboBox.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50118");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.LostFocus"/> event of <see cref="_documentTypeComboBox"/>
+        /// in order to remove DEP selection color. 
+        /// </summary>
+        void HandleDocumentTypeComboBox_LostFocus(object sender, EventArgs e)
+        {
+            try
+            {
+                _documentTypeComboBox.Select(0, 0);
+                _documentTypeComboBox.BackColor = SystemColors.Window;
+                _documentTypeComboBox.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50119");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ComboBox.DropDown"/> event of <see cref="_documentTypeComboBox"/>
+        /// in order to disable the auto-complete list from displaying while the drop list is displayed.
+        /// </summary>
+        void HandleDocumentTypeComboBox_DropDown(object sender, EventArgs e)
+        {
+            try
+            {
+                _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.None;
+                _documentTypeComboBox.Text = _configManager?.ActiveDocumentType;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50121");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ComboBox.DropDownClosed"/> event of <see cref="_documentTypeComboBox"/>
+        /// in order to re-enable the auto-complete list.
+        /// </summary>
+        void HandleDocumentTypeComboBox_DropDownClosed(object sender, EventArgs e)
+        {
+            try
+            {
+                _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50120");
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
-
-        /// <summary>
-        /// Gets the active data entry panel.
-        /// </summary>
-        /// <value>
-        /// The active data entry panel.
-        /// </value>
-        internal DataEntryDocumentDataPanel ActiveDataEntryPanel
-        {
-            get
-            {
-                return _configManager
-                    ?.ActiveDataEntryConfiguration
-                    ?.DataEntryControlHost
-                    as DataEntryDocumentDataPanel;
-            }
-        }
 
         /// <summary>
         /// Gets or sets the <see cref="ThreadManager"/> to use to manage

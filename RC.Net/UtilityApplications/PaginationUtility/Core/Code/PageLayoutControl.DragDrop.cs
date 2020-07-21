@@ -456,7 +456,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (e.Data.GetDataPresent(_DRAG_DROP_DATA_FORMAT))
                 {
-                    System.Diagnostics.Debug.WriteLine("Handle_DragEnter");
                     e.Effect = DragDropEffects.Move;
                 }
                 else

@@ -2,6 +2,7 @@
 using Extract.FileActionManager.Forms;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -199,6 +200,22 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// The currently applied document type.
+        /// </summary>
+        public string ActiveDocumentType
+        {
+            get
+            {
+                return _activeDocumentType;
+            }
+        }
+
+        /// <summary>
+        /// When set to <c>true</c> changes to <see cref="ActiveDocumentType"/> will be prevented.
+        /// </summary>
+        public bool LockDocumentType { get; set; }
+
+        /// <summary>
         /// Gets all the <see cref="DataEntryConfiguration"/>s.
         /// </summary>
         public IEnumerable<DataEntryConfiguration> Configurations
@@ -386,6 +403,7 @@ namespace Extract.DataEntry
                 if (_documentTypeConfigurations != null)
                 {
                     _documentTypeComboBox.DropDownClosed += HandleDocumentTypeDropDownClosed;
+                    _documentTypeComboBox.Validating += HandleDocumentTypeDropDown_Validating;
                     _documentTypeComboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
                     _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.Suggest;
                 }
@@ -650,6 +668,54 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Attempts to apply the current text of _documentTypeComboBox as the active document type.
+        /// </summary>
+        /// <returns><c>true</c> if the document type was successfully applied; <c>false</c> if the 
+        /// document type was not successfully applied.</returns>
+        public bool ApplyDocumentType()
+        {
+            try
+            {
+                // After selecting a value from the combo's auto-complete list, something gets thrown off
+                // with the processing of arrow keys such that arrow keys will no longer navigate the
+                // drop down list. Disabling and re-enabling auto-complete seems to correct the situation.
+                if (FormsMethods.IsAutoCompleteDisplayed())
+                {
+                    _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.None;
+                    _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                }
+
+                if (string.IsNullOrWhiteSpace(_documentTypeComboBox.Text))
+                {
+                    return false;
+                }
+
+                // Copies of all document types with a spacebar prefix have been added to allow for spacebar to drop
+                // display the list of document types; trim any such space from the current text.
+                if (_documentTypeComboBox.Text.StartsWith(" ", StringComparison.OrdinalIgnoreCase))
+                {
+                    _documentTypeComboBox.Text = _documentTypeComboBox.Text.TrimStart(' ');
+                }
+
+                if (RegisteredDocumentTypes.Contains(_documentTypeComboBox.Text,
+                    StringComparer.OrdinalIgnoreCase))
+                {
+                    ChangeActiveDocumentType(_documentTypeComboBox.Text, allowConfigurationChange: true);
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50110");
+            }
+        }
+
+        /// <summary>
         /// Changes the current document's document type to the specified value.
         /// </summary>
         /// <param name="documentType">The new document type</param>
@@ -658,7 +724,7 @@ namespace Extract.DataEntry
         /// the current configuration should not be changed.</param>
         bool ChangeActiveDocumentType(string documentType, bool allowConfigurationChange)
         {
-            if (_changingDocumentType)
+            if (_changingDocumentType || LockDocumentType)
             {
                 return false;
             }
@@ -842,6 +908,12 @@ namespace Extract.DataEntry
             {
                 changedDocumentType = false;
                 changedDataEntryConfig = false;
+
+                if (LockDocumentType)
+                {
+                    return;
+                }
+
                 DataEntryConfiguration newDataEntryConfig = GetConfigurationForDocumentType(documentType);
 
                 if (_activeDataEntryConfig == null ||
@@ -990,9 +1062,17 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Update the active document type, changing the current configuration if
-                // appropriate.
-                ChangeActiveDocumentType(_documentTypeComboBox.Text, true);
+                // Check for an active panel; the drop down may have been closed because the DEP is closing.
+                if (ActiveDataEntryConfiguration?.DataEntryControlHost?.IsDocumentLoaded == true
+                    && _documentTypeComboBox.SelectedItem != null
+                    && !LockDocumentType)
+                {
+                    _documentTypeComboBox.Text = (string)_documentTypeComboBox.SelectedItem;
+
+                    // Update the active document type, changing the current configuration if
+                    // appropriate.
+                    ChangeActiveDocumentType(_documentTypeComboBox.Text, true);
+                }
             }
             catch (Exception ex)
             {
@@ -1004,6 +1084,23 @@ namespace Extract.DataEntry
                 // document load and even it if doesn't, it could indicate that the document will
                 // not be able to be correctly saved.
                 OnConfigurationChangeError(ee);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.Validating"/> event for the_documentTypeComboBox.
+        /// </summary>
+        void HandleDocumentTypeDropDown_Validating(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                // If an entered document type cannot be applied, don't allow the document type combo
+                // to lose focus until the user selects a valid document type.
+                e.Cancel = !ApplyDocumentType();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50109");
             }
         }
 

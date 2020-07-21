@@ -222,11 +222,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<EventArgs> DocumentDataPanelClosed;
 
         /// <summary>
-        /// Raised when the user has navigated out of the <see cref="IPaginationDocumentDataPanel"/>
-        /// via tab navigation (as opposed to explicitly closing the panel).
-        /// NOTE: <see cref="DocumentDataPanelClosed"/> will still be raised as the data panel closes.
+        /// Raised when the user has used tab navigation in the <see cref="IPaginationDocumentDataPanel"/>
         /// </summary>
-        public event EventHandler<EventArgs> DocumentDataPanelNavigatedOut;
+        public event EventHandler<TabNavigationEventArgs> TabNavigation;
 
         /// <summary>
         /// Raised when the view of the associated <see cref="OutputDocument"/> pages have either
@@ -567,16 +565,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, forEditing: !Document.OutputProcessed);
 
-                        args.DocumentDataPanel.DataPanelChanged += DocumentDataPanel_DataPanelChanged;  
-                        var activeDataPanel = ((DataEntryPanelContainer)args.DocumentDataPanel).ActiveDataEntryPanel;
-                        activeDataPanel.NavigatedOut += HandleDEP_NavigatedOut;
+                        args.DocumentDataPanel.DocumentLoaded += HandleDataEntryControlHost_DocumentLoaded;
+                        args.DocumentDataPanel.DataPanelChanged += HandleDocumentDataPanel_DataPanelChanged;
+                        args.DocumentDataPanel.TabNavigation += HandleDocumentDataPanel_TabNavigation;
 
                         DocumentDataHasBeenViewed = true;
 
                         // Ensure this control gets sized based upon the added _documentDataPanelControl.
                         PerformLayout();
-
-                        DocumentDataPanel.EnsureFieldSelection(resetToFirstField: true);
                     }
                 }
             }
@@ -628,9 +624,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         documentDataPanel.ClearData();
                     }
 
-                    var activeDataPanel = ((DataEntryPanelContainer)documentDataPanel).ActiveDataEntryPanel;
-                    activeDataPanel.EnsureFieldSelection(resetToFirstField: false);
-                    activeDataPanel.NavigatedOut -= HandleDEP_NavigatedOut;
+                    documentDataPanel.ActiveDataEntryPanel.EnsureFieldSelection(
+                        resetToFirstField: false, resetToLastField: false);
 
                     // Report the DEP to be closed before it is removed so that events that trigger
                     // as part of its removal do not assume the DEP to be open and usable.
@@ -640,7 +635,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _tableLayoutPanel.Controls.Remove(documentDataPanel.PanelControl);
                     _tableLayoutPanel.Height = _tableLayoutPanel.Controls.OfType<Control>().Max(c => c.Bottom);
                     Height = _tableLayoutPanel.Height;
-                    documentDataPanel.DataPanelChanged -= DocumentDataPanel_DataPanelChanged;  
+
+                    documentDataPanel.DocumentLoaded -= HandleDataEntryControlHost_DocumentLoaded;
+                    documentDataPanel.DataPanelChanged -= HandleDocumentDataPanel_DataPanelChanged;
+                    documentDataPanel.TabNavigation -= HandleDocumentDataPanel_TabNavigation;
                 }
 
                 return true;
@@ -1021,16 +1019,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles the <see cref="DocumentDataPanel.DataPanelChanged"/> event of the active panel.
         /// </summary>
-        private void DocumentDataPanel_DataPanelChanged(object sender, DataPanelChangedEventArgs e)
+        private void HandleDocumentDataPanel_DataPanelChanged(object sender, DataPanelChangedEventArgs e)
         {
             try
             {
                 // https://extract.atlassian.net/browse/ISSUE-15139
                 // Ensure this control gets sized based upon the added _documentDataPanelControl.
                 PerformLayout();
-
-                e.OldDataPanel.NavigatedOut -= HandleDEP_NavigatedOut;
-                e.NewDataPanel.NavigatedOut += HandleDEP_NavigatedOut;
             }
             catch (Exception ex)
             {
@@ -1078,47 +1073,94 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles case when tab navigation reaches the last control in the DEP. At this point, DEP
-        /// data should be saved and navigation focus should be returned to the PageLayouControl.
+        /// Handles the casetab navigation is being processed by the data panel. This provides
+        /// this class as well as the hosting PageLayoutControl an opportunity to enforce tab
+        /// navigation scenarios. If not handled, this underlying DEP will.
         /// </summary>
-        void HandleDEP_NavigatedOut(object sender, NavigatedOutEventArgs e)
+        void HandleDocumentDataPanel_TabNavigation(object sender, TabNavigationEventArgs e)
         {
             try
             {
-                if (IsDataPanelOpen)
+                if (!IsDataPanelOpen)
                 {
-                    var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
+                    return;
+                }
 
-                    if (e.Forward)
+                var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
+
+                // In the case that the user is tabbing out of the DEP but there is invalid data,
+                // cancel the event so that focus can return to the invalid field.
+                if (e.Forward && e.LastStop &&
+                    !documentDataPanel.SaveData(_outputDocument.DocumentData, validateData: true))
+                {
+                    // Inform the panel that once the user uses tab navigation again, TabNavigation
+                    // should be raised.
+                    documentDataPanel.PendingTabNavigationEventArgs = e;
+
+                    e.Handled = true;
+                    return;
+                }
+
+                // Allow the PageLayoutControl a chance to handle the event.
+                if (TabNavigation != null)
+                {
+                    TabNavigation?.Invoke(this, e);
+                    if (e.Handled)
                     {
-                        if (documentDataPanel.SaveData(_outputDocument.DocumentData, validateData: true))
-                        {
-                            DocumentDataPanelNavigatedOut?.Invoke(this, new EventArgs());
-                        }
-                        else
-                        {
-                            // Inform the panel that once the user uses tab navigation again, NavigatedOut
-                            // should be raised.
-                            documentDataPanel.PendingNavigateOutEventArgs = e;
-                        }
+                        return;
                     }
-                    else
+                }
+
+                if (e.LastStop && !e.Forward)
+                {
+                    // Tabbing backward from the DocumentType field
+                    if (documentDataPanel.DocumentTypeFocused)
                     {
                         CloseDataPanel(saveData: true, validateData: false);
                     }
+                    // Tabbing backward from the DEP
+                    else if (!documentDataPanel.FocusDocumentType())
+                    {
+                        CloseDataPanel(saveData: true, validateData: false);
+                    }
+
+                    e.Handled = true;
                 }
-                else
+                else if (!e.LastStop && e.Forward && documentDataPanel.DocumentTypeFocused)
                 {
-                    // It is proving difficult to ensure NavigatedOut is properly unregistered.
-                    // In the case this event is encountered but it is not this separator that is active
-                    // do not handle the event; unregister the event instead.
-                    ((DataEntryDocumentDataPanel)sender).NavigatedOut -= HandleDEP_NavigatedOut;
+                    // Tabbing forward from the DocumentType field
+                    if (documentDataPanel.ApplyDocumentType())
+                    {
+                        documentDataPanel.EnsureFieldSelection(
+                            resetToFirstField: true, resetToLastField: false);
+                    }
+
+                    e.Handled = true;
                 }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI49857");
             }
+        }
+
+        /// <summary>
+        /// Handles the DocumentLoaded event for the current DEP.
+        /// </summary>
+        void HandleDataEntryControlHost_DocumentLoaded(object sender, EventArgs e)
+        {
+            // Initialize selection whenever the a DEP is loaded (or a DEP configuration change occurs).
+            var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
+
+            if (documentDataPanel.DocumentTypeAvailable)
+            {
+                documentDataPanel.FocusDocumentType();
+            }
+            else if (documentDataPanel.ActiveDataEntryPanel.ActiveDataControl == null)
+            {
+                Document.PageControls.First().Selected = true;
+            }
+            // else the DEP will have assumed focus.
         }
 
         #endregion Event Handlers

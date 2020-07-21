@@ -1911,7 +1911,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         LoadDataEntryControlHostPanel();
 
                         // Load the attributes from the previous DataEntryControlHost
-                        newDataEntryControlHost.LoadData(_configManager.Attributes, _fileName, forEditing: true);
+                        newDataEntryControlHost.LoadData(_configManager.Attributes, _fileName, 
+                            forEditing: true, initializeSelection: true);
 
                         // Register for events and engage shortcut handlers for the new DEP
                         newDataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
@@ -2103,7 +2104,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // If a DEP is being used, load the data into it
                     if (DataEntryControlHost != null)
                     {
-                        DataEntryControlHost.LoadData(attributes, _fileName, forEditing: true);
+                        DataEntryControlHost.LoadData(attributes, _fileName, forEditing: true, initializeSelection: true);
 
                         // Now that the data has been loaded into the DEP, update the document data
                         // in the pagination panel so that it is sharing the same attributes
@@ -2129,7 +2130,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     if (DataEntryControlHost != null)
                     {
-                        DataEntryControlHost.LoadData(null, null, forEditing: true);
+                        DataEntryControlHost.LoadData(null, null, forEditing: true, initializeSelection: true);
                     }
                 }
                 else
@@ -3060,7 +3061,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // panel (data tab), we will not be able to select a field.
                     if (_imageOpened)
                     {
-                        DataEntryControlHost.EnsureFieldSelection(resetToFirstField: false);
+                        DataEntryControlHost.EnsureFieldSelection(resetToFirstField: false, resetToLastField: false);
                     }
 
                     // Table controls don't always seem to be drawn correctly after switching tabs.

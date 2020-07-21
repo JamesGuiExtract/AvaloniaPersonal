@@ -359,6 +359,11 @@ namespace Extract.DataEntry
         bool _changingData;
 
         /// <summary>
+        /// Indicates whether field selection should be initialized upon completion of a LoadData call.
+        /// </summary>
+        bool _initializeSelection;
+
+        /// <summary>
         /// The current "active" data entry.  This is the last data entry control to have received
         /// input focus (but doesn't necessarily mean the control currently has input focus).
         /// </summary>
@@ -745,10 +750,10 @@ namespace Extract.DataEntry
         Icon _blankIcon;
 
         /// <summary>
-        /// Indicates a deferred <see cref="NavigatedOut"/> event that should be executed on the next
+        /// Indicates a deferred <see cref="TabNavigation"/> event that should be executed on the next
         /// tab navigation operation.
         /// </summary>
-        NavigatedOutEventArgs _pendingNavigateOutEventArgs;
+        TabNavigationEventArgs _pendingTabNavigationEventArgs;
 
         #endregion Fields
 
@@ -1472,19 +1477,19 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// <see cref="NavigatedOutEventArgs"/> indicating a deferred <see cref="NavigatedOut"/>
+        /// <see cref="TabNavigationEventArgs"/> indicating a deferred <see cref="TabNavigation"/>
         /// event that should be executed on the next tab navigation operation.
         /// </summary>
-        public NavigatedOutEventArgs PendingNavigateOutEventArgs
+        public TabNavigationEventArgs PendingTabNavigationEventArgs
         {
             get
             {
-                return _pendingNavigateOutEventArgs;
+                return _pendingTabNavigationEventArgs;
             }
 
             set
             {
-                _pendingNavigateOutEventArgs = value;
+                _pendingTabNavigationEventArgs = value;
             }
         }
 
@@ -1670,7 +1675,7 @@ namespace Extract.DataEntry
                         // propagate selection to the next attribute in the tab order.
                         if (m.Msg == WindowsMessage.KeyDown)
                         {
-                            AdvanceToNextTabStop(!_shiftKeyDown);
+                            AdvanceToNextTabStop(!_shiftKeyDown, viaTabKey: true);
 
                             // So that the input tracker is able to track this input
                             OnMessageHandled(new MessageHandledEventArgs(m));
@@ -1780,7 +1785,10 @@ namespace Extract.DataEntry
         /// <param name="forEditing"><c>true</c> if the loaded data is to be displayed for editing;
         /// <c>false</c> if the data is to be displayed read-only, or if it is being used for
         /// background formatting.</param>
-        public void LoadData(IUnknownVector attributes, string sourceDocName, bool forEditing)
+        /// <param name="initializeSelection">Indicates whether field selection should be initialized
+        /// upon completion of the load.</param>
+        public void LoadData(IUnknownVector attributes, string sourceDocName, bool forEditing,
+            bool initializeSelection)
         {
             try
             {
@@ -1792,18 +1800,18 @@ namespace Extract.DataEntry
                 }
 
                 _sourceDocName = sourceDocName;
+                _initializeSelection = initializeSelection;
                 HighlightDictionary preCreatedHighlights = null;
 
                 using (new TemporaryWaitCursor())
                 {
                     // De-activate any existing control that is active to prevent problems with
                     // last selected control remaining active when the next document is loaded.
-                    if (_activeDataControl != null)
-                    {
-                        _activeDataControl.IndicateActive(false, ActiveSelectionColor);
-                        _activeDataControl = null;
-                    }
+                    ClearSelection();
 
+                    // Disable all controls to prevent focus from being grabbed during load.
+                    EnableControls(false);
+                    
                     // Prevent updates to the controls during the attribute propagation
                     // that will occur as data is loaded.
                     LockControlUpdates(true);
@@ -1870,28 +1878,6 @@ namespace Extract.DataEntry
                         }
                     }
 
-                    // Enable/Disable all data controls per imageIsAvailable
-                    foreach (IDataEntryControl dataControl in _dataControls)
-                    {
-                        // Remove activate status from the active control.
-                        if (!imageIsAvailable && dataControl == _activeDataControl)
-                        {
-                            dataControl.IndicateActive(false, ActiveSelectionColor);
-                        }
-
-                        // Set the enabled status of every data control depending on the 
-                        // availability of data.
-                        Control control = (Control)dataControl;
-
-                        control.Enabled = imageIsAvailable && !dataControl.Disabled;
-                    }
-
-                    // Enable/Disable all non-data controls per imageIsAvailable
-                    foreach (Control control in _nonDataControls)
-                    {
-                        control.Enabled = imageIsAvailable;
-                    }
-
                     // For as long as unpropagated attributes are found, propagate them and their 
                     // subattributes so that all attributes that can be are mapped into controls.
                     // This enables the entire attribute tree to be navigated forward and backward 
@@ -1935,7 +1921,7 @@ namespace Extract.DataEntry
                     _refreshActiveControlHighlights = false;
                     _dirty = false;
                     _changingData = false;
-                    _pendingNavigateOutEventArgs = null;
+                    _pendingTabNavigationEventArgs = null;
 
                     if (imageIsAvailable)
                     {
@@ -1948,6 +1934,9 @@ namespace Extract.DataEntry
                     // FinalizeDocumentLoad at the end of the current message queue.
                     if (forEditing)
                     {
+                        _shiftKeyDown = ModifierKeys.HasFlag(Keys.Shift);
+                        _tabKeyDown = ModifierKeys.HasFlag(Keys.Tab);
+
                         this.SafeBeginInvoke("ELI34448", () => FinalizeDocumentLoad());
                     }
                     else
@@ -2842,11 +2831,7 @@ namespace Extract.DataEntry
                 // Since the data associated with the currently selected control has been cleared,
                 // set _activeDataControl to null so that the next control focus change is processed
                 // re-initializes the current selection even if the same control is still selected.
-                if (_activeDataControl != null)
-                {
-                    _activeDataControl.IndicateActive(false, ActiveSelectionColor);
-                    _activeDataControl = null;
-                }
+                ClearSelection();
 
                 _selectedAttributesWithAcceptedHighlights = 0;
                 _selectedAttributesWithUnacceptedHighlights = 0;
@@ -2898,14 +2883,25 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="resetToFirstField"><c>true</c> to select the first field regardless of any
         /// active selection.</param>
-        public void EnsureFieldSelection(bool resetToFirstField)
+        /// <param name="resetToLastField"><c>true</c> to select the last field regardless of any
+        /// active selection.</param>
+        public void EnsureFieldSelection(bool resetToFirstField, bool resetToLastField)
         {
             try
             {
-                if (resetToFirstField)
+                ExtractException.Assert("ELI50113", "Invalid operation", !resetToFirstField || !resetToLastField);
+
+                if (!IsDocumentLoaded)
                 {
-                    _activeDataControl?.IndicateActive(false, ActiveSelectionColor);
-                    _activeDataControl = null;
+                    // It is not valid to initialize to the last field.
+                    ExtractException.Assert("ELI50116", "Invalid operation", !resetToLastField);
+                    _initializeSelection = true;
+                    return;
+                }
+
+                if (resetToFirstField || resetToLastField)
+                {
+                    ClearSelection();
                 }
                 else
                 {
@@ -2916,12 +2912,28 @@ namespace Extract.DataEntry
                     }
                 }
 
-                AdvanceToNextTabStop(true);
+                AdvanceToNextTabStop(!resetToLastField, viaTabKey: false);
                 OnItemSelectionChanged();
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40236");
+            }
+        }
+
+        /// <summary>
+        /// Clears any active field selection.
+        /// </summary>
+        public void ClearSelection()
+        {
+            try
+            {
+                _activeDataControl?.IndicateActive(false, ActiveSelectionColor);
+                _activeDataControl = null;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50111");
             }
         }
 
@@ -3007,12 +3019,11 @@ namespace Extract.DataEntry
         public event EventHandler<DataEntryControlEventArgs> ControlUnregistered;
 
         /// <summary>
-        /// Raised when forward tab navigation is activated on the last tab stop or shift+tab navigation
-        /// is activated on the first; if handled, the application hosting the DEP should implement the
-        /// UI response to the navigation. If not handled, focus will loop around to the first/last tab
-        /// stop of the DEP.
+        /// Raised when tab navigation is activated; if handled, the application hosting the DEP
+        /// should implement the UI response to the navigation. If not handled, this class will.
+        /// (including loop around to the first/last tab stop of the DEP if necessary)
         /// </summary>
-        public event EventHandler<NavigatedOutEventArgs> NavigatedOut;
+        public event EventHandler<TabNavigationEventArgs> TabNavigation;
 
         #endregion Events
 
@@ -3291,6 +3302,11 @@ namespace Extract.DataEntry
         {
             try
             {
+                if (!IsDocumentLoaded)
+                {
+                    return;
+                }
+
                 // Keep track of the control that should be gaining focus.
                 _focusingControl = (IDataEntryControl)sender;
 
@@ -5864,7 +5880,8 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="forward"><see langword="true"/> to go to the next tab stop or
         /// <see langword="false"/> to go to the previous tab stop.</param>
-        void AdvanceToNextTabStop(bool forward)
+        /// <param name="viaTabKey"><c>true</c> if the navigation was initiated via the tab key.</param>
+        void AdvanceToNextTabStop(bool forward, bool viaTabKey)
         {
             // Notify AttributeStatusInfo that the current edit is over.
             // This will also be called as part of a focus change event, but it needs
@@ -5874,20 +5891,14 @@ namespace Extract.DataEntry
             AttributeStatusInfo.EndEdit();
 
             // If there are _pendingNavigateOutEventArgs, once tab navigation is used again, execute
-            // the pending NavigatedOut call or reset it.
-            if (_pendingNavigateOutEventArgs != null)
+            // the pending TabNavigationEventArgs call or reset it.
+            if (viaTabKey && ApplyPendingTabNavigation(forward))
             {
-                bool? pendingForward = _pendingNavigateOutEventArgs?.Forward;
-                _pendingNavigateOutEventArgs = null;
-                if (_isDocumentLoaded && (forward == pendingForward))
-                {
-                    NavigatedOut?.Invoke(this, new NavigatedOutEventArgs(pendingForward.Value));
-                    return;
-                }
+                return;
             }
 
             // Tab navigation should loop if there is no handler to process tabbing out of DEP.
-            bool tabLoop = NavigatedOut == null;
+            bool tabLoop = TabNavigation == null;
             IAttribute originalActiveAttribute = GetActiveAttribute(!forward);
             IAttribute activeAttribute = originalActiveAttribute;
             Stack<IAttribute> activeGenealogy = ActiveAttributeGenealogy(!forward,
@@ -5907,18 +5918,17 @@ namespace Extract.DataEntry
                 Stack<IAttribute> nextTabStopGenealogy = GetNextTabStopGenealogy(
                     activeAttribute, activeGenealogy, forward, tabLoop, out tabByGroup);
 
-                if (nextTabStopGenealogy == null)
+                // Allow registered TabNavigation listener a chance to handle the navigation first.
+                if (viaTabKey)
                 {
-                    // If no further tab stops were found and the hosting application has registered for
-                    // the NavigatedOut event, raise the event to allow it to assume control of tab navigation
-                    if (NavigatedOut != null
-                        && _isDocumentLoaded)
+                    bool lastStop = nextTabStopGenealogy == null || (!forward && originalActiveAttribute == null);
+                    if (OnTabNavigation(forward, lastStop))
                     {
-                        NavigatedOut?.Invoke(this, new NavigatedOutEventArgs(forward));
                         return;
                     }
                 }
-                else
+
+                if (nextTabStopGenealogy != null)
                 {
                     // Indicate a manual focus event so that HandleControlGotFocus allows the
                     // new attribute selection rather than overriding it.
@@ -5954,6 +5964,51 @@ namespace Extract.DataEntry
                 }
             }
             while (repeat);
+        }
+
+        /// <summary>
+        /// If there is any _pendingTabNavigationEventArgs, raise the event.
+        /// </summary>
+        /// <returns><c>true</c> if the event was handled by a registered event listener;
+        /// <c>false</c> if there was not a pending event, a listener, or the event was not
+        /// handled.</returns>
+        bool ApplyPendingTabNavigation(bool forward)
+        {
+            if (_pendingTabNavigationEventArgs != null)
+            {
+                var eventArgs = new TabNavigationEventArgs(_pendingTabNavigationEventArgs);
+                _pendingTabNavigationEventArgs = null;
+                if (_isDocumentLoaded && (forward == eventArgs?.Forward))
+                {
+                    TabNavigation?.Invoke(this, eventArgs);
+                    if (eventArgs.Handled)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="TabNavigation"/> event
+        /// </summary>
+        /// <returns><c>true</c> if the event was processed by an event listener; otherwise, <c>false</c>.</returns>
+        bool OnTabNavigation(bool forward, bool lastStop)
+        {
+            if (_isDocumentLoaded && TabNavigation != null)
+            {
+                var eventArgs = new TabNavigationEventArgs(forward, lastStop);
+                TabNavigation.Invoke(this, eventArgs);
+
+                if (eventArgs.Handled)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -8131,9 +8186,6 @@ namespace Extract.DataEntry
                     // Initialize _currentlySelectedGroupAttribute as null. 
                     _currentlySelectedGroupAttribute = null;
                     _lastNavigationViaTabKey = true;
-
-                    // Select the first tab stop in the DEP
-                    AdvanceToNextTabStop(true);
                 }
                 else
                 {
@@ -8145,6 +8197,12 @@ namespace Extract.DataEntry
 
                 OnUpdateEnded(new EventArgs());
 
+                // Loading + events up thru the UpdateEnded event can trigger focus events.
+                // Wait until any potential focus-grabbing operations have completed before
+                // enabling controls.
+                // Selection will be initialized per _initializeSelection below.
+                EnableControls(true);
+
                 ExecuteOnIdle("ELI34419", () => AttributeStatusInfo.UndoManager.TrackOperations = true);
                 ExecuteOnIdle("ELI34420", () => _dirty = false);
                 // Forget all LastAppliedStringValues that are currently being remembered to ensure
@@ -8155,6 +8213,20 @@ namespace Extract.DataEntry
                 ExecuteOnIdle("ELI39651", () =>
                 {
                     _isDocumentLoaded = true;
+
+                    // Select the first tab stop in the DEP only after the document is flagged as loaded;
+                    // ControlGotFocus handlers is set to ignore focus events that occur as part of loading.
+                    if (Active && _initializeSelection && ImageViewer?.IsImageAvailable == true)
+                    {
+                        AdvanceToNextTabStop(true, viaTabKey: false);
+                    }
+                    else
+                    {
+                        ClearSelection();
+                    }
+
+                    _initializeSelection = false;
+
                     // By default, all query executions from this point forward should be considered
                     // to be the result of a manual data update.
                     AttributeStatusInfo.QueryExecutionContext = ExecutionContext.OnUpdate;
@@ -8172,6 +8244,27 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException.Display("ELI30037", ex);
+            }
+        }
+
+        /// <summary>
+        /// Enables/disables all data entry controls. Controls will only be enabled pending the
+        /// availability of a document and the state of the <see cref="IDataEntryControl.Disabled"/> property.
+        /// </summary>
+        /// <param name="enable"></param>
+        void EnableControls(bool enable)
+        {
+            enable = enable && ImageViewer?.IsImageAvailable == true;
+
+            foreach (IDataEntryControl dataControl in _dataControls)
+            {
+                Control control = (Control)dataControl;
+                control.Enabled = enable && !dataControl.Disabled;
+            }
+
+            foreach (Control control in _nonDataControls)
+            {
+                control.Enabled = enable;
             }
         }
 
