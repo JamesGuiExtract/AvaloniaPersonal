@@ -640,6 +640,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _tableLayoutPanel.Controls.Remove(documentDataPanel.PanelControl);
                     _tableLayoutPanel.Height = _tableLayoutPanel.Controls.OfType<Control>().Max(c => c.Bottom);
                     Height = _tableLayoutPanel.Height;
+                    documentDataPanel.DataPanelChanged -= DocumentDataPanel_DataPanelChanged;  
                 }
 
                 return true;
@@ -1154,6 +1155,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _controlUpdatePending = false;
 
                 _hasAppliedStatus = true;
+
+                // These handles aren't created sometimes and can cause exceptions
+                // https://extract.atlassian.net/browse/ISSUE-17128
                 _selectedCheckBox.Visible = _showSelectionCheckBox && !Document.OutputProcessed;
                 _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
                 _collapseDocumentButton.Visible = true;
