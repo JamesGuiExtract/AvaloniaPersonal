@@ -2,6 +2,7 @@
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,8 +20,18 @@ namespace Extract.DataEntry
         ListBox _listBoxChild;
         bool _msgFilterActive = false;
         Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>> _providerSource;
+
+        // Lambda to unregister from events registered in the ctor
         Action _unregister;
-        int _ignoreTextChange;
+
+        // Flags used to suppress some redundant events
+        bool _ignoreTextChange;
+        bool _ignoreMouseDown;
+        bool _suppressListBoxChildLostFocusEvent;
+        bool _suppressControlLostFocusEvent;
+
+        // The value to revert to if the dropped down is canceled (closed with escape or lost focus)
+        string _acceptedText;
 
         #endregion Fields
 
@@ -62,6 +73,43 @@ namespace Extract.DataEntry
         /// </summary>
         private Func<string, IEnumerable<object>> Provider { get; set; }
 
+        /// <summary>
+        /// Whether the suggestion list is showing
+        /// </summary>
+        public bool DroppedDown { get; private set; }
+
+        /// <summary>
+        /// Raised when an item is selected from the suggestion list
+        /// </summary>
+        public event EventHandler<CancelEventArgs> Validating;
+
+        /// <summary>
+        /// Raised when the suggestion list is closed
+        /// </summary>
+        public event EventHandler DropDownClosed;
+
+        /// <summary>
+        /// Raised when the edit control or the suggestion list gets focus
+        /// </summary>
+        public event EventHandler GotFocus;
+
+        /// <summary>
+        /// Raised when the edit control or the suggestion list loses focus
+        /// </summary>
+        public event EventHandler LostFocus;
+
+        /// <summary>
+        /// Sets internal state so that text can be reverted on cancel (e.g., pressing escape while the list is displayed)
+        /// </summary>
+        /// <param name="text">The value to be reverted to on cancel</param>
+        /// <param name="ignoreNextTextChangedEvent">If <c>true</c> the next TextChanged event from the editing control
+        /// will not show the suggestion list</param>
+        public void SetText(string text, bool ignoreNextTextChangedEvent)
+        {
+            _ignoreTextChange = ignoreNextTextChangedEvent;
+            _acceptedText = text;
+        }
+
         #endregion Properties
 
         #region Constructors
@@ -88,6 +136,12 @@ namespace Extract.DataEntry
                 control.MouseDown += HandleControl_MouseDown;
                 control.HandleDestroyed += HandleControl_HandleDestroyed;
 
+                var canSuppressFocusEvents = control as ICanSuppressFocusEvents;
+                if (canSuppressFocusEvents != null)
+                {
+                    canSuppressFocusEvents.LosingFocus += HandleControl_LosingFocus;
+                }
+
                 // Set up event unregistration
                 _unregister = () =>
                 {
@@ -95,12 +149,28 @@ namespace Extract.DataEntry
                     control.LostFocus -= HandleControl_LostFocus;
                     control.MouseDown -= HandleControl_MouseDown;
                     control.HandleDestroyed -= HandleControl_HandleDestroyed;
+
+                    if (canSuppressFocusEvents != null)
+                    {
+                        canSuppressFocusEvents.LosingFocus -= HandleControl_LosingFocus;
+                    }
                 };
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45348");
             }
+        }
+
+        DataEntryControlHost _dataEntryControlHost;
+        internal void SetDataEntryControlHost(DataEntryControlHost value)
+        {
+            if (_msgFilterActive)
+            {
+                _dataEntryControlHost?.RemoveMessageFilter(this);
+                value?.AddMessageFilter(this);
+            }
+            _dataEntryControlHost = value;
         }
 
         /// <summary>
@@ -121,17 +191,43 @@ namespace Extract.DataEntry
             try
             {
                 // Set up additional events we need to handle
-                control.SelectionChangeCommitted += Handle_SelectionChangeCommitted;
+                control.SelectionChangeCommitted += HandleControl_SelectionChangeCommitted;
 
                 // Set up event unregistration
                 _unregister += () =>
                 {
-                    control.SelectionChangeCommitted -= Handle_SelectionChangeCommitted;
+                    control.SelectionChangeCommitted -= HandleControl_SelectionChangeCommitted;
                 };
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45349");
+            }
+        }
+
+        /// <summary>
+        /// Creates a suggestion drop-down for a <see cref="DocumentTypeComboBox"/>
+        /// </summary>
+        /// <param name="control">The control for which to display the suggestions</param>
+        public LuceneAutoSuggest(DocumentTypeComboBox control)
+            : this(control, control)
+        {
+            try
+            {
+                // Set up additional events we need to handle
+                control.DropDown += HandleControl_DropDown;
+                control.DropDownClosed += HandleControl_DropDownClosed;
+
+                // Set up event unregistration
+                _unregister += () =>
+                {
+                    control.DropDown -= HandleControl_DropDown;
+                    control.DropDownClosed -= HandleControl_DropDownClosed;
+                };
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50129");
             }
         }
 
@@ -151,22 +247,16 @@ namespace Extract.DataEntry
 
         #region Event Handlers
 
-        void Handle_SelectionChangeCommitted(object sender, EventArgs e)
+        void HandleControl_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            _ignoreTextChange++;
+            _ignoreTextChange = true;
         }
 
         void HandleControl_HandleDestroyed(object sender, EventArgs e)
         {
             try
             {
-                if (_msgFilterActive)
-                {
-                    if (_dataEntryControl is IDataEntryControl dec)
-                    {
-                        dec?.DataEntryControlHost?.RemoveMessageFilter(this);
-                    }
-                }
+                RemoveMessageFilter();
             }
             catch (Exception ex)
             {
@@ -178,11 +268,30 @@ namespace Extract.DataEntry
         {
             try
             {
-                HideTheList();
+                if (!_ignoreMouseDown)
+                {
+                    HideTheList();
+                }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI45351");
+            }
+        }
+
+        void HandleControl_LosingFocus(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                if (_suppressControlLostFocusEvent)
+                {
+                    _suppressControlLostFocusEvent = false;
+                    e.Cancel = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50161");
             }
         }
 
@@ -201,67 +310,79 @@ namespace Extract.DataEntry
             }
         }
 
+        void HandleListBoxChild_GotFocus(object sender, EventArgs e)
+        {
+            try
+            {
+                GotFocus?.Invoke(this, e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50158");
+            }
+        }
+
+        void HandleListBoxChild_LostFocus(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_suppressListBoxChildLostFocusEvent)
+                {
+                    _suppressListBoxChildLostFocusEvent = false;
+                    return;
+                }
+
+                LostFocus?.Invoke(this, e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50159");
+            }
+        }
+
+
+        void HandleControl_DropDown(object sender, EventArgs e)
+        {
+            try
+            {
+                _ignoreMouseDown = true;
+
+                DropDown(" ");
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50160");
+            }
+            finally
+            {
+                _ignoreMouseDown = false;
+            }
+        }
+
+        void HandleControl_DropDownClosed(object sender, EventArgs e)
+        {
+            try
+            {
+                HideTheList();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50165");
+            }
+        }
+
         void HandleControl_TextChanged(object sender, EventArgs e)
         {
             try
             {
-                if (_ignoreTextChange > 0)
+                if (_ignoreTextChange)
                 {
-                    _ignoreTextChange = 0;
+                    _ignoreTextChange = false;
                     return;
                 }
 
-                if (!_control.Visible
-                    || !_control.Focused)
-                {
-                    return;
-                }
-
-                InitListControl();
-
-                if (_listBoxChild == null)
-                {
-                    return;
-                }
-
-                string searchText = _control.Text;
-
-                _listBoxChild.Items.Clear();
-
-                if (!string.IsNullOrEmpty(searchText))
-                {
-                    var suggestions = Provider?.Invoke(searchText)?.ToArray();
-                    if (suggestions != null)
-                    {
-                        _listBoxChild.Items.AddRange(suggestions);
-                    }
-                }
-
-                if (_listBoxChild.Items.Count > 0)
-                {
-                    Point putItHere = _ancestorForm.PointToClient(
-                        _control.Parent.PointToScreen(new Point(_control.Left, _control.Bottom)));
-
-                    _listBoxChild.Left = putItHere.X;
-                    _listBoxChild.Top = putItHere.Y;
-                    _listBoxChild.Width = _control.Width;
-                    _ancestorForm.Controls.SetChildIndex(_listBoxChild, 0);
-                    _listBoxChild.Show();
-
-                    int totalItemHeight = _listBoxChild.ItemHeight * (_listBoxChild.Items.Count + 1);
-                    if ((FormsMethods.GetVisibleScrollBars(_listBoxChild) & ScrollBars.Horizontal) != 0)
-                    {
-                        totalItemHeight += SystemInformation.HorizontalScrollBarHeight;
-                    }
-                    _listBoxChild.Height = Math.Min(_ancestorForm.ClientSize.Height - _listBoxChild.Top, totalItemHeight);
-
-                    // Select first item
-                    _listBoxChild.SelectedIndex = 0;
-                }
-                else
-                {
-                    HideTheList();
-                }
+                string searchText = _control.Text ?? "";
+                DropDown(searchText);
             }
             catch (Exception ex)
             {
@@ -269,8 +390,7 @@ namespace Extract.DataEntry
             }
         }
 
-
-        private void HandleListBoxChild_Click(object sender, EventArgs e)
+        void HandleListBoxChild_Click(object sender, EventArgs e)
         {
             try
             {
@@ -290,6 +410,39 @@ namespace Extract.DataEntry
 
         #region Private Methods
 
+        void SetupMessageFilter()
+        {
+            if (!_msgFilterActive)
+            {
+                if (_dataEntryControl is IDataEntryControl dec)
+                {
+                    dec?.DataEntryControlHost?.AddMessageFilter(this);
+                }
+                else
+                {
+                   _dataEntryControlHost?.AddMessageFilter(this);
+                }
+
+                _msgFilterActive = true;
+            }
+        }
+
+        void RemoveMessageFilter()
+        {
+            if (_msgFilterActive)
+            {
+                if (_dataEntryControl is IDataEntryControl dec)
+                {
+                    dec?.DataEntryControlHost?.RemoveMessageFilter(this);
+                }
+                else
+                {
+                    _dataEntryControlHost?.RemoveMessageFilter(this);
+                }
+                _msgFilterActive = false;
+            }
+        }
+
         void InitListControl()
         {
             if (_dataEntryControl?.AutoCompleteMode
@@ -306,40 +459,116 @@ namespace Extract.DataEntry
 
                 if (_ancestorForm != null)
                 {
-                    // Setup a message filter so we can listen to the keyboard/mouse
-                    if (!_msgFilterActive)
-                    {
-                        if (_dataEntryControl is IDataEntryControl dec)
-                        {
-                            dec?.DataEntryControlHost?.AddMessageFilter(this);
-                        }
-
-                        _msgFilterActive = true;
-                    }
+                    SetupMessageFilter();
 
                     _listBoxChild = new ListBox
                     {
                         HorizontalScrollbar = true
                     };
-                    _listBoxChild.Click += HandleListBoxChild_Click;
                     _ancestorForm.Controls.Add(_listBoxChild);
                 }
             }
         }
 
-        private void HideTheList()
+        void ShowTheList()
         {
-            _listBoxChild?.Hide();
+            if (!DroppedDown)
+            {
+                _listBoxChild.Show();
+                _listBoxChild.Click += HandleListBoxChild_Click;
+                _listBoxChild.GotFocus += HandleListBoxChild_GotFocus;
+                _listBoxChild.LostFocus += HandleListBoxChild_LostFocus;
+                DroppedDown = true;
+            }
+        }
+
+        void HideTheList()
+        {
+            if (DroppedDown)
+            {
+                DroppedDown = false;
+                _listBoxChild.Click -= HandleListBoxChild_Click;
+                _listBoxChild.GotFocus -= HandleListBoxChild_GotFocus;
+                _listBoxChild.LostFocus -= HandleListBoxChild_LostFocus;
+                _listBoxChild?.Hide();
+                DropDownClosed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        void DropDown(string searchText)
+        {
+            // Allow user to delete the value without triggering the list to show
+            if (String.IsNullOrEmpty(searchText))
+            {
+                _acceptedText = null;
+                return;
+            }
+
+            // TODO: For DataGridView cells the parent is null until some
+            // text has been typed so figure out a way to update the control state
+            // or arrow keys won't be able to drop down the list
+            if (!_control.Visible || _control.Parent == null)
+            {
+                return;
+            }
+
+            InitListControl();
+
+            if (_listBoxChild == null)
+            {
+                return;
+            }
+
+            _listBoxChild.Items.Clear();
+
+            var suggestions = Provider?.Invoke(searchText)?.ToArray();
+            if (suggestions != null)
+            {
+                _listBoxChild.Items.AddRange(suggestions);
+            }
+
+            if (_listBoxChild.Items.Count > 0)
+            {
+                Point putItHere = _ancestorForm.PointToClient(
+                    _control.Parent.PointToScreen(new Point(_control.Left, _control.Bottom)));
+
+                _listBoxChild.Left = putItHere.X;
+                _listBoxChild.Top = putItHere.Y;
+                _listBoxChild.Width = _control.Width;
+                _ancestorForm.Controls.SetChildIndex(_listBoxChild, 0);
+                ShowTheList();
+
+                int totalItemHeight = _listBoxChild.ItemHeight * (_listBoxChild.Items.Count + 1);
+                if ((FormsMethods.GetVisibleScrollBars(_listBoxChild) & ScrollBars.Horizontal) != 0)
+                {
+                    totalItemHeight += SystemInformation.HorizontalScrollBarHeight;
+                }
+                _listBoxChild.Height = Math.Min(_ancestorForm.ClientSize.Height - _listBoxChild.Top, totalItemHeight);
+
+                // Select the current item or the first item
+                string currentText = _control.Text ?? "";
+                int idxOfCurrentText = _listBoxChild.Items.IndexOf(currentText);
+                if (idxOfCurrentText < 0)
+                {
+                    idxOfCurrentText = 0;
+                }
+                _listBoxChild.SelectedIndex = idxOfCurrentText;
+            }
+            else
+            {
+                HideTheList();
+            }
         }
 
         /// <summary>
         /// Copy the selection from the list-box into the text control
         /// </summary>
-        private void CopySelection()
+        void CopySelection()
         {
             var selectedItem = _listBoxChild.SelectedItem;
             if (selectedItem != null)
             {
+                _ignoreTextChange = true;
                 if (_control is ComboBox combo)
                 {
                     combo.SelectedItem = selectedItem;
@@ -350,9 +579,45 @@ namespace Extract.DataEntry
                     textBox.Text = _listBoxChild.SelectedItem.ToString();
                     textBox.SelectAll();
                 }
+
+                var cancelEventArgs = new CancelEventArgs();
+                Validating?.Invoke(this, cancelEventArgs);
+                if (cancelEventArgs.Cancel)
+                {
+                    return;
+                }
+                _acceptedText = _control.Text;
+
+                _suppressListBoxChildLostFocusEvent = true;
                 HideTheList();
+                
+                // Put focus back on the edit control so that user can type
+                _control.Focus();
             }
         }
+
+        internal void SetListBackColor(Color value)
+        {
+            InitListControl();
+            if (_listBoxChild != null)
+            {
+                _listBoxChild.BackColor = value;
+            }
+        }
+
+        void RevertSelection()
+        {
+            _control.Text = _acceptedText;
+            if (_control is ComboBox combo)
+            {
+                combo.SelectAll();
+            }
+            else if (_control is TextBoxBase textBox)
+            {
+                textBox.SelectAll();
+            }
+        }
+
 
         #endregion Private Methods
 
@@ -360,49 +625,65 @@ namespace Extract.DataEntry
 
         public bool PreFilterMessage(ref Message m)
         {
-            bool clientClick = false;
-            switch (m.Msg)
+            if (DroppedDown)
             {
-                // Handle clicking on client areas
-                case WindowsMessage.LeftButtonDown:
-                case WindowsMessage.RightButtonDown:
-                case WindowsMessage.MiddleButtonDown:
-                    clientClick = true;
-                    goto case WindowsMessage.NonClientLeftButtonDown;
+                bool clientClick = false;
+                switch (m.Msg)
+                {
+                    // Handle clicking on client areas
+                    case WindowsMessage.LeftButtonDown:
+                    case WindowsMessage.RightButtonDown:
+                    case WindowsMessage.MiddleButtonDown:
+                        clientClick = true;
+                        goto case WindowsMessage.NonClientLeftButtonDown;
 
-                // Handle clicking on non-client areas, like scrollbars
-                case WindowsMessage.NonClientLeftButtonDown:
-                case WindowsMessage.NonClientRightButtonDown:
-                case WindowsMessage.NonClientMiddleButtonDown:
-                    if (_ancestorForm != null)
-                    {
-                        var points = m.LParam.ToInt32();
-                        var pos = new Point(points & 0xFFFF, points >> 16);
-
-                        // Adjust point to screen coordinates if this was a client area click
-                        var ctrl = Control.FromHandle(m.HWnd);
-                        if (clientClick && ctrl != null)
+                    // Handle clicking on non-client areas, like scrollbars
+                    case WindowsMessage.NonClientLeftButtonDown:
+                    case WindowsMessage.NonClientRightButtonDown:
+                    case WindowsMessage.NonClientMiddleButtonDown:
+                        if (_ancestorForm != null)
                         {
-                            pos = ctrl.PointToScreen(pos);
+                            var points = m.LParam.ToInt32();
+                            var pos = new Point(points & 0xFFFF, points >> 16);
+
+                            // Adjust point to screen coordinates if this was a client area click
+                            var ctrl = Control.FromHandle(m.HWnd);
+                            if (clientClick && ctrl != null)
+                            {
+                                pos = ctrl.PointToScreen(pos);
+                            }
+
+                            // Adjust point to parent coordinates
+                            var posOnAncestor = _ancestorForm.PointToClient(pos);
+
+                            if (_listBoxChild != null &&
+                                ( posOnAncestor.X < _listBoxChild.Left || posOnAncestor.X > _listBoxChild.Right
+                                || posOnAncestor.Y < _listBoxChild.Top || posOnAncestor.Y > _listBoxChild.Bottom))
+                            {
+                                HideTheList();
+
+                                var parent = _control.Parent;
+                                if (parent != null)
+                                {
+                                    var posOnParent = parent.PointToClient(pos);
+
+                                    // Consider this click handled if clicking on the text control.
+                                    // This allows the combo box button to be used to close the list
+                                    if (posOnParent.X > _control.Left && posOnParent.X < _control.Right
+                                        && posOnParent.Y > _control.Top && posOnParent.Y < _control.Bottom)
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
                         }
+                        break;
 
-                        // Adjust point to parent coordinates
-                        pos = _ancestorForm.PointToClient(pos);
-
-                        if (_listBoxChild != null && (pos.X < _listBoxChild.Left || pos.X > _listBoxChild.Right
-                            || pos.Y < _listBoxChild.Top || pos.Y > _listBoxChild.Bottom))
-                        {
-                            HideTheList();
-                        }
-                    }
-                    break;
-
-                case WindowsMessage.KeyDown:
-                    if (_listBoxChild != null && _listBoxChild.Visible)
-                    {
+                    case WindowsMessage.KeyDown:
                         switch ((Keys)m.WParam)
                         {
                             case Keys.Escape:
+                                RevertSelection();
                                 HideTheList();
                                 return true;
 
@@ -420,30 +701,30 @@ namespace Extract.DataEntry
 
                             case Keys.Return:
                                 CopySelection();
-                                return false;
+                                return true; // Prevent data grid view row change
 
                             case Keys.Tab:
                                 CopySelection();
                                 return false;
                         }
-                    }
-                    break;
+                        break;
 
-                case WindowsMessage.MouseWheel:
-                    if (_listBoxChild != null)
-                    {
-                        if (_listBoxChild.ClientRectangle.Contains(
-                            _listBoxChild.PointToClient(Control.MousePosition)))
+                    case WindowsMessage.MouseWheel:
+                        if (_listBoxChild != null)
                         {
-                            WindowsMessage.SendMessage(_listBoxChild.Handle, m.Msg, m.WParam, m.LParam);
-                            return true;
+                            if (_listBoxChild.ClientRectangle.Contains(
+                                _listBoxChild.PointToClient(Control.MousePosition)))
+                            {
+                                WindowsMessage.SendMessage(_listBoxChild.Handle, m.Msg, m.WParam, m.LParam);
+                                return true;
+                            }
+                            else
+                            {
+                                HideTheList();
+                            }
                         }
-                        else
-                        {
-                            HideTheList();
-                        }
-                    }
-                    break;
+                        break;
+                }
             }
 
             return false;
@@ -466,6 +747,7 @@ namespace Extract.DataEntry
                     }
 
                     _unregister?.Invoke();
+                    RemoveMessageFilter();
                 }
 
                 disposedValue = true;

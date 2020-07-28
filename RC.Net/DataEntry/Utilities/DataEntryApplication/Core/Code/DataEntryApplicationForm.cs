@@ -1497,6 +1497,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Adjust UI elements to reflect the current configuration.
                 SetUIConfiguration(ActiveDataEntryConfig);
 
+                // This needs to be done after the window handle has been created
+                if (_documentTypeComboBox.Visible)
+                {
+                    _documentTypeComboBox.SetAutoCompleteValues(_configManager.RegisteredDocumentTypes);
+                }
+
                 _isLoaded = true;
                 OnInitialized();
             }
@@ -1936,6 +1942,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         // Set Active = true for the new DEP so that it tracks image viewer events.
                         newDataEntryControlHost.Active = true;
+
+                        // The combo box registers an IMessageFilter with the active DataEntryControlHost to intercept keyboard and mouse events
+                        _documentTypeComboBox.SetDataEntryControlHost(newDataEntryControlHost);
                     }
                 }
             }

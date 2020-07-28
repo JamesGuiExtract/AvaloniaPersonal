@@ -766,24 +766,7 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        // Permanently replace newline chars with spaces if specified.
-                        if (_removeNewLineChars &&
-                            value.IndexOf("\r\n", StringComparison.Ordinal) >= 0)
-                        {
-                            // Replace a group of CRLFs with just a single space.
-                            value = Regex.Replace(value, "(\r\n)+", " ");
-                        }
-                        // Temporarily replace carriage returns or line feeds with no break spaces
-                        // to prevent the unprintable "boxes" from appearing.
-                        else if (!_removeNewLineChars && !Multiline)
-                        {
-                            value = value.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
-                        }
-                    }
-
-                    base.Text = value;
+                    base.Text = FormatTextForDisplay(value);
 
                     // Check for selection change.
                     ProcessSelectionChange();
@@ -1608,9 +1591,15 @@ namespace Extract.DataEntry
         /// </summary>
         void OnAttributeChanged()
         {
+            var text = _attribute?.Value?.String ?? "";
+            if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene)
+            {
+                var formattedText = FormatTextForDisplay(text);
+                _luceneAutoSuggest?.SetText(formattedText, ignoreNextTextChangedEvent: true);
+            }
+
             // Display the attribute text.
-            Text = (_attribute != null && _attribute.Value != null)
-                ? _attribute.Value.String : "";
+            Text = text;
 
             // Display a validation error icon if needed.
             UpdateValidation();
@@ -1898,6 +1887,28 @@ namespace Extract.DataEntry
                 _lastSelectionStart = SelectionStart;
                 _lastSelectionLength = SelectionLength;
             }
+        }
+
+        string FormatTextForDisplay(string text)
+        {
+            if (!string.IsNullOrEmpty(text))
+            {
+                // Permanently replace newline chars with spaces if specified.
+                if (_removeNewLineChars &&
+                    text.IndexOf("\r\n", StringComparison.Ordinal) >= 0)
+                {
+                    // Replace a group of CRLFs with just a single space.
+                    text = Regex.Replace(text, "(\r\n)+", " ");
+                }
+                // Temporarily replace carriage returns or line feeds with no break spaces
+                // to prevent the unprintable "boxes" from appearing.
+                else if (!_removeNewLineChars && !Multiline)
+                {
+                    text = text.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
+                }
+            }
+
+            return text;
         }
 
         #endregion Private Members

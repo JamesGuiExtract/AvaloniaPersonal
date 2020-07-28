@@ -17,7 +17,7 @@
         {
             this._documentTypePanel = new System.Windows.Forms.Panel();
             this._tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this._documentTypeComboBox = new System.Windows.Forms.ComboBox();
+            this._documentTypeComboBox = new DataEntry.DocumentTypeComboBox();
             this._documentTypeLabel = new System.Windows.Forms.Label();
             this._undoButton = new System.Windows.Forms.Button();
             this._redoButton = new System.Windows.Forms.Button();
@@ -146,7 +146,7 @@
 
         private System.Windows.Forms.Panel _documentTypePanel;
         private System.Windows.Forms.Label _documentTypeLabel;
-        private System.Windows.Forms.ComboBox _documentTypeComboBox;
+        private Extract.DataEntry.DocumentTypeComboBox _documentTypeComboBox;
         private Utilities.Forms.ScrollPanel _scrollPanel;
         private System.Windows.Forms.TableLayoutPanel _tableLayoutPanel;
         private System.Windows.Forms.Button _undoButton;

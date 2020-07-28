@@ -220,25 +220,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else
                 {
-                    // Initialize the auto-complete list that will be available for free-form typing
-                    // in the combobox.
-                    // The auto-complete list should include copies of all items prefixed with space so
-                    // that the space bar displays the document type list just like in data entry controls.
-                    var docTypeList = _configManager.RegisteredDocumentTypes
-                        .Concat(_configManager.RegisteredDocumentTypes.Select(s => " " + s))
-                        .ToArray();
-
-                    var autoCompleteList = new AutoCompleteStringCollection();
-                    autoCompleteList.AddRange(docTypeList);
-
-                    _documentTypeComboBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
-                    _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    _documentTypeComboBox.AutoCompleteCustomSource = autoCompleteList;
-
                     _documentTypeComboBox.GotFocus += HandleDocumentTypeComboBox_GotFocus;
                     _documentTypeComboBox.LostFocus += HandleDocumentTypeComboBox_LostFocus;
-                    _documentTypeComboBox.DropDown += HandleDocumentTypeComboBox_DropDown;
-                    _documentTypeComboBox.DropDownClosed += HandleDocumentTypeComboBox_DropDownClosed;
                 }
             }
             catch (Exception ex)
@@ -891,6 +874,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnLoad(e);
 
+                // This needs to be done after the window handle has been created
+                if (DocumentTypeAvailable)
+                {
+                    _documentTypeComboBox.SetAutoCompleteValues(_configManager.RegisteredDocumentTypes);
+                }
+
                 // If an ActiveDataEntryPanel is assigned prior to the form being loaded, it will
                 // not be sized correctly without a layout call here.
                 if (ActiveDataEntryPanel != null)
@@ -902,74 +891,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 ex.ExtractDisplay("ELI41630");
             }
-        }
-
-        /// <summary>
-        /// Allows handling of command keys before the native controls do.
-        /// </summary>
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            try
-            {
-                if (_documentTypeComboBox.Visible)
-                {
-                    // Allow up/down arrow to open document type dropdown.
-                    if ((keyData == Keys.Up || keyData == Keys.Down)
-                            && _documentTypeComboBox.Focused
-                            && !_documentTypeComboBox.DroppedDown
-                            && !FormsMethods.IsAutoCompleteDisplayed())
-                    {
-                        _documentTypeComboBox.DroppedDown = true;
-                        return true;
-                    }
-
-                    // Escape key should closed auto-complete and/or drop down and restore the
-                    // document type to what it was before the auto-complete/drop list were displayed
-                    if (keyData == Keys.Escape && (_documentTypeComboBox.DroppedDown ||
-                        (_documentTypeComboBox.Focused && FormsMethods.IsAutoCompleteDisplayed())))
-                    {
-                        _documentTypeComboBox.Text = _configManager?.ActiveDocumentType;
-                        _documentTypeComboBox.DroppedDown = false;
-                        return true;
-                    }
-
-                    // Enter key should apply the currently selected valud in the auto-complete and/or
-                    // drop down list
-                    if (keyData == Keys.Enter && (_documentTypeComboBox.DroppedDown ||
-                        (_documentTypeComboBox.Focused && FormsMethods.IsAutoCompleteDisplayed())))
-                    {
-                        // When programmatically closing an open drop-down, the text property will be
-                        // overriden with the last valid selection in the drop down. In order to process
-                        // the current text (whether or not valid), lock the current document type as
-                        // the menu is closed, then attempt to manually process after the close.
-                        var currentText = _documentTypeComboBox.Text;
-
-                        try
-                        {
-                            _configManager.LockDocumentType = true;
-                            _documentTypeComboBox.DroppedDown = false;
-                        }
-                        finally
-                        {
-                            _configManager.LockDocumentType = false;
-                        }
-
-                        _documentTypeComboBox.Text = currentText;
-
-                        ApplyDocumentType();
-
-                        _documentTypeComboBox.SelectAll();
-
-                        return true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI50117");
-            }
-
-            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         /// <summary> 
@@ -1146,6 +1067,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Set Active = true for the new DEP so that it tracks image viewer events.
                     newDataEntryControlHost.Active = Editable;
                     newDataEntryControlHost.ShowValidationIcons = Editable;
+
+                    // The combo box registers an IMessageFilter with the active DataEntryControlHost to intercept keyboard and mouse events
+                    _documentTypeComboBox.SetDataEntryControlHost(newDataEntryControlHost);
                 }
 
                 DataPanelChanged?.Invoke(this,
@@ -1168,7 +1092,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// <see cref="DataEntryDocumentDataPanel"/>.
             void HandleDataEntryControlHost_DocumentLoaded(object sender, EventArgs e)
             {
-                DocumentLoaded.Invoke(sender, e);
+                DocumentLoaded?.Invoke(sender, e);
             }
 
         /// <summary>
@@ -1336,39 +1260,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI50119");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ComboBox.DropDown"/> event of <see cref="_documentTypeComboBox"/>
-        /// in order to disable the auto-complete list from displaying while the drop list is displayed.
-        /// </summary>
-        void HandleDocumentTypeComboBox_DropDown(object sender, EventArgs e)
-        {
-            try
-            {
-                _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.None;
-                _documentTypeComboBox.Text = _configManager?.ActiveDocumentType;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI50121");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ComboBox.DropDownClosed"/> event of <see cref="_documentTypeComboBox"/>
-        /// in order to re-enable the auto-complete list.
-        /// </summary>
-        void HandleDocumentTypeComboBox_DropDownClosed(object sender, EventArgs e)
-        {
-            try
-            {
-                _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI50120");
             }
         }
 

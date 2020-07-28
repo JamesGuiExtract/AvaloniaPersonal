@@ -80,15 +80,9 @@ namespace Extract.DataEntry
         bool _changingDocumentType;
 
         /// <summary>
-        /// An undefined document type that should temporarily be made available in
-        /// _documentTypeComboBox so that the document can be saved with its original DocumentType.
-        /// </summary>
-        string _temporaryDocumentType;
-
-        /// <summary>
         /// The document type ComboBox
         /// </summary>
-        ComboBox _documentTypeComboBox;
+        DocumentTypeComboBox _documentTypeComboBox;
 
         /// <summary>
         /// The attributes used to determine the current data configuration.
@@ -122,7 +116,7 @@ namespace Extract.DataEntry
         /// <param name="documentTypeComboBox">The <see cref="ComboBox"/> that offers the user the
         /// ability to see and change the current doc type.</param>
         public DataEntryConfigurationManager(IDataEntryApplication dataEntryApp, ITagUtility tagUtility,
-            ConfigSettings<T> applicationConfig, ImageViewer imageViewer, ComboBox documentTypeComboBox)
+            ConfigSettings<T> applicationConfig, ImageViewer imageViewer, DocumentTypeComboBox documentTypeComboBox)
         {
             try
             {
@@ -392,7 +386,6 @@ namespace Extract.DataEntry
                             throw ee;
                         }
 
-                        _documentTypeComboBox?.Items.Add(documentType);
                         _documentTypeConfigurations[documentType] = config;
                     }
                     while (documentTypeNode.MoveToNext());
@@ -404,8 +397,6 @@ namespace Extract.DataEntry
                 {
                     _documentTypeComboBox.DropDownClosed += HandleDocumentTypeDropDownClosed;
                     _documentTypeComboBox.Validating += HandleDocumentTypeDropDown_Validating;
-                    _documentTypeComboBox.AutoCompleteSource = AutoCompleteSource.ListItems;
-                    _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.Suggest;
                 }
             }
             catch (Exception ex)
@@ -488,15 +479,6 @@ namespace Extract.DataEntry
             {
                 UnregisterDocumentTypeHook();
                 _attributes = null;
-
-                // If a _temporaryDocumentType was added to the _documentTypeMenu to match the
-                // original type of the last document loaded, remove it now that the image has
-                // changed.
-                if (_temporaryDocumentType != null)
-                {
-                    _documentTypeComboBox.Items.Remove(_temporaryDocumentType);
-                    _temporaryDocumentType = null;
-                }
 
                 if (_activeDataEntryConfig?.DataEntryControlHost != null)
                 {
@@ -676,31 +658,16 @@ namespace Extract.DataEntry
         {
             try
             {
-                // After selecting a value from the combo's auto-complete list, something gets thrown off
-                // with the processing of arrow keys such that arrow keys will no longer navigate the
-                // drop down list. Disabling and re-enabling auto-complete seems to correct the situation.
-                if (FormsMethods.IsAutoCompleteDisplayed())
-                {
-                    _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.None;
-                    _documentTypeComboBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                }
-
-                if (string.IsNullOrWhiteSpace(_documentTypeComboBox.Text))
+                var newDocType = _documentTypeComboBox.Text;
+                if (string.IsNullOrWhiteSpace(newDocType))
                 {
                     return false;
                 }
 
-                // Copies of all document types with a spacebar prefix have been added to allow for spacebar to drop
-                // display the list of document types; trim any such space from the current text.
-                if (_documentTypeComboBox.Text.StartsWith(" ", StringComparison.OrdinalIgnoreCase))
+                // Case will have been corrected by the combo box so Ordinal comparison is sufficient
+                if (RegisteredDocumentTypes.Contains(newDocType, StringComparer.Ordinal))
                 {
-                    _documentTypeComboBox.Text = _documentTypeComboBox.Text.TrimStart(' ');
-                }
-
-                if (RegisteredDocumentTypes.Contains(_documentTypeComboBox.Text,
-                    StringComparer.OrdinalIgnoreCase))
-                {
-                    ChangeActiveDocumentType(_documentTypeComboBox.Text, allowConfigurationChange: true);
+                    ChangeActiveDocumentType(newDocType, allowConfigurationChange: true);
 
                     return true;
                 }
@@ -788,19 +755,6 @@ namespace Extract.DataEntry
                 {
                     GetDocumentTypeAttribute();
                     string documentType = _documentTypeAttribute?.Value.String;
-
-                    if (_documentTypeComboBox != null)
-                    {
-                        // If there is a default configuration, add the original document type to the
-                        // document type combo and allow the document to be saved with the undefined
-                        // document type.
-                        if (_defaultDataEntryConfig != null &&
-                            _documentTypeComboBox.FindStringExact(documentType) == -1)
-                        {
-                            _temporaryDocumentType = documentType;
-                            _documentTypeComboBox.Items.Insert(0, documentType);
-                        }
-                    }
 
                     changedDocumentType = ChangeActiveDocumentType(documentType, true);
                 }
@@ -956,13 +910,8 @@ namespace Extract.DataEntry
 
                         if (_documentTypeComboBox != null)
                         {
-                            if (blockedConfigurationChange ||
-                                _documentTypeComboBox.FindStringExact(documentType) == -1)
-                            {
-                                // The new documentType is not valid.
-                                _documentTypeComboBox.SelectedIndex = -1;
-                            }
-                            else
+                            if (!blockedConfigurationChange &&
+                                _documentTypeComboBox.FindStringExact(documentType) != -1)
                             {
                                 // Assign the new document type.
                                 _activeDocumentType = documentType;
@@ -1062,16 +1011,15 @@ namespace Extract.DataEntry
         {
             try
             {
+                var newDocType = _documentTypeComboBox.Text;
                 // Check for an active panel; the drop down may have been closed because the DEP is closing.
                 if (ActiveDataEntryConfiguration?.DataEntryControlHost?.IsDocumentLoaded == true
-                    && _documentTypeComboBox.SelectedItem != null
+                    && !String.IsNullOrEmpty(newDocType)
                     && !LockDocumentType)
                 {
-                    _documentTypeComboBox.Text = (string)_documentTypeComboBox.SelectedItem;
-
                     // Update the active document type, changing the current configuration if
                     // appropriate.
-                    ChangeActiveDocumentType(_documentTypeComboBox.Text, true);
+                    ChangeActiveDocumentType(newDocType, true);
                 }
             }
             catch (Exception ex)

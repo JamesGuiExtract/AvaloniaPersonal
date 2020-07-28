@@ -22,7 +22,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._dataTab = new System.Windows.Forms.TabPage();
             this._documentTypePanel = new System.Windows.Forms.Panel();
             this._documentTypeLabel = new System.Windows.Forms.Label();
-            this._documentTypeComboBox = new System.Windows.Forms.ComboBox();
+            this._documentTypeComboBox = new DocumentTypeComboBox();
             this._scrollPanel = new Extract.Utilities.Forms.ScrollPanel();
             this._paginationTab = new System.Windows.Forms.TabPage();
             this._paginationPanel = new Extract.UtilityApplications.PaginationUtility.PaginationPanel();
@@ -296,7 +296,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._documentTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._documentTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._documentTypeComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
             this._documentTypeComboBox.Enabled = false;
             this._documentTypeComboBox.Location = new System.Drawing.Point(92, 3);
             this._documentTypeComboBox.MaxDropDownItems = 25;
@@ -1361,7 +1361,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.ToolStripButton _toggleShowAllHighlightsButton;
         private Extract.FileActionManager.Forms.TagFileToolStripButton _tagFileToolStripButton;
         private System.Windows.Forms.Label _documentTypeLabel;
-        private System.Windows.Forms.ComboBox _documentTypeComboBox;
+        private DocumentTypeComboBox _documentTypeComboBox;
         private System.Windows.Forms.Panel _documentTypePanel;
         private System.Windows.Forms.ToolStripButton _undoToolStripButton;
         private System.Windows.Forms.ToolStripButton _redoToolStripButton;

@@ -200,6 +200,12 @@
     <Compile Include="DataEntryComboBox.Designer.cs">
       <DependentUpon>DataEntryComboBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="DocumentTypeComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DocumentTypeComboBox.Designer.cs">
+      <DependentUpon>DocumentTypeComboBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataEntryConfiguration.cs" />
     <Compile Include="DataEntryConfigurationManager.cs" />
     <Compile Include="DataEntryControlHost.cs" />
