@@ -3070,7 +3070,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // panel (data tab), we will not be able to select a field.
                     if (_imageOpened)
                     {
-                        DataEntryControlHost.EnsureFieldSelection(resetToFirstField: false, resetToLastField: false);
+                        DataEntryControlHost.EnsureFieldSelection(
+                            resetToFirstField: false, resetToLastField: false, viaTabKey: false);
                     }
 
                     // Table controls don't always seem to be drawn correctly after switching tabs.

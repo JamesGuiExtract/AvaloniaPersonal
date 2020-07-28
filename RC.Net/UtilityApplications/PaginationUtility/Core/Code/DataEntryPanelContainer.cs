@@ -11,8 +11,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Threading; 
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -167,6 +166,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool _editable = true;
 
+        /// <summary>
+        /// Provides visual indication when a specified document type is not valid
+        /// </summary>
+        ErrorProvider _errorProvider;
+
         #endregion Fields
 
         #region Constructors
@@ -196,6 +200,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _tagUtility = tagUtility;
                 _imageViewer = imageViewer;
 
+                _errorProvider = new ErrorProvider(this);
+                _errorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+
                 // Initialize the root directory the DataEntry framework should use when resolving
                 // relative paths.
                 DataEntryMethods.SolutionRootDirectory = Path.GetDirectoryName(_expandedConfigFileName);
@@ -207,6 +214,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _configManager.ConfigurationInitialized += HandleConfigManager_ConfigurationInitialized;
                 _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
+                _configManager.DocumentTypeValidityChanged += HandleConfigManager_DocumentTypeValidityChanged;
                 _configManager.LoadDataEntryConfigurations(_expandedConfigFileName);
 
                 // Hide the _documentTypePanel if there are no RegisteredDocumentTypes that allow for
@@ -222,6 +230,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _documentTypeComboBox.GotFocus += HandleDocumentTypeComboBox_GotFocus;
                     _documentTypeComboBox.LostFocus += HandleDocumentTypeComboBox_LostFocus;
+
+                    var existingMargin = _documentTypeComboBox.Margin;
+                    _documentTypeComboBox.Margin = new Padding(
+                        existingMargin.Left, existingMargin.Top, _errorProvider.Icon.Width, existingMargin.Bottom);
+                    _errorProvider.SetIconAlignment(_documentTypeComboBox, ErrorIconAlignment.MiddleRight);
                 }
             }
             catch (Exception ex)
@@ -295,6 +308,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     LoadDataEntryControlHostPanel();
                 }
                 _configManager.ConfigurationChanged += HandleConfigManager_ConfigurationChanged;
+                _configManager.DocumentTypeValidityChanged += HandleConfigManager_DocumentTypeValidityChanged;
             }
             catch (Exception ex)
             {
@@ -545,6 +559,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var initializeDEPSelection = Editable && forEditing && !_documentTypeComboBox.Visible;
                 ActiveDataEntryPanel.LoadData(data, forEditing, initializeDEPSelection);
 
+                _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
+
                 _documentTypeComboBox.Enabled = true;
                 _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeComboBox_SelectedIndexChanged;
             }
@@ -576,6 +592,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                // Ensure the document type value has been applied before saving.
+                if (DocumentTypeFocused)
+                {
+                    ApplyDocumentTypeFromComboBox();
+                }
+
                 return ActiveDataEntryPanel.SaveData(data, validateData);
             }
             catch (Exception ex)
@@ -746,11 +768,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// active selection.</param>
         /// <param name="resetToLastField"><c>true</c> to select the last field regardless of any
         /// active selection.</param>
-        public void EnsureFieldSelection(bool resetToFirstField, bool resetToLastField)
+        /// <param name="viaTabKey"><c>true</c> if this call is being made in the context of tab
+        /// key navigation; otherwise, <c>false</c>.</param>
+        /// <returns><c>true</c> if the result of the call is that a field in the DEP has received
+        /// focus; <c>false</c> if focus could not be applied or was handled externally via
+        /// <see cref="TabNavigation"/> event.</returns>
+        public bool EnsureFieldSelection(bool resetToFirstField, bool resetToLastField, bool viaTabKey)
         {
             try
             {
-                ActiveDataEntryPanel?.EnsureFieldSelection(resetToFirstField, resetToLastField);
+                bool fieldSelected = 
+                    ActiveDataEntryPanel?.EnsureFieldSelection(resetToFirstField, resetToLastField, viaTabKey) == true;
+
+                if (ActiveDataEntryPanel != null)
+                {
+                    ActiveDataEntryPanel.IndicateFocus = fieldSelected;
+                }
+
+                return fieldSelected;
             }
             catch (Exception ex)
             {
@@ -837,6 +872,20 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// <c>true</c> if the document type displayed in the panel is valid.
+        /// </summary>
+        public bool DocumentTypeIsValid
+        {
+            get
+            {
+                return _configManager.DocumentTypeIsValid;
+            }
+        }
+
+        /// <summary>
+        /// <c>true</c> if a document type field current has focus; otherwise, <c>false</c>.
+        /// </summary>
         public bool DocumentTypeFocused
         {
             get
@@ -845,6 +894,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Sets focus to the document type field
+        /// </summary>
+        /// <returns><c>true</c> if focus was able to be applied.</returns>
         public bool FocusDocumentType()
         {
             return _documentTypeComboBox.Focus();
@@ -853,11 +906,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Attempts to apply the current text of _documentTypeComboBox as the active document type.
         /// </summary>
-        /// <returns><c>true</c> if the document type was successfully applied; <c>false</c> if the 
-        /// document type was not successfully applied.</returns>
-        public bool ApplyDocumentType()
+        /// <returns><c>true</c> if the document type was changed; <c>false</c> if the change could
+        /// not be made or if there was no change to be applied.</returns>
+        public bool ApplyDocumentTypeFromComboBox()
         {
-            return _configManager.ApplyDocumentType();
+            try
+            {
+                return _configManager.ApplyDocumentTypeFromComboBox();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50148");
+            }
         }
 
         #endregion IPaginationDocumentDataPanel
@@ -890,6 +950,27 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41630");
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Leave"/> event. Overriden to ensure any pending changes to the
+        /// document type are applied.
+        /// </summary>
+        protected override void OnLeave(EventArgs e)
+        {
+            try
+            {
+                if (DocumentTypeFocused)
+                {
+                    ApplyDocumentTypeFromComboBox();
+                }
+
+                base.OnLeave(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50125");
             }
         }
 
@@ -927,6 +1008,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     components.Dispose();
                     components = null;
+                }
+
+                if (_errorProvider != null)
+                {
+                    _errorProvider.Dispose();
+                    _errorProvider = null;
                 }
 
                 if (_configManager != null)
@@ -987,7 +1074,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles the ConfigurationChanged event of the _configManager control.
+        /// Handles the ConfigurationChanged event of the _configManager.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="ConfigurationChangedEventArgs"/> instance containing the event data.</param>
@@ -1053,6 +1140,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         bool initializeDEPSelection = Editable && !_documentTypeComboBox.Visible;
                         newDataEntryControlHost.LoadData(_documentData, forEditing: Editable, initializeDEPSelection);
 
+                        _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
+
                         _undoButton.Enabled = UndoOperationAvailable;
                         _redoButton.Enabled = RedoOperationAvailable;
                     }
@@ -1077,23 +1166,47 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-            /// <summary>
-            /// Handles the DuplicateDocumentsApplied event of the active <see cref="DataEntryDocumentDataPanel"/>.
-            /// </summary>
-            /// <param name="sender">The source of the event.</param>
-            /// <param name="e">The <see cref="DuplicateDocumentsAppliedEventArgs"/> instance containing the event data.</param>
-            void HandleDataEntryControlHost_DuplicateDocumentsApplied(object sender, DuplicateDocumentsAppliedEventArgs e)
+        /// <summary>
+        /// Handles the <see cref="DocumentTypeValidityChanged"/> <see cref="_configManager"/>
+        /// </summary>
+        void HandleConfigManager_DocumentTypeValidityChanged(object sender, EventArgs e)
+        {
+            try
             {
-                DuplicateDocumentsApplied?.Invoke(sender, e);
-            }
+                if (_documentData != null)
+                {
+                    _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
+                }
 
-            /// <summary>
-            /// Handles the <see cref="DataEntryControlHost.DocumentLoaded"/> event of the active 
-            /// <see cref="DataEntryDocumentDataPanel"/>.
-            void HandleDataEntryControlHost_DocumentLoaded(object sender, EventArgs e)
-            {
-                DocumentLoaded?.Invoke(sender, e);
+                if (_errorProvider != null)
+                {
+                    _errorProvider.SetError(_documentTypeComboBox,
+                        _configManager.DocumentTypeIsValid ? null : "Invalid document type");
+                }
             }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50150");
+            }
+        }
+
+        /// <summary>
+        /// Handles the DuplicateDocumentsApplied event of the active <see cref="DataEntryDocumentDataPanel"/>.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="DuplicateDocumentsAppliedEventArgs"/> instance containing the event data.</param>
+        void HandleDataEntryControlHost_DuplicateDocumentsApplied(object sender, DuplicateDocumentsAppliedEventArgs e)
+        {
+            DuplicateDocumentsApplied?.Invoke(sender, e);
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryControlHost.DocumentLoaded"/> event of the active 
+        /// <see cref="DataEntryDocumentDataPanel"/>.
+        void HandleDataEntryControlHost_DocumentLoaded(object sender, EventArgs e)
+        {
+            DocumentLoaded?.Invoke(sender, e);
+        }
 
         /// <summary>
         /// Handles the <see cref="DataEntryControlHost.TabNavigation"/> event of the active 
@@ -1116,6 +1229,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_documentData != null)
                 {
                     _documentData.SetModified(AttributeStatusInfo.UndoManager.UndoOperationAvailable);
+                    _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
                     _documentData.SetDataError(ActiveDataEntryPanel.DataValidity == DataValidity.Invalid);
                     _documentData.SetSummary(ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString());
                     _documentData.SetSendForReprocessing(ActiveDataEntryPanel.SendForReprocessingFunc(_documentData));
@@ -1235,9 +1349,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                _documentTypeComboBox.BackColor = ActiveDataEntryPanel.ActiveSelectionColor;
-                ActiveDataEntryPanel.ClearSelection();
-                _documentTypeComboBox.Invalidate();
+                if (ActiveDataEntryPanel != null)
+                {
+                    _documentTypeComboBox.BackColor = ActiveDataEntryPanel.ActiveSelectionColor;
+                    ActiveDataEntryPanel.ClearSelection();
+                    _documentTypeComboBox.Invalidate();
+                }
             }
             catch (Exception ex)
             {
@@ -1630,6 +1747,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             IAttribute invalidAttribute = null;
             if (!backgroundConfigManager.ActiveDataEntryConfiguration.Config.Settings.PerformanceTesting)
             {
+                documentStatus.DocumentTypeIsValid = backgroundConfigManager.DocumentTypeIsValid;
+
                 invalidAttribute = AttributeStatusInfo.FindNextAttributeByValidity(
                     documentData.Attributes, DataValidity.Invalid, null, true, false)
                         ?.LastOrDefault();
@@ -1772,6 +1891,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 IAttribute invalidAttribute = null;
                 if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)
                 {
+                    documentStatus.DocumentTypeIsValid = configManager.DocumentTypeIsValid;
+
                     invalidAttribute = AttributeStatusInfo.FindNextAttributeByValidity(
                         tempData.Attributes, DataValidity.Invalid, null, true, false)
                             ?.LastOrDefault();

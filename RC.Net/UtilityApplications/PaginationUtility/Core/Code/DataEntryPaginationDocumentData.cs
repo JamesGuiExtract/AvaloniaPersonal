@@ -52,6 +52,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         string _dataErrorMessage;
 
         /// <summary>
+        /// <c>true</c> if the document type displayed in the panel is valid.
+        /// </summary>
+        bool _documentTypeIsValid;
+
+        /// <summary>
         /// An object representing the undo/redo operations that should be restored to the
         /// <see cref="UndoManager"/> when the data is loaded for editing.
         /// </summary>
@@ -206,6 +211,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ExtractException.Assert("ELI47128", "No status update pending",
                     PendingDocumentStatus != null);
 
+                if (PendingDocumentStatus.DocumentTypeIsValid != _documentTypeIsValid)
+                {
+                    _documentTypeIsValid = PendingDocumentStatus.DocumentTypeIsValid;
+                    dirty = true;
+                }
+
                 if (PendingDocumentStatus.DataError != _dataError)
                 {
                     _dataError = PendingDocumentStatus.DataError;
@@ -352,13 +363,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets whether the data currently contains a validation error.
+        /// <c>true</c> if the data contains a validation error or the document type is not valid.
         /// </summary>
         public override bool DataError
         {
             get
             {
-                return _dataError;
+                return _dataError || !_documentTypeIsValid;
             }
         }
 
@@ -381,7 +392,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _dataErrorMessage;
+                return _dataErrorMessage ??
+                    (_documentTypeIsValid ? null : "Invalid document type");
             }
         }
 
@@ -543,6 +555,21 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _dataErrorMessage = null;
                 }
+
+                OnDocumentDataStateChanged();
+            }
+        }
+
+        /// <summary>
+        /// Specifies whether the document type should be considered valid.
+        /// </summary>
+        /// <param name="isValid"><c>true</c> if the document type should be considered valid;
+        /// <c>false</c> if it is not valid.</param>
+        internal void SetDocumentTypeValidity(bool isValid)
+        {
+            if (_documentTypeIsValid != isValid)
+            {
+                _documentTypeIsValid = isValid;
 
                 OnDocumentDataStateChanged();
             }

@@ -324,7 +324,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="data">The data to save.</param>
         /// <param name="validateData"><see langword="true"/> if the <see paramref="data"/> should
-        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
+        /// be validated for errors when saving; otherwise, <see langword="false"/>.</param>
         /// <returns><see langword="true"/> if the data was saved correctly or
         /// <see langword="false"/> if corrections are needed before it can be saved.</returns>
         public virtual bool SaveData(PaginationDocumentData data, bool validateData)

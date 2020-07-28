@@ -878,7 +878,7 @@ namespace Extract.FileActionManager.FileProcessors
 
                     // Close any open panels before disposing of anything
                     // https://extract.atlassian.net/browse/ISSUE-14377
-                    _paginationPanel?.CloseDataPanel(validateData: false);
+                    _paginationPanel?.CloseDataPanel(updateData: false, validateData: false);
 
                     // Release managed resources
                     if (_inputEventTracker != null)

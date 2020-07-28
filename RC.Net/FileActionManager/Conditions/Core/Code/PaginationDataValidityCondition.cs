@@ -242,7 +242,7 @@ namespace Extract.FileActionManager.Conditions
                 else
                 {
                     var documentStatus = DocumentStatus.FromJson(bstrDocumentStatus);
-                    if (IfNoErrors && documentStatus.DataError)
+                    if (IfNoErrors && (documentStatus.DataError || !documentStatus.DocumentTypeIsValid))
                     {
                         return false;
                     }

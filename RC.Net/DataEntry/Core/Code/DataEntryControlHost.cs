@@ -1932,7 +1932,7 @@ namespace Extract.DataEntry
                     // Some tasks (such as selecting the first control), must take place after the
                     // ImageFileChanged event is complete. Use BeginInvoke to schedule
                     // FinalizeDocumentLoad at the end of the current message queue.
-                    if (forEditing)
+                    if (forEditing && attributes != null)
                     {
                         _shiftKeyDown = ModifierKeys.HasFlag(Keys.Shift);
                         _tabKeyDown = ModifierKeys.HasFlag(Keys.Tab);
@@ -2885,7 +2885,10 @@ namespace Extract.DataEntry
         /// active selection.</param>
         /// <param name="resetToLastField"><c>true</c> to select the last field regardless of any
         /// active selection.</param>
-        public void EnsureFieldSelection(bool resetToFirstField, bool resetToLastField)
+        /// <returns><c>true</c> if the result of the call is that a field in the DEP has received
+        /// focus; <c>false</c> if focus could not be applied or was handled externally via
+        /// <see cref="TabNavigation"/> event.</returns>
+        public bool EnsureFieldSelection(bool resetToFirstField, bool resetToLastField, bool viaTabKey)
         {
             try
             {
@@ -2896,7 +2899,12 @@ namespace Extract.DataEntry
                     // It is not valid to initialize to the last field.
                     ExtractException.Assert("ELI50116", "Invalid operation", !resetToLastField);
                     _initializeSelection = true;
-                    return;
+                    return false;
+                }
+
+                if (viaTabKey && ApplyPendingTabNavigation(true))
+                {
+                    return false;
                 }
 
                 if (resetToFirstField || resetToLastField)
@@ -2908,12 +2916,14 @@ namespace Extract.DataEntry
                     var selectedAttribute = ActiveAttributeGenealogy(true, null);
                     if (selectedAttribute?.Any() == true)
                     {
-                        return;
+                        return true;
                     }
                 }
 
-                AdvanceToNextTabStop(!resetToLastField, viaTabKey: false);
+                var advanced = AdvanceToNextTabStop(!resetToLastField, viaTabKey: false);
                 OnItemSelectionChanged();
+
+                return advanced;
             }
             catch (Exception ex)
             {
@@ -5881,7 +5891,10 @@ namespace Extract.DataEntry
         /// <param name="forward"><see langword="true"/> to go to the next tab stop or
         /// <see langword="false"/> to go to the previous tab stop.</param>
         /// <param name="viaTabKey"><c>true</c> if the navigation was initiated via the tab key.</param>
-        void AdvanceToNextTabStop(bool forward, bool viaTabKey)
+        /// <returns><c>true</c> if the result of the call is that a field in the DEP has received
+        /// focus; <c>false</c> if focus could not be applied or was handled externally via
+        /// <see cref="TabNavigation"/> event.</returns>
+        bool AdvanceToNextTabStop(bool forward, bool viaTabKey)
         {
             // Notify AttributeStatusInfo that the current edit is over.
             // This will also be called as part of a focus change event, but it needs
@@ -5894,7 +5907,7 @@ namespace Extract.DataEntry
             // the pending TabNavigationEventArgs call or reset it.
             if (viaTabKey && ApplyPendingTabNavigation(forward))
             {
-                return;
+                return false;
             }
 
             // Tab navigation should loop if there is no handler to process tabbing out of DEP.
@@ -5924,7 +5937,7 @@ namespace Extract.DataEntry
                     bool lastStop = nextTabStopGenealogy == null || (!forward && originalActiveAttribute == null);
                     if (OnTabNavigation(forward, lastStop))
                     {
-                        return;
+                        return false;
                     }
                 }
 
@@ -5964,6 +5977,8 @@ namespace Extract.DataEntry
                 }
             }
             while (repeat);
+
+            return (activeAttribute != null);
         }
 
         /// <summary>

@@ -25,6 +25,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         public bool DataError { get; set; }
 
         /// <summary>
+        /// <c>true</c> if the document type displayed in the panel is valid.
+        /// </summary>
+        [DataMember]
+        public bool DocumentTypeIsValid { get; set; }
+
+        /// <summary>
         /// Indicates whether there is an active data validation warning for the document's data.
         /// </summary>
         [DataMember]

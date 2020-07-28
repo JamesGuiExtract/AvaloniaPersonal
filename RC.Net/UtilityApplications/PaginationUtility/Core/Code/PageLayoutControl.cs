@@ -2538,7 +2538,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else
                 {
-                    DocumentInDataEdit.PaginationSeparator.CloseDataPanel(saveData: true, validateData: false);
+                    DocumentInDataEdit.PaginationSeparator.CloseDataPanel(updateData: true, validateData: false);
                 }
             }
             catch (Exception ex)
@@ -4402,7 +4402,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (!DocumentDataPanel.DocumentTypeAvailable)
                     {
                         DocumentDataPanel.EnsureFieldSelection(
-                            resetToFirstField: true, resetToLastField: false);
+                            resetToFirstField: true, resetToLastField: false, viaTabKey: true);
                     }
                 }
                 // Tabbing from no selection or any page but the last page of a document
@@ -4464,7 +4464,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             var separator = document.PaginationSeparator;
 
             separator.DocumentSelectedToCommit = true;
-            separator.CloseDataPanel(saveData: true, validateData: false);
+            separator.CloseDataPanel(updateData: true, validateData: false);
 
             _flowLayoutPanel.Controls
                 .OfType<PaginationSeparator>()
@@ -4496,8 +4496,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else if (previousControlDocument != currentDocument && DocumentInDataEdit != null)
                 {
                     _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
-                    DocumentDataPanel.EnsureFieldSelection(resetToFirstField: false, resetToLastField: true);
-                    if (DocumentDataPanel.ActiveDataControl == null)
+                    if (!DocumentDataPanel.EnsureFieldSelection(
+                        resetToFirstField: false, resetToLastField: true, viaTabKey: true))
                     {
                         // If there is no tab stop in the DEP, select the document type (if available)
                         if (DocumentDataPanel.DocumentTypeAvailable)
@@ -4507,7 +4507,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // Otherwise, close the DEP
                         else
                         {
-                            DocumentInDataEdit.PaginationSeparator.CloseDataPanel(saveData: true, validateData: false);
+                            DocumentInDataEdit.PaginationSeparator.CloseDataPanel(updateData: true, validateData: false);
                         }
                     }
                 }
@@ -4602,7 +4602,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (DocumentInDataEdit != null)
                 {
-                    DocumentInDataEdit.PaginationSeparator.CloseDataPanel(saveData: true, validateData: false);
+                    DocumentInDataEdit.PaginationSeparator.CloseDataPanel(updateData: true, validateData: false);
                 }
                 else
                 {

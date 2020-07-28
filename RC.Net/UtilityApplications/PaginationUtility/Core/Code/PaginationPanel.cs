@@ -1,8 +1,6 @@
 ﻿using ADODB;
 using Extract.AttributeFinder;
-using Extract.DataEntry;
 using Extract.DataEntry.LabDE;
-using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -1781,7 +1779,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 // If the document's data is open for editing, close the panel.
                                 if (_primaryPageLayoutControl.DocumentInDataEdit == outputDocument)
                                 {
-                                    CloseDataPanel(validateData: false);
+                                    CloseDataPanel(updateData: true, validateData: false);
                                 }
                                 int docPosition =
                                     _primaryPageLayoutControl.DeleteOutputDocument(outputDocument);
@@ -2590,7 +2588,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (DocumentDataPanel != null)
                 {
-                    if (!CloseDataPanel(validateData: false))
+                    if (!CloseDataPanel(updateData: true, validateData: false))
                     {
                         _primaryPageLayoutControl.SelectDocument(_primaryPageLayoutControl.DocumentInDataEdit);
                         return;
@@ -3181,7 +3179,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// the document is selected for commit, <see langword="false"/> if the data should be saved
         /// regardless.</param>
         /// <param name="validateData"><see langword="true"/> if the document's data should
-        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
+        /// be validated for errors when saving; otherwise, <see langword="false"/>.</param>
         /// <returns><see langword="true"/> if the data was saved or <see langword="false"/> if the
         /// data could not be saved and needs to be corrected.
         /// </returns>
@@ -3200,7 +3198,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (IsDataPanelOpen && documentsToSave.Contains(_primaryPageLayoutControl.DocumentInDataEdit))
             {
-                if (!CloseDataPanel(validateData))
+                if (!CloseDataPanel(updateData: true, validateData))
                 {
                     // It is the responsibility of the DocumentDataPanel to inform the user of
                     // any data issues that need correction if the panel is open.
@@ -3435,9 +3433,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="validateData"><see langword="true"/> if the document's data should
         /// be validated for errors when saving; otherwise, <see langword="false"/>.</param>
+        /// <param name="updateData"><see langword="true"/> to apply the panel's data to the
+        /// document's data; otherwise, <see langword="false"/>.</param>
         /// <returns><see langword="true"/> if the data panel was successfully closed,
         /// <see langword="false"/> if it could not be closed due to an error in the data.</returns>
-        public bool CloseDataPanel(bool validateData)
+        public bool CloseDataPanel(bool updateData, bool validateData)
         {
             try
             {
@@ -3449,7 +3449,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         .FirstOrDefault();
                     if (separator != null)
                     {
-                        bool closed = separator.CloseDataPanel(saveData: true, validateData: validateData);
+                        bool closed = separator.CloseDataPanel(updateData, validateData);
                         ProcessFocusChange(forceUpdate: true);
                         return closed;
                     }

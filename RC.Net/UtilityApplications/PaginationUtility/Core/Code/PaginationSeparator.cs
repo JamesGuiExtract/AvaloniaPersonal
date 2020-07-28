@@ -127,7 +127,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Initializes a new instance of the <see cref="PaginationSeparator"/> class.
         /// </summary>
         /// <param name="showSelectionCheckBox"><see langword="true"/> if the selection check box
-        /// should be visible; otherwise, <see langword="false"/>.</param>
+        /// should be visible.</param>
         public PaginationSeparator(bool showSelectionCheckBox)
             : base()
         {
@@ -601,22 +601,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Closes the <see cref="DocumentDataPanel"/> (if visible), applying any changed data in
         /// the process.
         /// </summary>
-        /// <param name="saveData"><see langword="true"/> to save the
-        /// document's data; otherwise, <see langwor="false"/>.</param>
+        /// <param name="updateData"><see langword="true"/> to apply the panel's data to the
+        /// document's data.</param>
         /// <param name="validateData"><see langword="true"/> if the document's data should
-        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
+        /// be validated for errors when saving</param>
         /// <returns><see langword="true"/> if the data was saved or <see langword="false"/> if the
         /// data could not be saved and needs to be corrected.</returns>
-        public bool CloseDataPanel(bool saveData, bool validateData)
+        public bool CloseDataPanel(bool updateData, bool validateData)
         {
             try
             {
                 if (IsDataPanelOpen)
                 {
                     var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
+
                     if (Document != null && _outputDocument.DocumentData != null)
                     {
-                        if (saveData && !documentDataPanel.SaveData(_outputDocument.DocumentData, validateData))
+                        if (updateData && !documentDataPanel.SaveData(_outputDocument.DocumentData, validateData))
                         {
                             return false;
                         }
@@ -625,7 +626,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     documentDataPanel.ActiveDataEntryPanel.EnsureFieldSelection(
-                        resetToFirstField: false, resetToLastField: false);
+                        resetToFirstField: false, resetToLastField: false, viaTabKey: false);
 
                     // Report the DEP to be closed before it is removed so that events that trigger
                     // as part of its removal do not assume the DEP to be open and usable.
@@ -1088,8 +1089,34 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
 
-                // In the case that the user is tabbing out of the DEP but there is invalid data,
-                // cancel the event so that focus can return to the invalid field.
+                // If document type was being edited and a change can be applied, the application of
+                // the document type will be the extent of handling here; return.
+                if (e.Forward && e.LastStop
+                    && documentDataPanel.DocumentTypeFocused
+                    && documentDataPanel.ApplyDocumentTypeFromComboBox())
+                {
+                    e.Handled = true;
+                    return;
+                }
+
+                // If document type is not valid, notify and return.
+                if (e.Forward && e.LastStop
+                    && !documentDataPanel.DocumentTypeIsValid)
+                {
+                    documentDataPanel.FocusDocumentType();
+
+                    var ee = new ExtractException("ELI50128", "Please select a valid document type");
+                    ee.Display();
+
+                    // Inform the panel that once the user uses tab navigation again, TabNavigation
+                    // should be raised.
+                    documentDataPanel.PendingTabNavigationEventArgs = e;
+
+                    e.Handled = true;
+                    return;
+                }
+                
+                // If there is invalid data, notify and return.
                 if (e.Forward && e.LastStop &&
                     !documentDataPanel.SaveData(_outputDocument.DocumentData, validateData: true))
                 {
@@ -1116,12 +1143,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Tabbing backward from the DocumentType field
                     if (documentDataPanel.DocumentTypeFocused)
                     {
-                        CloseDataPanel(saveData: true, validateData: false);
+                        CloseDataPanel(updateData: true, validateData: false);
                     }
                     // Tabbing backward from the DEP
                     else if (!documentDataPanel.FocusDocumentType())
                     {
-                        CloseDataPanel(saveData: true, validateData: false);
+                        CloseDataPanel(updateData: true, validateData: false);
                     }
 
                     e.Handled = true;
@@ -1129,11 +1156,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else if (!e.LastStop && e.Forward && documentDataPanel.DocumentTypeFocused)
                 {
                     // Tabbing forward from the DocumentType field
-                    if (documentDataPanel.ApplyDocumentType())
-                    {
-                        documentDataPanel.EnsureFieldSelection(
-                            resetToFirstField: true, resetToLastField: false);
-                    }
+                    documentDataPanel.ApplyDocumentTypeFromComboBox();
+                    
+                    documentDataPanel.EnsureFieldSelection(
+                        resetToFirstField: true, resetToLastField: false, viaTabKey: true);
 
                     e.Handled = true;
                 }

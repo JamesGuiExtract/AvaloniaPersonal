@@ -49,6 +49,12 @@ namespace Extract.DataEntry
         Dictionary<string, DataEntryConfiguration> _documentTypeConfigurations;
 
         /// <summary>
+        /// A map of defined document types used to be able to retrieve the original casing of a
+        /// a case-insensitive match to a document type.
+        /// </summary>
+        Dictionary<string, string> _registeredDocumentTypes;
+
+        /// <summary>
         /// If not <see langword="null"/> this configuration should be used for documents with
         /// missing or undefined document types.
         /// </summary>
@@ -78,6 +84,11 @@ namespace Extract.DataEntry
         /// Indicates whether the document type is in the process of being changed.
         /// </summary>
         bool _changingDocumentType;
+
+        /// <summary>
+        /// <c>true</c> if the current value of the document type combo box is valid.
+        /// </summary>
+        bool _documentTypeIsValid;
 
         /// <summary>
         /// The document type ComboBox
@@ -160,6 +171,11 @@ namespace Extract.DataEntry
         public event EventHandler<EventArgs> DocumentTypeChanged;
 
         /// <summary>
+        /// Raised whe the value of <see cref="DocumentTypeIsValid"/> changes.
+        /// </summary>
+        public event EventHandler<EventArgs> DocumentTypeValidityChanged;
+
+        /// <summary>
         /// Raised if there was an error changing configurations. An exception will not otherwise be
         /// raised in this situation, so it is the owner's responsibility to handle the error
         /// appropriately.
@@ -205,9 +221,31 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// When set to <c>true</c> changes to <see cref="ActiveDocumentType"/> will be prevented.
+        /// <c>true</c> if the current value of the document type combo box is valid.
         /// </summary>
-        public bool LockDocumentType { get; set; }
+        public bool DocumentTypeIsValid
+        {
+            get
+            {
+                return _documentTypeIsValid || !RegisteredDocumentTypes.Any();
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _documentTypeIsValid)
+                    {
+                        _documentTypeIsValid = value;
+                        DocumentTypeValidityChanged?.Invoke(this, new EventArgs());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI50146");
+                }
+            }
+        }
 
         /// <summary>
         /// Gets all the <see cref="DataEntryConfiguration"/>s.
@@ -254,9 +292,9 @@ namespace Extract.DataEntry
         {
             get
             {
-                if (_documentTypeConfigurations != null)
+                if (_registeredDocumentTypes != null)
                 {
-                    foreach (string documentType in _documentTypeConfigurations.Keys)
+                    foreach (string documentType in _registeredDocumentTypes.Keys)
                     {
                         yield return documentType;
                     }
@@ -298,6 +336,7 @@ namespace Extract.DataEntry
                 // Document type configurations have been defined.
                 _documentTypeConfigurations = new Dictionary<string, DataEntryConfiguration>
                     (StringComparer.OrdinalIgnoreCase);
+                _registeredDocumentTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
                 // Load each configuration.
                 do
@@ -387,13 +426,14 @@ namespace Extract.DataEntry
                         }
 
                         _documentTypeConfigurations[documentType] = config;
+                        _registeredDocumentTypes[documentType] = documentType;
                     }
                     while (documentTypeNode.MoveToNext());
                 }
                 while (configurationNode.MoveToNext());
 
                 // Register to be notified when the user selects a new document type.
-                if (_documentTypeConfigurations != null)
+                if (_documentTypeConfigurations != null && _documentTypeComboBox != null)
                 {
                     _documentTypeComboBox.DropDownClosed += HandleDocumentTypeDropDownClosed;
                     _documentTypeComboBox.Validating += HandleDocumentTypeDropDown_Validating;
@@ -421,12 +461,14 @@ namespace Extract.DataEntry
                 if (_documentTypeConfigurations != null)
                 {
                     manager._documentTypeConfigurations = new Dictionary<string, DataEntryConfiguration>();
+                    manager._registeredDocumentTypes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
                     foreach (var configuration in _documentTypeConfigurations)
                     {
                         var backgroundConfig = CreateBackgroundConfiguration(configuration.Value);
 
                         manager._documentTypeConfigurations[configuration.Key] = backgroundConfig;
+                        manager._registeredDocumentTypes[configuration.Key] = configuration.Key;
 
                         // Initialize active and default configurations
                         if (_activeDataEntryConfig == configuration.Value)
@@ -652,29 +694,26 @@ namespace Extract.DataEntry
         /// <summary>
         /// Attempts to apply the current text of _documentTypeComboBox as the active document type.
         /// </summary>
-        /// <returns><c>true</c> if the document type was successfully applied; <c>false</c> if the 
-        /// document type was not successfully applied.</returns>
-        public bool ApplyDocumentType()
+        /// <returns><c>true</c> if the document type was changed; <c>false</c> if the change could
+        /// not be made or if there was no change to be applied.</returns>
+        public bool ApplyDocumentTypeFromComboBox()
         {
             try
             {
-                var newDocType = _documentTypeComboBox.Text;
-                if (string.IsNullOrWhiteSpace(newDocType))
-                {
-                    return false;
-                }
+                var originalDocumentType = ActiveDocumentType;
 
-                // Case will have been corrected by the combo box so Ordinal comparison is sufficient
-                if (RegisteredDocumentTypes.Contains(newDocType, StringComparer.Ordinal))
+                var newDocType = _documentTypeComboBox.Text;
+                if (newDocType != null
+                    && _registeredDocumentTypes.ContainsKey(newDocType))
                 {
                     ChangeActiveDocumentType(newDocType, allowConfigurationChange: true);
-
-                    return true;
                 }
                 else
                 {
-                    return false;
+                    DocumentTypeIsValid = false;
                 }
+
+                return originalDocumentType != ActiveDocumentType;
             }
             catch (Exception ex)
             {
@@ -691,7 +730,7 @@ namespace Extract.DataEntry
         /// the current configuration should not be changed.</param>
         bool ChangeActiveDocumentType(string documentType, bool allowConfigurationChange)
         {
-            if (_changingDocumentType || LockDocumentType)
+            if (_changingDocumentType)
             {
                 return false;
             }
@@ -704,6 +743,7 @@ namespace Extract.DataEntry
                 bool changedDocumentType, changedDataEntryConfig;
                 SetActiveDocumentType(documentType, allowConfigurationChange,
                     out changedDocumentType, out changedDataEntryConfig);
+
                 if (changedDocumentType)
                 {
                     if (changedDataEntryConfig)
@@ -863,18 +903,17 @@ namespace Extract.DataEntry
                 changedDocumentType = false;
                 changedDataEntryConfig = false;
 
-                if (LockDocumentType)
-                {
-                    return;
-                }
-
                 DataEntryConfiguration newDataEntryConfig = GetConfigurationForDocumentType(documentType);
 
-                if (_activeDataEntryConfig == null ||
-                    !string.Equals(documentType, _activeDocumentType, StringComparison.OrdinalIgnoreCase))
+                // It is possible that even if documentType matches the active document type, a
+                // previously entered document type may have been invalid and set DocumentTypeIsValid
+                // false without changing the ActiveDocumentType; in these case proceed as if there
+                // has been a change to so that DocumentTypeIsValid can be updated as appropriate.
+                if (_activeDataEntryConfig == null
+                    || !DocumentTypeIsValid
+                    || !string.Equals(documentType, _activeDocumentType, StringComparison.OrdinalIgnoreCase))
                 {
                     changedDocumentType = true;
-                    bool blockedConfigurationChange = false;
 
                     // If a configuration was found and it differs from the active one, load it.
                     if (newDataEntryConfig != _activeDataEntryConfig)
@@ -883,14 +922,18 @@ namespace Extract.DataEntry
                         {
                             // The document type calls for the configuration to be changed, but
                             // configuration changes are disallowed. This change is to be blocked.
-                            blockedConfigurationChange = true;
+                            changedDocumentType = false;
+                            _documentTypeComboBox.SelectedIndex = -1;
                         }
                         else if (!OnConfigurationChanging())
                         {
                             // If the user cancelled the change, restore the _activeDocumentType
                             // selection in the document type combo box.
-                            _documentTypeComboBox.Text = _activeDocumentType;
                             changedDocumentType = false;
+                            if (_documentTypeComboBox != null)
+                            {
+                                _documentTypeComboBox.Text = _activeDocumentType;
+                            }
                         }
                         else
                         {
@@ -900,23 +943,25 @@ namespace Extract.DataEntry
                         }
                     }
 
-                    if (changedDocumentType)
+                    if (changedDocumentType && RegisteredDocumentTypes.Any())
                     {
-                        changedDocumentType = !blockedConfigurationChange;
-                        if (changedDocumentType)
+                        if (documentType == null
+                            || !_registeredDocumentTypes.ContainsKey(documentType))
                         {
-                            SetDocumentTypeAttribute(documentType);
+                            DocumentTypeIsValid = false;
+                        }
+                        else
+                        {
+                            // Update documentType to match registered casing of the document type.
+                            documentType = _registeredDocumentTypes[documentType];
+                            _activeDocumentType = documentType;
+                            DocumentTypeIsValid = true;
                         }
 
+                        SetDocumentTypeAttribute(documentType);
                         if (_documentTypeComboBox != null)
                         {
-                            if (!blockedConfigurationChange &&
-                                _documentTypeComboBox.FindStringExact(documentType) != -1)
-                            {
-                                // Assign the new document type.
-                                _activeDocumentType = documentType;
-                                _documentTypeComboBox.Text = documentType;
-                            }
+                            _documentTypeComboBox.Text = documentType;
                         }
                     }
                 }
@@ -1011,15 +1056,10 @@ namespace Extract.DataEntry
         {
             try
             {
-                var newDocType = _documentTypeComboBox.Text;
                 // Check for an active panel; the drop down may have been closed because the DEP is closing.
-                if (ActiveDataEntryConfiguration?.DataEntryControlHost?.IsDocumentLoaded == true
-                    && !String.IsNullOrEmpty(newDocType)
-                    && !LockDocumentType)
+                if (ActiveDataEntryConfiguration?.DataEntryControlHost?.IsDocumentLoaded == true)
                 {
-                    // Update the active document type, changing the current configuration if
-                    // appropriate.
-                    ChangeActiveDocumentType(newDocType, true);
+                    ApplyDocumentTypeFromComboBox();
                 }
             }
             catch (Exception ex)
@@ -1042,9 +1082,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                // If an entered document type cannot be applied, don't allow the document type combo
-                // to lose focus until the user selects a valid document type.
-                e.Cancel = !ApplyDocumentType();
+                ApplyDocumentTypeFromComboBox();
             }
             catch (Exception ex)
             {

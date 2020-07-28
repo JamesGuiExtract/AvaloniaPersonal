@@ -164,7 +164,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="data">The data to save.</param>
         /// <param name="validateData"><see langword="true"/> if the <see paramref="data"/> should
-        /// be validated for errors when saving; otherwise, <see langwor="false"/>.</param>
+        /// be validated for errors when saving; otherwise, <see langword="false"/>.</param>
         /// <returns><see langword="true"/> if the data was saved correctly or
         /// <see langword="false"/> if corrections are needed before it can be saved.</returns>
         bool SaveData(PaginationDocumentData data, bool validateData);
@@ -253,7 +253,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// active selection.</param>
         /// <param name="resetToLastField"><c>true</c> to select the last field regardless of any
         /// active selection.</param>
-        void EnsureFieldSelection(bool resetToFirstField, bool resetToLastField);
+        /// <returns><c>true</c> if the result of the call is that a field in the DEP has received
+        /// focus; <c>false</c> if focus could not be applied or was handled externally via
+        /// <see cref="TabNavigation"/> event.</returns>
+        bool EnsureFieldSelection(bool resetToFirstField, bool resetToLastField, bool viaTabKey);
 
         /// <summary>
         /// Performs an undo operation.
@@ -282,6 +285,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool DocumentTypeAvailable { get; }
 
         /// <summary>
+        /// <c>true</c> if the document type displayed in the panel is valid.
+        /// </summary>
+        bool DocumentTypeIsValid { get; }
+
+        /// <summary>
         /// <c>true</c> if a document type field current has focus; otherwise, <c>false</c>.
         /// </summary>
         bool DocumentTypeFocused { get; }
@@ -292,10 +300,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool FocusDocumentType();
 
         /// <summary>
-        /// Attempts to apply the current text of _documentTypeComboBox as the active document type.
+        /// Attempts to apply the current text of document type field as the active document type.
         /// </summary>
-        /// <returns><c>true</c> if the document type was successfully applied; <c>false</c> if the 
-        /// document type was not successfully applied.</returns>
-        bool ApplyDocumentType();
+        /// <returns><c>true</c> if the document type was changed; <c>false</c> if the change could
+        /// not be made or if there was no change to be applied.</returns>
+        bool ApplyDocumentTypeFromComboBox();
     }
 }
