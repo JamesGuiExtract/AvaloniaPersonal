@@ -227,19 +227,14 @@ namespace Extract.Dashboard.Utilities
         {
             try
             {
-                SqlServerConnectionParametersBase sqlParameters = e.ConnectionParameters as SqlServerConnectionParametersBase;
-
                 // Since the database connection is changing the custom context menu items should be removed
                 _menuNeedsUpdating = true;
 
-                // Only override SQL Server connection
-                if (sqlParameters == null)
-                {
-                    return;
-                }
+                UpdateConfiguredDatabase(e.ConnectionParameters);
 
-                _dashboardForm.ConfiguredServerName = sqlParameters.ServerName;
-                _dashboardForm.ConfiguredDatabaseName = sqlParameters.DatabaseName;
+                string server = _dashboardForm.IsDatabaseOverridden ? _dashboardForm.ServerName : string.Empty;
+                string database = _dashboardForm.IsDatabaseOverridden ? _dashboardForm.DatabaseName : string.Empty;
+                e.ConnectionParameters = e.ConnectionParameters.CreateConnectionParametersForReadOnly(server, database) ?? e.ConnectionParameters;
 
                 // Set timeout to 0 (infinite) for all DataSources
                 foreach (var ds in _dashboardForm.CurrentDashboard.DataSources)
@@ -250,13 +245,6 @@ namespace Extract.Dashboard.Utilities
                         sqlDataSource.ConnectionOptions.DbCommandTimeout = 0;
                     }
                 }
-
-                if (!_dashboardForm.IsDatabaseOverridden)
-                {
-                    return;
-                }
-                sqlParameters.ServerName = _dashboardForm.ServerName;
-                sqlParameters.DatabaseName = _dashboardForm.DatabaseName;
             }
             catch (Exception ex)
             {
@@ -660,7 +648,7 @@ namespace Extract.Dashboard.Utilities
             {
                 var menuItemData = e.Item.Tag as Dictionary<string, object>;
                 if (menuItemData != null)
-                _dashboardForm.OpenDashboardForm(menuItemData["DashboardReportName"] as string, _dashboardForm.CurrentFilteredDimensions);
+                    _dashboardForm.OpenDashboardForm(menuItemData["DashboardReportName"] as string, _dashboardForm.CurrentFilteredDimensions);
             }
             catch (Exception ex)
             {
@@ -1047,7 +1035,7 @@ namespace Extract.Dashboard.Utilities
                         var customValues = CustomGridValues[e.DashboardItemName];
 
                         // the form will only be displayed if there is a FileName specified and the datasource is SQL database
-                        if (!string.IsNullOrWhiteSpace(customValues.RowQuery) 
+                        if (!string.IsNullOrWhiteSpace(customValues.RowQuery)
                             && columnValues.Count > 0
                             && columnValues.ContainsKey(customValues.DataMemberUsedForFileName)
                             && !string.IsNullOrWhiteSpace(_dashboardForm.ServerName)
@@ -1339,6 +1327,28 @@ namespace Extract.Dashboard.Utilities
 
             return axisPointTuples.Select(at => at.ToDictionary())
                 .Where(v => v != null);
+        }
+
+        private void UpdateConfiguredDatabase(DataConnectionParametersBase parameters)
+        {
+            var sqlParameters = parameters as SqlServerConnectionParametersBase;
+            var customParameters = parameters as CustomStringConnectionParameters;
+            if (sqlParameters != null)
+            {
+                _dashboardForm.ConfiguredServerName = sqlParameters.ServerName;
+                _dashboardForm.ConfiguredDatabaseName = sqlParameters.DatabaseName;
+            }
+            else if (customParameters != null)
+            {
+                var builder = customParameters.CreateSQLConnectionBuilderFromParameters();
+                _dashboardForm.ConfiguredServerName = builder.DataSource;
+                _dashboardForm.ConfiguredDatabaseName = builder.InitialCatalog;
+            }
+            else
+            {
+                _dashboardForm.ConfiguredServerName = "";
+                _dashboardForm.ConfiguredDatabaseName = "";
+            }
         }
 
         #endregion

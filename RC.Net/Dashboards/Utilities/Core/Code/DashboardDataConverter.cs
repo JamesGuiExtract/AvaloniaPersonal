@@ -40,9 +40,9 @@ namespace Extract.Dashboard.Utilities
                         .OfType<DashboardSqlDataSource>().ToList();
                     foreach (var ds in sqlDataSources)
                     {
-                        var sqlParameters = ds.ConnectionParameters as SqlServerConnectionParametersBase;
-                        sqlParameters.DatabaseName = databaseName;
-                        sqlParameters.ServerName = serverName;
+                        ds.ConnectionParameters = ds.ConnectionParameters?
+                            .CreateConnectionParametersForReadOnly(serverName, databaseName) ?? ds.ConnectionParameters;
+
                         if (ds.Queries.Any(q => q.Parameters.Count() > 0))
                         {
                             return null;
@@ -161,10 +161,13 @@ namespace Extract.Dashboard.Utilities
 
             foreach (var query in ds.Queries)
             {
-                var sqlParameters = ds.ConnectionParameters as SqlServerConnectionParametersBase;
+                var builder = ds.ConnectionParameters.CreateSQLConnectionBuilderFromParameters();
+                if (builder is null)
+                    return;
+                
                 string extractDataSourceName = "ExtractData_" + dashboardName + "_" +
                     ds.Name +
-                    sqlParameters.ServerName + "_" + sqlParameters.DatabaseName + "_" + query.Name;
+                    builder.DataSource + "_" + builder.InitialCatalog + "_" + query.Name;
 
                 // check if the extract data source already exists
                 if (existingExtractDataSources
@@ -173,6 +176,9 @@ namespace Extract.Dashboard.Utilities
                 {
                     continue;
                 }
+
+                ds.ConnectionParameters = ds.ConnectionParameters
+                    .CreateConnectionParametersForReadOnly(string.Empty, string.Empty);
 
                 DashboardExtractDataSource extractDataSource =
                     CreateExtractedDataSource(extractDataSourceDir, ds, query.Name, extractDataSourceName);

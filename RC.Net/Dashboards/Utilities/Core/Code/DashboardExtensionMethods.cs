@@ -1,6 +1,8 @@
 ﻿using DevExpress.DashboardCommon.ViewerData;
+using DevExpress.DataAccess.ConnectionParameters;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace Extract.Dashboard.Utilities
@@ -43,6 +45,64 @@ namespace Extract.Dashboard.Utilities
             {
                 throw ex.AsExtract("ELI47054");
             }
+        }
+
+        /// <summary>
+        /// Creates a SQLConnectionStringBuilder that uses the settings in the parameters
+        /// </summary>
+        /// <param name="parameters">Parameters for a data connection</param>
+        /// <returns>Returns a builder populated with the settings in parameters</returns>
+        public static SqlConnectionStringBuilder CreateSQLConnectionBuilderFromParameters(this DataConnectionParametersBase parameters)
+        {
+            var sqlParameters = parameters as SqlServerConnectionParametersBase;
+            var customParameters = parameters as CustomStringConnectionParameters;
+
+            SqlConnectionStringBuilder builder = null;
+
+            if (customParameters != null)
+            {
+                var settings = customParameters.ConnectionString.Split(new char[] { ';' }).ToList();
+                var provider = settings.Where(s => s.Contains("XpoProvider"));
+                builder = new SqlConnectionStringBuilder(string.Join(";", settings.Except(provider).ToArray()));
+            }
+            else if (sqlParameters != null)
+            {
+                builder = new SqlConnectionStringBuilder();
+                builder.InitialCatalog = sqlParameters.DatabaseName;
+                builder.DataSource = sqlParameters.ServerName;
+            }
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Creates the CustomStringConnectionParameters based off of a DataConnectionParameterBase object that sets the 
+        /// ApplicationIntent=ReadOnly
+        /// </summary>
+        /// <param name="parameters">The DataConnectionParameterBase object to get the current connection info from</param>
+        /// <param name="serverName">Server to change the connection to, will be empty if not changing the server</param>
+        /// <param name="databaseName">Database to change the connection to, will be empty if not changing the database</param>
+        /// <returns>Returns the CustomStringConnectionParameters for ReadOnly connection to cluster, Null if the parameters 
+        /// were not for SQL database </returns>
+        public static CustomStringConnectionParameters CreateConnectionParametersForReadOnly(this DataConnectionParametersBase parameters,
+                                                                                             string serverName,
+                                                                                             string databaseName)
+        {
+            SqlConnectionStringBuilder builder = parameters.CreateSQLConnectionBuilderFromParameters();
+            if (builder is null)
+                return null;
+
+            if (!string.IsNullOrWhiteSpace(serverName) && !string.IsNullOrWhiteSpace(databaseName))
+            {
+                builder.DataSource = serverName;
+                builder.InitialCatalog = databaseName;
+            }
+
+            builder.ApplicationIntent = ApplicationIntent.ReadOnly;
+            builder.IntegratedSecurity = true;
+            builder.MultiSubnetFailover = true;
+            var connectionString = "XpoProvider=MSSqlServer;" + builder.ConnectionString;
+            return new CustomStringConnectionParameters(connectionString);
         }
     }
 }

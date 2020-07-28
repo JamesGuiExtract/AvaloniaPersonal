@@ -169,7 +169,8 @@ namespace Extract.ReportingDevExpress
                 _workflowName = extractReport._workflowName;
                 _reportFileName = extractReport._reportFileName;
 
-                SetDatabaseConnection();
+                if (!string.IsNullOrWhiteSpace(_databaseName) && !string.IsNullOrWhiteSpace(_serverName))
+                    SetDatabaseConnection();
 
                 _parameters.AddRange(extractReport._parameters);
             }
@@ -487,13 +488,14 @@ namespace Extract.ReportingDevExpress
         void SetDatabaseConnection()
         {
             var sqlConnection = _report.DataSource as SqlDataSource;
-            var connectionParameters = sqlConnection?.ConnectionParameters as MsSqlConnectionParameters;
-            if (connectionParameters != null)
-            {
-                connectionParameters.DatabaseName = _databaseName;
-                connectionParameters.ServerName = _serverName;
-                connectionParameters.AuthorizationType = MsSqlAuthorizationType.Windows;
-            }
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+            builder.DataSource = _serverName;
+            builder.InitialCatalog = _databaseName;
+            builder.IntegratedSecurity = true;
+            builder.ApplicationIntent = ApplicationIntent.ReadOnly;
+            builder.MultiSubnetFailover = true;
+            var sqlConnectionString = "XpoProvider=MSSqlServer;" + builder.ConnectionString;
+            sqlConnection.ConnectionParameters = new CustomStringConnectionParameters(sqlConnectionString);
         }
 
         /// <summary>
