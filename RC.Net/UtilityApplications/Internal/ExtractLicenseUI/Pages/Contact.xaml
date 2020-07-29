@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="ExtractLicenseUI.Contact"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mui="http://firstfloorsoftware.com/ModernUI">
+    <ScrollViewer>
+        <StackPanel>
+            <TextBlock Text="MODERN UI FOR WPF" Style="{StaticResource Heading2}" />
+            <TextBlock Text="Implement Org contacts here. (currently unused)" />
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
