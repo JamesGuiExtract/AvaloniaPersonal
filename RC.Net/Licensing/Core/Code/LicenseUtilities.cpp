@@ -54,6 +54,40 @@ void LicenseUtilities::LoadLicenseFilesFromFolder(int licenseType, MapLabel^ map
     }
 }
 //--------------------------------------------------------------------------------------------------
+void LicenseUtilities::LoadLicenseFilesFromFolder(String^ directory, int licenseType, MapLabel^ mapLabel)
+{
+    try
+    {
+        // Ensure a map label has been specified
+        ASSERT_ARGUMENT("ELI50151", mapLabel != nullptr);
+
+        if (!_licensesLoaded)
+        {
+            // Ensure the calling assembly has been signed by Extract
+            if (!CheckData(Assembly::GetCallingAssembly()))
+            {
+                throw gcnew ExtractException("ELI50152", "Failed to initialize license data!");
+            }
+
+            // Load the license file(s)
+            LicenseManagement::loadLicenseFilesFromFolder(StringHelpers::AsSTLString(directory),
+                LICENSE_MGMT_PASSWORD, licenseType);
+
+            _licensesLoaded = true;
+        }
+    }
+    catch(UCLIDException& uex)
+    {
+        throw gcnew ExtractException("ELI50153", "Failed loading license from folder!",
+            StringHelpers::AsSystemString(uex.asStringizedByteStream()));
+    }
+    catch(Exception^ ex)
+    {
+        // Wrap all exceptions as an ExtractException
+        throw gcnew ExtractException("ELI50154", "Failed loading license from folder!", ex);
+    }
+}
+//--------------------------------------------------------------------------------------------------
 bool LicenseUtilities::IsLicensed(LicenseIdName id)
 {
     try
@@ -445,6 +479,28 @@ void LicenseUtilities::ResetLicenseCache(LicenseIdName id)
             "License id was not found in the collection.");
         ee->AddDebugData("License ID", id.ToString("G"), true);
         throw ee;
+    }
+}
+//--------------------------------------------------------------------------------------------------
+void LicenseUtilities::UnlicenseAll()
+{
+    try
+    {
+        LicenseManagement::unlicenseAll();
+
+        ResetLicenseCache();
+        _licensesLoaded = false;
+    }
+    catch (UCLIDException& uex)
+    {
+        throw gcnew ExtractException("ELI50181",
+            "Failed unlicensing licenses!",
+            StringHelpers::AsSystemString(uex.asStringizedByteStream()));
+    }
+    catch (Exception^ ex)
+    {
+        // Wrap all exceptions as an ExtractException
+        throw gcnew ExtractException("ELI50182", "Failed unlicensing licenses!", ex);
     }
 }
 //--------------------------------------------------------------------------------------------------

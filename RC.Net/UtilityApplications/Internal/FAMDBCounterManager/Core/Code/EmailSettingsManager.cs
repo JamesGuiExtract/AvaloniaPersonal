@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Licensing.Internal;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;

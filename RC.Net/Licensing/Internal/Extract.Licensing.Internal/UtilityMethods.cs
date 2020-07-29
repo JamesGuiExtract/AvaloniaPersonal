@@ -3,12 +3,12 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Extract.FAMDBCounterManager
+namespace Extract.Licensing.Internal
 {
     /// <summary>
     /// Defines utility methods for use in this assembly.
     /// </summary>
-    internal static class UtilityMethods
+    public static class UtilityMethods
     {
         /// <summary>
         /// Converts the <see cref="T:byte[]"/> to a hexadecimal string.
@@ -177,6 +177,88 @@ namespace Extract.FAMDBCounterManager
             {
                 throw new Exception(errorMessage);
             }
+        }
+
+        public static DateTime Round(this DateTime dateTime,
+                                     TimeSpan timeSpan,
+                                     DateTime boundaryDateTime = new DateTime())
+        {
+            // Calculate an offset in ticks such that 0 will lie on a times pan boundary where the
+            // timespans are aligned with boundaryDateTime.
+            long offsetTicks = boundaryDateTime.Ticks % timeSpan.Ticks;
+            Assert(dateTime.Ticks >= offsetTicks, "Invalid datetime rounding boundary.");
+
+            // Normalize dateTime.Ticks against the boundaryDateTime.
+            long dateTimeTicks = dateTime.Ticks - offsetTicks;
+
+            // Round to the nearest boundary.
+            long ticks = ((dateTimeTicks + (timeSpan.Ticks / 2)) / timeSpan.Ticks) * timeSpan.Ticks;
+
+            // Normalize the result back to the standard DateTime timescale.
+            ticks += offsetTicks;
+
+            return new DateTime(ticks);
+        }
+
+        public static ByteArrayManipulator GetLicenseBytesFromCode(string hexString)
+        {
+            var byteArray = GetCodeWithKey(hexString,
+                                           NativeMethods.Key5,
+                                           NativeMethods.Key6,
+                                           NativeMethods.Key7,
+                                           NativeMethods.Key8);
+            var code = byteArray.ReadString();
+
+            return new ByteArrayManipulator(TranslateBytesWithUserKey(true, code.HexStringToBytes()));
+        }
+
+        public static string TranslateBytesToLicenseStringWithKey(Byte[] bytes, UInt32 key1, UInt32 key2, UInt32 key3, UInt32 Key4)
+        {
+            var code = TranslateBytesWithUserKey(false, bytes);
+            ByteArrayManipulator byteArray = new ByteArrayManipulator();
+            byteArray.Write(code.ToHexString());
+            return NativeMethods.EncryptDecryptBytes(byteArray.GetBytes(8), true, key1, key2, key3, Key4).ToHexString();
+        }
+
+        public static Byte[] TranslateBytesWithUserKey(bool extract, Byte[] bytes)
+        {
+            var userPassword = GetUserLicensePassword();
+            return NativeMethods.EncryptDecryptBytes(bytes,
+                                              !extract,
+                                              BitConverter.ToUInt32(userPassword, 0),
+                                              BitConverter.ToUInt32(userPassword, 4),
+                                              BitConverter.ToUInt32(userPassword, 8),
+                                              BitConverter.ToUInt32(userPassword, 12));
+
+        }
+
+        private static ByteArrayManipulator GetCodeWithKey(string hexString, UInt32 key1, UInt32 key2, UInt32 key3, UInt32 key4)
+        {
+            var byteCode = NativeMethods.EncryptDecryptBytes(hexString.HexStringToBytes(),
+                                                             false,
+                                                             key1,
+                                                             key2,
+                                                             key3,
+                                                             key4);
+
+            return new ByteArrayManipulator(byteCode);
+        }
+
+        private static Byte[] GetUserLicensePassword()
+        {
+            Byte[] passwordBytes = new byte[16];
+
+            int i;
+            for (i = 0; i < 8; i++)
+            {
+                passwordBytes[i] = (byte)(i * 4 + 23 - i * 2);
+            }
+            for (int j = 0; j < 8; j++)
+            {
+                passwordBytes[i + j] = (byte)((2 * i + j) * 7 + 31 - (i + 2 * j) * 3);
+            }
+
+            return passwordBytes;
         }
     }
 }

@@ -266,3 +266,8 @@ const unsigned int gnLASERFICHE_SERVICE_REDACTION		= gnBASE_OFFSET + 103;
 // Constants for items licensed for NetDMS integration
 //-------------------------------------------------------------------------------------------------
 const unsigned int gnNETDMS_COMPONENTS					= gnBASE_OFFSET + 110;
+
+//-------------------------------------------------------------------------------------------------
+// Constants Used for testing only: Add new values above this and with a value < 999
+//-------------------------------------------------------------------------------------------------
+const unsigned int gnTEST_COMPONENT						= gnBASE_OFFSET + 999;

@@ -37,6 +37,7 @@ namespace Extract
 			//
 			// PROMISE:	All license files in the CommonComponents folder will be loaded
 			static void LoadLicenseFilesFromFolder(int licenseType, MapLabel^ mapLabel);
+			static void LoadLicenseFilesFromFolder(String^ directory, int licenseType, MapLabel^ mapLabel);
             //--------------------------------------------------------------------------------------
 			// PURPOSE: To check if a particular component is licensed
 			//
@@ -105,6 +106,9 @@ namespace Extract
 			// In particular, this encodes the specified objectID using an encrypted day code
 			// (LICENSE_MGMT_PASSWORD).
 			static void RegisterObject(int objectId, MapLabel^ mapLabel);
+			//--------------------------------------------------------------------------------------
+			// PURPOSE: Unlicense all components
+			static void UnlicenseAll();
 
 		private:
             //--------------------------------------------------------------------------------------

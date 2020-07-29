@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Licensing.Internal;
+using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;

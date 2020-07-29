@@ -65,7 +65,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ByteArrayManipulator.cs" />
     <Compile Include="ConfigSettings.cs" />
     <Compile Include="CounterData.cs" />
     <Compile Include="EmailMessage.cs" />
@@ -114,7 +113,6 @@
     <Compile Include="EmailSettingsDialog.designer.cs">
       <DependentUpon>EmailSettingsDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="UtilityMethods.cs" />
     <EmbeddedResource Include="EmailSettingsControl.resx">
       <DependentUpon>EmailSettingsControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -160,6 +158,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\CounterManager.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Licensing\Internal\Extract.Licensing.Internal\Extract.Licensing.Internal.csproj">
+      <Project>{f5fe9212-d929-4dd5-8dfd-ade86c114c66}</Project>
+      <Name>Extract.Licensing.Internal</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

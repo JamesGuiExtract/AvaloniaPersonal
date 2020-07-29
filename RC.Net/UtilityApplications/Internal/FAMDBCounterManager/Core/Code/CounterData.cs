@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Licensing.Internal;
+using System;
 
 namespace Extract.FAMDBCounterManager
 {

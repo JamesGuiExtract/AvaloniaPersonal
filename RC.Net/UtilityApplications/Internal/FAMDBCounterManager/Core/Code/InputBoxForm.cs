@@ -1,6 +1,6 @@
 // InputBox - Based on implementation by: Andrew Ma
 // URL: http://www.devhood.com/Tools/tool_details.aspx?tool_id=295
-
+using Extract.Licensing.Internal;
 using System;
 using System.Drawing;
 using System.Windows.Forms;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Licensing.Internal;
+using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Configuration;

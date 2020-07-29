@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Licensing.Internal;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;

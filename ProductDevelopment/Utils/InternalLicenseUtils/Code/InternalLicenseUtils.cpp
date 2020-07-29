@@ -31,7 +31,7 @@ const unsigned long	gulFAMKey4 = 0x15990323;
 void getFAMPassword(ByteStream& rPasswordBytes)
 {
 	ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, rPasswordBytes);
-	
+
 	bsm << gulFAMKey1;
 	bsm << gulFAMKey2;
 	bsm << gulFAMKey3;
@@ -46,7 +46,7 @@ void getFAMPassword(ByteStream& rPasswordBytes)
 // When bScramble is false, data that was previously scrambled will be unscrambled (assuming the
 // same nScrambleKey is used as when the data was scrambled).
 void scrambleData(unsigned char* pszData, unsigned long nLength, unsigned long nScrambleKey,
-				  bool bScramble)
+	bool bScramble)
 {
 	// For every other byte in the array, swap it with a byte that is half the array
 	// size ahead +- 8 bytes. This position to swap with should roll over to the
@@ -68,6 +68,145 @@ void scrambleData(unsigned char* pszData, unsigned long nLength, unsigned long n
 	}
 }
 
+// This function should not be exported
+unsigned char* encrypt(unsigned char* pszInput, unsigned long* pulLength, ByteStream bsKey, bool scramble)
+{
+
+	ASSERT_ARGUMENT("ELI50173", pszInput != __nullptr);
+	ASSERT_ARGUMENT("ELI50174", pulLength != __nullptr);
+
+	unsigned long nScrambleKey;
+	ByteStream bytes;
+	if (scramble)
+	{
+		static Random rand;
+		nScrambleKey = rand.uniform(0, ULONG_MAX);
+		scrambleData(pszInput, *pulLength, nScrambleKey, true);
+	}
+	bytes = ByteStream(pszInput, *pulLength);
+
+	MapLabel encryptionEngine;
+	ByteStream bsOutputBytes;
+	encryptionEngine.setMapLabel(bsOutputBytes, bytes, bsKey);
+
+	*pulLength = bsOutputBytes.getLength();
+
+	// When encrypting, allocate 4 extra bytes to allow for nScrambleKey.
+	if (scramble)
+		*pulLength += 4;
+
+	// Allocate a buffer to hold the encrypted data.
+	// NOTE: Need to use CoTaskMemAlloc to allocate the memory so that it can be
+	// released on the C# side, CANNOT USE NEW
+	unsigned char* pszOutput = (unsigned char*)CoTaskMemAlloc(sizeof(char) * *pulLength);
+	ASSERT_RESOURCE_ALLOCATION("ELI50175", pszOutput != __nullptr);
+	try
+	{
+		if (scramble)
+		{
+			memcpy(pszOutput, &nScrambleKey, 4);
+			memcpy(pszOutput + 4, bsOutputBytes.getData(), *pulLength - 4);
+		}
+		else
+		{
+			memcpy(pszOutput, bsOutputBytes.getData(), *pulLength);
+		}
+		return pszOutput;
+	}
+	catch (...)
+	{
+		*pulLength = 0;
+
+		// Ensure all allocated memory is cleaned up
+		if (pszOutput != __nullptr)
+		{
+			CoTaskMemFree(pszOutput);
+		}
+		throw;
+	}
+}
+
+// This function should not be exported
+unsigned char* decrypt(unsigned char* pszInput, unsigned long* pulLength, ByteStream bsKey, bool scramble)
+{
+	ASSERT_ARGUMENT("ELI38791", pszInput != __nullptr);
+	ASSERT_ARGUMENT("ELI38792", pulLength != __nullptr);
+
+	unsigned long nScrambleKey;
+	ByteStream bytes;
+
+	if (scramble)
+	{
+		*pulLength -= 4;
+		nScrambleKey = *(long*)pszInput;
+		bytes = ByteStream(pszInput + 4, *pulLength);
+	}
+	else
+	{
+		bytes = ByteStream(pszInput, *pulLength);
+	}
+	
+	MapLabel encryptionEngine;
+	ByteStream bsOutputBytes;
+	encryptionEngine.getMapLabel(bsOutputBytes, bytes, bsKey);
+	
+	*pulLength = bsOutputBytes.getLength();
+	// Allocate a buffer to hold the encrypted data.
+	// NOTE: Need to use CoTaskMemAlloc to allocate the memory so that it can be
+	// released on the C# side, CANNOT USE NEW
+	unsigned char *pszOutput = (unsigned char*)CoTaskMemAlloc(sizeof(char) * *pulLength);
+	ASSERT_RESOURCE_ALLOCATION("ELI38793", pszOutput != __nullptr);
+
+	try
+	{
+		memcpy(pszOutput, bsOutputBytes.getData(), *pulLength);
+
+		if (scramble)
+		{
+			// Unscramble the now unencrypted bytes of the array.
+			scrambleData(pszOutput, *pulLength, nScrambleKey, false);
+		}
+	}
+	catch (...)
+	{
+		*pulLength = 0;
+
+		// Ensure all allocated memory is cleaned up
+		if (pszOutput != __nullptr)
+		{
+			CoTaskMemFree(pszOutput);
+		}
+		throw;
+	}
+
+	return pszOutput;
+}
+
+unsigned char* externManipulatorBase(unsigned char* pszInput, bool bEncrypt, unsigned long* pulLength, ByteStream bsKey, bool scramble)
+{
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT("ELI38791", pszInput != __nullptr);
+			ASSERT_ARGUMENT("ELI38792", pulLength != __nullptr);
+
+			return (bEncrypt) ? encrypt(pszInput, pulLength, bsKey, scramble) : decrypt(pszInput, pulLength, bsKey, scramble);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38794");
+	}
+	catch (UCLIDException& ue)
+	{
+		*pulLength = 0;
+
+		// Log this exception to the standard exception log
+		ue.log("", true, false, true);
+
+		// Now throw the exception
+		throw ue;
+	}
+}
+
 //-------------------------------------------------------------------------------------------------
 // PURPOSE:		Exported encrypt method for P/Invoke calls from C# to encrypt/decrypt data using
 //				the password for secure FAM counters. This process includes an extra step to
@@ -86,96 +225,20 @@ unsigned char* externManipulator(unsigned char* pszInput, bool bEncrypt, unsigne
 {
 	unsigned char* pszOutput = __nullptr;
 
-	try
-	{
-		try
-		{
-			ASSERT_ARGUMENT("ELI38791", pszInput != __nullptr);
-			ASSERT_ARGUMENT("ELI38792", pulLength != __nullptr);
-
-			unsigned long nScrambleKey;
-			ByteStream bytes;
-
-			if (bEncrypt)
-			{
-				// In order to avoid having encrypted results be mostly the same for data that is
-				// mostly the same, scramble the bytes of the input text before encrypting. A random
-				// number will be used as the key for the scrambling process and will be included as
-				// the first 4 bytes of the value to be encrypted.
-				static Random rand;
-				nScrambleKey = rand.uniform(0, ULONG_MAX);
-
-				scrambleData(pszInput, *pulLength, nScrambleKey, true);
-
-				bytes = ByteStream(pszInput, *pulLength);
-			}
-			else
-			{
-				// When decrypting, the first 4 bytes will be the key used to unscramble the
-				// unencrypted results.
-				*pulLength -= 4;
-				nScrambleKey = *(long *)pszInput;
-				bytes = ByteStream(pszInput + 4, *pulLength);
-			}
-
-			ByteStream bsPassword;
-			getFAMPassword(bsPassword);
-
-			MapLabel encryptionEngine;
-			ByteStream bsOutputBytes;
-			if (bEncrypt)
-			{
-				encryptionEngine.setMapLabel(bsOutputBytes, bytes, bsPassword);
-			}
-			else
-			{
-				encryptionEngine.getMapLabel(bsOutputBytes, bytes, bsPassword);
-			}
-
-			*pulLength = bsOutputBytes.getLength();
-			if (bEncrypt)
-			{
-				// When encrypting, allocate 4 extra bytes to allow for nScrambleKey.
-				*pulLength += 4;
-			}
-
-			// Allocate a buffer to hold the encrypted data.
-			// NOTE: Need to use CoTaskMemAlloc to allocate the memory so that it can be
-			// released on the C# side, CANNOT USE NEW
-			pszOutput = (unsigned char*) CoTaskMemAlloc(sizeof(char) **pulLength);
-			ASSERT_RESOURCE_ALLOCATION("ELI38793", pszOutput != __nullptr);
-			
-			if (bEncrypt)
-			{
-				memcpy(pszOutput, &nScrambleKey, 4);
-				memcpy(pszOutput + 4, bsOutputBytes.getData(), *pulLength - 4);
-			}
-			else
-			{
-				memcpy(pszOutput, bsOutputBytes.getData(), *pulLength);
-
-				// Unscramble the now unencrypted bytes of the array.
-				scrambleData(pszOutput, *pulLength, nScrambleKey, false);
-			}
-
-			return pszOutput;
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38794");
-	}
-	catch(UCLIDException& ue)
-	{
-		*pulLength = 0;
-
-		// Ensure all allocated memory is cleaned up
-		if (pszOutput != __nullptr)
-		{
-			CoTaskMemFree(pszOutput);	
-		}
-
-		// Log this exception to the standard exception log
-		ue.log("", true, false, true);
-
-		// Now throw the exception
-		throw ue;
-	}
+	ByteStream bsPassword;
+	getFAMPassword(bsPassword);
+	return externManipulatorBase(pszInput, bEncrypt, pulLength, bsPassword, true);
 }
+//-------------------------------------------------------------------------------------------------
+unsigned char* externManipulatorInternal(unsigned char* pszInput, bool bEncrypt, unsigned long* pulLength, 
+	unsigned long key1, unsigned long key2, unsigned long key3, unsigned long key4)
+{
+
+	ByteStream passwordBytes;
+	ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, passwordBytes);
+	bsm << key1 << key2 << key3 << key4;
+	bsm.flushToByteStream(8);
+
+	return externManipulatorBase(pszInput, bEncrypt, pulLength, passwordBytes, false);
+}
+//-------------------------------------------------------------------------------------------------

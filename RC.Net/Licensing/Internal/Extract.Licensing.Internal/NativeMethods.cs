@@ -1,26 +1,27 @@
-﻿using Extract.Licensing.Internal;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Globalization;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Extract.FAMDBCounterManager
+namespace Extract.Licensing.Internal
 {
     internal static class NativeMethods
     {
-        /// <summary>
-        /// Defines the coordinates of the upper-left and lower-right corners of a rectangle.
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential)]
-        struct WindowsRectangle
-        {
-            public int left;
-            public int top;
-            public int right;
-            public int bottom;
-        }
+        // Define four UCLID passwords used for interleaved string of 
+        // encrypted license data
+        public const UInt32 Key1 = 0x411065D2;
+        public const UInt32 Key2 = 0x7F9D16C2;
+        public const UInt32 Key3 = 0x6E5C66AA;
+        public const UInt32 Key4 = 0x15D27BA6;
+
+        // Define four UCLID passwords used for hard-coded application
+        // passwords
+        public const UInt32 Key5 = 0x17A64E1D;
+        public const UInt32 Key6 = 0xDA80339;
+        public const UInt32 Key7 = 0x1A0955D7;
+        public const UInt32 Key8 = 0x6EE23DA7;
 
         // P/Invoke the isInternalToolsLicensed();.
         // NOTE:    If there is a problem where the entry point cannot be found, run DUMPBIN
@@ -35,21 +36,7 @@ namespace Extract.FAMDBCounterManager
         [return: MarshalAs(UnmanagedType.U1)]
         static extern bool isInternalToolsLicensed();
 
-        /// <summary>
-        /// Gets the window rectangle associated with the provided window handle.
-        /// </summary>
-        /// <param name="hWnd">Window handle to get the rectangle for.</param>
-        /// <param name="rect">The struct that will hold the rectangle data.</param>
-        /// <returns><see langword="true"/> if the function is successful and
-        /// <see langword="false"/> otherwise.
-        /// <para><b>Note:</b></para>
-        /// If the function returns <see langword="false"/> it will also set the
-        /// last error flag.  You can create a new <see cref="Win32Exception"/>
-        /// with the return value of <see cref="Marshal.GetLastWin32Error"/> to
-        /// get the extended error information.</returns>
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool GetWindowRect(IntPtr hWnd, ref WindowsRectangle rect);
+
 
         // P/Invoke the encryption method from BaseUtils.
         // NOTE:    The mangled name appearing below should stay the same unless we switch
@@ -60,11 +47,11 @@ namespace Extract.FAMDBCounterManager
         //          there should be three columns of numbers (1 decimal, 2 HEX) and then
         //          the mangled name of the function followed by a space and '='.
         [DllImport("InternalLicenseUtils.dll",
-            EntryPoint = "?externManipulator@@YAPAEPAE_NPAK@Z", CharSet = CharSet.Ansi,
+            EntryPoint = "?externManipulatorInternal@@YAPAEPAE_NPAKKKKK@Z", CharSet = CharSet.Ansi,
             BestFitMapping = false, ThrowOnUnmappableChar = true,
             CallingConvention = CallingConvention.Cdecl)]
         static extern IntPtr EncryptDecryptBytes([MarshalAs(UnmanagedType.SysInt)] IntPtr input,
-            [MarshalAs(UnmanagedType.U1)] bool encrypt, ref uint length);
+            [MarshalAs(UnmanagedType.U1)] bool encrypt, ref uint length, uint k1, uint k2, uint k3, uint k4);
 
         /// <summary>
         /// Gets a value indicating whether this instance is licensed for internal Extract Systems use.
@@ -79,30 +66,7 @@ namespace Extract.FAMDBCounterManager
             }
         }
 
-        /// <summary>
-        /// Get the rectangle containing the specified window in screen coordinates.
-        /// </summary>
-        /// <param name="window">The window to get the rectangle for. May not
-        /// be <see langword="null"/>.</param>
-        /// <returns>A <see cref="Rectangle"/> representing the location and
-        /// the bounds of the specified window in screen coordinates.</returns>
-        public static Rectangle GetWindowScreenRectangle(IWin32Window window)
-        {
-            UtilityMethods.Assert(window != null, "Window object is null");
-
-            // Declare a new windows rectangle to hold the return data
-            WindowsRectangle windowRectangle = new WindowsRectangle();
-
-            // Call the win32API GetWindowRect function
-            UtilityMethods.Assert(GetWindowRect(window.Handle, ref windowRectangle),
-                "Failed to get window rect");
-
-            // Return a Rectangle containing the window position and size
-            return new Rectangle(windowRectangle.left, windowRectangle.top,
-                windowRectangle.right - windowRectangle.left,
-                windowRectangle.bottom - windowRectangle.top);
-        }
-
+    
         /// <summary>
         /// Encrypts or decrypts the specified <see paramref="input"/> data using the internal
         /// Extract Systems password for secure FAM counters.
@@ -113,8 +77,10 @@ namespace Extract.FAMDBCounterManager
         /// <see langword="false"/> to decrypt it.</param>
         /// <returns>The encrypted data.</returns>
         //[SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-        internal static byte[] EncryptDecryptBytes(byte[] input, bool encrypt)
+        internal static byte[] EncryptDecryptBytes(byte[] input, bool encrypt, UInt32 k1, UInt32 k2, UInt32 k3, UInt32 k4)
         {
+            if (!IsInternalToolsLicensed)
+                throw new Exception("ELI50176: Must be internally licneses.");
             // Create a pointer to a buffer to hold the encrypted data
             IntPtr inBuffer = IntPtr.Zero;
             IntPtr outBuffer = IntPtr.Zero;
@@ -130,7 +96,7 @@ namespace Extract.FAMDBCounterManager
             // 3) Memory allocated for the buffer will be released.
             try
             {
-                outBuffer = EncryptDecryptBytes(inBuffer, encrypt, ref dataLength);
+                outBuffer = EncryptDecryptBytes(inBuffer, encrypt, ref dataLength, k1, k2, k3, k4);
 
                 // Copy the data from the buffer to a managed byte array.
                 var outputData = new byte[dataLength];

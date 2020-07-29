@@ -14,3 +14,7 @@
 // Systems.
 INTERNALLICENSEUTILS_API unsigned char* externManipulator(
 	unsigned char* pszInput, bool bEncrypt, unsigned long* pulLength);
+
+// Only to be used internally 
+INTERNALLICENSEUTILS_API unsigned char* externManipulatorInternal(unsigned char* pszInput, bool bEncrypt, unsigned long* pulLength,
+	unsigned long key1, unsigned long key2, unsigned long key3, unsigned long key4);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Licensing.Internal;
+using System;
 using System.Windows.Forms;
 
 namespace Extract.FAMDBCounterManager

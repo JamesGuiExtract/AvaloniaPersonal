@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Extract.FAMDBCounterManager
+namespace Extract.Licensing.Internal
 {
     /// <summary>
     /// Provides ability to serialize objects of various data types into an array of bytes.
@@ -11,7 +11,7 @@ namespace Extract.FAMDBCounterManager
     /// This class is a modified copy of Extract.Utilities.ByteArrayManipulator. This project is not
     /// linked to Extract.Utilities to avoid COM dependencies.
     /// </summary>
-    internal class ByteArrayManipulator
+    public class ByteArrayManipulator
     {
         #region Fields
 
@@ -73,7 +73,7 @@ namespace Extract.FAMDBCounterManager
 
             set
             {
-                UtilityMethods.Assert(value >= 0 && value < Length, "Invalid read position.");
+                Assert(value >= 0 && value < Length, "Invalid read position.");
 
                 _readPosition = value;
             }
@@ -93,6 +93,15 @@ namespace Extract.FAMDBCounterManager
         #endregion Properties
 
         #region Methods
+
+        /// <summary>
+        /// Writes the specified <see paramref="value"/> to the stream.
+        /// </summary>
+        /// <param name="value">The <see cref="Boolean"/> to write to the stream.</param>
+        public void Write(Boolean value)
+        {
+            _bytes.AddRange(BitConverter.GetBytes(value));
+        }
 
         /// <summary>
         /// Writes the specified <see paramref="value"/> to the stream.
@@ -125,6 +134,15 @@ namespace Extract.FAMDBCounterManager
         /// <summary>
         /// Writes the specified <see paramref="value"/> to the stream.
         /// </summary>
+        /// <param name="value">The <see cref="UInt32"/> to write to the stream.</param>
+        public void Write(UInt32 value)
+        {
+            _bytes.AddRange(BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
+        /// Writes the specified <see paramref="value"/> to the stream.
+        /// </summary>
         /// <param name="value">The <see cref="DateTime"/> to write to the stream.</param>
         public void WriteAsCTime(DateTime value)
         {
@@ -134,7 +152,7 @@ namespace Extract.FAMDBCounterManager
             }
             else
             {
-                TimeSpan span = value - new DateTime(1970, 1, 1);
+                TimeSpan span = value.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
                 Write((int)(span.Ticks / TimeSpan.TicksPerSecond));
             }
         }
@@ -173,12 +191,22 @@ namespace Extract.FAMDBCounterManager
         /// </returns>
         public byte[] ReadBytes(int count)
         {
-            UtilityMethods.Assert(ReadPosition + count <= Length, "Cannot read past end of stream");
+            Assert(ReadPosition + count <= Length, "Cannot read past end of stream");
 
             var bytes = _bytes.GetRange(_readPosition, count).ToArray();
             _readPosition += count;
 
             return bytes;
+        }
+
+
+        /// <summary>
+        /// Reads a <see cref="Boolean"/> value from the stream at <see cref="ReadPosition"/>.
+        /// </summary>
+        /// <returns>The <see cref="Boolean"/> value read from the stream.</returns>
+        public bool ReadBoolean()
+        {
+            return BitConverter.ToBoolean(ReadBytes(sizeof(Boolean)), 0);
         }
 
         /// <summary>
@@ -198,6 +226,16 @@ namespace Extract.FAMDBCounterManager
         public int ReadInt32()
         {
              return BitConverter.ToInt32(ReadBytes(sizeof(Int32)), 0);
+        }
+
+
+        /// <summary>
+        /// Reads a <see cref="UInt32"/> value from the stream at <see cref="ReadPosition"/>.
+        /// </summary>
+        /// <returns>The <see cref="UInt32"/> value read from the stream.</returns>
+        public UInt32 ReadUInt32()
+        {
+            return BitConverter.ToUInt32(ReadBytes(sizeof(UInt32)), 0);
         }
 
         /// <summary>
@@ -263,6 +301,15 @@ namespace Extract.FAMDBCounterManager
                 ? padToMultiple - (Length % padToMultiple)
                 : 0;
             return _bytes.Concat(Enumerable.Repeat((byte)0, toPad)).ToArray();
+        }
+
+
+        private static void Assert(bool condition, string errorMessage)
+        {
+            if (!condition)
+            {
+                throw new Exception(errorMessage);
+            }
         }
 
         #endregion Methods
