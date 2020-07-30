@@ -290,11 +290,15 @@ void CImageConverter::convertPageToPDF(const string& strInputFileName, int nPage
 				kRecGetImgFilePageInfo(0, hInputImage, nPage - 1, &imgInfo, &imgFormat));
 			int nBitsPerPixel = imgInfo.BitsPerPixel;
 
+			bool bSourceIsPDF = imgFormat == FF_PDF
+				|| imgFormat == FF_PDF_MRC
+				|| ((imgFormat >= FF_PDF_MIN) && (imgFormat <= FF_PDF_MRC_SUPERB));
+
 			// Keep the same image format if the source image is a PDF. Otherwise,
 			// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
 			// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
 			// FF_PDF_SUPERB.
-			IMF_FORMAT nFormat = (imgFormat >= FF_PDF_MIN && imgFormat <= FF_PDF_MRC_SUPERB)
+			IMF_FORMAT nFormat = bSourceIsPDF
 				? imgFormat
 				: (nBitsPerPixel == 1) ? FF_PDF_SUPERB : FF_PDF_GOOD;
 

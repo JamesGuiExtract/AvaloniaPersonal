@@ -208,7 +208,9 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 		// https://extract.atlassian.net/browse/ISSUE-11940
 		// If the source document was a PDF, the OCR text can be added to the original document
 		// without touching the images at all (preventing any possible degradation in quality).
-		bool bSourceIsPDF = (imgFormat >= FF_PDF_MIN) && (imgFormat <= FF_PDF_MRC_LOSSLESS);
+		bool bSourceIsPDF = imgFormat == FF_PDF
+			|| imgFormat == FF_PDF_MRC
+			|| ((imgFormat >= FF_PDF_MIN) && (imgFormat <= FF_PDF_MRC_LOSSLESS));
 		if (bSourceIsPDF)
 		{
 			copyFile(m_strInputFile, tfnDocument.getName());
