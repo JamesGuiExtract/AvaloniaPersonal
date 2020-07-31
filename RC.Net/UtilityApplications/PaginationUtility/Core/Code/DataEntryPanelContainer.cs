@@ -157,6 +157,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _loading;
 
         /// <summary>
+        /// Indicates which field (if any) should be selected upon completion of a LoadData call.
+        /// If the document type field is available, it will count as the first field and can also
+        /// count as the first field with an error if the document type is not valid.
+        /// </summary>
+        FieldSelection _initialSelection;
+
+        /// <summary>
         /// The document statuses updated
         /// </summary>
         ManualResetEvent _documentStatusesUpdated = new ManualResetEvent(true);
@@ -536,11 +543,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="forEditing"><c>true</c> if the loaded data is to be displayed for editing;
         /// <c>false</c> if the data is to be displayed read-only, or if it is being used for
         /// background formatting.</param>
-        public void LoadData(PaginationDocumentData data, bool forEditing)
+        /// <param name="initialSelection">Indicates which field should be selected upon completion
+        /// of the load (if any). If the document type field is available, it will count as the first
+        /// field and can also count as the first field with an error if the document type is not valid.
+        /// </param>
+        public void LoadData(PaginationDocumentData data, bool forEditing, FieldSelection initialSelection)
         {
             try
             {
                 _loading = true;
+                _initialSelection = initialSelection;
 
                 // If this data is getting loaded, there is no need to proceed with any pending
                 // document status update.
@@ -556,13 +568,22 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _configManager.LoadCorrectConfigForData(_documentData.WorkingAttributes);
                 _configManager.ActiveDataEntryConfiguration.OpenDatabaseConnections();
 
-                var initializeDEPSelection = Editable && forEditing && !_documentTypeComboBox.Visible;
-                ActiveDataEntryPanel.LoadData(data, forEditing, initializeDEPSelection);
+                if (DocumentTypeAvailable)
+                {
+                    _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
+                    _documentTypeComboBox.Enabled = true;
+                    _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeComboBox_SelectedIndexChanged;
 
-                _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
+                    // If the specified initialSelection should target the document type field, pass
+                    // DoNotReset to the DEP so it does not try to initialize selection.
+                    if (initialSelection == FieldSelection.First
+                        || (initialSelection == FieldSelection.Error && !_configManager.DocumentTypeIsValid))
+                    {
+                        initialSelection = FieldSelection.DoNotReset;
+                    }
+                }
 
-                _documentTypeComboBox.Enabled = true;
-                _documentTypeComboBox.SelectedIndexChanged += HandleDocumentTypeComboBox_SelectedIndexChanged;
+                ActiveDataEntryPanel.LoadData(data, forEditing, initialSelection);
             }
             catch (Exception ex)
             {
@@ -764,21 +785,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Ensures a field is selected by selecting the first field if necessary.
         /// </summary>
-        /// <param name="resetToFirstField"><c>true</c> to select the first field regardless of any
-        /// active selection.</param>
-        /// <param name="resetToLastField"><c>true</c> to select the last field regardless of any
-        /// active selection.</param>
+        /// <param name="targetField">Indicates which field should be selected upon completion
+        /// of the load (if any). The field specified here does not include the document type field.
+        /// </param>
         /// <param name="viaTabKey"><c>true</c> if this call is being made in the context of tab
         /// key navigation; otherwise, <c>false</c>.</param>
         /// <returns><c>true</c> if the result of the call is that a field in the DEP has received
         /// focus; <c>false</c> if focus could not be applied or was handled externally via
         /// <see cref="TabNavigation"/> event.</returns>
-        public bool EnsureFieldSelection(bool resetToFirstField, bool resetToLastField, bool viaTabKey)
+        public bool EnsureDEPFieldSelection(FieldSelection targetField, bool viaTabKey)
         {
             try
             {
                 bool fieldSelected = 
-                    ActiveDataEntryPanel?.EnsureFieldSelection(resetToFirstField, resetToLastField, viaTabKey) == true;
+                    ActiveDataEntryPanel?.EnsureFieldSelection(targetField, viaTabKey) == true;
 
                 if (ActiveDataEntryPanel != null)
                 {
@@ -857,6 +877,44 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI41666");
+            }
+        }
+
+        /// <summary>
+        /// Selects and activates the next field with invalid data (including the document type
+        /// field).
+        /// </summary>
+        /// <param name="includeWarnings">Indicates whether to includes fields with warnings as
+        /// targets for this navigation.</param>
+        /// <returns><c>true</c> if selection was advanced to the next invalid field; <c>false</c>
+        /// if no more invalid fields were found.</returns>
+        public bool GoToNextInvalid(bool includeWarnings)
+        {
+            try
+            {
+                if (ActiveDataEntryPanel != null)
+                {
+                    // Document type is not valid
+                    if (!DocumentTypeIsValid
+                        && !DocumentTypeFocused
+                        && !ActiveDataEntryPanel.IndicateFocus)
+                    {
+                        FocusDocumentType();
+                        return true;
+                    }
+
+                    // DEP data is not valid (panel already open)
+                    if (ActiveDataEntryPanel.GoToNextInvalid(includeWarnings, loop: false))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50162");
             }
         }
 
@@ -1137,8 +1195,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _documentData.SetPermanentlyModified();
                         }
 
-                        bool initializeDEPSelection = Editable && !_documentTypeComboBox.Visible;
-                        newDataEntryControlHost.LoadData(_documentData, forEditing: Editable, initializeDEPSelection);
+                        // If the configuration change is happening as part of loading a document,
+                        // don't load the data into the panel now as it will be done by the calling
+                        // LoadData method.
+                        if (!_loading)
+                        {
+                            newDataEntryControlHost.LoadData(_documentData, forEditing: Editable, 
+                                initialSelection: FieldSelection.First);
+                        }
 
                         _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
 
@@ -1205,7 +1269,25 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <see cref="DataEntryDocumentDataPanel"/>.
         void HandleDataEntryControlHost_DocumentLoaded(object sender, EventArgs e)
         {
-            DocumentLoaded?.Invoke(sender, e);
+            try
+            {
+                if (DocumentTypeAvailable &&
+                    (_initialSelection == FieldSelection.First
+                        || (_initialSelection == FieldSelection.Error && !DocumentTypeIsValid)))
+                {
+                    FocusDocumentType();
+                }
+                else if (ActiveDataEntryPanel?.ActiveDataControl == null)
+                {
+                    ActiveDataEntryPanel.IndicateFocus = false;
+                }
+
+                DocumentLoaded?.Invoke(sender, e);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50180");
+            }
         }
 
         /// <summary>
@@ -1886,7 +1968,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 form.Controls.Add(tempPanel);
                 form.Controls.Add(imageViewer);
 
-                tempPanel.LoadData(tempData, forEditing: false);
+                tempPanel.LoadData(tempData, forEditing: false, initialSelection: FieldSelection.DoNotReset);
 
                 IAttribute invalidAttribute = null;
                 if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)

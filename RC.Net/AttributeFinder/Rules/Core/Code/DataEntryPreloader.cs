@@ -1,4 +1,5 @@
-﻿using Extract.DataEntry.Utilities.DataEntryApplication;
+﻿using Extract.DataEntry;
+using Extract.DataEntry.Utilities.DataEntryApplication;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -980,7 +981,7 @@ namespace Extract.AttributeFinder.Rules
                 // In case the there are multiple configurations for different document types,
                 // ensure the proper configuration is loaded for the supplied data.
                 dataEntryApplicationForm.ActiveDataEntryControlHost.LoadData(attributes, null,
-                    forEditing: false, initializeSelection: false);
+                    forEditing: false, initialSelection: FieldSelection.DoNotReset);
                 IUnknownVector loadedAttributes =
                     dataEntryApplicationForm.ActiveDataEntryControlHost.GetData(false);
                 ExtractException.Assert("ELI41673", "Failed to load data", loadedAttributes != null);

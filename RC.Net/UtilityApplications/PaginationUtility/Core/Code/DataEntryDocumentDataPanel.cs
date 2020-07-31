@@ -258,9 +258,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="forEditing"><c>true</c> if the loaded data is to be displayed for editing;
         /// <c>false</c> if the data is to be displayed read-only, or if it is being used for
         /// background formatting.</param>
-        /// <param name="initializeSelection">Indicates whether field selection should be initialized
-        /// upon completion of the load.</param>
-        public virtual void LoadData(PaginationDocumentData data, bool forEditing, bool initializeSelection)
+        /// <param name="initialSelection">Indicates which field should be selected upon completion
+        /// of the load (if any).</param>
+        public virtual void LoadData(PaginationDocumentData data, bool forEditing, FieldSelection initialSelection)
         {
             try
             {
@@ -271,7 +271,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentData = (DataEntryPaginationDocumentData)data;
 
-                LoadData(_documentData.WorkingAttributes, _documentData.SourceDocName, forEditing, initializeSelection);
+                LoadData(_documentData.WorkingAttributes, _documentData.SourceDocName, forEditing, initialSelection);
 
                 if (_imageViewer != null && _imageViewer.Visible)
                 {

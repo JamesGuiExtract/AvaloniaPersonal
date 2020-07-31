@@ -1918,7 +1918,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         // Load the attributes from the previous DataEntryControlHost
                         newDataEntryControlHost.LoadData(_configManager.Attributes, _fileName, 
-                            forEditing: true, initializeSelection: true);
+                            forEditing: true, initialSelection: FieldSelection.First);
 
                         // Register for events and engage shortcut handlers for the new DEP
                         newDataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
@@ -1928,7 +1928,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         newDataEntryControlHost.MessageHandled += HandleMessageFilterMessageHandled;
 
                         _gotoNextInvalidCommand.ShortcutHandler =
-                            newDataEntryControlHost.GoToNextInvalid;
+                            newDataEntryControlHost.GoToNextInvalidWithPromptIfNone;
                         _gotoNextUnviewedCommand.ShortcutHandler =
                             newDataEntryControlHost.GoToNextUnviewed;
                         _hideToolTipsCommand.ShortcutHandler =
@@ -2113,7 +2113,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // If a DEP is being used, load the data into it
                     if (DataEntryControlHost != null)
                     {
-                        DataEntryControlHost.LoadData(attributes, _fileName, forEditing: true, initializeSelection: true);
+                        DataEntryControlHost.LoadData(attributes, _fileName, forEditing: true, 
+                            initialSelection: FieldSelection.First);
 
                         // Now that the data has been loaded into the DEP, update the document data
                         // in the pagination panel so that it is sharing the same attributes
@@ -2139,7 +2140,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     if (DataEntryControlHost != null)
                     {
-                        DataEntryControlHost.LoadData(null, null, forEditing: true, initializeSelection: true);
+                        DataEntryControlHost.LoadData(null, null, forEditing: true,
+                            initialSelection: FieldSelection.First);
                     }
                 }
                 else
@@ -2451,7 +2453,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 if (DataEntryControlHost != null)
                 {
-                    DataEntryControlHost.GoToNextInvalid();
+                    DataEntryControlHost.GoToNextInvalidWithPromptIfNone();
                 }
             }
             catch (Exception ex)
@@ -3071,7 +3073,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     if (_imageOpened)
                     {
                         DataEntryControlHost.EnsureFieldSelection(
-                            resetToFirstField: false, resetToLastField: false, viaTabKey: false);
+                            targetField: FieldSelection.DoNotReset, viaTabKey: false);
                     }
 
                     // Table controls don't always seem to be drawn correctly after switching tabs.

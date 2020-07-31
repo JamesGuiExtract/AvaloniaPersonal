@@ -233,7 +233,7 @@ namespace Extract.DataEntry.LabDE.Test
                     testButton.DataEntryControlHost = dataEntryPanel;
 
                     dataEntryPanel.LoadData(new IUnknownVector(), FILE_2_FILENAME,
-                        forEditing: false, initializeSelection: false);
+                        forEditing: false, initialSelection: FieldSelection.DoNotReset);
 
                     var doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
                     Assert.AreEqual(EActionStatus.kActionPending, doc3Status);
@@ -593,7 +593,7 @@ namespace Extract.DataEntry.LabDE.Test
             testButton.DataEntryControlHost = dataEntryPanel;
 
             dataEntryPanel.LoadData(new IUnknownVector(), fileName,
-                forEditing: false, initializeSelection: false);
+                forEditing: false, initialSelection: FieldSelection.DoNotReset);
 
             return testButton;
         }

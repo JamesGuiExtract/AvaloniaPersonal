@@ -1925,6 +1925,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (DocumentInDataEdit.PaginationSeparator != null)
                 {
+                    DocumentInDataEdit.PaginationSeparator.Collapsed = false;
+
                     // Hide all other documents except for the DEP and page controls for the document displayed. 
                     _flowLayoutPanel.Controls
                         .OfType<PaginationControl>()
@@ -2116,15 +2118,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                             AttributeStatusInfo.EndEdit();
                         }
 
+                        //IgnoreShortcutKey = true;
                         return base.ProcessCmdKey(ref msg, keyData);
                     }
-                    else if (keyData == Keys.PageUp || keyData == Keys.PageDown)
+                    // Even with data entry panel open and focused:
+                    // - Allow page up/down to change pages
+                    // - Allow F3 to go to next invalid
+                    else if (keyData != Keys.PageUp && keyData != Keys.PageDown
+                        && keyData != Keys.F3)
                     {
-                        // Allow page up/down to change pages while DEP is open/active
-                        return base.ProcessCmdKey(ref msg, keyData);
+                        IgnoreShortcutKey = true;
                     }
-
-                    IgnoreShortcutKey = true;
                 }
 
                 // This key was not processed, bubble it up to the base class.
@@ -3530,16 +3534,43 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="forward"><see langword="true"/> to select the next document if the target
         /// document is already entirely selected; <see langword="false"/> to select the previous.</param>
-        /// <param name="selectionTarget">The <see cref="PageThumbnailControl"/> the document
-        /// selection is to be based off of.</param>
-        OutputDocument SelectNextDocument(bool forward, PageThumbnailControl selectionTarget = null)
+
+        OutputDocument SelectNextDocument(bool forward)
         {
-            OutputDocument nextDocument = null;
-            var activeDocument = GetActiveDocument(forward, selectionTarget);
+            OutputDocument nextDocument = GetNextDocument(forward);
+
+            if (nextDocument != null)
+            {
+                // Select the selectionTarget and the pageControls that make up the document it is in.
+                // Do not allow handling of modifier keys since modifier keys have a different meaning
+                // for document navigation.
+                ProcessControlSelection(
+                    activeControl: nextDocument.PageControls.First(),
+                    additionalControls: nextDocument.PageControls,
+                    select: true,
+                    modifierKeys: Keys.None);
+
+                _flowLayoutPanel.RequestScrollToControl(nextDocument.PaginationSeparator);
+            }
+
+            return nextDocument;
+        }
+
+        /// <summary>
+        /// Gets the next document relative to <see paramref="currentDocument"/>.
+        /// </summary>
+        /// <param name="forward"><c>true</c> to navigate to the next document;
+        /// <c>false</c> to navigate to the previous.</param>
+        /// <param name="currentDocument">The document relative to which the operation should be
+        /// performed or <c>null</c> to perform the operation relative to the active document.</param>
+        /// <returns>The resulting <see cref="OutputDocument"/>.</returns>
+        OutputDocument GetNextDocument(bool forward, OutputDocument currentDocument = null)
+        {
+            currentDocument = currentDocument ?? GetActiveDocument(forward);
 
             // If this document is fully selected, iterate the page controls forward/backward until
             // we get to the next document.
-            IEnumerable<PageThumbnailControl> pageControls = activeDocument.PageControls;
+            var pageControls = currentDocument.PageControls;
             PaginationControl control = forward
                 ? pageControls.Last()
                 : pageControls.First();
@@ -3551,33 +3582,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                     : control.PreviousControl;
 
                 var pageControl = control as PageThumbnailControl;
-                if (pageControl != null)
+                var nextDocument = pageControl?.Document;
+                if (nextDocument != null && nextDocument != currentDocument)
                 {
-                    nextDocument = pageControl.Document;
-                    break;
+                    return nextDocument;
                 }
             }
             while (control != null);
 
-            pageControls = nextDocument?.PageControls;
-
-            if (nextDocument == null)
-            {
-                return null;
-            }
-
-            // Select the selectionTarget and the pageControls that make up the document it is in.
-            // Do not allow handling of modifier keys since modifier keys have a different meaning
-            // for document navigation.
-            ProcessControlSelection(
-                activeControl: nextDocument.PageControls.First(),
-                additionalControls: pageControls,
-                select: true,
-                modifierKeys: Keys.None);
-
-            _flowLayoutPanel.RequestScrollToControl(nextDocument.PaginationSeparator);
-
-            return nextDocument;
+            return null;
         }
 
         /// <summary>
@@ -3782,6 +3795,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             Shortcuts[Keys.Enter] = HandleOpenDataPanel;
             Shortcuts[Keys.F2] = HandleOpenDataPanel;
+            Shortcuts[Keys.F3] = HandleGoToNextInvalid;
             Shortcuts[Keys.Escape] = HandleEscape;
 
             Shortcuts[Keys.Left] = HandleSelectPreviousPage;
@@ -4397,13 +4411,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else if (pageThumbnailIsActive && AllowDataEdit && !activeSeparator.IsDataPanelOpen)
                 {
                     activeSeparator.Collapsed = false;
-                    activeSeparator.OpenDataPanel();
-
-                    if (!DocumentDataPanel.DocumentTypeAvailable)
-                    {
-                        DocumentDataPanel.EnsureFieldSelection(
-                            resetToFirstField: true, resetToLastField: false, viaTabKey: true);
-                    }
+                    activeSeparator.OpenDataPanel(initialSelection: FieldSelection.First);
                 }
                 // Tabbing from no selection or any page but the last page of a document
                 else if (PrimarySelection == null || activeControl?.NextControl is PageThumbnailControl)
@@ -4496,8 +4504,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else if (previousControlDocument != currentDocument && DocumentInDataEdit != null)
                 {
                     _flowLayoutPanel.VerticalScroll.Value = _flowLayoutPanel.VerticalScroll.Minimum;
-                    if (!DocumentDataPanel.EnsureFieldSelection(
-                        resetToFirstField: false, resetToLastField: true, viaTabKey: true))
+                    if (!DocumentDataPanel.EnsureDEPFieldSelection(
+                        targetField: FieldSelection.Last, viaTabKey: true))
                     {
                         // If there is no tab stop in the DEP, select the document type (if available)
                         if (DocumentDataPanel.DocumentTypeAvailable)
@@ -4586,7 +4594,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var activeSeparator = GetActiveDocument(true)?.PaginationSeparator;
                 if (activeSeparator != null && DocumentInDataEdit != activeSeparator.Document)
                 {
-                    activeSeparator.OpenDataPanel();
+                    activeSeparator.OpenDataPanel(initialSelection: FieldSelection.First);
                     activeSeparator.Collapsed = false;
                 }
             }
@@ -4616,6 +4624,51 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI49871");
+            }
+        }
+
+        /// <summary>
+        /// Handles a UI command to navigate to the next field with invalid data.
+        /// </summary>
+        internal void HandleGoToNextInvalid()
+        {
+            try
+            {
+                // If a panel is open, first attempt to navigate within the panel.
+                if (DocumentDataPanel != null && DocumentDataPanel.GoToNextInvalid(includeWarnings: true))
+                {
+                    return;
+                }
+
+                OutputDocument activeDocument = GetActiveDocument(forward: true);
+                OutputDocument document = (DocumentDataPanel == null)
+                    ? activeDocument
+                    : GetNextDocument(forward: true) ?? Documents.First();
+                OutputDocument stopSearch = null;
+
+                while (document != stopSearch && !document.DataError && !document.DataWarning)
+                {
+                    document = GetNextDocument(forward: true, document);
+                    if (document == null && stopSearch == null)
+                    {
+                        // Loop from start until we get back to the active document.
+                        stopSearch = activeDocument;
+                        document = Documents.First();
+                    }
+                }
+
+                // If a document with a data error was found, open the panel and initialize selection
+                // to the first error.
+                if (document != stopSearch &&
+                    (document?.DataError == true || document?.DataWarning == true))
+                {
+                    document.PaginationSeparator.OpenDataPanel(initialSelection: FieldSelection.Error);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50157");
             }
         }
 

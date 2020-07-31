@@ -95,6 +95,32 @@ namespace Extract.DataEntry
         PromptForEachWarning = 4
     }
 
+    /// <summary>
+    /// Defines a field to be selected in the panel.
+    /// </summary>
+    public enum FieldSelection
+    {
+        /// <summary>
+        /// Leave any existing selection as-is.
+        /// </summary>
+        DoNotReset = 0,
+
+        /// <summary>
+        /// Select the first tab stop in the panel
+        /// </summary>
+        First = 1,
+
+        /// <summary>
+        /// Select the last tab stop in the panel
+        /// </summary>
+        Last = 2,
+
+        /// <summary>
+        /// Select the first field with a data error in the panel
+        /// </summary>
+        Error = 3
+    }
+
     #endregion Enums
 
     /// <summary>
@@ -359,9 +385,9 @@ namespace Extract.DataEntry
         bool _changingData;
 
         /// <summary>
-        /// Indicates whether field selection should be initialized upon completion of a LoadData call.
+        /// Indicates which field (if any) should be selected upon completion of a LoadData call.
         /// </summary>
-        bool _initializeSelection;
+        FieldSelection _initialSelection = FieldSelection.DoNotReset;
 
         /// <summary>
         /// The current "active" data entry.  This is the last data entry control to have received
@@ -1785,10 +1811,10 @@ namespace Extract.DataEntry
         /// <param name="forEditing"><c>true</c> if the loaded data is to be displayed for editing;
         /// <c>false</c> if the data is to be displayed read-only, or if it is being used for
         /// background formatting.</param>
-        /// <param name="initializeSelection">Indicates whether field selection should be initialized
-        /// upon completion of the load.</param>
+        /// <param name="initialSelection">Indicates which field should be selected upon completion
+        /// of the load (if any).</param>
         public void LoadData(IUnknownVector attributes, string sourceDocName, bool forEditing,
-            bool initializeSelection)
+            FieldSelection initialSelection)
         {
             try
             {
@@ -1800,7 +1826,7 @@ namespace Extract.DataEntry
                 }
 
                 _sourceDocName = sourceDocName;
-                _initializeSelection = initializeSelection;
+                _initialSelection = initialSelection;
                 HighlightDictionary preCreatedHighlights = null;
 
                 using (new TemporaryWaitCursor())
@@ -2181,9 +2207,36 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Selects and activates the next <see cref="IAttribute"/> whose data currently fails
+        /// validation. A prompt will be displayed if there are no more invalid items.
+        /// </summary>
+        public void GoToNextInvalidWithPromptIfNone()
+        {
+            try
+            {
+                if (!GoToNextInvalid(includeWarnings: true, loop: true))
+                {
+                    MessageBox.Show(this, "There are no invalid items.",
+                        _dataEntryApp.ApplicationTitle, MessageBoxButtons.OK,
+                        MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50172");
+            }
+        }
+
+        /// <summary>
+        /// Selects and activates the next <see cref="IAttribute"/> whose data currently fails
         /// validation.
         /// </summary>
-        public void GoToNextInvalid()
+        /// <param name="includeWarnings">Indicates whether to includes fields with warnings as
+        /// targets for this navigation.</param>
+        /// <param name="loop">Indicates whether navigation should loop back to the beginning
+        /// if no further invalid data is found beyond the current field.</param>
+        /// <returns><c>true</c> if selection was advanced to the next invalid field; <c>false</c>
+        /// if no more invalid fields were found.</returns>
+        public bool GoToNextInvalid(bool includeWarnings, bool loop)
         {
             try
             {
@@ -2191,22 +2244,27 @@ namespace Extract.DataEntry
                 // there is no document loaded.
                 if (_imageViewer == null || !_imageViewer.IsImageAvailable)
                 {
-                    return;
+                    return false;
                 }
 
                 using (new TemporaryWaitCursor())
                 {
-                    if (GetNextInvalidAttribute(true) == null)
+                    if (GetNextInvalidAttribute(includeWarnings, loop, enabledOnly: true) == null)
                     {
-                        MessageBox.Show(this, "There are no invalid items.",
-                            _dataEntryApp.ApplicationTitle, MessageBoxButtons.OK,
-                            MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+                        if (loop)
+                        {
+                            // If we failed to find any attributes with invalid data (even when looping),
+                            // make sure _invalidAttributes is zero and raise the DataValidityChanged
+                            // event to indicate no invalid items remain.
+                            _invalidAttributes.Clear();
+                            OnDataValidityChanged();
+                        }
 
-                        // If we failed to find any attributes with invalid data, make sure 
-                        // _invalidAttributes is zero and raise the DataValidityChanged event to 
-                        // indicate no invalid items remain.
-                        _invalidAttributes.Clear();
-                        OnDataValidityChanged();
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
                     }
                 }
             }
@@ -2214,6 +2272,8 @@ namespace Extract.DataEntry
             {
                 ExtractException.Display("ELI24646", ex);
             }
+
+            return false;
         }
 
         /// <summary>
@@ -2881,24 +2941,18 @@ namespace Extract.DataEntry
         /// <summary>
         /// Ensures a field is selected by selecting the first field if necessary.
         /// </summary>
-        /// <param name="resetToFirstField"><c>true</c> to select the first field regardless of any
-        /// active selection.</param>
-        /// <param name="resetToLastField"><c>true</c> to select the last field regardless of any
-        /// active selection.</param>
+        /// <param name="targetField">Indicates which field should be selected upon completion
+        /// of the load (if any).</param>
         /// <returns><c>true</c> if the result of the call is that a field in the DEP has received
         /// focus; <c>false</c> if focus could not be applied or was handled externally via
         /// <see cref="TabNavigation"/> event.</returns>
-        public bool EnsureFieldSelection(bool resetToFirstField, bool resetToLastField, bool viaTabKey)
+        public bool EnsureFieldSelection(FieldSelection targetField, bool viaTabKey)
         {
             try
             {
-                ExtractException.Assert("ELI50113", "Invalid operation", !resetToFirstField || !resetToLastField);
-
                 if (!IsDocumentLoaded)
                 {
-                    // It is not valid to initialize to the last field.
-                    ExtractException.Assert("ELI50116", "Invalid operation", !resetToLastField);
-                    _initializeSelection = true;
+                    _initialSelection = targetField;
                     return false;
                 }
 
@@ -2907,7 +2961,7 @@ namespace Extract.DataEntry
                     return false;
                 }
 
-                if (resetToFirstField || resetToLastField)
+                if (targetField != FieldSelection.DoNotReset)
                 {
                     ClearSelection();
                 }
@@ -2920,7 +2974,10 @@ namespace Extract.DataEntry
                     }
                 }
 
-                var advanced = AdvanceToNextTabStop(!resetToLastField, viaTabKey: false);
+                bool advanced = (targetField == FieldSelection.Error)
+                    ? GoToNextInvalid(includeWarnings: true, loop: true)
+                    : AdvanceToNextTabStop(targetField != FieldSelection.Last, viaTabKey: false);
+                
                 OnItemSelectionChanged();
 
                 return advanced;
@@ -5289,7 +5346,7 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    firstInvalidAttribute = GetNextInvalidAttribute(!ignoreWarnings);
+                    firstInvalidAttribute = GetNextInvalidAttribute(!ignoreWarnings, loop: true, enabledOnly: false);
 
                     // If GetNextInvalidAttribute found something, the selection has been changed.
                     changedSelection = firstInvalidAttribute != null;
@@ -5347,7 +5404,7 @@ namespace Extract.DataEntry
                             // invalid attributes before returning true.
                             else
                             {
-                                invalidAttribute = GetNextInvalidAttribute(!ignoreWarnings);
+                                invalidAttribute = GetNextInvalidAttribute(!ignoreWarnings, loop: true, enabledOnly: false);
 
                                 // If the next invalid attribute is the first one that was found,
                                 // the user has responded to prompts for each-- exit the prompting
@@ -6793,11 +6850,15 @@ namespace Extract.DataEntry
         /// Attempts to find the next <see cref="IAttribute"/> (in display order) whose data
         /// has failed validation.
         /// </summary>
-        /// <param name="includeValidationWarnings"><see langword="true"/> if attributes marked
+        /// <param name="includeWarnings"><see langword="true"/> if attributes marked
         /// AllowWithWarnings should be included in the search.</param>
+        /// <param name="loop">Indicates whether navigation should loop back to the beginning
+        /// if no further invalid data is found beyond the current field.</param>
+        /// <param name="enabledOnly"><c>true</c> if only fields that are visible and enabled;
+        /// <c>false</c> to return any field with invalid data.</param>
         /// <returns>The first <see cref="IAttribute"/> that failed validation, or 
         /// <see langword="null"/> if no invalid <see cref="IAttribute"/>s were found.</returns>
-        IAttribute GetNextInvalidAttribute(bool includeValidationWarnings)
+        IAttribute GetNextInvalidAttribute(bool includeWarnings, bool loop, bool enabledOnly)
         {
             // Toggle the enabled status of the active control to force editing to end and 
             // validation to occur for any field that is currently being edited.
@@ -6817,23 +6878,54 @@ namespace Extract.DataEntry
                 control.Select();
             }
 
-            var targetValidity = includeValidationWarnings
+            var targetValidity = includeWarnings
                 ? DataValidity.Invalid | DataValidity.ValidationWarning
                 : DataValidity.Invalid;
 
-            // Look for any attributes whose data failed validation.
-            Stack<IAttribute> invalidAttributeGenealogy = 
+            var activeAttributeGenealogy = ActiveAttributeGenealogy(true, null);
+            var checkedAttributes = new HashSet<IAttribute>();
+
+            // Loop in case enabledOnly == true and next invalid is in disabled control.
+            do
+            {
+                Stack<IAttribute> invalidAttributeGenealogy =
                 AttributeStatusInfo.FindNextAttributeByValidity(_attributes,
-                    targetValidity, ActiveAttributeGenealogy(true, null), true, true);
-            
-            if (invalidAttributeGenealogy != null)
-            {
-                return PropagateAttributes(invalidAttributeGenealogy, true, false);
+                    targetValidity, activeAttributeGenealogy, true, loop);
+
+                if (invalidAttributeGenealogy != null)
+                {
+                    var activeAttribute = PropagateAttributes(
+                        new Stack<IAttribute>(invalidAttributeGenealogy.Reverse()), // preserve genealogy stack for use below
+                        true, false);
+
+                    // Prevent infinite loop
+                    if (checkedAttributes.Contains(activeAttribute))
+                    {
+                        return null;
+                    }
+
+                    if (!enabledOnly)
+                    {
+                        return activeAttribute;
+                    }
+
+                    var owningControl = AttributeStatusInfo.GetOwningControl(activeAttribute) as Control;
+                    if (owningControl?.Visible == true && owningControl?.Enabled == true)
+                    {
+                        return activeAttribute;
+                    }
+                    else
+                    {
+                        checkedAttributes.Add(activeAttribute);
+                        activeAttributeGenealogy = invalidAttributeGenealogy;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
-            {
-                return null;
-            }
+            while (true);
         }
 
         /// <summary>
@@ -8215,7 +8307,7 @@ namespace Extract.DataEntry
                 // Loading + events up thru the UpdateEnded event can trigger focus events.
                 // Wait until any potential focus-grabbing operations have completed before
                 // enabling controls.
-                // Selection will be initialized per _initializeSelection below.
+                // Selection will be initialized per _initialSelection below.
                 EnableControls(true);
 
                 ExecuteOnIdle("ELI34419", () => AttributeStatusInfo.UndoManager.TrackOperations = true);
@@ -8229,18 +8321,27 @@ namespace Extract.DataEntry
                 {
                     _isDocumentLoaded = true;
 
-                    // Select the first tab stop in the DEP only after the document is flagged as loaded;
-                    // ControlGotFocus handlers is set to ignore focus events that occur as part of loading.
-                    if (Active && _initializeSelection && ImageViewer?.IsImageAvailable == true)
+                    // If _initialSelection is set to anything other than DoNotReset, initialize
+                    // field selection.
+                    if (Active
+                        && ImageViewer?.IsImageAvailable == true
+                        && _initialSelection != FieldSelection.DoNotReset)
                     {
-                        AdvanceToNextTabStop(true, viaTabKey: false);
+                        if (_initialSelection == FieldSelection.Error)
+                        {
+                            GoToNextInvalid(includeWarnings: true, loop: true);
+                        }
+                        else
+                        {
+                            AdvanceToNextTabStop(_initialSelection != FieldSelection.Last, viaTabKey: false);
+                        }
                     }
                     else
                     {
                         ClearSelection();
                     }
 
-                    _initializeSelection = false;
+                    _initialSelection = FieldSelection.DoNotReset;
 
                     // By default, all query executions from this point forward should be considered
                     // to be the result of a manual data update.

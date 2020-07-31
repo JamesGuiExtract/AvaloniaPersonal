@@ -541,7 +541,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Opens the <see cref="DocumentDataPanel"/>, populating it with the
         /// <see cref="Document"/>'s data.
         /// </summary>
-        public void OpenDataPanel()
+        /// <param name="initialSelection">Indicates which field should be selected upon completion
+        /// of the load (if any). If the document type field is available, it will count as the first
+        /// field and can also count as the first field with an error if the document type is not valid.
+        /// </param>
+        public void OpenDataPanel(FieldSelection initialSelection)
         {
             bool locked = false;
 
@@ -563,7 +567,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         _tableLayoutPanel.Controls.Add(_documentDataPanelControl, 0, 3);
                         _tableLayoutPanel.SetColumnSpan(_documentDataPanelControl, _tableLayoutPanel.ColumnCount);
 
-                        args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, forEditing: !Document.OutputProcessed);
+                        args.DocumentDataPanel.LoadData(args.OutputDocument.DocumentData, 
+                            forEditing: !Document.OutputProcessed, initialSelection);
 
                         args.DocumentDataPanel.DocumentLoaded += HandleDataEntryControlHost_DocumentLoaded;
                         args.DocumentDataPanel.DataPanelChanged += HandleDocumentDataPanel_DataPanelChanged;
@@ -626,7 +631,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     documentDataPanel.ActiveDataEntryPanel.EnsureFieldSelection(
-                        resetToFirstField: false, resetToLastField: false, viaTabKey: false);
+                        targetField: FieldSelection.DoNotReset, viaTabKey: false);
 
                     // Report the DEP to be closed before it is removed so that events that trigger
                     // as part of its removal do not assume the DEP to be open and usable.
@@ -841,7 +846,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (!IsDataPanelOpen)
                 {
-                    OpenDataPanel();
+                    OpenDataPanel(initialSelection: FieldSelection.First);
                     Collapsed = false;
                 }
                 else
@@ -1158,8 +1163,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Tabbing forward from the DocumentType field
                     documentDataPanel.ApplyDocumentTypeFromComboBox();
                     
-                    documentDataPanel.EnsureFieldSelection(
-                        resetToFirstField: true, resetToLastField: false, viaTabKey: true);
+                    documentDataPanel.EnsureDEPFieldSelection(
+                        targetField: FieldSelection.First, viaTabKey: true);
 
                     e.Handled = true;
                 }
@@ -1175,18 +1180,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void HandleDataEntryControlHost_DocumentLoaded(object sender, EventArgs e)
         {
-            // Initialize selection whenever the a DEP is loaded (or a DEP configuration change occurs).
-            var documentDataPanel = (IPaginationDocumentDataPanel)_documentDataPanelControl;
-
-            if (documentDataPanel.DocumentTypeAvailable)
+            try
             {
-                documentDataPanel.FocusDocumentType();
+                // If after initializing the document _documentDataPanelControl does not have focus
+                // (either the document type or the DEP), select the first page thumbnail.
+                if (!_documentDataPanelControl.Focused)
+                {
+                    foreach (var pageControl in Document.PageControls.Skip(1))
+                    {
+                        pageControl.Selected = false;
+                    }
+                    Document.PageControls.First().Selected = true;
+                }
             }
-            else if (documentDataPanel.ActiveDataEntryPanel.ActiveDataControl == null)
+            catch (Exception ex)
             {
-                Document.PageControls.First().Selected = true;
+                throw ex.AsExtract("ELI50177");
             }
-            // else the DEP will have assumed focus.
         }
 
         #endregion Event Handlers

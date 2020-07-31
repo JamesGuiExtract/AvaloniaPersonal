@@ -1,5 +1,6 @@
 ﻿using ADODB;
 using Extract.AttributeFinder;
+using Extract.DataEntry;
 using Extract.DataEntry.LabDE;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
@@ -1851,7 +1852,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Opens the data panel for the singly selected document or the first document.
         /// </summary>
-        public void OpenDataPanel()
+        /// <param name="initialSelection">Indicates which field should be selected upon completion
+        /// of the load (if any). If the document type field is available, it will count as the first
+        /// field and can also count as the first field with an error if the document type is not valid.
+        /// </param>
+        public void OpenDataPanel(FieldSelection initialSelection)
         {
             try
             {
@@ -1875,7 +1880,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         _primaryPageLayoutControl.UpdateDocumentSeparator(targetDocument);
                     }
-                    targetDocument.PaginationSeparator.OpenDataPanel();
+                    targetDocument.PaginationSeparator.OpenDataPanel(initialSelection);
 
                     ProcessFocusChange(forceUpdate: true);
                 }
@@ -3255,7 +3260,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                         this.SafeBeginInvoke("ELI41669", () =>
                         {
                             _primaryPageLayoutControl.SelectDocument(erroredDocument);
-                            erroredDocument.PaginationSeparator.OpenDataPanel();
+                            erroredDocument.PaginationSeparator.OpenDataPanel(
+                                initialSelection: FieldSelection.Error);
                             erroredDocument.Collapsed = false;
                             ProcessFocusChange(forceUpdate: true);
                         });

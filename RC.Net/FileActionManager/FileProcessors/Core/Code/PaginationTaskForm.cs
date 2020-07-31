@@ -960,7 +960,7 @@ namespace Extract.FileActionManager.FileProcessors
                             && _paginationPanel.OutputDocumentCount == 1
                             && _paginationDocumentDataPanel != null)
                         {
-                            _paginationPanel.OpenDataPanel();
+                            _paginationPanel.OpenDataPanel(initialSelection: FieldSelection.DoNotReset);
                         }
                     });
                 }
@@ -1004,7 +1004,7 @@ namespace Extract.FileActionManager.FileProcessors
                         && _paginationPanel.OutputDocumentCount == 1
                         && _paginationDocumentDataPanel != null)
                     {
-                        _paginationPanel.OpenDataPanel();
+                        _paginationPanel.OpenDataPanel(initialSelection: FieldSelection.First);
                     }
 
                     // Without this call, after committing the top document separator bar is not updating correctly after commit.

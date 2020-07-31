@@ -266,7 +266,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // No need to raise DocumentDataStateChanged for any changed properties here.
                     if (DataError)
                     {
-                        return ExtractException.FromStringizedByteStream("ELI45581", PendingDocumentStatus.StringizedError);
+                        if (!PendingDocumentStatus.DocumentTypeIsValid)
+                        {
+                            return new ExtractException("ELI50179", "Invalid document type");
+                        }
+                        else
+                        {
+                            return ExtractException.FromStringizedByteStream("ELI45581", PendingDocumentStatus.StringizedError);
+                        }
                     }
                     else
                     {

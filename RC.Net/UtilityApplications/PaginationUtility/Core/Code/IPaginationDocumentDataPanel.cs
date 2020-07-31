@@ -153,7 +153,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="forEditing"><c>true</c> if the loaded data is to be displayed for editing;
         /// <c>false</c> if the data is to be displayed read-only, or if it is being used for
         /// background formatting.</param>
-        void LoadData(PaginationDocumentData data, bool forEditing);
+        /// <param name="initialSelection">Indicates which field should be selected upon completion
+        /// of the load (if any). If the document type field is available, it will count as the first
+        /// field and can also count as the first field with an error if the document type is not valid.
+        /// </param>
+        void LoadData(PaginationDocumentData data, bool forEditing, FieldSelection initialSelection);
 
         /// <summary>
         /// Applies any data to the specified <see paramref="data"/>.
@@ -249,14 +253,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Ensures a field is selected by selecting the first field if necessary.
         /// </summary>
-        /// <param name="resetToFirstField"><c>true</c> to select the first field regardless of any
-        /// active selection.</param>
-        /// <param name="resetToLastField"><c>true</c> to select the last field regardless of any
-        /// active selection.</param>
+        /// <param name="targetField">Indicates which field should be selected upon completion
+        /// of the load (if any). The field specified here does not include the document type field.
+        /// </param>
         /// <returns><c>true</c> if the result of the call is that a field in the DEP has received
         /// focus; <c>false</c> if focus could not be applied or was handled externally via
         /// <see cref="TabNavigation"/> event.</returns>
-        bool EnsureFieldSelection(bool resetToFirstField, bool resetToLastField, bool viaTabKey);
+        bool EnsureDEPFieldSelection(FieldSelection targetField, bool viaTabKey);
 
         /// <summary>
         /// Performs an undo operation.
@@ -277,6 +280,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Refreshes the state of the control.
         /// </summary>
         void RefreshControlState();
+
+        /// <summary>
+        /// Selects and activates the next field with invalid data (including the document type
+        /// field).
+        /// </summary>
+        /// <param name="includeWarnings">Indicates whether to includes fields with warnings as
+        /// targets for this navigation.</param>
+        /// <returns><c>true</c> if selection was advanced to the next invalid field; <c>false</c>
+        /// if no more invalid fields were found.</returns>
+        bool GoToNextInvalid(bool includeWarnings);
 
         /// <summary>
         /// <c>true</c> if a document type field is available to select from document-type specific
