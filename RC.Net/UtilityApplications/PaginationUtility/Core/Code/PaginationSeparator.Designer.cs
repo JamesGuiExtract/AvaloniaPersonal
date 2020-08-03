@@ -22,8 +22,8 @@
             this._collapseDocumentButton = new System.Windows.Forms.Button();
             this._selectedCheckBox = new System.Windows.Forms.CheckBox();
             this._rightArrowPictureBox = new System.Windows.Forms.PictureBox();
-            this._summaryLabel = new System.Windows.Forms.Label();
-            this._pagesLabel = new System.Windows.Forms.Label();
+            this._summaryLabel = new Utilities.Forms.BetterLabel();
+            this._pagesLabel = new Utilities.Forms.BetterLabel();
             this._leftArrowPictureBox = new System.Windows.Forms.PictureBox();
             this._reprocessDocumentPictureBox = new System.Windows.Forms.PictureBox();
             this._newDocumentGlyph = new Extract.UtilityApplications.PaginationUtility.NewDocumentGlyph();
@@ -281,8 +281,8 @@
 
         private System.Windows.Forms.TableLayoutPanel _tableLayoutPanel;
         private System.Windows.Forms.Button _collapseDocumentButton;
-        private System.Windows.Forms.Label _summaryLabel;
-        private System.Windows.Forms.Label _pagesLabel;
+        private Utilities.Forms.BetterLabel _summaryLabel;
+        private Utilities.Forms.BetterLabel _pagesLabel;
         private System.Windows.Forms.PictureBox _editedDataPictureBox;
         private NewDocumentGlyph _newDocumentGlyph;
         private EditedPaginationGlyph _editedPaginationGlyph;
