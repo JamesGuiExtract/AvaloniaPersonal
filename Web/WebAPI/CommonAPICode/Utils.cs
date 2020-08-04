@@ -449,41 +449,52 @@ namespace WebAPI
             }
         }
 
+        static string GetCacheKey<T>(IEnumerable<string> paths)
+        {
+            string key = typeof(T).AssemblyQualifiedName;
+            foreach (var p in paths.OrderBy(p=>p))
+            {
+                string fullPath = Path.GetFullPath(p).ToLowerInvariant();
+                key += fullPath;
+            }
+            return key;
+        }
+
         /// <summary>
         /// Gets or creates an object based on source paths and a creator function
         /// </summary>
         /// <typeparam name="T">The type of the cached object</typeparam>
         /// <param name="creator">A function to create the cached object</param>
         /// <param name="paths">The paths of the files that the cached object is derived from</param>
+        /// <param name="monitorPathsForChanges">Whether to watch the <see paramref="paths"/> for changes,
+        /// removing the cache entry if any path changes</param>
         /// <param name="slidingExpiration">The time after last access before the cache entry is removed</param>
         /// <param name="removedCallback">A function that will be called when the cache entry is removed</param>
         public static T GetCachedObject<T>(Func<T> creator, IEnumerable<string> paths,
+            bool monitorPathsForChanges,
             TimeSpan? slidingExpiration = null,
             CacheEntryRemovedCallback removedCallback = null)
             where T : class
         {
             try
             {
-                List<string> monitorPaths = new List<string>();
-                List<string> etfPaths = new List<string>();
-
-                string key = typeof(T).AssemblyQualifiedName;
-                foreach (var p in paths.OrderBy(p=>p))
-                {
-                    string fullPath = Path.GetFullPath(p);
-                    key += fullPath;
-                    monitorPaths.Add(fullPath);
-                }
-
+                var key = GetCacheKey<T>(paths);
                 var cache = MemoryCache.Default;
                 if (!(cache.Get(key) is T result))
                 {
-                    var existingPaths = monitorPaths.Where(p => File.Exists(p)).ToList();
-                    ExtractException.Assert("ELI49948", "No file found", existingPaths.Count > 0,
-                        "Paths", string.Join(", ", paths));
                     CacheItemPolicy policy = new CacheItemPolicy();
-                    policy.ChangeMonitors.Add(new HostFileChangeMonitor(existingPaths));
+                    if (monitorPathsForChanges)
+                    {
+                        var monitorPaths = paths
+                        .Select(path => Path.GetFullPath(path))
+                        .Where(path => File.Exists(path))
+                        .ToList();
 
+                        ExtractException.Assert("ELI49948", "No file found", monitorPaths.Count > 0,
+                            "Paths", string.Join(", ", paths));
+
+                        policy.ChangeMonitors.Add(new HostFileChangeMonitor(monitorPaths));
+                    }
                     if (slidingExpiration.HasValue)
                     {
                         policy.SlidingExpiration = slidingExpiration.Value;
@@ -505,5 +516,25 @@ namespace WebAPI
             }
         }
 
+        /// <summary>
+        /// Removes an object from the cache
+        /// </summary>
+        /// <typeparam name="T">The type of the cached object</typeparam>
+        /// <param name="paths">The paths of the files that the cached object is derived from</param>
+        /// <returns>The removed object or null if the object was not found</returns>
+        public static T RemoveCachedObject<T>(IEnumerable<string> paths)
+            where T : class
+        {
+            try
+            {
+                var key = GetCacheKey<T>(paths);
+                var cache = MemoryCache.Default;
+                return cache.Remove(key) as T;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50183");
+            }
+        }
     }
 }

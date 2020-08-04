@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using System;
+using org.apache.pdfbox.pdmodel;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -129,7 +129,7 @@ namespace Extract.Web.WebAPI.Test
             GeneralMethods.TestSetup();
             _testDbManager = new FAMTestDBManager<TestDocument>();
 
-            _testFiles = new TestFileManager<TestDocument>();
+            _testFiles = new TestFileManager<TestDocument>("452534BF-684A-446C-9C69-057489BDEC23");
         }
 
         [OneTimeTearDown]
@@ -1373,10 +1373,11 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 tifPath = _testFiles.GetFile("Resources.TestImage003.tif");
+
                 Assert.False(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out var _));
 
                 Assert.True(DocumentData.TryGetPageWithConversionToPdf(tifPath, 1, out byte[] imageDataFromConversion));
-                Assert.That(imageDataFromConversion.Length > 0);
+                Assert.True(imageDataFromConversion.Length > 0);
             }
             finally
             {
@@ -1395,7 +1396,8 @@ namespace Extract.Web.WebAPI.Test
             {
                 pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf");
                 Assert.True(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, 1, out byte[] imageDataFromPDF));
-                Assert.That(imageDataFromPDF.Length > 0);
+                Assert.True(imageDataFromPDF.Length > 0);
+                RemoveCachedPDF(pdfPath);
             }
             finally
             {
@@ -1418,17 +1420,20 @@ namespace Extract.Web.WebAPI.Test
 
                 pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf");
                 Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out byte[] imageDataFromPDF));
+                RemoveCachedPDF(pdfPath);
 
                 var pdfPathOld = pdfPath;
                 pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf", tifPath + ".PDF");
                 Assert.False(File.Exists(pdfPathOld));
                 Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out imageDataFromPDF));
+                RemoveCachedPDF(pdfPath);
 
                 tifPath = _testFiles.GetFile("Resources.TestImage003.tif", Path.ChangeExtension(tifPath, ".pdf.tif"));
                 pdfPathOld = pdfPath;
                 pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf", Path.ChangeExtension(tifPath, null));
                 Assert.False(File.Exists(pdfPathOld));
                 Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out imageDataFromPDF));
+                RemoveCachedPDF(pdfPath);
             }
             finally
             {
@@ -1495,6 +1500,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf");
                 Assert.True(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, pageNumber, out byte[] imageDataFromPDF));
+                RemoveCachedPDF(pdfPath);
 
                 tifPath = _testFiles.GetFile("Resources.TestImage003.tif");
                 Assert.True(DocumentData.TryGetPageWithConversionToPdf(tifPath, pageNumber, out byte[] imageDataFromConversion));
@@ -1795,6 +1801,12 @@ namespace Extract.Web.WebAPI.Test
                             "Node name test failed: expected: {0}, node is actually named: {1}",
                             name,
                             nodeName);
+        }
+
+        // Remove the PDDocument from the cache and close it so that the file can be deleted
+        static void RemoveCachedPDF(string pdfPath)
+        {
+            Utils.RemoveCachedObject<PDDocument>(new[] { pdfPath })?.close();
         }
     }
 }

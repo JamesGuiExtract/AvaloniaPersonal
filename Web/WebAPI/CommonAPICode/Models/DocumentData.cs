@@ -2,13 +2,17 @@
 using Extract.Licensing;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using org.apache.pdfbox.pdmodel;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.Caching;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UCLID_COMUTILSLib;
@@ -20,9 +24,6 @@ using static WebAPI.Utils;
 using AttributeDBMgr = AttributeDbMgrComponentsLib.AttributeDBMgr;
 using ComAttribute = UCLID_AFCORELib.Attribute;
 using EActionStatus = UCLID_FILEPROCESSINGLib.EActionStatus;
-using System.Text.RegularExpressions;
-using System.Linq;
-using org.apache.pdfbox.pdmodel;
 
 namespace WebAPI.Models
 {
@@ -1448,61 +1449,24 @@ namespace WebAPI.Models
                     ee.Log();
                 }
 
-                // Set sessionId variables for closure of the Task.Run lamda
-                int sessionId = FileApi.DocumentSession.Id;
-
-                if (cacheData)
-                {
-                    Task.Run(() =>
-                    {
-                        try
-                        {
-                            var cachedPages = UtilityFileProcessingDB.GetCachedPageNumbers(
-                                sessionId, ECacheDataType.kImage);
-
-                            // Trigger data cache for the first page and also for the subsequent page
-                            // (if not already cached)
-                            int[] pagesToCache = (pageNum == 1)
-                                ? new[] { 2, 1 }   // Prioritize caching 2nd page over the first as the second would be need first.
-                                : new[] { pageNum + 1 };
-                            int pageCount = _imageUtils.Value.GetPageCount(fileName);
-                            pagesToCache = pagesToCache
-                                .Where(p => p <= pageCount)
-                                .Except((int[])cachedPages)
-                                .ToArray();
-
-                            foreach (int page in pagesToCache)
-                            {
-                                CachePageData(sessionId, fileId, page);
-                            }
-                        }
-                        catch (Exception cacheException)
-                        {
-                            // Since the ability to access cached data is not critical, log the
-                            // exception but otherwise ignore.
-                            // If needed, exceptions will be stored in the cache table where the
-                            // data would have been.
-                            var eeAppTrace = new ExtractException("ELI49468",
-                                "Application Trace: Cache operation did not succeed.", cacheException);
-                            eeAppTrace.AddDebugData("Session ID", sessionId, false);
-                            eeAppTrace.AddDebugData("File ID", fileId, false);
-                            eeAppTrace.AddDebugData("Page", pageNum, false);
-                            eeAppTrace.AddDebugData("Note",
-                                "If logged during unit test execution, this is not likely an indication of a problem.",
-                                true);
-                            eeAppTrace.Log();
-                        }
-                    });
-                }
-
+                byte[] imageData = null;
                 if (cachedImageData != null && cachedImageData.Length > 0)
                 {
-                    return (byte[])cachedImageData;
+                    imageData = (byte[])cachedImageData;
                 }
                 else
                 {
-                    return GetImagePage(fileName, pageNum);
+                    imageData = GetImagePage(fileName, pageNum);
                 }
+
+                // Start caching task after getting image data so that this thread can make use of the already-opened PDF file
+                // (PDF files are left open for a minute after access for efficiency)
+                if (cacheData)
+                {
+                    StartCachingTask(sessionID: FileApi.DocumentSession.Id, fileID: fileId, fileName: fileName, pageNum: pageNum);
+                }
+
+                return imageData;
             }
             catch (Exception ex)
             {
@@ -2332,16 +2296,26 @@ namespace WebAPI.Models
 
         private static byte[] GetPageFromPdf(string pdfFileName, int pageNumber)
         {
-            var entireDoc = GetCachedObject(
+            var sourceDoc = GetCachedObject(
                 creator: () => PDDocument.load(new java.io.File(pdfFileName)),
+                monitorPathsForChanges: false, // Change monitors can cause problems with unit testing and could cause issues for the API too
                 paths: new[] { pdfFileName },
                 slidingExpiration: TimeSpan.FromMinutes(1),
-                removedCallback: entry => ((PDDocument)entry.CacheItem.Value).close());
+                removedCallback: entry =>
+                {
+                    // If an entry is being removed because it has expired then it is safe to close the document now.
+                    // If it has been removed because of a change monitor or because the entry has been re-added then
+                    // the document could still be in use (let the finalizer for PDDocument close the document)
+                    if (entry.RemovedReason == CacheEntryRemovedReason.Expired)
+                    {
+                        ((PDDocument)entry.CacheItem.Value).close();
+                    }
+                });
 
             using (var pageDoc = new PDDocument())
             using (var pageStream = new java.io.ByteArrayOutputStream())
             {
-                pageDoc.addPage(entireDoc.getPage(pageNumber - 1));
+                pageDoc.addPage(sourceDoc.getPage(pageNumber - 1));
                 pageDoc.save(pageStream);
                 return pageStream.toByteArray();
             }
@@ -2355,6 +2329,50 @@ namespace WebAPI.Models
         static string GetSpecialOcrValue()
         {
             return LicenseUtilities.GetMapLabelValue(new MapLabel());
+        }
+
+        private void StartCachingTask(int sessionID, int fileID, string fileName, int pageNum)
+        {
+            Task.Run(() =>
+            {
+                try
+                {
+                    var cachedPages = UtilityFileProcessingDB.GetCachedPageNumbers(
+                        sessionID, ECacheDataType.kImage);
+
+                    // Trigger data cache for the first page and also for the subsequent page
+                    // (if not already cached)
+                    int[] pagesToCache = (pageNum == 1)
+                        ? new[] { 2, 1 }   // Prioritize caching 2nd page over the first as the second would be need first.
+                        : new[] { pageNum + 1 };
+                    int pageCount = _imageUtils.Value.GetPageCount(fileName);
+                    pagesToCache = pagesToCache
+                        .Where(p => p <= pageCount)
+                        .Except((int[])cachedPages)
+                        .ToArray();
+
+                    foreach (int page in pagesToCache)
+                    {
+                        CachePageData(sessionID, fileID, page);
+                    }
+                }
+                catch (Exception cacheException)
+                {
+                    // Since the ability to access cached data is not critical, log the
+                    // exception but otherwise ignore.
+                    // If needed, exceptions will be stored in the cache table where the
+                    // data would have been.
+                    var eeAppTrace = new ExtractException("ELI49468",
+                        "Application Trace: Cache operation did not succeed.", cacheException);
+                    eeAppTrace.AddDebugData("Session ID", sessionID, false);
+                    eeAppTrace.AddDebugData("File ID", fileID, false);
+                    eeAppTrace.AddDebugData("Page", pageNum, false);
+                    eeAppTrace.AddDebugData("Note",
+                        "If logged during unit test execution, this is not likely an indication of a problem.",
+                        true);
+                    eeAppTrace.Log();
+                }
+            });
         }
 
         #endregion Private Members
