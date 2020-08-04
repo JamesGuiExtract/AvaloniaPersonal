@@ -343,7 +343,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._paginationPanel.Name = "_paginationPanel";
             this._paginationPanel.OutputExpectedPaginationAttributesFile = false;
             this._paginationPanel.Size = new System.Drawing.Size(454, 484);
-            this._paginationPanel.SuspendUIUpdates = false;
             this._paginationPanel.TabIndex = 0;
             this._paginationPanel.ToolBarVisible = true;
             this._paginationPanel.AcceptedSourcePagination += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.AcceptedSourcePaginationEventArgs>(this.HandlePaginationPanel_AcceptedSourcePagination);

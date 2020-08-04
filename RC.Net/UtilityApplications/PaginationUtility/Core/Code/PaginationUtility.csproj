@@ -102,6 +102,10 @@
       <DependentUpon>DataEntryPanelContainer.cs</DependentUpon>
     </Compile>
     <Compile Include="DocumentStatus.cs" />
+    <Compile Include="PageLayoutControl.UIUpdateLock.cs">
+	  <DependentUpon>PageLayoutControl.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="PaginatedOutputCreationUtility.cs" />
     <Compile Include="NewDocumentGlyph.cs">
       <SubType>UserControl</SubType>

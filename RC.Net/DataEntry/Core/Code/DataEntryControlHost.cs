@@ -8302,14 +8302,6 @@ namespace Extract.DataEntry
 
                 OnItemSelectionChanged();
 
-                OnUpdateEnded(new EventArgs());
-
-                // Loading + events up thru the UpdateEnded event can trigger focus events.
-                // Wait until any potential focus-grabbing operations have completed before
-                // enabling controls.
-                // Selection will be initialized per _initialSelection below.
-                EnableControls(true);
-
                 ExecuteOnIdle("ELI34419", () => AttributeStatusInfo.UndoManager.TrackOperations = true);
                 ExecuteOnIdle("ELI34420", () => _dirty = false);
                 // Forget all LastAppliedStringValues that are currently being remembered to ensure
@@ -8319,7 +8311,21 @@ namespace Extract.DataEntry
 
                 ExecuteOnIdle("ELI39651", () =>
                 {
+                    // Don't signal the update to have ended until we are ready to initialize control state/selection
+                    // Otherwise, events such as keystrokes can be processed between the time UpdateEnded is signaled
+                    // and selection is initialized and prevent the selection initialization expected below.
+                    // Specifically, in the PaginationUtility project, HandlePaginationSeparator_DocumentDataPanelRequest
+                    // is dependent on this this come after any potential windows messages are handled in the document
+                    // load process, but before selection is initialized.
+                    OnUpdateEnded(new EventArgs());
+
                     _isDocumentLoaded = true;
+
+                    // Loading + events up thru the UpdateEnded event can trigger focus events.
+                    // Wait until any potential focus-grabbing operations have completed before
+                    // enabling controls.
+                    // Selection will be initialized per _initialSelection below.
+                    EnableControls(true);
 
                     // If _initialSelection is set to anything other than DoNotReset, initialize
                     // field selection.

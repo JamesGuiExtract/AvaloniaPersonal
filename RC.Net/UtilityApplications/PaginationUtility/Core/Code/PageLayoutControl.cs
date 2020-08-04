@@ -9,7 +9,6 @@ using Leadtools.Drawing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Globalization;
@@ -21,6 +20,8 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// <summary>
     /// Displays and manages <see cref="PaginationControl"/>s that allow a user to manipulate image
     /// pages into output documents.
+    /// NOTE: The UI locking mechanisms used in this class are implemented via thread static fields,
+    /// thus only one <see cref="PageLayoutControl"/> is supported per thread.
     /// </summary>
     internal partial class PageLayoutControl : UserControl
     {
@@ -29,139 +30,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Window's user objects.
         /// </summary>
         internal static readonly int _MAX_LOADED_PAGES = 1000;
-
-        /// <summary>
-        /// Displays a wait cursor and suspends layout and painting of the _flowLayoutPanel during
-        /// an operation which is re-organizing controls in the panel.
-        /// </summary>
-        class PageLayoutControlUpdateLock : IDisposable
-        {
-            #region Fields
-
-            /// <summary>
-            /// The <see cref="PageLayoutControl"/> for which the update is taking place.
-            /// </summary>
-            PageLayoutControl _pageLayoutControl;
-
-            /// <summary>
-            /// The wait cursor that is displayed during the operation.
-            /// </summary>
-            TemporaryWaitCursor _waitCursor;
-
-            /// <summary>
-            /// Prevents painting of the control during the operation.
-            /// </summary>
-            LockControlUpdates _controlUpdateLock;
-
-            /// <summary>
-            /// Indicates whether a full layout should be performed when this instance is disposed.
-            /// </summary>
-            bool _forceFullLayout;
-
-            #endregion Fields
-             
-            #region Constructors
-             
-            /// <summary>
-            /// Initializes a new instance of the <see cref="PageLayoutControlUpdateLock"/> class.
-            /// </summary>
-            /// <param name="pageLayoutControl">The <see cref="PageLayoutControl"/> for which the
-            /// update is taking place.</param>
-            /// <param name="forceFullRefresh"><c>true</c> to force a full layout when layout is
-            /// resumed.</param>
-            public PageLayoutControlUpdateLock(PageLayoutControl pageLayoutControl, bool forceFullLayout = false)
-            {
-                if (!pageLayoutControl._inUpdateOperation)
-                {
-                    _pageLayoutControl = pageLayoutControl;
-                    _forceFullLayout = forceFullLayout;
-                    pageLayoutControl._inUpdateOperation = true;
-
-                    _waitCursor = new TemporaryWaitCursor();
-
-                    _pageLayoutControl.SuspendLayout();
-                    _pageLayoutControl._flowLayoutPanel.SuspendLayout();
-
-                    _controlUpdateLock =
-                        new LockControlUpdates(_pageLayoutControl._flowLayoutPanel, true, true);
-
-
-                }
-            }
-
-            #endregion Constructors
-
-            #region IDisposable Members
-
-            /// <summary>
-            /// Releases all resources used by the <see cref="PageLayoutControlUpdateLock"/>.
-            /// </summary>
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            /// <overloads>Releases resources used by the <see cref="PageLayoutControlUpdateLock"/>.
-            /// </overloads>
-            /// <summary>
-            /// Releases all unmanaged resources used by the <see cref="PageLayoutControlUpdateLock"/>.
-            /// </summary>
-            /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
-            /// resources; <see langword="false"/> to release only unmanaged resources.</param>
-            // These fields are disposed of, just not directly.
-            [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "_waitCursor")]
-            [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "_controlUpdateLock")]
-            void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    try
-                    {
-                        // Dispose of managed resources
-                        if (_pageLayoutControl != null && _waitCursor != null &&
-                            _controlUpdateLock != null)
-                        {
-                            var pageLayoutControl = _pageLayoutControl;
-                            var waitCursor = _waitCursor;
-                            var controlUpdateLock = _controlUpdateLock;
-
-                            // Invoke the dispose of waitCursor and controlUpdateLock so that they
-                            // are in effect until all events associated with the operation have
-                            // been processed.
-                            _pageLayoutControl.SafeBeginInvoke("ELI35613", () =>
-                            {
-                                waitCursor.Dispose();
-                                controlUpdateLock.Dispose();
-                                // Ensure the page layout control has keyboard focus after each
-                                //event.
-                                pageLayoutControl.Focus();
-                            });
-
-                            _controlUpdateLock = null;
-                            _waitCursor = null;
-                        }
-
-                        if (_pageLayoutControl != null)
-                        {
-                            _pageLayoutControl._inUpdateOperation = false;
-                            if (_forceFullLayout)
-                            {
-                                ((PaginationLayoutEngine)_pageLayoutControl._flowLayoutPanel.LayoutEngine).ForceNextLayout = true;
-                            }
-                            _pageLayoutControl._flowLayoutPanel.ResumeLayout(true);
-                            _pageLayoutControl.ResumeLayout(true);
-                            _pageLayoutControl.UpdateCommandStates();
-                            _pageLayoutControl = null;
-                        }
-                    }
-                    catch { }
-                }
-                // Dispose of unmanaged resources
-            }
-
-            #endregion IDisposable Members
-        }
 
         #region Constants
 
@@ -319,11 +187,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         ApplicationCommand _outputDocumentCommand;
 
         /// <summary>
-        /// Indicates whether an operation that re-organizes controls in the panel is taking place.
-        /// </summary>
-        bool _inUpdateOperation;
-
-        /// <summary>
         /// Indicates whether that the _flowLayoutPanel is resizing.
         /// </summary>
         bool _flowLayoutPanelResizing;
@@ -367,14 +230,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         ShortcutsManager _shortcuts;
 
         /// <summary>
-        /// Prevents UI updates of this control.
+        /// Used to lock the UI for the duration of any ongoing UI operation. This lock will remain
+        /// in place until the next time the application goes idle.
         /// </summary>
-        PageLayoutControlUpdateLock _updateLock = null;
+        UIUpdateLock _operationUpdateLock = null;
 
         /// <summary>
-        /// To execute code upon next time UI goes idle.
+        /// Used to lock the UI during loading of a DEP. This lock will remain in place until the DEP
+        /// signals that loading is complete.
         /// </summary>
-        OnIdleHandler _onIdleHandler;
+        UIUpdateLock _panelLoadUpdateLock = null;
 
         /// <summary>
         /// Indicates whether <see cref="UpdateCommandStates"/> has been invoked to execute on a
@@ -431,6 +296,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _flowLayoutPanel.ClientSizeChanged += HandleFlowLayoutPanel_ClientSizeChanged;
                 ((PaginationLayoutEngine)_flowLayoutPanel.LayoutEngine).LayoutCompleted +=
                     PaginationLayoutEngine_LayoutCompleted;
+                Application.Idle += Application_Idle;
 
                 _printPageCounter = 0;
             }
@@ -439,6 +305,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 throw ex.AsExtract("ELI35429");
             }
         }
+
 
         #endregion Constructors
 
@@ -476,6 +343,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// editing of the data associated with an <see cref="OutputDocument"/>.
         /// </summary>
         public event EventHandler<DocumentDataPanelRequestEventArgs> DocumentDataPanelRequest;
+
+        /// <summary>
+        /// Raised when the UI is about to be suspended from drawing, layouts, or accepting input.
+        /// </summary>
+        public event EventHandler<EventArgs> SuspendingUIUpdates;
+
+        /// <summary>
+        /// Raised after UI has resumed drawing, layouts and accepting input.
+        /// </summary>
+        public event EventHandler<EventArgs> ResumingUIUpdates;
 
         #endregion Events
 
@@ -784,58 +661,66 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Gets or sets a value whether UI updates are currently suspended.
+        /// Suspend the UI from drawing, layouts and accepting input. This suspension will remain
+        /// in place until the application enters the idle state.
         /// </summary>
-        /// <value><see langword="true"/> if UI updates suspended; otherwise,
-        /// <see langword="false"/>.
-        /// </value>
-        public bool UIUpdatesSuspended
+        public void SuspendUIUpdatesForOperation(bool forceLayoutOnResume = false)
         {
-            get
+            try
             {
-                return _updateLock != null;
+                if (_operationUpdateLock == null)
+                {
+                    _operationUpdateLock = new UIUpdateLock(this, forceLayoutOnResume);
+                }
             }
-
-            set
+            catch (Exception ex)
             {
-                try
-                {
-                    if (value && _updateLock == null)
-                    {
-                        _updateLock = new PageLayoutControlUpdateLock(this);
-                        if (LoadNextDocumentVisible)
-                        {
-                            RemovePaginationControl(_loadNextDocumentButtonControl, false);
-                        }
-                    }
-                    else if (!value && _updateLock != null)
-                    {
-                        if (LoadNextDocumentVisible)
-                        {
-                            AddPaginationControl(_loadNextDocumentButtonControl);
-                        }
-                        _updateLock.Dispose();
-                        _updateLock = null;
-                        ((PaginationLayoutEngine)_flowLayoutPanel.LayoutEngine).ForceNextLayout = true;
-                        UpdateCommandStates();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI40220");
-                }
+                throw ex.AsExtract("ELI50198");
             }
         }
 
         /// <summary>
+        /// If the UI is currently suspended, perform a one-time update. Use this to prevent blank or
+        /// out-of-date controls as the backdrop to a prompt displayed during an operation that suspends
+        /// the UI.
+        /// </summary>
+        public static void RefreshSuspendedUI()
+        {
+            UIUpdateLock.RefreshUI();
+        }
+
+        /// <summary>
+        /// Indicates whether the UI is currently in a suspended state.
+        /// </summary>
+        public static bool UIUpdatesSuspended
+        {
+            get
+            {
+                return UIUpdateLock.IsLocked;
+            }
+        }
+
+
+        /// <summary>
         /// Gets or sets whether the current keystroke should be ignored as a shortcut key. Used in
         /// the case that data is being edited.
+        /// NOTE: Will return <c>true</c> even if this property was not so set if the UI is currently
+        /// suspended.
         /// </summary>
         public bool IgnoreShortcutKey
         {
-            get;
-            set;
+            get
+            {
+                return (_ignoreShortcutKey || UIUpdatesSuspended);
+            }
+
+            set
+            {
+                _ignoreShortcutKey = value;
+            }
         }
+        bool _ignoreShortcutKey;
+
 
         /// <summary>
         /// Gets the <see cref="PaginationControl"/> that should be considered the primary selection
@@ -1205,7 +1090,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             try
             {
-                using (new PageLayoutControlUpdateLock(this))
+                using (new UIUpdateLock(this))
                 {
                     // While new pages are being added, remove the load next document control.
                     if (LoadNextDocumentVisible)
@@ -1254,12 +1139,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     outputDocument.DocumentOutput += HandleOutputDocument_DocumentOutput;
-
-                    this.SafeBeginInvoke("ELI39641", () =>
-                    {
-                        // Ensure this control has keyboard focus after loading a document.
-                        Focus();
-                    });
                 }
             }
             catch (Exception ex)
@@ -1347,57 +1226,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI35434");
-            }
-        }
-
-        /// <summary>
-        /// Adds the specified <see paramref="pages"/> to this instance.
-        /// <para><b>Note</b></para>
-        /// It is assumed that none of these pages are duplicates of existing ones.
-        /// </summary>
-        /// <param name="pages">The <see cref="Page"/>s to add.</param>
-        public void AddPages(params Page[] pages)
-        {
-            try
-            {
-                using (new PageLayoutControlUpdateLock(this))
-                {
-                    // While new pages are being added, remove the load next document control.
-                    if (LoadNextDocumentVisible)
-                    {
-                        RemovePaginationControl(_loadNextDocumentButtonControl, false);
-                    }
-
-                    foreach (Page page in pages)
-                    {
-                        var newPageControl = new PageThumbnailControl(null, page);
-
-                        int index = -1;
-                        InitializePaginationControl(newPageControl, ref index);
-
-                        // Now that these pages have been loaded, they are referenced by the page controls
-                        // so the reference from this object can be released.
-                        page.RemoveReference(this);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI35672");
-            }
-            finally
-            {
-                try
-                {
-                    if (LoadNextDocumentVisible)
-                    {
-                        AddPaginationControl(_loadNextDocumentButtonControl);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI35673");
-                }
             }
         }
 
@@ -1507,7 +1335,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (previousPageControl != null)
                         {
                             OutputDocument firstDocument = previousPageControl.Document;
-                            firstDocument.Collapsed = false;
+                            firstDocument.Collapsed = false; //TODO: This call should be moved to merge operation; not appropriate when in the context a document has been submitted.
                             MovePagesToDocument(firstDocument, nextPageControl);
 
                             OnSelectionChanged();
@@ -2118,7 +1946,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                             AttributeStatusInfo.EndEdit();
                         }
 
-                        //IgnoreShortcutKey = true;
                         return base.ProcessCmdKey(ref msg, keyData);
                     }
                     // Even with data entry panel open and focused:
@@ -2156,16 +1983,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    if (_updateLock != null)
+                    if (_operationUpdateLock != null)
                     {
-                        _updateLock.Dispose();
-                        _updateLock = null;
+                        _operationUpdateLock.Dispose();
+                        _operationUpdateLock = null;
                     }
 
-                    if (_onIdleHandler != null)
+                    if (_panelLoadUpdateLock != null)
                     {
-                        _onIdleHandler.Dispose();
-                        _onIdleHandler = null;
+                        _panelLoadUpdateLock.Dispose();
+                        _panelLoadUpdateLock = null;
                     }
 
                     // Allows a much quick response to remove and dispose of the controls first
@@ -2623,14 +2450,22 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (e.DocumentDataPanel != null)
                 {
                     // Update display all at once rather than as controls are being arranged.
-                    var updateLock = new PageLayoutControlUpdateLock(this);
-                    this.SafeBeginInvoke("ELI49743", () =>
-                    {
-                        updateLock.Dispose();
-                    });
 
                     DocumentDataPanel = e.DocumentDataPanel;
                     DocumentInDataEdit = e.OutputDocument;
+
+                    // Lock the UI until DocumentDataPanel.UpdateEnded is called. UpdateEnded will be
+                    // raised after the load has been finalized except for selection.
+                    _panelLoadUpdateLock?.Dispose();
+                    _panelLoadUpdateLock = new UIUpdateLock(this);
+
+                    DocumentDataPanel.UpdateEnded += endPanelUpdateLock;
+                    void endPanelUpdateLock(object _, EventArgs __)
+                    {
+                        _panelLoadUpdateLock?.Dispose();
+                        _panelLoadUpdateLock = null;
+                        DocumentDataPanel.UpdateEnded -= endPanelUpdateLock;
+                    };
 
                     var activePage = PrimarySelection as PageThumbnailControl;
                     if (activePage == null || activePage.Document != e.OutputDocument)
@@ -2681,10 +2516,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 DocumentInDataEdit = null;
 
                 // Redisplay controls from other documents that were hidden while a DEP was in edit.
-                using (new PageLayoutControlUpdateLock(this))
-                {
-                    RedisplayAllDocuments();
-                }
+                RedisplayAllDocuments();
 
                 _flowLayoutPanel.RequestScrollPositionRestore();
             }
@@ -2791,6 +2623,22 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI49904");
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Application.Idle"/> even in order to end any UI lock put in place.
+        /// </summary>
+        void Application_Idle(object sender, EventArgs e)
+        {
+            try
+            {
+                _operationUpdateLock?.Dispose();
+                _operationUpdateLock = null;
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50200");
             }
         }
 
@@ -2939,7 +2787,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         void MoveSelectedControls(PageLayoutControl sourceLayoutControl, int targetIndex)
         {
-            using (new PageLayoutControlUpdateLock(this, forceFullLayout: true))
+            using (new UIUpdateLock(this, forceLayoutOnResume: true))
             {
                 var primarySelection = PrimarySelection;
                 var selectedControls = sourceLayoutControl.SelectedControls
@@ -3181,12 +3029,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         void RedisplayAllDocuments()
         {
+            SuspendUIUpdatesForOperation();
+
             if (!_allDocumentsShowing)
             {
                 foreach (var separator in _flowLayoutPanel.Controls.OfType<PaginationSeparator>())
                 {
                     separator.Visible = true;
-                    if (!separator.Collapsed)
+                    if (!separator.Collapsed && separator.Document != null)
                     {
                         foreach (var pageControl in separator.Document.PageControls)
                         {
@@ -3910,7 +3760,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="paginationControls">The <see cref="PaginationControl"/>s to delete.</param>
         void DeleteControls(PaginationControl[] paginationControls)
         {
-            using (new PageLayoutControlUpdateLock(this))
+            using (new UIUpdateLock(this))
             {
                 int newSelectionPosition = -1;
                 foreach (var control in paginationControls
@@ -4413,15 +4263,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                     activeSeparator.Collapsed = false;
                     activeSeparator.OpenDataPanel(initialSelection: FieldSelection.First);
                 }
-                // Tabbing from no selection or any page but the last page of a document
-                else if (PrimarySelection == null || activeControl?.NextControl is PageThumbnailControl)
+                else if (DocumentDataPanel?.PanelControl?.ContainsFocus != true)
                 {
-                    HandleSelectNextPage();
-                }
-                // Tabbing from the last page of a document
-                else
-                {
-                    TabNavigateNextDocument(activeDocument);
+                    // Tabbing from no selection or any page but the last page of a document
+                    if (PrimarySelection == null || activeControl?.NextControl is PageThumbnailControl)
+                    {
+                        HandleSelectNextPage();
+                    }
+                    // Tabbing from the last page of a document
+                    else
+                    {
+                        TabNavigateNextDocument(activeDocument);
+                    }
                 }
             }
             catch (Exception ex)
@@ -4439,28 +4292,25 @@ namespace Extract.UtilityApplications.PaginationUtility
             OutputDocument nextDocument = null;
 
             // Use of the update lock masks a couple of scrolling shifts that can be a distracting/disorienting.
-            using (new PageLayoutControlUpdateLock(this))
+            SuspendUIUpdatesForOperation();
+             
+            if (activeDocument?.PaginationSeparator != null)
             {
-                if (activeDocument?.PaginationSeparator != null)
-                {
-                    CloseAndSelectDocumentForCommit(activeDocument);
-                }
+                CloseAndSelectDocumentForCommit(activeDocument);
+            }
 
-                nextDocument = SelectNextDocument(true);
-                if (nextDocument == null)
-                {
-                    // TODO: Prompt whether to commit batch. Until then, clear control selection when
-                    // there are no more documents to prevent tab loop at end.
-                    ClearSelection();
-                }
-                else
-                {
-                    nextDocument.Collapsed = false;
+            nextDocument = SelectNextDocument(true);
+            if (nextDocument == null)
+            {
+                // TODO: Prompt whether to commit batch. Until then, clear control selection when
+                // there are no more documents to prevent tab loop at end.
+                ClearSelection();
+            }
+            else
+            {
+                nextDocument.Collapsed = false;
 
-                    _flowLayoutPanel.RequestScrollToControl(nextDocument.PageControls.First());
-                }
-
-                _flowLayoutPanel.Focus();
+                _flowLayoutPanel.RequestScrollToControl(nextDocument.PageControls.First());
             }
         }
 
@@ -4721,7 +4571,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                using (new PageLayoutControlUpdateLock(this))
+                using (new UIUpdateLock(this))
                 {
                     IEnumerable<KeyValuePair<Page, bool>> copiedPages = GetClipboardData();
 
@@ -5005,7 +4855,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                using (new PageLayoutControlUpdateLock(this))
+                using (new UIUpdateLock(this))
                 {
                     if (_commandTargetControl != null)
                     {

@@ -547,8 +547,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </param>
         public void OpenDataPanel(FieldSelection initialSelection)
         {
-            bool locked = false;
-
             try
             {
                 if (Document != null && !IsDataPanelOpen)
@@ -558,8 +556,6 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     if (args.DocumentDataPanel != null)
                     {
-                        FormsMethods.LockControlUpdate(this, true);
-                        locked = true;
                         args.DocumentDataPanel.Editable = !Document.OutputProcessed;
                         _documentDataPanelControl = (Control)args.DocumentDataPanel;
                         _documentDataPanelControl.Width = _tableLayoutPanel.Width;
@@ -584,21 +580,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40237");
-            }
-            finally
-            {
-                if (locked)
-                {
-                    try
-                    {
-                        FormsMethods.LockControlUpdate(this, false);
-                        Refresh();
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.ExtractLog("ELI40208");
-                    }
-                }
             }
         }
 
@@ -1235,7 +1216,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             if (_controlUpdatePending &&
-                (Parent as PageLayoutControl)?.UIUpdatesSuspended != true &&
+                PageLayoutControl.UIUpdatesSuspended != true &&
                 Document?.DocumentData?.Initialized == true)
             {
                 _controlUpdatePending = false;

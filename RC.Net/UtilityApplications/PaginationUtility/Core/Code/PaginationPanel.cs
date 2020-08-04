@@ -28,6 +28,8 @@ namespace Extract.UtilityApplications.PaginationUtility
     /// <summary>
     /// Pagination functionality encapsulated in a panel to allow for pagination as part of an
     /// application other than PaginationUtility.exe.
+    /// NOTE: The UI locking mechanisms used in <see cref="PageLayoutControl"/> are implemented
+    /// via thread static fields, thus only one <see cref="PaginationPanel"/> is supported per thread.
     /// </summary>
     public partial class PaginationPanel : UserControl, IPaginationUtility, IImageViewerControl
     {
@@ -150,13 +152,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Indicates whether the <see cref="UpdateCommandStates"/> is in the process of being
         /// called so that controls modifications aren't mistaken for user input.
         /// </summary>
-        bool _updatingCommandStates;
-
-        /// <summary>
-        /// Indicates whether UI updates are currently suspended for performance reasons during an
-        /// operation.
-        /// </summary>
-        bool _uiUpdatesSuspended;
+        bool _updatingCommandStates;    
 
         /// <summary>
         /// Indicates whether the <see cref="CommittingChanges"/> event is currently being raised in
@@ -1247,7 +1243,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Don't suspend UI updates until CanSelectedDocumentsBeCommitted has been checked--
                 // there is not flickering to prevent at this point and moving windows in front of
                 // a suspended UI can cause artifacts.
-                SuspendUIUpdates = true;
+                SuspendUIUpdatesForOperation();
 
                 // Prevent the UI from trying to load/close pages in the image viewer as the
                 // operation is taking place.
@@ -1439,7 +1435,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (!IsDisposed)
                     {
                         _committingChanges = false;
-                        SuspendUIUpdates = false;
                         if (_outputDocumentPositions != null)
                         {
                             _outputDocumentPositions.Clear();
@@ -1606,7 +1601,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SuspendUIUpdates = true;
+                SuspendUIUpdatesForOperation();
 
                 _primaryPageLayoutControl.ClearSelection();
 
@@ -1720,7 +1715,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
-                SuspendUIUpdates = false;
                 _primaryPageLayoutControl.PerformFullLayout();
                 _primaryPageLayoutControl.SelectFirstPage();
                 _primaryPageLayoutControl.Focus();
@@ -1731,8 +1725,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                SuspendUIUpdates = false;
-
                 throw ex.AsExtract("ELI40018");
             }
         }
@@ -2293,6 +2285,23 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Override of <see cref="Control.Refresh"/> to ensure the refresh occurs even if the UI is
+        /// currently suspended.
+        /// </summary>
+        public override void Refresh()
+        {
+            try
+            {
+                base.Refresh();
+                RefreshSuspendedUI();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50196");
+            }
+        }
+
         #endregion Overrides
 
         #region Event Handlers
@@ -2611,6 +2620,44 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles <see cref="PageLayoutControl.SuspendingUpdates"/> in order to apply control suspension
+        /// that needs to happen at the <see cref="PaginationPanel"/> level.
+        /// </summary>
+        void HandlePageLayoutControl_SuspendingUpdates(object sender, EventArgs e)
+        {
+            try
+            {
+                SuspendLayout();
+                EnablePageDisplay = false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50201");
+            }
+        }
+
+        /// <summary>
+        /// Handles <see cref="PageLayoutControl.ResumingUpdates"/> in order to release control suspension
+        /// that occurred at the <see cref="PaginationPanel"/> level.
+        /// </summary>
+        void HandlePageLayoutControl_ResumingUpdates(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!IsDisposed)
+                {
+                    EnablePageDisplay = true;
+                    ResumeLayout(true);
+                    UpdateCommandStates();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50202");
+            }
+        }
+
+        /// <summary>
         /// Handles the ObservableCollection.CollectionChanged event of
         /// <see cref="_displayedDocuments"/>.
         /// </summary>
@@ -2686,7 +2733,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SuspendUIUpdatesForOperation();
+                SuspendUIUpdatesForOperation(forceLayoutOnResume: true);
 
                 bool collapse = !AllDocumentsCollapsed;
 
@@ -3038,6 +3085,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandlePrimaryPageLayoutControl_LoadNextDocumentRequest;
             _primaryPageLayoutControl.DocumentDataPanelRequest += HandlePrimaryPageLayoutControl_DocumentDataPanelRequest;
+            _primaryPageLayoutControl.SuspendingUIUpdates += HandlePageLayoutControl_SuspendingUpdates;
+            _primaryPageLayoutControl.ResumingUIUpdates += HandlePageLayoutControl_ResumingUpdates;
+
             _tableLayoutPanel.Controls.Add(_primaryPageLayoutControl, 0, 1);
             _primaryPageLayoutControl.Focus();
         }
@@ -3249,45 +3299,37 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (validateData)
             {
-                try
+                var erroredDocument = documentsToSave.FirstOrDefault(document => document.DocumentData.DataError);
+
+                if (erroredDocument != null)
                 {
-                    SuspendUIUpdates = false;
-
-                    var erroredDocument = documentsToSave.FirstOrDefault(document => document.DocumentData.DataError);
-
-                    if (erroredDocument != null)
+                    this.SafeBeginInvoke("ELI41669", () =>
                     {
-                        this.SafeBeginInvoke("ELI41669", () =>
-                        {
-                            _primaryPageLayoutControl.SelectDocument(erroredDocument);
-                            erroredDocument.PaginationSeparator.OpenDataPanel(
-                                initialSelection: FieldSelection.Error);
-                            erroredDocument.Collapsed = false;
-                            ProcessFocusChange(forceUpdate: true);
-                        });
+                        _primaryPageLayoutControl.SelectDocument(erroredDocument);
+                        erroredDocument.PaginationSeparator.OpenDataPanel(
+                            initialSelection: FieldSelection.Error);
+                        erroredDocument.Collapsed = false;
+                        RefreshSuspendedUI();
+                        ProcessFocusChange(forceUpdate: true);
+                    });
 
-                        return false;
-                    }
-
-                    if (!ConfirmRecordNumberReuse(
-                            documentsToSave.Where(document => document.DocumentData.PromptForDuplicateOrders),
-                            document => document.DocumentData.Orders?.Select(order => order.OrderNumber),
-                            "LabDEOrderFile", "OrderNumber", "order number"))
-                    {
-                        return false;
-                    }
-
-                    if (!ConfirmRecordNumberReuse(
-                            documentsToSave.Where(document => document.DocumentData.PromptForDuplicateEncounters),
-                            document => document.DocumentData.Encounters?.Select(encounter => encounter.EncounterNumber),
-                            "LabDEEncounterFile", "EncounterID", "encounter number"))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
-                finally
+
+                if (!ConfirmRecordNumberReuse(
+                        documentsToSave.Where(document => document.DocumentData.PromptForDuplicateOrders),
+                        document => document.DocumentData.Orders?.Select(order => order.OrderNumber),
+                        "LabDEOrderFile", "OrderNumber", "order number"))
                 {
-                    SuspendUIUpdates = true;
+                    return false;
+                }
+
+                if (!ConfirmRecordNumberReuse(
+                        documentsToSave.Where(document => document.DocumentData.PromptForDuplicateEncounters),
+                        document => document.DocumentData.Encounters?.Select(encounter => encounter.EncounterNumber),
+                        "LabDEEncounterFile", "EncounterID", "encounter number"))
+                {
+                    return false;
                 }
             }
 
@@ -3325,6 +3367,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (docsWithDuplicateRecordNumbers.Any())
                 {
+                    RefreshSuspendedUI();
+
                     var message = string.Join("\r\n",
                     docsWithDuplicateRecordNumbers.Select(item =>
                         Invariant($"{item.Document.Summary} ({string.Join(", ", item.DuplicateNumbers)})")));
@@ -3389,6 +3433,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 if (docsWithUsedRecordNumbers.Any())
                 {
+                    RefreshSuspendedUI();
+
                     var message = string.Join("\r\n",
                     docsWithUsedRecordNumbers.Select(item =>
                         Invariant($"{item.Document.Summary} ({string.Join(", ", item.UsedNumbers)})")));
@@ -3476,7 +3522,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!SuspendUIUpdates)
+                if (!UIUpdatesSuspended)
                 {
                     _updatingCommandStates = true;
 
@@ -3521,46 +3567,17 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+
+
         /// <summary>
         /// Gets or sets whether UI updates are currently suspended for performance reasons during
         /// an operation.
         /// </summary>
-        public bool SuspendUIUpdates
+        public static bool UIUpdatesSuspended
         {
             get
             {
-                return _uiUpdatesSuspended;
-            }
-
-            set
-            {
-                try
-                {
-                    if (value != _uiUpdatesSuspended)
-                    {
-                        if (value)
-                        {
-                            _uiUpdatesSuspended = true;
-                            SuspendLayout();
-                            _primaryPageLayoutControl.UIUpdatesSuspended = true;
-                            EnablePageDisplay = false;
-                        }
-                        // Document loads that being in the midst committing documents was turning off
-                        // SuspendUIUpdates and allowing flickering to occur.
-                        else if (!_committingChanges)
-                        {
-                            _uiUpdatesSuspended = false;
-                            EnablePageDisplay = true;
-                            _primaryPageLayoutControl.UIUpdatesSuspended = false;
-                            UpdateCommandStates();
-                            ResumeLayout(true);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI40226");
-                }
+                return PageLayoutControl.UIUpdatesSuspended == true;
             }
         }
 
@@ -3605,23 +3622,35 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Temporarily suspends UI updates for the context of the current message handler. UI
         /// updates will automatically be resumed with the next windows message.
         /// </summary>
-        public void SuspendUIUpdatesForOperation()
+        public void SuspendUIUpdatesForOperation(bool forceLayoutOnResume = false)
         {
             try
             {
-                if (!_uiUpdatesSuspended)
+                if (_primaryPageLayoutControl != null)
                 {
-                    SuspendUIUpdates = true;
-
-                    this.SafeBeginInvoke("ELI40218", () =>
-                    {
-                        SuspendUIUpdates = false;
-                    });
+                    _primaryPageLayoutControl.SuspendUIUpdatesForOperation(forceLayoutOnResume);
                 }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI40227");
+            }
+        }
+
+        /// <summary>
+        /// If the UI is currently suspended, perform a one-time update. Use this to prevent blank or
+        /// out-of-date controls as the backdrop to a prompt displayed during an operation that suspends
+        /// the UI.
+        /// </summary>
+        static void RefreshSuspendedUI()
+        {
+            try
+            {
+                PageLayoutControl.RefreshSuspendedUI();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50195");
             }
         }
 

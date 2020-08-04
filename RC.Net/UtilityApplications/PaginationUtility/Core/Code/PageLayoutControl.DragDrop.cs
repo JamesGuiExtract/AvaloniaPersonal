@@ -223,7 +223,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_lastDragMove.HasValue
                     && (DateTime.Now - _lastDragMove.Value) > new TimeSpan(0, 0, 0, 0, milliseconds: 500))
                 {
-                    using (new PageLayoutControlUpdateLock(this))
+                    using (new UIUpdateLock(this))
                     {
                         separator.Collapsed = false;
                     }
@@ -622,10 +622,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // If dragging to top/bottom of panel while a single document is displayed via
                     // SnapDataPanelToTop, redisplay all other documents to allow the pages being
                     // dragged to be dropped into other documents.
-                    using (new PageLayoutControlUpdateLock(this))
-                    {
-                        RedisplayAllDocuments();
-                    }
+                    RedisplayAllDocuments();
 
                     // After displaying all documents, the panel will be scrolled to the top; restore
                     // scroll position relative to the top of the document from which we are dragging.

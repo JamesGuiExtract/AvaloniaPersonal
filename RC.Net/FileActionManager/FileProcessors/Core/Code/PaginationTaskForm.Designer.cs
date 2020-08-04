@@ -197,7 +197,6 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.SaveButtonVisible = false;
             this._paginationPanel.SelectAllCheckBoxVisible = true;
             this._paginationPanel.Size = new System.Drawing.Size(528, 787);
-            this._paginationPanel.SuspendUIUpdates = false;
             this._paginationPanel.TabIndex = 1;
             this._paginationPanel.ToolBarVisible = true;
             this._paginationPanel.DocumentDataRequest += new System.EventHandler<Extract.UtilityApplications.PaginationUtility.DocumentDataRequestEventArgs>(this.HandlePaginationPanel_DocumentDataRequest);

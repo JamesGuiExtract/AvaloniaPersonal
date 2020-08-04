@@ -335,6 +335,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Occurs when a document has finished loading.
         /// </summary>
+        public event EventHandler<EventArgs> UpdateEnded;
+
+        /// <summary>
+        /// Occurs when a document has finished loading.
+        /// </summary>
         public event EventHandler<EventArgs> DocumentLoaded;
 
         /// <summary>
@@ -1155,6 +1160,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     oldDataEntryControlHost.RedoAvailabilityChanged -= DataEntryControlHost_RedoAvailabilityChanged;
                     oldDataEntryControlHost.DuplicateDocumentsApplied -= HandleDataEntryControlHost_DuplicateDocumentsApplied;
                     oldDataEntryControlHost.TabNavigation -= HandleDataEntryControlHost_TabNavigation;
+                    oldDataEntryControlHost.UpdateEnded -= HandleDataEntryControlHost_UpdateEnded;
                     oldDataEntryControlHost.DocumentLoaded -= HandleDataEntryControlHost_DocumentLoaded;
 
                     oldDataEntryControlHost.ClearData();
@@ -1215,6 +1221,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     newDataEntryControlHost.RedoAvailabilityChanged += DataEntryControlHost_RedoAvailabilityChanged;
                     newDataEntryControlHost.DuplicateDocumentsApplied += HandleDataEntryControlHost_DuplicateDocumentsApplied;
                     newDataEntryControlHost.TabNavigation += HandleDataEntryControlHost_TabNavigation;
+                    newDataEntryControlHost.UpdateEnded += HandleDataEntryControlHost_UpdateEnded;
                     newDataEntryControlHost.DocumentLoaded += HandleDataEntryControlHost_DocumentLoaded;
 
                     // Set Active = true for the new DEP so that it tracks image viewer events.
@@ -1288,6 +1295,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 throw ex.AsExtract("ELI50180");
             }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataEntryControlHost.UpdateEnded"/> event of the active 
+        /// <see cref="DataEntryDocumentDataPanel"/>.
+        void HandleDataEntryControlHost_UpdateEnded(object sender, EventArgs e)
+        {
+            UpdateEnded?.Invoke(sender, e);
         }
 
         /// <summary>

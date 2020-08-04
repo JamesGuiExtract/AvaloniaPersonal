@@ -35,6 +35,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         event EventHandler<EventArgs> RedoAvailabilityChanged;
 
         /// <summary>
+        /// Indicates that a significant update of control values has ended. Examples include
+        /// loading a new document or selecting/creating a new table row on a table with dependent
+        /// controls.
+        /// </summary>
+        event EventHandler<EventArgs> UpdateEnded;
+
+        /// <summary>
         /// Occurs when a document has finished loading.
         /// </summary>
         event EventHandler<EventArgs> DocumentLoaded;

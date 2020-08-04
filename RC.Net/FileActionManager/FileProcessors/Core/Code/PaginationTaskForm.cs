@@ -102,7 +102,7 @@ namespace Extract.FileActionManager.FileProcessors
             /// Gets the number of seconds a user has been actively working within the document.
             /// As with overhead time, the time recorded will be exclusive to the user being active
             /// within this specific document as opposed to also recording active time while the
-            /// user is working in another document that is loaded at the same time.
+            /// user is working in another document that is loaded at the same time. 
             /// </summary>
             public double ActiveSeconds { get; set; }
         }
@@ -2035,7 +2035,7 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                _paginationPanel.SuspendUIUpdates = true;
+                _paginationPanel.SuspendUIUpdatesForOperation();
 
                 if (_paginationPanel.SourceDocuments.Contains(fileName))
                 {
@@ -2225,11 +2225,6 @@ namespace Extract.FileActionManager.FileProcessors
                 catch (Exception ex)
                 {
                     ex.ExtractLog("ELI44678");
-                }
-
-                if (!_paginationPanel.IsCommittingChanges)
-                {
-                    _paginationPanel.SuspendUIUpdates = false;
                 }
 
                 // End timing of overhead for this file
