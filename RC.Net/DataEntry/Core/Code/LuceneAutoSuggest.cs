@@ -498,7 +498,7 @@ namespace Extract.DataEntry
         void DropDown(string searchText)
         {
             // Allow user to delete the value without triggering the list to show
-            if (String.IsNullOrEmpty(searchText))
+            if (String.IsNullOrEmpty(searchText) && !DroppedDown)
             {
                 _acceptedText = null;
                 return;
@@ -761,11 +761,11 @@ namespace Extract.DataEntry
             Dispose(true);
         }
 
-        internal void UpdateAutoCompleteList(Dictionary<string, List<string>> autoCompleteValues)
+        internal void UpdateAutoCompleteList(IEnumerable<KeyValuePair<string, List<string>>> autoCompleteValues)
         {
             ProviderSource = new Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>>(
                 () => new LuceneSuggestionProvider<KeyValuePair<string, List<string>>>(
-                    autoCompleteValues.AsEnumerable(),
+                    autoCompleteValues,
                     s => s.Key,
                     s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s.Key), 1)
                         .Concat(s.Value.Select(aka => new KeyValuePair<string, string>("AKA", aka)))));

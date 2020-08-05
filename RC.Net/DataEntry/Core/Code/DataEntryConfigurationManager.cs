@@ -292,13 +292,9 @@ namespace Extract.DataEntry
         {
             get
             {
-                if (_registeredDocumentTypes != null)
-                {
-                    foreach (string documentType in _registeredDocumentTypes.Keys)
-                    {
-                        yield return documentType;
-                    }
-                }
+                return (_registeredDocumentTypes ?? Enumerable.Empty<KeyValuePair<string, string>>())
+                    .Select(kv => kv.Key)
+                    .OrderBy(x => x, StringComparer.OrdinalIgnoreCase);
             }
         }
 

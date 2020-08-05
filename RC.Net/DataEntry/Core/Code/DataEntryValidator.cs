@@ -94,7 +94,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The list of values that comprise the auto-complete options that should be available.
         /// </summary>
-        Dictionary<string, List<string>> _autoCompleteValues;
+        List<KeyValuePair<string, List<string>>> _autoCompleteValues;
 
         /// <summary>
         /// Specifies whether validation lists will be checked for matches case-sensitively.
@@ -255,7 +255,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Get the dictionary of autocomplete values to akas
         /// </summary>
-        public Dictionary<string, List<string>> AutoCompleteValuesDictionary => _autoCompleteValues;
+        public IEnumerable<KeyValuePair<string, List<string>>> AutoCompleteValuesWithSynonyms => _autoCompleteValues;
 
         #endregion Properties
 
@@ -584,7 +584,7 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    return _autoCompleteValues.Keys.ToArray();
+                    return _autoCompleteValues.Select(kv => kv.Key).ToArray();
                 }
             }
             catch (Exception ex)
@@ -603,23 +603,34 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Populate the validation list dictionary.
-                _autoCompleteValues = new Dictionary<string, List<string>>();
+                _autoCompleteValues = new List<KeyValuePair<string, List<string>>>();
                 if (values != null)
                 {
-                    foreach (string[] items in values)
+                    // Build the validation list to AKA map
+                    var map = new Dictionary<string, List<string>>();
+                    if (values != null)
                     {
-                        string trimmedItem = items[0].Trim();
-
-                        // [DataEntry:188] Add support of "blank" as a valid value.
-                        if (string.Compare(trimmedItem, _BLANK_VALUE,
-                                StringComparison.CurrentCultureIgnoreCase) == 0)
+                        foreach (string[] items in values)
                         {
-                            trimmedItem = "";
-                        }
+                            string trimmedItem = items[0].Trim();
 
-                        var akas = _autoCompleteValues.GetOrAdd(trimmedItem, _ => new List<string>());
-                        akas.AddRange(items.Skip(1));
+                            // [DataEntry:188] Add support of "blank" as a valid value.
+                            if (string.Compare(trimmedItem, _BLANK_VALUE,
+                                    StringComparison.CurrentCultureIgnoreCase) == 0)
+                            {
+                                trimmedItem = "";
+                            }
+                            if (map.TryGetValue(trimmedItem, out var akas))
+                            {
+                                akas.AddRange(items.Skip(1));
+                            }
+                            else
+                            {
+                                akas = items.Skip(1).ToList();
+                                map.Add(trimmedItem, akas);
+                                _autoCompleteValues.Add(new KeyValuePair<string, List<string>>(trimmedItem, akas));
+                            }
+                        }
                     }
                 }
 

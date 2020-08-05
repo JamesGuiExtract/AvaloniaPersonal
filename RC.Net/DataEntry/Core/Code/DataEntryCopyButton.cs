@@ -332,7 +332,7 @@ namespace Extract.DataEntry
         /// Unused. The copy button does not provide any auto-complete list.
         /// </summary>
         /// <returns><see <c>null</c></returns>
-        public Dictionary<string, List<string>> AutoCompleteValuesDictionary => null;
+        public IEnumerable<KeyValuePair<string, List<string>>> AutoCompleteValuesWithSynonyms => null;
 
         /// <summary>
         /// The copy button's validation is not specific to any given attribute; the same instance

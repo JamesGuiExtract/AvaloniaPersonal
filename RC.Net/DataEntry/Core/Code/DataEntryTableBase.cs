@@ -1347,7 +1347,7 @@ namespace Extract.DataEntry
 
                         if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene && validator != null)
                         {
-                            var autoCompleteValues = validator.AutoCompleteValuesDictionary;
+                            var autoCompleteValues = validator.AutoCompleteValuesWithSynonyms;
                             _luceneAutoSuggest = new LuceneAutoSuggest(textEditingControl, this);
                             _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);
 

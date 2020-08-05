@@ -37,10 +37,10 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Get the dictionary of autocomplete values to akas
+        /// Get the map of autocomplete values to akas
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
-        Dictionary<string, List<string>> AutoCompleteValuesDictionary { get; }
+        IEnumerable<KeyValuePair<string, List<string>>> AutoCompleteValuesWithSynonyms { get; }
 
         #endregion Properties
 

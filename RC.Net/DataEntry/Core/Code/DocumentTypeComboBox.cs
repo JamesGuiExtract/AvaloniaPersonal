@@ -468,7 +468,7 @@ namespace Extract.DataEntry
         void UpdateComboBoxItems()
         {
             var autoCompleteValues = _validator.GetAutoCompleteValues();
-            _luceneAutoSuggest.UpdateAutoCompleteList(_validator.AutoCompleteValuesDictionary);
+            _luceneAutoSuggest.UpdateAutoCompleteList(_validator.AutoCompleteValuesWithSynonyms);
 
             Items.Clear();
             if (autoCompleteValues != null)
