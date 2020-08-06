@@ -1,5 +1,0 @@
-<ExtractReportParameterData Version="2">
-	<ReportParameters>
-		<DateRangeParameter Name="ReportingPeriod" Default="" />
-	</ReportParameters>
-</ExtractReportParameterData>

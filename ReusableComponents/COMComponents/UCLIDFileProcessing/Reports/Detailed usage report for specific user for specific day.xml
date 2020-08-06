@@ -1,8 +1,0 @@
-<ExtractReportParameterData Version="2">
-	<ReportParameters>
-		<ValueListParameter Name="UserName" Query="Select FAMUser.UserName FROM FAMUser" Default=""/>
-		<DateParameter Name="ReportDate" Default="" ShowTime="False"/>
-		<NumberParameter Name="StartHour" Default="6"		/>
-		<NumberParameter Name="EndHour" Default="18" />
-	</ReportParameters>
-</ExtractReportParameterData>
