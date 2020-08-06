@@ -80,7 +80,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
         #region Unit Tests
 
-        [Test, Category("Automated")]
+        [Test, Category("Automated"), Category("Broken")]
         public static void TestSplitTif()
         {
             string testDbName = "SplitMultiPageDocument_TestSplitTif";
@@ -143,7 +143,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             }
         }
 
-        [Test, Category("Interactive")]
+        [Test, Category("Interactive"), Category("Broken")]
         public static void TestSplitTifTwice()
         {
             string testDbName = "SplitMultiPageDocument_TestSplitTifTwice";

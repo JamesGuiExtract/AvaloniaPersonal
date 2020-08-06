@@ -86,7 +86,6 @@
     </Compile>
     <Compile Include="TestCommentedTextFileReader.cs" />
     <Compile Include="TestComUtils.cs" />
-    <Compile Include="TestExtractFileLock.cs" />
     <Compile Include="TestExtractSettings.cs" />
     <Compile Include="TestScheduledEvent.cs" />
     <Compile Include="TestSystemMethods.cs" />
