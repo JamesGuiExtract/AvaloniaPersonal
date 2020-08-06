@@ -941,6 +941,7 @@ namespace Extract.DataEntry
                         // Dispose the auto-suggest control here to prevent it from popping up
                         // twice when a new cell is edited
                         _luceneAutoSuggest?.Dispose();
+                        _luceneAutoSuggest = null;
                     }
                 }
 
@@ -1349,6 +1350,8 @@ namespace Extract.DataEntry
                         {
                             var autoCompleteValues = validator.AutoCompleteValuesWithSynonyms;
                             _luceneAutoSuggest = new LuceneAutoSuggest(textEditingControl, this);
+                            _luceneAutoSuggest.SetDataEntryControlHost(DataEntryControlHost);
+                            _luceneAutoSuggest.SetListBackColor(_color);
                             _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);
 
                         }
@@ -1794,7 +1797,18 @@ namespace Extract.DataEntry
             }
             set
             {
-                _dataEntryControlHost = value;
+                try
+                {
+                    if (_dataEntryControlHost != value)
+                    {
+                        _dataEntryControlHost = value;
+                        _luceneAutoSuggest?.SetDataEntryControlHost(value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI50225");
+                }
             }
         }
 

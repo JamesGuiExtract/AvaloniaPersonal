@@ -1944,7 +1944,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         newDataEntryControlHost.Active = true;
 
                         // The combo box registers an IMessageFilter with the active DataEntryControlHost to intercept keyboard and mouse events
-                        _documentTypeComboBox.SetDataEntryControlHost(newDataEntryControlHost);
+                        _documentTypeComboBox.DataEntryControlHost = newDataEntryControlHost;
                     }
                 }
             }

@@ -16,7 +16,7 @@ namespace Extract.DataEntry
     /// text of another control to the clipboard and report its "data" as invalid until it is
     /// pressed.
     /// </summary>
-    public partial class DataEntryCopyButton : Button, IDataEntryControl, IRequiresErrorProvider,
+    public partial class DataEntryCopyButton : Button, IDataEntryAttributeControl, IRequiresErrorProvider,
         IDataEntryValidator
     {
         #region Fields
@@ -644,6 +644,11 @@ namespace Extract.DataEntry
                 attribute == null || attribute == _attribute);
         }
 
+        /// <summary>
+        /// The attribute mapped to this control.
+        /// </summary>
+        public IAttribute Attribute => _attribute;
+
         #endregion IDataEntryControl Members
 
         #region Unused IDataEntryControl Members
@@ -870,8 +875,7 @@ namespace Extract.DataEntry
         {
             if (this.AttributesSelected != null)
             {
-                var selectionState = new SelectionState(this, 
-                    DataEntryMethods.AttributeAsVector(_attribute), false, true, null);
+                var selectionState = SelectionState.Create(this);
                 AttributesSelected(this, new AttributesSelectedEventArgs(selectionState));
             }
         }

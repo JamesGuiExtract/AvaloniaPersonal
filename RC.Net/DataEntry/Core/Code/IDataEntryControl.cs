@@ -318,4 +318,23 @@ namespace Extract.DataEntry
 
         #endregion EventHandlers
     }
+
+    /// <summary>
+    /// Interface for <see cref="IDataEntryControl"/>s that have an attribute property
+    /// </summary>
+    public interface IDataEntryAttributeControl : IDataEntryControl
+    {
+        IAttribute Attribute { get; }
+    }
+
+    /// <summary>
+    /// Interface for <see cref="IDataEntryControl"/>s that have selection start and length properties
+    /// </summary>
+    public interface IDataEntryTextControl : IDataEntryAttributeControl
+    {
+        int LastSelectionStart { get; }
+
+        int LastSelectionLength { get; }
+    }
+
 }

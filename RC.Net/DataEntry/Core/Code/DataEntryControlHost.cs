@@ -6,6 +6,8 @@ using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
+using Extract.Utilities.FSharp;
+using Microsoft.FSharp.Collections;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -25,9 +27,6 @@ using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 using ESpatialStringMode = UCLID_RASTERANDOCRMGMTLib.ESpatialStringMode;
 using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
 using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
-using HighlightList =
-    System.Collections.Generic.List<System.Collections.Generic.List<
-        Extract.Imaging.Forms.CompositeHighlightLayerObject>>;
 using HighlightDictionary =
     System.Collections.Generic.Dictionary<
         UCLID_AFCORELib.IAttribute, System.Collections.Generic.List<
@@ -747,13 +746,18 @@ namespace Extract.DataEntry
         /// <summary>
         /// Type to enable delegate field for PreFilterMessage method
         /// </summary>
-        private delegate bool MessageFilterType(ref Message m);
+        delegate bool MessageFilterType(ref Message m);
 
         /// <summary>
         /// Message filter delegates. With some exceptions, e.g., Undo/Redo actions, these filters will be run
         /// before this instance's PreFilterMessage method does anything
         /// </summary>
-        private MessageFilterType _messageFilters;
+        /// <remarks>
+        /// Using an immutable linked list so that it can be iterated safely without copying.
+        /// This list will be used a lot more than it is modified and, I think, added to more than removed from
+        /// so this is a fit data structure
+        /// </remarks>
+        FSharpList<MessageFilterType> _messageFilters = ListModule.Empty<MessageFilterType>();
 
         /// <summary>
         /// Indicates whether validation errors/warnings will be flagged with an icon in the DEP
@@ -1643,9 +1647,12 @@ namespace Extract.DataEntry
                     _isIdle = false;
                 }
 
-                if (_messageFilters?.Invoke(ref m) ?? false)
+                foreach (MessageFilterType filter in _messageFilters)
                 {
-                    return true;
+                    if (filter(ref m))
+                    {
+                        return true;
+                    }
                 }
 
                 if (m.Msg == WindowsMessage.KeyDown || m.Msg == WindowsMessage.KeyUp)
@@ -3011,19 +3018,25 @@ namespace Extract.DataEntry
         /// <summary>
         /// Add a message filter that will run, mostly, before this instance handles messages
         /// </summary>
+        /// <remarks>
+        /// Filters will be run in last-added-first order
+        /// </remarks>
         /// <param name="messageFilter">The <see cref="IMessageFilter"/> to add</param>
         public void AddMessageFilter(IMessageFilter messageFilter)
         {
-            _messageFilters += messageFilter.PreFilterMessage;
+            _messageFilters =
+                FSharpList<MessageFilterType>.Cons(messageFilter.PreFilterMessage, _messageFilters);
         }
 
         /// <summary>
-        /// Add a message filter that will run, mostly, before this instance handles messages
+        /// Remove a message filter from the list
         /// </summary>
         /// <param name="messageFilter">The <see cref="IMessageFilter"/> to remove</param>
         public void RemoveMessageFilter(IMessageFilter messageFilter)
         {
-            _messageFilters -= messageFilter.PreFilterMessage;
+            _messageFilters = _messageFilters
+                .Where(func => func != messageFilter.PreFilterMessage)
+                .ToFSharpList();
         }
 
         #endregion Methods
@@ -3446,10 +3459,16 @@ namespace Extract.DataEntry
                     // If focus returned via a mouse press and we have already determined which
                     // data entry control should receive focus as a result, set focus back to that
                     // control.
-                    if (_clickedDataEntryControl != null)
+                    if (_clickedDataEntryControl is Control clickedControl)
                     {
                         newActiveDataControl = _clickedDataEntryControl;
-                        ((Control)_clickedDataEntryControl).Focus();
+
+                        // Don't call Focus() if the control already has focus because this will cause a dropped-down combo box to close
+                        // https://extract.atlassian.net/browse/ISSUE-799
+                        if (!clickedControl.Focused)
+                        {
+                            clickedControl.Focus();
+                        }
                     }
                     else if (lastActiveDataControl != null)
                     {

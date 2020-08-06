@@ -1,5 +1,3 @@
-using Extract.Licensing;
-using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -18,205 +16,47 @@ namespace Extract.DataEntry
     /// with an <see cref="IAttribute"/> to be viewed and changed to one of list of pre-defined
     /// values.
     /// </summary>
-    public partial class DataEntryComboBox : ComboBox, IDataEntryControl, IRequiresErrorProvider, IDataEntryAutoCompleteControl
+    public partial class DataEntryComboBox : LuceneComboBox, IDataEntryTextControl
     {
-        #region Constants
-
-        /// <summary>
-        /// The name of the object to be used in the validate license calls.
-        /// </summary>
-        static readonly string _OBJECT_NAME = typeof(DataEntryComboBox).ToString();
-
-        #endregion Constants
-
-        #region Fields
-
-        /// <summary>
-        /// The name used to identify the <see cref="IAttribute"/> to be  associated with the text 
-        /// box.
-        /// </summary>
-        string _attributeName;
-
-        /// <summary>
-        /// The <see cref="DataEntryControlHost"/> to which this control belongs
-        /// </summary>
-        DataEntryControlHost _dataEntryControlHost;
-
-        /// <summary>
-        /// Used to specify the data entry control which is mapped to the parent of the attribute 
-        /// to which the current combobox is to be mapped.
-        /// </summary>
-        IDataEntryControl _parentDataEntryControl;
-
-        /// <summary>
-        /// The selection mode to use when multiple attributes are found which match the attribute 
-        /// name for this control.
-        /// </summary>
-        MultipleMatchSelectionMode _multipleMatchSelectionMode = 
+        // The selection mode to use when multiple attributes are found which match the attribute 
+        // name for this control.
+        MultipleMatchSelectionMode _multipleMatchSelectionMode =
             MultipleMatchSelectionMode.None;
 
-        /// <summary>
-        /// Specifies whether this control should allow input via image swipe.
-        /// </summary>
+        // Specifies whether this control should allow input via image swipe.
         bool _supportsSwiping = true;
 
-        /// <summary>
-        /// Specifies whether the control should remain disabled at all times.
-        /// </summary>
-        bool _disabled;
-
-        /// <summary>
-        /// Specifies whether the clipboard contents should be cleared after pasting into the
-        /// control.
-        /// </summary>
-        bool _clearClipboardOnPaste;
-
-        /// <summary>
-        /// Specifies whether descendant attributes in other controls should be highlighted when
-        /// this attribute is selected.
-        /// </summary>
-        bool _highlightSelectionInChildControls;
-
-        /// <summary>
-        /// The attribute mapped to this control.
-        /// </summary>
-        IAttribute _attribute;
-
-        /// <summary>
-        /// The filename of the rule file to be used to parse swiped data.
-        /// </summary>
+        // The filename of the rule file to be used to parse swiped data.
         string _formattingRuleFileName;
 
-        /// <summary>
-        /// The formatting rule to be used when processing text from image swipes.
-        /// </summary>
-        IRuleSet _formattingRule;
+        // The template object to be used as a model for per-attribute validation objects.
+        readonly DataEntryValidator _validatorTemplate = new DataEntryValidator();
 
-        /// <summary>
-        /// The template object to be used as a model for per-attribute validation objects.
-        /// </summary>
-        DataEntryValidator _validatorTemplate = new DataEntryValidator();
-
-        /// <summary>
-        /// The validator currently being used to validate the control's attribute.
-        /// </summary>
-        IDataEntryValidator _activeValidator;
-
-        /// <summary>
-        /// The error provider to be used to indicate data validation problems to the user.
-        /// </summary>
-        ErrorProvider _validationErrorProvider;
-
-        /// <summary>
-        /// The error provider to be used to indicate data validation warnings to the user.
-        /// </summary>
-        ErrorProvider _validationWarningErrorProvider;
-
-        /// <summary>
-        /// A query which will cause value to automatically be updated using the values from other
-        /// <see cref="IAttribute"/>'s and/or a database query.
-        /// </summary>
-        string _autoUpdateQuery;
-
-        /// <summary>
-        /// A query which will cause the validation list to be updated using the values from other
-        /// <see cref="IAttribute"/>'s and/or a database query.
-        /// </summary>
-        string _validationQuery;
-
-        /// <summary>
-        /// Specifies under what circumstances the control's attribute should serve as a tab stop.
-        /// </summary>
-        TabStopMode _tabStopMode = TabStopMode.Always;
-
-        /// <summary>
-        /// Specifies whether the mapped attribute's value should be saved.
-        /// </summary>
-        bool _persistAttribute = true;
-
-        /// <summary>
-        /// Specifies whether carriage return or new line characters will be replaced with spaces.
-        /// </summary>
-        bool _removeNewLineChars = true;
-
-        /// <summary>
-        /// Specifies whether the current instance is running in design mode
-        /// </summary>
-        bool _inDesignMode;
-
-        /// <summary>
-        /// Indicates whether the combo box is currently active.
-        /// </summary>
+        // Indicates whether the combo box is currently active.
         bool _isActive;
 
-        /// <summary>
-        /// Indicates whether an update of the auto-complete list was requested, but the update was
-        /// postponed because <see cref="DataEntryControlHost"/> UpdateInProgress returned.
-        /// <see langword="true"/>.
-        /// </summary>
-        bool _autoCompleteUpdatePending;
-
-        /// <summary>
-        /// The active <see cref="FontStyle"/> for the control.
-        /// </summary>
+        // The active FontStyle for the control.
         FontStyle _fontStyle;
-
-        LuceneAutoSuggest _luceneAutoSuggest;
-
-        #endregion Fields
-
-        #region Delegates
-
-        /// <summary>
-        /// Signature to use for invoking parameterless methods.
-        /// </summary>
-        delegate void ParameterlessDelegate();
-
-        /// <summary>
-        /// Signature to use for invoking methods that accept one <see cref="FontStyle"/> parameter.
-        /// </summary>
-        /// <param name="fontStyle">A <see cref="FontStyle"/> parameter.</param>
-        delegate void FontStyleDelegate(FontStyle fontStyle);
-
-        #endregion Delegates
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new <see cref="DataEntryComboBox"/> instance.
         /// </summary>
-        public DataEntryComboBox()
+        public DataEntryComboBox() : base()
         {
             try
             {
-                _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
-
-                // Load licenses in design mode
-                if (_inDesignMode)
-                {
-                    // Load the license files from folder
-                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-                }
-
-                // Validate the license
-                LicenseUtilities.ValidateLicense(
-                    LicenseIdName.DataEntryCoreComponents, "ELI25534", _OBJECT_NAME);
-
                 InitializeComponent();
 
                 _fontStyle = Font.Style;
 
-                _luceneAutoSuggest = new LuceneAutoSuggest(this);
+                LastSelectionStart = SelectionStart;
+                LastSelectionLength = SelectionLength;
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI25535", ex);
             }
         }
-
-        #endregion Constructors
-
-        #region Properties
 
         /// <summary>
         /// Gets or sets the name identifying the <see cref="IAttribute"/> to be associated with 
@@ -231,20 +71,7 @@ namespace Extract.DataEntry
         /// <returns>The name identifying the <see cref="IAttribute"/> to be associated with the 
         /// <see cref="DataEntryComboBox"/>.</returns>
         [Category("Data Entry Combo Box")]
-        public string AttributeName
-        {
-            get
-            {
-                return _attributeName;
-            }
-
-            set
-            {
-                // TODO: Assert that either ParentDataEntryControl or AttributeName must be non-null.
-
-                _attributeName = value;
-            }
-        }
+        public string AttributeName { get; set; }
 
         /// <summary>
         /// Gets or sets the selection mode to use to find the mapped attribute for the
@@ -302,11 +129,6 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    if (value != _formattingRuleFileName)
-                    {
-                        _formattingRule = null;
-                    }
-
                     _formattingRuleFileName = value;
                 }
                 catch (Exception ex)
@@ -366,18 +188,7 @@ namespace Extract.DataEntry
         [Category("Data Entry Combo Box")]
         [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design", typeof(UITypeEditor)), Localizable(true)]
         [DefaultValue(null)]
-        public string ValidationQuery
-        {
-            get
-            {
-                return _validationQuery;
-            }
-
-            set
-            {
-                _validationQuery = value;
-            }
-        }
+        public string ValidationQuery { get; set; }
 
         /// <summary>
         /// Gets or sets whether a value that matches a validation list item case-insensitively but
@@ -473,18 +284,7 @@ namespace Extract.DataEntry
         [Category("Data Entry Combo Box")]
         [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design", typeof(UITypeEditor)), Localizable(true)]
         [DefaultValue(null)]
-        public string AutoUpdateQuery
-        {
-            get
-            {
-                return _autoUpdateQuery;
-            }
-
-            set
-            {
-                _autoUpdateQuery = value;
-            }
-        }
+        public string AutoUpdateQuery { get; set; }
 
         /// <summary>
         /// Specifies under what circumstances the <see cref="DataEntryComboBox"/>'s
@@ -496,18 +296,7 @@ namespace Extract.DataEntry
         /// tab stop.</returns>
         [Category("Data Entry Combo Box")]
         [DefaultValue(TabStopMode.Always)]
-        public TabStopMode TabStopMode
-        {
-            get
-            {
-                return _tabStopMode;
-            }
-
-            set
-            {
-                _tabStopMode = value;
-            }
-        }
+        public TabStopMode TabStopMode { get; set; } = TabStopMode.Always;
 
         /// <summary>
         /// Gets or sets whether the mapped <see cref="IAttribute"/>'s value should be saved.
@@ -519,19 +308,7 @@ namespace Extract.DataEntry
         /// <see langword="false"/> otherwise.</returns>
         [Category("Data Entry Combo Box")]
         [DefaultValue(true)]
-        public bool PersistAttribute
-        {
-            get
-            {
-                return _persistAttribute;
-            }
-
-            set
-            {
-                _persistAttribute = value;
-            }
-        }
-
+        public bool PersistAttribute { get; set; } = true;
 
         /// <summary>
         /// Gets or sets whether carriage return or new line characters will be replaced with
@@ -547,27 +324,22 @@ namespace Extract.DataEntry
         /// replaced; <see langword="false"/> otherwise.</returns>
         [Category("Data Entry Combo Box")]
         [DefaultValue(true)]
-        public bool RemoveNewLineChars
-        {
-            get
-            {
-                return _removeNewLineChars;
-            }
-
-            set
-            {
-                _removeNewLineChars = value;
-            }
-        }
+        public bool RemoveNewLineChars { get; set; } = true;
 
         /// <summary>
-        /// The <see cref="DataEntryAutoCompleteMode"/> to use
+        /// The attribute mapped to this control.
         /// </summary>
-        public new DataEntryAutoCompleteMode AutoCompleteMode { get; set; } = DataEntryAutoCompleteMode.SuggestLucene;
+        public IAttribute Attribute { get; private set; }
 
-        #endregion Properties
+        /// <summary>
+        /// The last noted selection start.
+        /// </summary>
+        public int LastSelectionStart { get; private set; }
 
-        #region Overrides
+        /// <summary>
+        /// The last noted selection length.
+        /// </summary>
+        public int LastSelectionLength { get; private set; }
 
         /// <summary>
         /// Handles changes to the text of the control by updating the underlying
@@ -581,13 +353,16 @@ namespace Extract.DataEntry
                 base.OnTextChanged(e);
 
                 // Only apply data if the combo box is currently mapped
-                if (_attribute != null)
+                if (Attribute != null)
                 {
-                    AttributeStatusInfo.SetValue(_attribute, Text, true, false);
+                    AttributeStatusInfo.SetValue(Attribute, Text, true, false);
                 }
 
+                // Check for selection change as a result of the text change.
+                ProcessSelectionChange();
+
                 // Display a validation error icon if needed.
-                UpdateValidation();
+                UpdateValidation(Validate(false, out var _));
             }
             catch (Exception ex)
             {
@@ -606,38 +381,14 @@ namespace Extract.DataEntry
                 base.OnSelectedIndexChanged(e);
 
                 // Only apply data if the combo box is currently mapped.
-                if (_attribute != null)
+                if (Attribute != null)
                 {
-                    AttributeStatusInfo.SetValue(_attribute, Text, true, true);
+                    AttributeStatusInfo.SetValue(Attribute, Text, true, true);
                 }
-
-                // Display or clear a validation error icon if needed.
-                UpdateValidation();
             }
             catch (Exception ex)
             {
                 ExtractException.Display("ELI25551", ex);
-            }
-        }
-
-        /// <summary>
-        /// Handles the case the focus has changed to another control.  At this point, attempt to
-        /// use validation to correct capitalization differences with a validation list.
-        /// </summary>
-        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        protected override void OnLostFocus(EventArgs e)
-        {
-            try
-            {
-                base.OnLostFocus(e);
-
-                // If a validation list is supplied, this will correct capitalization differences
-                // with a list item.
-                Validate(true);
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI25543", ex);
             }
         }
 
@@ -649,38 +400,19 @@ namespace Extract.DataEntry
         {
             try
             {
-                // [DataEntry:295]
-                // Ctrl + A is not implemented by the base ComboBox class.
-                if (e.KeyCode == Keys.A && e.Control)
-                {
-                    SelectAll();
-
-                    e.Handled = true;
-                }
                 // If the delete key is pressed while all text is selected or when using
                 // DropDownList, delete spatial info.
-                else if (e.KeyCode == Keys.Delete && _attribute != null &&
-                            (DropDownStyle == ComboBoxStyle.DropDownList || 
-                             SelectionLength == base.Text.Length))
+                if (e.KeyCode == Keys.Delete
+                    && Attribute != null
+                    && (DroppedDown || SelectionLength == base.Text.Length))
                 {
-                    AttributeStatusInfo.RemoveSpatialInfo(_attribute);
+                    AttributeStatusInfo.RemoveSpatialInfo(Attribute);
                 }
 
                 base.OnKeyDown(e);
 
-                // [DataEntry:443]
-                // When an auto-complete list entry is selected (whether via clicking on an item or
-                // pressing enter) an enter key press will be registered. If an auto-complete list
-                // is active, an enter key press was registered, all text is selected an the text
-                // leads off with a space, trim off the space that is very likely the special space
-                // that was added for all entries in the auto-complete list.
-                if (e.KeyCode == Keys.Return && AutoCompleteCustomSource != null &&
-                    AutoCompleteCustomSource.Count > 0 && !string.IsNullOrEmpty(Text) &&
-                    Text.Length > 1 && SelectionLength == Text.Length && Text[0] == ' ')
-                {
-                    Text = Text.Substring(1);
-                    SelectAll();
-                }
+                // Check for selection change.
+                ProcessSelectionChange();
             }
             catch (Exception ex)
             {
@@ -689,123 +421,42 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets or sets the text associated with this <see cref="DataEntryTextBox"/>.
+        /// Adds back newlines if not permanently replaced
         /// </summary>
-        /// <value>The text associated with this <see cref="DataEntryTextBox"/>.</value>
-        /// <returns>The text associated with this <see cref="DataEntryTextBox"/>.</returns>
-        public override string Text
+        protected override string FormatForTextGetter(string text)
         {
-            get
+            // Add carriage returns back so that caller will not know they were replaced
+            // internally.
+            if (!RemoveNewLineChars && !string.IsNullOrEmpty(text))
             {
-                try
-                {
-                    string value = base.Text;
-
-                    // Add carriage returns back so that caller will not know they were replaced
-                    // internally.
-                    if (!_removeNewLineChars && !string.IsNullOrEmpty(value))
-                    {
-                        return value.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
-                    }
-
-                    return value;
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI26011");
-                    return "";
-                }
+                return text.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
             }
 
-            set
-            {
-                try
-                {
-                    if (!string.IsNullOrEmpty(value))
-                    {
-                        // Permanently replace newline chars with spaces if specified.
-                        if (_removeNewLineChars &&
-                            value.IndexOf("\r\n", StringComparison.Ordinal) >= 0)
-                        {
-                            // Replace a group of CRLFs with just a single space.
-                            value = Regex.Replace(value, "(\r\n)+", " ");
-                        }
-                        // Temporarily replace carriage returns or line feeds with no break spaces
-                        // to prevent the unprintable "boxes" from appearing.
-                        else if (!_removeNewLineChars)
-                        {
-                            value = value.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
-                        }
-                    }
-
-                    base.Text = value;
-                }
-                catch (Exception ex)
-                {
-                    ex.ExtractDisplay("ELI26012");
-                }
-            }
+            return text;
         }
 
         /// <summary>
-        /// Raises the <see cref="Control.PreviewKeyDown"/> event.
+        /// Replaces newlines in the value
         /// </summary>
-        /// <param name="e">A <see cref="PreviewKeyDownEventArgs"/> containing the event data.
-        /// </param>
-        // This event handler has undergone a security review.
-        //[SuppressMessage("Microsoft.Security", "CA2109:ReviewVisibleEventHandlers", MessageId = "0#")]
-        protected override void OnPreviewKeyDown(PreviewKeyDownEventArgs e)
+        protected override string FormatForTextSetter(string text)
         {
-            try
+            if (!string.IsNullOrEmpty(text))
             {
-                // [DataEntry:385]
-                // If the up or down arrow keys are pressed while the cursor is at the end of the
-                // text and the auto-complete list is not currently displayed, temporarily disable
-                // auto-complete to prevent some apparent memory issues with auto-complete that can
-                // otherwise cause garbage characters to appear at the end of the field.
-                if ((e.KeyCode == Keys.Up || e.KeyCode == Keys.Down) &&
-                    AutoCompleteMode == DataEntryAutoCompleteMode.SuggestAppend &&
-                    DropDownStyle != ComboBoxStyle.DropDownList &&
-                    SelectionStart == Text.Length && !FormsMethods.IsAutoCompleteDisplayed())
+                // Permanently replace newline chars with spaces if specified.
+                if (RemoveNewLineChars &&
+                    text.IndexOf("\r\n", StringComparison.Ordinal) >= 0)
                 {
-                    base.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.None;
+                    // Replace a group of CRLFs with just a single space.
+                    text = Regex.Replace(text, "(\r\n)+", " ");
                 }
-
-                base.OnPreviewKeyDown(e);
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI27655", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
-        /// Raises the <see cref="Control.KeyUp"/> event.
-        /// </summary>
-        /// <param name="e">A <see cref="KeyEventArgs"/> containing the event data.</param>
-        protected override void OnKeyUp(KeyEventArgs e)
-        {
-            try
-            {
-                base.OnKeyUp(e);
-
-                // If auto-complete was temporarily disabled to prevent arrow keys from exposing
-                // memory issues with auto-complete, re-enable autocomplete now.
-                if (DropDownStyle != ComboBoxStyle.DropDownList &&
-                    AutoCompleteMode == DataEntryAutoCompleteMode.SuggestAppend &&
-                    base.AutoCompleteMode == System.Windows.Forms.AutoCompleteMode.None)
+                // Temporarily replace carriage returns or line feeds with no break spaces
+                // to prevent the unprintable "boxes" from appearing.
+                else if (!RemoveNewLineChars)
                 {
-                    base.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+                    text = text.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
                 }
             }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI27656", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
+            return text;
         }
 
         /// <summary>
@@ -823,10 +474,10 @@ namespace Extract.DataEntry
                 // If the visibility of this control is changed after document load, the viewable
                 // status of the attribute needs to be updated so that highlights and validation
                 // are applied correctly.
-                if (_attribute != null &&
+                if (Attribute != null &&
                     DataEntryControlHost != null && !DataEntryControlHost.ChangingData)
                 {
-                    AttributeStatusInfo.MarkAsViewable(_attribute, Visible);
+                    AttributeStatusInfo.MarkAsViewable(Attribute, Visible);
                 }
             }
             catch (Exception ex)
@@ -847,8 +498,8 @@ namespace Extract.DataEntry
                 base.OnLeave(e);
 
                 if (_fontStyle == FontStyle.Bold &&
-                    _attribute != null && 
-                    AttributeStatusInfo.HasBeenViewedOrIsNotViewable(_attribute, false))
+                    Attribute != null &&
+                    AttributeStatusInfo.HasBeenViewedOrIsNotViewable(Attribute, false))
                 {
                     SetFontStyle(FontStyle.Regular);
                 }
@@ -859,9 +510,25 @@ namespace Extract.DataEntry
             }
         }
 
-        #endregion Overrides
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Forms.Control.MouseUp"/> event.
+        /// </summary>
+        /// <param name="e">The event data.</param>
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            try
+            {
+                base.OnMouseUp(e);
 
-        #region IDataEntryControl Events
+                // Check for selection change as a result of any mouse click.
+                ProcessSelectionChange();
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI50228", ex);
+            }
+        }
+
 
         /// <summary>
         /// Fired whenever the set of selected or active <see cref="IAttribute"/>(s) for a control
@@ -936,28 +603,6 @@ namespace Extract.DataEntry
             remove { }
         }
 
-        #endregion IDataEntryControl Events
-
-        #region IDataEntryControl Properties
-
-        /// <summary>
-        /// Gets or sets the <see cref="DataEntryControlHost"/> to which this control belongs
-        /// </summary>
-        /// <value>The <see cref="DataEntryControlHost"/> to which this control belongs.</value>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public DataEntryControlHost DataEntryControlHost
-        {
-            get
-            {
-                return _dataEntryControlHost;
-            }
-            set
-            {
-                _dataEntryControlHost = value;
-            }
-        }
-
         /// <summary>
         /// If the <see cref="DataEntryComboBox"/> is not intended to operate on root-level
         /// data, this property must be used to specify the <see cref="IDataEntryControl"/> which is
@@ -970,18 +615,7 @@ namespace Extract.DataEntry
         /// <seealso cref="IDataEntryControl"/>
         [Category("Data Entry Control")]
         [DefaultValue(null)]
-        public IDataEntryControl ParentDataEntryControl
-        {
-            get
-            {
-                return _parentDataEntryControl;
-            }
-
-            set
-            {
-                _parentDataEntryControl = value;
-            }
-        }
+        public IDataEntryControl ParentDataEntryControl { get; set; }
 
         /// <summary>
         /// If <see langword="true"/>, the text box will accept as input the 
@@ -995,7 +629,7 @@ namespace Extract.DataEntry
         {
             get
             {
-                if (_inDesignMode)
+                if (InDesignMode)
                 {
                     return _supportsSwiping;
                 }
@@ -1003,7 +637,7 @@ namespace Extract.DataEntry
                 {
                     // If control isn't enabled or no attribute has been mapped, swiping is not
                     // currently supported.
-                    return (_supportsSwiping && base.Enabled && _attribute != null);
+                    return (_supportsSwiping && base.Enabled && Attribute != null);
                 }
             }
 
@@ -1024,18 +658,7 @@ namespace Extract.DataEntry
         /// <see langword="false"/> otherwise.</returns>
         [Category("Data Entry Control")]
         [DefaultValue(false)]
-        public bool Disabled
-        {
-            get
-            {
-                return _disabled;
-            }
-
-            set
-            {
-                _disabled = value;
-            }
-        }
+        public bool Disabled { get; set; }
 
         /// <summary>
         /// Gets or sets whether the clipboard contents should be cleared after pasting into the
@@ -1045,18 +668,7 @@ namespace Extract.DataEntry
         /// <see langword="false"/> otherwise.</value>
         [Category("Data Entry Control")]
         [DefaultValue(false)]
-        public bool ClearClipboardOnPaste
-        {
-            get
-            {
-                return _clearClipboardOnPaste;
-            }
-
-            set
-            {
-                _clearClipboardOnPaste = value;
-            }
-        }
+        public bool ClearClipboardOnPaste { get; set; }
 
         /// <summary>
         /// Gets or sets whether descendant attributes in other controls should be highlighted when
@@ -1066,22 +678,9 @@ namespace Extract.DataEntry
         /// highlighted when this attribute is selected; <see langword="false"/> otherwise.</value>
         [Category("Data Entry Control")]
         [DefaultValue(false)]
-        public bool HighlightSelectionInChildControls
-        {
-            get
-            {
-                return _highlightSelectionInChildControls;
-            }
+        public bool HighlightSelectionInChildControls { get; set; }
 
-            set
-            {
-                _highlightSelectionInChildControls = value;
-            }
-        }
 
-        #endregion IDataEntryControl Properties
-
-        #region IDataEntryControl Methods
 
         /// <summary>
         /// Specifies the domain of <see cref="IAttribute"/>s from which the 
@@ -1105,41 +704,41 @@ namespace Extract.DataEntry
                 // would not be mapped into the attribute hierarchy.
                 // Also, prevent it from being enabled if explicitly disabled via the
                 // IDataEntryControl interface.
-                base.Enabled = (sourceAttributes != null && !_disabled);
+                base.Enabled = (sourceAttributes != null && !Disabled);
 
                 if (sourceAttributes == null)
                 {
                     // If the source attribute is null, clear existing data and do not attempt to
                     // map to a new attribute.
-                    _attribute = null;
+                    Attribute = null;
                     SelectedIndex = -1;
                 }
                 else
                 {
                     // Stop listening to the previous active validator (if there is one)
-                    if (_activeValidator != null)
+                    if (ActiveValidator != null)
                     {
-                        _activeValidator.AutoCompleteValuesChanged -= HandleAutoCompleteValuesChanged;
-                        _activeValidator = null;
+                        ActiveValidator.AutoCompleteValuesChanged -= HandleAutoCompleteValuesChanged;
+                        ActiveValidator = null;
                     }
 
                     // Attempt to find a mapped attribute from the provided vector.  Create a new 
                     // attribute if no such attribute can be found.
-                    _attribute = DataEntryMethods.InitializeAttribute(_attributeName,
-                        _multipleMatchSelectionMode, !string.IsNullOrEmpty(_attributeName),
-                        sourceAttributes, null, this, null, false, _tabStopMode, _validatorTemplate, 
-                        _autoUpdateQuery, _validationQuery);
+                    Attribute = DataEntryMethods.InitializeAttribute(AttributeName,
+                        _multipleMatchSelectionMode, !string.IsNullOrEmpty(AttributeName),
+                        sourceAttributes, null, this, null, false, TabStopMode, _validatorTemplate,
+                        AutoUpdateQuery, ValidationQuery);
 
                     // Update the combo box using the new attribute's validator (if there is one).
-                    if (_attribute != null)
+                    if (Attribute != null)
                     {
-                        _activeValidator = AttributeStatusInfo.GetStatusInfo(_attribute).Validator;
+                        ActiveValidator = AttributeStatusInfo.GetStatusInfo(Attribute).Validator;
 
-                        if (_activeValidator != null)
+                        if (ActiveValidator != null)
                         {
                             UpdateComboBoxItems();
 
-                            _activeValidator.AutoCompleteValuesChanged +=
+                            ActiveValidator.AutoCompleteValuesChanged +=
                                 HandleAutoCompleteValuesChanged;
                         }
                     }
@@ -1147,36 +746,27 @@ namespace Extract.DataEntry
                     if (base.Visible)
                     {
                         // Mark the attribute as visible if the combobox is visible
-                        AttributeStatusInfo.MarkAsViewable(_attribute, true);
+                        AttributeStatusInfo.MarkAsViewable(Attribute, true);
 
                         // [DataEntry:327] If this control is active, ensure the attribute is marked as viewed.
                         if (_isActive)
                         {
-                            AttributeStatusInfo.MarkAsViewed(_attribute, true);
+                            AttributeStatusInfo.MarkAsViewed(Attribute, true);
                         }
                     }
 
                     // If not persisting the attribute, mark the attribute accordingly.
-                    if (!_persistAttribute)
+                    if (!PersistAttribute)
                     {
-                        AttributeStatusInfo.SetAttributeAsPersistable(_attribute, false);
+                        AttributeStatusInfo.SetAttributeAsPersistable(Attribute, false);
                     }
 
                     // If the attribute has not been viewed, apply bold font. Otherwise, use
                     // regular font.
-                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewedOrIsNotViewable(_attribute, false);
+                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewedOrIsNotViewable(Attribute, false);
                     if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
                     {
                         SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
-                    }
-
-                    // If the text value is not editable (DropDownList style), use the first value in
-                    // the list as the default value.  Otherwise, allow the value to initialize to
-                    // blank.
-                    if (base.Items.Count > 0 && base.DropDownStyle == ComboBoxStyle.DropDownList &&
-                        base.FindStringExact(_attribute.Value.String) == ListBox.NoMatches)
-                    {
-                        base.SelectedIndex = 0;
                     }
                 }
 
@@ -1206,20 +796,25 @@ namespace Extract.DataEntry
             {
                 // The combo box should be displayed as active only if it is editable and mapped to
                 // an attribute.
-                _isActive = (setActive && _attribute != null);
+                _isActive = (setActive && Attribute != null);
 
                 // Change the background color to display active status.
                 if (_isActive)
                 {
-                    base.BackColor = color;
+                    BackColor = color;
 
                     // Mark the attribute as having been viewed and update the attribute's status
                     // info accordingly.
-                    AttributeStatusInfo.MarkAsViewed(_attribute, true);
+                    AttributeStatusInfo.MarkAsViewed(Attribute, true);
+
+                    if (_fontStyle == FontStyle.Bold)
+                    {
+                        SetFontStyle(FontStyle.Regular);
+                    }
                 }
                 else
                 {
-                    base.ResetBackColor();
+                    ResetBackColor();
                 }
 
                 Invalidate();
@@ -1253,7 +848,7 @@ namespace Extract.DataEntry
             bool selectTabGroup)
         {
             ExtractException.Assert("ELI25547", "Unexpected attribute!",
-                attribute == null || attribute == _attribute);
+                attribute == null || attribute == Attribute);
         }
 
         /// <summary>
@@ -1262,7 +857,7 @@ namespace Extract.DataEntry
         /// </summary>
         public virtual void RefreshAttributes()
         {
-            RefreshAttributes(true, _attribute);
+            RefreshAttributes(true, Attribute);
         }
 
         /// <summary>
@@ -1275,24 +870,21 @@ namespace Extract.DataEntry
         /// </param>
         public virtual void RefreshAttributes(bool spatialInfoUpdated,
             params IAttribute[] attributes)
-            
+
         {
             try
             {
-                if (_attribute != null && attributes.Contains(_attribute))
+                if (Attribute != null && attributes.Contains(Attribute))
                 {
-                    // Don't update the value if the value hasn't actually changed. Doing so is not
-                    // only in-efficient but it can cause un-intended side effects if an
-                    // auto-complete list is active.
-                    string newValue = (_attribute.Value != null) ? _attribute.Value.String : "";
+                    string newValue = Attribute.Value?.String ?? "";
                     if (newValue != Text || spatialInfoUpdated)
                     {
-                        Text = (_attribute.Value != null) ? _attribute.Value.String : "";
+                        Text = (Attribute.Value != null) ? Attribute.Value.String : "";
                     }
 
                     // In case the value itself didn't change but the validation list did,
                     // explicitly check validation here.
-                    UpdateValidation();
+                    UpdateValidation(Validate(false, out var _));
 
                     // Raise the AttributesSelected event to re-notify the host of the spatial
                     // information associated with the attribute in case the spatial info has
@@ -1300,7 +892,7 @@ namespace Extract.DataEntry
                     OnAttributesSelected();
 
                     // Update the font according to the viewed status.
-                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewedOrIsNotViewable(_attribute, false);
+                    bool hasBeenViewed = AttributeStatusInfo.HasBeenViewedOrIsNotViewable(Attribute, false);
                     if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
                     {
                         SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
@@ -1341,7 +933,7 @@ namespace Extract.DataEntry
             {
                 // If control isn't enabled or no attribute has been mapped, swiping is not
                 // currently supported.
-                if (!base.Enabled || _attribute == null)
+                if (!base.Enabled || Attribute == null)
                 {
                     return false;
                 }
@@ -1350,29 +942,29 @@ namespace Extract.DataEntry
                 {
                     // Find the appropriate attribute (if there is one) from the rule's output.
                     IAttribute attribute = DataEntryMethods.RunFormattingRule(
-                        FormattingRuleFile, swipedText, _attributeName, _multipleMatchSelectionMode);
+                        FormattingRuleFile, swipedText, AttributeName, _multipleMatchSelectionMode);
 
                     if (attribute != null && !string.IsNullOrEmpty(attribute.Value.String))
                     {
                         // Use the resulting attribute's value if one was found.
-                        AttributeStatusInfo.SetValue(_attribute, attribute.Value, false, true);
+                        AttributeStatusInfo.SetValue(Attribute, attribute.Value, false, true);
                     }
                     else
                     {
                         // If the rules did not find anything, go ahead and use the swiped text
                         // as the attribute value.
-                        AttributeStatusInfo.SetValue(_attribute, swipedText, false, true);
+                        AttributeStatusInfo.SetValue(Attribute, swipedText, false, true);
                     }
                 }
                 else
                 {
                     // If there is no formatting rule specified, simply assign the swiped text
                     // as the current attribute's value.
-                    AttributeStatusInfo.SetValue(_attribute, swipedText, false, true);
+                    AttributeStatusInfo.SetValue(Attribute, swipedText, false, true);
                 }
 
                 // Consider the attribute un-accepted after a swipe.
-                AttributeStatusInfo.AcceptValue(_attribute, false);
+                AttributeStatusInfo.AcceptValue(Attribute, false);
 
                 // Update text value of this control and raise the events that need to be raised
                 // in conjunction with an attribute change.
@@ -1403,7 +995,18 @@ namespace Extract.DataEntry
         /// <param name="selectionState">The <see cref="SelectionState"/> to apply.</param>
         public void ApplySelection(SelectionState selectionState)
         {
-            // Nothing to do.
+            try
+            {
+                if (selectionState is TextControlSelectionState textBoxSelectionState)
+                {
+                    SelectionStart = textBoxSelectionState.SelectionStart;
+                    SelectionLength = textBoxSelectionState.SelectionLength;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI50227", ex);
+            }
         }
 
         /// <summary>
@@ -1436,9 +1039,7 @@ namespace Extract.DataEntry
             }
         }
 
-        #endregion IDataEntryControl Methods
 
-        #region IDataEntryControl Event Handlers
 
         /// <summary>
         /// Handles the case that this <see cref="IDataEntryControl"/>'s 
@@ -1459,7 +1060,7 @@ namespace Extract.DataEntry
                 // propagated.
                 if (e.Attributes != null && e.Attributes.Size() == 1)
                 {
-                    base.Enabled = !_disabled;
+                    base.Enabled = !Disabled;
 
                     // This is a dependent child to the sender. Re-map this control using the
                     // updated attribute's children.
@@ -1473,7 +1074,7 @@ namespace Extract.DataEntry
                     // a sub-attribute of the provided attribute. If no attribute name is specified,
                     // this is a "sibling" control likely intended to display details of the currently
                     // selected attribute in a multi-selection control.
-                    if (!string.IsNullOrEmpty(_attributeName))
+                    if (!string.IsNullOrEmpty(AttributeName))
                     {
                         SetAttributes(propagatedAttribute.SubAttributes);
                     }
@@ -1500,63 +1101,6 @@ namespace Extract.DataEntry
             }
         }
 
-        #endregion IDataEntryControl Event Handlers
-
-        #region IRequiresErrorProvider Members
-
-        /// <summary>
-        /// Specifies the standard <see cref="ErrorProvider"/>s that should be used to 
-        /// display data validation errors.
-        /// </summary>
-        /// <param name="validationErrorProvider">The standard <see cref="ErrorProvider"/> that
-        /// should be used to display data validation errors.</param>
-        /// <param name="validationWarningErrorProvider">The <see cref="ErrorProvider"/> that should
-        /// be used to display data validation warnings.</param>
-        public void SetErrorProviders(ErrorProvider validationErrorProvider,
-            ErrorProvider validationWarningErrorProvider)
-        {
-            _validationErrorProvider = validationErrorProvider;
-            _validationWarningErrorProvider = validationWarningErrorProvider;
-        }
-
-        #endregion IRequiresErrorProvider Members
-
-        #region Private Members
-
-        /// <summary>
-        /// Gets the <see cref="IRuleSet"/> that should be used to reformat or
-        /// split <see cref="SpatialString"/> content passed into 
-        /// <see cref="IDataEntryControl.ProcessSwipedText"/> for this control.
-        /// </summary>
-        /// <returns>The <see cref="IRuleSet"/> that should be used. Can be <see langword="null"/>
-        /// if no formatting rule has been specified.</returns>
-        IRuleSet FormattingRule
-        {
-            get
-            {
-                try
-                {
-                    // If not in design mode and a formatting rule is specified, attempt to load an
-                    // attribute finding rule.
-                    if (!_inDesignMode && _formattingRule == null &&
-                        !string.IsNullOrEmpty(_formattingRuleFileName))
-                    {
-                        _formattingRule = (IRuleSet)new RuleSetClass();
-                        _formattingRule.LoadFrom(
-                            DataEntryMethods.ResolvePath(_formattingRuleFileName), false);
-                    }
-
-                    return _formattingRule;
-                }
-                catch (Exception ex)
-                {
-                    // If we failed to load the rule, don't attempt to load it again.
-                    _formattingRuleFileName = null;
-
-                    throw ex.AsExtract("ELI35377");
-                }
-            }
-        }
 
         /// <summary>
         /// Updates the text value of this control and raise the events that need to be raised
@@ -1565,12 +1109,10 @@ namespace Extract.DataEntry
         /// </summary>
         void OnAttributeChanged()
         {
-            // Display the attribute text.
-            Text = (_attribute != null && _attribute.Value != null)
-                ? _attribute.Value.String : "";
+            Text = Attribute?.Value?.String ?? "";
 
-            // Display a validation error icon if needed.
-            UpdateValidation();
+            // Display the attribute text.
+            UpdateValidation(Validate(false, out var _));
 
             // Raise the AttributesSelected event to signal that the spatial information
             // associated with this control has changed.
@@ -1588,8 +1130,7 @@ namespace Extract.DataEntry
         {
             if (AttributesSelected != null)
             {
-                var selectionState = new SelectionState(this,
-                    DataEntryMethods.AttributeAsVector(_attribute), false, true, null);
+                var selectionState = SelectionState.Create(this);
                 AttributesSelected(this, new AttributesSelectedEventArgs(selectionState));
             }
         }
@@ -1601,7 +1142,7 @@ namespace Extract.DataEntry
         {
             if (PropagateAttributes != null)
             {
-                if (_attribute == null)
+                if (Attribute == null)
                 {
                     // If the combo box is not currently mapped to an attribute, it should propagate
                     // null so all dependent controls are unmapped.
@@ -1613,64 +1154,15 @@ namespace Extract.DataEntry
                     // Propagate the mapped attribute.
                     PropagateAttributes(this,
                         new AttributesEventArgs(
-                            DataEntryMethods.AttributeAsVector(_attribute)));
+                            DataEntryMethods.AttributeAsVector(Attribute)));
                 }
             }
-            else if (_attribute != null)
+            else if (Attribute != null)
             {
                 // If there are no dependent controls registered to receive this event, consider
                 // the attribute propagated.
-                AttributeStatusInfo.MarkAsPropagated(_attribute, true, true);
+                AttributeStatusInfo.MarkAsPropagated(Attribute, true, true);
             }
-        }
-
-        /// <summary>
-        /// Tests to see if the control's data fails to match any validation requirements it has.
-        /// <para><b>NOTE:</b></para>
-        /// If the items used to populate the combo box are not specified explicitly via the
-        /// Items property, the items from the validation list (if
-        /// provided) will be used to populate the combo box.
-        /// </summary>
-        /// <param name="correctValue">If <see langword="true"/>, a list of valid values is provided
-        /// and the <see cref="DataEntryTextBox"/>'s value matches a value in the supplied list  
-        /// case-insensitively but not case-sensitively or the value is different only due to
-        /// leading or trailing spaces, the value will be modified to match the value in the
-        /// supplied list.</param>
-        /// <returns>If the data is valid or <see paramref="throwException"/> is
-        /// <see langword="false"/> a <see cref="DataValidity"/> value indicating the validity of
-        /// the data.
-        /// </returns>
-        DataValidity Validate(bool correctValue)
-        {
-            // If there is no mapped attribute, the control is disabled or there is not active
-            // validator, the data cannot be validated.
-            if (_disabled || _attribute == null || _activeValidator == null)
-            {
-                return DataValidity.Valid;
-            }
-
-            DataValidity dataValidity;
-
-            if (correctValue)
-            {
-                // If the attribute's value should be removed of extra whitespace and made to match
-                // the casing in the validator, provide a variable to retrieve a corrected value.
-                string correctedValue;
-                dataValidity = AttributeStatusInfo.Validate(_attribute, false, out correctedValue);
-
-                // If a corrected value was returned, apply it to the combo box.
-                if (!string.IsNullOrEmpty(correctedValue))
-                {
-                    Text = correctedValue;
-                }
-            }
-            else
-            {
-                // Do not auto-correct whitespace, casing... just validate.
-                dataValidity = AttributeStatusInfo.Validate(_attribute, false);
-            }
-
-            return dataValidity;
         }
 
         /// <summary>
@@ -1687,231 +1179,54 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26161", ex);
-                ee.AddDebugData("Event data", e, false);
-                throw ee;
+                ex.ExtractDisplay("ELI26161");
             }
         }
 
-        /// <summary>
-        /// Updates the items in the ComboBox list to reflect the current values in the
-        /// auto-complete list.
-        /// </summary>
-        void UpdateComboBoxItems()
+        // Determines validity of _attribute and optionally creates a corrected value
+        DataValidity Validate(bool correctValue, out string correctedValue)
         {
-            // Post a message to update the autocomplete values on the message queue. This way we
-            // can be sure that the list will not be updated as part of a key event handler (which
-            // can lead to access violations.
-            BeginInvoke(new ParameterlessDelegate(UpdateComboBoxItemsDirect));
+            if (ActiveValidator == null || Attribute == null)
+            {
+                correctedValue = null;
+                return DataValidity.Valid;
+            }
+            DataValidity dataValidity;
+            if (correctValue)
+            {
+                dataValidity = ActiveValidator.Validate(Attribute, false, out correctedValue);
+            }
+            else
+            {
+                dataValidity = ActiveValidator.Validate(Attribute, false);
+                correctedValue = null;
+            }
+
+            return dataValidity;
         }
 
-        /// <summary>
-        /// Helper method for UpdateComboBoxItems. UpdateComboBoxItemsDirect should not be called 
-        /// directly to ensure auto-complete lists are never updated during a keystroke event.
-        /// </summary>
-        void UpdateComboBoxItemsDirect()
-        {
-            try
-            {
-                // If the host reports that an update is in progress, delay updating the auto-complete
-                // list since the update may otherwise result in the auto-complete list being changed
-                // multiple times before the update is over.
-                if (DataEntryControlHost != null && DataEntryControlHost.UpdateInProgress)
-                {
-                    if (!_autoCompleteUpdatePending)
-                    {
-                        _autoCompleteUpdatePending = true;
-                        DataEntryControlHost.UpdateEnded += HandleDataEntryControlHostUpdateEnded;
-                    }
-
-                    return;
-                }
-                else if (_autoCompleteUpdatePending)
-                {
-                    DataEntryControlHost.UpdateEnded -= HandleDataEntryControlHostUpdateEnded;
-                    _autoCompleteUpdatePending = false;
-                }
-
-                // _attribute could have been set to null in between the time this method invocation
-                // was added to the queue and now.
-                // https://extract.atlassian.net/browse/ISSUE-14347
-                if (_attribute == null)
-                {
-                    return;
-                }
-
-                // Get updated values for the auto-complete fields if an update is required.
-                if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene && _activeValidator != null)
-                {
-                    var autoCompleteValues = _activeValidator.GetAutoCompleteValues();
-                    _luceneAutoSuggest.UpdateAutoCompleteList(_activeValidator.AutoCompleteValuesWithSynonyms);
-
-                    Items.Clear();
-                    if (autoCompleteValues != null)
-                    {
-                        Items.AddRange(autoCompleteValues);
-                    }
-
-                    // If a LastAppliedStringValue is available, use to ensure a value applied
-                    // previously programmatically is correctly set after the Items list has been
-                    // prepared.
-                    var statusInfo = AttributeStatusInfo.GetStatusInfo(_attribute);
-                    if (statusInfo.LastAppliedStringValue != null && Items.Contains(statusInfo.LastAppliedStringValue))
-                    {
-                        Text = statusInfo.LastAppliedStringValue;
-                    }
-                }
-                else
-                {
-                    AutoCompleteMode autoCompleteMode = base.AutoCompleteMode;
-                    AutoCompleteSource autoCompleteSource = AutoCompleteSource;
-                    AutoCompleteStringCollection autoCompleteCollection = AutoCompleteCustomSource;
-                    if (DataEntryMethods.UpdateAutoCompleteList(_activeValidator, ref autoCompleteMode,
-                            ref autoCompleteSource, ref autoCompleteCollection, out string[] autoCompleteValues))
-                    {
-                        var statusInfo = AttributeStatusInfo.GetStatusInfo(_attribute);
-
-                        if (DropDownStyle != ComboBoxStyle.DropDownList)
-                        {
-                            base.AutoCompleteMode = autoCompleteMode;
-                            AutoCompleteSource = autoCompleteSource;
-                            AutoCompleteCustomSource = autoCompleteCollection;
-                        }
-
-                        Items.Clear();
-                        Items.AddRange(autoCompleteValues);
-
-                        // If a LastAppliedStringValue is available, use to ensure a value applied
-                        // previously programmatically is correctly set after the Items list has been
-                        // prepared.
-                        if (statusInfo.LastAppliedStringValue != null && Items.Contains(statusInfo.LastAppliedStringValue))
-                        {
-                            Text = statusInfo.LastAppliedStringValue;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // This method is called via BeginInvoke, thus it cannot throw out the exception.
-                ex.ExtractDisplay("ELI30629");
-            }
-        }
-
-        /// <summary>
-        /// Handles the case the a significant update of control data as reported by
-        /// <see cref="DataEntryControlHost"/> UpdateInProgress has ended.
-        /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        void HandleDataEntryControlHostUpdateEnded(object sender, EventArgs e)
-        {
-            try
-            {
-                DataEntryControlHost.UpdateEnded -= HandleDataEntryControlHostUpdateEnded;
-                _autoCompleteUpdatePending = false;
-
-                UpdateComboBoxItems();
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI30112", ex);
-            }
-        }
-
-        /// <summary>
-        /// Re-validates the control's data and updates validation error icon as appropriate.
-        /// </summary>
-        void UpdateValidation()
-        {
-            if (_validationErrorProvider != null || _validationWarningErrorProvider != null)
-            {
-                DataValidity dataValidity = Validate(false);
-
-                if (_validationErrorProvider != null)
-                {
-                    _validationErrorProvider.SetError(this, dataValidity == DataValidity.Invalid ?
-                        _activeValidator.ValidationErrorMessage : "");
-                }
-
-                if (_validationWarningErrorProvider != null)
-                {
-                    _validationWarningErrorProvider.SetError(this,
-                        dataValidity == DataValidity.ValidationWarning ?
-                            _activeValidator.ValidationErrorMessage : "");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Applies a new font style to the control.
-        /// </summary>
-        /// <param name="fontStyle">The new <see cref="FontStyle"/> to apply.</param>
+        // Applies a new font style to the control.
         void SetFontStyle(FontStyle fontStyle)
         {
-            try
-            {
-                // Perform the font change asynchronously otherwise it results in memory corruption
-                // related to auto-complete lists (probably related to the window handle recreation it
-                // triggers).
-                if (IsHandleCreated && !IsDisposed)
-                {
-                    BeginInvoke(new FontStyleDelegate(SetFontStyleDirect),
-                                new object[] { fontStyle });
-                }
-            }
-            // An InvalidOperationException will be thrown if this object has been disposed of, e.g.,
-            // when the application is closing and BeginInvoke is called. This happens because this method is
-            // called from OnLeave which is run when you close a window while the combobox has focus.
-            catch (InvalidOperationException ex)
-            {
-                // I think this will always be false, but if not, throw the exception
-                if (IsHandleCreated && !IsDisposed)
-                {
-                    throw ex.AsExtract("ELI41682");
-                }
-            }
+            _fontStyle = fontStyle;
+            Font = new Font(Font, fontStyle);
         }
 
         /// <summary>
-        /// Applies a new font style to the control. This method is a helper for SetFontStyle and
-        /// should not be called directly.
+        /// Checks for a change in the current selection. Needed to add
+        /// <see cref="DataEntrySelectionMemento"/>s to the <see cref="Extract.Utilities.UndoManager"/>
+        /// stack since there is no SelectionChanged event for the <see cref="TextBox"/> class.
         /// </summary>
-        /// <param name="fontStyle">The new <see cref="FontStyle"/> to apply.</param>
-        void SetFontStyleDirect(FontStyle fontStyle)
+        void ProcessSelectionChange()
         {
-            try
+            if (SelectionStart != LastSelectionStart || SelectionLength != LastSelectionLength)
             {
-                // Don't do anything if there are no items in the collection to avoid triggering an exception
-                // https://extract.atlassian.net/browse/ISSUE-14315
-                if (Items.Count == 0 || _fontStyle == fontStyle)
-                {
-                    return;
-                }
+                AttributeStatusInfo.UndoManager.AddMemento(
+                    new DataEntrySelectionMemento(DataEntryControlHost, SelectionState.Create(this)));
 
-                _fontStyle = fontStyle;
-
-                // [DataEntry:954]
-                // Changing the font will cause an open list to collapse and re-display. At times this
-                // results in a different value getting inadvertently selected. Record the original
-                // value so that it can be restored after changing the font.
-                var valueBeforeFontChange = Text;
-
-                Font = new Font(Font, fontStyle);
-
-                // Restore the value the control had before the font change, even if that means clearing it
-                // https://extract.atlassian.net/browse/ISSUE-14320
-                if (Text != valueBeforeFontChange)
-                {
-                    Text = valueBeforeFontChange;
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI29999", ex);
+                LastSelectionStart = SelectionStart;
+                LastSelectionLength = SelectionLength;
             }
         }
-
-        #endregion Private Members
     }
 }

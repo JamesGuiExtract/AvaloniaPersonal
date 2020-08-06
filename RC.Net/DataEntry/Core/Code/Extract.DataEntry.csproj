@@ -67,6 +67,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\..\..\ReusableComponents\APIs\Leadtools_20\Dotnet\Leadtools.dll</HintPath>
@@ -200,6 +204,8 @@
     <Compile Include="DataEntryComboBox.Designer.cs">
       <DependentUpon>DataEntryComboBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="LuceneComboBox.cs" />
+    <Compile Include="SelectionState.cs" />
     <Compile Include="DocumentTypeComboBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -240,10 +246,6 @@
     </Compile>
     <Compile Include="DataEntryTableColumn.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DataEntryTextBox.SelectionState.cs">
-      <DependentUpon>DataEntryTextBox.cs</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="DataEntryTextBoxCell.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
@@ -384,6 +386,10 @@
     <ProjectReference Include="..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Utilities\FSharp\CSharpInterop\Extract.Utilities.FSharp.CSharpInterop.fsproj">
+      <Project>{504dcf5f-fd4e-4e5d-b1ce-2e27518fc0bc}</Project>
+      <Name>Extract.Utilities.FSharp.CSharpInterop</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj">
       <Project>{DC72C952-D6ED-42F6-893D-8262BC9D183E}</Project>

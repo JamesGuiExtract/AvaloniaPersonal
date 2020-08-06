@@ -1229,7 +1229,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     newDataEntryControlHost.ShowValidationIcons = Editable;
 
                     // The combo box registers an IMessageFilter with the active DataEntryControlHost to intercept keyboard and mouse events
-                    _documentTypeComboBox.SetDataEntryControlHost(newDataEntryControlHost);
+                    _documentTypeComboBox.DataEntryControlHost = newDataEntryControlHost;
                 }
 
                 DataPanelChanged?.Invoke(this,

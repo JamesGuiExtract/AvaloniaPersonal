@@ -16,7 +16,7 @@ namespace Extract.DataEntry
 
         Form _ancestorForm;
         Control _control;
-        IDataEntryAutoCompleteControl _dataEntryControl;
+        IDataEntryAutoCompleteControl _dataEntryAutoCompleteControl;
         ListBox _listBoxChild;
         bool _msgFilterActive = false;
         Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>> _providerSource;
@@ -32,6 +32,12 @@ namespace Extract.DataEntry
 
         // The value to revert to if the dropped down is canceled (closed with escape or lost focus)
         string _acceptedText;
+
+        // Provides message filtering capability
+        DataEntryControlHost _dataEntryControlHost;
+
+        // The color to use for the list
+        Color _listBoxChildBackColor;
 
         #endregion Fields
 
@@ -78,38 +84,6 @@ namespace Extract.DataEntry
         /// </summary>
         public bool DroppedDown { get; private set; }
 
-        /// <summary>
-        /// Raised when an item is selected from the suggestion list
-        /// </summary>
-        public event EventHandler<CancelEventArgs> Validating;
-
-        /// <summary>
-        /// Raised when the suggestion list is closed
-        /// </summary>
-        public event EventHandler DropDownClosed;
-
-        /// <summary>
-        /// Raised when the edit control or the suggestion list gets focus
-        /// </summary>
-        public event EventHandler GotFocus;
-
-        /// <summary>
-        /// Raised when the edit control or the suggestion list loses focus
-        /// </summary>
-        public event EventHandler LostFocus;
-
-        /// <summary>
-        /// Sets internal state so that text can be reverted on cancel (e.g., pressing escape while the list is displayed)
-        /// </summary>
-        /// <param name="text">The value to be reverted to on cancel</param>
-        /// <param name="ignoreNextTextChangedEvent">If <c>true</c> the next TextChanged event from the editing control
-        /// will not show the suggestion list</param>
-        public void SetText(string text, bool ignoreNextTextChangedEvent)
-        {
-            _ignoreTextChange = ignoreNextTextChangedEvent;
-            _acceptedText = text;
-        }
-
         #endregion Properties
 
         #region Constructors
@@ -117,18 +91,19 @@ namespace Extract.DataEntry
         /// <summary>
         /// Private constructor to handle common ctor work
         /// </summary>
-        /// <param name="control">The editing control: Either a ComboBox or a TextBoxBase</param>
-        /// <param name="dataEntryControl">The <see cref="IDataEntryAutoCompleteControl"/> used
+        /// <param name="control">The editing control: Either a LuceneComboBox or a TextBoxBase</param>
+        /// <param name="dataEntryAutoCompleteControl">The <see cref="IDataEntryAutoCompleteControl"/> used
         /// to determine whether to react to text changes with suggestions or not</param>
-        private LuceneAutoSuggest(Control control, IDataEntryAutoCompleteControl dataEntryControl)
+        private LuceneAutoSuggest(Control control, IDataEntryAutoCompleteControl dataEntryAutoCompleteControl)
         {
             try
             {
                 ExtractException.Assert("ELI45347", "Unknown type of control",
-                    control is ComboBox || control is TextBoxBase);
+                    control is LuceneComboBox || control is TextBoxBase);
 
                 _control = control;
-                _dataEntryControl = dataEntryControl;
+                _listBoxChildBackColor = control.BackColor;
+                _dataEntryAutoCompleteControl = dataEntryAutoCompleteControl;
 
                 // Set up all the events we need to handle
                 control.TextChanged += HandleControl_TextChanged;
@@ -162,15 +137,30 @@ namespace Extract.DataEntry
             }
         }
 
-        DataEntryControlHost _dataEntryControlHost;
-        internal void SetDataEntryControlHost(DataEntryControlHost value)
+        /// <summary>
+        /// Creates a suggestion drop-down for a <see cref="LuceneComboBox"/>
+        /// </summary>
+        /// <param name="control">The control for which to display the suggestions</param>
+        public LuceneAutoSuggest(LuceneComboBox comboBox)
+            : this(comboBox, comboBox)
         {
-            if (_msgFilterActive)
+            try
             {
-                _dataEntryControlHost?.RemoveMessageFilter(this);
-                value?.AddMessageFilter(this);
+                // Set up additional events needed for combo boxes
+                comboBox.DropDown += HandleControl_DropDown;
+                comboBox.DropDownClosed += HandleControl_DropDownClosed;
+
+                // Set up event unregistration
+                _unregister += () =>
+                {
+                    comboBox.DropDown -= HandleControl_DropDown;
+                    comboBox.DropDownClosed -= HandleControl_DropDownClosed;
+                };
             }
-            _dataEntryControlHost = value;
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50129");
+            }
         }
 
         /// <summary>
@@ -180,56 +170,6 @@ namespace Extract.DataEntry
         public LuceneAutoSuggest(DataEntryTextBox control)
             : this(control, control)
         { }
-
-        /// <summary>
-        /// Creates a suggestion drop-down for a <see cref="DataEntryComboBox"/>
-        /// </summary>
-        /// <param name="control">The control for which to display the suggestions</param>
-        public LuceneAutoSuggest(DataEntryComboBox control)
-            : this(control, control)
-        {
-            try
-            {
-                // Set up additional events we need to handle
-                control.SelectionChangeCommitted += HandleControl_SelectionChangeCommitted;
-
-                // Set up event unregistration
-                _unregister += () =>
-                {
-                    control.SelectionChangeCommitted -= HandleControl_SelectionChangeCommitted;
-                };
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45349");
-            }
-        }
-
-        /// <summary>
-        /// Creates a suggestion drop-down for a <see cref="DocumentTypeComboBox"/>
-        /// </summary>
-        /// <param name="control">The control for which to display the suggestions</param>
-        public LuceneAutoSuggest(DocumentTypeComboBox control)
-            : this(control, control)
-        {
-            try
-            {
-                // Set up additional events we need to handle
-                control.DropDown += HandleControl_DropDown;
-                control.DropDownClosed += HandleControl_DropDownClosed;
-
-                // Set up event unregistration
-                _unregister += () =>
-                {
-                    control.DropDown -= HandleControl_DropDown;
-                    control.DropDownClosed -= HandleControl_DropDownClosed;
-                };
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI50129");
-            }
-        }
 
         /// <summary>
         /// Creates a suggestion drop-down for a <see cref="TextBox"/> that is, e.g., the
@@ -245,12 +185,60 @@ namespace Extract.DataEntry
 
         #endregion Constructors
 
-        #region Event Handlers
+        #region Public Methods
 
-        void HandleControl_SelectionChangeCommitted(object sender, EventArgs e)
+        /// <summary>
+        /// Sets internal state so that text can be reverted on cancel (e.g., pressing escape while the list is displayed)
+        /// </summary>
+        /// <param name="text">The value to be reverted to on cancel</param>
+        /// <param name="ignoreNextTextChangedEvent">If <c>true</c> the next TextChanged event from the editing control
+        /// will not show the suggestion list</param>
+        public void SetText(string text, bool ignoreNextTextChangedEvent)
         {
-            _ignoreTextChange = true;
+            _ignoreTextChange = ignoreNextTextChangedEvent;
+            _acceptedText = text;
         }
+
+        /// <summary>
+        /// Sets the <see cref="DataEntryControlHost"/> that will use this instance as as <see cref="IMessageFilter"/>
+        /// </summary>
+        internal void SetDataEntryControlHost(DataEntryControlHost value)
+        {
+            if (_msgFilterActive)
+            {
+                _dataEntryControlHost?.RemoveMessageFilter(this);
+                value?.AddMessageFilter(this);
+            }
+            _dataEntryControlHost = value;
+        }
+
+        #endregion Public Methods
+
+        #region Events
+
+        /// <summary>
+        /// Raised when an item is selected from the suggestion list
+        /// </summary>
+        public event EventHandler<CancelEventArgs> Validating;
+
+        /// <summary>
+        /// Raised when the suggestion list is closed
+        /// </summary>
+        public event EventHandler DropDownClosed;
+
+        /// <summary>
+        /// Raised when the edit control or the suggestion list gets focus
+        /// </summary>
+        public event EventHandler GotFocus;
+
+        /// <summary>
+        /// Raised when the edit control or the suggestion list loses focus
+        /// </summary>
+        public event EventHandler LostFocus;
+
+        #endregion
+
+        #region Event Handlers
 
         void HandleControl_HandleDestroyed(object sender, EventArgs e)
         {
@@ -299,7 +287,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_listBoxChild != null && !_listBoxChild.Focused)
+                if (DroppedDown && !_listBoxChild.Focused)
                 {
                     HideTheList();
                 }
@@ -414,15 +402,7 @@ namespace Extract.DataEntry
         {
             if (!_msgFilterActive)
             {
-                if (_dataEntryControl is IDataEntryControl dec)
-                {
-                    dec?.DataEntryControlHost?.AddMessageFilter(this);
-                }
-                else
-                {
-                   _dataEntryControlHost?.AddMessageFilter(this);
-                }
-
+               _dataEntryControlHost?.AddMessageFilter(this);
                 _msgFilterActive = true;
             }
         }
@@ -431,21 +411,14 @@ namespace Extract.DataEntry
         {
             if (_msgFilterActive)
             {
-                if (_dataEntryControl is IDataEntryControl dec)
-                {
-                    dec?.DataEntryControlHost?.RemoveMessageFilter(this);
-                }
-                else
-                {
-                    _dataEntryControlHost?.RemoveMessageFilter(this);
-                }
+                _dataEntryControlHost?.RemoveMessageFilter(this);
                 _msgFilterActive = false;
             }
         }
 
         void InitListControl()
         {
-            if (_dataEntryControl?.AutoCompleteMode
+            if (_dataEntryAutoCompleteControl?.AutoCompleteMode
                 != DataEntryAutoCompleteMode.SuggestLucene)
             {
                 _listBoxChild = null;
@@ -463,7 +436,10 @@ namespace Extract.DataEntry
 
                     _listBoxChild = new ListBox
                     {
-                        HorizontalScrollbar = true
+                        HorizontalScrollbar = true,
+                        BackColor = _listBoxChildBackColor,
+                        IntegralHeight = false, // Set so that the height can be adjusted for horizontal scroll bar
+                        Height = 13 // Small value so that the list doesn't initially appear larger than its eventual size
                     };
                     _ancestorForm.Controls.Add(_listBoxChild);
                 }
@@ -490,7 +466,7 @@ namespace Extract.DataEntry
                 _listBoxChild.Click -= HandleListBoxChild_Click;
                 _listBoxChild.GotFocus -= HandleListBoxChild_GotFocus;
                 _listBoxChild.LostFocus -= HandleListBoxChild_LostFocus;
-                _listBoxChild?.Hide();
+                _listBoxChild.Hide();
                 DropDownClosed?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -527,7 +503,8 @@ namespace Extract.DataEntry
                 _listBoxChild.Items.AddRange(suggestions);
             }
 
-            if (_listBoxChild.Items.Count > 0)
+            // Show the list even if it's empty when the control is a ComboBox because otherwise the button will appear to be broken
+            if (_listBoxChild.Items.Count > 0 || _control is LuceneComboBox)
             {
                 Point putItHere = _ancestorForm.PointToClient(
                     _control.Parent.PointToScreen(new Point(_control.Left, _control.Bottom)));
@@ -536,9 +513,10 @@ namespace Extract.DataEntry
                 _listBoxChild.Top = putItHere.Y;
                 _listBoxChild.Width = _control.Width;
                 _ancestorForm.Controls.SetChildIndex(_listBoxChild, 0);
+
                 ShowTheList();
 
-                int totalItemHeight = _listBoxChild.ItemHeight * (_listBoxChild.Items.Count + 1);
+                int totalItemHeight = _listBoxChild.PreferredHeight;
                 if ((FormsMethods.GetVisibleScrollBars(_listBoxChild) & ScrollBars.Horizontal) != 0)
                 {
                     totalItemHeight += SystemInformation.HorizontalScrollBarHeight;
@@ -546,13 +524,16 @@ namespace Extract.DataEntry
                 _listBoxChild.Height = Math.Min(_ancestorForm.ClientSize.Height - _listBoxChild.Top, totalItemHeight);
 
                 // Select the current item or the first item
-                string currentText = _control.Text ?? "";
-                int idxOfCurrentText = _listBoxChild.Items.IndexOf(currentText);
-                if (idxOfCurrentText < 0)
+                if (_listBoxChild.Items.Count > 0)
                 {
-                    idxOfCurrentText = 0;
+                    string currentText = _control.Text ?? "";
+                    int idxOfCurrentText = _listBoxChild.Items.IndexOf(currentText);
+                    if (idxOfCurrentText < 0)
+                    {
+                        idxOfCurrentText = 0;
+                    }
+                    _listBoxChild.SelectedIndex = idxOfCurrentText;
                 }
-                _listBoxChild.SelectedIndex = idxOfCurrentText;
             }
             else
             {
@@ -569,9 +550,13 @@ namespace Extract.DataEntry
             if (selectedItem != null)
             {
                 _ignoreTextChange = true;
-                if (_control is ComboBox combo)
+
+                if (_control is LuceneComboBox combo)
                 {
-                    combo.SelectedItem = selectedItem;
+                    // Setting the Text vs SelectedIndex property of the combo behaves differently wrt auto update queries
+                    // Maybe this could be changed but for now just search for the item's index
+                    var text = _listBoxChild.SelectedItem.ToString();
+                    combo.SelectedIndex = combo.Items.IndexOf(text);
                     combo.SelectAll();
                 }
                 else if (_control is TextBoxBase textBox)
@@ -598,7 +583,7 @@ namespace Extract.DataEntry
 
         internal void SetListBackColor(Color value)
         {
-            InitListControl();
+            _listBoxChildBackColor = value;
             if (_listBoxChild != null)
             {
                 _listBoxChild.BackColor = value;
@@ -608,7 +593,7 @@ namespace Extract.DataEntry
         void RevertSelection()
         {
             _control.Text = _acceptedText;
-            if (_control is ComboBox combo)
+            if (_control is LuceneComboBox combo)
             {
                 combo.SelectAll();
             }

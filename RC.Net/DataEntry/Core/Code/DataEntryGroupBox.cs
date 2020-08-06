@@ -1,9 +1,6 @@
 using System;
 using System.ComponentModel;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -16,7 +13,7 @@ namespace Extract.DataEntry
     /// <see cref="IDataEntryControl"/>s which share a common parent attribute whose value does not
     /// need to be viewable.
     /// </summary>
-    public partial class DataEntryGroupBox : GroupBox, IDataEntryControl
+    public partial class DataEntryGroupBox : GroupBox, IDataEntryAttributeControl
     {
         #region Fields
 
@@ -297,6 +294,11 @@ namespace Extract.DataEntry
         /// The event will provide the updated <see cref="IAttribute"/> to registered listeners.
         /// </summary>
         public event EventHandler<AttributesEventArgs> PropagateAttributes;
+
+        /// <summary>
+        /// The attribute mapped to this control.
+        /// </summary>
+        public IAttribute Attribute => _attribute;
 
         #endregion IDataEntryControl Members
 

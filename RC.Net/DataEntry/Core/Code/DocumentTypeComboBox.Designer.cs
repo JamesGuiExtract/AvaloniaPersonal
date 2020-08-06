@@ -19,12 +19,6 @@ namespace Extract.DataEntry
                 {
                     components.Dispose();
                 }
-
-                if (_luceneAutoSuggest != null)
-                {
-                    _luceneAutoSuggest.Dispose();
-                    _luceneAutoSuggest = null;
-                }
             }
             base.Dispose(disposing);
         }

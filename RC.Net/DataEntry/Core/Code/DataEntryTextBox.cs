@@ -1,7 +1,6 @@
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
@@ -18,7 +17,7 @@ namespace Extract.DataEntry
     /// A <see cref="IDataEntryControl"/> which allows the <see langref="string"/> value associated
     /// with an <see cref="IAttribute"/> to be viewed and edited.
     /// </summary>
-    public partial class DataEntryTextBox : TextBox, IDataEntryControl, IRequiresErrorProvider, IDataEntryAutoCompleteControl
+    public partial class DataEntryTextBox : TextBox, IDataEntryTextControl, IRequiresErrorProvider, IDataEntryAutoCompleteControl
     {
         #region Constants
 
@@ -163,16 +162,6 @@ namespace Extract.DataEntry
         /// </summary>
         FontStyle _fontStyle;
 
-        /// <summary>
-        /// The last noted selection start.
-        /// </summary>
-        int _lastSelectionStart;
-
-        /// <summary>
-        /// The last noted selection length.
-        /// </summary>
-        int _lastSelectionLength;
-
         LuceneAutoSuggest _luceneAutoSuggest;
 
         #endregion Fields
@@ -218,8 +207,8 @@ namespace Extract.DataEntry
 
                 _fontStyle = Font.Style;
 
-                _lastSelectionStart = SelectionStart;
-                _lastSelectionLength = SelectionLength;
+                LastSelectionStart = SelectionStart;
+                LastSelectionLength = SelectionLength;
 
                 _luceneAutoSuggest = new LuceneAutoSuggest(this);
             }
@@ -883,6 +872,22 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Set the background color of the edit box and the list control
+        /// </summary>
+        public override Color BackColor
+        {
+            get
+            {
+                return base.BackColor;
+            }
+            set
+            {
+                base.BackColor = value;
+                _luceneAutoSuggest?.SetListBackColor(value);
+            }
+        }
+
         #endregion Overrides
 
         #region IDataEntryControl Events
@@ -978,7 +983,18 @@ namespace Extract.DataEntry
             }
             set
             {
-                _dataEntryControlHost = value;
+                try
+                {
+                    if (_dataEntryControlHost != value)
+                    {
+                        _dataEntryControlHost = value;
+                        _luceneAutoSuggest?.SetDataEntryControlHost(value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI50226");
+                }
             }
         }
 
@@ -1104,6 +1120,25 @@ namespace Extract.DataEntry
         }
 
         #endregion IDataEntryControl Properties
+
+        #region IDataEntryFreeTextControl Properties
+
+        /// <summary>
+        /// The attribute mapped to this control.
+        /// </summary>
+        public IAttribute Attribute => _attribute;
+
+        /// <summary>
+        /// The last noted selection start.
+        /// </summary>
+        public int LastSelectionStart { get; private set; }
+
+        /// <summary>
+        /// The last noted selection length.
+        /// </summary>
+        public int LastSelectionLength { get; private set; }
+
+        #endregion IDataEntryFreeTextControl Properties
 
         #region IDataEntryControl Methods
 
@@ -1448,17 +1483,14 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="selectionState">The <see cref="Extract.DataEntry.SelectionState"/> to
         /// apply.</param>
-        public void ApplySelection(Extract.DataEntry.SelectionState selectionState)
+        public void ApplySelection(SelectionState selectionState)
         {
             try
             {
-                SelectionState textBoxSelectionState =
-                            selectionState as DataEntryTextBox.SelectionState;
-
-                if (textBoxSelectionState != null)
+                if (selectionState is TextControlSelectionState textSelectionState)
                 {
-                    SelectionStart = textBoxSelectionState.SelectionStart;
-                    SelectionLength = textBoxSelectionState.SelectionLength;
+                    SelectionStart = textSelectionState.SelectionStart;
+                    SelectionLength = textSelectionState.SelectionLength;
                 }
             }
             catch (Exception ex)
@@ -1620,7 +1652,7 @@ namespace Extract.DataEntry
         {
             if (AttributesSelected != null)
             {
-                var selectionState = new SelectionState(this);
+                var selectionState = SelectionState.Create(this);
                 AttributesSelected(this, new AttributesSelectedEventArgs(selectionState));
             }
         }
@@ -1764,7 +1796,7 @@ namespace Extract.DataEntry
                 if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene &&  _activeValidator != null)
                 {
                     var autoCompleteValues = _activeValidator.AutoCompleteValuesWithSynonyms;
-                    _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);
+                    _luceneAutoSuggest?.UpdateAutoCompleteList(autoCompleteValues);
                 }
                 else
                 {
@@ -1879,13 +1911,13 @@ namespace Extract.DataEntry
         /// </summary>
         void ProcessSelectionChange()
         {
-            if (SelectionStart != _lastSelectionStart || SelectionLength != _lastSelectionLength)
+            if (SelectionStart != LastSelectionStart || SelectionLength != LastSelectionLength)
             {
                 AttributeStatusInfo.UndoManager.AddMemento(
-                    new DataEntrySelectionMemento(_dataEntryControlHost, new SelectionState(this)));
+                    new DataEntrySelectionMemento(_dataEntryControlHost, SelectionState.Create(this)));
 
-                _lastSelectionStart = SelectionStart;
-                _lastSelectionLength = SelectionLength;
+                LastSelectionStart = SelectionStart;
+                LastSelectionLength = SelectionLength;
             }
         }
 
