@@ -103,7 +103,7 @@ CopyFilesToInstallFolder: CreateDestinationFolders
  	@COPY /V /Y  "$(BinariesFolder)\CopyNumberedFiles.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V /Y  "$(BinariesFolder)\LearningMachineEditor.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V /Y  "$(BinariesFolder)\ExpressionAndQueryTester.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V /Y  "$(BinariesFolder)\Extract*test*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+	@COPY /V /Y  "$(BinariesFolder)\E*test.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\Extract.DataEntry.DEP.*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V /Y  "$(BinariesFolder)\NERAnnotator.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V /Y  "$(BinariesFolder)\TestAppForSystemMethods.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"
@@ -116,6 +116,7 @@ CopyFilesToInstallFolder: CreateDestinationFolders
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\html-report.xslt" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\nunit.framework.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@XCOPY "$(RCDotNetDir)\APIs\NUnit.ConsoleRunner.3.11.1\tools\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
+	@XCOPY "$(RCDotNetDir)\APIs\PDFsharp.1.50.5147\lib\net20\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.nl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"
