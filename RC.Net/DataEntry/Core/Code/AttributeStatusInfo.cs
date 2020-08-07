@@ -1355,6 +1355,10 @@ namespace Extract.DataEntry
                         validator.ValidationErrorMessage = fieldModel.ValidationErrorMessage;
                         validator.ValidationPattern = fieldModel.ValidationPattern;
                         validator.CorrectCase = fieldModel.ValidationCorrectsCase;
+
+                        // Some DataEntry controls may update the value beyond changes defined by auto-update queries.
+                        // Use FormatValue mimic value changes that would be imposed by the controls themselves.
+                        fieldModel.FormatValue(attribute);
                     }
                 }
             }
@@ -1363,6 +1367,7 @@ namespace Extract.DataEntry
                 throw ex.AsExtract("ELI35963");
             }
         }
+
 
         /// <summary>
         /// Initializes an <see cref="IAttribute"/> of the specified <see paramref="attributeName"/>
@@ -1502,10 +1507,6 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(
-                    LicenseIdName.DataEntryCoreComponents, "ELI26134", _OBJECT_NAME);
-
                 if (IsLoggingEnabled(LogCategories.AttributeInitialized))
                 {
                     Logger.LogEvent(LogCategories.AttributeInitialized, attribute,
@@ -1649,7 +1650,7 @@ namespace Extract.DataEntry
                     // can end up clearing the intended value for this new attribute. Set
                     // LastAppliedStringValue only if we are dealing with a previously existing
                     // attribute.
-                    if (!newAttribute)
+                    if (!newAttribute && statusInfo.OwningControl != null)
                     {
                         // Keep track of previously applied values, in case the field control isn't
                         // yet prepared to accept the value. (i.e. combo box whose item list has not
@@ -1977,10 +1978,6 @@ namespace Extract.DataEntry
 
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(
-                    LicenseIdName.DataEntryCoreComponents, "ELI26135", _OBJECT_NAME);
-
                 // https://extract.atlassian.net/browse/ISSUE-12555
                 // Ensure leading spaces are removed when applying values from auto-complete since
                 // we artificially prepending spaces to auto-complete values allow the space bar to

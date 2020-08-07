@@ -192,6 +192,16 @@
       <SubType>Code</SubType>
       <DependentUpon>DataEntryQuery.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataEntryCheckBox.BackgroundFieldModel.cs">
+      <SubType>Component</SubType>
+      <DependentUpon>DataEntryCheckBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataEntryCheckBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DataEntryCheckBox.Designer.cs">
+      <DependentUpon>DataEntryCheckBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataEntryButton.cs">
       <SubType>Component</SubType>
     </Compile>

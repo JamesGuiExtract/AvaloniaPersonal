@@ -739,7 +739,7 @@ namespace Extract.DataEntry
                 // Only set LastAppliedStringValue in the case where the owning control did not
                 // properly accept the new query result.
                 var statusInfo = AttributeStatusInfo.GetStatusInfo(_targetAttribute);
-                if (_targetAttribute.Value.String != stringResult)
+                if (_targetAttribute.Value.String != stringResult && statusInfo.OwningControl != null)
                 {
                     // Keep track of programmatically applied values, in case the field control isn't
                     // yet prepared to accept the value. (i.e. combo box whose item list has not yet

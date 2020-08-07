@@ -397,13 +397,12 @@ namespace Extract.DataEntry
                     if (File.Exists(noUiLoadConfigFile))
                     {
                         string noUiLoadConfig = File.ReadAllText(noUiLoadConfigFile);
-                        _backgroundFieldModels = JsonConvert.DeserializeObject<IEnumerable<BackgroundFieldModel>>(noUiLoadConfig);
+                        _backgroundFieldModels = BackgroundFieldModel.FromJson(noUiLoadConfig);
                     }
                     else
                     {
                         var fieldModels = BuildFieldModels(_dataEntryControlHost);
-                        string noUiLoadConfig =
-                            JsonConvert.SerializeObject(fieldModels, Newtonsoft.Json.Formatting.Indented);
+                        var noUiLoadConfig = BackgroundFieldModel.ToJson(fieldModels);
                         File.WriteAllText(noUiLoadConfigFile, noUiLoadConfig);
 
                         _backgroundFieldModels = fieldModels;
