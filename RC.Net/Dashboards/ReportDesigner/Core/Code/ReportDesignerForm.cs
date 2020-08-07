@@ -4,6 +4,7 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraReports.UserDesigner;
 using Extract;
 using System;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Windows.Forms;
@@ -40,7 +41,10 @@ namespace ReportDesigner
             DatabaseName = databaseName;
 
             if (!string.IsNullOrEmpty(reportFile))
+            {
+                DevExpress.XtraReports.Configuration.Settings.Default.StorageOptions.RootDirectory = Path.GetDirectoryName(reportFile);
                 reportDesigner1.OpenReport(reportFile);
+            }
         }
 
         private void reportDesigner1_DesignPanelLoaded(object sender, DesignerLoadedEventArgs e)
@@ -69,6 +73,7 @@ namespace ReportDesigner
             if (e.ReportState == ReportState.Opened)
             {
                 var designPanel = sender as XRDesignPanel;
+                DevExpress.XtraReports.Configuration.Settings.Default.StorageOptions.RootDirectory = Path.GetDirectoryName(designPanel.FileName);
                 designPanel.ReportState = ReportState.Changed;
                 designPanel.ReportStateChanged -= HandleXRDesignPanel_ReportStateChanged;
             }
@@ -76,43 +81,44 @@ namespace ReportDesigner
 
         private bool OverrideConnectionWithPrompt(XRDesignPanel panel)
         {
-            if (string.IsNullOrEmpty(ServerName) || string.IsNullOrEmpty(DatabaseName))
-            {
-                return false;
-            }
-
             var report = panel.Report;
             bool changeConnection = false;
             bool promptedChangeConnection = false;
 
             foreach (var sqlConnection in report.ComponentStorage.OfType<SqlDataSource>())
             {
-                var connectionParameters = sqlConnection?.ConnectionParameters as MsSqlConnectionParameters;
-                if (connectionParameters != null &&
-                    (connectionParameters?.ServerName != ServerName ||
-                        connectionParameters?.DatabaseName != DatabaseName))
+                if (string.IsNullOrEmpty(ServerName) || string.IsNullOrEmpty(DatabaseName))
                 {
-                    if (!promptedChangeConnection)
+                    var connectionParameters = sqlConnection?.ConnectionParameters as MsSqlConnectionParameters;
+                    if (connectionParameters != null &&
+                        (connectionParameters?.ServerName != ServerName ||
+                            connectionParameters?.DatabaseName != DatabaseName))
                     {
-                        changeConnection = MessageBox.Show(
-$@"Change all SQL connections to:
-    Server: {ServerName} 
-    Database: {DatabaseName}?
+                        if (!promptedChangeConnection)
+                        {
+                            changeConnection = MessageBox.Show(
+    $@"Change all SQL connections to:
+        Server: {ServerName} 
+        Database: {DatabaseName}?
 
-Note: This will change the report if saved.",
-                            "Change data connection",
-                            MessageBoxButtons.YesNo,
-                            MessageBoxIcon.Question,
-                            MessageBoxDefaultButton.Button1, 0) == DialogResult.Yes;
+    Note: This will change the report if saved.",
+                                "Change data connection",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question,
+                                MessageBoxDefaultButton.Button1, 0) == DialogResult.Yes;
 
-                        promptedChangeConnection = true;
-                    }
-                    if (changeConnection)
-                    {
-                        connectionParameters.ServerName = ServerName;
-                        connectionParameters.DatabaseName = DatabaseName;
+                            promptedChangeConnection = true;
+                        }
+                        if (changeConnection)
+                        {
+                            connectionParameters.ServerName = ServerName;
+                            connectionParameters.DatabaseName = DatabaseName;
+                        }
                     }
                 }
+
+                // change the Command timeout
+                sqlConnection.ConnectionOptions.DbCommandTimeout = 0;
             }
             return changeConnection;
         }

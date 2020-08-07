@@ -496,6 +496,7 @@ namespace Extract.ReportingDevExpress
             builder.MultiSubnetFailover = true;
             var sqlConnectionString = "XpoProvider=MSSqlServer;" + builder.ConnectionString;
             sqlConnection.ConnectionParameters = new CustomStringConnectionParameters(sqlConnectionString);
+            sqlConnection.ConnectionOptions.DbCommandTimeout = 0;
         }
 
         /// <summary>
