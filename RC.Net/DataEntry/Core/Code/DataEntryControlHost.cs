@@ -2008,6 +2008,10 @@ namespace Extract.DataEntry
                 // Ensure that the _changingData flag does not remain set.
                 _changingData = false;
 
+                // https://extract.atlassian.net/browse/ISSUE-17141
+                // Ensure any operations that were waiting on OnUpdateEnded are executed.
+                OnUpdateEnded(new EventArgs());
+
                 ExtractException ee = new ExtractException("ELI23919", "Failed to load data!", ex);
                 if (_imageViewer != null && _imageViewer.IsImageAvailable)
                 {

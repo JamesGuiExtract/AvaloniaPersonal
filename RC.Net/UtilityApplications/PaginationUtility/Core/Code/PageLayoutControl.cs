@@ -690,6 +690,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Releases any active locks in situations where it needs to be ensured than no locks remain
+        /// and the UI is reponsive.
+        /// </summary>
+        public static void ResumeAllUIUpdates()
+        {
+            UIUpdateLock.ResumeAllUIUpdates();
+        }
+
+        /// <summary>
         /// Indicates whether the UI is currently in a suspended state.
         /// </summary>
         public static bool UIUpdatesSuspended
@@ -1983,18 +1992,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    if (_operationUpdateLock != null)
-                    {
-                        _operationUpdateLock.Dispose();
-                        _operationUpdateLock = null;
-                    }
-
-                    if (_panelLoadUpdateLock != null)
-                    {
-                        _panelLoadUpdateLock.Dispose();
-                        _panelLoadUpdateLock = null;
-                    }
-
                     // Allows a much quick response to remove and dispose of the controls first
                     // rather than disposing with the controls still loaded.
                     PaginationControl[] controls = _flowLayoutPanel.Controls
@@ -2029,10 +2026,26 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     DragDrop_Dispose();
+
+                    base.Dispose(disposing);
+
+                    // UIUpdateLock will check IsDisposed before triggering operations on the PageLayoutControl
+                    // that is being disposed. Dispose of these after the base.Dispose call, otherwise IsDisposed
+                    // (and even Disposing) will be false.
+                    if (_operationUpdateLock != null)
+                    {
+                        _operationUpdateLock.Dispose();
+                        _operationUpdateLock = null;
+                    }
+
+                    if (_panelLoadUpdateLock != null)
+                    {
+                        _panelLoadUpdateLock.Dispose();
+                        _panelLoadUpdateLock = null;
+                    }
                 }
                 catch { }
             }
-            base.Dispose(disposing);
         }
 
         #endregion Overrides

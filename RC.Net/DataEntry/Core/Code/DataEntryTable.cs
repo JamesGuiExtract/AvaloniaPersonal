@@ -2931,41 +2931,50 @@ namespace Extract.DataEntry
                         IDataEntryTableCell dataEntryCell = (IDataEntryTableCell)
                             Rows[rowIndex].Cells[column.Index];
 
-                        var displayOrder = DataEntryMethods.GetTabIndices(this).Concat(new[] { column.Index + 1 });
-
                         IAttribute subAttribute;
-                        if (dataEntryTableColumn.AttributeName == ".")
+                        try
                         {
-                            // "." indicates that the value of the row's attribute should be used in
-                            // this column.
-                            subAttribute = attribute;
-                            parentAttributeIsMapped = true;
+                            InitializingTableElement = dataEntryCell;
 
-                            // It is important to call initialize here to ensure AttributeStatusInfo
-                            // raises the AttributeInitialized event for all attributes mapped into
-                            // the table.
-                            AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this,
-                                displayOrder, false, dataEntryTableColumn.TabStopMode,
-                                dataEntryCell.ValidatorTemplate, dataEntryTableColumn.AutoUpdateQuery,
-                                dataEntryTableColumn.ValidationQuery);
-                        }
-                        else
-                        {
-                            // Select the appropriate subattribute to use and create an new (empty)
-                            // attribute if no such attribute can be found.
-                            subAttribute = DataEntryMethods.InitializeAttribute(
-                                dataEntryTableColumn.AttributeName,
-                                dataEntryTableColumn.MultipleMatchSelectionMode,
-                                true, attribute.SubAttributes, null, this, displayOrder, true,
-                                dataEntryTableColumn.TabStopMode, dataEntryCell.ValidatorTemplate,
-                                dataEntryTableColumn.AutoUpdateQuery,
-                                dataEntryTableColumn.ValidationQuery);
+                            var displayOrder = DataEntryMethods.GetTabIndices(this).Concat(new[] { column.Index + 1 });
 
-                            if (_allowTabbingByRow && !Disabled)
+                            if (dataEntryTableColumn.AttributeName == ".")
                             {
-                                AttributeStatusInfo.SetAttributeTabGroup(subAttribute,
-                                    new List<IAttribute>());
+                                // "." indicates that the value of the row's attribute should be used in
+                                // this column.
+                                subAttribute = attribute;
+                                parentAttributeIsMapped = true;
+
+                                // It is important to call initialize here to ensure AttributeStatusInfo
+                                // raises the AttributeInitialized event for all attributes mapped into
+                                // the table.
+                                AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this,
+                                    displayOrder, false, dataEntryTableColumn.TabStopMode,
+                                    dataEntryCell.ValidatorTemplate, dataEntryTableColumn.AutoUpdateQuery,
+                                    dataEntryTableColumn.ValidationQuery);
                             }
+                            else
+                            {
+                                // Select the appropriate subattribute to use and create an new (empty)
+                                // attribute if no such attribute can be found.
+                                subAttribute = DataEntryMethods.InitializeAttribute(
+                                    dataEntryTableColumn.AttributeName,
+                                    dataEntryTableColumn.MultipleMatchSelectionMode,
+                                    true, attribute.SubAttributes, null, this, displayOrder, true,
+                                    dataEntryTableColumn.TabStopMode, dataEntryCell.ValidatorTemplate,
+                                    dataEntryTableColumn.AutoUpdateQuery,
+                                    dataEntryTableColumn.ValidationQuery);
+
+                                if (_allowTabbingByRow && !Disabled)
+                                {
+                                    AttributeStatusInfo.SetAttributeTabGroup(subAttribute,
+                                        new List<IAttribute>());
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            InitializingTableElement = null;
                         }
 
                         rowAttributes.Add(subAttribute);

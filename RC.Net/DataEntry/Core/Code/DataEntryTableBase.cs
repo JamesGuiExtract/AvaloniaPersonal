@@ -431,10 +431,43 @@ namespace Extract.DataEntry
                 ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
 
                 AttributeStatusInfo.ValidationStateChanged += HandleValidationStateChanged;
+                AttributeStatusInfo.AttributeInitialized += HandleAttributeStatusInfo_AttributeInitialized;
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI24283", ex);
+            }
+        }
+
+        /// <summary>
+        /// A table element that is currently being initialized. This is used to be able to map any
+        /// attribute that is initialized to the table element before data queries that may need to
+        /// access the element are applied (per ISSUE-13193).
+        /// </summary>
+        protected object InitializingTableElement
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Handles the AttributeInitialized event in order to to map the attribute to any
+        /// <see cref="InitializingTableElement"/> currently defined.
+        /// </summary>
+        void HandleAttributeStatusInfo_AttributeInitialized(object sender, AttributeInitializedEventArgs e)
+        {
+            try
+            {
+                if (e.DataEntryControl == this
+                        && InitializingTableElement != null
+                        && !_attributeMap.ContainsKey(e.Attribute))
+                {
+                    MapAttribute(e.Attribute, InitializingTableElement);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50232");
             }
         }
 
@@ -2666,28 +2699,37 @@ namespace Extract.DataEntry
             {
                 ExtractException.Assert("ELI24639", "Missing attribute!", attribute != null);
 
-                // Since the spatial information for this table has likely changed, refresh all
-                // spatial hints for this table.
-                _hintsAreDirty = true;
-
-                _attributeMap[attribute] = tableElement;
-
-                // Register for the AttributeDeleted event so the attribute is removed from the
-                // map once it is deleted. It is important to do this because FinalReleaseComObject
-                // will be called on the attribute after deletion to prevent handle leaks.
-                AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
-                statusInfo.AttributeDeleted += HandleAttributeDeleted;
-
-                // Only attributes mapped to a IDataEntryTableCell will be viewable.
-                IDataEntryTableCell dataEntryCell = tableElement as IDataEntryTableCell;
-                
-                // Mark the attribute as visible if the table is visible and the table element
-                // is a cell (as opposed to a row which isn't visible on its own)
-                if (dataEntryCell != null)
+                object mappedElement = null;
+                if (!_attributeMap.TryGetValue(attribute, out mappedElement) || mappedElement != tableElement)
                 {
-                    // Register to receive notification that the spatial info for the cell has
-                    // changed.
-                    dataEntryCell.CellSpatialInfoChanged += HandleCellSpatialInfoChanged;
+                    if (mappedElement != null)
+                    {
+                        UnMapAttribute(attribute, clearCellAttributes: true);
+                    }
+
+                    // Since the spatial information for this table has likely changed, refresh all
+                    // spatial hints for this table.
+                    _hintsAreDirty = true;
+
+                    _attributeMap[attribute] = tableElement;
+
+                    // Register for the AttributeDeleted event so the attribute is removed from the
+                    // map once it is deleted. It is important to do this because FinalReleaseComObject
+                    // will be called on the attribute after deletion to prevent handle leaks.
+                    AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+                    statusInfo.AttributeDeleted += HandleAttributeDeleted;
+
+                    // Only attributes mapped to a IDataEntryTableCell will be viewable.
+                    IDataEntryTableCell dataEntryCell = tableElement as IDataEntryTableCell;
+
+                    // Mark the attribute as visible if the table is visible and the table element
+                    // is a cell (as opposed to a row which isn't visible on its own)
+                    if (dataEntryCell != null)
+                    {
+                        // Register to receive notification that the spatial info for the cell has
+                        // changed.
+                        dataEntryCell.CellSpatialInfoChanged += HandleCellSpatialInfoChanged;
+                    }
                 }
             }
             catch (Exception ex)

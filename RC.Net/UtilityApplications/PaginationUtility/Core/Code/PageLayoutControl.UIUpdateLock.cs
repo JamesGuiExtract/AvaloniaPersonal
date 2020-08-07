@@ -1,5 +1,6 @@
 ﻿using Extract.Utilities.Forms;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
@@ -18,9 +19,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         class UIUpdateLock : IDisposable
         {
             // The number of instances that currently exist.
-            [ThreadStatic]
-            static int _referenceCount;
-            
+            static ThreadLocal<HashSet<UIUpdateLock>> _references
+                = new ThreadLocal<HashSet<UIUpdateLock>>(() => new HashSet<UIUpdateLock>());
+
             /// <summary>
             /// Prevents painting of the control during the operation.
             /// </summary>
@@ -45,6 +46,25 @@ namespace Extract.UtilityApplications.PaginationUtility
             [ThreadStatic]
             static PageLayoutControl _pageLayoutControl;
 
+            [SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
+            static UIUpdateLock()
+            {
+                ExtractException.DisplayingException += (o, e) =>
+                {
+                    try
+                    {
+                        // https://extract.atlassian.net/browse/ISSUE-17141
+                        // At any point an exception is to be displayed, don't count on all UIUpdateLocks
+                        // being disposed properly. Resume all UI updates (dispose all _references)
+                        ResumeAllUIUpdates();
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.ExtractLog("ELI50243");
+                    }
+                };
+            }
+
             /// <summary>
             /// Initializes a new instance of the <see cref="UIUpdateLock"/> class.
             /// NOTE: While the UI is locked via individual class instances in order to keep track of
@@ -57,9 +77,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// resumed.</param>
             public UIUpdateLock(PageLayoutControl pageLayoutControl, bool forceLayoutOnResume = false)
             {
-                Extract.ExtractException.Assert("ELI50184", "Invalid control state", _referenceCount >= 0);
-
-                if (_referenceCount == 0)
+                if (_references.Value.Count == 0)
                 {
                     _pageLayoutControl = pageLayoutControl;
                     _forceFullLayout = forceLayoutOnResume;
@@ -74,7 +92,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _forceFullLayout |= forceLayoutOnResume;
                 }
 
-                _referenceCount++;
+                _references.Value.Add(this);
             }
 
             /// <summary>
@@ -86,7 +104,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 get
                 {
-                    return _referenceCount > 0;
+                    return _references.Value.Count > 0;
                 }
             }
 
@@ -97,7 +115,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 try
                 {
-                    if (_referenceCount > 0)
+                    if (_references.Value.Count > 0)
                     {
                         UnlockUI(temporary: true);
                         LockUI();
@@ -106,6 +124,24 @@ namespace Extract.UtilityApplications.PaginationUtility
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI50197");
+                }
+            }
+            
+            /// <summary>
+            /// Releases any active locks in situations where it needs to be ensured than no locks remain
+            /// and the UI is reponsive.
+            /// </summary>
+            public static void ResumeAllUIUpdates()
+            {
+                try
+                {
+                    _references.Value.Clear();
+
+                    UnlockUI(temporary: false);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI50233");
                 }
             }
 
@@ -133,9 +169,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                     try
                     {
                         // Dispose of managed resources
-                        _referenceCount--;
+                        _references.Value.Remove(this);
 
-                        if (_referenceCount == 0)
+                        if (_references.Value.Count == 0)
                         {
                             UnlockUI(temporary: false);
                         }
@@ -150,7 +186,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// </summary>
             static void LockUI()
             {
-                if (_controlUpdateLock == null)
+                if (!_pageLayoutControl.IsDisposed && _controlUpdateLock == null)
                 {
                     _pageLayoutControl.SuspendingUIUpdates?.Invoke(_pageLayoutControl, new EventArgs());
 
@@ -180,7 +216,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// or <c>false</c> if the UI is intented to be usable at this point.</param>
             static void UnlockUI(bool temporary)
             {
-                if (_pageLayoutControl != null && _controlUpdateLock != null)
+                if (_pageLayoutControl?.IsDisposed == false && _controlUpdateLock != null)
                 {
                     if (_pageLayoutControl.LoadNextDocumentVisible)
                     {

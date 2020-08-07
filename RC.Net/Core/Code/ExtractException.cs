@@ -284,6 +284,15 @@ namespace Extract
 
         #endregion Constructors
 
+        #region Events
+
+        /// <summary>
+        /// Raised to notify listeners that an exception is about to be displayed.
+        /// </summary>
+        public static event EventHandler<ExtractExceptionEventArgs> DisplayingException;
+
+        #endregion Events
+
         #region Properties
 
         /// <summary>
@@ -474,6 +483,18 @@ namespace Extract
                 // Create a UCLIDException COM object and populate it with all the information
                 // contained in this ExtractException object.
                 UCLID_EXCEPTIONMGMTLib.COMUCLIDException uex = AsCppException();
+
+                // https://extract.atlassian.net/browse/ISSUE-17141
+                // Allows any special handling that needs to occur for exceptions to be displayed
+                // while leaving the application in a good state.
+                try
+                {
+                    DisplayingException?.Invoke(this, new ExtractExceptionEventArgs(this));
+                }
+                catch (Exception exDisplay)
+                {
+                    Log("ELI50244", exDisplay);
+                }
 
                 // Ensure the COM dialog handles the user's first mouse click [DotNetRCAndUtils #58]
                 // https://extract.atlassian.net/browse/ISSUE-1222

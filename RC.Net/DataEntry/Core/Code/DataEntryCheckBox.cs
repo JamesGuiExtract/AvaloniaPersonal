@@ -1150,7 +1150,7 @@ namespace Extract.DataEntry
         /// </summary>
         void OnAttributesSelected()
         {
-            if (this.AttributesSelected != null)
+            if (AttributesSelected != null)
             {
                 var selectionState = SelectionState.Create(this);
                 AttributesSelected(this, new AttributesSelectedEventArgs(selectionState));

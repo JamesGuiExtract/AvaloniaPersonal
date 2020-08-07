@@ -1094,6 +1094,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             try
             {
+                SuspendUIUpdatesForOperation();
+
                 bool result = SaveDocumentData(selectedDocumentsOnly: false, validateData: false);
 
                 if (result)

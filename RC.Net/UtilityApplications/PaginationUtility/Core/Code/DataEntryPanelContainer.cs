@@ -592,6 +592,11 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
+                // https://extract.atlassian.net/browse/ISSUE-17141
+                // Help ensure the mechanism to lock the UI during the load operation can't remain
+                // locked.
+                PageLayoutControl.ResumeAllUIUpdates();
+
                 ex.ExtractDisplay("ELI41599");
             }
             finally
