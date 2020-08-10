@@ -289,7 +289,7 @@ CopyCommonFiles:
     @TIME /T
     @ECHO.
 	
-CopyFilesToInstallFolder: BuildPDUtils BuildDashboards ObfuscateFiles
+CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
     @ECHO Copying the AttributeFinderCore files to installation directory...
     @ECHO.
     @DATE /T
@@ -643,7 +643,7 @@ BuildDataEntryMergeModule: BuildAFCoreMergeModule
 
 MakeMergeModules: CleanUpMergeModulesFromPreviousBuilds BuildAFCoreMergeModule BuildDataEntryMergeModule 
 
-DoBuilds: SetupBuildEnv SetVersions BuildPDUtils CopyFKB
+DoBuilds: SetupBuildEnv SetVersions BuildPDUtils BuildDashboards CopyFKB
 
 DoEverythingNoGet: DoBuilds MakeMergeModules RegisterClearImage_7_0 CopyCommonFiles
     @ECHO.
