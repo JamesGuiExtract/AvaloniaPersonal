@@ -225,22 +225,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                     continue;
                 }
 
+                bool newRow = false;
+                PageThumbnailControl previousPageControl = previousControl as PageThumbnailControl;
+
                 if (separator != null)
                 {
-                    // Resize the last page control before each separator so that it extends all
-                    // the way to the right edge of the panel. This allows for the drops to
-                    // occur anywhere to the right of that page.
                     if (previousControl != null)
                     {
-                        var newPadding = parentDisplayRectangle.Right - previousControl.Right;
-                        previousControl.Width = parentDisplayRectangle.Right - previousControl.Left;
-                        var padding = previousControl.Padding;
-                        padding.Right = newPadding;
-                        previousControl.Padding = padding;
+                        newRow = true;
 
                         nextControlLocation.X = parentDisplayRectangle.Left;
 
-                        PageThumbnailControl previousPageControl = previousControl as PageThumbnailControl;
                         if (previousPageControl != null)
                         {
                             if (previousPageControl.Document.Collapsed)
@@ -268,11 +263,24 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // If the next control would start beyond parentDisplayRectangle, wrap.
                     if (nextXPosition > parentDisplayRectangle.Right)
                     {
+                        newRow = true;
                         nextControlLocation.X = parentDisplayRectangle.Left;
                         nextControlLocation.Y += (previousSeparator != null)
                             ? previousSeparator.Height
                             : PageThumbnailControl.UniformSize.Height;
                     }
+                }
+
+                // Resize the last page control in a row so that it extends all the way to the right
+                // edge of the panel. This allows for the (drag)drops to occur anywhere to the right
+                // of the last page in each row.
+                if (newRow && previousPageControl != null)
+                {
+                    var newPadding = parentDisplayRectangle.Right - previousPageControl.Right;
+                    previousPageControl.Width = parentDisplayRectangle.Right - previousPageControl.Left;
+                    var padding = previousPageControl.Padding;
+                    padding.Right = newPadding;
+                    previousPageControl.Padding = padding;
                 }
 
                 // Size the control properly.

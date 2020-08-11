@@ -361,31 +361,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
-        /// <summary>
-        /// Raises the <see cref="E:Paint" /> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.Windows.Forms.PaintEventArgs" /> instance containing the event data.</param>
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            try
-            {
-                base.OnPaint(e);
-
-                if (_pageControl != null && _pageControl.Highlighted)
-                {
-                    var highlightColor = _pageControl.PageLayoutControl.IndicateFocus
-                        ? ExtractColors.LightBlue
-                        : SystemColors.ControlDark;
-                    var highlightBrush = ExtractBrushes.GetSolidBrush(highlightColor);
-                    e.Graphics.FillRectangle(highlightBrush, e.ClipRectangle);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI43379");
-            }
-        }
-
         /// <summary> 
         /// Clean up any resources being used.
         /// </summary>
@@ -484,13 +459,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (_pageControl != null)
                 {
-                    var brush = ExtractBrushes.GetSolidBrush(
-                        _pageControl.Selected && _pageControl.PageLayoutControl.IndicateFocus
-                        ? SystemColors.ControlDark
-                        : SystemColors.Control);
-
-                    e.Graphics.FillRectangle(brush, e.ClipRectangle);
-
                     foreach (var stylist in _pageControl.PageStylists)
                     {
                         stylist.PaintBackground(e);
@@ -515,6 +483,54 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
             }
         }
+
+        /// <summary>
+        /// Handles the when the control is invalidated to ensure the controls colors reflect
+        /// the current controls state.
+        /// </summary>
+        protected override void OnInvalidated(InvalidateEventArgs e)
+        {
+            try
+            {
+                (bool Highlighted, bool Selected, bool IndicateFocus) currentControlState
+                        = (_pageControl.Highlighted, _pageControl.Selected, _pageControl.PageLayoutControl.IndicateFocus);
+
+                // If the control state has changed since the last invalidation, apply appropriate background
+                // colors
+                if (currentControlState != _lastControlState)
+                {
+                    if (currentControlState.Highlighted)
+                    {
+                        BackColor = currentControlState.IndicateFocus
+                            ? ExtractColors.LightBlue
+                            : SystemColors.ControlDark;
+                    }
+                    else
+                    {
+                        BackColor = SystemColors.Control;
+                    }
+
+                    // _borderPanel.BackColor must be set after setting BackColor since the color applied to
+                    // BackColor will get applied to _borderPanel.BackColor as well.
+                    _borderPanel.BackColor = currentControlState.Selected && currentControlState.IndicateFocus
+                        ? SystemColors.ControlDark
+                        : SystemColors.Control;
+
+                    _lastControlState = currentControlState;
+                }
+
+                // Ensure any status changes are rendered by the PageStylists.
+                _borderPanel.Invalidate();
+                _rasterPictureBox.Invalidate();
+
+                base.OnInvalidated(e);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50263");
+            }
+        }
+        (bool Highlighted, bool Selected, bool IndicateFocus) _lastControlState;
 
         /// <summary>
         /// Handles the <see cref="Control.Paint"/> event of the <see cref="_rasterPictureBox"/>.

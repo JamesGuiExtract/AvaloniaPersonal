@@ -1,4 +1,6 @@
-﻿using Extract.Imaging.Forms;
+﻿using Extract.Drawing;
+using Extract.Imaging.Forms;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -301,6 +303,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.Highlighted = value;
 
+                _contentsPanel?.Invalidate();
                 _contentsPanel?.OnHighlightedStateChanged();
             }
         }
@@ -536,6 +539,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     base.Selected = value;
 
+                    _contentsPanel?.Invalidate();
                     OnSelectedStateChanged();
                 }
             }

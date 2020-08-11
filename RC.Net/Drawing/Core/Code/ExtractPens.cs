@@ -52,7 +52,14 @@ namespace Extract.Drawing
                 pen.DashStyle = DashStyle.Dash;
                 return pen;
             });
-                
+
+        static ThreadLocal<Pen> _dashedGray =
+            new ThreadLocal<Pen>(() =>
+            {
+                var pen = new Pen(Color.FromArgb(191, 191, 191), 1);
+                pen.DashStyle = DashStyle.Dash;
+                return pen;
+            });
 
         /// <summary>
         /// A pen that draws a dotted black line.
@@ -83,6 +90,14 @@ namespace Extract.Drawing
             get
             {
                 return _dashedBlack.Value;
+            }
+        }
+
+        public static Pen DashedGray
+        {
+            get
+            {
+                return _dashedGray.Value;
             }
         }
 

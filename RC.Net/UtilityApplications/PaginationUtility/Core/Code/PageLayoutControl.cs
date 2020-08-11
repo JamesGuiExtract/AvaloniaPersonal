@@ -286,6 +286,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 this.SetStyle(ControlStyles.Selectable, true);
 
                 DragDrop_Init();
+                SplitDocument_Init();
 
                 _toolTip.AutoPopDelay = 0;
                 _toolTip.InitialDelay = 500;
@@ -1268,6 +1269,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 control.Click -= HandlePaginationControl_Click;
                 control.MouseMove -= HandlePaginationControl_MouseMove;
+                UnRegisterWithSplitterControl(control);
 
                 // Determine which controls are before and after the removed control to determine
                 // how the removal affects the output documents.
@@ -1941,6 +1943,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                // To prevent accidental splits of a document, hide the document split indicator
+                // at any point a modifier key is pressed since any click with a modifier key is
+                // likely to be for control selection.
+                if (Control.ModifierKeys != Keys.None)
+                {
+                    DeactivateSplitIndicator();
+                }
+
                 // If the _documentDataPanelControl has focus, keystrokes shouldn't be treated as
                 // pagination shortcut keys.
                 if (DocumentDataPanel?.PanelControl != null &&
@@ -2026,6 +2036,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
 
                     DragDrop_Dispose();
+                    SplitDocument_Dispose();
 
                     base.Dispose(disposing);
 
@@ -2052,6 +2063,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         #region Event Handlers
 
+
+
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event of a <see cref="PaginationControl"/>.
         /// </summary>
@@ -2062,6 +2075,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                if (IsSplitIndicatorAtMousePosition())
+                {
+                    // A click here is to be handled by the _splitDocumentIndicator
+                    return;
+                }
+
                 var clickedControl = (PaginationControl)sender;
 
                 if (clickedControl != _loadNextDocumentButtonControl)
@@ -2122,6 +2141,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var originControl = sender as PaginationControl;
+
+                if (IsSplitIndicatorAtMousePosition())
+                {
+                    // The mouse move is to be handled by the _splitDocumentIndicator
+                    return;
+                }
 
                 // Assigning a ToolTip instance for all page controls uses a lot of GDI handles.
                 // Instead, dynamically assign a single _toolTip instance the control the mouse is
@@ -2766,6 +2791,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             control.Click += HandlePaginationControl_Click;
             control.MouseMove += HandlePaginationControl_MouseMove;
+            RegisterWithSplitterControl(control);
 
             var asPaginationSeparator = control as PaginationSeparator;
 

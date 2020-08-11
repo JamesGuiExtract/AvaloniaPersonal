@@ -102,6 +102,17 @@
       <DependentUpon>DataEntryPanelContainer.cs</DependentUpon>
     </Compile>
     <Compile Include="DocumentStatus.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SplitDocumentIndicator.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SplitDocumentIndicator.Designer.cs">
+      <DependentUpon>SplitDocumentIndicator.cs</DependentUpon>
+    </Compile>
     <Compile Include="PageLayoutControl.UIUpdateLock.cs">
       <DependentUpon>PageLayoutControl.cs</DependentUpon>
       <SubType>UserControl</SubType>
@@ -135,6 +146,10 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="PageLayoutControl.DragDrop.cs">
+      <DependentUpon>PageLayoutControl.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PageLayoutControl.SplitDocument.cs">
       <DependentUpon>PageLayoutControl.cs</DependentUpon>
       <SubType>UserControl</SubType>
     </Compile>
@@ -206,6 +221,9 @@
     <EmbeddedResource Include="DataEntryPanelContainer.resx">
       <DependentUpon>DataEntryPanelContainer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="SplitDocumentIndicator.resx">
+      <DependentUpon>SplitDocumentIndicator.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NewDocumentGlyph.resx">
       <DependentUpon>NewDocumentGlyph.cs</DependentUpon>
     </EmbeddedResource>
@@ -237,14 +255,9 @@
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -334,6 +347,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\RightArrow.png" />
+    <None Include="Resources\Tear.png" />
     <None Include="Resources\view.png" />
     <None Include="Resources\YellowArrow.png" />
     <None Include="Resources\RevertToSuggestion.png" />
@@ -346,8 +360,8 @@
     <None Include="Resources\Collapse16.png" />
     <Content Include="Resources\Edit11.png" />
     <None Include="Resources\Error.png" />
-    <None Include="Resources\LeftArrow.png" />
     <None Include="Resources\Expand16.png" />
+    <None Include="Resources\LeftArrow.png" />
     <Content Include="Resources\PaginationUtility.ico" />
   </ItemGroup>
   <ItemGroup>

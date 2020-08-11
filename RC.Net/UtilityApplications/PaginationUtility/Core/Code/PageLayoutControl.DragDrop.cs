@@ -69,6 +69,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         int _dragDropScrollPos;
 
+        /// <summary>
+        /// Indicates whether a drag operation is in progress
+        /// </summary>
+        bool _dragActive;
+
         #endregion Fields
 
         #region Methods
@@ -363,10 +368,17 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                             try
                             {
+                                _dragActive = true;
+
+                                // Don't allow the document split indicator to be active once a drag
+                                // operation begins.
+                                DeactivateSplitIndicator();
+
                                 DoDragDrop(dataObject, DragDropEffects.Move);
                             }
                             finally
                             {
+                                _dragActive = false;
                                 _dropLocationIndex = -1;
 
                                 if (Controls.Contains(_dropLocationIndicator))
