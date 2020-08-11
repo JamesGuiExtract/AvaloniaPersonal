@@ -120,13 +120,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._revertToOriginalToolStripButton});
             this._topToolStrip.Location = new System.Drawing.Point(3, 0);
             this._topToolStrip.Name = "_topToolStrip";
-            this._topToolStrip.Size = new System.Drawing.Size(513, 25);
+            this._topToolStrip.Size = new System.Drawing.Size(489, 25);
             this._topToolStrip.TabIndex = 0;
             // 
             // _collapseAllToolStripButton
             // 
             this._collapseAllToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._collapseAllToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.Collapse;
+            this._collapseAllToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.Collapse16;
             this._collapseAllToolStripButton.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this._collapseAllToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._collapseAllToolStripButton.Name = "_collapseAllToolStripButton";
@@ -138,7 +138,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             this._submitToolStripButton.Image = global::Extract.UtilityApplications.PaginationUtility.Properties.Resources.Accept;
             this._submitToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._submitToolStripButton.Name = "_submitToolStripButton";
-            this._submitToolStripButton.Size = new System.Drawing.Size(58, 22);
+            this._submitToolStripButton.Size = new System.Drawing.Size(65, 22);
             this._submitToolStripButton.Text = "Submit";
             this._submitToolStripButton.Click += new System.EventHandler(this.HandleSubmitToolStripButton_Click);
             // 

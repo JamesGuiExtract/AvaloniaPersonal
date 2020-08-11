@@ -3550,8 +3550,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _submitToolStripButton.Enabled = CommitEnabled && !dataEntryPanelOpen;
                     _collapseAllToolStripButton.Image =
                         AllDocumentsCollapsed
-                            ? Properties.Resources.Expand
-                            : Properties.Resources.Collapse;
+                            ? Properties.Resources.Expand16
+                            : Properties.Resources.Collapse16;
                     _collapseAllToolStripButton.Enabled = !dataEntryPanelOpen;
                     
                     if (CommitOnlySelection)

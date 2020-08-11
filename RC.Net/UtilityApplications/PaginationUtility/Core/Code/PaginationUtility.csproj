@@ -103,7 +103,7 @@
     </Compile>
     <Compile Include="DocumentStatus.cs" />
     <Compile Include="PageLayoutControl.UIUpdateLock.cs">
-	  <DependentUpon>PageLayoutControl.cs</DependentUpon>
+      <DependentUpon>PageLayoutControl.cs</DependentUpon>
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="PaginatedOutputCreationUtility.cs" />
@@ -343,9 +343,11 @@
     <None Include="Resources\Edit16.png" />
     <None Include="Resources\Collapse.png" />
     <None Include="Resources\Accept.png" />
+    <None Include="Resources\Collapse16.png" />
     <Content Include="Resources\Edit11.png" />
     <None Include="Resources\Error.png" />
     <None Include="Resources\LeftArrow.png" />
+    <None Include="Resources\Expand16.png" />
     <Content Include="Resources\PaginationUtility.ico" />
   </ItemGroup>
   <ItemGroup>

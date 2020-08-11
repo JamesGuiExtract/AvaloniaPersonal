@@ -83,6 +83,16 @@ namespace Extract.UtilityApplications.PaginationUtility.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Collapse16 {
+            get {
+                object obj = ResourceManager.GetObject("Collapse16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap DownArrow {
             get {
                 object obj = ResourceManager.GetObject("DownArrow", resourceCulture);
@@ -136,6 +146,16 @@ namespace Extract.UtilityApplications.PaginationUtility.Properties {
         internal static System.Drawing.Bitmap Expand {
             get {
                 object obj = ResourceManager.GetObject("Expand", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Expand16 {
+            get {
+                object obj = ResourceManager.GetObject("Expand16", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
