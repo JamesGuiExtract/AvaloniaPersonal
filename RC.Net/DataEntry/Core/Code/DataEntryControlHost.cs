@@ -2995,6 +2995,10 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Remove highlights so that when you click on the document type combo the last selected control doesn't show its highlight
+                // https://extract.atlassian.net/browse/ISSUE-17146
+                RemoveActiveAttributeHighlights();
+
                 _activeDataControl?.IndicateActive(false, ActiveSelectionColor);
                 _activeDataControl = null;
             }
@@ -8669,6 +8673,26 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI49856");
+            }
+        }
+
+        /// <summary>
+        /// Removes the highlights, tooltip and validation icons for the active control from the image viewer
+        /// </summary>
+        void RemoveActiveAttributeHighlights()
+        {
+            try
+            {
+                foreach (var attr in GetActiveAttributes())
+                {
+                    ShowAttributeHighlights(attr, false);
+                    RemoveAttributeToolTip(attr);
+                }
+                ImageViewer?.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50239");
             }
         }
 
