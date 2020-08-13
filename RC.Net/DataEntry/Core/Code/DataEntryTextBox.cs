@@ -888,6 +888,26 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="Control.EnabledChanged"/> event
+        /// </summary>
+        /// <remarks>
+        /// Overridden to ensure that the control's font agrees with its viewed status
+        /// </remarks>
+        protected override void OnEnabledChanged(EventArgs e)
+        {
+            base.OnEnabledChanged(e);
+
+            if (_attribute is IAttribute attr)
+            {
+                bool hasBeenViewed = AttributeStatusInfo.HasBeenViewedOrIsNotViewable(attr, false);
+                if ((_fontStyle == FontStyle.Bold) == hasBeenViewed)
+                {
+                    SetFontStyle(hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
+                }
+            }
+        }
+
         #endregion Overrides
 
         #region IDataEntryControl Events
