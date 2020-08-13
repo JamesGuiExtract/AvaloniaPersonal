@@ -1,3 +1,4 @@
+using DevExpress.Data.Helpers;
 using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.DataAccess.Sql;
 using DevExpress.XtraReports.Parameters;
@@ -799,7 +800,7 @@ namespace Extract.ReportingDevExpress
 
             foreach (var parameter in _report.Parameters)
             {
-                if (parameter.Name.StartsWith("ES_"))
+                if (parameter.Name.StartsWith("ES_") || !parameter.Visible)
                     continue;
 
                 var existingValue = GetExistingValue(parameter.Name);
@@ -1440,7 +1441,12 @@ namespace Extract.ReportingDevExpress
             try
             {
                 // The Base DevExpress report ParameterCollection only includes the non linked parameters
-                return parameters.Count;
+                int count = 0;
+                foreach (var p in parameters)
+                {
+                    count += (p.Visible) ? 1 : 0;
+                }
+                return count;
             }
             catch (Exception ex)
             {

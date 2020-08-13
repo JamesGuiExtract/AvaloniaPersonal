@@ -1787,6 +1787,9 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW_LEGACY_166);
 		vecQueries.push_back(gstrCREATE_GET_CLUSTER_NAME_PROCEDURE);
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_WITH_FILEID_VIEW);
+		vecQueries.push_back(gstrCREATE_USAGE_FOR_SPECIFIC_USER_SPECIFIC_DAY_PROCEDURE);
+		vecQueries.push_back(gstrCREATE_TABLE_FROM_COMMA_SEPARATED_LIST_FUNCTION);
+		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);

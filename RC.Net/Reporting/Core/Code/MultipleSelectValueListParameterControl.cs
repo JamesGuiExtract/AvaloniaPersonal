@@ -200,6 +200,8 @@ namespace Extract.Reporting
 
         private void CheckSelectedValues(string selections)
         {
+            if (string.IsNullOrWhiteSpace(selections))
+                return;
             var selectedItems = selections
                 .Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries)
                 .ToList();

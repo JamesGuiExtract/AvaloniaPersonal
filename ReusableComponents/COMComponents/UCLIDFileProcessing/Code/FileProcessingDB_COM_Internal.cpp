@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 186;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 187;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2841,6 +2841,35 @@ int UpdateToSchemaVersion186(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49891");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion187(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 187;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrCREATE_USAGE_FOR_SPECIFIC_USER_SPECIFIC_DAY_PROCEDURE);
+		vecQueries.push_back(gstrCREATE_TABLE_FROM_COMMA_SEPARATED_LIST_FUNCTION);
+		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50242");
 }
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -7979,7 +8008,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 183:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion184);
 				case 184:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion185);
 				case 185:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion186);
-				case 186:
+				case 186:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion187);
+				case 187:
 					break;
 
 				default:
