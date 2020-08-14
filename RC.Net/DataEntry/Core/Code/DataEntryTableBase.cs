@@ -1,5 +1,6 @@
 using Extract.Imaging;
 using Extract.Licensing;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections;
@@ -1846,6 +1847,15 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// The attributes mapped to this control.
+        /// This includes child attributes whose parents are also mapped to this control. 
+        /// The ordering of the attributes is undefined.
+        /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IEnumerable<IAttribute> Attributes => _attributeMap.Keys;
+
+        /// <summary>
         /// Gets or sets the <see cref="IDataEntryControl"/> which is mapped to the parent of the 
         /// <see cref="IAttribute"/>(s) to which the current table is to be mapped.  The specified 
         /// <see cref="IDataEntryControl"/> must be contained in the same 
@@ -2224,8 +2234,12 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> for which the UI element is needed.
         /// </param>
-        /// <returns>The UI element</returns>
-        public object GetAttributeUIElement(IAttribute attribute)
+        /// <param name="elementName">If a related element is required, the property name of an
+        /// object relative to the object mapped directly to the attribute. Multiple references may
+        /// be chained by separating with a period.. E.g., While a specific attribute may be mapped
+        /// to a DataGridViewRow, an elementName of "DataGridView.VerticalScrollBar" could be used
+        /// to refer to the scroll bar for the grid.</param>
+        public object GetAttributeUIElement(IAttribute attribute, string elementName)
         {
             try
             {
@@ -2234,18 +2248,9 @@ namespace Extract.DataEntry
                 object tableElement;
                 if (_attributeMap.TryGetValue(attribute, out tableElement))
                 {
-                    DataGridViewCell cell = tableElement as DataGridViewCell;
-                    if (cell != null)
-                    {
-                        return cell;
-                    }
-
-                    // Attempt to interpret the item as a DataEntryTableRow to get its Attribute.
-                    DataEntryTableRow row = tableElement as DataEntryTableRow;
-                    if (row != null)
-                    {
-                        return row;
-                    }
+                    return string.IsNullOrEmpty(elementName)
+                        ? tableElement
+                        : tableElement.GetProperty(elementName);
                 }
 
                 return null;

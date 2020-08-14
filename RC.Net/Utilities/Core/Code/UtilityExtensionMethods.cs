@@ -92,6 +92,99 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Gets the specified <see paramref="propertyName"/> value of <see paramref="targetObject"/>.
+        /// </summary>
+        /// <param name="targetObject">The object for which the property value is sought</param>
+        /// <param name="propertyName">The name of the property value to retrieve. Multiple property
+        /// references may be chained by separating with a period. E.g., if the targetObject is a
+        /// DataGridViewRow, an elementName of "DataGridView.VerticalScrollBar" could be used to refer
+        /// to the scroll bar for the grid.</param>
+        public static object GetProperty(this object targetObject, string propertyName)
+        {
+            try
+            {
+                PropertyInfo property = ResolveProperty(ref targetObject, propertyName);
+                return property.GetValue(targetObject);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50296");
+            }
+        }
+
+        /// <summary>
+        /// Sets the specified <see paramref="propertyName"/> value of <see paramref="targetObject"/>.
+        /// </summary>
+        /// <param name="targetObject">The object for which the property value is sought</param>
+        /// <param name="propertyName">The name of the property value to retrieve. Multiple property
+        /// references may be chained by separating with a period. E.g., if the targetObject is a
+        /// DataGridViewRow, an elementName of "DataGridView.VerticalScrollBar" could be used to refer
+        /// to the scroll bar for the grid.</param>
+        /// <param name="value">The string representation of the value to apply. Must be convertable
+        /// to the type of the specified property.</param>
+        public static void SetPropertyValue(this object targetObject, string propertyName, string value)
+        {
+            try
+            {
+                PropertyInfo property = ResolveProperty(ref targetObject, propertyName);
+                property.SetValue(targetObject, value.ConvertToType(property.PropertyType));
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50311");
+            }
+        }
+
+        /// <summary>
+        /// Sets the specified <see paramref="propertyName"/> value of <see paramref="targetObject"/>.
+        /// </summary>
+        /// <param name="targetObject">The object for which the property value is sought</param>
+        /// <param name="propertyName">The name of the property value to retrieve. Multiple property
+        /// references may be chained by separating with a period. E.g., if the targetObject is a
+        /// DataGridViewRow, an elementName of "DataGridView.VerticalScrollBar" could be used to refer
+        /// to the scroll bar for the grid.</param>
+        /// <param name="value">The  value to apply. Must be of the same type of the specified property.</param>
+        public static void SetPropertyValue<T>(this object targetObject, string propertyName, T value)
+        {
+            try
+            {
+                PropertyInfo property = ResolveProperty(ref targetObject, propertyName);
+                ExtractException.Assert("ELI50313", "Unexpected type", property.PropertyType == typeof(T));
+
+                property.SetValue(targetObject, value);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50312");
+            }
+        }
+
+        /// <summary>
+        /// Helper method for GetProperty/SetProperty. Resolves and returns a <see cref="PropertyInfo"/>
+        /// representing the the specified <see cref="propertyName"/>.
+        /// </summary>
+        /// <param name="targetObject">The object for which the property is sought</param>
+        /// <param name="propertyName">The name of the property value to retrieve. Multiple property
+        /// references may be chained by separating with a period. In this case targetObject is updated
+        /// to represent each successive object referenced until it represents the object to which the
+        /// property directly pertains.
+        static PropertyInfo ResolveProperty(ref object targetObject, string propertyName)
+        {
+            PropertyInfo property = null;
+            foreach (string currentProperty in propertyName.Split('.'))
+            {
+                if (property != null)
+                {
+                    targetObject = property.GetValue(targetObject, null);
+                }
+
+                property = targetObject.GetType().GetProperty(currentProperty);
+            }
+
+            return property;
+        }
+
+        /// <summary>
         /// Creates a memoized version of a unary function
         /// </summary>
         /// <typeparam name="T1">The type of the function parameter</typeparam>

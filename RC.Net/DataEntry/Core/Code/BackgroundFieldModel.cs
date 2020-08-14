@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using UCLID_AFCORELib;
@@ -80,16 +77,16 @@ namespace Extract.DataEntry
         [DataMember]
         public bool AutoCreate { get; set; } = true;
 
+        [DataMember(Name = "OwningControl")]
+        public BackgroundControlModel OwningControlModel { get; set; }
+
         // The models that should be mapped to subattributes of the current field's attributes.
         [DataMember]
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
         public List<BackgroundFieldModel> Children { get; set; } = new List<BackgroundFieldModel>();
-        
-        /// <summary>
-        /// The IDataEntryControl that represents the parent attribute for this field.
-        /// </summary>
-        public IDataEntryControl ParentAttributeControl { get; set; }
+
+        public IDataEntryControl OwningControl { get; set; }
 
         /// <summary>
         /// For controls that may format values beyond any defined AutoUpdateQueries, this method
@@ -97,74 +94,5 @@ namespace Extract.DataEntry
         /// foreground.
         /// </summary>
         public virtual void FormatValue(IAttribute attribute) { }
-
-        /// <summary>
-        /// Returns a JSON representation of the provided <see paramref="fieldModels"/>.
-        /// </summary>
-        public static string ToJson(IEnumerable<BackgroundFieldModel> fieldModels)
-        {
-            try
-            {
-                string json = JsonConvert.SerializeObject(fieldModels, Formatting.Indented, SerializationSettings);
-
-                return json;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI50241");
-            }
-        }
-
-        /// <summary>
-        /// Returns the <see cref="BackgroundFieldModel"/>s instances defined by the specified
-        /// <see paramref="json"/>.
-        /// </summary>
-        public static IEnumerable<BackgroundFieldModel> FromJson(string json)
-        {
-            try
-            {
-                var backgroundFieldModels = JsonConvert.DeserializeObject<IEnumerable<BackgroundFieldModel>>(
-                        json, SerializationSettings);
-
-                return backgroundFieldModels;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI50240");
-            }
-        }
-
-        /// <summary>
-        /// Gets the <see cref="JsonSerializerSettings"/> to use for <see cref="ToJson"/> and <see cref="FromJson"/>.
-        /// </summary>
-        static JsonSerializerSettings SerializationSettings { get; } = 
-            new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.None,
-                    ContractResolver = new ContractResolver(),
-                };
-
-        /// <summary>
-        /// Ensure $type for subclasses of <see cref="BackgroundFieldModel"/>
-        /// </summary>
-        class ContractResolver : DefaultContractResolver
-        {
-            public ContractResolver() : base() { }
-
-            protected override JsonContract CreateContract(Type objectType)
-            {
-                var contract = base.CreateContract(objectType);
-
-                // Use Auto for List<BackgroundFieldModel> so that subclasses get a $type field
-                if (objectType == typeof(List<BackgroundFieldModel>)
-                    && contract is JsonContainerContract containerContract
-                    && containerContract.ItemTypeNameHandling == null)
-                {
-                    containerContract.ItemTypeNameHandling = TypeNameHandling.Auto;
-                }
-
-                return contract;
-            }
-        }
     }
 }

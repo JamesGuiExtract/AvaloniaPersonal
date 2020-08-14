@@ -1263,7 +1263,10 @@ namespace Extract.DataEntry.Test
             IUnknownVector attributes = (IUnknownVector)new IUnknownVector();
             attributes.LoadFrom(fileName, false);
 
-            AttributeStatusInfo.ResetData(fileName, attributes, dbConnection);
+            var dbConnections = new Dictionary<string, DbConnection>();
+            dbConnections[""] = dbConnection;
+
+            AttributeStatusInfo.ResetData(fileName, attributes, dbConnections, pathTags: null, noUILoad: false);
 
             InitializeAttributes(attributes);
 

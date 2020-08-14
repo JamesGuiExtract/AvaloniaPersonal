@@ -1,3 +1,4 @@
+using Extract.AttributeFinder;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -666,35 +667,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Converts the provided <see cref="IEnumerable{T}"/> of <see cref="IAttribute"/>s to an
-        /// <see cref="IEnumerable{T}"/> that optionally includes all sub-attributes as well.
-        /// </summary>
-        /// <param name="attributes">The source<see cref="IEnumerable{T}"/> of
-        /// <see cref="IAttribute"/>s.</param>
-        /// <param name="includeSubAttributes"><see langword="true"/> to include all sub-attributes
-        /// of the provided attributes, <see langword="false"/> to return the source enumeration.
-        /// If included, sub-attributes will occur earlier in the enumeration that their parents.
-        /// </param>
-        /// <returns>The resulting <see cref="IEnumerable{T}"/> of <see cref="IAttribute"/>s.</returns>
-        static internal IEnumerable<IAttribute> ToAttributeEnumerable(IEnumerable<IAttribute> attributes,
-            bool includeSubAttributes)
-        {
-            foreach (IAttribute attribute in attributes)
-            {
-                if (includeSubAttributes)
-                {
-                    foreach (IAttribute subAttribute in
-                        ToAttributeEnumerable(attribute.SubAttributes, true))
-                    {
-                        yield return subAttribute;
-                    }
-                }
-
-                yield return attribute;
-            }
-        }
-
-        /// <summary>
         /// Converts the provided <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s to an
         /// <see cref="IEnumerable{T}"/> that optionally includes all sub-attributes as well.
         /// </summary>
@@ -708,31 +680,34 @@ namespace Extract.DataEntry
         static internal IEnumerable<IAttribute> ToAttributeEnumerable(IUnknownVector attributes,
             bool includeSubAttributes)
         {
-            ExtractException.Assert("ELI25170", "Null argument exception!", attributes != null);
+            return ToAttributeEnumerable(attributes.ToIEnumerable<IAttribute>(), includeSubAttributes);
+        }
 
-            // Loop through each attribute, but return sub-attributes first, if requested.
-            int attributeCount = attributes.Size();
-            for (int i = 0; i < attributeCount; i++)
+        /// <summary>
+        /// Converts the provided <see cref="IEnumerable{T}"/> of <see cref="IAttribute"/>s to an
+        /// <see cref="IEnumerable{T}"/> that optionally includes all sub-attributes as well.
+        /// </summary>
+        /// <param name="attributes">The source<see cref="IEnumerable{T}"/> of
+        /// <see cref="IAttribute"/>s.</param>
+        /// <param name="includeSubAttributes"><see langword="true"/> to include all sub-attributes
+        /// of the provided attributes, <see langword="false"/> to return the source enumeration.
+        /// If included, sub-attributes will occur earlier in the enumeration that their parents.
+        /// </param>
+        /// <returns>The resulting <see cref="IEnumerable{T}"/> of <see cref="IAttribute"/>s.</returns>
+        static internal IEnumerable<IAttribute> ToAttributeEnumerable(IEnumerable<IAttribute> attributes,
+            bool includeSubAttributes)
+        {
+            foreach (var attribute in attributes.OfType<IAttribute>())
             {
-                // Can be null, so don't use explicit cast.
-                IAttribute attribute = attributes.At(i) as IAttribute;
-
-                if (attribute == null)
-                {
-                    continue;
-                }
-
-                // If the supplied attribute is not null and we are including sub-attributes, 
-                // collect the raster zones from this attribute's children.
                 if (includeSubAttributes)
                 {
-                    foreach (IAttribute subAttribute in
+                    foreach (var subAttribute in 
                         ToAttributeEnumerable(attribute.SubAttributes, true))
                     {
                         yield return subAttribute;
                     }
                 }
-
+                
                 yield return attribute;
             }
         }

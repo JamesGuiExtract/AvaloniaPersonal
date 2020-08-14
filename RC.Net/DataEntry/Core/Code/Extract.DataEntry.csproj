@@ -171,7 +171,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BackgroundFieldModel.cs" />
     <Compile Include="AttributeQueryNode.cs">
       <SubType>Code</SubType>
       <DependentUpon>DataEntryQuery.cs</DependentUpon>
@@ -184,6 +183,13 @@
       <DependentUpon>AttributeStatusInfo.cs</DependentUpon>
     </Compile>
     <Compile Include="AutoUpdateTrigger.cs" />
+    <Compile Include="BackgroundModel.cs" />
+	<Compile Include="BackgroundControlModel.cs">
+		<DependentUpon>BackgroundModel.cs</DependentUpon>
+	</Compile>
+    <Compile Include="BackgroundFieldModel.cs">
+		<DependentUpon>BackgroundModel.cs</DependentUpon>
+	</Compile>
     <Compile Include="CachedQueryData.cs">
       <SubType>Code</SubType>
       <DependentUpon>DataEntryQuery.cs</DependentUpon>
@@ -251,6 +257,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DataEntryTableBase.SelectionState.cs">
+      <DependentUpon>DataEntryTableBase.cs</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DataEntryTableBase.BackgroundControlModel.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
       <SubType>Component</SubType>
     </Compile>

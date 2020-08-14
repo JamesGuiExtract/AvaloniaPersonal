@@ -781,7 +781,8 @@ namespace Extract.DataEntry
                 var fieldModel = new BackgroundFieldModel()
                 {
                     Name = AttributeName,
-                    ParentAttributeControl = ParentDataEntryControl,
+                    OwningControl = this,
+                    OwningControlModel = BackgroundOwningControlModel,
                     DisplayOrder = displayOrder
                 };
 
@@ -806,6 +807,8 @@ namespace Extract.DataEntry
                         var childFieldModel = new BackgroundFieldModel()
                         {
                             Name = dataEntryRow.AttributeName,
+                            OwningControl = this,
+                            OwningControlModel = BackgroundOwningControlModel,
                             AutoUpdateQuery = dataEntryRow.AutoUpdateQuery,
                             ValidationQuery = dataEntryRow.ValidationQuery,
                             DisplayOrder = displayOrder.Concat(new[] { dataEntryRow.Index + 1 }),

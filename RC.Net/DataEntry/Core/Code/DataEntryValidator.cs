@@ -318,7 +318,7 @@ namespace Extract.DataEntry
                 // displayed.
                 bool validationEnabled = !string.IsNullOrEmpty(_validationErrorMessage) &&
                                          AttributeStatusInfo.IsValidationEnabled(attribute) &&
-                                         AttributeStatusInfo.IsViewable(attribute);
+                                         AttributeStatusInfo.IsAttributeViewable(attribute);
 
                 // If there is a specified validation pattern, check it.
                 if (validationEnabled &&  _validationRegex != null &&

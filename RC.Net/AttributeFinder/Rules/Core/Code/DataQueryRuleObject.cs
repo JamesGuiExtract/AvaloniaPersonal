@@ -983,7 +983,7 @@ namespace Extract.AttributeFinder.Rules
                 {
                     result = query.Evaluate();
                 }
-                AttributeStatusInfo.ResetData(null, null, null);
+                AttributeStatusInfo.ResetData();
 
                 // Close the database connection if one was opened.
                 if (dbConnection != null)

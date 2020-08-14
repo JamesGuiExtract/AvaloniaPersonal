@@ -795,7 +795,7 @@ namespace Extract.DataEntry.LabDE
                             {
                                 IAttribute recordIdAttribute = e.DocumentDataRecord.IdField.Attribute;
                                 IDataEntryTableCell recordIdCell =
-                                    dataEntryTable.GetAttributeUIElement(recordIdAttribute)
+                                    dataEntryTable.GetAttributeUIElement(recordIdAttribute, "")
                                         as IDataEntryTableCell;
                                 if (recordIdCell != null)
                                 {

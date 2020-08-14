@@ -474,7 +474,7 @@ namespace Extract.LabResultsCustomComponents
                     {
                         result = query.Evaluate();
                     }
-                    AttributeStatusInfo.ResetData(null, null, null);
+                    AttributeStatusInfo.ResetData();
 
                     int retVal = 0;
                     return result.Max(r => Int32.TryParse(result.FirstString, out retVal) ? retVal : 0);

@@ -1,5 +1,7 @@
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -16,7 +18,7 @@ namespace Extract.DataEntry
     /// implementation of custom actions in a DEP using a button that supports validation queries
     /// and/or queries to update the button text.
     /// </summary>
-    public partial class DataEntryButton : Button, IDataEntryAttributeControl, IRequiresErrorProvider
+    public partial class DataEntryButton : Button, IDataEntrySingleAttributeControl, IRequiresErrorProvider
     {
         #region Constants
 
@@ -875,16 +877,66 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> for which the UI element is needed.
         /// </param>
+        /// <param name="elementName">If a related element is required, the property name of an
+        /// object relative to the object mapped directly to the attribute. Multiple references may
+        /// be chained by separating with a period. E.g., While a specific attribute may be mapped
+        /// to a DataGridViewRow, an elementName of "DataGridView.VerticalScrollBar" could be used
+        /// to refer to the scroll bar for the grid.</param>
         /// <returns>The UI element.</returns>
-        public object GetAttributeUIElement(IAttribute attribute)
+        public object GetAttributeUIElement(IAttribute attribute, string elementName)
         {
-            return this;
+            try
+            {
+                return string.IsNullOrEmpty(elementName)
+                    ? this
+                    : this.GetProperty(elementName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50315");
+            }
         }
 
         /// <summary>
-        /// The attribute mapped to this control.
+        /// Creates a <see cref="BackgroundFieldModel"/> for representing this control during
+        /// a background data load.
+        /// </summary>
+        public BackgroundFieldModel GetBackgroundFieldModel()
+        {
+            try
+            {
+                var fieldModel = new BackgroundFieldModel()
+                {
+                    Name = AttributeName,
+                    OwningControl = this,
+                    OwningControlModel = new BackgroundControlModel(this),
+                    AutoUpdateQuery = AutoUpdateQuery,
+                    ValidationQuery = ValidationQuery,
+                    DisplayOrder = DataEntryMethods.GetTabIndices(this),
+                    IsViewable = Visible,
+                    ValidationErrorMessage = ValidationErrorMessage,
+                    PersistAttribute = PersistAttribute,
+                    ValidationPattern = ValidationPattern
+                };
+
+                return fieldModel;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI45505");
+            }
+        }
+
+        /// <summary>
+        /// The single attribute mapped to this control
         /// </summary>
         public IAttribute Attribute => _attribute;
+
+        /// <summary>
+        /// The attributes mapped to this control.
+        /// (In the case of this control, there will only be one)
+        /// </summary>
+        public IEnumerable<IAttribute> Attributes => new[] { _attribute };
 
         #endregion IDataEntryControl Members
 
@@ -1014,35 +1066,6 @@ namespace Extract.DataEntry
         /// </summary>
         public void ApplySelection(SelectionState selectionState)
         {
-        }
-
-        /// <summary>
-        /// Creates a <see cref="BackgroundFieldModel"/> for representing this control during
-        /// a background data load.
-        /// </summary>
-        public BackgroundFieldModel GetBackgroundFieldModel()
-        {
-            try
-            {
-                var fieldModel = new BackgroundFieldModel()
-                {
-                    Name = AttributeName,
-                    ParentAttributeControl = ParentDataEntryControl,
-                    AutoUpdateQuery = AutoUpdateQuery,
-                    ValidationQuery = ValidationQuery,
-                    DisplayOrder = DataEntryMethods.GetTabIndices(this),
-                    IsViewable = Visible,
-                    ValidationErrorMessage = ValidationErrorMessage,
-                    PersistAttribute = PersistAttribute,
-                    ValidationPattern = ValidationPattern
-                };
-
-                return fieldModel;
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45505");
-            }
         }
 
         #endregion Unused IDataEntryControl Members

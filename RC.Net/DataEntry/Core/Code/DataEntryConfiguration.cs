@@ -1,6 +1,5 @@
 ﻿using Extract.Database;
 using Extract.Utilities;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,7 +8,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using System.Xml;
 using System.Xml.XPath;
 using UCLID_AFUTILSLib;
@@ -66,9 +64,9 @@ namespace Extract.DataEntry
         FileProcessingDB _fileProcessingDB;
 
         /// <summary>
-        /// The <see cref="BackgroundFieldModel"/>s to use for performing background data loads.
+        /// The <see cref="BackgroundModel"/> emulating this configuration in background data loads.
         /// </summary>
-        IEnumerable<BackgroundFieldModel> _backgroundFieldModels;
+        BackgroundModel _backgroundModel;
 
         /// <summary>
         /// <c>true</c> if this configuration is for background data loading; otherwise <c>false</c>.
@@ -184,7 +182,7 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _backgroundFieldModels ?? new BackgroundFieldModel[0];
+                return _backgroundModel.Fields ?? new List<BackgroundFieldModel>();
             }
         }
 
@@ -285,7 +283,7 @@ namespace Extract.DataEntry
                 configuration._config = _config;
                 configuration._tagUtility = _tagUtility;
                 configuration._fileProcessingDB = _fileProcessingDB;
-                configuration._backgroundFieldModels = _backgroundFieldModels;
+                configuration._backgroundModel = _backgroundModel;
 
                 return configuration;
             }
@@ -389,7 +387,7 @@ namespace Extract.DataEntry
             {
                 if (string.IsNullOrWhiteSpace(Config.Settings.NoUILoadConfig))
                 {
-                    _backgroundFieldModels = BuildFieldModels(_dataEntryControlHost);
+                    _backgroundModel = new BackgroundModel(_dataEntryControlHost);
                 }
                 else
                 {
@@ -397,15 +395,13 @@ namespace Extract.DataEntry
                     if (File.Exists(noUiLoadConfigFile))
                     {
                         string noUiLoadConfig = File.ReadAllText(noUiLoadConfigFile);
-                        _backgroundFieldModels = BackgroundFieldModel.FromJson(noUiLoadConfig);
+                        _backgroundModel = BackgroundModel.FromJson(noUiLoadConfig);
                     }
                     else
                     {
-                        var fieldModels = BuildFieldModels(_dataEntryControlHost);
-                        var noUiLoadConfig = BackgroundFieldModel.ToJson(fieldModels);
+                        _backgroundModel = new BackgroundModel(_dataEntryControlHost);
+                        var noUiLoadConfig = _backgroundModel.ToJson();
                         File.WriteAllText(noUiLoadConfigFile, noUiLoadConfig);
-
-                        _backgroundFieldModels = fieldModels;
                     }
                 }
             }
@@ -699,78 +695,6 @@ namespace Extract.DataEntry
                 ExtractException ee = new ExtractException("ELI49962",
                     "Unable to initialize data entry control host!", ex);
                 throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Builds a hierarchy of <see cref="BackgroundFieldModel"/> that represent the fields in
-        /// the specified <see cref="controlHost"/>.
-        /// </summary>
-        /// <param name="controlHost">The <see cref="DataEntryControlHost"/> for which field models
-        /// are to be created.</param>
-        static List<BackgroundFieldModel> BuildFieldModels(DataEntryControlHost controlHost)
-        {
-            var modelDictionary = new Dictionary<object, BackgroundFieldModel>();
-            var fieldModels =
-                BuildFieldModels(controlHost, modelDictionary)
-                .ToArray();
-
-            var modelList = new List<BackgroundFieldModel>();
-            foreach (var fieldModel in fieldModels)
-            {
-                if (fieldModel.ParentAttributeControl == null)
-                {
-                    modelList.Add(fieldModel);
-                }
-                else
-                {
-                    var parentModel = modelDictionary[fieldModel.ParentAttributeControl];
-
-                    // Confirm that the parent has a name since otherwise it won't be in the fieldModels collection
-                    ExtractException.Assert("ELI45636", "Logic exception", !string.IsNullOrEmpty(parentModel.Name));
-
-                    parentModel.Children.Add(fieldModel);
-                }
-            }
-
-            return modelList;
-        }
-
-        /// <summary>
-        /// Builds a hierarchy of <see cref="BackgroundFieldModel"/> that represent the fields in
-        /// the specified <see cref="control"/> and decedent controls.
-        /// </summary>
-        /// <param name="control">The <see cref="DataEntryControlHost"/> for which field models
-        /// are to be created.</param>
-        /// <param name="modelDictionary">A dictionary that maps every parent control to its
-        /// decendent field models. Used by <see cref="BuildFieldModels{DataEntryControlHost}"/> to
-        /// organize the returned enumerations into the appropriate hierarchy for the attributes.
-        /// </param>
-        static IEnumerable<BackgroundFieldModel> BuildFieldModels(Control control,
-            Dictionary<object, BackgroundFieldModel> modelDictionary)
-        {
-            var thisDataEntryControl = control as IDataEntryControl;
-            if (thisDataEntryControl != null)
-            {
-                var fieldModel = thisDataEntryControl.GetBackgroundFieldModel();
-                if (fieldModel != null)
-                {
-                    modelDictionary[control] = fieldModel;
-                    // Don't create unnamed models
-                    // https://extract.atlassian.net/browse/ISSUE-15300
-                    if (!string.IsNullOrEmpty(fieldModel.Name))
-                    {
-                        yield return fieldModel;
-                    }
-                }
-            }
-
-            foreach (var childControl in control.Controls.OfType<Control>())
-            {
-                foreach (var fieldModel in BuildFieldModels(childControl, modelDictionary))
-                {
-                    yield return fieldModel;
-                }
             }
         }
 

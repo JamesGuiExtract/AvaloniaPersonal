@@ -1,3 +1,4 @@
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,7 +17,7 @@ namespace Extract.DataEntry
     /// text of another control to the clipboard and report its "data" as invalid until it is
     /// pressed.
     /// </summary>
-    public partial class DataEntryCopyButton : Button, IDataEntryAttributeControl, IRequiresErrorProvider,
+    public partial class DataEntryCopyButton : Button, IDataEntrySingleAttributeControl, IRequiresErrorProvider,
         IDataEntryValidator
     {
         #region Fields
@@ -645,9 +646,15 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// The attribute mapped to this control.
+        /// The single attribute mapped to this control
         /// </summary>
         public IAttribute Attribute => _attribute;
+
+        /// <summary>
+        /// The attributes mapped to this control.
+        /// (In the case of this control, there will only be one)
+        /// </summary>
+        public IEnumerable<IAttribute> Attributes => new[] { _attribute };
 
         #endregion IDataEntryControl Members
 
@@ -821,10 +828,24 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> for which the UI element is needed.
         /// </param>
+        /// <param name="elementName">If a related element is required, the property name of an
+        /// object relative to the object mapped directly to the attribute. Multiple references may
+        /// be chained by separating with a period. E.g., While a specific attribute may be mapped
+        /// to a DataGridViewRow, an elementName of "DataGridView.VerticalScrollBar" could be used
+        /// to refer to the scroll bar for the grid.</param>
         /// <returns>The UI element.</returns>
-        public object GetAttributeUIElement(IAttribute attribute)
+        public object GetAttributeUIElement(IAttribute attribute, string elementName)
         {
-            return this;
+            try
+            {
+                return string.IsNullOrEmpty(elementName)
+                    ? this
+                    : this.GetProperty(elementName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50323");
+            }
         }
 
         /// <summary>
@@ -853,6 +874,8 @@ namespace Extract.DataEntry
                 return new BackgroundFieldModel()
                 {
                     Name = _attributeName,
+                    OwningControl = this,
+                    OwningControlModel = new BackgroundControlModel(this),
                     DisplayOrder = DataEntryMethods.GetTabIndices(this),
                     IsViewable = Visible,
                     PersistAttribute = false,

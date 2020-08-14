@@ -11,7 +11,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
@@ -147,6 +146,12 @@ namespace Extract.DataEntry
         /// </summary>
         [ThreadStatic]
         static IUnknownVector _attributes;
+
+        /// <summary>
+        /// Indicates whether the current data was initialize in the background without Windows controls.
+        /// </summary>
+        [ThreadStatic]
+        static bool _noUILoad;
 
         /// <summary>
         /// The current base <see cref="ExecutionContext"/> for use in enforcing the
@@ -332,12 +337,9 @@ namespace Extract.DataEntry
         #region Instance fields
 
         /// <summary>
-        /// Indicates whether the object has been modified since being loaded via the 
-        /// IPersistStream interface. This is an int because that is the return type of 
-        /// IPersistStream::IsDirty in order to support COM values of <see cref="HResult.Ok"/> and 
-        /// <see cref="HResult.False"/>.
+        /// The <see cref="IAttribute"/> to which the data in this instance relates.
         /// </summary>
-        int _dirty;
+        IAttribute _attribute;
 
         /// <summary>
         /// The control in charge of displaying the attribute.
@@ -370,6 +372,13 @@ namespace Extract.DataEntry
         /// <see langword="false"/> otherwise.
         /// </summary>
         bool _isViewable;
+
+        /// <summary>
+        /// Whether a field is viewable depends on control state beyond _isViewable. To process changes
+        /// in the viewable state that may result from these control state changes, keep track of whether
+        /// the control was considered viewable when last interogated.
+        /// </summary>
+        bool _lastReportedViewableState;
 
         /// <summary>
         /// A <see cref="DataValidity"/> value indicating whether the attribute's value is valid.
@@ -605,6 +614,44 @@ namespace Extract.DataEntry
             set
             {
                 _persistAttribute = value;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether this attribute is considered viewable.
+        /// NOTE: When set to <c>false</c>, this property is guaranteed to return false.
+        /// However, when set to <c>true</c>, this property may still return <c>false</c> if the
+        /// control is disabled or not visible.
+        /// </summary>
+        public bool IsViewable
+        {
+            get
+            {
+                if (_noUILoad)
+                {
+                    return _isViewable;
+                }
+                else
+                {
+                    var isViewable = _isViewable
+                        && _owningControl?.Disabled == false
+                        && (_owningControl as Control)?.Visible == true;
+
+                    // If the result differs from the last reported state (whether as a result of a
+                    // change to _isViewable, or the control's Disabled or Visible properties), perform
+                    // any actions dependent on the control's viewability.
+                    if (isViewable != _lastReportedViewableState)
+                    {
+                        ProcessViewabilityChange(isViewable, _attribute);
+                    }
+
+                    return isViewable;
+                }
+            }
+
+            set
+            {
+                _isViewable = value;
             }
         }
 
@@ -1021,6 +1068,7 @@ namespace Extract.DataEntry
                     }
 
                     _statusInfoMap[attribute] = statusInfo;
+                    statusInfo._attribute = attribute;
                 }
 
                 return statusInfo;
@@ -1037,18 +1085,10 @@ namespace Extract.DataEntry
         /// <see langword="null"/> every time a document is closed (or <see cref="IAttribute"/>s are
         /// otherwise unloaded).
         /// </summary>
-        /// <param name="sourceDocName">The name of the currently open document.</param>
-        /// <param name="attributes">The active <see cref="IAttribute"/> hierarchy.</param>
-        /// <param name="dbConnection">Any database available for use in validation or
-        /// auto-update queries; (Can be <see langword="null"/> if not required).</param>
         [ComVisible(false)]
-        public static void ResetData(string sourceDocName, IUnknownVector attributes,
-            DbConnection dbConnection)
+        public static void ResetData()
         {
-            var dbConnections = new Dictionary<string, DbConnection>();
-            dbConnections[""] = dbConnection;
-
-            ResetData(sourceDocName, attributes, dbConnections, null);
+            ResetData(null, null, null, null, false);
         }
 
         /// <summary>
@@ -1065,9 +1105,11 @@ namespace Extract.DataEntry
         /// <param name="pathTags">An <see cref="IPathTags"/> instance to be used to expand tags if
         /// anything other than the SourceDocName tag is needed; Otherwise, <see langword="null"/>.
         /// </param>
+        /// <param name="noUILoad">Indicates whether this data is associated with a background load
+        /// that is not using any Windows controls.</param>
         [ComVisible(false)]
         public static void ResetData(string sourceDocName, IUnknownVector attributes,
-            Dictionary<string, DbConnection> dbConnections, IPathTags pathTags)
+            Dictionary<string, DbConnection> dbConnections, IPathTags pathTags, bool noUILoad)
         {
             try
             {
@@ -1169,6 +1211,7 @@ namespace Extract.DataEntry
                 _attributes = attributes;
                 _sourceDocName = sourceDocName;
                 _dbConnections = dbConnections;
+                _noUILoad = noUILoad;
 
                 OnDataReset();
             }
@@ -1196,7 +1239,7 @@ namespace Extract.DataEntry
                 var dbConnections = new Dictionary<string, DbConnection>();
                 dbConnections[""] = dbConnection;
 
-                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, null);
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags: null, noUILoad: true);
                 Initialize(attributes);
             }
             catch (Exception ex)
@@ -1230,7 +1273,8 @@ namespace Extract.DataEntry
         {
             try
             {
-                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags);
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags,
+                    noUILoad: fieldModels != null);
                 EnableValidationTriggers(false);
                 Initialize(attributes, fieldModels);
                 EnableValidationTriggers(true);
@@ -1261,7 +1305,7 @@ namespace Extract.DataEntry
                 var dbConnections = new Dictionary<string, DbConnection>();
                 dbConnections[""] = dbConnection;
 
-                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags);
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags, noUILoad: true);
                 Initialize(attributes);
             }
             catch (Exception ex)
@@ -1287,7 +1331,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags);
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags, noUILoad: true);
                 Initialize(attributes);
             }
             catch (Exception ex)
@@ -1337,9 +1381,9 @@ namespace Extract.DataEntry
                     IAttribute attribute = (IAttribute)attributes.At(i);
                     var fieldModel = fieldModels?.SingleOrDefault(child => child.Name == attribute.Name);
 
-                    AttributeStatusInfo.Initialize(attribute, attributes, null, fieldModel?.DisplayOrder,
-                        false, TabStopMode.Never, new DataEntryValidator(), fieldModel?.AutoUpdateQuery,
-                        fieldModel?.ValidationQuery);
+                    AttributeStatusInfo.Initialize(attribute, attributes, fieldModel?.OwningControl, 
+                        fieldModel?.DisplayOrder, considerPropagated: false, TabStopMode.Never,
+                        new DataEntryValidator(), fieldModel?.AutoUpdateQuery, fieldModel?.ValidationQuery);
 
                     Initialize(attribute.SubAttributes, fieldModel?.Children);
 
@@ -1349,7 +1393,7 @@ namespace Extract.DataEntry
                         // would have done.
                         var statusInfo = GetStatusInfo(attribute);
                         statusInfo._isMapped = true;
-                        statusInfo._isViewable = fieldModel.IsViewable;
+                        statusInfo.IsViewable = fieldModel.IsViewable;
                         statusInfo.PersistAttribute = fieldModel.PersistAttribute;
                         var validator = (DataEntryValidator)statusInfo.Validator;
                         validator.ValidationErrorMessage = fieldModel.ValidationErrorMessage;
@@ -1660,6 +1704,12 @@ namespace Extract.DataEntry
 
                     _undoManager.AddMemento(new DataEntryAddedAttributeMemento(attribute));
 
+                    var control = statusInfo.OwningControl as Control;
+                    if (control != null)
+                    {
+                        control.VisibleChanged += HandleControl_VisibleChanged;
+                    }
+
                     OnAttributeInitialized(attribute, sourceAttributes, owningControl);
                 }
 
@@ -1926,28 +1976,33 @@ namespace Extract.DataEntry
         {
             try
             {
-                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+                string elementName = "";
 
-                // These values will be set for each generation in the specified property name.
-                object element = null;
-                Type elementType = null;
-                PropertyInfo property = null;
-
-                foreach (string currentProperty in propertyName.Split('.'))
+                // If any periods are in the property name, first get the object for which the property
+                // value will be applied.
+                var endPos = propertyName.LastIndexOf('.');
+                if (endPos > 0)
                 {
-                    // The root element will be the UI element directly associated with the
-                    // attribute.
-                    element = (property == null)
-                        ? statusInfo.OwningControl.GetAttributeUIElement(attribute)
-                        : property.GetValue(element, null);
-
-                    elementType = element.GetType();
-                    property = elementType.GetProperty(currentProperty);
+                    elementName = propertyName.Substring(0, endPos);
+                    propertyName = propertyName.Substring(endPos + 1);
                 }
 
-                // The property we have after looping through all generations is the one for which
-                // we need to apply the value.
-                property.SetValue(element, value.ConvertToType(property.PropertyType), null);
+                var statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+                var element = statusInfo?.OwningControl?.GetAttributeUIElement(attribute, elementName);
+
+                if (element != null)
+                {
+                    element.SetPropertyValue(propertyName, value);
+
+                    // If the Disabled property of the OwningControl is being changed, automatically
+                    // update "Enabled" to reflect the change. That way, AutoUpdateQueries can target
+                    // one property and we can be sure the enabled status is being updated correctly.
+                    if (propertyName == "Disabled" && element == statusInfo.OwningControl
+                        && statusInfo.OwningControl.DataEntryControlHost?.ChangingData == false)
+                    {
+                        element.SetPropertyValue("Enabled", !value.ToBoolean());
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -2351,7 +2406,7 @@ namespace Extract.DataEntry
                 // raise the ViewedStateChanged event to notify listeners of the new status.
                 // Ensure an item's viewed status doesn't change after it has been deleted (i.e.,
                 // it no longer exists.
-                if (statusInfo._isViewable && statusInfo._hasBeenViewed != hasBeenViewed &&
+                if (statusInfo.IsViewable && statusInfo._hasBeenViewed != hasBeenViewed &&
                     statusInfo._initialized)
                 {
                     // AddMemento needs to be called before changing the status so that the
@@ -2467,7 +2522,7 @@ namespace Extract.DataEntry
             {
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                return (statusInfo._isViewable) ? statusInfo._dataValidity : DataValidity.Valid;
+                return statusInfo.IsViewable ? statusInfo._dataValidity : DataValidity.Valid;
             }
             catch (Exception ex)
             {
@@ -2594,52 +2649,14 @@ namespace Extract.DataEntry
         /// set.</param>
         /// <param name="isViewable"><see langword="true"/> if the <see cref="IAttribute"/> is
         /// viewable, <see langword="false"/> if it is not.</param>
-        /// <returns><see langword="true"/> in all cases to continue the scan.</returns>
         [ComVisible(false)]
-        public static bool MarkAsViewable(IAttribute attribute, bool isViewable)
+        public static void MarkAsViewable(IAttribute attribute, bool isViewable)
         {
             try
             {
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                if (statusInfo._isViewable != isViewable)
-                {
-                    // Don't allow any attribute that belongs to a disabled data entry control to
-                    // be marked as viewable since the value will not be selectable or editable.
-                    if (isViewable &&
-                        statusInfo._owningControl != null && statusInfo._owningControl.Disabled)
-                    {
-                        return true;
-                    }
-
-                    statusInfo._isViewable = isViewable;
-
-                    // If the attribute was not previously viewable, it would not have been
-                    // considered unviewed.  Now it will be considered unviewed so the 
-                    // ViewedStateChanged event needs to be raised (assuming the attribute
-                    // is actually unviewed).
-                    if (!statusInfo._hasBeenViewed)
-                    {
-                        OnViewedStateChanged(attribute, false);
-                    }
-
-                    // https://extract.atlassian.net/browse/ISSUE-12812
-                    // Since non-viewable attributes will not be considered invalid, ensure the
-                    // validation status is up-to-date for any attribute whose viewed status has
-                    // been changed since the original document load.
-                    if (statusInfo._owningControl != null &&
-                        !statusInfo._owningControl.DataEntryControlHost.ChangingData)
-                    {
-                        AttributeStatusInfo.Validate(attribute, false);
-                        if (isViewable)
-                        {
-                            // If the attribute has been made viewable, make sure the control is
-                            // accurately indicating the current validation state.
-                            statusInfo._owningControl.RefreshAttributes(false, attribute);
-                        }
-                    }
-                }
-                return true;
+                statusInfo.IsViewable = isViewable;
             }
             catch (Exception ex)
             {
@@ -2656,13 +2673,13 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the specified <see cref="IAttribute"/> is viewable;
         /// <see langword="false"/> if it is not.</returns>
         [ComVisible(false)]
-        public static bool IsViewable(IAttribute attribute)
+        public static bool IsAttributeViewable(IAttribute attribute)
         {
             try
             {
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
-                return statusInfo._isViewable;
+                return statusInfo.IsViewable;
             }
             catch (Exception ex)
             {
@@ -3663,10 +3680,24 @@ namespace Extract.DataEntry
                     {
                         ReleaseAttributes(attribute.SubAttributes, miscUtils);
 
+                        var statusInfo = GetStatusInfo(attribute);
+                        if (statusInfo.OwningControl != null)
+                        {
+                            var control = statusInfo.OwningControl as Control;
+                            if (control != null)
+                            {
+                                control.VisibleChanged -= HandleControl_VisibleChanged;
+                            }
+
+                            statusInfo.OwningControl = null;
+                        }
+
                         // This will release the reference to the DataObject (thereby preventing memory
                         // leak issues), while saving the persistable elements of the status info object
                         // so that they are persisted with the attribute itself.
                         attribute.StowDataObject(miscUtils);
+
+                        statusInfo._attribute = null;
                     }
                 }
             }
@@ -3687,7 +3718,7 @@ namespace Extract.DataEntry
             {
                 // Ensure all AttributeStatusInfos are released; these may otherwise hold references
                 // to objects thereby preventing them from being finalized.
-                ResetData(null, null, null);
+                ResetData();
 
                 // This unregisters event handlers that may otherwise hold references to objects
                 // thereby preventing them from being finalized.
@@ -3890,6 +3921,30 @@ namespace Extract.DataEntry
                 _undoManager = new UndoManager();
                 _endEditReferenceCount = 0;
                 _endEditRecursionBlock = false;
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the visibility of the control mapped to an attribute changes.
+        /// </summary>
+        static void HandleControl_VisibleChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                var control = sender as IDataEntryControl;
+                if (control != null)
+                {
+                    foreach (var attribute in control.Attributes)
+                    {
+                        var statusInfo = GetStatusInfo(attribute);
+
+                        statusInfo.ProcessViewabilityChange(statusInfo.IsViewable, attribute);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50318");
             }
         }
 
@@ -4254,6 +4309,43 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Performs any actions that need to be to reflect a change in the <see cref="IsViewable"/>
+        /// status of an attribute.
+        /// </summary>
+        void ProcessViewabilityChange(bool isViewable, IAttribute attribute)
+        {
+            if (isViewable != _lastReportedViewableState)
+            {
+                _lastReportedViewableState = isViewable;
+
+                // If the attribute was not previously viewable, it would not have been
+                // considered unviewed.  Now it will be considered unviewed so the 
+                // ViewedStateChanged event needs to be raised (assuming the attribute
+                // is actually unviewed).
+                if (!_hasBeenViewed)
+                {
+                    OnViewedStateChanged(attribute, false);
+                }
+
+                // https://extract.atlassian.net/browse/ISSUE-12812
+                // Since non-viewable attributes will not be considered invalid, ensure the
+                // validation status is up-to-date for any attribute whose viewed status has
+                // been changed since the original document load.
+                if (_owningControl != null &&
+                    !_owningControl.DataEntryControlHost.ChangingData)
+                {
+                    AttributeStatusInfo.Validate(attribute, false);
+                    if (isViewable)
+                    {
+                        // If the attribute has been made viewable, make sure the control is
+                        // accurately indicating the current validation state.
+                        _owningControl.RefreshAttributes(false, attribute);
+                    }
+                }
+            }
+        }
+
         #endregion Private Methods
 
         #region IPersistStream Members
@@ -4275,7 +4367,7 @@ namespace Extract.DataEntry
         /// <see langword="false"/> otherwise.</returns>
         public int IsDirty()
         {
-            return _dirty;
+            return HResult.False;
         }
 
         /// <summary>
@@ -4302,8 +4394,6 @@ namespace Extract.DataEntry
                         _hintEnabled = reader.ReadBoolean();
                     }
                 }
-
-                _dirty = HResult.False;
             }
             catch (Exception ex)
             {
@@ -4336,11 +4426,6 @@ namespace Extract.DataEntry
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
-                }
-
-                if (clearDirty)
-                {
-                    _dirty = HResult.False;
                 }
             }
             catch (Exception ex)

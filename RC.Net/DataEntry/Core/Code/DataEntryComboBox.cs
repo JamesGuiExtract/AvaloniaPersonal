@@ -1,4 +1,6 @@
+using Extract.Utilities;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
@@ -330,6 +332,12 @@ namespace Extract.DataEntry
         /// The attribute mapped to this control.
         /// </summary>
         public IAttribute Attribute { get; private set; }
+
+        /// <summary>
+        /// The attributes mapped to this control.
+        /// (In the case of this control, there will only be one)
+        /// </summary>
+        public IEnumerable<IAttribute> Attributes => new[] { Attribute };
 
         /// <summary>
         /// The last noted selection start.
@@ -932,10 +940,24 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> for which the UI element is needed.
         /// </param>
+        /// <param name="elementName">If a related element is required, the property name of an
+        /// object relative to the object mapped directly to the attribute. Multiple references may
+        /// be chained by separating with a period. E.g., While a specific attribute may be mapped
+        /// to a DataGridViewRow, an elementName of "DataGridView.VerticalScrollBar" could be used
+        /// to refer to the scroll bar for the grid.</param>
         /// <returns>The UI element</returns>
-        public object GetAttributeUIElement(IAttribute attribute)
+        public object GetAttributeUIElement(IAttribute attribute, string elementName)
         {
-            return this;
+            try
+            {
+                return string.IsNullOrEmpty(elementName)
+                    ? this
+                    : this.GetProperty(elementName);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50322");
+            }
         }
 
         /// <summary>
@@ -1039,7 +1061,8 @@ namespace Extract.DataEntry
                 var fieldModel = new BackgroundFieldModel()
                 {
                     Name = AttributeName,
-                    ParentAttributeControl = ParentDataEntryControl,
+                    OwningControl = this,
+                    OwningControlModel = new BackgroundControlModel(this),
                     AutoUpdateQuery = AutoUpdateQuery,
                     ValidationQuery = ValidationQuery,
                     DisplayOrder = DataEntryMethods.GetTabIndices(this),
@@ -1057,8 +1080,6 @@ namespace Extract.DataEntry
                 throw ex.AsExtract("ELI45504");
             }
         }
-
-
 
         /// <summary>
         /// Handles the case that this <see cref="IDataEntryControl"/>'s 

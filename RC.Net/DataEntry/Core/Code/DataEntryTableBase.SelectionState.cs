@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -54,8 +55,8 @@ namespace Extract.DataEntry
             /// <see langword="null"/> if no group attribute is selected.</param>
             public SelectionState(DataEntryTableBase table, IUnknownVector attributes,
                 bool includeSubAttributes, bool displayToolTips, IAttribute selectedGroupAttribute)
-                : base(table, attributes, includeSubAttributes, displayToolTips,
-                    selectedGroupAttribute)
+                : base(table, attributes.ToIEnumerable<IAttribute>(), includeSubAttributes,
+                    displayToolTips, selectedGroupAttribute)
             {
                 try
                 {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Reflection;
 using System.Text;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
@@ -154,6 +155,10 @@ namespace Extract.DataEntry
         /// <summary>
         /// Gets or sets whether the control should remain disabled at all times.
         /// <para><b>Note</b></para>
+        /// Disabled is a DataEntry framework property that should be used in place of Control.Enabled
+        /// The Enabled status of a field will be dynamically changed when data is loaded/unloaded or
+        /// when data is propagated from parent controls; thus Enabled should be left to the DE
+        /// framework to control.
         /// Disabled controls will not perform validation on mapped data.
         /// </summary>
         bool Disabled
@@ -184,6 +189,13 @@ namespace Extract.DataEntry
             get;
             set;
         }
+
+        /// <summary>
+        /// The attributes mapped to this control.
+        /// This includes child attributes whose parents are also mapped to this control. 
+        /// The ordering of the attributes is undefined.
+        /// </summary>
+        IEnumerable<IAttribute> Attributes { get; }
 
         #endregion Properties
 
@@ -270,8 +282,12 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> for which the UI element is needed.
         /// </param>
-        /// <returns>The UI element</returns>
-        object GetAttributeUIElement(IAttribute attribute);
+        /// <param name="elementName">If a related element is required, the property name of an
+        /// object relative to the object mapped directly to the attribute. Multiple references may
+        /// be chained by separating with a period. E.g., While a specific attribute may be mapped
+        /// to a DataGridViewRow, an elementName of "DataGridView.VerticalScrollBar" could be used
+        /// to refer to the scroll bar for the grid.</param>
+        object GetAttributeUIElement(IAttribute attribute, string elementName);
 
         /// <summary>
         /// Any data that was cached should be cleared;  This is called when a document is unloaded.
@@ -322,15 +338,18 @@ namespace Extract.DataEntry
     /// <summary>
     /// Interface for <see cref="IDataEntryControl"/>s that have an attribute property
     /// </summary>
-    public interface IDataEntryAttributeControl : IDataEntryControl
+    public interface IDataEntrySingleAttributeControl : IDataEntryControl
     {
+        /// <summary>
+        /// The single attribute mapped to this control
+        /// </summary>
         IAttribute Attribute { get; }
     }
 
     /// <summary>
     /// Interface for <see cref="IDataEntryControl"/>s that have selection start and length properties
     /// </summary>
-    public interface IDataEntryTextControl : IDataEntryAttributeControl
+    public interface IDataEntryTextControl : IDataEntrySingleAttributeControl
     {
         int LastSelectionStart { get; }
 

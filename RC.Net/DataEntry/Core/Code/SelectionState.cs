@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UCLID_AFCORELib;
@@ -11,7 +12,7 @@ namespace Extract.DataEntry
     /// selected <see cref="IAttribute"/>s as well as the indicated selection within the related
     /// <see cref="IDataEntryControl"/>.
     /// </summary>
-    public abstract class SelectionState
+    public class SelectionState
     {
         /// <summary>
         /// The <see cref="IDataEntryControl"/> the selection pertains to.
@@ -34,6 +35,17 @@ namespace Extract.DataEntry
         readonly IAttribute _selectedGroupAttribute;
 
         /// <summary>
+        /// Initializes a new <see cref="SelectionState"/> instance for which a single-attribute
+        /// control is selected.
+        /// </summary>
+        /// <param name="dataEntryControl">The <see cref="IDataEntryControl"/> the selection
+        /// pertains to.</param>
+        public SelectionState(IDataEntrySingleAttributeControl dataEntryControl)
+            : this(dataEntryControl, new[] { dataEntryControl.Attribute }, false, true, null)
+        { 
+        }
+
+        /// <summary>
         /// Initializes a new <see cref="SelectionState"/> instance.
         /// </summary>
         /// <param name="dataEntryControl">The <see cref="IDataEntryControl"/> the selection
@@ -47,7 +59,7 @@ namespace Extract.DataEntry
         /// <param name="selectedGroupAttribute">The <see cref="IAttribute"/> representing a
         /// currently selected row or group. <see langword="null"/> if no row or group is selected.
         /// </param>
-        protected SelectionState(IDataEntryControl dataEntryControl, IUnknownVector attributes,
+        protected SelectionState(IDataEntryControl dataEntryControl, IEnumerable<IAttribute> attributes,
             bool includeSubAttributes, bool displayToolTips, IAttribute selectedGroupAttribute)
             : this(dataEntryControl, 
                 DataEntryMethods.ToAttributeEnumerable(attributes, includeSubAttributes),
@@ -130,9 +142,9 @@ namespace Extract.DataEntry
         /// <summary>
         /// Create a <see cref="ButtonControlSelectionState"/> from an <see cref="IDataEntryControl/>
         /// </summary>
-        public static ButtonControlSelectionState Create(IDataEntryAttributeControl control)
+        public static SelectionState Create(IDataEntrySingleAttributeControl control)
         {
-            return new ButtonControlSelectionState(control);
+            return new SelectionState(control);
         }
 
         /// <summary>
@@ -141,23 +153,6 @@ namespace Extract.DataEntry
         public static TextControlSelectionState Create(IDataEntryTextControl control)
         {
             return new TextControlSelectionState(control);
-        }
-    }
-
-    /// <summary>
-    /// Represents the current selection within the data entry framework for a non-text control. This includes both the
-    /// selected <see cref="IAttribute"/>s as well as the indicated selection within the related
-    /// <see cref="IDataEntryControl"/>.
-    /// </summary>
-    public class ButtonControlSelectionState : SelectionState
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SelectionState"/> class.
-        /// </summary>
-        /// <param name="dataEntryControl">The <see cref="IDataEntryControl"/> the selection state applies to</param>
-        public ButtonControlSelectionState(IDataEntryAttributeControl dataEntryControl)
-            : base(dataEntryControl, DataEntryMethods.AttributeAsVector(dataEntryControl.Attribute), false, true, null)
-        {
         }
     }
 
@@ -185,7 +180,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="textControl">The <see cref="IDataEntryTextControl"/> the selection state applies to.</param>
         public TextControlSelectionState(IDataEntryTextControl dataEntryControl)
-            : base(dataEntryControl, DataEntryMethods.AttributeAsVector(dataEntryControl.Attribute), false, true, null)
+            : base(dataEntryControl, new[] { dataEntryControl.Attribute }, false, true, null)
         {
             try
             {

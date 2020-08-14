@@ -1882,7 +1882,7 @@ namespace Extract.DataEntry
 
                         // Notify AttributeStatusInfo of the new attribute hierarchy
                         AttributeStatusInfo.ResetData(_sourceDocName, _attributes,
-                            _dbConnections, null);
+                            _dbConnections, pathTags: null, noUILoad: false);
 
                         // Enable or disable swiping as appropriate.
                         OnSwipingStateChanged(new SwipingStateChangedEventArgs(SwipingEnabled));
@@ -2884,7 +2884,7 @@ namespace Extract.DataEntry
 
                 // AttributeStatusInfo cannot persist any data from one document to the next as it can
                 // cause COM threading exceptions in FAM mode. Unload its data now.
-                AttributeStatusInfo.ResetData(null, null, null);
+                AttributeStatusInfo.ResetData();
 
                 if (_attributes != null)
                 {
@@ -3767,7 +3767,7 @@ namespace Extract.DataEntry
 
                 // If the spatial info for a viewable attribute has changed, re-create the highlight 
                 // for the attribute with the new spatial information.
-                if (e.SpatialInfoChanged && AttributeStatusInfo.IsViewable(e.Attribute))
+                if (e.SpatialInfoChanged && AttributeStatusInfo.IsAttributeViewable(e.Attribute))
                 {
                     RemoveAttributeHighlight(e.Attribute);
 
@@ -4821,7 +4821,7 @@ namespace Extract.DataEntry
             {
                 // If this attribute's value isn't viewable in the DEP, don't create a highlight for
                 // it.
-                if (!AttributeStatusInfo.IsViewable(attribute))
+                if (!AttributeStatusInfo.IsAttributeViewable(attribute))
                 {
                     continue;
                 }
@@ -6698,7 +6698,7 @@ namespace Extract.DataEntry
                 // Only viewable attributes that are within the current control's selection should
                 // be considered active.
                 foreach (IAttribute attribute in selectionState.Attributes
-                    .Where(attribute => AttributeStatusInfo.IsViewable(attribute) &&
+                    .Where(attribute => AttributeStatusInfo.IsAttributeViewable(attribute) &&
                         (selectionState.DataControl.HighlightSelectionInChildControls ||
                         AttributeStatusInfo.GetOwningControl(attribute) == selectionState.DataControl)))
                 {
@@ -7153,7 +7153,7 @@ namespace Extract.DataEntry
 
             // [DataEntry:1178]
             // Never set highlights for un-viewable attributes.
-            if (!AttributeStatusInfo.IsViewable(attribute))
+            if (!AttributeStatusInfo.IsAttributeViewable(attribute))
             {
                 return;
             }
@@ -7913,7 +7913,7 @@ namespace Extract.DataEntry
                 DataEntryMethods.ToAttributeEnumerable(attributes, true))
             {
                 // If this attribute is not visible in the DEP, don't create a highlight.
-                if (!AttributeStatusInfo.IsViewable(attribute))
+                if (!AttributeStatusInfo.IsAttributeViewable(attribute))
                 {
                     continue;
                 }
@@ -8298,7 +8298,7 @@ namespace Extract.DataEntry
                 DataEntryMethods.ToAttributeEnumerable(attributes, true))
             {
                 if (AttributeStatusInfo.GetOwningControl(attribute) == dataEntryControl &&
-                    AttributeStatusInfo.IsViewable(attribute))
+                    AttributeStatusInfo.IsAttributeViewable(attribute))
                 {
                     viewableAttributes.Add(attribute);
                 }
