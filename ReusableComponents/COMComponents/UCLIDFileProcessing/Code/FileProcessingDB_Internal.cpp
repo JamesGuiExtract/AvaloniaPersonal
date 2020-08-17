@@ -2193,7 +2193,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrSTORE_FAM_SESSION_HISTORY] = "1";
 	mapDefaultValues[gstrREQUIRE_AUTHENTICATION_BEFORE_RUN] = "0";
 	mapDefaultValues[gstrAUTO_CREATE_ACTIONS] = "0";
-	mapDefaultValues[gstrSKIP_AUTHENTICATION_ON_MACHINES] = "";
+	mapDefaultValues[gstrSKIP_AUTHENTICATION_ON_MACHINES] = "*";
 	mapDefaultValues[gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS] = "300";
 	mapDefaultValues[gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT] =
 		asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0);
@@ -5225,7 +5225,8 @@ bool CFileProcessingDB::isMachineInListOfMachinesToSkipUserAuthentication(
 			makeLowerCase(strTemp);
 
 			// Check if it matches the machine name
-			if (strTemp == strMachineName)
+			// or special, wildcard value, see https://extract.atlassian.net/browse/ISSUE-17137
+			if (strTemp == strMachineName || strTemp == "*")
 			{
 				return true;
 			}

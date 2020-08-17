@@ -2611,6 +2611,25 @@ bool FileProcessingDlg::saveFile(std::string strFileName, bool bShowConfiguratio
 				return false;
 			}
 		}
+
+		// Get the AccessRequires interface for the management role to check if Admin access is required
+		IAccessRequiredPtr ipAccess(getFPM()->FileProcessingMgmtRole);
+		ASSERT_RESOURCE_ALLOCATION("ELI50247", ipAccess != __nullptr);
+
+		if (ipAccess->RequiresAdminAccess())
+		{
+			strWarning =
+				"This FAM will require users to supply admin credentials to run"
+				" (except if run as a service on a machine exempt from authentication)."
+				"\r\n\r\nContinue with save?";
+
+			int nResponse = MessageBox(strWarning.c_str(), "Authentication required to run",
+				MB_YESNO| MB_ICONEXCLAMATION);
+			if (nResponse != IDYES)
+			{
+				return false;
+			}
+		}
 	}
 
 	if (strFileName == "")
