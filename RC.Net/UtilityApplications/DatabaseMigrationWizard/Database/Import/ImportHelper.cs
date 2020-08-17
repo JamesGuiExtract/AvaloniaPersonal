@@ -134,13 +134,20 @@ namespace DatabaseMigrationWizard.Database.Input
         /// </summary>
         public void ClearDatabase()
         {
-            var fileProcessingDb = new FileProcessingDB()
+            try
             {
-                DatabaseServer = this.ImportOptions.ConnectionInformation.DatabaseServer,
-                DatabaseName = this.ImportOptions.ConnectionInformation.DatabaseName
-            };
+                var fileProcessingDb = new FileProcessingDB()
+                {
+                    DatabaseServer = this.ImportOptions.ConnectionInformation.DatabaseServer,
+                    DatabaseName = this.ImportOptions.ConnectionInformation.DatabaseName
+                };
 
-            fileProcessingDb.Clear(false);
+                fileProcessingDb.Clear(false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50249");
+            }
         }
 
         /// <summary>

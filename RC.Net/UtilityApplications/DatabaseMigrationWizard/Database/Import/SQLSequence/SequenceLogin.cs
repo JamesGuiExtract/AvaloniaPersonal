@@ -1,6 +1,4 @@
 ﻿using DatabaseMigrationWizard.Database.Input.DataTransformObject;
-using Extract.Database;
-using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 
 namespace DatabaseMigrationWizard.Database.Input.SQLSequence
@@ -10,91 +8,91 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
     class SequenceLogin : ISequence
     {
         private readonly string CreateTempTableSQL = @"
-CREATE TABLE [dbo].[##Login](
-[UserName] [nvarchar](50) NOT NULL,
-[Password] [nvarchar](128) NOT NULL,
-[Guid] uniqueidentifier NOT NULL,
-)";
+            CREATE TABLE [dbo].[##Login](
+            [UserName] [nvarchar](50) NOT NULL,
+            [Password] [nvarchar](128) NOT NULL,
+            [Guid] uniqueidentifier NOT NULL,
+            )";
 
         private readonly string insertSQL = @"
-UPDATE
-	dbo.Login
-SET
-	UserName = UpdatingLogin.UserName
-FROM
-	##Login AS UpdatingLogin
-WHERE
-	dbo.Login.Guid = UpdatingLogin.Guid
-;
-INSERT INTO dbo.Login(UserName, Password, Guid)
+            UPDATE
+                dbo.Login
+            SET
+                UserName = UpdatingLogin.UserName
+            FROM
+                ##Login AS UpdatingLogin
+            WHERE
+                dbo.Login.Guid = UpdatingLogin.Guid
+            ;
+            INSERT INTO dbo.Login(UserName, Password, Guid)
 
-SELECT
-	UserName
-	, Password
-	, Guid
-FROM 
-	##Login AS UpdatingLogin
-WHERE
-	UpdatingLogin.Guid NOT IN (SELECT Guid FROM dbo.Login)
-    AND
-    UserName <> 'admin'";
+            SELECT
+                UserName
+                , Password
+                , Guid
+            FROM 
+                ##Login AS UpdatingLogin
+            WHERE
+                UpdatingLogin.Guid NOT IN (SELECT Guid FROM dbo.Login)
+                AND
+                UserName <> 'admin'";
 
         private readonly string insertTempTableSQL = @"
-INSERT INTO ##Login (UserName, Password, Guid)
-VALUES
-";
+            INSERT INTO ##Login (UserName, Password, Guid)
+            VALUES
+            ";
 
         private readonly string InsertReportingSQL = @"
-INSERT INTO
-	dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
-SELECT
-	'Insert'
-	, 'Warning'
-	, 'Login'
-	, CONCAT('The Login ', dbo.Login.UserName, ' is present in the destination database, but NOT in the importing source.')
-FROM
-	dbo.Login
-		LEFT OUTER JOIN ##Login
-			ON dbo.Login.Guid = ##Login.GUID
-WHERE
-	##Login.GUID IS NULL
-    AND
-    Login.UserName <> 'Admin'
-;
-INSERT INTO
-	dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
-SELECT
-	'Insert'
-	, 'Info'
-	, 'Login'
-	, CONCAT('The Login ', ##Login.UserName, ' will be added to the database')
-FROM
-	##Login
-		LEFT OUTER JOIN dbo.Login
-			ON dbo.Login.Guid = ##Login.GUID
-WHERE
-	dbo.Login.Guid IS NULL
-    AND
-    ##Login.UserName <> 'Admin'";
+            INSERT INTO
+                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+            SELECT
+                'Insert'
+                , 'Warning'
+                , 'Login'
+                , CONCAT('The Login ', dbo.Login.UserName, ' is present in the destination database, but NOT in the importing source.')
+            FROM
+                dbo.Login
+                    LEFT OUTER JOIN ##Login
+                        ON dbo.Login.Guid = ##Login.GUID
+            WHERE
+                ##Login.GUID IS NULL
+                AND
+                Login.UserName <> 'Admin'
+            ;
+            INSERT INTO
+                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+            SELECT
+                'Insert'
+                , 'Info'
+                , 'Login'
+                , CONCAT('The Login ', ##Login.UserName, ' will be added to the database')
+            FROM
+                ##Login
+                    LEFT OUTER JOIN dbo.Login
+                        ON dbo.Login.Guid = ##Login.GUID
+            WHERE
+                dbo.Login.Guid IS NULL
+                AND
+                ##Login.UserName <> 'Admin'";
 
         private readonly string UpdateReportingSQL = @"
-INSERT INTO
-	dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
-SELECT
-	'Update'
-	, 'Info'
-	, 'Login'
-	, 'The Login will be updated'
-	, dbo.Login.UserName
-	, UpdatingLogin.UserName
-FROM
-	##Login AS UpdatingLogin
+            INSERT INTO
+                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
+            SELECT
+                'Update'
+                , 'Info'
+                , 'Login'
+                , 'The Login will be updated'
+                , dbo.Login.UserName
+                , UpdatingLogin.UserName
+            FROM
+                ##Login AS UpdatingLogin
 
-			INNER JOIN dbo.Login
-				ON dbo.Login.Guid = UpdatingLogin.Guid
+                        INNER JOIN dbo.Login
+                            ON dbo.Login.Guid = UpdatingLogin.Guid
 
-WHERE
-	ISNULL(UpdatingLogin.UserName, '') <> ISNULL(dbo.Login.UserName, '')";
+            WHERE
+                ISNULL(UpdatingLogin.UserName, '') <> ISNULL(dbo.Login.UserName, '')";
 
         public Priorities Priority => Priorities.Low;
 

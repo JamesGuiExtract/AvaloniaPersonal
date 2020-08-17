@@ -7,13 +7,11 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using UCLID_FILEPROCESSINGLib;
 
 namespace DatabaseMigrationWizard.Test
@@ -181,11 +179,7 @@ namespace DatabaseMigrationWizard.Test
         public static void DBInfo()
         {
             var DBInfoFromDB = JsonConvert.DeserializeObject<List<DBInfo>>(BuildAndWriteTable(new SerializeDBInfo()).ToString());
-
-            foreach (var DBInfo in DatabaseMigrationWizardTestHelper.DBInfos)
-            {
-                Assert.IsTrue(DBInfoFromDB.Where(m => m.Equals(DBInfo)).Any());
-            }
+            DatabaseMigrationWizardTestHelper.CompareDBInfo(DBInfoFromDB);
         }
 
         /// <summary>

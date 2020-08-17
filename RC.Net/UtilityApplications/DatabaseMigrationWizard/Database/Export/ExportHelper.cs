@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace DatabaseMigrationWizard.Database.Output
 {
-    public class ExportHelper
+    public static class ExportHelper
     {
         /// <summary>
         /// The number of records to buffer before writing. The smaller this number, the slower the speed of

@@ -1,11 +1,14 @@
 ﻿using DatabaseMigrationWizard.Database.Input.DataTransformObject;
+using DatabaseMigrationWizard.Database.Input.SQLSequence;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 
 namespace DatabaseMigrationWizard.Test
 {
@@ -155,6 +158,8 @@ namespace DatabaseMigrationWizard.Test
             DBInfos.Add(new DBInfo() { Name = "AutoRevertTimeOutInMinutes", Value = "5" });
             DBInfos.Add(new DBInfo() { Name = "CommandTimeout", Value = "120" });
             DBInfos.Add(new DBInfo() { Name = "ConnectionRetryTimeout", Value = "120" });
+            DBInfos.Add(new DBInfo() { Name = "DashboardExcludeFilter", Value = "" });
+            DBInfos.Add(new DBInfo() { Name = "DashboardIncludeFilter", Value = "" });
             DBInfos.Add(new DBInfo() { Name = "DatabaseID", Value = "7205a98a604343dc35659dd1b820033d287369feacb4cc3533469860611b300142056f888ef512f33d3f6ba98a43a107de4ccc87009b65c0caf9688947c9b43293ac8c4a540116125b5a2a19" });
             DBInfos.Add(new DBInfo() { Name = "DataEntrySchemaVersion", Value = "6" });
             DBInfos.Add(new DBInfo() { Name = "EmailEnableSettings", Value = "1" });
@@ -348,6 +353,22 @@ namespace DatabaseMigrationWizard.Test
                 Description = "Tests2 Description Workflow",
                 LoadBalanceWeight = 4,
             });
+        }
+
+        internal void CompareDBInfo(List<DBInfo> dBInfoFromDB)
+        {
+            var excludedSettingNames = new HashSet<string>(SequenceDBInfo.ExcludedSettings, StringComparer.OrdinalIgnoreCase);
+
+            var includedInImport = DBInfos.Where(info => !excludedSettingNames.Contains(info.Name));
+            var excludedFromImport = DBInfos.Where(info => excludedSettingNames.Contains(info.Name));
+            var expected = new { includedInImport, excludedFromImport };
+
+            var includedInImport2 = dBInfoFromDB.Where(info => !excludedSettingNames.Contains(info.Name));
+            var excludedFromImport2 = dBInfoFromDB.Where(info => excludedSettingNames.Contains(info.Name));
+            var actual = new { includedInImport = includedInImport2, excludedFromImport = excludedFromImport2 };
+
+            CollectionAssert.AreEquivalent(expected.includedInImport, actual.includedInImport);
+            CollectionAssert.AreNotEquivalent(expected.excludedFromImport, actual.excludedFromImport);
         }
     }
 }

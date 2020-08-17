@@ -25,7 +25,7 @@ namespace DatabaseMigrationWizard.Database.Input.DataTransformObject
 
         public override string ToString()
         {
-            return $@"('{DashboardName}'
+            return Invariant($@"('{DashboardName}'
                         , CONVERT(XML, N'{Definition.Replace("'", "''")}')
                         , CAST('{LastImportedDate}' AS DATETIME)
                         , {(UseExtractedData == true ? "1" : "0")}
@@ -33,7 +33,7 @@ namespace DatabaseMigrationWizard.Database.Input.DataTransformObject
                         , '{DashboardGuid}'
                         , '{UserName}'
                         , '{FullUserName}'
-                    )";
+                    )");
         }
 
         public override bool Equals(object obj)
