@@ -3,6 +3,8 @@ using Extract.Imaging;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
@@ -10,7 +12,7 @@ using UCLID_FILEPROCESSINGLib;
 namespace Extract.DataEntry.LabDE.Test
 {
     /// <summary>
-    /// Class to test <see cref="Extract.DataEntry.LabDE.DuplicateDocumentsButton"/>.
+    /// Class to test <see cref="DuplicateDocumentsButton"/>.
     /// </summary>
     [Category("TestLabDEDuplicateDocumentsButton")]
     [TestFixture]
@@ -28,6 +30,14 @@ namespace Extract.DataEntry.LabDE.Test
         const string STAPLED_TAG = "User_MultiplePatients";
         const string STAPLED_INTO_METADATA_FIELD = "StapledInto";
 
+        readonly string[] ORIGINAL_IMAGE_PATHS = new[]
+        {
+            FILE_1_FILENAME,
+            FILE_2_FILENAME,
+            FILE_3_FILENAME,
+        };
+
+
         #endregion
 
         #region Fields
@@ -36,6 +46,7 @@ namespace Extract.DataEntry.LabDE.Test
         /// Manages test FAM DBs
         /// </summary>
         static FAMTestDBManager<TestLabDEDuplicateDocumentsButton> _testDbManager;
+        static TestFileManager<TestLabDEDuplicateDocumentsButton> _testFileManager;
 
         #endregion Fields
 
@@ -50,6 +61,7 @@ namespace Extract.DataEntry.LabDE.Test
             GeneralMethods.TestSetup();
 
             _testDbManager = new FAMTestDBManager<TestLabDEDuplicateDocumentsButton>();
+            _testFileManager = new TestFileManager<TestLabDEDuplicateDocumentsButton>("A53F8802-DB9D-4B23-9865-D1A3DE33AB55");
         }
 
         /// <summary>
@@ -63,6 +75,7 @@ namespace Extract.DataEntry.LabDE.Test
                 _testDbManager.Dispose();
                 _testDbManager = null;
             }
+            _testFileManager.Dispose();
         }
 
         #endregion Overhead
@@ -91,8 +104,9 @@ namespace Extract.DataEntry.LabDE.Test
                 // PatientDOB = "08/08/2000"
                 // CollectionDate = "08/08/2008";
                 _famDB = _testDbManager.GetDatabase(Demo_LabDE_With_Data_DB, testDBName);
+                var updatedFilePaths = GetAndRenameFilesInDB(_famDB);
                 using (var famSession = new FAMProcessingSession(_famDB, VERIFY_ACTION, "", new NullFileProcessingTask()))
-                using (var testButton = InitializeDuplicateDocumentButton(famSession, FILE_2_FILENAME))
+                using (var testButton = InitializeDuplicateDocumentButton(famSession, updatedFilePaths[FILE_2_FILENAME]))
                 using (testButton.DataEntryControlHost)
                 {
                     // Confirm file ID 3 is pending for now.
@@ -160,8 +174,9 @@ namespace Extract.DataEntry.LabDE.Test
                 // PatientDOB = "08/08/2000"
                 // CollectionDate = "08/08/2008";
                 _famDB = _testDbManager.GetDatabase(Demo_LabDE_With_Data_DB, testDBName);
+                var updatedFilePaths = GetAndRenameFilesInDB(_famDB);
                 using (var famSession = new FAMProcessingSession(_famDB, VERIFY_ACTION, "", new NullFileProcessingTask()))
-                using (var testButton = InitializeDuplicateDocumentButton(famSession, FILE_2_FILENAME))
+                using (var testButton = InitializeDuplicateDocumentButton(famSession, updatedFilePaths[FILE_2_FILENAME]))
                 using (testButton.DataEntryControlHost)
                 {
                     // Populate info matching ID 3
@@ -219,6 +234,7 @@ namespace Extract.DataEntry.LabDE.Test
                 // PatientDOB = "08/08/2000"
                 // CollectionDate = "08/08/2008";
                 _famDB = _testDbManager.GetDatabase(Demo_LabDE_With_Data_DB, testDBName);
+                var updatedFilePaths = GetAndRenameFilesInDB(_famDB);
                 using (var dataEntryPanel = new DataEntryControlHost())
                 using (var famSession = new FAMProcessingSession(_famDB, VERIFY_ACTION))
                 {
@@ -232,7 +248,7 @@ namespace Extract.DataEntry.LabDE.Test
                     dataEntryPanel.Controls.Add(testButton);
                     testButton.DataEntryControlHost = dataEntryPanel;
 
-                    dataEntryPanel.LoadData(new IUnknownVector(), FILE_2_FILENAME,
+                    dataEntryPanel.LoadData(new IUnknownVector(), updatedFilePaths[FILE_2_FILENAME],
                         forEditing: false, initialSelection: FieldSelection.DoNotReset);
 
                     var doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
@@ -283,8 +299,9 @@ namespace Extract.DataEntry.LabDE.Test
                 // PatientDOB = "08/08/2000"
                 // CollectionDate = "08/08/2008";
                 _famDB = _testDbManager.GetDatabase(Demo_LabDE_With_Data_DB, testDBName);
+                var updatedFilePaths = GetAndRenameFilesInDB(_famDB);
                 using (var famSession = new FAMProcessingSession(_famDB, VERIFY_ACTION, "", new NullFileProcessingTask()))
-                using (var testButton = InitializeDuplicateDocumentButton(famSession, FILE_2_FILENAME))
+                using (var testButton = InitializeDuplicateDocumentButton(famSession, updatedFilePaths[FILE_2_FILENAME]))
                 using (testButton.DataEntryControlHost)
                 using (var stapledOutputTempFile = new TemporaryFile(".tif", false))
                 {
@@ -385,8 +402,8 @@ namespace Extract.DataEntry.LabDE.Test
                         testFFIColumn.Apply();
 
                         int totalPages =
-                            _famDB.GetFileRecord(FILE_1_FILENAME, VERIFY_ACTION).Pages
-                            + _famDB.GetFileRecord(FILE_3_FILENAME, VERIFY_ACTION).Pages;
+                            _famDB.GetFileRecord(updatedFilePaths[FILE_1_FILENAME], VERIFY_ACTION).Pages
+                            + _famDB.GetFileRecord(updatedFilePaths[FILE_3_FILENAME], VERIFY_ACTION).Pages;
                         Assert.AreEqual(totalPages, NuanceImageMethods.GetPageCount(stapledOutputTempFile.FileName));
 
                         var doc1Status = _famDB.GetFileStatus(1, VERIFY_ACTION, false);
@@ -443,8 +460,9 @@ namespace Extract.DataEntry.LabDE.Test
                 // PatientDOB = "08/08/2000"
                 // CollectionDate = "08/08/2008";
                 _famDB = _testDbManager.GetDatabase(Demo_LabDE_With_Data_DB, testDBName);
+                var updatedFilePaths = GetAndRenameFilesInDB(_famDB);
                 using (var famSession = new FAMProcessingSession(_famDB, VERIFY_ACTION, "", new NullFileProcessingTask()))
-                using (var testButton = InitializeDuplicateDocumentButton(famSession, FILE_2_FILENAME))
+                using (var testButton = InitializeDuplicateDocumentButton(famSession, updatedFilePaths[FILE_2_FILENAME]))
                 using (testButton.DataEntryControlHost)
                 using (var stapledOutputTempFile = new TemporaryFile(".tif", false))
                 {
@@ -539,8 +557,8 @@ namespace Extract.DataEntry.LabDE.Test
                         testFFIColumn.Apply();
 
                         int totalPages =
-                            _famDB.GetFileRecord(FILE_1_FILENAME, VERIFY_ACTION).Pages
-                            + _famDB.GetFileRecord(FILE_3_FILENAME, VERIFY_ACTION).Pages;
+                            _famDB.GetFileRecord(updatedFilePaths[FILE_1_FILENAME], VERIFY_ACTION).Pages
+                            + _famDB.GetFileRecord(updatedFilePaths[FILE_3_FILENAME], VERIFY_ACTION).Pages;
                         Assert.AreEqual(totalPages, NuanceImageMethods.GetPageCount(stapledOutputTempFile.FileName));
 
                         var doc1Status = _famDB.GetFileStatus(1, VERIFY_ACTION, false);
@@ -606,6 +624,20 @@ namespace Extract.DataEntry.LabDE.Test
         {
             var fileTags = famDB.GetTagsOnFile(fileID).ToIEnumerable<string>();
             return fileTags.Contains(tagName);
+        }
+
+        Dictionary<string, string> GetAndRenameFilesInDB(FileProcessingDB famDB)
+        {
+            return ORIGINAL_IMAGE_PATHS
+                .Select(origPath =>
+                {
+                    var fileRecord = famDB.GetFileRecord(origPath, VERIFY_ACTION);
+                    var resourceName = "Resources.DemoImages." + Path.GetFileName(origPath);
+                    var newPath = _testFileManager.GetFile(resourceName);
+                    famDB.RenameFile(fileRecord, newPath);
+                    return (origPath, newPath);
+                })
+                .ToDictionary(t => t.origPath, t => t.newPath);
         }
 
         #endregion Helper Methods

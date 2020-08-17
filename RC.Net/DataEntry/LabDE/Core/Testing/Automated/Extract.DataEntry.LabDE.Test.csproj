@@ -143,6 +143,11 @@
     <EmbeddedResource Include="Resources\Unmerge_B.txt" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\DemoImages\J057.tif" />
+    <EmbeddedResource Include="Resources\DemoImages\F003.tif" />
+    <EmbeddedResource Include="Resources\DemoImages\H350.tif" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="ADODB">
       <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
       <VersionMajor>2</VersionMajor>
