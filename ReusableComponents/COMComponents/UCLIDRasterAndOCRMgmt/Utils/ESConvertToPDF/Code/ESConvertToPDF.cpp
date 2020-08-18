@@ -195,22 +195,26 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 	TemporaryFileName tfnDocument(true, "", ".pdf", true);
 	RPDF_DOC pdfDoc;
 
+	// https://extract.atlassian.net/browse/ISSUE-11940
+	// If the source document was a PDF, the OCR text can be added to the original document
+	// without touching the images at all (preventing any possible degradation in quality).
+	bool bSourceIsPDF = imgFormat == FF_PDF
+		|| imgFormat == FF_PDF_MRC
+		|| ((imgFormat >= FF_PDF_MIN) && (imgFormat <= FF_PDF_MRC_LOSSLESS));
+
+	// If the PDF will be created from an HPAGE array then it is necessary to preserve the original pages
+	// so that the output can specify II_ORIGINAL (II_CURRENT would mean pages rotated by the preprocessing step)
+	if (!bSourceIsPDF || !bUseRecDFAPI)
+	{
+		RECERR rc = kRecSetPreserveOriginalImg(0, TRUE);
+		throwExceptionIfNotSuccess(rc, "ELI50259", "Failed to set preserve original image setting.", m_strInputFile);
+	}
+
 	if (bUseRecDFAPI)
 	{
 		RECERR rc = rPdfInit();
 		throwExceptionIfNotSuccess(rc, "ELI36754", "Unable to initialize PDF processing engine.");
 
-		// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
-		// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
-		// FF_PDF_SUPERB.
-		IMF_FORMAT outFormat = imgInfo.BitsPerPixel == 1 ? FF_PDF_SUPERB : FF_PDF_GOOD;
-
-		// https://extract.atlassian.net/browse/ISSUE-11940
-		// If the source document was a PDF, the OCR text can be added to the original document
-		// without touching the images at all (preventing any possible degradation in quality).
-		bool bSourceIsPDF = imgFormat == FF_PDF
-			|| imgFormat == FF_PDF_MRC
-			|| ((imgFormat >= FF_PDF_MIN) && (imgFormat <= FF_PDF_MRC_LOSSLESS));
 		if (bSourceIsPDF)
 		{
 			copyFile(m_strInputFile, tfnDocument.getName());
@@ -218,6 +222,11 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 			rc = rPdfOpen(tfnDocument.getName().c_str(), __nullptr, &pdfDoc);
 			throwExceptionIfNotSuccess(rc, "ELI36744", "Failed to open document as PDF.", m_strInputFile);
 		}
+
+		// FF_PDF_SUPERB was causing unacceptable growth in PDF size in some cases for color
+		// documents. For the time being, unless a document is bitonal, use FF_PDF_GOOD rather than
+		// FF_PDF_SUPERB.
+		IMF_FORMAT outFormat = imgInfo.BitsPerPixel == 1 ? FF_PDF_SUPERB : FF_PDF_GOOD;
 
 		for (int i = 0; i < nPageCount; i += g_nPAGE_BATCH_SIZE)
 		{
@@ -230,7 +239,7 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 
 			int nPagesToProcess = min(g_nPAGE_BATCH_SIZE, nPageCount - i);
 
-			// The returned HPAGE instaces will have OCR text that can be applied to an output document.
+			// The returned HPAGE instances will have OCR text that can be applied to an output document.
 			HPAGE *pPages = apRecAPIManager->getOCRedPages(i, nPagesToProcess);
 			
 			if (!bSourceIsPDF)
@@ -289,7 +298,7 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 		// location.
 		deleteFile(tfnDocument.getName().c_str());
 
-		rc = kRecConvert2DTXT(0, pPages, nPageCount, tfnDocument.getName().c_str());
+		rc = kRecConvert2DTXTEx(0, pPages, nPageCount, II_ORIGINAL, tfnDocument.getName().c_str());
 		throwExceptionIfNotSuccess(rc, "ELI36846", "Failed to output document.", m_strInputFile);
 	}
 
@@ -308,7 +317,7 @@ void CESConvertToPDFApp::addPagesToOutput(HPAGE *pPages, const string& strOutput
 	{
 		HPAGE hPage = pPages[i];
 
-		RECERR rc = kRecSaveImgFA(0, strOutputPDF.c_str(), outFormat, hPage, II_CURRENT, true);
+		RECERR rc = kRecSaveImgFA(0, strOutputPDF.c_str(), outFormat, hPage, II_ORIGINAL, true);
 		throwExceptionIfNotSuccess(rc, "ELI36753", "Failed to save document page.",
 			m_strInputFile, i + 1);
 	}

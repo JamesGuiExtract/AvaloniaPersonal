@@ -124,7 +124,7 @@ int CRecAPIManager::getPageCount()
 void CRecAPIManager::getImageInfo(IMG_INFO &rimgInfo, IMF_FORMAT &rimgFormat)
 {
 	RECERR rc = kRecGetImgFilePageInfo(0, m_hFile, 0, &rimgInfo, &rimgFormat);
-	throwExceptionIfNotSuccess(rc, "ELI36759", "Failed to indentify image format.",
+	throwExceptionIfNotSuccess(rc, "ELI36759", "Failed to identify image format.",
 		m_pApp->m_strInputFile);
 }
 //-------------------------------------------------------------------------------------------------
@@ -149,8 +149,13 @@ HPAGE* CRecAPIManager::getOCRedPages(int nStartPage, int nPageCount)
 		{
 			try
 			{
-				// recognize the text on this page
-				RECERR rc = kRecRecognize(0, hPage, 0);
+				// Preprocess the image to take care of rotation
+				// https://extract.atlassian.net/browse/ISSUE-16740
+				RECERR rc = kRecPreprocessImg(0, hPage);
+				throwExceptionIfNotSuccess(rc, "ELI50258", "Failed to preprocess image page.",
+					m_pApp->m_strInputFile, i);
+
+				rc = kRecRecognize(0, hPage, 0);
 				if (rc != REC_OK && rc != NO_TXT_WARN && rc != ZONE_NOTFOUND_ERR)
 				{
 					// log an error
@@ -262,6 +267,10 @@ void CRecAPIManager::applySettings()
 
 	// Preserve the original resolution in the output PDF.
 	m_pApp->setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".LoadOriginalDPI", true);
+
+	// Increase the max image size allowed to be the max size that is supported
+	m_pApp->setIntSetting("Kernel.Img.Max.Pix.X", 32000);
+	m_pApp->setIntSetting("Kernel.Img.Max.Pix.Y", 32000);
 
 	// If output is to be PDF/A compliant then need to set the PDF/A compatibility mode
 	// Adding searchable text with the RecPDFAPI breaks 1a and 1b compliance, but we seem to be
