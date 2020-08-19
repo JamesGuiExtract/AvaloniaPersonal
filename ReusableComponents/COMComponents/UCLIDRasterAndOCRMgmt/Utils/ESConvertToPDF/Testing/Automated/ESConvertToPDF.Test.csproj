@@ -21,6 +21,7 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,23 +55,184 @@
     <Reference Include="PdfSharp.Charting, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\..\..\RC.Net\APIs\PDFsharp.1.50.5147\lib\net20\PdfSharp.Charting.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\..\..\RC.Net\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Pdf, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\APIs\Leadtools_20\Dotnet\Leadtools.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>True</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\APIs\Leadtools_20\Dotnet\Leadtools.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Annotations, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>True</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\APIs\Leadtools_20\Dotnet\Leadtools.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>True</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\APIs\Leadtools_20\Dotnet\Leadtools.Codecs.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Drawing, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>True</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\APIs\Leadtools_20\DotNet\Leadtools.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.ImageProcessing.Color, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>True</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\APIs\Leadtools_20\DotNet\Leadtools.ImageProcessing.Color.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.WinForms, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>True</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\APIs\Leadtools_20\Dotnet\Leadtools.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Tabula.IKVM, Version=1.0.4.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\Tabula.IKVM\target\Tabula.IKVM.exe</HintPath>
+    </Reference>
+    <Reference Include="IKVM.AWT.WinForms, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.AWT.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Beans, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Beans.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Charsets, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Charsets.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Cldrdata, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Cldrdata.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Corba, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Corba.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Core, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Jdbc, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Jdbc.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Localedata, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Localedata.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Management, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Management.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Media, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Media.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Misc, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Misc.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Naming, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Naming.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Nashorn, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Nashorn.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Remoting, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Remoting.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Security, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.SwingAWT, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.SwingAWT.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Text, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Tools, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Tools.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Util, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.API, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.API.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.Bind, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.Bind.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.Crypto, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.Parse, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.Parse.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.Transform, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.Transform.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.WebServices, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.WebServices.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.XPath, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.XML.XPath.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.Reflection, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.Reflection.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.Runtime, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.Runtime.JNI, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\IKVM\lib\IKVM.Runtime.JNI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ImageUtils.cs" />
     <Compile Include="PDFSharpExtensions.cs" />
     <Compile Include="TestESConvertToPDF.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <EmbeddedResource Include="Resources\Annotated.pdf" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
+      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
+      <Name>Extract</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
       <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
       <Name>Extract.Testing.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
+      <Project>{e610e652-0891-40d4-b5ca-a622b87c7979}</Project>
+      <Name>Extract.Imaging.Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
@@ -78,7 +240,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Annotated.pdf" />
     <EmbeddedResource Include="Resources\TestImage001.tif" />
+    <EmbeddedResource Include="Resources\plagiarizers_paper.pdf" />
+    <EmbeddedResource Include="Resources\Example05.tif" />
+    <EmbeddedResource Include="Resources\Example05_WithRotatedPage.tif" />
+    <EmbeddedResource Include="Resources\Example05_WithRotatedPage.pdf" />
+    <EmbeddedResource Include="Resources\TallImage.pdf" />
+    <EmbeddedResource Include="Resources\WideImage.pdf" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -2,13 +2,15 @@
 using PdfSharp.Pdf.Content;
 using PdfSharp.Pdf.Content.Objects;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ESConvertToPDF.Test
 {
     /// <summary>
     /// Adapted from: https://stackoverflow.com/questions/10141143/c-sharp-extract-text-from-pdf-using-pdfsharp
     /// </summary>
+    /// <remarks>
+    /// These methods don't seem to work on PDFA files
+    /// </remarks>
     static class PDFSharpExtensions
     {
         public static string GetPageText(this PdfDocument pdfDocument, int pageNumber)
