@@ -286,20 +286,6 @@ library UCLID_IMAGEUTILSLib
 		//-----------------------------------------------------------------------------------------
 	};
 
-	[
-		object,
-		uuid(075A2276-B6E1-4CFA-8529-66831F8E84CB),
-		dual,
-		helpstring("IImageConverter Interface"),
-		pointer_default(unique)
-	]
-	interface IImageConverter : IDispatch
-	{
-		// Gets the specified image page as a PDF.
-		[id(1), helpstring("method GetPDFImage")] HRESULT GetPDFImage(
-			[in] BSTR bstrFileName, [in] int nPage, VARIANT_BOOL vbUseSeparateProcess, [out, retval] VARIANT *pImageData);
-	}
-
 	//----------------------------------------------------------------------------------------------
 	//-C O C L A S S E S ---------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -330,16 +316,6 @@ library UCLID_IMAGEUTILSLib
 	{
 		[default] interface IImageLineUtility;
 		interface ICopyableObject;
-		interface ILicensedComponent;
-	};
-
-	[
-		uuid(E6975412-9E3F-4574-968D-1F21708C09B8),
-		helpstring("ImageConverter Class")
-	]
-	coclass ImageConverter
-	{
-		[default] interface IImageConverter;
 		interface ILicensedComponent;
 	};
 };

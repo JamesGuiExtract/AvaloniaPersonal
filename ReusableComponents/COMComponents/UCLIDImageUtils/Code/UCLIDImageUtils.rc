@@ -92,7 +92,6 @@ END
 IDR_IMAGEUTILS          REGISTRY                "ImageUtils.rgs"
 IDR_IMAGESTATS          REGISTRY                "ImageStats.rgs"
 IDR_IMAGELINEUTILITY    REGISTRY                "ImageLineUtility.rgs"
-IDR_IMAGECONVERTER		REGISTRY				"ImageConverter.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -2906,6 +2906,19 @@ void CScansoftOCR2::applyCommonSettings()
 		m_bReturnUnrecognizedCharacters = false;
 		m_bLocateZonesInSpecifiedZone = false;
 		m_bIgnoreAreaOutsideSpecifiedZone = false;
+
+		// Increase default max image size
+		THROW_UE_ON_ERROR("ELI50267", "Unable to get max X pixels setting.",
+			kRecSettingGetHandle(NULL, "Kernel.Img.Max.Pix.X", &hSetting, NULL));
+
+		THROW_UE_ON_ERROR("ELI50268", "Unable to set max X pixels.",
+			kRecSettingSetInt(0, hSetting, 32000));
+
+		THROW_UE_ON_ERROR("ELI50269", "Unable get max Y pixels setting.",
+			kRecSettingGetHandle(NULL, "Kernel.Img.Max.Pix.Y", &hSetting, NULL));
+
+		THROW_UE_ON_ERROR("ELI50270", "Unable to set max Y pixels.",
+			kRecSettingSetInt(0, hSetting, 32000));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45914")
 }

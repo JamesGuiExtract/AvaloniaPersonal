@@ -339,6 +339,20 @@ void initNuanceEngineAndLicense()
 				THROW_UE("ELI34305", "Unable to find required DOT module for Nuance engine to run.", rc);
 			}
 		}
+
+		// Increase max image size
+		HSETTING hSetting;
+		rc = kRecSettingGetHandle(NULL, "Kernel.Img.Max.Pix.X", &hSetting, NULL);
+		throwExceptionIfNotSuccess(rc, "ELI50254", "Failed to get max X pixels setting.");
+
+		rc = kRecSettingSetInt(0, hSetting, 32000);
+		throwExceptionIfNotSuccess(rc, "ELI50255", "Failed to set max X pixels setting.");
+
+		rc = kRecSettingGetHandle(NULL, "Kernel.Img.Max.Pix.Y", &hSetting, NULL);
+		throwExceptionIfNotSuccess(rc, "ELI50256", "Failed to get max Y pixels setting.");
+
+		rc = kRecSettingSetInt(0, hSetting, 32000);
+		throwExceptionIfNotSuccess(rc, "ELI50257", "Failed to set max Y pixels setting.");
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34306")
 }

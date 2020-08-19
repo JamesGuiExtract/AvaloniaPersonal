@@ -108,7 +108,6 @@
       <OutputFile>.\..\Release/UCLIDImageUtils.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -168,11 +167,9 @@
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
     <PostBuildEvent>
-      
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ImageConverter.cpp" />
     <ClCompile Include="ImageLineUtility.cpp" />
     <ClCompile Include="ImageStats.cpp" />
     <ClCompile Include="ImageUtils.cpp">
@@ -197,7 +194,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ImageConverter.rgs" />
     <None Include="UCLIDImageUtils.def" />
     <None Include="ImageLineUtility.rgs" />
     <None Include="ImageStats.rgs" />
@@ -224,7 +220,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ImageConverter.h" />
     <ClInclude Include="ImageLineUtility.h" />
     <ClInclude Include="ImageStats.h" />
     <ClInclude Include="ImageUtils.h" />
