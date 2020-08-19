@@ -17,7 +17,7 @@ class CESConvertToPDFApp;
 class CRecAPIManager
 {
 public:
-	CRecAPIManager(CESConvertToPDFApp *pApp, const string& strFileName);
+	CRecAPIManager(CESConvertToPDFApp *pApp, const string& strFileName, PDF_PROC_MODE processingMode);
 	~CRecAPIManager();
 
 	// Gets the number of pages in the loaded file.
@@ -44,7 +44,7 @@ private:
 
 	void init();
 	// Applies RecAPI settings for OCR, format and security based on the command-line params.
-	void applySettings();
+	void applySettings(PDF_PROC_MODE processingMode);
 	// Opens the specified image file for reading.
 	void openImageFile(const string& strFileName);
 };

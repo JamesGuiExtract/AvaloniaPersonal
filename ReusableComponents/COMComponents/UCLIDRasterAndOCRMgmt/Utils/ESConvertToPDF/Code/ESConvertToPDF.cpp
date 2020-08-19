@@ -173,17 +173,23 @@ int CESConvertToPDFApp::ExitInstance()
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
+void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecPdfApi)
 {
 	// initialize the RecAPI license
 	// NOTE: this is separate from the Extract licensing which occurred earlier
 	licenseOCREngine();
 
+	// Use Auto for the legacy method so that existing text is preserved
+	// https://extract.atlassian.net/browse/ISSUE-17173
+	PDF_PROC_MODE processingMode = bUseRecPdfApi
+		? PDF_PM_GRAPHICS_ONLY
+		: PDF_PM_AUTO;
+
 	// https://extract.atlassian.net/browse/ISSUE-12184
 	// When using bUseRecDFAPI, a new CRecAPIManager instance will be generated and used after
 	// every [g_nPAGE_BATCH_SIZE] pages to ensure that memory usage is not excessive when processing
 	// large documents.
-	unique_ptr<CRecAPIManager> apRecAPIManager(new CRecAPIManager(this, m_strInputFile));
+	auto apRecAPIManager = make_unique<CRecAPIManager>(this, m_strInputFile, processingMode);
 
 	IMG_INFO imgInfo = {0};
 	IMF_FORMAT imgFormat;
@@ -204,13 +210,13 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 
 	// If the PDF will be created from an HPAGE array then it is necessary to preserve the original pages
 	// so that the output can specify II_ORIGINAL (II_CURRENT would mean pages rotated by the preprocessing step)
-	if (!bSourceIsPDF || !bUseRecDFAPI)
+	if (!bSourceIsPDF || !bUseRecPdfApi)
 	{
 		RECERR rc = kRecSetPreserveOriginalImg(0, TRUE);
 		throwExceptionIfNotSuccess(rc, "ELI50259", "Failed to set preserve original image setting.", m_strInputFile);
 	}
 
-	if (bUseRecDFAPI)
+	if (bUseRecPdfApi)
 	{
 		RECERR rc = rPdfInit();
 		throwExceptionIfNotSuccess(rc, "ELI36754", "Unable to initialize PDF processing engine.");
@@ -234,7 +240,7 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 			{
 				// Free all RecAPI memory and re-initialize the API for the next g_nPAGE_BATCH_SIZE
 				// pages.
-				apRecAPIManager.reset(new CRecAPIManager(this, m_strInputFile));
+				apRecAPIManager = make_unique<CRecAPIManager>(this, m_strInputFile, processingMode);
 			}
 
 			int nPagesToProcess = min(g_nPAGE_BATCH_SIZE, nPageCount - i);
@@ -263,7 +269,7 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 			}
 
 			// Apply the OCR from pages to the output document.
-			applySearchableTextWithRecAPI(pdfDoc, pPages, i, nPagesToProcess);
+			applySearchableTextWithRecPDFAPI(pdfDoc, pPages, i, nPagesToProcess);
 		}
 
 		rc = rPdfClose(pdfDoc);
@@ -282,7 +288,7 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecDFAPI)
 	{
 		HPAGE *pPages = apRecAPIManager->getOCRedPages(0, nPageCount);
 
-		// If not using RecAPI, use the RecAPI to convert to searchable PDF.
+		// If not using the PDF API, use RecAPI to convert to searchable PDF.
 		RECERR rc = kRecSetDTXTFormat(0, DTXT_PDFIOT);
 		throwExceptionIfNotSuccess(rc, "ELI36845", "Unable to set direct text format.", m_strInputFile);
 
@@ -323,7 +329,7 @@ void CESConvertToPDFApp::addPagesToOutput(HPAGE *pPages, const string& strOutput
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CESConvertToPDFApp::applySearchableTextWithRecAPI(RPDF_DOC pdfDoc, HPAGE *pages,
+void CESConvertToPDFApp::applySearchableTextWithRecPDFAPI(RPDF_DOC pdfDoc, HPAGE *pages,
 													   int nStartPage, int nPageCount)
 {
 	RPDF_OPERATION op;
@@ -347,14 +353,14 @@ void CESConvertToPDFApp::validatePDF(const string& strFileName)
 	{
 		try
 		{
-			CRecAPIManager recAPIManager(this, strFileName);
+			CRecAPIManager recAPIManager(this, strFileName, PDF_PM_NORMAL);
 
 			int nPageCount = recAPIManager.getPageCount();
 
 			for(i = 0; i < nPageCount; i++)  
 			{
 				HPAGE hPage;
-				loadPageFromImageHandle(m_strInputFile, recAPIManager.m_hFile, i, &hPage);
+				loadPageFromImageHandle(strFileName, recAPIManager.m_hFile, i, &hPage);
 
 				RECERR rc = kRecFreeImg(hPage);
 				if (rc != REC_OK)

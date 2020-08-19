@@ -72,9 +72,6 @@ private:
 	string m_strExceptionLogFile;
 
 	//---------------------------------------------------------------------------------------------
-	// Applies RecAPI settings for OCR, format and security based on the command-line params.
-	void applySettings();
-	//---------------------------------------------------------------------------------------------
 	// Executes the conversion to searchable PDF. If bUseRecDFAPI = true, the RecAPI will be used
 	// exclusively which means each image will be converted (modified) into the output document.
 	// If bUseRecDFAPI = false, the RecPDF API will be used. The RecPDF API has the advantage of
@@ -89,7 +86,7 @@ private:
 		int nPageCount);
 	//---------------------------------------------------------------------------------------------
 	// Applies the searchable text in pages to the specified strImageFile using the RecPDF API.
-	void applySearchableTextWithRecAPI(RPDF_DOC pdfDoc, HPAGE *pages, int nStartPage, int nPageCount);
+	void applySearchableTextWithRecPDFAPI(RPDF_DOC pdfDoc, HPAGE *pages, int nStartPage, int nPageCount);
 	//---------------------------------------------------------------------------------------------
 	// Validates that the specified PDF can be read. Added use in response to issue where RecPDF
 	// API call can result in corrupted images:

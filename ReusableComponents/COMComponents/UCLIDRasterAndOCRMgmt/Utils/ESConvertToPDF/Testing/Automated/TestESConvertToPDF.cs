@@ -248,7 +248,7 @@ namespace ESConvertToPDF.Test
         /// Currently this test is broken. The code in ESConvertToPDF should be fixed so that it preserves existing text
         /// when using the legacy method. The same code path is used as a fall-back method for (so this could affect non-password protected, non-PDFA outputs too).
         /// </remarks>
-        [Test, Category("Automated"), Category("Broken")]
+        [Test, Category("Automated")]
         public static void TextTest_TextPdfToPdfa()
         {
             using var pair = ConvertPdfResourceToSearchable(_TEXT_BASED_PDF, "/pdfa");
@@ -257,7 +257,11 @@ namespace ESConvertToPDF.Test
             var origText = GetText(pair.Input);
             var newText = GetText(pair.Output);
             var editDistance = UtilityMethods.LevenshteinDistance(origText, newText);
-            Assert.Less(editDistance, 20, "This test is broken. I saw a value of 6872 when test was written");
+            Assert.Less(editDistance, 70, "I saw a value of 67 when test was written");
+
+            var fixedText = newText.Replace(" \r\n", "\r\n");
+            editDistance = UtilityMethods.LevenshteinDistance(origText, fixedText);
+            Assert.Less(editDistance, 2, "I saw a value of 1 when test was written");
         }
 
         /// <summary>

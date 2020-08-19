@@ -38,7 +38,7 @@ string strOUTPUT_SETTINGS_CLASS = "Kernel.Imf.PDF";
 //---------------------------------------------------------------------------------------------
 // CRecAPIManager class
 //---------------------------------------------------------------------------------------------
-CRecAPIManager::CRecAPIManager(CESConvertToPDFApp *pApp, const string& strFileName)
+CRecAPIManager::CRecAPIManager(CESConvertToPDFApp *pApp, const string& strFileName, PDF_PROC_MODE processingMode)
 : m_pApp(pApp)
 , m_hFile(__nullptr)
 , m_pPages(__nullptr)
@@ -47,7 +47,7 @@ CRecAPIManager::CRecAPIManager(CESConvertToPDFApp *pApp, const string& strFileNa
 	ASSERT_ARGUMENT("ELI37012", m_pApp != __nullptr);
 
 	init();
-	applySettings();
+	applySettings(processingMode);
 	openImageFile(strFileName);
 }
 //---------------------------------------------------------------------------------------------
@@ -254,7 +254,7 @@ void CRecAPIManager::init()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CRecAPIManager::applySettings()
+void CRecAPIManager::applySettings(PDF_PROC_MODE processingMode)
 {
 	// OCR should be accurate rather than fast.
 	m_pApp->setIntSetting("Kernel.OcrMgr.PDF.TradeOff", TO_ACCURATE);
@@ -262,8 +262,7 @@ void CRecAPIManager::applySettings()
 	// Use the more accurate 3-way voting engine (rather than the default 2-way voting engine).
 	m_pApp->setBoolSetting("Kernel.OcrMgr.PreferAccurateEngine", true);
 	
-	// OCR should be performed only on images.
-	m_pApp->setIntSetting("Kernel.OcrMgr.PDF.ProcessingMode", PDF_PM_GRAPHICS_ONLY);
+	m_pApp->setIntSetting("Kernel.OcrMgr.PDF.ProcessingMode", processingMode);
 
 	// Preserve the original resolution in the output PDF.
 	m_pApp->setBoolSetting(strOUTPUT_SETTINGS_CLASS + ".LoadOriginalDPI", true);
