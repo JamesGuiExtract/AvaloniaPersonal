@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
@@ -125,8 +126,12 @@ namespace Extract.FileActionManager.Utilities
         /// Path to the database that contains the FAM service settings.
         /// </summary>
         // Store the database parallel to the ESFAMService.exe file [DNRCAU #381]
-        static readonly string _databaseFile = FileSystemMethods.PathCombine(
-            FileSystemMethods.CommonApplicationDataPath, "ESFAMService", "ESFAMService.sdf");
+        string _databaseFile;
+
+        /// <summary>
+        /// Allow for custom service name
+        /// </summary>
+        string _serviceName;
 
         /// <summary>
         /// Event to indicate processing should stop.
@@ -216,6 +221,15 @@ namespace Extract.FileActionManager.Utilities
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects, "ELI28495",
                     _OBJECT_NAME);
 
+                if (TryGetServiceName(out _serviceName))
+                {
+                    _databaseFile = GetDatabaseFileName(_serviceName);
+                }
+                else
+                {
+                    throw new ExtractException("ELI50266", "Could not determine service name");
+                }
+
                 var dbManager = new FAMServiceDatabaseManager(_databaseFile);
 
                 // Validate the service database schema
@@ -241,8 +255,8 @@ namespace Extract.FileActionManager.Utilities
                     .ToList();
 
                 // [DNRCAU #357] - Log application trace when service is starting
-                ExtractException ee2 = new ExtractException("ELI28772",
-                    "Application trace: FAM Service starting.");
+                ExtractException ee2 = new ExtractException("ELI28772", UtilityMethods.FormatInvariant(
+                    $"Application trace: FAM Service starting. ({_serviceName})"));
                 ee2.Log();
 
                 // Create the sleep thread and start it
@@ -269,6 +283,7 @@ namespace Extract.FileActionManager.Utilities
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI28496", ex);
+                ee.AddDebugData("ServiceName", _serviceName);
                 ee.Log();
                 throw ee;
             }
@@ -1381,8 +1396,8 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 // [DNRCAU #357] - Log application trace when service is stopping
-                ExtractException ee = new ExtractException(eliCode,
-                    "Application trace: FAM Service stopping.");
+                ExtractException ee = new ExtractException(eliCode, UtilityMethods.FormatInvariant(
+                    $"Application trace: FAM Service stopping. ({_serviceName})"));
                 ee.Log();
 
                 // Signal the threads to stop
@@ -1425,8 +1440,8 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 // [DNRCAU #357] - Log application trace when service has shutdown
-                ExtractException ee2 = new ExtractException("ELI28774",
-                    "Application trace: FAM Service stopped.");
+                ExtractException ee2 = new ExtractException("ELI28774", UtilityMethods.FormatInvariant(
+                    $"Application trace: FAM Service stopped. ({_serviceName})"));
                 ee2.AddDebugData("Threads Stopped",
                     _threadsStopped != null ? _threadsStopped.Wait(0) : true, false);
                 ee2.Log();
@@ -1466,6 +1481,18 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
+        // Query for the name of this instance
+        static bool TryGetServiceName(out string serviceName)
+        {
+            using var searcher = new ManagementObjectSearcher(UtilityMethods.FormatInvariant(
+                $"SELECT * FROM Win32_Service where ProcessId = {Process.GetCurrentProcess().Id}"));
+            using var results = searcher.Get();
+            serviceName = results
+                .Cast<ManagementBaseObject>()
+                .FirstOrDefault()?["Name"] as string;
+            return serviceName != null;
+        }
+
         #endregion Methods
 
         #region Properties
@@ -1473,13 +1500,12 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// Gets the name of the database file that is used by the service.
         /// </summary>
+        /// <param name="serviceName">The name of the service (e.g., ESFAMService)</param>
         /// <returns>The name of the database file that is used by the service.</returns>
-        public static string DatabaseFile
+        public static string GetDatabaseFileName(string serviceName)
         {
-            get
-            {
-                return _databaseFile;
-            }
+            return FileSystemMethods.PathCombine(
+                FileSystemMethods.CommonApplicationDataPath, "ESFAMService", serviceName + ".sdf");
         }
 
         #endregion Properties
