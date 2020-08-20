@@ -821,7 +821,7 @@ namespace Extract.ReportingDevExpress
                                                                         existingValue.Value as DateTime? ?? DateTime.Now,
                                                                         true);
                     }
-                    else if (parameter.Type.IsNumericType())
+                    else if (parameter.IsNumericType())
                     {
                         extractParameter = new NumberParameter(parameter.Name, (double)(existingValue.Value ?? parameter.Value));
                     }

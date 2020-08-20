@@ -321,6 +321,7 @@ namespace Extract.Utilities
         /// <typeparam name="TValue">The type of the objects in the map</typeparam>
         /// <param name="map">The map to enumerate</param>
         [CLSCompliant(false)]
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public static IEnumerable<KeyValuePair<int, TValue>> ToIEnumerable<TValue>(this LongToObjectMap map)
         {
             for (int i = 0, size = map.Size; i < size; i++)
@@ -334,40 +335,57 @@ namespace Extract.Utilities
         /// Creates a <see cref="LongToObjectMap"/> from enumeration of int-to-object pairs
         /// </summary>
         /// <typeparam name="TValue">The type of the objects in the pairs</typeparam>
-        /// <param name="intsToObjects">The key-value pairs for the map</param>
+        /// <param name="integersToObjects">The key-value pairs for the map</param>
         [CLSCompliant(false)]
-        public static LongToObjectMap ToLongToObjectMap<TValue>(this IEnumerable<KeyValuePair<int, TValue>> intsToObjects)
+        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+        public static LongToObjectMap ToLongToObjectMap<TValue>(this IEnumerable<KeyValuePair<int, TValue>> integersToObjects)
         {
-            var map = new LongToObjectMapClass();
-            foreach (var intToObject in intsToObjects)
+            try
             {
-                map.Set(intToObject.Key, intToObject.Value);
+                var map = new LongToObjectMapClass();
+                foreach (var intToObject in integersToObjects)
+                {
+                    map.Set(intToObject.Key, intToObject.Value);
+                }
+                return map;
             }
-            return map;
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50293");
+            }
         }
 
         /// <summary>
-        /// Returns true of the type of the object is a numeric type
+        /// Returns true if the type of the object is a numeric type
         /// </summary>
-        /// <param name="t>Type to check the type of</param>
+        /// <param name="value">The object to check the type of</param>
         /// <returns>Returns true of the type of the object is a numeric type, false if not</returns>
-        public static bool IsNumericType(this Type t)
+        public static bool IsNumericType(this object value)
         {
-            HashSet<Type> NumericTypes = new HashSet<Type>
+            try
             {
-                typeof(Decimal),
-                typeof(Single),
-                typeof(Double),
-                typeof(Byte),
-                typeof(SByte),
-                typeof(Int16),
-                typeof(Int32),
-                typeof(Int64),
-                typeof(UInt16),
-                typeof(UInt32),
-                typeof(UInt64)
-            };
-            return NumericTypes.Contains(t);
+                switch (value)
+                {
+                    case Decimal _:
+                    case Single _:
+                    case Double _:
+                    case Byte _:
+                    case SByte _:
+                    case Int16 _:
+                    case Int32 _:
+                    case Int64 _:
+                    case UInt16 _:
+                    case UInt32 _:
+                    case UInt64 _:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50292");
+            }
         }
 
         #endregion Methods
