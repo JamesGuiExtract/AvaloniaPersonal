@@ -1,0 +1,142 @@
+﻿<Attributes>
+  <Attribute Name="LabInfo">
+    <SubAttributes>
+      <Attribute Name="Address">
+        <SubAttributes>
+          <Attribute Name="Address1">
+            <Value Spatial="0">8901 WEST LINCOLN AVENUE</Value>
+          </Attribute>
+          <Attribute Name="City">
+            <Value Spatial="0">WEST ALLIS</Value>
+          </Attribute>
+          <Attribute Name="State">
+            <Value Spatial="0">WI</Value>
+          </Attribute>
+          <Attribute Name="ZipCode">
+            <Value Spatial="0">53227</Value>
+          </Attribute>
+        </SubAttributes>
+        <Value Spatial="0">N/A</Value>
+      </Attribute>
+    </SubAttributes>
+    <Value Spatial="0">N/A</Value>
+  </Attribute>
+  <Attribute Name="PatientInfo">
+    <SubAttributes>
+      <Attribute Name="DOB">
+        <Value Spatial="0">08/08/2000</Value>
+      </Attribute>
+      <Attribute Name="Gender">
+        <Value Spatial="0">M</Value>
+      </Attribute>
+      <Attribute Name="Name">
+        <SubAttributes>
+          <Attribute Name="First">
+            <Value Spatial="0">BERT</Value>
+          </Attribute>
+          <Attribute Name="Last">
+            <Value Spatial="0">DOE</Value>
+          </Attribute>
+        </SubAttributes>
+        <Value Spatial="0">DOE, BERT</Value>
+      </Attribute>
+    </SubAttributes>
+    <Value Spatial="0">N/A</Value>
+  </Attribute>
+  <Attribute Name="PhysicianInfo">
+    <SubAttributes>
+      <Attribute Name="OrderingPhysicianName">
+        <SubAttributes>
+          <Attribute Name="First">
+            <Value Spatial="0">RICHARD</Value>
+          </Attribute>
+          <Attribute Name="Last">
+            <Value Spatial="0">DOE</Value>
+          </Attribute>
+        </SubAttributes>
+        <Value Spatial="0">DOE, RICHARD</Value>
+      </Attribute>
+    </SubAttributes>
+    <Value Spatial="0">N/A</Value>
+  </Attribute>
+  <Attribute Name="Test">
+    <SubAttributes>
+      <Attribute Name="CollectionDate">
+        <Value Spatial="0">08/08/2008</Value>
+      </Attribute>
+      <Attribute Name="CollectionTime">
+        <Value Spatial="0">09:18</Value>
+      </Attribute>
+      <Attribute Name="Component">
+        <SubAttributes>
+          <Attribute Name="Flag">
+            <Value Spatial="0">H</Value>
+          </Attribute>
+          <Attribute Name="OriginalName">
+            <Value Spatial="0">GLUCOSE</Value>
+          </Attribute>
+          <Attribute Name="Range">
+            <Value Spatial="0">65-99</Value>
+          </Attribute>
+          <Attribute Name="TestCode">
+            <Value Spatial="0">GLU</Value>
+          </Attribute>
+          <Attribute Name="Units">
+            <Value Spatial="0">mg/dL</Value>
+          </Attribute>
+          <Attribute Name="Value">
+            <Value Spatial="0">143</Value>
+          </Attribute>
+        </SubAttributes>
+        <Value Spatial="0">GLUCOSE</Value>
+      </Attribute>
+      <Attribute Name="Name">
+        <Value Spatial="0">GLUCOSE</Value>
+      </Attribute>
+      <Attribute Name="OrderCode">
+        <Value Spatial="0">GLU</Value>
+      </Attribute>
+    </SubAttributes>
+    <Value Spatial="0">N/A</Value>
+  </Attribute>
+  <Attribute Name="Test">
+    <SubAttributes>
+      <Attribute Name="CollectionDate">
+        <Value Spatial="0">08/08/2008</Value>
+      </Attribute>
+      <Attribute Name="CollectionTime">
+        <Value Spatial="0">09:18</Value>
+      </Attribute>
+      <Attribute Name="Component">
+        <SubAttributes>
+          <Attribute Name="Flag">
+            <Value Spatial="0">H</Value>
+          </Attribute>
+          <Attribute Name="OriginalName">
+            <Value Spatial="0">HEMOGLOBIN A1C</Value>
+          </Attribute>
+          <Attribute Name="Range">
+            <Value Spatial="0">4.5-5.9</Value>
+          </Attribute>
+          <Attribute Name="TestCode">
+            <Value Spatial="0">GLYH</Value>
+          </Attribute>
+          <Attribute Name="Units">
+            <Value Spatial="0">%</Value>
+          </Attribute>
+          <Attribute Name="Value">
+            <Value Spatial="0">7.5</Value>
+          </Attribute>
+        </SubAttributes>
+        <Value Spatial="0">HEMOGLOBIN A1C</Value>
+      </Attribute>
+      <Attribute Name="Name">
+        <Value Spatial="0">GLYCOHEMOGLOBIN A1C</Value>
+      </Attribute>
+      <Attribute Name="OrderCode">
+        <Value Spatial="0">GLYH</Value>
+      </Attribute>
+    </SubAttributes>
+    <Value Spatial="0">N/A</Value>
+  </Attribute>
+</Attributes>

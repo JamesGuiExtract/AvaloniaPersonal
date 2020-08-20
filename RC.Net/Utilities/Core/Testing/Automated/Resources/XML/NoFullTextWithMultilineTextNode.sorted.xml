@@ -1,0 +1,13 @@
+﻿<FlexData>
+  <ConsiderationAmount>192800.00</ConsiderationAmount>
+  <DocumentType>Deed of Trust</DocumentType>
+  <LegalDescription>n.a.<FullText>LOT 123, ARBOR OAKS NO. 2, IN THE COUNTY OF WASHINGTON AND STATE OF OREGON</FullText><Lot FieldType="FULL">123<Lot1>123</Lot1></Lot><Subdivision>ARBOR OAKS NO. 2</Subdivision></LegalDescription>
+  <Party>n.a.<First>Jane</First><LastOrCompany>Doe</LastOrCompany><MappedTo>Grantor</MappedTo><PartyType>Trustor</PartyType><PersonCompanyTrust>Person</PersonCompanyTrust></Party>
+  <Party>n.a.<LastOrCompany>CitiMortgage, Inc.</LastOrCompany><MappedTo>Grantee</MappedTo><PartyType>Beneficiary</PartyType><PersonCompanyTrust>Company</PersonCompanyTrust></Party>
+  <Party>n.a.<LastOrCompany>Mortgage Electronic Registration Systems, Inc.</LastOrCompany><MappedTo>Grantee</MappedTo><PartyType>Beneficiary</PartyType><PersonCompanyTrust>Company</PersonCompanyTrust></Party>
+  <Party>n.a.<LastOrCompany>First American Title Company</LastOrCompany><MappedTo>Grantee</MappedTo><PartyType>Trustee</PartyType><PersonCompanyTrust>Company</PersonCompanyTrust></Party>
+  <ReturnAddress>CitiMortgage, Inc.
+Attn: Document Processing
+P.O. Box 790021
+St Louis, MO 63179-0021<Address1>P.O. Box 790021</Address1><City>St Louis</City><Recipient1>CitiMortgage, Inc.</Recipient1><Recipient2>Attn: Document Processing</Recipient2><State>MO</State><ZipCode>63179-0021</ZipCode></ReturnAddress>
+</FlexData>

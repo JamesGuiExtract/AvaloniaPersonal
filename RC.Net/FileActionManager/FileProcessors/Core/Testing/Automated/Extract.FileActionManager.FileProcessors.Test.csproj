@@ -24,6 +24,7 @@
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <LangVer>8.0</LangVer>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -80,6 +81,7 @@
     <Compile Include="TestSetActionStatusFileProcessor.cs" />
     <Compile Include="TestSplitMultiPageDocument.cs" />
     <Compile Include="TestCreateRedactedTextTask.cs" />
+    <Compile Include="TestTransformXmlTask.cs" />
     <Compile Include="TestValidateXmlTask.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +240,12 @@
     <EmbeddedResource Include="Resources\BatchWithInvalidContent.txt" />
     <EmbeddedResource Include="Resources\C413.tif" />
     <EmbeddedResource Include="Resources\CopyMoveDeleteFiles.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\TransformXmlTask\FullText.sortedDescending.xml" />
+    <EmbeddedResource Include="Resources\TransformXmlTask\FullText.xml" />
+    <EmbeddedResource Include="Resources\TransformXmlTask\alphaSortDescendingTransform.xslt" />
+    <EmbeddedResource Include="Resources\TransformXmlTask\FullText.sorted.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

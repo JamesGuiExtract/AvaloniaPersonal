@@ -1,0 +1,142 @@
+﻿<Attributes>
+  <Attribute Name="LabInfo">
+    <SubAttributes>
+      <Attribute Name="Address">
+        <SubAttributes>
+          <Attribute Name="Address1">
+            <Value Spatial="1" AverageCharConfidence="98">8901 WEST LINCOLN AVENUE<Line Spatial="1">8901 WEST LINCOLN AVENUE<RectBounds Top="1456" Left="993" Bottom="1486" Right="1593" PageNumber="1" /><Zone StartX="993" StartY="1471" EndX="1593" EndY="1471" Height="31" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="City">
+            <Value Spatial="1" AverageCharConfidence="97">WEST ALLIS<Line Spatial="1">WEST ALLIS<RectBounds Top="1462" Left="1616" Bottom="1488" Right="1867" PageNumber="1" /><Zone StartX="1616" StartY="1475" EndX="1867" EndY="1475" Height="27" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="State">
+            <Value Spatial="1" AverageCharConfidence="60">WI<Line Spatial="1">WI<RectBounds Top="1464" Left="1917" Bottom="1488" Right="1965" PageNumber="1" /><Zone StartX="1917" StartY="1476" EndX="1965" EndY="1476" Height="25" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="ZipCode">
+            <Value Spatial="1" AverageCharConfidence="100">53227<Line Spatial="1">53227<RectBounds Top="1462" Left="1995" Bottom="1490" Right="2113" PageNumber="1" /><Zone StartX="1995" StartY="1476" EndX="2113" EndY="1476" Height="29" PageNumber="1" /></Line></Value>
+          </Attribute>
+        </SubAttributes>
+        <Value Spatial="1" AverageCharConfidence="100">N/A<Line Spatial="1">N/A<RectBounds Top="1456" Left="993" Bottom="1490" Right="2113" PageNumber="1" /><Zone StartX="993" StartY="1473" EndX="2113" EndY="1473" Height="35" PageNumber="1" /></Line></Value>
+      </Attribute>
+    </SubAttributes>
+    <Value Spatial="1" AverageCharConfidence="100">N/A<Line Spatial="1">N/A<RectBounds Top="38" Left="200" Bottom="2914" Right="2318" PageNumber="1" /><Zone StartX="200" StartY="1476" EndX="2318" EndY="1476" Height="2877" PageNumber="1" /></Line></Value>
+  </Attribute>
+  <Attribute Name="PatientInfo">
+    <SubAttributes>
+      <Attribute Name="DOB">
+        <Value Spatial="1" AverageCharConfidence="98">08/08/2000<Line Spatial="1">08/08/2000<RectBounds Top="442" Left="1647" Bottom="478" Right="1872" PageNumber="1" /><Zone StartX="1647" StartY="460" EndX="1872" EndY="460" Height="37" PageNumber="1" /></Line></Value>
+      </Attribute>
+      <Attribute Name="Gender">
+        <Value Spatial="1" AverageCharConfidence="80">M<Line Spatial="1">M<RectBounds Top="538" Left="1761" Bottom="562" Right="1795" PageNumber="1" /><Zone StartX="1761" StartY="550" EndX="1795" EndY="550" Height="25" PageNumber="1" /></Line></Value>
+      </Attribute>
+      <Attribute Name="Name">
+        <SubAttributes>
+          <Attribute Name="First">
+            <Value Spatial="1" AverageCharConfidence="72">BERT<Line Spatial="1">BERT<RectBounds Top="763" Left="312" Bottom="789" Right="405" PageNumber="1" /><Zone StartX="312" StartY="776" EndX="405" EndY="776" Height="27" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="Last">
+            <Value Spatial="1" AverageCharConfidence="76">DOE<Line Spatial="1">DOE<RectBounds Top="765" Left="219" Bottom="789" Right="288" PageNumber="1" /><Zone StartX="219" StartY="777" EndX="288" EndY="777" Height="25" PageNumber="1" /></Line></Value>
+          </Attribute>
+        </SubAttributes>
+        <Value Spatial="1" AverageCharConfidence="74">DOE, BERT<Line Spatial="1">DOE, BERT<RectBounds Top="763" Left="219" Bottom="789" Right="405" PageNumber="1" /><Zone StartX="219" StartY="776" EndX="405" EndY="776" Height="27" PageNumber="1" /></Line></Value>
+      </Attribute>
+    </SubAttributes>
+    <Value Spatial="1" AverageCharConfidence="90">N/A<Line Spatial="1">N/A<RectBounds Top="38" Left="200" Bottom="2914" Right="2318" PageNumber="1" /><Zone StartX="200" StartY="1476" EndX="2318" EndY="1476" Height="2877" PageNumber="1" /></Line></Value>
+  </Attribute>
+  <Attribute Name="PhysicianInfo">
+    <SubAttributes>
+      <Attribute Name="OrderingPhysicianName">
+        <SubAttributes>
+          <Attribute Name="First">
+            <Value Spatial="1" AverageCharConfidence="64">RICHARD<Line Spatial="1">RICHARD<RectBounds Top="857" Left="642" Bottom="883" Right="803" PageNumber="1" /><Zone StartX="642" StartY="870" EndX="803" EndY="870" Height="27" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="Last">
+            <Value Spatial="1" AverageCharConfidence="70">DOE<Line Spatial="1">DOE<RectBounds Top="858" Left="544" Bottom="882" Right="613" PageNumber="1" /><Zone StartX="544" StartY="870" EndX="613" EndY="870" Height="25" PageNumber="1" /></Line></Value>
+          </Attribute>
+        </SubAttributes>
+        <Value Spatial="1" AverageCharConfidence="66">DOE, RICHARD<Line Spatial="1">DOE, RICHARD<RectBounds Top="857" Left="544" Bottom="883" Right="803" PageNumber="1" /><Zone StartX="544" StartY="870" EndX="803" EndY="870" Height="27" PageNumber="1" /></Line></Value>
+      </Attribute>
+    </SubAttributes>
+    <Value Spatial="0">N/A</Value>
+  </Attribute>
+  <Attribute Name="Test">
+    <SubAttributes>
+      <Attribute Name="CollectionDate">
+        <Value Spatial="1" AverageCharConfidence="100">08/08/2008<Line Spatial="1">08/08/2008<RectBounds Top="718" Left="2017" Bottom="754" Right="2359" PageNumber="1" /><RectBounds Top="721" Left="2155" Bottom="749" Right="2243" PageNumber="1" /><Zone StartX="2017" StartY="736" EndX="2359" EndY="736" Height="37" PageNumber="1" /><Zone StartX="2155" StartY="735" EndX="2243" EndY="735" Height="29" PageNumber="1" /></Line></Value>
+      </Attribute>
+      <Attribute Name="CollectionTime">
+        <Value Spatial="1" AverageCharConfidence="100">09:18<Line Spatial="1">09:18<RectBounds Top="720" Left="2273" Bottom="748" Right="2291" PageNumber="1" /><RectBounds Top="718" Left="2017" Bottom="754" Right="2359" PageNumber="1" /><Zone StartX="2273" StartY="734" EndX="2291" EndY="734" Height="29" PageNumber="1" /><Zone StartX="2017" StartY="736" EndX="2359" EndY="736" Height="37" PageNumber="1" /></Line></Value>
+      </Attribute>
+      <Attribute Name="Component">
+        <SubAttributes>
+          <Attribute Name="Flag">
+            <Value Spatial="1" AverageCharConfidence="40">H<Line Spatial="1">H<RectBounds Top="1086" Left="823" Bottom="1110" Right="845" PageNumber="1" /><Zone StartX="823" StartY="1098" EndX="845" EndY="1098" Height="25" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="OriginalName">
+            <Value Spatial="1" AverageCharConfidence="100">GLUCOSE<Line Spatial="1">GLUCOSE<RectBounds Top="1085" Left="194" Bottom="1109" Right="356" PageNumber="1" /><Zone StartX="194" StartY="1097" EndX="356" EndY="1097" Height="25" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="Range">
+            <Value Spatial="1" AverageCharConfidence="92">65-99<Line Spatial="1">65-99<RectBounds Top="1084" Left="1624" Bottom="1112" Right="1736" PageNumber="1" /><Zone StartX="1624" StartY="1098" EndX="1736" EndY="1098" Height="29" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="TestCode">
+            <Value Spatial="0">GLU</Value>
+          </Attribute>
+          <Attribute Name="Units">
+            <Value Spatial="1" AverageCharConfidence="80">mg/dL<Line Spatial="1">mg/dL<RectBounds Top="1080" Left="1359" Bottom="1120" Right="1482" PageNumber="1" /><Zone StartX="1359" StartY="1100" EndX="1482" EndY="1100" Height="41" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="Value">
+            <Value Spatial="1" AverageCharConfidence="95">143<Line Spatial="1">143<RectBounds Top="1083" Left="1034" Bottom="1111" Right="1100" PageNumber="1" /><Zone StartX="1034" StartY="1097" EndX="1100" EndY="1097" Height="29" PageNumber="1" /></Line></Value>
+          </Attribute>
+        </SubAttributes>
+        <Value Spatial="1" AverageCharConfidence="100">GLUCOSE<Line Spatial="1">GLUCOSE<RectBounds Top="1085" Left="194" Bottom="1109" Right="356" PageNumber="1" /><Zone StartX="194" StartY="1097" EndX="356" EndY="1097" Height="25" PageNumber="1" /></Line></Value>
+      </Attribute>
+      <Attribute Name="Name">
+        <Value Spatial="0">GLUCOSE</Value>
+      </Attribute>
+      <Attribute Name="OrderCode">
+        <Value Spatial="0">GLU</Value>
+      </Attribute>
+    </SubAttributes>
+    <Value Spatial="0">N/A</Value>
+  </Attribute>
+  <Attribute Name="Test">
+    <SubAttributes>
+      <Attribute Name="CollectionDate">
+        <Value Spatial="1" AverageCharConfidence="100">08/08/2008<Line Spatial="1">08/08/2008<RectBounds Top="718" Left="2017" Bottom="754" Right="2359" PageNumber="1" /><RectBounds Top="721" Left="2155" Bottom="749" Right="2243" PageNumber="1" /><Zone StartX="2017" StartY="736" EndX="2359" EndY="736" Height="37" PageNumber="1" /><Zone StartX="2155" StartY="735" EndX="2243" EndY="735" Height="29" PageNumber="1" /></Line></Value>
+      </Attribute>
+      <Attribute Name="CollectionTime">
+        <Value Spatial="1" AverageCharConfidence="100">09:18<Line Spatial="1">09:18<RectBounds Top="720" Left="2273" Bottom="748" Right="2291" PageNumber="1" /><RectBounds Top="718" Left="2017" Bottom="754" Right="2359" PageNumber="1" /><Zone StartX="2273" StartY="734" EndX="2291" EndY="734" Height="29" PageNumber="1" /><Zone StartX="2017" StartY="736" EndX="2359" EndY="736" Height="37" PageNumber="1" /></Line></Value>
+      </Attribute>
+      <Attribute Name="Component">
+        <SubAttributes>
+          <Attribute Name="Flag">
+            <Value Spatial="1" AverageCharConfidence="40">H<Line Spatial="1">H<RectBounds Top="1178" Left="824" Bottom="1204" Right="845" PageNumber="1" /><Zone StartX="824" StartY="1191" EndX="845" EndY="1191" Height="27" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="OriginalName">
+            <Value Spatial="1" AverageCharConfidence="90">HEMOGLOBIN A1C<Line Spatial="1">HEMOGLOBIN A1C<RectBounds Top="1174" Left="194" Bottom="1202" Right="519" PageNumber="1" /><Zone StartX="194" StartY="1188" EndX="519" EndY="1188" Height="29" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="Range">
+            <Value Spatial="1" AverageCharConfidence="91">4.5-5.9<Line Spatial="1">4.5-5.9<RectBounds Top="1176" Left="1623" Bottom="1204" Right="1783" PageNumber="1" /><Zone StartX="1623" StartY="1190" EndX="1783" EndY="1190" Height="29" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="TestCode">
+            <Value Spatial="0">GLYH</Value>
+          </Attribute>
+          <Attribute Name="Units">
+            <Value Spatial="1" AverageCharConfidence="100">%<Line Spatial="1">%<RectBounds Top="1176" Left="1359" Bottom="1204" Right="1384" PageNumber="1" /><Zone StartX="1359" StartY="1190" EndX="1384" EndY="1190" Height="29" PageNumber="1" /></Line></Value>
+          </Attribute>
+          <Attribute Name="Value">
+            <Value Spatial="1" AverageCharConfidence="100">7.5<Line Spatial="1">7.5<RectBounds Top="1175" Left="1035" Bottom="1203" Right="1101" PageNumber="1" /><Zone StartX="1035" StartY="1189" EndX="1101" EndY="1189" Height="29" PageNumber="1" /></Line></Value>
+          </Attribute>
+        </SubAttributes>
+        <Value Spatial="1" AverageCharConfidence="90">HEMOGLOBIN A1C<Line Spatial="1">HEMOGLOBIN A1C<RectBounds Top="1174" Left="194" Bottom="1202" Right="519" PageNumber="1" /><Zone StartX="194" StartY="1188" EndX="519" EndY="1188" Height="29" PageNumber="1" /></Line></Value>
+      </Attribute>
+      <Attribute Name="Name">
+        <Value Spatial="0">GLYCOHEMOGLOBIN A1C</Value>
+      </Attribute>
+      <Attribute Name="OrderCode">
+        <Value Spatial="0">GLYH</Value>
+      </Attribute>
+    </SubAttributes>
+    <Value Spatial="0">N/A</Value>
+  </Attribute>
+</Attributes>

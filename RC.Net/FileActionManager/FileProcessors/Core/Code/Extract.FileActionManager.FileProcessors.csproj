@@ -39,6 +39,7 @@
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -189,6 +190,13 @@
     </Compile>
     <Compile Include="StoreAttributesInDBTaskSettingsDialog.Designer.cs">
       <DependentUpon>StoreAttributesInDBTaskSettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TransformXmlTask.cs" />
+    <Compile Include="TransformXmlTaskSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TransformXmlTaskSettingsDialog.Designer.cs">
+      <DependentUpon>TransformXmlTaskSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="ValidateXmlTaskSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -516,6 +524,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="StoreAttributesInDBTaskSettingsDialog.resx">
       <DependentUpon>StoreAttributesInDBTaskSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TransformXmlTaskSettingsDialog.resx">
+      <DependentUpon>TransformXmlTaskSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ValidateXMLTaskSettingsDialog.resx">
       <DependentUpon>ValidateXmlTaskSettingsDialog.cs</DependentUpon>

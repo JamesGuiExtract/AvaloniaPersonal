@@ -1,5 +1,5 @@
 REM Clean Source and Destination folders
-call Clean.bat Test_1
+call Clean.bat Test_3
 
 REM Create Source direcrtory
 md Source

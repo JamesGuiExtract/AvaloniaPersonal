@@ -39,6 +39,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -69,6 +70,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -90,6 +94,7 @@
     <Compile Include="TestScheduledEvent.cs" />
     <Compile Include="TestSystemMethods.cs" />
     <Compile Include="TestUtilityMethods.cs" />
+    <Compile Include="TestXmlTransformer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -142,12 +147,40 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\TestUtilitiesInterfaceOnly.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\OneClassInterface.dll" />
+    <EmbeddedResource Include="Resources\NoTestInterface.dll" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\NoTestInterface.dll" />
+    <EmbeddedResource Include="Resources\XML\FullText.xml" />
+    <EmbeddedResource Include="Resources\XML\FullText.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttribute.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttribute.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttributeNoSpatial.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttributeNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchema.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchema.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaNoSpatial.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaRemoveEmpty.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaRemoveEmpty.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaRemoveEmptyNoSpatial.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaRemoveEmptyNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextNoSpatial.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextSchema.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextSchema.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextSchemaNoSpatial.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextSchemaNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\Version1NoSpatial.xml" />
+    <EmbeddedResource Include="Resources\XML\Version1NoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\Version1Spatial.xml" />
+    <EmbeddedResource Include="Resources\XML\Version1Spatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextSchemaRemoveEmpty.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextSchemaRemoveEmpty.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextSchemaRemoveEmptyNoSpatial.xml" />
+    <EmbeddedResource Include="Resources\XML\FullTextSchemaRemoveEmptyNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\NoFullTextWithMultilineTextNode.xml" />
+    <EmbeddedResource Include="Resources\XML\NoFullTextWithMultilineTextNode.sorted.xml" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_COMLMLib">
