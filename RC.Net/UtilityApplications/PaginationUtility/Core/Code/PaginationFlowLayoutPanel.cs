@@ -165,20 +165,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _activeScrollTarget = new ScrollTarget()
                     { Control = control, TopAlignmentOffset = topAlignmentOffset };
 
-                if (!_layoutEngine.LayoutPending)
-                {
-                    _activeScrollTarget.Pending = true;
+                _activeScrollTarget.Pending = true;
 
-                    if (_activeScrollTarget.TopAlignmentOffset.HasValue)
-                    {
-                        _layoutEngine.ScrollTarget = _activeScrollTarget;
-                        PerformLayout();
-                    }
-                    else
-                    {
-                        base.ScrollControlIntoView(_activeScrollTarget.Control);
-                    }
-                }   
+                if (_activeScrollTarget.TopAlignmentOffset.HasValue)
+                {
+                    _layoutEngine.ScrollTarget = _activeScrollTarget;
+                    PerformLayout();
+                }
+                else
+                {
+                    base.ScrollControlIntoView(_activeScrollTarget.Control);
+                }
             }
             catch (Exception ex)
             {
@@ -186,7 +183,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             finally
             {
-                _activeScrollTarget.Pending = false;
+                if (_activeScrollTarget is ScrollTarget target)
+                {
+                    target.Pending = false;
+                }
             }
         }
 

@@ -25,12 +25,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Fields
 
         /// <summary>
-        /// Indicates when a layout operation has been invoked. (Layout operations are delayed to be
-        /// able to perform one layout rather than many as individual control properties change).
-        /// </summary>
-        bool _layoutInvoked;
-
-        /// <summary>
         /// Recursion protection for UpdateScrollPosition.
         /// </summary>
         bool _updatingScrollPosition;
@@ -38,17 +32,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Fields
 
         #region Properties
-
-        /// <summary>
-        /// Gets a value indicating whether a layout operation is pending.
-        /// </summary>
-        public bool LayoutPending
-        {
-            get
-            {
-                return _layoutInvoked;
-            }
-        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the next layout should be required.
@@ -91,54 +74,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                // Delay all triggered layouts to occur as part of one layout invoked to occur on the
-                // next windows message to avoid unnecessary layout work.
-                if (_layoutInvoked)
-                {
-                    return false;
-                }
-
-                Control parent = container as Control;
-                if (parent != null)
+                if (container is Control parent)
                 {
                     if (parent.Handle == null)
                     {
                         return false;
                     }
 
-                    parent.SafeBeginInvoke("ELI40230", () =>
+                    DoLayout(parent, layoutEventArgs, out List<PaginationControl> redundantControls);
+                    OnLayoutCompleted(redundantControls.ToArray());
+
+                    // Manually update separators that have pending status changes.
+                    foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
+                        .Where(separator => separator.InvalidatePending))
                     {
-                        // Locking control update here prevents flicker in document headers as the
-                        // layout occurs.
-                        using (new LockControlUpdates(parent, initiallyLock: true, invalidateOnUnlock: true))
-                        {
-                            DoLayout(parent, layoutEventArgs, out List<PaginationControl> redundantControls);
-
-                            // Reset _layoutInvoked before OnLayoutCompleted, otherwise pending
-                            // _scrollToControl actions will be missed.
-                            _layoutInvoked = false;
-                            OnLayoutCompleted(redundantControls.ToArray());
-
-                            // Manually update separators that have pending status changes.
-                            foreach (var separator in parent.Controls.OfType<PaginationSeparator>()
-                                .Where(separator => separator.InvalidatePending))
-                            {
-                                separator.Invalidate();
-                                separator.InvalidatePending = false;
-                            }
-
-                            parent.ResumeLayout();
-                        }
-                    },
-                    true,
-                    (e) =>
-                        {
-                            parent.ResumeLayout();
-                            _layoutInvoked = false;
-                        });
-
-                    parent.SuspendLayout();
-                    _layoutInvoked = true;
+                        separator.Invalidate();
+                        separator.InvalidatePending = false;
+                    }
                 }
             }
             catch (Exception ex)
