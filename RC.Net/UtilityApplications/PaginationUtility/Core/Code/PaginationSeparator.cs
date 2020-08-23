@@ -119,6 +119,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         Image _qualifiedIconImage;
 
+        // Used to delay updating a separator if another separator is updating
+        static bool _updatingControlsOfSomeSeparator;
+
+        // Used to skip updating this instance if already updating it
+        bool _updatingControls;
+
         #endregion Fields
 
         #region Constructors
@@ -740,13 +746,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 InvalidatePending = true;
 
-                SetColor();
-
                 // If the controls cannot be updated at this time, no need to invalidate (optimization).
                 // If UpdateControls returns true it will have executed a full layout such that a call
                 // to Invalidate would now be superfluous.
                 if (!UpdateControls())
                 {
+                    SetColor();
                     base.OnInvalidated(e);
                 }
             }
@@ -1189,102 +1194,122 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         bool UpdateControls()
         {
-            if (Parent == null || !Parent.ClientRectangle.IntersectsWith(Bounds))
+            // Skip if already in the midst of updating
+            if (_updatingControls)
             {
                 return false;
             }
-
-            if (Document != null && Document.PaginationSeparator != this)
+            // Skip if another separator is updating.
+            // Prevents error creating window handle that happens when updates cascade
+            // https://extract.atlassian.net/browse/ISSUE-17128
+            if (_updatingControlsOfSomeSeparator)
             {
-                // Force a follow-up layout to occur after assigning this separator to a new document.
-                _controlUpdatePending = true;
-                Document.PaginationSeparator = this;
-                InvalidatePending = true;
-
-                if (Document.DocumentData != null)
+                this.SafeBeginInvoke("ELI50295", () => UpdateControls());
+                return false;
+            }
+            try
+            {
+                _updatingControls = true;
+                _updatingControlsOfSomeSeparator = true;
+                if (Parent == null || !Parent.ClientRectangle.IntersectsWith(Bounds))
                 {
-                    DocumentSelectedToCommit =
-                        AttributeStatusInfo.IsAccepted(_outputDocument.DocumentData.DocumentDataAttribute);
-                    var statusInfo = AttributeStatusInfo.GetStatusInfo(Document.DocumentData.DocumentDataAttribute);
-                    DocumentDataHasBeenViewed = statusInfo.HasBeenViewed;
+                    return false;
+                }
+
+                if (Document != null && Document.PaginationSeparator != this)
+                {
+                    // Force a follow-up layout to occur after assigning this separator to a new document.
+                    _controlUpdatePending = true;
+                    Document.PaginationSeparator = this;
+                    InvalidatePending = true;
+
+                    if (Document.DocumentData != null)
+                    {
+                        DocumentSelectedToCommit =
+                            AttributeStatusInfo.IsAccepted(_outputDocument.DocumentData.DocumentDataAttribute);
+                        var statusInfo = AttributeStatusInfo.GetStatusInfo(Document.DocumentData.DocumentDataAttribute);
+                        DocumentDataHasBeenViewed = statusInfo.HasBeenViewed;
+                    }
+                    else
+                    {
+                        DocumentSelectedToCommit = false;
+                        DocumentDataHasBeenViewed = false;
+                    }
+                }
+
+                if (_controlUpdatePending &&
+                    PageLayoutControl.UIUpdatesSuspended != true &&
+                    Document?.DocumentData?.Initialized == true)
+                {
+                    _controlUpdatePending = false;
+
+                    _hasAppliedStatus = true;
+
+                    _selectedCheckBox.Visible = _showSelectionCheckBox && !Document.OutputProcessed;
+                    _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
+                    _collapseDocumentButton.Visible = true;
+                    _collapseDocumentButton.Image = Document.Collapsed
+                        ? Properties.Resources.Expand
+                        : Properties.Resources.Collapse;
+
+                    UpdateDragHints();
+
+                    _summaryLabel.Visible = true;
+                    _summaryLabel.Text = Document.Summary
+                        + (Document.OutputProcessed ? " (PROCESSED)" : "");
+                    _pagesLabel.Visible = true;
+                    int pageCount = Document.PageControls.Count(c => !c.Deleted);
+                    _pagesLabel.Text = string.Format(CultureInfo.CurrentCulture,
+                        "{0} page{1}", pageCount, (pageCount == 1) ? "" : "s");
+                    if (_pagesLabel.Width < _pagesLabel.PreferredWidth)
+                    {
+                        // https://extract.atlassian.net/browse/ISSUE-13980
+                        // To fix cases where the width has no updated properly
+                        _pagesLabel.PerformLayout();
+                    }
+
+                    _newDocumentGlyph.Visible = !Document.InSourceDocForm && !Document.OutputProcessed
+                        && Document.PageControls.Any(page => !page.Deleted);
+                    _editedPaginationGlyph.Visible = !Document.InOriginalForm && !Document.OutputProcessed;
+                    _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing && pageCount > 0 && !Document.OutputProcessed;
+                    _editedDataPictureBox.Visible = Document.DataModified && !Document.OutputProcessed;
+
+                    UpdateDataValidityIcon();
+
+                    SetColor();
+
+                    PerformLayout();
+                    return true;
                 }
                 else
                 {
-                    DocumentSelectedToCommit = false;
-                    DocumentDataHasBeenViewed = false;
+                    if (_hasAppliedStatus && Document?.DocumentData.Initialized != true)
+                    {
+                        _hasAppliedStatus = false;
+                        _collapseDocumentButton.Visible = false;
+                        _selectedCheckBox.Visible = false;
+                        _leftArrowPictureBox.Visible = false;
+                        _summaryLabel.Text = "";
+                        _pagesLabel.Text = "";
+                        _rightArrowPictureBox.Visible = false;
+                        _newDocumentGlyph.Visible = false;
+                        _editedPaginationGlyph.Visible = false;
+                        _reprocessDocumentPictureBox.Visible = false;
+                        _editedDataPictureBox.Visible = false;
+                        _dataValidityPictureBox.Visible = false;
+
+                        // Initialize drag/drop indicator columns to hidden.
+                        _tableLayoutPanel.ColumnStyles[3].Width = 0;
+                        _tableLayoutPanel.ColumnStyles[6].Width = 0;
+                    }
+
+                    return false;
                 }
             }
-
-            if (_controlUpdatePending &&
-                PageLayoutControl.UIUpdatesSuspended != true &&
-                Document?.DocumentData?.Initialized == true)
+            finally
             {
-                _controlUpdatePending = false;
-
-                _hasAppliedStatus = true;
-
-                // These handles aren't created sometimes and can cause exceptions
-                // https://extract.atlassian.net/browse/ISSUE-17128
-                _selectedCheckBox.Visible = _showSelectionCheckBox && !Document.OutputProcessed;
-                _selectedCheckBox.Checked = _showSelectionCheckBox && Document.Selected;
-                _collapseDocumentButton.Visible = true;
-                _collapseDocumentButton.Image = Document.Collapsed
-                    ? Properties.Resources.Expand
-                    : Properties.Resources.Collapse;
-
-                UpdateDragHints();
-
-                _summaryLabel.Visible = true;
-                _summaryLabel.Text = Document.Summary
-                    + (Document.OutputProcessed ? " (PROCESSED)" : "");
-                _pagesLabel.Visible = true;
-                int pageCount = Document.PageControls.Count(c => !c.Deleted);
-                _pagesLabel.Text = string.Format(CultureInfo.CurrentCulture,
-                    "{0} page{1}", pageCount, (pageCount == 1) ? "" : "s");
-                if (_pagesLabel.Width < _pagesLabel.PreferredWidth)
-                {
-                    // https://extract.atlassian.net/browse/ISSUE-13980
-                    // To fix cases where the width has no updated properly
-                    _pagesLabel.PerformLayout();
-                }
-
-                _newDocumentGlyph.Visible = !Document.InSourceDocForm && !Document.OutputProcessed
-                    && Document.PageControls.Any(page => !page.Deleted);
-                _editedPaginationGlyph.Visible = !Document.InOriginalForm && !Document.OutputProcessed;
-                _reprocessDocumentPictureBox.Visible = Document.SendForReprocessing && pageCount > 0 && !Document.OutputProcessed;
-                _editedDataPictureBox.Visible = Document.DataModified && !Document.OutputProcessed;
-
-                UpdateDataValidityIcon();
-
-                SetColor();
-
-                PerformLayout();
-
-                return true;
-            }
-            else
-            {
-                if (_hasAppliedStatus && Document?.DocumentData.Initialized != true)
-                {
-                    _hasAppliedStatus = false;
-                    _collapseDocumentButton.Visible = false;
-                    _selectedCheckBox.Visible = false;
-                    _leftArrowPictureBox.Visible = false;
-                    _summaryLabel.Text = "";
-                    _pagesLabel.Text = "";
-                    _rightArrowPictureBox.Visible = false;
-                    _newDocumentGlyph.Visible = false;
-                    _editedPaginationGlyph.Visible = false;
-                    _reprocessDocumentPictureBox.Visible = false;
-                    _editedDataPictureBox.Visible = false;
-                    _dataValidityPictureBox.Visible = false;
-
-                    // Initialize drag/drop indicator columns to hidden.
-                    _tableLayoutPanel.ColumnStyles[3].Width = 0;
-                    _tableLayoutPanel.ColumnStyles[6].Width = 0;
-                }
-
-                return false;
+                _updatingControls = false;
+                _updatingControlsOfSomeSeparator = false;
             }
         }
 
