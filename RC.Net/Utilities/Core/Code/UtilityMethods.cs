@@ -1136,6 +1136,34 @@ namespace Extract.Utilities
                 throw ex.AsExtract("ELI45665");
             }
         }
+
+        /// <summary>
+        /// Returns the volume serial number for the <paramref name="volumePath"/>
+        /// </summary>
+        /// <param name="volumePath">The path to the volume to get serial number for</param>
+        /// <returns>Volume serial number for <paramref name="volumePath"/></returns>
+        [CLSCompliant(false)]
+        public static UInt32 GetVolumeSerialNumber(string volumePath)
+        {
+            uint serialNumber = 0;
+            uint maxComponentLength = 0;
+            StringBuilder VolumeName = new StringBuilder(261);
+            UInt32 fileSystemFlags = new UInt32();
+            StringBuilder fileSystemName = new StringBuilder(261);
+
+            if (!NativeMethods.GetVolumeInformation(volumePath,
+                                     VolumeName,
+                                     (UInt32)VolumeName.Capacity,
+                                     ref serialNumber,
+                                     ref maxComponentLength,
+                                     ref fileSystemFlags,
+                                     fileSystemName,
+                                     (UInt32)fileSystemName.Capacity) )
+            {
+                throw new ExtractException("ELI50319", "Unable to get Volume information");
+            }
+            return serialNumber;
+        }
     }
 
     /// <summary>
@@ -1188,6 +1216,5 @@ namespace Extract.Utilities
                 throw e.AsExtract("ELI40198");
             }
         }
-
     }
 }

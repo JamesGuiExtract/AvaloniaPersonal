@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Net.NetworkInformation;
 
 namespace Extract.Licensing.Internal
 {
@@ -12,6 +13,8 @@ namespace Extract.Licensing.Internal
     {
         // This is the version saved to the .lic file
         public const int Version = 1;
+
+        public const string ExpiringLicenseUnlockFileName  = "Extract_UnlockLicense.txt";
 
         public LicenseInfo()
         {
@@ -51,7 +54,7 @@ namespace Extract.Licensing.Internal
         public string UserString 
         {
             get { return userString; }
-            
+
             set
             { 
                 userString = value;
@@ -62,6 +65,20 @@ namespace Extract.Licensing.Internal
                 UserSerialNumber = userData.ReadUInt32();
                 UserMACAddress = userData.ReadString();
             }
+        }
+
+        public static string GenerateUserString()
+        {
+            var newUserString = new ByteArrayManipulator();
+            newUserString.Write(Environment.MachineName);
+            newUserString.Write(NativeMethods.GetVolumeSerialNumber());
+            var firstMacAddress = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(nic => nic.OperationalStatus == OperationalStatus.Up &&
+                    nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                .Select(nic => nic.GetPhysicalAddress().ToString())
+                .FirstOrDefault();
+            newUserString.Write(firstMacAddress);
+            return UtilityMethods.TranslateBytesWithUserKey(false, newUserString.GetBytes(8)).ToHexString();
         }
 
         public Dictionary<UInt32, ComponentInfo> ComponentIDToInfo { get; } = new Dictionary<uint, ComponentInfo>();
@@ -171,6 +188,58 @@ namespace Extract.Licensing.Internal
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Creates unlock file, or unlock code
+        /// </summary>
+        /// <param name="directoryForFile">A file with the name <see cref="ExpiringLicenseUnlockFileName"/> will be saved
+        /// to the given directory, if null the file will not be created</param>
+        /// <param name="expireDateForUnlockCode">Expire date for the unlock file</param>
+        /// <returns>Unlock code, this is the same code that is saved to the file if a <paramref name="directoryForFile"/> is
+        /// not null</returns>
+        public string GenerateUnlockCodeFile(string directoryForFile, DateTime expireDateForUnlockCode)
+        {
+            UtilityMethods.Assert(!ComponentIDToInfo.Any(cd => !cd.Value.PermanentLicense && !cd.Value.Disabled),
+                                  "Must be an expiring license!");
+
+            UtilityMethods.Assert(!string.IsNullOrWhiteSpace(UserString), "User string must be set!");
+
+            expireDateForUnlockCode = UtilityMethods.Round(expireDateForUnlockCode, new TimeSpan(0, 0, 0, 1));
+
+            var unlockData = new ByteArrayManipulator();
+            unlockData.Write(UserComputerName);
+            unlockData.Write(UserSerialNumber);
+            unlockData.Write(UserMACAddress);
+            unlockData.WriteAsCTime(expireDateForUnlockCode);
+
+            var unlockCode = UtilityMethods.TranslateToUnlockCode(unlockData.GetBytes(8));
+
+            if (!string.IsNullOrWhiteSpace(directoryForFile))
+            {
+                string filePath = Path.Combine(directoryForFile, ExpiringLicenseUnlockFileName);
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+                File.WriteAllText(filePath, unlockCode);
+            }
+
+            return unlockCode;
+        }
+
+        /// <summary>
+        /// Used to in tests to validate the unlock code
+        /// </summary>
+        /// <param name="unlockCode">Unlock code to decrypt</param>
+        /// <param name="expireDate">out parameter to get the expireDate</param>
+        public static LicenseInfo ExpandUnlockCode(string unlockCode, out DateTime expireDate)
+        {
+            var byteArray = new ByteArrayManipulator(UtilityMethods.TranslateFromUnlockCode(unlockCode));
+            var licenseInfo = new LicenseInfo();
+            licenseInfo.UserComputerName = byteArray.ReadString();
+            licenseInfo.UserSerialNumber = byteArray.ReadUInt32();
+            licenseInfo.UserMACAddress = byteArray.ReadString();
+            expireDate = byteArray.ReadCTimeAsDateTime().ToLocalTime();
+            return licenseInfo;
         }
 
         public bool Equals(LicenseInfo other)

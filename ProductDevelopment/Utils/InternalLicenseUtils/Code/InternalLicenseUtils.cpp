@@ -242,3 +242,13 @@ unsigned char* externManipulatorInternal(unsigned char* pszInput, bool bEncrypt,
 	return externManipulatorBase(pszInput, bEncrypt, pulLength, passwordBytes, false);
 }
 //-------------------------------------------------------------------------------------------------
+unsigned char* externManipulatorInternal(unsigned char* pszInput, unsigned char *key, unsigned long keyLength, bool bEncrypt, unsigned long* pulLength)
+{
+
+	ByteStream passwordBytes(key, keyLength);
+	ByteStreamManipulator bsm(ByteStreamManipulator::kWrite, passwordBytes);
+
+	return externManipulatorBase(pszInput, bEncrypt, pulLength, passwordBytes, false);
+}
+//-------------------------------------------------------------------------------------------------
+

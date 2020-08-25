@@ -184,7 +184,7 @@ namespace Extract.Licensing.Internal
                                      DateTime boundaryDateTime = new DateTime())
         {
             // Calculate an offset in ticks such that 0 will lie on a times pan boundary where the
-            // timespans are aligned with boundaryDateTime.
+            // time spans are aligned with boundaryDateTime.
             long offsetTicks = boundaryDateTime.Ticks % timeSpan.Ticks;
             Assert(dateTime.Ticks >= offsetTicks, "Invalid datetime rounding boundary.");
 
@@ -218,6 +218,33 @@ namespace Extract.Licensing.Internal
             ByteArrayManipulator byteArray = new ByteArrayManipulator();
             byteArray.Write(code.ToHexString());
             return NativeMethods.EncryptDecryptBytes(byteArray.GetBytes(8), true, key1, key2, key3, Key4).ToHexString();
+        }
+
+        public static string TranslateToUnlockCode(Byte[] unlockCodeAsBytes)
+        {
+            var encrypted = NativeMethods.EncryptDecryptBytes(unlockCodeAsBytes, GetUnlockPassword(), true);
+            
+            return SwapChars(encrypted.ToHexString());
+        }
+
+
+        public static Byte[] TranslateFromUnlockCode(string code)
+        {
+            var bytes = SwapChars(code).HexStringToBytes();
+
+            return NativeMethods.EncryptDecryptBytes(bytes, GetUnlockPassword(), false);
+        }
+
+        private static string SwapChars(string hexString)
+        {
+            StringBuilder sb = new StringBuilder(hexString.Length);
+            char[] charArray = hexString.ToCharArray();
+            for (int i = 0; i < hexString.Length - 1; i += 2)
+            {
+                sb.Append(charArray[i + 1]);
+                sb.Append(charArray[i]);
+            }
+            return sb.ToString();
         }
 
         public static Byte[] TranslateBytesWithUserKey(bool extract, Byte[] bytes)
@@ -260,5 +287,36 @@ namespace Extract.Licensing.Internal
 
             return passwordBytes;
         }
+
+        private static Byte[] GetUnlockPassword()
+        {
+            byte[] passwordBytes = new byte[16];
+            var bytes = BitConverter.GetBytes(NativeMethods.DateTimeKey9);
+            passwordBytes[0] = bytes[0];
+            passwordBytes[1] = bytes[1];
+            passwordBytes[2] = bytes[2];
+            passwordBytes[3] = bytes[3];
+
+            bytes = BitConverter.GetBytes(NativeMethods.DateTimeKeyA);
+            passwordBytes[4] = bytes[0];
+            passwordBytes[5] = bytes[1];
+            passwordBytes[6] = bytes[2];
+            passwordBytes[7] = bytes[3];
+
+            bytes = BitConverter.GetBytes(NativeMethods.DateTimeKeyB);
+            passwordBytes[8] = bytes[0];
+            passwordBytes[9] = bytes[1];
+            passwordBytes[10] = bytes[2];
+            passwordBytes[11] = bytes[3];
+
+            bytes = BitConverter.GetBytes(NativeMethods.DateTimeKeyC);
+            passwordBytes[12] = bytes[0];
+            passwordBytes[13] = bytes[1];
+            passwordBytes[14] = bytes[2];
+            passwordBytes[15] = bytes[3];
+
+            return passwordBytes;
+        }
+
     }
 }

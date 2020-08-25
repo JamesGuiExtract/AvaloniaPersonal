@@ -847,6 +847,31 @@ namespace Extract.Utilities
         internal static extern IntPtr CommandLineToArgvW(
             [MarshalAs(UnmanagedType.LPWStr)] string lpCmdLine, out int pNumArgs);
 
+
+        /// <summary>
+        /// The Windows GetVolumeInformation function
+        /// </summary>
+        /// <param name="PathName">Path for the volume to get information on such as C:\</param>
+        /// <param name="VolumeNameBuffer">Buffer to receive the name of the volume</param>
+        /// <param name="VolumeNameSize">The length of the buffer in <paramref name="VolumeNameBuffer"/></param>
+        /// <param name="VolumeSerialNumber">Reference to a variable for the Volume Serial Number</param>
+        /// <param name="MaximumComponentLength">Reference to a variable for the Maximum file name component (between \)</param>
+        /// <param name="FileSystemFlags">Reference to a variable for the flags associated with the specified file system</param>
+        /// <param name="FileSystemNameBuffer">Buffer to receive the name of the file system</param>
+        /// <param name="FileSystemNameSize">The length of the buffer in <paramref name="FileSystemNameSize"/></param>
+        /// <returns></returns>
+        [DllImport("Kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetVolumeInformation(
+            string PathName,
+            StringBuilder VolumeNameBuffer,
+            UInt32 VolumeNameSize,
+            ref UInt32 VolumeSerialNumber,
+            ref UInt32 MaximumComponentLength,
+            ref UInt32 FileSystemFlags,
+            StringBuilder FileSystemNameBuffer,
+            UInt32 FileSystemNameSize);
+
         #endregion NativeMethods P/Invokes
 
         #region NativeMethods Methods
@@ -1306,6 +1331,8 @@ namespace Extract.Utilities
         {
             Marshal.Copy(Enumerable.Repeat((byte)0, (int)length).ToArray(), 0, buffer, (int)length);
         }
+
+        
 
         #endregion NativeMethods Methods
     }
