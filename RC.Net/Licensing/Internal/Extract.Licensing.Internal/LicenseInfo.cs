@@ -76,7 +76,7 @@ namespace Extract.Licensing.Internal
                 .Where(nic => nic.OperationalStatus == OperationalStatus.Up &&
                     nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
                 .Select(nic => nic.GetPhysicalAddress().ToString())
-                .FirstOrDefault();
+                .FirstOrDefault().ToLower();
             newUserString.Write(firstMacAddress);
             return UtilityMethods.TranslateBytesWithUserKey(false, newUserString.GetBytes(8)).ToHexString();
         }
@@ -210,7 +210,7 @@ namespace Extract.Licensing.Internal
             var unlockData = new ByteArrayManipulator();
             unlockData.Write(UserComputerName);
             unlockData.Write(UserSerialNumber);
-            unlockData.Write(UserMACAddress);
+            unlockData.Write(UserMACAddress.ToLower());
             unlockData.WriteAsCTime(expireDateForUnlockCode);
 
             var unlockCode = UtilityMethods.TranslateToUnlockCode(unlockData.GetBytes(8));
