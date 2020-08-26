@@ -166,6 +166,8 @@ namespace Extract.Licensing.Internal.Test
             licenseInfo.UserString = LicenseInfo.GenerateUserString();
             DateTime expire = UtilityMethods.Round(DateTime.Now.AddDays(30), new TimeSpan(0,0,0,1));
 
+            licenseInfo.ComponentIDToInfo.Add(999, new ComponentInfo(DateTime.Now));
+
             // Create the unlock code
             var unlockCode = licenseInfo.GenerateUnlockCodeFile(null, expire);
             var expandedUnlockInfo = LicenseInfo.ExpandUnlockCode(unlockCode, out DateTime expireDate);

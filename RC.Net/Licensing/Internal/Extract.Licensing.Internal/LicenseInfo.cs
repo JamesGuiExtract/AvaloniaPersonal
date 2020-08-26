@@ -200,7 +200,7 @@ namespace Extract.Licensing.Internal
         /// not null</returns>
         public string GenerateUnlockCodeFile(string directoryForFile, DateTime expireDateForUnlockCode)
         {
-            UtilityMethods.Assert(!ComponentIDToInfo.Any(cd => !cd.Value.PermanentLicense && !cd.Value.Disabled),
+            UtilityMethods.Assert(ComponentIDToInfo.Any(cd => !cd.Value.PermanentLicense && !cd.Value.Disabled),
                                   "Must be an expiring license!");
 
             UtilityMethods.Assert(!string.IsNullOrWhiteSpace(UserString), "User string must be set!");
