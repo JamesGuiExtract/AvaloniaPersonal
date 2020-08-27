@@ -1,5 +1,8 @@
 ﻿using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.DataAccess.Sql;
+using DevExpress.XtraBars.Docking2010;
+using DevExpress.XtraBars.Docking2010.Views.Tabbed;
+using DevExpress.XtraCharts;
 using DevExpress.XtraEditors;
 using DevExpress.XtraReports.UserDesigner;
 using Extract;
@@ -35,19 +38,26 @@ namespace ReportDesigner
         /// <param name="databaseName">Database to open on <paramref name="serverName"/></param>
         public ReportDesignerForm(string reportFile, string reportName, string serverName, string databaseName)
         {
-            InitializeComponent();
-
-            ServerName = serverName;
-            DatabaseName = databaseName;
-
-            if (!string.IsNullOrEmpty(reportFile))
+            try
             {
-                DevExpress.XtraReports.Configuration.Settings.Default.StorageOptions.RootDirectory = Path.GetDirectoryName(reportFile);
-                reportDesigner1.OpenReport(reportFile);
+                InitializeComponent();
+
+                ServerName = serverName;
+                DatabaseName = databaseName;
+
+                if (!string.IsNullOrEmpty(reportFile))
+                {
+                    DevExpress.XtraReports.Configuration.Settings.Default.StorageOptions.RootDirectory = Path.GetDirectoryName(reportFile);
+                    reportDesigner1.OpenReport(reportFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50328");
             }
         }
 
-        private void reportDesigner1_DesignPanelLoaded(object sender, DesignerLoadedEventArgs e)
+        private void HandleReportDesigner_DesignPanelLoaded(object sender, DesignerLoadedEventArgs e)
         {
             try
             {
@@ -65,17 +75,76 @@ namespace ReportDesigner
                 ex.ExtractDisplay("ELI49829");
             }
         }
-        
 
         private void HandleXRDesignPanel_ReportStateChanged(object sender, ReportStateEventArgs e)
         {
-            // if the Report Status is Opened change to State to Changed and remove handler
-            if (e.ReportState == ReportState.Opened)
+            try
             {
-                var designPanel = sender as XRDesignPanel;
-                DevExpress.XtraReports.Configuration.Settings.Default.StorageOptions.RootDirectory = Path.GetDirectoryName(designPanel.FileName);
-                designPanel.ReportState = ReportState.Changed;
-                designPanel.ReportStateChanged -= HandleXRDesignPanel_ReportStateChanged;
+                // if the Report Status is Opened change to State to Changed and remove handler
+                if (e.ReportState == ReportState.Opened)
+                {
+                    var designPanel = sender as XRDesignPanel;
+                    DevExpress.XtraReports.Configuration.Settings.Default.StorageOptions.RootDirectory = Path.GetDirectoryName(designPanel.FileName);
+                    designPanel.ReportState = ReportState.Changed;
+                    designPanel.ReportStateChanged -= HandleXRDesignPanel_ReportStateChanged;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50329");
+            }
+        }
+
+        private void HandleReportDesigner_AnyDocumentActivated(object sender, DevExpress.XtraBars.Docking2010.Views.DocumentEventArgs e)
+        {
+            try
+            {
+                var designController = sender as XRDesignMdiController;
+                if (designController != null)
+                {
+                    if (string.IsNullOrWhiteSpace(designController.ActiveDesignPanel.FileName))
+                    {
+                        Text = "New Report - Report Designer";
+                    }
+                    else
+                    {
+                        Text = string.Format("{0} - Report designer", designController.ActiveDesignPanel.FileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.AsExtract("ELI50330");
+            }
+        }
+
+        private void HandleReportDesignerForm_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                var tabbedMdiManager = reportDesigner1.XtraTabbedMdiManager.View as TabbedView;
+                if (tabbedMdiManager != null)
+                    tabbedMdiManager.DocumentClosed += HandleTabbedMdiManager_DocumentClosed;
+            }
+            catch(Exception ex)
+            {
+                ex.AsExtract("ELI50331");
+            }
+        }
+
+        private void HandleTabbedMdiManager_DocumentClosed(object sender, DevExpress.XtraBars.Docking2010.Views.DocumentEventArgs e)
+        {
+            try
+            {
+                var tabbedMdiManager = reportDesigner1.XtraTabbedMdiManager.View as TabbedView;
+                if (tabbedMdiManager?.Documents.Count == 0)
+                {
+                    Text = "Report Designer";
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.AsExtract("ELI50332");
             }
         }
 
