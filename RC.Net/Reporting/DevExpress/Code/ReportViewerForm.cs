@@ -1,10 +1,7 @@
-using DevExpress.XtraBars.Docking;
 using DevExpress.XtraBars.Ribbon;
 using DevExpress.XtraPrinting;
 using DevExpress.XtraReports.Parameters;
-using DevExpress.XtraPrinting.Localization;
 using DevExpress.XtraReports.UI;
-using DevExpress.XtraRichEdit.Import.Rtf;
 using Extract.Licensing;
 using Extract.Reporting;
 using Extract.ReportingDevExpress.Properties;
@@ -15,9 +12,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Extract.ReportingDevExpress
@@ -91,6 +88,11 @@ namespace Extract.ReportingDevExpress
         /// be disposed when the form is closed.
         /// </summary>
         List<TemporaryFile> _temporaryFiles = new List<TemporaryFile>();
+
+        /// <summary>
+        /// Task that generates the report - currently cannot be canceled
+        /// </summary>
+        Task ReportGenerationTask = null;
 
         #endregion Fields
 
@@ -544,21 +546,9 @@ namespace Extract.ReportingDevExpress
                     openReport.Icon = this.Icon;
                     if (openReport.ShowDialog() == DialogResult.OK)
                     {
-                        // Clear the report viewer
-                        documentViewer.DocumentSource = null;
-
-                        // Set the title bar back to default
-                        this.Text = _FORM_CAPTION;
-
+                        ResetReportInfo();
                         // Set the report file name
                         _reportFileName = openReport.ReportFileName;
-
-                        // Dispose of the old report
-                        if (_report != null)
-                        {
-                            _report.Dispose();
-                            _report = null;
-                        }
 
                         // Refresh the window
                         this.Refresh();
@@ -578,13 +568,24 @@ namespace Extract.ReportingDevExpress
             }
             catch (Exception ex)
             {
+                ResetReportInfo();
+
                 ExtractException ee = ExtractException.AsExtractException("ELI23748", ex);
                 ee.AddDebugData("Event Arguments", e, false);
                 ee.Display();
             }
         }
 
- 
+        private void ResetReportInfo()
+        {
+            // reset the report related fields
+            _reportFileName = "";
+            _report = null;
+            documentViewer.DocumentSource = null;
+            this.Text = _FORM_CAPTION;
+        }
+
+
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event.
         /// </summary>
@@ -701,13 +702,58 @@ namespace Extract.ReportingDevExpress
         /// </summary>
         private void AttachReportToReportViewer()
         {
-            ExtractException.Assert("ELI23751", "Report object cannot be null!",
-                _report != null);
+            try
+            {
+                ExtractException.Assert("ELI23751", "Report object cannot be null!", _report != null);
 
+                var reportAsXtraReport = _report.ReportDocument as XtraReport;
+                GenerateReport(reportAsXtraReport);
+
+            }
+            catch (ExtractException ee)
+            {
+                if (ee.EliCode == "ELI50335")
+                    ResetReportInfo();
+            }
+        }
+ 
+        private async void GenerateReport(XtraReport reportAsXtraReport)
+        {
+            try
+            {
+                reportAsXtraReport.RequestParameters = false;
+                reportAsXtraReport.ParametersRequestBeforeShow += HandleXtraReportParametersRequestBeforeShow;
+                OpenReportBarButton.Enabled = false;
+                using (ReportProgressForm progressForm = new ReportProgressForm(_reportFileName))
+                {
+                    progressForm.Show(this);
+
+                    ReportGenerationTask = new Task(() =>
+                    {
+                        reportAsXtraReport.CreateDocument();
+                    },
+                                                         TaskCreationOptions.LongRunning);
+                    ReportGenerationTask.Start();
+                    await ReportGenerationTask;
+
+                    ProcessGenerateReportComplete();
+                    progressForm.CanClose = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50335");
+            }
+            finally
+            {
+                ReportGenerationTask.Dispose();
+                ReportGenerationTask = null;
+            }
+        }       
+
+        private void ProcessGenerateReportComplete()
+        {
             var reportAsXtraReport = _report.ReportDocument as XtraReport;
-            reportAsXtraReport.RequestParameters = false;
-            reportAsXtraReport.ParametersRequestBeforeShow += HandleXtraReportParametersRequestBeforeShow;
-            reportAsXtraReport.CreateDocument();
             documentViewer.DocumentSource = reportAsXtraReport;
 
             barButtonItemParameters.Enabled = UserParametersExist(reportAsXtraReport);
@@ -715,21 +761,25 @@ namespace Extract.ReportingDevExpress
 
             // Set the title based on the report file
             this.Text = _FORM_CAPTION + " - " + Path.GetFileNameWithoutExtension(_reportFileName);
-            bool saveEnabled = !string.IsNullOrEmpty(_reportFileName)
-                 && ExtractReport.StandardReportFolder.Equals(
-                Path.GetDirectoryName(_reportFileName), StringComparison.OrdinalIgnoreCase);
+            bool saveEnabled = !string.IsNullOrEmpty(_reportFileName) &&
+                ExtractReport.StandardReportFolder
+                    .Equals(Path.GetDirectoryName(_reportFileName), StringComparison.OrdinalIgnoreCase);
 
             // Enable / disable the save template menu item depending on whether the
             // report is a standard report or not
             documentViewer.PrintingSystem
-                .SetCommandVisibility(PrintingSystemCommand.Save, (saveEnabled) ? CommandVisibility.All : CommandVisibility.None);
-            documentViewer.PrintingSystem.SetCommandVisibility(PrintingSystemCommand.Parameters, CommandVisibility.None);
-            
+                .SetCommandVisibility(PrintingSystemCommand.Save,
+                                        (saveEnabled) ? CommandVisibility.All : CommandVisibility.None);
+            documentViewer.PrintingSystem
+                .SetCommandVisibility(PrintingSystemCommand.Parameters, CommandVisibility.None);
+
             // Add overrides for the Save and SendFile commands
             documentViewer.PrintingSystem.AddCommandHandler(new SaveTemplateCommandHandler(this));
             documentViewer.PrintingSystem.AddCommandHandler(new SendFileTemplateCommandHandler(this));
 
             Invalidate();
+
+            OpenReportBarButton.Enabled = true;
         }
 
         private static bool UserParametersExist(XtraReport report)
@@ -807,5 +857,20 @@ namespace Extract.ReportingDevExpress
         }
 
         #endregion Methods
+
+        private void ReportViewerForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                if (ReportGenerationTask?.Status == System.Threading.Tasks.TaskStatus.Running)
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50345");
+            }
+        }
     }
 }
