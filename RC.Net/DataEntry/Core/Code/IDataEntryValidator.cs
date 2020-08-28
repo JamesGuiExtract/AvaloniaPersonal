@@ -37,6 +37,18 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Indicates whether validation is enabled for the this field. If <c>false</c>, validation
+        /// queries will continue to provide auto-complete lists and alter case if
+        /// ValidationCorrectsCase is set for any field, but it will not show any data errors or
+        /// warnings or prevent saving of the document.
+        /// </summary>
+        bool ValidationEnabled
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Get the map of autocomplete values to akas
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]

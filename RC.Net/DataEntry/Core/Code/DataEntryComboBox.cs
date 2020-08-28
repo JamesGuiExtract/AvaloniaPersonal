@@ -334,12 +334,6 @@ namespace Extract.DataEntry
         public IAttribute Attribute { get; private set; }
 
         /// <summary>
-        /// The attributes mapped to this control.
-        /// (In the case of this control, there will only be one)
-        /// </summary>
-        public IEnumerable<IAttribute> Attributes => new[] { Attribute };
-
-        /// <summary>
         /// The last noted selection start.
         /// </summary>
         public int LastSelectionStart { get; private set; }
@@ -707,7 +701,19 @@ namespace Extract.DataEntry
         [DefaultValue(false)]
         public bool HighlightSelectionInChildControls { get; set; }
 
-
+        /// <summary>
+        /// Indicates whether validation is enabled for the control. If <c>false</c>, validation
+        /// queries will continue to provide auto-complete lists and alter case if
+        /// ValidationCorrectsCase is set for any field, but it will not show any data errors or
+        /// warnings or prevent saving of the document.
+        /// </summary>
+        [Category("Data Entry Control")]
+        [DefaultValue(true)]
+        public bool ValidationEnabled
+        {
+            get;
+            set;
+        } = true;
 
         /// <summary>
         /// Specifies the domain of <see cref="IAttribute"/>s from which the 

@@ -253,6 +253,14 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Indicates whether validation is enabled for the control. If <c>false</c>, validation
+        /// queries will continue to provide auto-complete lists and alter case if
+        /// ValidationCorrectsCase is set for any field, but it will not show any data errors or
+        /// warnings or prevent saving of the document.
+        /// </summary>
+        public bool ValidationEnabled { get; set; } = true;
+
+        /// <summary>
         /// Get the dictionary of autocomplete values to akas
         /// </summary>
         public IEnumerable<KeyValuePair<string, List<string>>> AutoCompleteValuesWithSynonyms => _autoCompleteValues;
@@ -317,8 +325,7 @@ namespace Extract.DataEntry
                 // where the DataEntry framework considers a value invalid, yet no error icon is
                 // displayed.
                 bool validationEnabled = !string.IsNullOrEmpty(_validationErrorMessage) &&
-                                         AttributeStatusInfo.IsValidationEnabled(attribute) &&
-                                         AttributeStatusInfo.IsAttributeViewable(attribute);
+                                         AttributeStatusInfo.IsValidationEnabled(attribute);
 
                 // If there is a specified validation pattern, check it.
                 if (validationEnabled &&  _validationRegex != null &&
@@ -806,6 +813,7 @@ namespace Extract.DataEntry
                 _validationQueries.Clear();
                 _correctCase = sourceValidator._correctCase;
                 _caseSensitive = sourceValidator._caseSensitive;
+                ValidationEnabled = sourceValidator.ValidationEnabled;
             }
             catch (Exception ex)
             {

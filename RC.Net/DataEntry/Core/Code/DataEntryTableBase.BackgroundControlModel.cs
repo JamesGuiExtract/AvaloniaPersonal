@@ -37,8 +37,15 @@ namespace Extract.DataEntry
                     {
                         return this;
                     }
-
-                    return null;
+                    else if (elementName == "DataGridView.DataEntryControlHost")
+                    {
+                        // The BackgroundModel represents DataEntryControlHost properties.
+                        return BackgroundModel;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 catch (Exception ex)
                 {

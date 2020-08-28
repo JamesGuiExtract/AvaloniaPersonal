@@ -191,11 +191,16 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// The attributes mapped to this control.
-        /// This includes child attributes whose parents are also mapped to this control. 
-        /// The ordering of the attributes is undefined.
+        /// Indicates whether validation is enabled for the control. If <c>false</c>, validation
+        /// queries will continue to provide auto-complete lists and alter case if
+        /// ValidationCorrectsCase is set for any field, but it will not show any data errors or
+        /// warnings or prevent saving of the document.
         /// </summary>
-        IEnumerable<IAttribute> Attributes { get; }
+        bool ValidationEnabled
+        {
+            get;
+            set;
+        }
 
         #endregion Properties
 

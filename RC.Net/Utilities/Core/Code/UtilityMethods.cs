@@ -1145,24 +1145,31 @@ namespace Extract.Utilities
         [CLSCompliant(false)]
         public static UInt32 GetVolumeSerialNumber(string volumePath)
         {
-            uint serialNumber = 0;
-            uint maxComponentLength = 0;
-            StringBuilder VolumeName = new StringBuilder(261);
-            UInt32 fileSystemFlags = new UInt32();
-            StringBuilder fileSystemName = new StringBuilder(261);
-
-            if (!NativeMethods.GetVolumeInformation(volumePath,
-                                     VolumeName,
-                                     (UInt32)VolumeName.Capacity,
-                                     ref serialNumber,
-                                     ref maxComponentLength,
-                                     ref fileSystemFlags,
-                                     fileSystemName,
-                                     (UInt32)fileSystemName.Capacity) )
+            try
             {
-                throw new ExtractException("ELI50319", "Unable to get Volume information");
+                uint serialNumber = 0;
+                uint maxComponentLength = 0;
+                StringBuilder VolumeName = new StringBuilder(261);
+                UInt32 fileSystemFlags = new UInt32();
+                StringBuilder fileSystemName = new StringBuilder(261);
+
+                if (!NativeMethods.GetVolumeInformation(volumePath,
+                                         VolumeName,
+                                         (UInt32)VolumeName.Capacity,
+                                         ref serialNumber,
+                                         ref maxComponentLength,
+                                         ref fileSystemFlags,
+                                         fileSystemName,
+                                         (UInt32)fileSystemName.Capacity))
+                {
+                    throw new ExtractException("ELI50319", "Unable to get Volume information");
+                }
+                return serialNumber;
             }
-            return serialNumber;
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50342");
+            }
         }
     }
 

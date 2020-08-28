@@ -386,12 +386,6 @@ namespace Extract.DataEntry
         DataValidity _dataValidity = DataValidity.Valid;
 
         /// <summary>
-        /// <see langword="true"/> if data validation should be performed on the attribute,
-        /// <see langword="false"/> if the attribute should always be considered valid.
-        /// </summary>
-        bool _validationEnabled = true;
-
-        /// <summary>
         /// A string that allows attributes to be sorted by compared to other display order values.
         /// </summary>
         string _displayOrder;
@@ -1766,7 +1760,7 @@ namespace Extract.DataEntry
                     // If validation triggers are being enabled, try to register all triggers.
                     if (_validationTriggersEnabled)
                     {
-                        RefreshValidation();
+                        RefreshValidationQueries();
                     }
                 }
             }
@@ -1807,7 +1801,7 @@ namespace Extract.DataEntry
         /// Triggers the execution of all validation queries.
         /// </summary>
         [ComVisible(false)]
-        public static void RefreshValidation()
+        public static void RefreshValidationQueries()
         {
             var executionContext = QueryExecutionContext;
 
@@ -1827,6 +1821,31 @@ namespace Extract.DataEntry
             finally
             {
                 QueryExecutionContext = executionContext;
+            }
+        }
+
+        /// <summary>
+        /// Refreshes the validation status of all attributes mapped to the specified <see cref="dataEntryControl"/>.
+        /// <para><b>Note</b></para>
+        /// This includes attributes that may not currently be displayed in the control because the
+        /// ParentDataEntryControl does not currently have an ancestor of the attribute selected.
+        /// </summary>
+        [ComVisible(false)]
+        public static void RefreshValidation(IDataEntryControl dataEntryControl)
+        {
+            try
+            {
+                var controlAttributes = GetAttributesMappedToControl(dataEntryControl).ToArray();
+                foreach (var controlAttribute in controlAttributes)
+                {
+                    Validate(controlAttribute, false);
+                }
+
+                dataEntryControl.RefreshAttributes(false, controlAttributes);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50339");
             }
         }
 
@@ -1977,6 +1996,23 @@ namespace Extract.DataEntry
             try
             {
                 string elementName = "";
+                var statusInfo = GetStatusInfo(attribute);
+
+                // https://extract.atlassian.net/browse/ISSUE-12517
+                // Treat "AttributeValidationEnabled" as a special property that allows validation to be
+                // enabled/disabled for this attribute only. "ValidationEnabled", on the other hand, will
+                // enable/disable validation for all attributes mapped to a control.
+                if (propertyName == "AttributeValidationEnabled")
+                {
+                    if (statusInfo.Validator != null)
+                    {
+                        statusInfo.Validator.ValidationEnabled = value.ToBoolean();
+
+                        Validate(attribute, false);
+                        statusInfo.OwningControl?.RefreshAttributes(false, attribute);
+                    }
+                    return;
+                }
 
                 // If any periods are in the property name, first get the object for which the property
                 // value will be applied.
@@ -1986,21 +2022,30 @@ namespace Extract.DataEntry
                     elementName = propertyName.Substring(0, endPos);
                     propertyName = propertyName.Substring(endPos + 1);
                 }
-
-                var statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+                
                 var element = statusInfo?.OwningControl?.GetAttributeUIElement(attribute, elementName);
 
                 if (element != null)
                 {
-                    element.SetPropertyValue(propertyName, value);
+                    var valueChanged = element.SetPropertyValue(propertyName, value);
 
-                    // If the Disabled property of the OwningControl is being changed, automatically
-                    // update "Enabled" to reflect the change. That way, AutoUpdateQueries can target
-                    // one property and we can be sure the enabled status is being updated correctly.
-                    if (propertyName == "Disabled" && element == statusInfo.OwningControl
-                        && statusInfo.OwningControl.DataEntryControlHost?.ChangingData == false)
+                    if (valueChanged)
                     {
-                        element.SetPropertyValue("Enabled", !value.ToBoolean());
+                        // If the Disabled property of the OwningControl is being changed, automatically
+                        // update "Enabled" to reflect the change. That way, AutoUpdateQueries can target
+                        // one property and we can be sure the enabled status is being updated correctly.
+                        if (propertyName == "Disabled" && element == statusInfo.OwningControl
+                            && statusInfo.OwningControl.DataEntryControlHost?.ChangingData == false)
+                        {
+                            element.SetPropertyValue("Enabled", !value.ToBoolean());
+                        }
+                        else if (element is IDataEntryControl dataEntryControl
+                            && propertyName == "ValidationEnabled")
+                        {
+                            // If validation has been enabled/disabled for the control, update validation
+                            // for all attributes mapped to the control.
+                            RefreshValidation(dataEntryControl);
+                        }
                     }
                 }
             }
@@ -2520,35 +2565,13 @@ namespace Extract.DataEntry
         {
             try
             {
-                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
-
-                return statusInfo.IsViewable ? statusInfo._dataValidity : DataValidity.Valid;
+                return IsValidationEnabled(attribute)
+                    ? GetStatusInfo(attribute)._dataValidity 
+                    : DataValidity.Valid;
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI24919", ex);
-            }
-        }
-
-        /// <summary>
-        /// Enables or disables data validation on the specified attribute.
-        /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> for which the data validation
-        /// should be enabled or disabled.</param>
-        /// <param name="enable"><see langword="true"/> if the data validation should be enabled;
-        /// <see langword="false"/> otherwise.</param>
-        [ComVisible(false)]
-        public static void EnableValidation(IAttribute attribute, bool enable)
-        {
-            try
-            {
-                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
-
-                statusInfo._validationEnabled = enable;
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI26963", ex);
             }
         }
 
@@ -2564,8 +2587,28 @@ namespace Extract.DataEntry
             try
             {
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+                bool validationEnabled = statusInfo.IsViewable;
+                validationEnabled &= statusInfo.Validator?.ValidationEnabled == true;
+                validationEnabled &= statusInfo.OwningControl?.ValidationEnabled == true;
 
-                return statusInfo._validationEnabled;
+                // If not using the UI then check the background models
+                if (_noUILoad
+                    && statusInfo.OwningControl is BackgroundControlModel controlModel
+                    && controlModel.BackgroundModel is BackgroundModel uberModel)
+                {
+                    validationEnabled &= uberModel.ValidationEnabled;
+                }
+                // Else check the DataEntryControlHost.
+                // I saw cases of OwningControl is DataEntryTable where DataEntryControlHost was null.
+                // In this scenario the legacy behavior would be changed by returning false so don't update the return value
+                else if (!_noUILoad
+                    && statusInfo.OwningControl is IDataEntryControl control
+                    && control.DataEntryControlHost is DataEntryControlHost host)
+                {
+                    validationEnabled &= host.ValidationEnabled == true;
+                }
+
+                return validationEnabled;
             }
             catch (Exception ex)
             {
@@ -3934,7 +3977,7 @@ namespace Extract.DataEntry
                 var control = sender as IDataEntryControl;
                 if (control != null)
                 {
-                    foreach (var attribute in control.Attributes)
+                    foreach (var attribute in GetAttributesMappedToControl(control))
                     {
                         var statusInfo = GetStatusInfo(attribute);
 
@@ -4343,6 +4386,23 @@ namespace Extract.DataEntry
                         _owningControl.RefreshAttributes(false, attribute);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets all attributes mapped to the specified <see cref="dataEntryControl"/>.
+        /// <para><b>Note</b></para>
+        /// This includes attributes that may not currently be displayed in the control because the
+        /// ParentDataEntryControl does not currently have an ancestor of the attribute selected.
+        /// </summary>
+        static IEnumerable<IAttribute> GetAttributesMappedToControl(IDataEntryControl dataEntryControl)
+        {
+            InitializeStatics();
+
+            foreach (var attributeControlMap in _statusInfoMap
+                .Where(attributeControlMap => attributeControlMap.Value.OwningControl == dataEntryControl))
+            {
+                yield return attributeControlMap.Key;
             }
         }
 

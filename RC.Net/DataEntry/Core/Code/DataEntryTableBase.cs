@@ -1847,15 +1847,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// The attributes mapped to this control.
-        /// This includes child attributes whose parents are also mapped to this control. 
-        /// The ordering of the attributes is undefined.
-        /// </summary>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public IEnumerable<IAttribute> Attributes => _attributeMap.Keys;
-
-        /// <summary>
         /// Gets or sets the <see cref="IDataEntryControl"/> which is mapped to the parent of the 
         /// <see cref="IAttribute"/>(s) to which the current table is to be mapped.  The specified 
         /// <see cref="IDataEntryControl"/> must be contained in the same 
@@ -1945,6 +1936,20 @@ namespace Extract.DataEntry
                 _highlightSelectionInChildControls = value;
             }
         }
+
+        /// <summary>
+        /// Indicates whether validation is enabled for the control. If <c>false</c>, validation
+        /// queries will continue to provide auto-complete lists and alter case if
+        /// ValidationCorrectsCase is set for any field, but it will not show any data errors or
+        /// warnings or prevent saving of the document.
+        /// </summary>
+        [Category("Data Entry Control")]
+        [DefaultValue(true)]
+        public bool ValidationEnabled
+        {
+            get;
+            set;
+        } = true;
 
         /// <summary>
         /// Activates or inactivates the <see cref="DataEntryTable"/>.

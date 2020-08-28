@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -29,6 +27,7 @@ namespace Extract.DataEntry
                 ID = control.Name;
                 Visible = control.Visible;
                 Disabled = dataEntryControl.Disabled;
+                ValidationEnabled = dataEntryControl.ValidationEnabled;
             }
             catch (Exception ex)
             {
@@ -59,6 +58,21 @@ namespace Extract.DataEntry
         public bool Visible { get; set; }
 
         /// <summary>
+        /// Indicates whether validation is enabled for the control. If <c>false</c>, validation
+        /// queries will continue to provide auto-complete lists and alter case if
+        /// ValidationCorrectsCase is set for any field, but it will not show any data errors or
+        /// warnings or prevent saving of the document.
+        /// </summary>
+        public bool ValidationEnabled { get; set; }
+        
+        /// <summary>
+        /// The BackgroundModel representing the DEP configuration in which this control representation exists.
+        /// </summary>
+        // This property is programmatically assigned during BackgroundModel construction; it should not be persisted.
+        [JsonIgnore]
+        public BackgroundModel BackgroundModel { get; set; }
+
+        /// <summary>
         /// Gets the UI element associated with the specified <see paramref="attribute"/>. This may
         /// be a type of <see cref="T:Control"/> or it may also be
         /// <see cref="T:DataGridViewElement"/> such as a <see cref="T:DataGridViewCell"/> if the
@@ -74,11 +88,21 @@ namespace Extract.DataEntry
         {
             try
             {
-                // For most background control models, no elements other than the controls itself
-                // are represented.
-                return string.IsNullOrEmpty(elementName)
-                    ? this
-                    : null;
+                // For most background control models, no elements other than the control itself
+                // or the DEP can be represented.
+                if (string.IsNullOrEmpty(elementName))
+                {
+                    return this;
+                }
+                else if (elementName == "DataEntryControlHost")
+                {
+                    // The BackgroundModel represents DataEntryControlHost properties.
+                    return BackgroundModel;
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception ex)
             {
@@ -98,10 +122,6 @@ namespace Extract.DataEntry
         public IDataEntryControl ParentDataEntryControl { get; set; }
         [JsonIgnore]
         public DataEntryControlHost DataEntryControlHost { get; set; }
-        // When loading data in background, Attributes property should not be accessed.
-        [JsonIgnore]
-        [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
-        public IEnumerable<IAttribute> Attributes => throw new NotImplementedException();
 
         public event EventHandler<AttributesSelectedEventArgs> AttributesSelected { add { } remove { } }
         public event EventHandler<AttributesEventArgs> PropagateAttributes { add { } remove { } }

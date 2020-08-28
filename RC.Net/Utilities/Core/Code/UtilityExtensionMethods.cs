@@ -99,6 +99,7 @@ namespace Extract.Utilities
         /// references may be chained by separating with a period. E.g., if the targetObject is a
         /// DataGridViewRow, an elementName of "DataGridView.VerticalScrollBar" could be used to refer
         /// to the scroll bar for the grid.</param>
+        [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "object")]
         public static object GetProperty(this object targetObject, string propertyName)
         {
             try
@@ -122,12 +123,26 @@ namespace Extract.Utilities
         /// to the scroll bar for the grid.</param>
         /// <param name="value">The string representation of the value to apply. Must be convertable
         /// to the type of the specified property.</param>
-        public static void SetPropertyValue(this object targetObject, string propertyName, string value)
+        /// <returns><c>true</c> if <see paramref="value"/> represented a different value than was
+        /// previously applied, thus updating the property; <c>false</c> if the specified value did
+        /// not result in a change to the existing value.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "object")]
+        public static bool SetPropertyValue(this object targetObject, string propertyName, string value)
         {
             try
             {
                 PropertyInfo property = ResolveProperty(ref targetObject, propertyName);
-                property.SetValue(targetObject, value.ConvertToType(property.PropertyType));
+                var originalValue = property.GetValue(targetObject);
+                var newValue = value?.ConvertToType(property.PropertyType);
+                if (!object.Equals(originalValue, newValue))
+                {
+                    property.SetValue(targetObject, newValue);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -144,14 +159,28 @@ namespace Extract.Utilities
         /// DataGridViewRow, an elementName of "DataGridView.VerticalScrollBar" could be used to refer
         /// to the scroll bar for the grid.</param>
         /// <param name="value">The  value to apply. Must be of the same type of the specified property.</param>
-        public static void SetPropertyValue<T>(this object targetObject, string propertyName, T value)
+        /// <returns><c>true</c> if <see paramref="value"/> is a different value than was previously applied,
+        /// thus updating the property; <c>false</c> if the specified value did not result in a change to
+        /// the existing value.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "object")]
+        public static bool SetPropertyValue<T>(this object targetObject, string propertyName, T value)
         {
             try
             {
                 PropertyInfo property = ResolveProperty(ref targetObject, propertyName);
                 ExtractException.Assert("ELI50313", "Unexpected type", property.PropertyType == typeof(T));
 
-                property.SetValue(targetObject, value);
+                var originalValue = property.GetValue(targetObject);
+                if (!object.Equals(originalValue, value))
+                {
+                    property.SetValue(targetObject, value);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
             }
             catch (Exception ex)
             {

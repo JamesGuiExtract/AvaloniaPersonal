@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -11,11 +12,13 @@ namespace Extract.DataEntry
     /// A representation of the controls and fields of a DEP needed to model the data formatting
     /// and validation of a DEP in the background without Windows controls.
     /// </summary>
-    class BackgroundModel
+    public class BackgroundModel
     {
         public BackgroundModel() { } 
         public BackgroundModel(DataEntryControlHost controlHost)
         {
+            ValidationEnabled = controlHost.ValidationEnabled;
+
             // The field models returned will have hierarchy only for fields within specific complex
             // controls (tables). The fields will need to be organized into the full hierarchy.
             var unorganizedFieldModels = GetFieldModels(controlHost).ToArray();
@@ -48,13 +51,25 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Indicates whether validation is enabled for the all data in the panel as a whole.
+        /// If <c>false</c>, validation queries will continue to provide auto-complete lists
+        /// and alter case if ValidationCorrectsCase is set for any field, but it will not
+        /// show any data errors or warnings or prevent saving of the document.
+        /// </summary>
+        public bool ValidationEnabled { get; set; }
+
+        /// <summary>
         /// Represents the IDataEntryControls in the DEP
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public List<BackgroundControlModel> Controls { get; set; }
 
         /// <summary>
         /// Represents the fields (properties governing the attributes) in the DEP.
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public List<BackgroundFieldModel> Fields { get; set; }
 
         // Tracks field/control relationships during model building in order to build the hierarchy
@@ -89,7 +104,7 @@ namespace Extract.DataEntry
                         json, SerializationSettings);
 
                 // Sets OwningControl as OwningControlModel for all fields.
-                ApplyOwningControlModels(backgroundModel.Fields);
+                backgroundModel.ApplyOwningControlModels(backgroundModel.Fields);
 
                 return backgroundModel;
             }
@@ -131,10 +146,11 @@ namespace Extract.DataEntry
         /// Sets <see cref="BackgroundFieldModel.OwningControl"/> as
         /// <see cref="BackgroundFieldModel.OwningControlModel"/> for all fields.
         /// </summary>
-        static void ApplyOwningControlModels(List<BackgroundFieldModel> fieldModels)
+        void ApplyOwningControlModels(List<BackgroundFieldModel> fieldModels)
         {
             fieldModels.ForEach(fieldModel =>
             {
+                fieldModel.OwningControlModel.BackgroundModel = this;
                 fieldModel.OwningControl = fieldModel.OwningControlModel;
                 ApplyOwningControlModels(fieldModel.Children);
             });

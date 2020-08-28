@@ -119,6 +119,20 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Indicates whether validation is enabled for the control. If <c>false</c>, validation
+        /// queries will continue to provide auto-complete lists and alter case if
+        /// ValidationCorrectsCase is set for any field, but it will not show any data errors or
+        /// warnings or prevent saving of the document.
+        /// </summary>
+        [Category("Data Entry Copy Button")]
+        [DefaultValue(true)]
+        public bool ValidationEnabled
+        {
+            get;
+            set;
+        } = true;
+
+        /// <summary>
         /// Gets or sets the <see cref="Control"/> that contains the text to be copied.
         /// </summary>
         /// <value>The <see cref="Control"/> that contains the text to be copied.</value>
@@ -649,12 +663,6 @@ namespace Extract.DataEntry
         /// The single attribute mapped to this control
         /// </summary>
         public IAttribute Attribute => _attribute;
-
-        /// <summary>
-        /// The attributes mapped to this control.
-        /// (In the case of this control, there will only be one)
-        /// </summary>
-        public IEnumerable<IAttribute> Attributes => new[] { _attribute };
 
         #endregion IDataEntryControl Members
 

@@ -327,12 +327,6 @@ namespace Extract.DataEntry
         /// </summary>
         public IAttribute Attribute => _attribute;
 
-        /// <summary>
-        /// The attributes mapped to this control.
-        /// (In the case of this control, there will only be one)
-        /// </summary>
-        public IEnumerable<IAttribute> Attributes => new[] { _attribute };
-
         #endregion IDataEntryControl Members
 
         #region Unused IDataEntryControl Members
@@ -463,6 +457,29 @@ namespace Extract.DataEntry
             {
                 throw new ExtractException("ELI34991",
                     "DataEntryGroupBox does not support selection!");
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether validation is enabled for the control. If <c>false</c>, validation
+        /// queries will continue to provide auto-complete lists and alter case if
+        /// ValidationCorrectsCase is set for any field, but it will not show any data errors or
+        /// warnings or prevent saving of the document.
+        /// </summary>
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool ValidationEnabled
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+                throw new ExtractException("ELI50325",
+                    "DataEntryGroupBox does not support validation!");
             }
         }
 

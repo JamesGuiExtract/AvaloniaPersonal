@@ -1142,6 +1142,46 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Indicates whether validation is enabled for the all data in the panel as a whole.
+        /// If <c>false</c>, validation queries will continue to provide auto-complete lists
+        /// and alter case if ValidationCorrectsCase is set for any field, but it will not
+        /// show any data errors or warnings or prevent saving of the document.
+        /// </summary>
+        bool _validationEnabled = true;
+        [Category("Data Entry Control Host")]
+        [DefaultValue(true)]
+        public bool ValidationEnabled
+        {
+            get
+            {
+                return _validationEnabled;
+            }
+
+            set
+            {
+                try
+                {
+                    if (value != _validationEnabled)
+                    {
+                        _validationEnabled = value;
+
+                        if (IsDocumentLoaded)
+                        {
+                            foreach (var control in _dataControls)
+                            {
+                                AttributeStatusInfo.RefreshValidation(control);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI50338");
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a comma separated list of names of <see cref="IDataEntryControl"/>s on
         /// which validation should be disabled.
         /// <para><b>Note</b></para>
@@ -1706,7 +1746,7 @@ namespace Extract.DataEntry
 
                         // If the tab key was pressed, indicate a manual focus event and
                         // propagate selection to the next attribute in the tab order.
-                        if (m.Msg == WindowsMessage.KeyDown)
+                        if (m.Msg == WindowsMessage.KeyDown && IsDocumentLoaded)
                         {
                             AdvanceToNextTabStop(!_shiftKeyDown, viaTabKey: true);
 
@@ -2171,7 +2211,7 @@ namespace Extract.DataEntry
             {
                 AttributeStatusInfo.ClearQueryCache();
                 AttributeStatusInfo.RefreshAutoUpdateValues();
-                AttributeStatusInfo.RefreshValidation();
+                AttributeStatusInfo.RefreshValidationQueries();
             }
             catch (Exception ex)
             {
@@ -4075,21 +4115,6 @@ namespace Extract.DataEntry
                     OnDataChanged();
                 }
 
-                // Disable validation on any controls in the _disabledValidationControls list.
-                Control control = e.DataEntryControl as Control;
-                if (!InUndo && !InRedo && control != null && 
-                    _disabledValidationControls.Contains(control.Name))
-                {
-                    AttributeStatusInfo.EnableValidation(e.Attribute, false);
-
-                    // If the data was already marked as invalid, mark it as valid.
-                    if (AttributeStatusInfo.GetDataValidity(e.Attribute) != DataValidity.Valid)
-                    {
-                        AttributeStatusInfo.SetDataValidity(e.Attribute, DataValidity.Valid);
-                        e.DataEntryControl.RefreshAttributes(false, e.Attribute);
-                    }
-                }
-
                 AttributeStatusInfo.GetStatusInfo(e.Attribute).AttributeValueModified +=
                     HandleAttributeValueModified;
 
@@ -5850,6 +5875,11 @@ namespace Extract.DataEntry
                         dataControl.Disabled = true;
                     }
 
+                    if (_disabledValidationControls.Contains(control.Name))
+                    {
+                        dataControl.ValidationEnabled = false;
+                    }
+                        
                     ControlRegistered?.Invoke(this, new DataEntryControlEventArgs(dataControl));
                 }
             }
