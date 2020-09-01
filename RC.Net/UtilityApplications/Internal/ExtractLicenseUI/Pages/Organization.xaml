@@ -77,7 +77,13 @@
                               IsReadOnly="True">
                         
                         <DataGrid.Columns>
-                            <mui:DataGridTextColumn Header="License Name" Binding="{Binding LicenseName}"></mui:DataGridTextColumn>
+                            <mui:DataGridTextColumn Header="License Name" Binding="{Binding LicenseName}" MaxWidth="350" ToolTipService.ToolTip="{Binding LicenseName}">
+                                <mui:DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                                        <Setter Property="ToolTip" Value="{Binding LicenseName}"></Setter>
+                                    </Style>
+                                </mui:DataGridTextColumn.CellStyle>
+                            </mui:DataGridTextColumn>
                             <mui:DataGridTextColumn Header="Machine Name" Binding="{Binding MachineName}"></mui:DataGridTextColumn>
                             <mui:DataGridTextColumn Header="Issued By" Binding="{Binding IssuedBy}"></mui:DataGridTextColumn>
                             <mui:DataGridTextColumn Header="Expires On" Binding="{Binding ExpiresOn}"></mui:DataGridTextColumn>

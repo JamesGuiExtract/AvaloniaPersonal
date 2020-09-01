@@ -40,6 +40,7 @@ namespace ExtractLicenseUI.Database
             this.IssuedBy = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
             this.IssuedOn = DateTime.Now;
             this.LicenseKey = "Generated On Save";
+            this.IsActive = true;
         }
 
         /// <summary>

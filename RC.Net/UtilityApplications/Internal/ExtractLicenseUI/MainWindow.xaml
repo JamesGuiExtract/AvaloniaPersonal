@@ -3,7 +3,7 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   Title="License Generator"
-                  Width="1000px"
+                  Width="1200px"
                   Height="850px">
     <mui:ModernWindow.MenuLinkGroups>
         <mui:LinkGroup x:Name="MainLinks">

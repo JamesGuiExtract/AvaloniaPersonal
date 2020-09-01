@@ -19,6 +19,11 @@ namespace ExtractLicenseUI.Database
         public Guid Guid { get; set; }
 
         /// <summary>
+        /// The state the customer is in.
+        /// </summary>
+        public string State { get; set; }
+
+        /// <summary>
         /// The name of the customer.
         /// </summary>
         public string CustomerName { 

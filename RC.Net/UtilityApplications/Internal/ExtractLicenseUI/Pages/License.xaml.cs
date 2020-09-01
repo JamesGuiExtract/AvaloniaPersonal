@@ -95,12 +95,58 @@ namespace ExtractLicenseUI
             }
             else 
             {
+                if(string.IsNullOrEmpty(this.SelectedOrganization.SelectedLicense.LicenseName))
+                {
+                    this.SelectedOrganization.SelectedLicense.LicenseName = this.GenerateLicenseName();
+                }
+                
                 this.SelectedOrganization.SelectedLicense.GenerateNewLicenseKey(this.SelectedOrganization, this.GetSelectedPackages());
                 new DatabaseWriter().WriteLicense(this.SelectedOrganization);
                 new DatabaseWriter().WritePackages(this.SelectedOrganization.SelectedLicense, this.GetSelectedPackages());
                 this.MainWindow.OrganizationWindow.RefreshLicenses();
                 this.ConfigureNavigationOption(LicenseNavigationOptions.ViewLicense);
             }
+        }
+
+        private string GenerateLicenseName()
+        {
+            string licenseName = string.Empty;
+            if(!String.IsNullOrEmpty(this.SelectedOrganization.Reseller))
+            {
+                licenseName += this.SelectedOrganization.Reseller + "_";
+            }
+            if (!String.IsNullOrEmpty(this.SelectedOrganization.State))
+            {
+                licenseName += this.SelectedOrganization.State + "_";
+            }
+            licenseName += this.SelectedOrganization.CustomerName + "_";
+            if(this.PackageHeaders.Where(m => m.Name.ToUpper().Contains("FLEX INDEX") && m.PackagesChecked).Any())
+            {
+                licenseName += "FlexIndex_";
+            }
+            if (this.PackageHeaders.Where(m => m.Name.ToUpper().Contains("ID SHIELD") && m.PackagesChecked).Any())
+            {
+                licenseName += "IDShield_";
+            }
+            if (this.PackageHeaders.Where(m => m.Name.ToUpper().Contains("LABDE") && m.PackagesChecked).Any())
+            {
+                licenseName += "LabDE_";
+            }
+            if(this.GetSelectedPackages().Where(m => m.Name.ToUpper().Contains("SERVER")).Any())
+            {
+                licenseName += "Server_";
+            }
+            else
+            {
+                licenseName += "Client_";
+            }
+            licenseName += this.SelectedOrganization.SelectedLicense.RestrictByDiskSerialNumber 
+                ? this.SelectedOrganization.SelectedLicense.MachineName + "_" 
+                : "Universal_";
+            licenseName += this.SelectedOrganization.SelectedLicense.IsPermanent
+                ? "Full"
+                : ((DateTime)this.SelectedOrganization.SelectedLicense.ExpiresOn).Date.ToString("yyyy-MM-dd");
+            return licenseName;
         }
 
         /// <summary>
@@ -241,20 +287,27 @@ namespace ExtractLicenseUI
         /// <param name="e"></param>
         private void SaveLicenseToFile_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            using (CommonOpenFileDialog fileDialog = new CommonOpenFileDialog()
+            try
             {
-                Multiselect = false,
-                EnsurePathExists = true
-            })
-            {
-                fileDialog.InitialDirectory = @"C:\ProgramData\Extract Systems\LicenseFiles";
-                fileDialog.Title = "Please select a folder to generate the file in";
-                fileDialog.DefaultFileName = this.SelectedOrganization.SelectedLicense.LicenseName + @".lic";
-                var fileDialogResult = fileDialog.ShowDialog();
-                if (fileDialogResult == CommonFileDialogResult.Ok)
+                using (CommonOpenFileDialog fileDialog = new CommonOpenFileDialog()
                 {
-                    this.SelectedOrganization.SelectedLicense.GenerateLicenseFile(fileDialog.FileName);
+                    Multiselect = false,
+                    EnsurePathExists = true
+                })
+                {
+                    fileDialog.InitialDirectory = @"C:\ProgramData\Extract Systems\LicenseFiles";
+                    fileDialog.Title = "Please select a folder to generate the file in";
+                    fileDialog.DefaultFileName = this.SelectedOrganization.SelectedLicense.LicenseName + @".lic";
+                    var fileDialogResult = fileDialog.ShowDialog();
+                    if (fileDialogResult == CommonFileDialogResult.Ok)
+                    {
+                        this.SelectedOrganization.SelectedLicense.GenerateLicenseFile(fileDialog.FileName);
+                    }
                 }
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Unable to save the license to a file. Make sure you use a valid file name and path.");
             }
         }
 
@@ -265,9 +318,16 @@ namespace ExtractLicenseUI
         /// <param name="e"></param>
         private void CopyLicenseToClipboard_Click(object sender, RoutedEventArgs e)
         {
-            var appdataFolder = CreateAndGetTempFolder();
-            this.SelectedOrganization.SelectedLicense.GenerateLicenseFile(appdataFolder);
-            this.CopyFileToClipboard(appdataFolder + @"\" + this.SelectedOrganization.SelectedLicense.LicenseName + ".lic");
+            try
+            {
+                var appdataFolder = CreateAndGetTempFolder();
+                this.SelectedOrganization.SelectedLicense.GenerateLicenseFile(appdataFolder);
+                this.CopyFileToClipboard(appdataFolder + @"\" + this.SelectedOrganization.SelectedLicense.LicenseName + ".lic");
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Unable to copy license to clipboard");
+            }
         }
 
         /// <summary>
@@ -277,20 +337,27 @@ namespace ExtractLicenseUI
         /// <param name="e"></param>
         private void SaveUnlockCodeToFile_Click(object sender, RoutedEventArgs e)
         {
-            using (CommonOpenFileDialog fileDialog = new CommonOpenFileDialog()
+            try
             {
-                IsFolderPicker = true,
-                Multiselect = false,
-                EnsurePathExists = true
-            })
-            {
-                fileDialog.InitialDirectory = @"C:\ProgramData\Extract Systems\LicenseFiles";
-                fileDialog.Title = "Please select a folder to generate the unlock code in";
-                var fileDialogResult = fileDialog.ShowDialog();
-                if (fileDialogResult == CommonFileDialogResult.Ok)
+                using (CommonOpenFileDialog fileDialog = new CommonOpenFileDialog()
                 {
-                    this.SelectedOrganization.SelectedLicense.GenerateUnlockCode(this.SelectedOrganization, fileDialog.FileName + @"\");
+                    IsFolderPicker = true,
+                    Multiselect = false,
+                    EnsurePathExists = true
+                })
+                {
+                    fileDialog.InitialDirectory = @"C:\ProgramData\Extract Systems\LicenseFiles";
+                    fileDialog.Title = "Please select a folder to generate the unlock code in";
+                    var fileDialogResult = fileDialog.ShowDialog();
+                    if (fileDialogResult == CommonFileDialogResult.Ok)
+                    {
+                        this.SelectedOrganization.SelectedLicense.GenerateUnlockCode(this.SelectedOrganization, fileDialog.FileName + @"\");
+                    }
                 }
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Unable to save unlock code to file. Ensure you use a valid file path");
             }
         }
 
@@ -301,9 +368,16 @@ namespace ExtractLicenseUI
         /// <param name="e"></param>
         private void CopyUnlockCodeToClipboard_Click(object sender, RoutedEventArgs e)
         {
-            var appdataFolder = CreateAndGetTempFolder();
-            this.SelectedOrganization.SelectedLicense.GenerateUnlockCode(this.SelectedOrganization, appdataFolder);
-            this.CopyFileToClipboard(appdataFolder + @"\Extract_UnlockLicense.txt");
+            try
+            {
+                var appdataFolder = CreateAndGetTempFolder();
+                this.SelectedOrganization.SelectedLicense.GenerateUnlockCode(this.SelectedOrganization, appdataFolder);
+                this.CopyFileToClipboard(appdataFolder + @"\Extract_UnlockLicense.txt");
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Unable to copy unlock code to clipboard.");
+            }
         }
 
         /// <summary>
@@ -323,9 +397,16 @@ namespace ExtractLicenseUI
         /// <param name="filePath"></param>
         private void CopyFileToClipboard(string filePath)
         {
-            var stringCollection = new System.Collections.Specialized.StringCollection();
-            stringCollection.Add(filePath);
-            Clipboard.SetFileDropList(stringCollection);
+            try
+            {
+                var stringCollection = new System.Collections.Specialized.StringCollection();
+                stringCollection.Add(filePath);
+                Clipboard.SetFileDropList(stringCollection);
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Unable to copy file to clipboard.");
+            }
         }
 
         /// <summary>
@@ -384,9 +465,9 @@ namespace ExtractLicenseUI
                     this.ClonedPackageSelector.Visibility = System.Windows.Visibility.Visible;
                     goto case LicenseNavigationOptions.NewLicense;
                 case LicenseNavigationOptions.NewLicense:
-                    this.LicenseName.IsEnabled = true;
                     this.RequestKey.IsEnabled = true;
                     this.IsPermanent.IsEnabled = true;
+                    this.LicenseName.IsEnabled = true;
                     this.ExpiresOn.IsEnabled = true;
                     this.IsActive.IsEnabled = true;
                     this.Comments.IsEnabled = true;
@@ -400,11 +481,12 @@ namespace ExtractLicenseUI
                     this.CopyLicenseToClipboard.Visibility = System.Windows.Visibility.Collapsed;
                     this.SaveUnlockCodeToFile.Visibility = System.Windows.Visibility.Collapsed;
                     this.CopyUnlockCodeToClipboard.Visibility = System.Windows.Visibility.Collapsed;
+                    this.GenerateLicenseNameButton.Visibility = System.Windows.Visibility.Visible;
                     this.UseDiskSerialNumber.IsEnabled = true;
                     break;
                 case LicenseNavigationOptions.ViewLicense:
-                    this.LicenseName.IsEnabled = false;
                     this.RequestKey.IsEnabled = false;
+                    this.LicenseName.IsEnabled = false;
                     this.GenerateRequestKey.Visibility = System.Windows.Visibility.Collapsed;
                     this.IsPermanent.IsEnabled = false;
                     this.ExpiresOn.IsEnabled = false;
@@ -419,6 +501,7 @@ namespace ExtractLicenseUI
                     this.CopyLicenseToClipboard.Visibility = System.Windows.Visibility.Visible;
                     this.SaveUnlockCodeToFile.Visibility = System.Windows.Visibility.Visible;
                     this.CopyUnlockCodeToClipboard.Visibility = System.Windows.Visibility.Visible;
+                    this.GenerateLicenseNameButton.Visibility = System.Windows.Visibility.Collapsed;
                     this.SaveUnlockCodeToFile.IsEnabled = this.SelectedOrganization.SelectedLicense.IsPermanent ? false : true;
                     this.CopyUnlockCodeToClipboard.IsEnabled = this.SelectedOrganization.SelectedLicense.IsPermanent ? false : true;
                     this.UseDiskSerialNumber.IsEnabled = false;
@@ -428,6 +511,16 @@ namespace ExtractLicenseUI
                 case LicenseNavigationOptions.None: break;
             }
 
+        }
+
+        /// <summary>
+        /// Event handler for the generate license name button.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void GenerateLicenseName_Click(object sender, RoutedEventArgs e)
+        {
+            this.SelectedOrganization.SelectedLicense.LicenseName = GenerateLicenseName();
         }
     }
 }
