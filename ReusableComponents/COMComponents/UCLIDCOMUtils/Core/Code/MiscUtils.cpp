@@ -578,6 +578,12 @@ STDMETHODIMP CMiscUtils::GetStringOptionallyFromFile(BSTR bstrFileName, BSTR *pb
 
 			while (!ifs.eof())
 			{
+				if (!ifs)
+				{
+					UCLIDException ue("ELI50347", "Failed to read file");
+					ue.addDebugInfo("Filename", strFileName);
+					throw ue;
+				}
 				// Put each uncommented line into the string, add "\r\n" between each line
 				string strTemp = fileReader.getLineText();
 				strFromFile += strTemp + "\r\n";
