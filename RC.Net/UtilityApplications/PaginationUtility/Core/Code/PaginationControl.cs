@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Extract.Utilities.Forms;
+using System;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Extract.UtilityApplications.PaginationUtility
@@ -47,6 +49,28 @@ namespace Extract.UtilityApplications.PaginationUtility
         #endregion Constructors
 
         #region Properties
+
+        /// <summary>
+        /// Gets the <see cref="PageLayoutControl"/> this instance is currently loaded into.
+        /// </summary>
+        public PageLayoutControl PageLayoutControl
+        {
+            get
+            {
+                try
+                {
+                    var pageLayoutControl = this.GetAncestors()
+                        .OfType<PageLayoutControl>()
+                        .FirstOrDefault();
+
+                    return pageLayoutControl;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI39658");
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="PaginationControl"/> is

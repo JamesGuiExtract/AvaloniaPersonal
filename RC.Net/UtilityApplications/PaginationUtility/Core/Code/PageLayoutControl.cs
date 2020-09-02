@@ -104,7 +104,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the selected PaginationControls to be cut.
         /// </summary>
-        readonly ToolStripMenuItem _cutMenuItem = new ToolStripMenuItem("Cut");
+        readonly ToolStripMenuItem _cutMenuItem = new ToolStripMenuItem("Cut page(s)");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the cut operation.
@@ -114,7 +114,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the PaginationControls to be copied.
         /// </summary>
-        readonly ToolStripMenuItem _copyMenuItem = new ToolStripMenuItem("Copy");
+        readonly ToolStripMenuItem _copyMenuItem = new ToolStripMenuItem("Copy page(s)");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the copy operation.
@@ -124,7 +124,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the PaginationControls to be deleted.
         /// </summary>
-        readonly ToolStripMenuItem _deleteMenuItem = new ToolStripMenuItem("Delete");
+        readonly ToolStripMenuItem _deleteMenuItem = new ToolStripMenuItem("Delete page(s)");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the delete operation.
@@ -134,13 +134,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the PaginationControls to be un-deleted.
         /// </summary>
-        readonly ToolStripMenuItem _unDeleteMenuItem = new ToolStripMenuItem("Un-delete");
+        readonly ToolStripMenuItem _unDeleteMenuItem = new ToolStripMenuItem("Un-delete pages(s)");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the un-delete
         /// operation.
         /// </summary>
         ApplicationCommand _unDeleteCommand;
+
+        readonly ToolStripMenuItem _rotateClockwiseMenuItem = new ToolStripMenuItem("Rotate page(s) clockwise");
+        ApplicationCommand _rotateSelectedPagesClockwiseCommand;
+        readonly ToolStripMenuItem _rotateCounterclockwiseMenuItem = new ToolStripMenuItem("Rotate page(s) counterclockwise");
+        ApplicationCommand _rotateSelectedPagesCounterclockwiseCommand;
 
         /// <summary>
         /// Context menu option that allows the PaginationControls to be printed.
@@ -155,7 +160,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Context menu option that allows the copied PaginationControls to be inserted.
         /// </summary>
-        readonly ToolStripMenuItem _pasteMenuItem = new ToolStripMenuItem("Paste");
+        readonly ToolStripMenuItem _pasteMenuItem = new ToolStripMenuItem("Paste page(s)");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the paste
@@ -1841,7 +1846,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _cutCommand = new ApplicationCommand(Shortcuts,
                     new Keys[] { Keys.Control | Keys.X }, HandleCutSelectedControls,
                     JoinToolStripItems(_cutMenuItem, _paginationUtility.CutMenuItem),
-                    false, true, false);
+                    shortcutsAlwaysEnabled: false, visible: true, enabled: false);
                 _cutMenuItem.Click += HandleCutMenuItem_Click;
 
                 _copyMenuItem.ShortcutKeyDisplayString = "Ctrl + C";
@@ -1849,7 +1854,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _copyCommand = new ApplicationCommand(Shortcuts,
                     new Keys[] { Keys.Control | Keys.C }, HandleCopySelectedControls,
                     JoinToolStripItems(_copyMenuItem, _paginationUtility.CopyMenuItem),
-                    false, true, false);
+                    shortcutsAlwaysEnabled: false, visible: true, enabled: false);
                 _copyMenuItem.Click += HandleCopyMenuItem_Click;
 
                 _pasteMenuItem.ShortcutKeyDisplayString = "Ctrl + V";
@@ -1857,7 +1862,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _pasteCommand = new ApplicationCommand(Shortcuts,
                     new Keys[] { Keys.Control | Keys.V }, HandlePaste,
                     JoinToolStripItems(_pasteMenuItem, _paginationUtility.PasteMenuItem),
-                    false, true, false);
+                    shortcutsAlwaysEnabled: false, visible: true, enabled: false);
                 _pasteMenuItem.Click += HandlePasteMenuItem_Click;
 
                 _deleteMenuItem.ShortcutKeyDisplayString = "Del";
@@ -1865,7 +1870,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _deleteCommand = new ApplicationCommand(Shortcuts,
                     new Keys[] { Keys.Delete }, HandleDeleteSelectedItems,
                     JoinToolStripItems(_deleteMenuItem, _paginationUtility.DeleteMenuItem),
-                    false, true, false);
+                    shortcutsAlwaysEnabled: false, visible: true, enabled: false);
                 _deleteMenuItem.Click += HandleDeleteMenuItem_Click;
 
                 _unDeleteMenuItem.ShortcutKeyDisplayString = "Shift + Del";
@@ -1873,15 +1878,29 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _unDeleteCommand = new ApplicationCommand(Shortcuts,
                     new Keys[] { Keys.Shift | Keys.Delete }, HandleUnDeleteSelectedItems,
                     JoinToolStripItems(_unDeleteMenuItem),
-                    false, true, false);
+                    shortcutsAlwaysEnabled: false, visible: true, enabled: false);
                 _unDeleteMenuItem.Click += HandleUnDeleteMenuItem_Click;
+
+                _rotateClockwiseMenuItem.Click += (o, args) => HandleRotatePagesInSelection(90);
+                _rotateClockwiseMenuItem.ShortcutKeyDisplayString = "Ctrl + Shift + .";
+                _rotateSelectedPagesClockwiseCommand = new ApplicationCommand(Shortcuts,
+                    new Keys[] { Keys.OemPeriod | Keys.Shift | Keys.Control}, () => HandleRotatePagesInSelection(90),
+                    JoinToolStripItems(_rotateClockwiseMenuItem),
+                    shortcutsAlwaysEnabled: false, visible: true, enabled: false);
+
+                _rotateCounterclockwiseMenuItem.Click += (o, args) => HandleRotatePagesInSelection(-90);
+                _rotateCounterclockwiseMenuItem.ShortcutKeyDisplayString = "Ctrl + Shift + ,";
+                _rotateSelectedPagesCounterclockwiseCommand = new ApplicationCommand(Shortcuts,
+                    new Keys[] { Keys.Oemcomma | Keys.Shift | Keys.Control }, () => HandleRotatePagesInSelection(-90),
+                    JoinToolStripItems(_rotateCounterclockwiseMenuItem),
+                    shortcutsAlwaysEnabled: false, visible: true, enabled: false);
 
                 _printMenuItem.ShortcutKeyDisplayString = "Ctrl + P";
                 _printMenuItem.ShowShortcutKeys = true;
                 _printCommand = new ApplicationCommand(Shortcuts,
                     new Keys[] { Keys.Control | Keys.P }, HandlePrintSelectedItems,
                     JoinToolStripItems(_printMenuItem, _paginationUtility.PrintMenuItem),
-                    false, true, false);
+                    shortcutsAlwaysEnabled: false, visible: true, enabled: false);
                 _printMenuItem.Click += HandlePrintMenuItem_Click;
 
                 _editDocumentDataMenuItem.ShortcutKeyDisplayString = "Enter or double-click";
@@ -1898,8 +1917,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _toggleDocumentSeparatorMenuItem.Click += HandleToggleDocumentSeparator_Click;
 
                 _outputDocumentCommand = new ApplicationCommand(Shortcuts,
-                    new Keys[] { Keys.Control | Keys.S }, HandleOutputDocument,
-                    null, false, true, false);
+                    new Keys[] { Keys.Control | Keys.S }, HandleOutputDocument, null,
+                    shortcutsAlwaysEnabled: false, visible: true, enabled: false);
 
                 InitializeShortcuts();
 
@@ -1909,6 +1928,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ContextMenuStrip.Items.Add(_pasteMenuItem);
                 ContextMenuStrip.Items.Add(_deleteMenuItem);
                 ContextMenuStrip.Items.Add(_unDeleteMenuItem);
+                ContextMenuStrip.Items.Add(_rotateClockwiseMenuItem);
+                ContextMenuStrip.Items.Add(_rotateCounterclockwiseMenuItem);
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
                 ContextMenuStrip.Items.Add(_printMenuItem);
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
@@ -2925,6 +2946,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                using var uiLock = new UIUpdateLock(this);
+
                 PaginationControl lastSelectedControl = _lastSelectedControl;
 
                 // Clear any currently selected controls first unless the control key is down.
@@ -3027,6 +3050,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                                 .All(pageControl => pageControl.Document == activeSeparator.Document))
                             {
                                 activeControl = activeSeparator.Document.PageControls.First();
+                            }
+
+                            // https://extract.atlassian.net/browse/ISSUE-17190
+                            // If the activeControl was originally a separator, ensure it is selected
+                            // even if a page from the document will henceforth represent the PrimarySelection
+                            if (activeSeparator != activeControl)
+                            {
+                                SetSelected(activeSeparator, select, false);
                             }
                         }
                     }
@@ -3547,13 +3578,16 @@ namespace Extract.UtilityApplications.PaginationUtility
             bool enablePageModificationCommands =
                 !SelectedControls.OfType<PageThumbnailControl>().Any(c => c.Document.OutputProcessed);
 
+            _copyCommand.Enabled = enableSelectionBasedCommands;
+
             // The cut command is applicable to separators if the only thing selected is a
             // separator. Depending upon SetSelected to prevent mixed selection.
             bool enabledCutCommand = enableSelectionBasedCommands && enablePageModificationCommands &&
                 (!SelectedControls
                     .OfType<PageThumbnailControl>()
                     .Any(page => page.Deleted) ||
-                SelectedControls.Any(c => c.GetType() == typeof(PaginationSeparator)));
+                SelectedControls.OfType<PaginationSeparator>().Any());
+            _cutCommand.Enabled = enabledCutCommand;
 
             // The delete command is applicable to separators if the only thing selected is a
             // separator. Depending upon SetSelected to prevent mixed selection.
@@ -3562,7 +3596,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 (SelectedControls
                     .OfType<PageThumbnailControl>()
                     .Any(c => !c.Deleted) ||
-                SelectedControls.Any(c => c.GetType() == typeof(PaginationSeparator)));
+                SelectedControls.OfType<PaginationSeparator>().Any());
             _deleteCommand.Enabled = enableDeleteCommand;
 
             // The un-delete command will be enabled only in the case that there are deleted
@@ -3574,11 +3608,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                     .Any(c => c.Deleted);
             _unDeleteCommand.Enabled = enableUnDeleteCommand;
 
+            bool enableRotationCommands = enableSelectionBasedCommands && enablePageModificationCommands
+                && SelectedControls
+                    .Select(c => c.Document?.PaginationSeparator)
+                    .All(s => s?.Collapsed == false);
+            _rotateSelectedPagesClockwiseCommand.Enabled = enableRotationCommands;
+            _rotateSelectedPagesCounterclockwiseCommand.Enabled = enableRotationCommands;
+
             bool enablePrintCommand = enableSelectionBasedCommands &&
                 SelectedPageControls.ToArray().Length > 0;
-
-            _cutCommand.Enabled = enabledCutCommand;
-            _copyCommand.Enabled = enableSelectionBasedCommands;
             _printCommand.Enabled = enablePrintCommand;
 
             // Adjust the text of the insertion commands to be append commands if there is no
@@ -3746,9 +3784,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             Shortcuts[Keys.End | Keys.Control] = HandleSelectLastPage;
             Shortcuts[Keys.End | Keys.Shift] = HandleSelectLastPage;
             Shortcuts[Keys.End | Keys.Control | Keys.Shift] = HandleSelectLastPage;
-
-            Shortcuts[Keys.Oemcomma] = HandleSelectPreviousPage;
-            Shortcuts[Keys.OemPeriod] = HandleSelectNextPage;
 
             // Clear shortcuts that don't apply to this application.
             Shortcuts[Keys.O | Keys.Control] = null;
@@ -4729,6 +4764,45 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI40045");
+            }
+        }
+
+        /// <summary>
+        /// Rotates all non-processed pages in current selection by the specified amount.
+        /// </summary>
+        void HandleRotatePagesInSelection(int degrees)
+        {
+            try
+            {
+                // Identify any of the selected pages currently displayed in the image viewer;
+                // rotation of this page will need to be done via the ImageViewer so that
+                // both the thumbnails and the main image viewer are affected.
+                var displayedPage = SelectedControls
+                    .OfType<PageThumbnailControl>()
+                    .Where(pageControl => pageControl.PageIsDisplayed)
+                    .Select(pageControl => pageControl.Page);
+
+                if (displayedPage.Any())
+                {
+                    ImageViewer.Rotate(degrees, updateZoomHistory: true, raiseZoomChanged: true);
+                }
+
+                // Rotating other pages can be don via the thumbnail controls only.
+                var otherPagesToRotate = SelectedControls
+                    .OfType<PageThumbnailControl>()
+                        .Where(pageControl => pageControl.Document?.OutputProcessed == false)
+                        .Select(pageControl => pageControl.Page)
+                        .Except(displayedPage)
+                        .Distinct();
+
+                foreach (var page in otherPagesToRotate.Except(displayedPage))
+                {
+                    page.ImageOrientation += degrees;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50348");
             }
         }
 

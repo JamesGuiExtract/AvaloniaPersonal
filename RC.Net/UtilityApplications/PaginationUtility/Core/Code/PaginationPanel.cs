@@ -413,7 +413,13 @@ namespace Extract.UtilityApplications.PaginationUtility
             get;
             set;
         }
-        
+
+        /// <summary>
+        /// <c>true</c> if this pane should monitor and self-initiate registered shortcut handlers;
+        /// <c>false</c> if <see cref="ProcessShortcut"/> will be called by host to process shortcuts.
+        /// </summary>
+        public bool HandleShortcutsInternally { get; set; } = true;
+
         #endregion Configuration Properties
 
         #region Runtime Properties
@@ -1924,6 +1930,33 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Processed any ImageViewer or PaginationPanel shortcuts corresponding the specified <see cref="keyData"/>.
+        /// </summary>
+        /// <returns><c>true</c> if a corresponding shortcut handler was processed, <c>false</c> if no handler was
+        /// processed.</returns>
+        public bool ProcessShortcut(Keys keyData)
+        {
+            try
+            {
+                if (!_primaryPageLayoutControl.IgnoreShortcutKey && _shortcuts.ProcessKey(keyData))
+                {
+                    return true;
+                }
+
+                if (ImageViewer.Shortcuts.ProcessKey(keyData))
+                {
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50352");
+            }
+        }
+
         #endregion Methods
 
         #region IPaginationUtility
@@ -2272,7 +2305,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!_primaryPageLayoutControl.IgnoreShortcutKey && _shortcuts.ProcessKey(keyData))
+                if (HandleShortcutsInternally
+                    && !_primaryPageLayoutControl.IgnoreShortcutKey
+                    && _shortcuts.ProcessKey(keyData))
                 {
                     return true;
                 }
@@ -2953,7 +2988,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (!_primaryPageLayoutControl.IgnoreShortcutKey && !_dataPanelFocused)
+                if (HandleShortcutsInternally
+                    && !_primaryPageLayoutControl.IgnoreShortcutKey
+                    && !_dataPanelFocused)
                 {
                     _shortcuts.ProcessKey(e.KeyCode);
                 }

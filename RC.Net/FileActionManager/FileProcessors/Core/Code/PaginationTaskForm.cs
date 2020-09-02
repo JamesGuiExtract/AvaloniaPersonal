@@ -348,6 +348,7 @@ namespace Extract.FileActionManager.FileProcessors
                 _paginationPanel.SelectAllCheckBoxVisible = _settings.SelectAllCheckBoxVisible;
                 _paginationPanel.LoadNextDocumentVisible = _settings.LoadNextDocumentVisible;
                 _paginationPanel.SaveButtonVisible = true;
+                _paginationPanel.HandleShortcutsInternally = false;
 
                 if (!string.IsNullOrWhiteSpace(paginationDocumentDataPanelAssembly))
                 {
@@ -689,6 +690,8 @@ namespace Extract.FileActionManager.FileProcessors
                 _imageViewer.Shortcuts[Keys.H] = null;
                 _imageViewer.Shortcuts[Keys.OemPeriod] = null;
                 _imageViewer.Shortcuts[Keys.Oemcomma] = null;
+                _imageViewer.Shortcuts[Keys.R | Keys.Control] = null;
+                _imageViewer.Shortcuts[Keys.R | Keys.Control | Keys.Shift] = null;
                 _imageViewer.Shortcuts[Keys.F3] = null;
                 _imageViewer.Shortcuts[Keys.Control | Keys.OemPeriod] = null;
                 _imageViewer.Shortcuts[Keys.F3 | Keys.Shift] = null;
@@ -715,8 +718,8 @@ namespace Extract.FileActionManager.FileProcessors
                 _imageViewer.Shortcuts[Keys.OemMinus | Keys.Control] = _imageViewer.SelectZoomOut;
                 _imageViewer.Shortcuts[Keys.Alt | Keys.Left] = _imageViewer.SelectZoomPrevious;
                 _imageViewer.Shortcuts[Keys.Alt | Keys.Right] = _imageViewer.SelectZoomNext;
-                _imageViewer.Shortcuts[Keys.R | Keys.Control] = _imageViewer.SelectRotateClockwise;
-                _imageViewer.Shortcuts[Keys.R | Keys.Control | Keys.Shift] = _imageViewer.SelectRotateCounterclockwise;
+                _imageViewer.Shortcuts[Keys.OemPeriod | Keys.Control] = _imageViewer.SelectRotateClockwise;
+                _imageViewer.Shortcuts[Keys.Oemcomma | Keys.Control] = _imageViewer.SelectRotateCounterclockwise;
                 if (_paginationDocumentDataPanel != null && _paginationDocumentDataPanel.AdvancedDataEntryOperationsSupported)
                 {
                     _imageViewer.Shortcuts[Keys.Escape] = _paginationDocumentDataPanel.ToggleHideTooltips;
@@ -807,8 +810,8 @@ namespace Extract.FileActionManager.FileProcessors
         {
             try
             {
-                // Allow the image viewer to handle keyboard input for shortcuts.
-                if (_imageViewer.Shortcuts.ProcessKey(keyData))
+                // Allow the _paginationPanel a chance to handle keyboard input for shortcuts.
+                if (_paginationPanel?.ProcessShortcut(keyData) == true)
                 {
                     return true;
                 }

@@ -776,12 +776,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             var newColor = (Document?.OutputProcessed == true)
                 ? Color.Gray
                 : (Document?.PageControls.Any(pageControl =>
-                        pageControl.PageIsDisplayed && pageControl.Highlighted) == true)
+                // Check was changed from pageControl.PageIsDisplayed to PageLayoutControl.PrimarySelection comparison
+                // becuse UIUpdateLock can cause PageIsDisplayed to be false even when a page is the PrimarySelection
+                // which would cause flickering of the separator color.
+                        pageControl == PageLayoutControl.PrimarySelection && pageControl.Highlighted) == true)
                     ? ExtractColors.LightOrange
                     : Selected || (Document?.PageControls.Any(pageControl => pageControl.Selected) == true)
                         ? Color.LightGray
                         : ExtractColors.White;
-            
+
             // Update the BackColor of the separator itself, as well as any controls except the edit button.
             if (newColor != _currentColor)
             {
@@ -860,11 +863,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (ActiveControl == _collapseDocumentButton ||
                     ActiveControl == _selectedCheckBox)
                 {
-                    // Prevent confusion that space key is intended to activate this buttons by
-                    // preventing keys from activating these buttons. Instead, send the key event
-                    // on to the parent control so it does what it otherwise should have done.
-                    KeyMethods.SendKeyToControl((int)keyData, false, false, false, Parent);
-                    return false;
+                    // While needing to remain responsive to mouse clicks, any keyboard handling
+                    // should be referred up to the the PageLayoutControl for processing of
+                    // registered shortcuts.
+                    return Parent.PreProcessMessage(ref msg);
                 }
 
                 return base.ProcessCmdKey(ref msg, keyData);

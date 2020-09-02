@@ -33,33 +33,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         #region Properties
 
         /// <summary>
-        /// Gets the <see cref="PageLayoutControl"/> this instance is currently loaded into.
-        /// </summary>
-        public PageLayoutControl PageLayoutControl
-        {
-            get
-            {
-                try
-                {
-                    for (Control control = Parent; Parent != null; control = control.Parent)
-                    {
-                        var pageLayoutControl = control as PageLayoutControl;
-                        if (pageLayoutControl != null)
-                        {
-                            return pageLayoutControl;
-                        }
-                    }
-
-                    return null;
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI39658");
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets or sets a value indicating whether this instance is highlighted.
         /// </summary>
         /// <value><see langword="true"/> if this instance is highlighted; otherwise,
