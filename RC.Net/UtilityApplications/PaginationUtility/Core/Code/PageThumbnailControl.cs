@@ -522,6 +522,24 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the when the control is invalidated to invalidate the _contentsPanel.
+        /// </summary>
+        protected override void OnInvalidated(InvalidateEventArgs e)
+        {
+            try
+            {
+                // Since _contentsPanel effectively represents this entire control, invalidate
+                // it even when the caller didn't explicitly invalidate children. Otherwise
+                // in cases where focus change, it may not be properly indicated.
+                this._contentsPanel?.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50349");
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether this control is selected.
         /// </summary>
         /// <value><see langword="true"/> if selected; otherwise, <see langword="false"/>.

@@ -492,6 +492,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                if (_pageControl.PageLayoutControl == null)
+                {
+                    // During some operations (such as drag/drop), page controls may be temporarily
+                    // removed from the panel.
+                    base.OnInvalidated(e);
+                    return;
+                }
+
                 (bool Highlighted, bool Selected, bool IndicateFocus) currentControlState
                         = (_pageControl.Highlighted, _pageControl.Selected, _pageControl.PageLayoutControl.IndicateFocus);
 

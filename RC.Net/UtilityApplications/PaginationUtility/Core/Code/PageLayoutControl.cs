@@ -3397,7 +3397,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else
                 {
-                    var outputDocument = SelectNextDocument(forward);
+                    var outputDocument = SelectNextDocument(forward, onlyUnprocessed: false);
                     if (outputDocument == null)
                     {
                         _flowLayoutPanel.VerticalScroll.Value = forward
@@ -3421,12 +3421,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// that document are already selected, in which case the next document before/after that
         /// document is selected.
         /// </summary>
+        /// <param name="onlyUnprocessed"><c>true</c> if processed documents should not be selected
+        /// by this method.</param>
         /// <param name="forward"><see langword="true"/> to select the next document if the target
         /// document is already entirely selected; <see langword="false"/> to select the previous.</param>
 
-        OutputDocument SelectNextDocument(bool forward)
+        OutputDocument SelectNextDocument(bool forward, bool onlyUnprocessed)
         {
-            OutputDocument nextDocument = GetNextDocument(forward);
+            OutputDocument nextDocument = GetNextDocument(forward, onlyUnprocessed);
 
             if (nextDocument != null)
             {
@@ -3450,29 +3452,47 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="forward"><c>true</c> to navigate to the next document;
         /// <c>false</c> to navigate to the previous.</param>
+        /// <param name="onlyUnprocessed"><c>true</c> if processed documents should not be returned
+        /// by this method.</param>
         /// <param name="currentDocument">The document relative to which the operation should be
         /// performed or <c>null</c> to perform the operation relative to the active document.</param>
         /// <returns>The resulting <see cref="OutputDocument"/>.</returns>
-        OutputDocument GetNextDocument(bool forward, OutputDocument currentDocument = null)
+        OutputDocument GetNextDocument(bool forward, bool onlyUnprocessed, OutputDocument currentDocument = null)
         {
-            currentDocument = currentDocument ?? GetActiveDocument(forward);
+            currentDocument = currentDocument ?? GetActiveDocument(null);
 
-            // If this document is fully selected, iterate the page controls forward/backward until
-            // we get to the next document.
-            var pageControls = currentDocument.PageControls;
-            PaginationControl control = forward
-                ? pageControls.Last()
-                : pageControls.First();
+            PaginationControl control = null;
+            if (currentDocument != null)
+            {
+                // If this document is fully selected, iterate the page controls forward/backward until
+                // we get to the next document.
+                control = forward
+                    ? currentDocument.PageControls.Last()
+                    : currentDocument.PageControls.First();
+            }
 
             do
             {
-                control = forward
-                    ? control.NextControl
-                    : control.PreviousControl;
+                // If there is no initial selection, select either the first or last page control
+                // loaded into the layout control.
+                if (control == null)
+                {
+                    control = forward
+                        ? PageControls.First()
+                        : PageControls.Last();
+                }
+                else
+                {
+                    control = forward
+                        ? control.NextControl
+                        : control.PreviousControl;
+                }
 
                 var pageControl = control as PageThumbnailControl;
                 var nextDocument = pageControl?.Document;
-                if (nextDocument != null && nextDocument != currentDocument)
+                if (nextDocument != null
+                    && nextDocument != currentDocument
+                    && (!onlyUnprocessed || !nextDocument.OutputProcessed))
                 {
                     return nextDocument;
                 }
@@ -4255,26 +4275,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SelectNextDocument(true);
+                SelectNextDocument(true, onlyUnprocessed: false);
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35462");
-            }
-        }
-
-        /// <summary>
-        /// Handles a UI command to select the previous document.
-        /// </summary>
-        void HandleSelectPreviousDocument()
-        {
-            try
-            {
-                SelectNextDocument(false);
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35463");
             }
         }
 
@@ -4288,16 +4293,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 var activeControl = GetActiveControl(true);
                 var pageThumbnailIsActive = activeControl is PageThumbnailControl;
-                var activeDocument = GetActiveDocument(true);
+                var activeDocument = GetActiveDocument(null);
                 var activeSeparator = activeDocument?.PaginationSeparator;
 
                 // Tabbing into a collapsed document
-                if (pageThumbnailIsActive && activeSeparator.Collapsed)
+                if (pageThumbnailIsActive && activeSeparator.Collapsed 
+                    && activeDocument?.OutputProcessed == false)
                 {
                     activeSeparator.Collapsed = false;
                 }
-                // Tabbing from an expandedd document with a DEP configuration that is not open
-                else if (pageThumbnailIsActive && AllowDataEdit && !activeSeparator.IsDataPanelOpen)
+                // Tabbing from an expanded document with a DEP configuration that is not open
+                else if (pageThumbnailIsActive && activeDocument?.OutputProcessed == false
+                    && AllowDataEdit && !activeSeparator.IsDataPanelOpen)
                 {
                     activeSeparator.Collapsed = false;
                     activeSeparator.OpenDataPanel(initialSelection: FieldSelection.First);
@@ -4305,11 +4312,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 else if (DocumentDataPanel?.PanelControl?.ContainsFocus != true)
                 {
                     // Tabbing from no selection or any page but the last page of a document
-                    if (PrimarySelection == null || activeControl?.NextControl is PageThumbnailControl)
+                    if (activeControl?.NextControl is PageThumbnailControl)
                     {
                         HandleSelectNextPage();
                     }
-                    // Tabbing from the last page of a document
+                    // Tabbing no selection or from the last page of a document
                     else
                     {
                         TabNavigateNextDocument(activeDocument);
@@ -4338,7 +4345,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 CloseAndSelectDocumentForCommit(activeDocument);
             }
 
-            nextDocument = SelectNextDocument(true);
+            nextDocument = SelectNextDocument(true, onlyUnprocessed: true);
             if (nextDocument == null)
             {
                 // TODO: Prompt whether to commit batch. Until then, clear control selection when
@@ -4380,14 +4387,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                var currentDocument = GetActiveDocument(true);
+                var currentDocument = GetActiveDocument(null);
                 var previousPageThumbnailControl = GetPreviousPageControl();
                 var previousControlDocument = previousPageThumbnailControl?.Document;
 
                 // Select the previous document
-                if (previousControlDocument != null && previousControlDocument != currentDocument && DocumentInDataEdit == null)
+                if (previousControlDocument != null
+                    && previousControlDocument != currentDocument
+                    && DocumentInDataEdit == null)
                 {
-                    SelectDocument(previousControlDocument);
+                    // If navigating to the previous document, we don't necessarily want to move to
+                    // previousControlDocument; use SelectNextDocument to move to a previous document
+                    // that has not been processed.
+                    SelectNextDocument(forward: false, onlyUnprocessed: true);
                 }
                 // Return focus to the DEP from the page controls
                 else if (previousControlDocument != currentDocument && DocumentInDataEdit != null)
@@ -4532,12 +4544,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 OutputDocument activeDocument = GetActiveDocument(forward: true);
                 OutputDocument document = (DocumentDataPanel == null)
                     ? activeDocument
-                    : GetNextDocument(forward: true) ?? Documents.First();
+                    : GetNextDocument(forward: true, onlyUnprocessed: false) ?? Documents.First();
                 OutputDocument stopSearch = null;
 
                 while (document != stopSearch && !document.DataError && !document.DataWarning)
                 {
-                    document = GetNextDocument(forward: true, document);
+                    document = GetNextDocument(forward: true, onlyUnprocessed: false, document);
                     if (document == null && stopSearch == null)
                     {
                         // Loop from start until we get back to the active document.
