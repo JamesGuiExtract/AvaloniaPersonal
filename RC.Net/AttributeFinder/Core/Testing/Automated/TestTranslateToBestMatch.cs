@@ -141,7 +141,7 @@ namespace Extract.AttributeFinder.Test
             var ex = Assert.Throws<ExtractException>(() => ProcessTestCases(testDataCSV, targets, synonyms));
             ex = ExtractException.FromStringizedByteStream(ex.EliCode, ex.Message);
             var rootCause = ex.InnerException as ExtractException;
-            StringAssert.AreEqualIgnoringCase("Failed to open file", rootCause?.Message);
+            StringAssert.AreEqualIgnoringCase("Failed to read file", rootCause?.Message);
             StringAssert.AreEqualIgnoringCase(targets, rootCause?.Data["Filename"].ToString());
         }
 
@@ -181,7 +181,7 @@ namespace Extract.AttributeFinder.Test
             var ex = Assert.Throws<ExtractException>(() => ProcessTestCases(testDataCSV, targets, synonyms));
             ex = ExtractException.FromStringizedByteStream(ex.EliCode, ex.Message);
             var rootCause = ex.InnerException as ExtractException;
-            StringAssert.AreEqualIgnoringCase("Failed to open file", rootCause?.Message);
+            StringAssert.AreEqualIgnoringCase("Failed to read file", rootCause?.Message);
             StringAssert.AreEqualIgnoringCase(synonyms, rootCause?.Data["Filename"].ToString());
         }
 
