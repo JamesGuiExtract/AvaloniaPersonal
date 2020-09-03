@@ -565,6 +565,11 @@ namespace Extract.DashboardViewer
                         dashboardViewerMain.DashboardSource = string.Empty;
                         _dashboardName = selected;
                         var xdoc = XDocument.Load(_dashboardName);
+
+                        // Set empty dashboard to clear previous parameters 
+                        // https://extract.atlassian.net/browse/ISSUE-17169
+                        dashboardViewerMain.Dashboard?.Dispose();
+                        dashboardViewerMain.Dashboard = new DevExpress.DashboardCommon.Dashboard();
                         dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
                         UpdateMainTitle();
                     }
@@ -636,6 +641,11 @@ namespace Extract.DashboardViewer
                     dashboardViewerMain.DashboardSource = string.Empty;
                     _dashboardName = selectedFile;
                     var xdoc = XDocument.Load(_dashboardName);
+                    
+                    // Set empty dashboard to clear previous parameters 
+                    // https://extract.atlassian.net/browse/ISSUE-17169
+                    dashboardViewerMain.Dashboard?.Dispose();
+                    dashboardViewerMain.Dashboard = new DevExpress.DashboardCommon.Dashboard();
                     dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
                     UpdateMainTitle();
                 }
@@ -877,6 +887,11 @@ namespace Extract.DashboardViewer
                         UpdateMainTitle();
 
                         var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
+
+                        // Set empty dashboard to clear previous parameters 
+                        // https://extract.atlassian.net/browse/ISSUE-17169
+                        dashboardViewerMain.Dashboard?.Dispose();
+                        dashboardViewerMain.Dashboard = new DevExpress.DashboardCommon.Dashboard();
                         dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
                     }
                 }
