@@ -167,7 +167,8 @@ namespace Extract.Dashboard.Utilities
                 
                 string extractDataSourceName = "ExtractData_" + dashboardName + "_" +
                     ds.Name +
-                    builder.DataSource + "_" + builder.InitialCatalog + "_" + query.Name;
+                    builder.DataSource.Replace('\\','_').Replace('/','_') + 
+                    "_" + builder.InitialCatalog + "_" + query.Name;
 
                 // check if the extract data source already exists
                 if (existingExtractDataSources
