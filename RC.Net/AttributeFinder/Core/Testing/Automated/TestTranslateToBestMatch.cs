@@ -51,11 +51,6 @@ namespace Extract.AttributeFinder.Test
             {
                 _testFiles.Dispose();
             }
-
-            // Prevent nunit error after tests are run:
-            // "Unhandled Exception: NUnit.Engine.NUnitEngineException: Remote test agent exited with non-zero exit code -2146233020"
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
         }
 
         #endregion Setup and Teardown
@@ -146,7 +141,7 @@ namespace Extract.AttributeFinder.Test
             var ex = Assert.Throws<ExtractException>(() => ProcessTestCases(testDataCSV, targets, synonyms));
             ex = ExtractException.FromStringizedByteStream(ex.EliCode, ex.Message);
             var rootCause = ex.InnerException as ExtractException;
-            StringAssert.AreEqualIgnoringCase("Failed to read file", rootCause?.Message);
+            StringAssert.AreEqualIgnoringCase("Failed to open file", rootCause?.Message);
             StringAssert.AreEqualIgnoringCase(targets, rootCause?.Data["Filename"].ToString());
         }
 
@@ -186,7 +181,7 @@ namespace Extract.AttributeFinder.Test
             var ex = Assert.Throws<ExtractException>(() => ProcessTestCases(testDataCSV, targets, synonyms));
             ex = ExtractException.FromStringizedByteStream(ex.EliCode, ex.Message);
             var rootCause = ex.InnerException as ExtractException;
-            StringAssert.AreEqualIgnoringCase("Failed to read file", rootCause?.Message);
+            StringAssert.AreEqualIgnoringCase("Failed to open file", rootCause?.Message);
             StringAssert.AreEqualIgnoringCase(synonyms, rootCause?.Data["Filename"].ToString());
         }
 

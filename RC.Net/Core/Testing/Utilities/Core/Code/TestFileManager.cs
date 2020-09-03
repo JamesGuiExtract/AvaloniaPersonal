@@ -222,6 +222,11 @@ namespace Extract.Testing.Utilities
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+
+            // Prevent nunit error after tests are run:
+            // "Unhandled Exception: NUnit.Engine.NUnitEngineException: Remote test agent exited with non-zero exit code -2146233020"
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         /// <overloads>Releases resources used by the <see cref="TestFileManager{T}"/>.</overloads>
