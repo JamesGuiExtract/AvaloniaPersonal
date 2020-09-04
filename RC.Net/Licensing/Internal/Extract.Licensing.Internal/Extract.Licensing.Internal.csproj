@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{F5FE9212-D929-4DD5-8DFD-ADE86C114C66}</ProjectGuid>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>

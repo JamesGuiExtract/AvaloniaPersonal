@@ -14,7 +14,7 @@
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <ApplicationIcon>Resources\ReportViewer.ico</ApplicationIcon>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileUpgradeFlags />
     <OldToolsVersion>2.0</OldToolsVersion>
     <UpgradeBackupLocation />

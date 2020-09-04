@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extract.AttributeFinder.Rules</RootNamespace>
     <AssemblyName>Extract.AttributeFinder.Rules</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
@@ -165,9 +165,6 @@
       <HintPath>..\..\..\..\APIs\Lucene.Net.4.8.0\lib\net45\Lucene.Net.Queries.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="Nuance.OmniPage.CSDK.ArgTypes">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\Nuance_20\Bin\Nuance.OmniPage.CSDK.ArgTypes.dll</HintPath>
     </Reference>
@@ -192,18 +189,12 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="YamlDotNet, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\YamlDotNet.6.1.1\lib\net45\YamlDotNet.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoShrinkRedactionZones.cs" />
@@ -603,11 +594,18 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Resources\EAVGenerator.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\EAVGenerator.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>11.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="YamlDotNet">
+      <Version>6.1.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

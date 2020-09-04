@@ -1,117 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\..\APIs\FSharp.Compiler.Tools.10.2.3\build\FSharp.Compiler.Tools.props" Condition="Exists('..\..\..\APIs\FSharp.Compiler.Tools.10.2.3\build\FSharp.Compiler.Tools.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>504dcf5f-fd4e-4e5d-b1ce-2e27518fc0bc</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Extract.Utilities.FSharp.FunctionLoader</RootNamespace>
-    <AssemblyName>Extract.Utilities.FSharp.CSharpInterop</AssemblyName>
-    <UseStandardResourceNames>true</UseStandardResourceNames>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Name>Extract.Utilities.FSharp.CSharpInterop</Name>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <Tailcalls>false</Tailcalls>
-    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <WarningLevel>3</WarningLevel>
-    <OtherFlags>
-    </OtherFlags>
+    <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <OutDir>$(SolutionDir)..\..\..\..\..\Binaries\$(Configuration)</OutDir>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <Tailcalls>true</Tailcalls>
-    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <WarningLevel>3</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup>
-    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(FSharpTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets') ">
-    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
-  </PropertyGroup>
-  <Import Project="$(FSharpTargetsPath)" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\APIs\FSharp.Compiler.Tools.10.2.3\build\FSharp.Compiler.Tools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\APIs\FSharp.Compiler.Tools.10.2.3\build\FSharp.Compiler.Tools.props'))" />
-  </Target>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="FunctionLoader.fs" />
-    <Content Include="packages.config" />
     <Compile Include="ExtensionMethods.fs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="FSharp.Compiler.Private">
-      <HintPath>..\..\..\APIs\FSharp.Compiler.Tools.10.2.3\tools\FSharp.Compiler.Private.dll</HintPath>
-    </Reference>
-    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\..\APIs\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="FSharp.Compiler.Interactive.Settings">
-      <HintPath>..\..\..\APIs\FSharp.Compiler.Tools.10.2.3\tools\FSharp.Compiler.Interactive.Settings.dll</HintPath>
-    </Reference>
-    <Reference Include="Interop.UCLID_COMUTILSLib">
-      <HintPath>..\..\..\..\Binaries\Debug\Interop.UCLID_COMUTILSLib.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>..\..\..\APIs\System.Collections.Immutable.1.5.0\lib\netstandard1.3\System.Collections.Immutable.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Reflection.Metadata">
-      <HintPath>..\..\..\APIs\System.Reflection.Metadata.1.6.0\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple">
-      <HintPath>..\..\..\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
-      <Name>Extract</Name>
-      <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Core\Code\Extract.Utilities.csproj">
-      <Name>Extract.Utilities</Name>
-      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <PackageReference Include="FSharp.Compiler.Service" Version="37.0.0" />
+    <PackageReference Include="FSharp.Core" Version="4.6.2" />
+    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
 </Project>

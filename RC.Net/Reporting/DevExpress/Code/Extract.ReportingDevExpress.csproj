@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
@@ -37,9 +37,6 @@
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />

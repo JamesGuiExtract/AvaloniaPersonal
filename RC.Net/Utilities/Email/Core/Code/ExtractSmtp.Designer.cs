@@ -12,7 +12,7 @@ namespace Extract.Utilities.Email {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
     public sealed partial class ExtractSmtp : global::System.Configuration.ApplicationSettingsBase {
         
         private static ExtractSmtp defaultInstance = ((ExtractSmtp)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new ExtractSmtp())));

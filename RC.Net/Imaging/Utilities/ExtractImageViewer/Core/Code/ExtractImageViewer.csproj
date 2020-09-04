@@ -18,7 +18,7 @@
     <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <ApplicationIcon>Resources\ExtractImageViewer.ico</ApplicationIcon>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileUpgradeFlags />
     <OldToolsVersion>2.0</OldToolsVersion>
     <UpgradeBackupLocation />

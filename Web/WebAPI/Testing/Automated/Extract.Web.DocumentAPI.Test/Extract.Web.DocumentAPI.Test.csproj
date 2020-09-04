@@ -1,7 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\..\..\..\RC.Net\APIs\NUnit3TestAdapter.3.16.1\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\..\..\..\..\RC.Net\APIs\NUnit3TestAdapter.3.16.1\build\net35\NUnit3TestAdapter.props')" />
-  <Import Project="..\..\..\..\..\RC.Net\APIs\NUnit.3.12.0\build\NUnit.props" Condition="Exists('..\..\..\..\..\RC.Net\APIs\NUnit.3.12.0\build\NUnit.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,10 +10,11 @@
     <RootNamespace>Extract.Web.WebAPI.Test</RootNamespace>
     <AssemblyName>Extract.Web.DocumentAPI.Test</AssemblyName>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -42,107 +41,16 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.AspNetCore.Antiforgery, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Antiforgery.1.1.1\lib\net451\Microsoft.AspNetCore.Antiforgery.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Authorization, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Authorization.1.1.1\lib\net451\Microsoft.AspNetCore.Authorization.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Diagnostics.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Diagnostics.Abstractions.1.1.1\lib\netstandard1.0\Microsoft.AspNetCore.Diagnostics.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Html.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Html.Abstractions.1.1.1\lib\netstandard1.0\Microsoft.AspNetCore.Html.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Http, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Http.1.1.1\lib\net451\Microsoft.AspNetCore.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Http.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Http.Abstractions.1.1.1\lib\net451\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Http.Features, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60" />
-    <Reference Include="Microsoft.AspNetCore.JsonPatch, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.JsonPatch.1.1.1\lib\net451\Microsoft.AspNetCore.JsonPatch.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Mvc.Abstractions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Mvc.Abstractions.1.1.2\lib\net451\Microsoft.AspNetCore.Mvc.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Mvc.Core, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Mvc.Core.1.1.2\lib\net451\Microsoft.AspNetCore.Mvc.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Mvc.DataAnnotations, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Mvc.DataAnnotations.1.1.2\lib\net451\Microsoft.AspNetCore.Mvc.DataAnnotations.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Mvc.Formatters.Json, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Mvc.Formatters.Json.1.1.2\lib\net451\Microsoft.AspNetCore.Mvc.Formatters.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Mvc.Versioning, Version=1.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Mvc.Versioning.1.2.1\lib\net451\Microsoft.AspNetCore.Mvc.Versioning.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Mvc.ViewFeatures, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Mvc.ViewFeatures.1.1.2\lib\net451\Microsoft.AspNetCore.Mvc.ViewFeatures.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.ResponseCaching.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.ResponseCaching.Abstractions.1.1.1\lib\net451\Microsoft.AspNetCore.ResponseCaching.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Routing, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Routing.1.1.1\lib\net451\Microsoft.AspNetCore.Routing.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.Routing.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.AspNetCore.Routing.Abstractions.1.1.1\lib\net451\Microsoft.AspNetCore.Routing.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.DotNet.PlatformAbstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.DotNet.PlatformAbstractions.1.1.1\lib\net451\Microsoft.DotNet.PlatformAbstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyModel, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.Extensions.DependencyModel.1.1.1\lib\net451\Microsoft.Extensions.DependencyModel.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Localization, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.Extensions.Localization.1.1.1\lib\net451\Microsoft.Extensions.Localization.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Localization.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.Extensions.Localization.Abstractions.1.1.1\lib\netstandard1.0\Microsoft.Extensions.Localization.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.PlatformAbstractions, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.Extensions.PlatformAbstractions.1.1.0\lib\net451\Microsoft.Extensions.PlatformAbstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.IdentityModel.JsonWebTokens.5.3.0\lib\net451\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.Logging, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.IdentityModel.Logging.5.3.0\lib\net451\Microsoft.IdentityModel.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Microsoft.IdentityModel.Tokens.5.3.0\lib\net451\Microsoft.IdentityModel.Tokens.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\..\RC.Net\APIs\System.Diagnostics.DiagnosticSource.4.3.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\System.IdentityModel.Tokens.Jwt.5.3.0\lib\net451\System.IdentityModel.Tokens.Jwt.dll</HintPath>
-    </Reference>
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.ReaderWriter, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\RC.Net\APIs\System.Xml.ReaderWriter.4.3.0\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
-    </Reference>
     <Reference Include="IKVM.OpenJDK.Core">
       <HintPath>..\..\..\RC.Net\APIs\IKVM\lib\IKVM.OpenJDK.Core.dll</HintPath>
     </Reference>
@@ -166,7 +74,6 @@
     <EmbeddedResource Include="Resources\Demo_FlexIndex.bak" />
     <EmbeddedResource Include="Resources\Demo_IDShield.bak" />
     <EmbeddedResource Include="Resources\Demo_LabDE.bak" />
-    <None Include="packages.config" />
     <EmbeddedResource Include="Resources\C413.tif.uss" />
     <EmbeddedResource Include="Resources\TestImage001.tif.uss" />
   </ItemGroup>
@@ -311,18 +218,39 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\TestImage001.tif" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies">
+      <Version>1.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer">
+      <Version>1.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning">
+      <Version>1.2.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures">
+      <Version>1.1.2</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>11.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="NUnit">
+      <Version>3.12.0</Version>
+    </PackageReference>
+    <PackageReference Include="NUnit3TestAdapter">
+      <Version>3.16.1</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt">
+      <Version>5.3.0</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\..\..\RC.Net\APIs\NUnit.3.12.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\..\RC.Net\APIs\NUnit.3.12.0\build\NUnit.props'))" />
-    <Error Condition="!Exists('..\..\..\..\..\RC.Net\APIs\NUnit3TestAdapter.3.16.1\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\..\RC.Net\APIs\NUnit3TestAdapter.3.16.1\build\net35\NUnit3TestAdapter.props'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -381,16 +381,14 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\FirstFloor*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\grpc*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\FSharp.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V /Y "$(RCNETDir)\APIs\protobuf-net.2.4.0\lib\net40\protobuf-net.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V /Y "$(RCNETDir)\APIs\PDFsharp.1.50.5147\lib\net20\*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\protobuf-net.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\PdfSharp.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
-# This includes System.ValueTuple in the install
-	@COPY /V /Y "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+# This includes things in the install
 	@COPY /V /Y "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\System.Reactive.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\System.Reactive.Linq.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-# This makes System.ValueTuple available when installshield runs regasm
-	@COPY /V /Y "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+# This makes things available when installshield runs regasm
 	@COPY /V /Y "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(BinariesFolder)\System.Reactive.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(BinariesFolder)\System.Reactive.Linq.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
@@ -437,9 +435,9 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@XCOPY "$(RCNETDir)\APIs\IKVM\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 # Copy to DotNetGAC for Installshield
 	@XCOPY "$(RCNETDir)\APIs\IKVM\lib\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /v /s /e /y
-	@XCOPY "$(RCNETDir)\APIs\WindowsAPICodePack.1.1.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
+	@XCOPY "$(BinariesFolder)\Microsoft.WindowsAPICodePack.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
 # Copy WindowsAPICodePack to DotNetGAC for installshield
-	@XCOPY "$(RCNETDir)\APIs\WindowsAPICodePack.1.1.0\lib\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /v /s /e /y
+	@XCOPY "$(BinariesFolder)\Microsoft.WindowsAPICodePack.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC" /v /s /e /y
 	@COPY /V /Y "$(BinariesFolder)\OpenNLP.IKVM.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Tabula.IKVM.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\YamlDotNet.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"

@@ -17,7 +17,7 @@
     <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
     <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
     <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -69,31 +69,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Accord, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Accord.3.0.2\lib\net45\Accord.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Accord.MachineLearning, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Accord.MachineLearning.3.0.2\lib\net45\Accord.MachineLearning.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Accord.Math, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Accord.Math.3.0.2\lib\net45\Accord.Math.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Accord.Neuro, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Accord.Neuro.3.0.2\lib\net45\Accord.Neuro.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Accord.Statistics, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\APIs\Accord.Statistics.3.0.2\lib\net45\Accord.Statistics.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="IKVM.AWT.WinForms, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\APIs\IKVM\lib\IKVM.AWT.WinForms.dll</HintPath>
@@ -237,16 +212,12 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="MurmurHash, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ff7eff5eb27df7b9, processorArchitecture=MSIL">
-      <HintPath>..\..\..\APIs\murmurhash-signed.1.0.2\lib\net45\MurmurHash.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="ZstdNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
@@ -465,13 +436,24 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\..\..\APIs\zstd\1.1.0\build\VS_scripts\bin\Release\Win32\zstdlib_x86.dll">
       <Link>zstdlib_x86.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Accord.MachineLearning">
+      <Version>3.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="Accord.Neuro">
+      <Version>3.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="murmurhash-signed">
+      <Version>1.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>11.0.2</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -484,11 +466,4 @@
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\..\..\APIs\Accord.3.0.2\build\Accord.targets" Condition="Exists('..\..\..\APIs\Accord.3.0.2\build\Accord.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\APIs\Accord.3.0.2\build\Accord.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\APIs\Accord.3.0.2\build\Accord.targets'))" />
-  </Target>
 </Project>

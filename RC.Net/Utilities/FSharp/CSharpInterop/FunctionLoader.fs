@@ -7,7 +7,7 @@ type Transformation<'TData> = 'TData -> 'TData
 module Evaluator =
     open System.IO
     open System.Text
-    open Microsoft.FSharp.Compiler.Interactive.Shell
+    open FSharp.Compiler.Interactive.Shell
 
     // Load a script file with fsi and get the specified functions
     // Assumes the functions are in a module with the same name as the file name, minus extension

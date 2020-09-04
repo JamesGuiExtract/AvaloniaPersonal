@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extract.UtilityApplications.LearningMachineEditor</RootNamespace>
     <AssemblyName>LearningMachineEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -57,35 +57,13 @@
     <ApplicationIcon>Resources\LearningMachineEditor.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Accord, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\Accord.3.0.2\lib\net45\Accord.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Accord.Math, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\Accord.Math.3.0.2\lib\net45\Accord.Math.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Accord.Statistics, Version=3.0.2.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\Accord.Statistics.3.0.2\lib\net45\Accord.Statistics.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Leadtools, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_20\DotNet\Leadtools.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="MurmurHash, Version=1.0.0.0, Culture=neutral, PublicKeyToken=ff7eff5eb27df7b9, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\APIs\murmurhash-signed.1.0.2\lib\net45\MurmurHash.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -199,7 +177,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="App.config" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -245,6 +222,11 @@
   <ItemGroup>
     <None Include="Resources\LearningMachineEditor.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Accord.Statistics">
+      <Version>3.0.2</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")
@@ -252,13 +234,6 @@ CALL "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvars32.bat"
 editbin /largeaddressaware "$(TargetPath)"
 sn -Ra "$(TargetPath)" "$(TargetDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk"</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\..\..\..\APIs\Accord.3.0.2\build\Accord.targets" Condition="Exists('..\..\..\..\APIs\Accord.3.0.2\build\Accord.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\..\APIs\Accord.3.0.2\build\Accord.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\APIs\Accord.3.0.2\build\Accord.targets'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

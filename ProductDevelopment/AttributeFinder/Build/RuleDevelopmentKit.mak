@@ -115,8 +115,8 @@ CopyFilesToInstallFolder: CreateDestinationFolders
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\RunInteractiveNunitTestsFromInstall.bat" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\RunNonInteractiveNunitTestsSeriallyFromInstall.bat" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\html-report.xslt" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@COPY /V /Y  "$(BinariesFolder)\nunit.framework.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
-	@XCOPY "$(RCDotNetDir)\APIs\NUnit.ConsoleRunner.3.11.1\tools\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
+	@COPY /V /Y  "$(BinariesFolder)\Mono.Cecil.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
+	@XCOPY "$(BinariesFolder)\nunit*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.nl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"

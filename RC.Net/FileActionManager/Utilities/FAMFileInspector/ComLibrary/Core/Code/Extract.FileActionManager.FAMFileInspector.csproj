@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extract.FileActionManager.Utilities</RootNamespace>
     <AssemblyName>Extract.FileActionManager.FAMFileInspector</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>

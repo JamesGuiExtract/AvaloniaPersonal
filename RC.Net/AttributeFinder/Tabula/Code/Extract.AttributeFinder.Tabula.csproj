@@ -11,9 +11,10 @@
     <AssemblyName>Extract.AttributeFinder.Tabula</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -259,11 +260,6 @@
     <Compile Include="TabulaTableFinderV1.cs" />
     <Compile Include="TabulaTablesForPage.cs" />
     <Compile Include="TabulaUtils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.ValueTuple">
-      <Version>4.4.0</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

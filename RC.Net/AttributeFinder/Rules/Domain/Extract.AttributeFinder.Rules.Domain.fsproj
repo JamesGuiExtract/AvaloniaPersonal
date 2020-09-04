@@ -12,10 +12,11 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <UseStandardResourceNames>true</UseStandardResourceNames>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <WarningsAsErrors>3239;$(WarningsAsErrors)</WarningsAsErrors>
     <Name>Extract.AttributeFinder.Rules.Domain</Name>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -155,6 +156,9 @@
     <Compile Include="RuleObjectConverter.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\..\..\APIs\FSharp.Core.4.6.2\lib\net45\FSharp.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Interop.UCLID_AFCONDITIONSLib">
       <HintPath>..\..\..\..\Binaries\Debug\Interop.UCLID_AFCONDITIONSLib.dll</HintPath>
     </Reference>
@@ -218,10 +222,6 @@
     <Reference Include="Interop.UCLID_REGEXPRIVLib">
       <HintPath>..\..\..\..\Binaries\Debug\Interop.UCLID_REGEXPRIVLib.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\..\APIs\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\APIs\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -229,10 +229,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.ValueTuple">
-      <HintPath>..\..\..\APIs\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <ProjectReference Include="..\..\..\..\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj">

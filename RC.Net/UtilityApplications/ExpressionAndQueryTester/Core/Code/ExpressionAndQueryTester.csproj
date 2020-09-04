@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extract.UtilityApplications.ExpressionAndQueryTester</RootNamespace>
     <AssemblyName>ExpressionAndQueryTester</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <FileAlignment>512</FileAlignment>
     <SccProjectName>ExpressionAndQueryTester</SccProjectName>

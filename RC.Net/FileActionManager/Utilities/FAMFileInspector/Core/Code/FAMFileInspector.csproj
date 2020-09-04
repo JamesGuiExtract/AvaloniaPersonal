@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extract.FileActionManager.Utilities</RootNamespace>
     <AssemblyName>FAMFileInspector</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -293,11 +293,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Expand.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.ValueTuple">
-      <Version>4.4.0</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -18,7 +18,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <ApplicationIcon>Resources\IDShieldTester.ico</ApplicationIcon>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>

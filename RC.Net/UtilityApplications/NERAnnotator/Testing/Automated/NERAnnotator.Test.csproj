@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Extract.UtilityApplications.NERAnnotation.Test</RootNamespace>
     <AssemblyName>Extract.UtilityApplications.NERAnnotator.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <SignAssembly>true</SignAssembly>
@@ -105,7 +105,6 @@
     </COMReference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
@@ -227,7 +226,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core">
-      <Version>4.5.2</Version>
+      <Version>4.6.2</Version>
     </PackageReference>
     <PackageReference Include="NUnit">
       <Version>3.12.0</Version>
