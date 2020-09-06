@@ -125,6 +125,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         // Used to skip updating this instance if already updating it
         bool _updatingControls;
 
+        // The OutputDocument that had been assigned to this separator at the start of an on-going
+        // operation. If the operation were to require a fresh document to be created, the provisional
+        // document should be used instead (to prevent un-intended data loss).
+        OutputDocument _provisionalDocument;
+
         #endregion Fields
 
         #region Constructors
@@ -134,8 +139,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="showSelectionCheckBox"><see langword="true"/> if the selection check box
         /// should be visible.</param>
-        public PaginationSeparator(bool showSelectionCheckBox)
-            : base()
+        /// <param name="pageLayoutControl">The <see cref="PageLayoutControl"/> this instance will be used in.</param>
+        public PaginationSeparator(PageLayoutControl pageLayoutControl, bool showSelectionCheckBox)
+            : base(pageLayoutControl)
         {
             try
             {
@@ -171,6 +177,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _toolTip.SetToolTip(_reprocessDocumentPictureBox, "This document will be returned to the server");
                 _toolTip.SetToolTip(_editedDataPictureBox, "The data for this document has been modified");
                 _toolTip.SetToolTip(_dataValidityPictureBox, "The data for this document has error(s)");
+
+                // Consider any time UIUpdateLocks are released to indicate the end of an operation.
+                // At this point any previously assigned _provisionalDocument should not be used
+                // in place of a new one.
+                PageLayoutControl.ResumingUIUpdates += HandlePageLayoutControl_ResumingUIUpdates;
             }
             catch (Exception ex)
             {
@@ -197,7 +208,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_uniformSize == null)
                     {
-                        using (var separator = new PaginationSeparator(false))
+                        using (var separator = new PaginationSeparator(null, false))
                         {
                             _uniformSize = new Size(-1, separator.Height);
                         }
@@ -456,6 +467,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                             {
                                 _outputDocument.PaginationSeparator = null;
                             }
+
+                            _provisionalDocument = _outputDocument;
                         }
 
                         _outputDocument = document;
@@ -498,6 +511,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
             }
         }
+
+        /// <summary>
+        /// The <see cref="OutputDocument"/> that had been assigned to this separator at the start of an
+        /// on-going operation. If the operation were to require a fresh document to be created, the
+        /// provisional document should be used instead (to prevent un-intended data loss)
+        /// </summary>
+        public OutputDocument ProvisionalDocument => _provisionalDocument;
 
         /// <summary>
         /// Gets or sets whether the view of the associated <see cref="OutputDocument"/> should be hidden.
@@ -886,6 +906,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             if (disposing)
             {
+                if (PageLayoutControl != null)
+                {
+                    PageLayoutControl.ResumingUIUpdates -= HandlePageLayoutControl_ResumingUIUpdates;
+                    PageLayoutControl = null;
+                }
+
                 if (components != null)
                 {
                     components.Dispose();
@@ -1185,6 +1211,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 throw ex.AsExtract("ELI50177");
             }
+        }
+
+        void HandlePageLayoutControl_ResumingUIUpdates(object sender, EventArgs e)
+        {
+            // Consider any time UIUpdateLocks are released to indicate the end of an operation.
+            // At this point any previously assigned _provisionalDocument should not be used
+            // in place of a new one.
+            _provisionalDocument = null;
         }
 
         #endregion Event Handlers

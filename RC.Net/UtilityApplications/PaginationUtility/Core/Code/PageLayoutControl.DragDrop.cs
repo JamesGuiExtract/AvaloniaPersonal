@@ -160,31 +160,46 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (paginationControl != null)
             {
-                if (_dragLocation != dragLocation)
+                if (paginationControl.Document?.OutputProcessed == true)
                 {
-                    _lastDragMove = DateTime.Now;
+                    paginationControl = null;
                 }
-                _dragLocation = dragLocation;
-            }
+                // https://extract.atlassian.net/browse/ISSUE-17192
+                // Do not allow a drop in a case where the user would be dropping into a document
+                // the exact same pages that already exist in that document. This prevents both
+                // dropping into the document separator as well as dropping amongst the pages.
+                else if (paginationControl
+                        ?.Document
+                        ?.PageControls
+                        ?.SequenceEqual(SelectedPageControls) == true)
+                {
+                    paginationControl = null;
+                }
 
-            if (paginationControl is PageThumbnailControl pageThumbnailControl
-                && pageThumbnailControl.Visible
-                && pageThumbnailControl.Document.OutputProcessed != true)
-            {
-                InitializePageThumbnailDragTarget(dragLocation, pageThumbnailControl);
-                return true;
+                if (paginationControl != null)
+                {
+                    if (_dragLocation != dragLocation)
+                    {
+                        _lastDragMove = DateTime.Now;
+                    }
+                    _dragLocation = dragLocation;
+
+                    if (paginationControl is PageThumbnailControl pageThumbnailControl
+                        && pageThumbnailControl.Visible)
+                    {
+                        InitializePageThumbnailDragTarget(dragLocation, pageThumbnailControl);
+                        return true;
+                    }
+                    else if (paginationControl is PaginationSeparator separator)
+                    {
+                        InitializeDocumentSeparatorDragTarget(separator);
+                        return true;
+                    }
+                }
             }
-            else if (paginationControl is PaginationSeparator separator
-                && !SelectedControls.Any(control => control.Document == separator.Document))
-            {
-                InitializeDocumentSeparatorDragTarget(separator);
-                return true;
-            }
-            else
-            {
-                Controls.Remove(_dropLocationIndicator);
-                return false;
-            }
+            
+            Controls.Remove(_dropLocationIndicator);
+            return false;
         }
 
         void InitializePageThumbnailDragTarget(Point dragLocation, PageThumbnailControl pageThumbnailControl)
@@ -334,9 +349,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 // Do not allow modification of documents that have already been output.
-                if (SelectedControls
-                        .OfType<PageThumbnailControl>()
-                        .Any(pageControl => pageControl.Document.OutputProcessed))
+                if (SelectedPageControls
+                    .Any(pageControl => pageControl.Document.OutputProcessed))
                 {
                     return;
                 }
@@ -554,7 +568,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (_dropLocationIndex >= 0)
+                if (_dropLocationIndex >= 0 && SelectedPageControls.Any())
                 {
                     var sourceLayoutControl =
                         e.Data.GetData(_DRAG_DROP_DATA_FORMAT) as PageLayoutControl;
@@ -570,19 +584,24 @@ namespace Extract.UtilityApplications.PaginationUtility
                             }
 
                             // Reset selection so that the first dropped page (rather than the separator)
-                            // is now the primary selection
+                            // is now the primary selection. Do not explicitly select pagination separators
+                            // which can be re-assigned to other docs based on the new location of pages;
+                            // allow separator selection to be derived from page selection.
                             ProcessControlSelection(
-                                activeControl: SelectedControls.First(),
-                                additionalControls: SelectedControls.ToArray(),
+                                activeControl: SelectedPageControls.First(),
+                                additionalControls: SelectedPageControls.ToArray(),
                                 select: true,
                                 modifierKeys: Keys.None);
                         }
 
                         // Whenever pages are dropped, ensure after the drop, the first dropped page is in view.
-                        _flowLayoutPanel.RequestScrollToControl(
-                            control: SelectedControls.First(),
-                            topAlignmentOffset: null,
-                            activateScrollToControlForEvent: true);
+                        if (SelectedPageControls.FirstOrDefault() is PageThumbnailControl firstPageControl)
+                        {
+                            _flowLayoutPanel.RequestScrollToControl(
+                                control: firstPageControl,
+                                topAlignmentOffset: null,
+                                activateScrollToControlForEvent: true);
+                        }
                     }
                 }
             }

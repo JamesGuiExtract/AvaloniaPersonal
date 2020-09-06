@@ -270,7 +270,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             if (topAlignmentOffset == null)
             {
                 var separator = targetControl as PaginationSeparator;
-                if (separator?.Collapsed == false
+                if (separator?.Collapsed == false && separator.Document != null
                     && separator.Document.PageControls.First().Bottom > ClientRectangle.Bottom)
                 {
                     targetControl = separator.Document.PageControls.First();

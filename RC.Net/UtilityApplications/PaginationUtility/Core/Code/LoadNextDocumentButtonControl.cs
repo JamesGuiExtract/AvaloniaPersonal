@@ -26,8 +26,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="LoadNextDocumentButtonControl"/> class.
         /// </summary>
-        public LoadNextDocumentButtonControl()
-            : base()
+        /// <param name="pageLayoutControl">The <see cref="PageLayoutControl"/> this instance will be used in.</param>
+        public LoadNextDocumentButtonControl(PageLayoutControl pageLayoutControl)
+            : base(pageLayoutControl)
         {
             try
             {
@@ -97,7 +98,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_normalPadding == null)
                     {
-                        using (var control = new LoadNextDocumentButtonControl())
+                        using (var control = new LoadNextDocumentButtonControl(PageLayoutControl))
                         {
                             _normalPadding = control.Padding;
                         }

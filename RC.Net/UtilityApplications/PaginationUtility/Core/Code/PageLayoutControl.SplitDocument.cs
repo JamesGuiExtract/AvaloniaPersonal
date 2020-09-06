@@ -193,7 +193,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Index should be calculated only after removing the split indicator
                 int index = _flowLayoutPanel.Controls.IndexOf(splitTarget);
                 InitializePaginationControl(
-                    new PaginationSeparator(CommitOnlySelection), ref index);
+                    new PaginationSeparator(this, CommitOnlySelection), ref index);
             }
         }
 

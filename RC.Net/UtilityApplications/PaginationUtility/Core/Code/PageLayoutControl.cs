@@ -61,8 +61,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Button that appears as the last <see cref="PaginationControl"/> and that causes the next
         /// document to be loaded when pressed.
         /// </summary>
-        LoadNextDocumentButtonControl _loadNextDocumentButtonControl =
-            new LoadNextDocumentButtonControl();
+        LoadNextDocumentButtonControl _loadNextDocumentButtonControl;
 
         /// <summary>
         /// The <see cref="PaginationControl"/> that is currently the primarily selected
@@ -298,6 +297,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _toolTip.ReshowDelay = 500;
 
                 _paginationUtility = paginationUtility;
+                _loadNextDocumentButtonControl = new LoadNextDocumentButtonControl(this);
                 _flowLayoutPanel.Click += HandleFlowLayoutPanel_Click;
                 _flowLayoutPanel.ClientSizeChanged += HandleFlowLayoutPanel_ClientSizeChanged;
                 ((PaginationLayoutEngine)_flowLayoutPanel.LayoutEngine).LayoutCompleted +=
@@ -968,7 +968,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (lastPageControl == null)
                     {
                         InsertPaginationControl(
-                            new PaginationSeparator(CommitOnlySelection), index: 0);
+                            new PaginationSeparator(this, CommitOnlySelection), index: 0);
                         pageIndex = 1;
                     }
                     // Otherwise, place the separator immediately after the previous document.
@@ -976,7 +976,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         pageIndex = _flowLayoutPanel.Controls.GetChildIndex(lastPageControl) + 1;
                         InsertPaginationControl(
-                            new PaginationSeparator(CommitOnlySelection), index: pageIndex);
+                            new PaginationSeparator(this, CommitOnlySelection), index: pageIndex);
                         pageIndex++;
                     }
                 }
@@ -1027,7 +1027,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         }
                     }
 
-                    var pageControl = new PageThumbnailControl(outputDocument, page);
+                    var pageControl = new PageThumbnailControl(this, outputDocument, page);
 
                     if (deletedPages != null && deletedPages.Contains(page.OriginalPageNumber))
                     {
@@ -1123,13 +1123,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                     if (lastPageControl != null)
                     {
                         InsertPaginationControl(
-                            new PaginationSeparator(CommitOnlySelection), index: -1);
+                            new PaginationSeparator(this, CommitOnlySelection), index: -1);
                     }
 
                     // Create a page control for every page in sourceDocument.
                     foreach (var page in pages)
                     {
-                        var pageControl = new PageThumbnailControl(outputDocument, page);
+                        var pageControl = new PageThumbnailControl(this, outputDocument, page);
                         if (deletedPages != null && deletedPages.Contains(page))
                         {
                             pageControl.Deleted = true;
@@ -1407,6 +1407,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     OutputDocument document = (previousPageControl == null)
                         ? (nextPageControl == null) ? null : nextPageControl.Document
                         : previousPageControl.Document;
+
                     if (document != null)
                     {
                         newPageControl.Document = document;
@@ -1433,12 +1434,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     else
                     {
-                        // There is no page control on either side of this document, a new document
+                        // https://extract.atlassian.net/browse/ISSUE-17192
+                        // In the case that the previous control is a pagination control that has only just
+                        // lost its document assignment as part of the ongoing operation, the previously
+                        // assigned document can be used. (e.g.: dragging in pages that included all pages
+                        // from this separator)
+                        document = (newControl.PreviousControl as PaginationSeparator)?.ProvisionalDocument
+                        // Else there is no page control on either side of this document, a new document
                         // should be created with this as the one and only page.
-                        document = GetOutputDocumentFromUtility(
-                            newPageControl.Page.OriginalDocumentName);
-                        newPageControl.Document = document;
+                            ?? GetOutputDocumentFromUtility(newPageControl.Page.OriginalDocumentName);
 
+                        newPageControl.Document = document;
                         document.AddPage(newPageControl);
                     }
 
@@ -2775,7 +2781,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var lastControl = _flowLayoutPanel.Controls.OfType<PaginationControl>().LastOrDefault();
                 if (lastControl != null && !(lastControl is PaginationSeparator))
                 {
-                    AddPaginationControl(new PaginationSeparator(CommitOnlySelection));
+                    AddPaginationControl(new PaginationSeparator(this, CommitOnlySelection));
                 }
             }
 
@@ -2790,7 +2796,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // Precede the first page with a separator to serve as a header for the document.
             if (isPageControl && !areAnyPaginationControls)
             {
-                AddPaginationControl(new PaginationSeparator(CommitOnlySelection));
+                AddPaginationControl(new PaginationSeparator(this, CommitOnlySelection));
             }
 
             // A pagination separator is meaningless as the first control.
@@ -3926,7 +3932,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // A null page represents a document boundary; insert a separator.
                 if (page.Key == null)
                 {
-                    var separator = new PaginationSeparator(CommitOnlySelection);
+                    var separator = new PaginationSeparator(this, CommitOnlySelection);
                     insertedPaginationControls.Add(separator);
 
                     if (InitializePaginationControl(separator, ref index))
@@ -3937,7 +3943,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Insert a new page control that uses the specified page.
                 else
                 {
-                    var newPageControl = new PageThumbnailControl(null, page.Key);
+                    var newPageControl = new PageThumbnailControl(this, null, page.Key);
                     newPageControl.Deleted = page.Value;
                     insertedPaginationControls.Add(newPageControl);
 
@@ -5002,7 +5008,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             int index = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
                             InitializePaginationControl(
-                                new PaginationSeparator(CommitOnlySelection), ref index);
+                                new PaginationSeparator(this, CommitOnlySelection), ref index);
                         }
                     }
                 }

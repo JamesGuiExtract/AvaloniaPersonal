@@ -33,12 +33,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="PaginationControl"/> class.
         /// </summary>
-        public PaginationControl()
+        /// <param name="pageLayoutControl">The <see cref="PageLayoutControl"/> this instance will be used in.</param>
+        public PaginationControl(PageLayoutControl pageLayoutControl)
             : base()
         {
             try
             {
                 InitializeComponent();
+
+                PageLayoutControl = pageLayoutControl;
             }
             catch (Exception ex)
             {
@@ -53,24 +56,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Gets the <see cref="PageLayoutControl"/> this instance is currently loaded into.
         /// </summary>
-        public PageLayoutControl PageLayoutControl
-        {
-            get
-            {
-                try
-                {
-                    var pageLayoutControl = this.GetAncestors()
-                        .OfType<PageLayoutControl>()
-                        .FirstOrDefault();
-
-                    return pageLayoutControl;
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI39658");
-                }
-            }
-        }
+        /// <param name="pageLayoutControl">The <see cref="PageLayoutControl"/> this instance will be used in.</param>
+        public PageLayoutControl PageLayoutControl { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="PaginationControl"/> is

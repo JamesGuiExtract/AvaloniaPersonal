@@ -15,8 +15,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Initializes a new instance of the <see cref="NavigablePaginationControl"/> class.
         /// </summary>
-        public NavigablePaginationControl()
-            : base()
+        /// <param name="pageLayoutControl">The <see cref="PageLayoutControl"/> this instance will be used in.</param>
+        public NavigablePaginationControl(PageLayoutControl pageLayoutControl)
+            : base(pageLayoutControl)
         {
             try
             {

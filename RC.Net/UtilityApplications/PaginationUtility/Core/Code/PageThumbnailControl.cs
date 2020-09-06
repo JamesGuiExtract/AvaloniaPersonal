@@ -73,8 +73,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Prevents a default instance of the <see cref="PageThumbnailControl"/> class from being
         /// created from an outside caller.
         /// </summary>
-        PageThumbnailControl()
-            : base()
+        /// <param name="pageLayoutControl">The <see cref="PageLayoutControl"/> this instance will be used in.</param>
+        PageThumbnailControl(PageLayoutControl pageLayoutControl)
+            : base(pageLayoutControl)
         {
             try
             {
@@ -97,8 +98,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="document">The <see cref="OutputDocument"/> to which this instance should be
         /// added.</param>
         /// <param name="page">The <see cref="Page"/> represented by this instance.</param>
-        public PageThumbnailControl(OutputDocument document, Page page)
-            : this()
+        /// <param name="pageLayoutControl">The <see cref="PageLayoutControl"/> this instance will be used in.</param>
+        public PageThumbnailControl(PageLayoutControl pageLayoutControl, OutputDocument document, Page page)
+            : this(pageLayoutControl)
         {
             try
             {
@@ -141,7 +143,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_uniformSize == null)
                     {
-                        using (var pageControl = new PageThumbnailControl())
+                        using (var pageControl = new PageThumbnailControl(null))
                         {
                             _uniformSize = pageControl.Size;
                         }
@@ -321,7 +323,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_normalPadding == null)
                     {
-                        using (var pageControl = new PageThumbnailControl())
+                        using (var pageControl = new PageThumbnailControl(PageLayoutControl))
                         {
                             _normalPadding = pageControl.Padding;
                         }
