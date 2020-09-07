@@ -1288,6 +1288,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESConvertToPDF.Test", "..\.
 		{85C608A6-E2D6-439C-A3A8-ED75140E771C} = {85C608A6-E2D6-439C-A3A8-ED75140E771C}
 	EndProjectSection
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FAMServiceManager.Lib", "..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMServiceManager\FAMServiceManager.Lib\FAMServiceManager.Lib.fsproj", "{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FAMServiceManager", "..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMServiceManager\FAMServiceManager\FAMServiceManager.csproj", "{B476FE8A-8765-4E61-9B14-C64FB748EF17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -6457,6 +6461,66 @@ Global
 		{503DBA94-B0F0-4E2C-ABEA-F571D23D5EC8}.Template|x64.Build.0 = Release|Any CPU
 		{503DBA94-B0F0-4E2C-ABEA-F571D23D5EC8}.Template|x86.ActiveCfg = Release|Any CPU
 		{503DBA94-B0F0-4E2C-ABEA-F571D23D5EC8}.Template|x86.Build.0 = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Debug|Win32.Build.0 = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Debug|x64.Build.0 = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Debug|x86.Build.0 = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Release|Win32.ActiveCfg = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Release|Win32.Build.0 = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Release|x64.ActiveCfg = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Release|x64.Build.0 = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Release|x86.ActiveCfg = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Release|x86.Build.0 = Release|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Template|Win32.Build.0 = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Template|x64.ActiveCfg = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Template|x64.Build.0 = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Template|x86.ActiveCfg = Debug|Any CPU
+		{39AD485E-0470-45B7-BE7E-B3AB4F4E5E1B}.Template|x86.Build.0 = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Debug|Win32.Build.0 = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Debug|x64.Build.0 = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Debug|x86.Build.0 = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Release|Win32.ActiveCfg = Release|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Release|Win32.Build.0 = Release|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Release|x64.ActiveCfg = Release|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Release|x64.Build.0 = Release|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Release|x86.ActiveCfg = Release|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Release|x86.Build.0 = Release|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Template|Win32.Build.0 = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Template|x64.ActiveCfg = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Template|x64.Build.0 = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Template|x86.ActiveCfg = Debug|Any CPU
+		{B476FE8A-8765-4E61-9B14-C64FB748EF17}.Template|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
