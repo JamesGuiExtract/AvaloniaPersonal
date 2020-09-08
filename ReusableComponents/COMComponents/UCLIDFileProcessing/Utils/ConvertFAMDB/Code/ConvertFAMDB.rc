@@ -76,7 +76,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
     LTEXT           "ConvertFAMDB Version 1.0",IDC_STATIC,40,10,119,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2019",IDC_STATIC,40,25,119,8
+    LTEXT           "Copyright (C) 2020",IDC_STATIC,40,25,119,8
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
 END
 
@@ -132,7 +132,7 @@ BEGIN
             VALUE "FileDescription", "ConvertFAMDB.exe"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "ConvertFAMDB.exe"
-            VALUE "LegalCopyright", "(c) 2019 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2020 Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename", "ConvertFAMDB.exe"
             VALUE "ProductName", "ConvertFAMDB.exe"
             VALUE "ProductVersion", "1.0.0.1"

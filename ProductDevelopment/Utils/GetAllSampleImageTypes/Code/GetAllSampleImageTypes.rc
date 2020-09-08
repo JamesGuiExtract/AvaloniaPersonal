@@ -80,7 +80,7 @@ BEGIN
             VALUE "FileDescription", "Extract Systems GetAllSampleImageTypes"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "GetAllSampleImageTypes.exe"
-            VALUE "LegalCopyright", "(c) 2019 Extract Systems.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2020 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "GetAllSampleImageTypes.exe"
             VALUE "ProductName", "Extract Systems GetAllSampleImageTypes"
             VALUE "ProductVersion", "1.0.0.1"

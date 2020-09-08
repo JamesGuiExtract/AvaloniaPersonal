@@ -109,7 +109,7 @@ BEGIN
             VALUE "FileDescription", "GetNextELICode MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "GetNextELICode"
-            VALUE "LegalCopyright", "Copyright (C) 2019"
+            VALUE "LegalCopyright", "Copyright (C) 2020"
             VALUE "OriginalFilename", "GetNextELICode.EXE"
             VALUE "ProductName", "GetNextELICode Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

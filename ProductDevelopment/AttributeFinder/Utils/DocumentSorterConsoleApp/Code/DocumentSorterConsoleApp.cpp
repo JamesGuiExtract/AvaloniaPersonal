@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 	try
 	{
 		cout << "Document Sorter Utility" << endl;
-		cout << "Copyright 2019, Extract Systems, LLC." << endl;
+		cout << "Copyright 2020, Extract Systems, LLC." << endl;
 		cout << "All rights reserved." << endl;
 		cout << endl;
 		

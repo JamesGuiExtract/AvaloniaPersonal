@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "SSOCR2 Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "SSOCR2"
-            VALUE "LegalCopyright", "Copyright 2019 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright 2020 Extract Systems, LLC"
             VALUE "OriginalFilename", "SSOCR2.EXE"
             VALUE "ProductName", "SSOCR2 Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "AFOutputHandlers Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFOutputHandlers"
-            VALUE "LegalCopyright", "Copyright 2019"
+            VALUE "LegalCopyright", "Copyright 2020"
             VALUE "OriginalFilename", "AFOutputHandlers.DLL"
             VALUE "ProductName", "AFOutputHandlers Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

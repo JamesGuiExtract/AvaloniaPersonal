@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("NetDMSCustomComponents")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2019")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

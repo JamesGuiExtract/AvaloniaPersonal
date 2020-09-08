@@ -81,7 +81,7 @@ BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
     LTEXT           "DecompositionViewer Version 1.0",IDC_STATIC,40,10,119,8,
                     SS_NOPREFIX
-    LTEXT           "Copyright (C) 2019",IDC_STATIC,40,25,119,8
+    LTEXT           "Copyright (C) 2020",IDC_STATIC,40,25,119,8
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
 END
 
@@ -160,7 +160,7 @@ BEGIN
             VALUE "FileDescription", "DecompositionViewer MFC Application\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "DecompositionViewer\0"
-            VALUE "LegalCopyright", "Copyright (C) 2019\0"
+            VALUE "LegalCopyright", "Copyright (C) 2020\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "DecompositionViewer.EXE\0"
             VALUE "ProductName", "DecompositionViewer Application\0"

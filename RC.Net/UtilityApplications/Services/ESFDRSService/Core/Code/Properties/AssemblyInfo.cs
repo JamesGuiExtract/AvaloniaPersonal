@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract System")]
 [assembly: AssemblyProduct("ESFDRSService")]
-[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2019")]
+[assembly: AssemblyCopyright("Copyright © Extract System, LLC 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

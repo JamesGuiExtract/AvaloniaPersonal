@@ -70,7 +70,7 @@ BEGIN
             VALUE "FileDescription", "Document Sorter"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "Document.exe"
-            VALUE "LegalCopyright", "Copyright (C) 2019 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright (C) 2020 Extract Systems, LLC"
             VALUE "OriginalFilename", "Document.exe"
             VALUE "ProductName", "Document Sorter"
             VALUE "ProductVersion", "1.0.0.1"

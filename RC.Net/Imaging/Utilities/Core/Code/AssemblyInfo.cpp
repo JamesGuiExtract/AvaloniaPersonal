@@ -16,7 +16,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("Extract Systems")];
 [assembly:AssemblyProductAttribute("ExtractImagingUtilities")];
-[assembly:AssemblyCopyrightAttribute("Copyright (c) Extract Systems 2019")];
+[assembly:AssemblyCopyrightAttribute("Copyright (c) Extract Systems 2020")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
 

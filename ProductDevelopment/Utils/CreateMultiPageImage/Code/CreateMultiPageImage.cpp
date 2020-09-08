@@ -583,7 +583,7 @@ int main(int argc, char *argv[])
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		// print banner
 		cout << "CreateMultiPageImage Utility" << endl;
-		cout << "Copyright 2019, Extract Systems, LLC." << endl;
+		cout << "Copyright 2020, Extract Systems, LLC." << endl;
 		cout << "All rights reserved." << endl;
 		cout << endl;
 

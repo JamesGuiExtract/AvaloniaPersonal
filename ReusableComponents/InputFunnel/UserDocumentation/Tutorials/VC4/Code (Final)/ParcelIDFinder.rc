@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileDescription", "ParcelIDFinder Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "ParcelIDFinder\0"
-            VALUE "LegalCopyright", "Copyright 2019\0"
+            VALUE "LegalCopyright", "Copyright 2020\0"
             VALUE "OriginalFilename", "ParcelIDFinder.DLL\0"
             VALUE "ProductName", "ParcelIDFinder Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

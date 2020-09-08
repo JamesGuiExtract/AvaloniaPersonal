@@ -75,7 +75,7 @@ BEGIN
             VALUE "FileDescription", "UCLIDGenericDisplay ActiveX Control Module\0"
             VALUE "FileVersion", "2, 0, 0, 1\0"
             VALUE "InternalName", "UCLIDGenericDisplay\0"
-            VALUE "LegalCopyright", "Copyright (C) 2019\0"
+            VALUE "LegalCopyright", "Copyright (C) 2020\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OLESelfRegister", "\0"
             VALUE "OriginalFilename", "UCLIDGenericDisplay.OCX\0"
@@ -124,7 +124,7 @@ BEGIN
     ICON            IDI_ABOUTDLL,IDC_STATIC,10,10,20,20
     LTEXT           "GenericDisplay Control, Version 1.0.0.3",IDC_STATIC,40,
                     10,170,8
-    LTEXT           "Copyright (C) 2019, UCLID Software, LLC",IDC_STATIC,40,
+    LTEXT           "Copyright (C) 2020, UCLID Software, LLC",IDC_STATIC,40,
                     25,170,8
     DEFPUSHBUTTON   "OK",IDOK,221,7,32,14,WS_GROUP
 END

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.AttributeFinder.Tabula")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2019")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

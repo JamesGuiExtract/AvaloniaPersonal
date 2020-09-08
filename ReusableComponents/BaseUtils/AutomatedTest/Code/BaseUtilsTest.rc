@@ -73,7 +73,7 @@ BEGIN
             VALUE "FileDescription", "BaseUtilsTest.dll"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "BaseUtilsTest.dll"
-            VALUE "LegalCopyright", "(c) 2019 Extract Systems, LLC. All rights reserved."
+            VALUE "LegalCopyright", "(c) 2020 Extract Systems, LLC. All rights reserved."
             VALUE "OriginalFilename", "BaseUtilsTest.dll"
             VALUE "ProductName", "BaseUtilsTest.dll"
             VALUE "ProductVersion", "1.0.0.1"

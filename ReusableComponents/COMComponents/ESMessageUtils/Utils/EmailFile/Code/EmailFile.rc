@@ -82,7 +82,7 @@ BEGIN
             VALUE "FileDescription", "EmailFile.exe"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "EmailFile.exe"
-            VALUE "LegalCopyright", "(c) 2019 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2020 Extract Systems, LLC.  All rights reserved."
             VALUE "OriginalFilename", "EmailFile.exe"
             VALUE "ProductName", "EmailFile"
             VALUE "ProductVersion", "1.0.0.1"

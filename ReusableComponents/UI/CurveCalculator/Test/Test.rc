@@ -118,7 +118,7 @@ BEGIN
             VALUE "FileDescription", "Test MFC Application\0"
             VALUE "FileVersion", "2, 1, 0, 9\0"
             VALUE "InternalName", "Test\0"
-            VALUE "LegalCopyright", "Copyright (C) 2019\0"
+            VALUE "LegalCopyright", "Copyright (C) 2020\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "Test.EXE\0"
             VALUE "ProductName", "Test Application\0"
