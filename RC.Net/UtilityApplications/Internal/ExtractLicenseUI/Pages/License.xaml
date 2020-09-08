@@ -119,21 +119,6 @@
                                     <Label Content="Restrict by DiskSerial Number" Target="{Binding ElementName=UseDiskSerialNumber}" Width="180px"></Label>
                                     <CheckBox x:Name="UseDiskSerialNumber" Width="150" IsChecked="{Binding SelectedOrganization.SelectedLicense.RestrictByDiskSerialNumber}" Click="UpdateRequestKey"></CheckBox>
                                 </StackPanel>
-                                <StackPanel>
-                                    <Button x:Name="CloneButton" Content="Clone License" Click="CloneButton_Click"></Button>
-                                </StackPanel>
-                                <StackPanel>
-                                    <Button x:Name="SaveLicenseToFile" Content="Save license to file" Click="SaveLicenseToFile_Click"></Button>
-                                </StackPanel>
-                                <StackPanel>
-                                    <Button x:Name="CopyLicenseToClipboard" Content="Copy license to clipboard" Click="CopyLicenseToClipboard_Click"></Button>
-                                </StackPanel>
-                                <StackPanel>
-                                    <Button x:Name="SaveUnlockCodeToFile" Content="Save unlock code to file" Click="SaveUnlockCodeToFile_Click"></Button>
-                                </StackPanel>
-                                <StackPanel>
-                                    <Button x:Name="CopyUnlockCodeToClipboard" Content="Copy unlock code to clipboard" Click="CopyUnlockCodeToClipboard_Click"></Button>
-                                </StackPanel>
                             </StackPanel>
                             
                             <StackPanel Orientation="Horizontal" Height="420px">
@@ -193,7 +178,21 @@
                         <StackPanel>
                             <Button x:Name="SaveButton" Content="Save" Click="SaveButton_Click"></Button>
                         </StackPanel>
-
+                        <StackPanel>
+                            <Button x:Name="CloneButton" Content="Clone License" Click="CloneButton_Click"></Button>
+                        </StackPanel>
+                        <StackPanel>
+                            <Button x:Name="SaveLicenseToFile" Content="Save license to file" Click="SaveLicenseToFile_Click"></Button>
+                        </StackPanel>
+                        <StackPanel>
+                            <Button x:Name="CopyLicenseToClipboard" Content="Copy license to clipboard" Click="CopyLicenseToClipboard_Click"></Button>
+                        </StackPanel>
+                        <StackPanel>
+                            <Button x:Name="SaveUnlockCodeToFile" Content="Save unlock code to file" Click="SaveUnlockCodeToFile_Click"></Button>
+                        </StackPanel>
+                        <StackPanel>
+                            <Button x:Name="CopyUnlockCodeToClipboard" Content="Copy unlock code to clipboard" Click="CopyUnlockCodeToClipboard_Click"></Button>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </StackPanel>
