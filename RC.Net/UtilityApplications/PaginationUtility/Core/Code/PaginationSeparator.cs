@@ -717,25 +717,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (Parent != null)
-                {
-                    var parentPanel = (ScrollableControl)Parent;
-
-                    // Set margin when scroll bar is not visible such that when it does become visible,
-                    // it doesn't force a shift of separator icons/controls to the left.
-                    int scrollMargin = parentPanel.VerticalScroll.Visible
-                        ? 0
-                        : SystemInformation.VerticalScrollBarWidth;
-
-                    var marginColumnStyle = _tableLayoutPanel.ColumnStyles.OfType<ColumnStyle>().Last();
-                    if (marginColumnStyle.Width != scrollMargin)
-                    {
-                        _tableLayoutPanel.SuspendLayout();
-                        marginColumnStyle.Width = scrollMargin;
-
-                        _tableLayoutPanel.ResumeLayout();
-                    }
-                }
+                CheckShouldScrollMarginChange(updateMargin: true);
 
                 if (_tableLayoutPanel != null)
                 {
@@ -1215,10 +1197,25 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         void HandlePageLayoutControl_ResumingUIUpdates(object sender, EventArgs e)
         {
-            // Consider any time UIUpdateLocks are released to indicate the end of an operation.
-            // At this point any previously assigned _provisionalDocument should not be used
-            // in place of a new one.
-            _provisionalDocument = null;
+            try
+            {
+                // Consider any time UIUpdateLocks are released to indicate the end of an operation.
+                // At this point any previously assigned _provisionalDocument should not be used
+                // in place of a new one.
+                _provisionalDocument = null;
+
+                // https://extract.atlassian.net/browse/ISSUE-17149
+                // If the PageLayoutControl scroll bar has changed visiblity since the last layout,
+                // force a layout to account for the change.
+                if (Visible && CheckShouldScrollMarginChange(updateMargin: false))
+                {
+                    PerformLayout();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50357");
+            }
         }
 
         #endregion Event Handlers
@@ -1392,6 +1389,39 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _pagesLabel.Font = new Font(_pagesLabel.Font,
                     allPagesHaveBeenDisplayed ? FontStyle.Regular : FontStyle.Bold);
             }
+        }
+
+        /// <summary>
+        /// Indicates if the margin to account for the scroll bar needs to be updated and,
+        /// if <see paramref="updateMargin"/> is <c>true</c>, updates it.
+        /// </summary>
+        bool CheckShouldScrollMarginChange(bool updateMargin)
+        {
+            if (Parent is ScrollableControl parentPanel)
+            {
+                // Set margin when scroll bar is not visible such that when it does become visible,
+                // it doesn't force a shift of separator icons/controls to the left.
+                int scrollMargin = parentPanel.VerticalScroll.Visible
+                    ? 0
+                    : SystemInformation.VerticalScrollBarWidth;
+
+                var marginColumnStyle = _tableLayoutPanel.ColumnStyles.OfType<ColumnStyle>().Last();
+
+                if (marginColumnStyle.Width != scrollMargin)
+                {
+                    if (updateMargin)
+                    {
+                        _tableLayoutPanel.SuspendLayout();
+                        marginColumnStyle.Width = scrollMargin;
+
+                        _tableLayoutPanel.ResumeLayout();
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
