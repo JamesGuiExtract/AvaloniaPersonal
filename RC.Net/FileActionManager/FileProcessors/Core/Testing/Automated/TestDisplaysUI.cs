@@ -68,7 +68,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
             { "Core: OCR document", "FileProcessors.OCRFileProcessor.1" },
             { "Core: Conditionally execute task(s)", "FileProcessors.ConditionalTask.1" },
             { "Pagination: Auto-Paginate", "Extract.FileActionManager.AutoPaginateTask" },
-            { "Core: Transform Xml", "Extract.FileActionManager.FileProcessors.TransformXmlTask" },
+            { "Core: Transform XML", "Extract.FileActionManager.FileProcessors.TransformXmlTask" },
         };
 
         /// <summary>
