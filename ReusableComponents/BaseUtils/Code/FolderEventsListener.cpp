@@ -291,7 +291,14 @@ UINT FolderEventsListener::threadFuncListen(LPVOID pParam)
 								UCLIDException ue ("ELI13017", "Error getting file changes.");
 								ue.addWin32ErrorInfo();
 								ue.addDebugInfo("Folder", fl->m_strFolderToListenTo);
+								ue.addDebugInfo("Bytes in buffer", dwBytesTransfered);
 								throw ue;
+							}
+							if (dwBytesTransfered == 0)
+							{
+								UCLIDException oue("ELI50366", "Buffer overflow getting directory changes.");
+								oue.addDebugInfo("Folder", fl->m_strFolderToListenTo);
+								throw oue;
 							}
 
 							// reset the event
