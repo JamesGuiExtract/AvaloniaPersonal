@@ -1534,6 +1534,30 @@ namespace Extract.FileActionManager.Utilities
         }
 
         /// <summary>
+        /// Previews a keyboard message in order to close dialog via Escape key.
+        /// </summary>
+        /// <returns><c>true</c> if the message was processed; otherwise, <c>false</c>.</returns>
+        protected override bool ProcessKeyPreview(ref Message m)
+        {
+            try
+            {
+                // Allow Escape key to close dialog even if a DataGridView has focus.
+                // https://extract.atlassian.net/browse/ISSUE-17151
+                if (m.WParam == (IntPtr)Keys.Escape)
+                {
+                    Close();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50360");
+            }
+
+            return base.ProcessKeyPreview(ref m);
+        }
+
+        /// <summary>
         /// Processes a command key.
         /// </summary>
         /// <param name="msg">The window message to process.</param>
@@ -1551,6 +1575,21 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 _processingCmdKey = true;
+
+                // Allow Enter key to apply the currently selected record dialog when the
+                // FileSelectionPane (DataGridView) has focus.
+                // https://extract.atlassian.net/browse/ISSUE-17151
+                if (keyData == Keys.Enter
+                    && FileSelectorPane?.Control?.ContainsFocus == true)
+                {
+                    if (PromptToApplyCustomChanges(false))
+                    {
+                        DialogResult = DialogResult.OK;
+                        Close();
+                    }
+
+                    return true;
+                }
 
                 if (keyData == Keys.Tab || keyData == (Keys.Shift | Keys.Tab))
                 {
@@ -3536,6 +3575,9 @@ namespace Extract.FileActionManager.Utilities
             if (openTopDockableWindow)
             {
                 _customSearchTopDockableWindow.Open();
+                // If the FileSelectorPane is available, focus it so the keyboard can be used to
+                // select different records without having to first click into the pane.
+                FileSelectorPane.Control.Focus();
             }
             else
             {

@@ -2325,6 +2325,28 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Makes the specified cell the singly selected cell.
+        /// </summary>
+        public void SelectCell(DataGridViewCell cell)
+        {
+            try
+            {
+                ExtractException.Assert("ELI50364",
+                    "Cannot activate cell not present in table",
+                    cell?.DataGridView == this);
+
+                ClearSelection();
+                CurrentCell = cell;
+                CurrentCell.Selected = true;
+                ProcessSelectionChange();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50363");
+            }
+        }
+
+        /// <summary>
         /// Applies the selection state represented by <see paramref="selectionState"/> to the
         /// control.
         /// </summary>

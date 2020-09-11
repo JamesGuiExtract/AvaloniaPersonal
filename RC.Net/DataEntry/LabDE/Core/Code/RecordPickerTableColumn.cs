@@ -1,5 +1,6 @@
 ﻿using Extract.Drawing;
 using Extract.FileActionManager.Utilities;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -481,6 +482,7 @@ namespace Extract.DataEntry.LabDE
                     DataGridView.HandleDestroyed += HandleDataGridView_HandleDestroyed;
                     DataGridView.CellContentClick += HandleDataGridView_CellContentClick;
                     DataGridView.CellPainting += HandleDataGridView_CellPainting;
+                    DataGridView.KeyDown += HandleDataGridView_KeyDown;
                     DataGridView.Rows.CollectionChanged += HandleDataGridViewRows_CollectionChanged;
 
                     _eventsRegistered = true;
@@ -522,6 +524,7 @@ namespace Extract.DataEntry.LabDE
                         DataGridView.HandleDestroyed -= HandleDataGridView_HandleDestroyed;
                         DataGridView.CellContentClick -= HandleDataGridView_CellContentClick;
                         DataGridView.CellPainting -= HandleDataGridView_CellPainting;
+                        DataGridView.KeyDown -= HandleDataGridView_KeyDown;
                         DataGridView.Rows.CollectionChanged -= HandleDataGridViewRows_CollectionChanged;
 
                         _eventsRegistered = false;
@@ -577,6 +580,36 @@ namespace Extract.DataEntry.LabDE
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI41581");
+            }
+        }
+
+        void HandleDataGridView_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                // Enter key should open picker FFI if order number or picker button is the singly
+                // selected cell.
+                // https://extract.atlassian.net/browse/ISSUE-17151
+                if (e.KeyData == Keys.Enter
+                    && DataGridView.SelectedCells.Count == 1
+                    && DataGridView.SelectedRows.Count == 0
+                    && DataGridView.CurrentCell is DataGridViewCell cell
+                    && cell != null
+                    && cell.RowIndex >= 0
+                    && (cell.OwningColumn == _recordIDColumn || cell.OwningColumn == this))
+                {
+                    e.Handled = true;
+                    ActivateRecordPickerFFI(rowIndex: cell.RowIndex);
+                    DataGridView.SafeBeginInvoke("ELI50361", () =>
+                    {
+                        DataGridView.CurrentCell = cell;
+                        DataGridView.Focus();
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50358");
             }
         }
 
@@ -650,26 +683,31 @@ namespace Extract.DataEntry.LabDE
                                 return;
                             }
 
-                            // By making the brush color be translucent, some of the original button
-                            // shading shows through giving a more polished appearance than a flat
-                            // color.
-                            Color color = Color.FromArgb(80, rowData.StatusColor.Value);
-                            Brush brush = ExtractBrushes.GetSolidBrush(color);
+                            // Coloring the buttons when the table is disabled gives the impression it is enabled.
+                            if (DataGridView.Enabled)
+                            {
+                                // By making the brush color be translucent, some of the original button
+                                // shading shows through giving a more polished appearance than a flat
+                                // color.
+                                Color color = Color.FromArgb(80, rowData.StatusColor.Value);
+                                Brush brush = ExtractBrushes.GetSolidBrush(color);
 
-                            // The button doesn't extend all the way to the edges of the cell...
-                            // shrink the paint area vs the overall bounds.
-                            e.Paint(e.CellBounds, DataGridViewPaintParts.All);
-                            Rectangle fillRect = e.CellBounds;
-                            fillRect.Inflate(-3, -3);
-                            e.Graphics.FillRectangle(brush, fillRect);
+                                // The button doesn't extend all the way to the edges of the cell...
+                                // shrink the paint area vs the overall bounds.
+                                e.Paint(e.CellBounds, DataGridViewPaintParts.All);
+                                Rectangle fillRect = e.CellBounds;
+                                fillRect.Inflate(-3, -3);
+                                e.Graphics.FillRectangle(brush, fillRect);
 
-                            // Now paint "..." to indicate this will open a form.
-                            brush = ExtractBrushes.GetSolidBrush(Color.Black);
-                            StringFormat stringFormat = new StringFormat();
-                            stringFormat.Alignment = StringAlignment.Center;
-                            stringFormat.LineAlignment = StringAlignment.Center;
-                            e.Graphics.DrawString(
-                                "...", DataGridView.Font, brush, e.CellBounds, stringFormat);
+                                // Now paint "..." to indicate this will open a form.
+                                brush = ExtractBrushes.GetSolidBrush(Color.Black);
+                                StringFormat stringFormat = new StringFormat();
+                                stringFormat.Alignment = StringAlignment.Center;
+                                stringFormat.LineAlignment = StringAlignment.Center;
+                                e.Graphics.DrawString(
+                                    "...", DataGridView.Font, brush, e.CellBounds, stringFormat);
+                            }
+
                             e.Handled = true;
                         }
                     }
@@ -692,43 +730,51 @@ namespace Extract.DataEntry.LabDE
         {
             try
             {
-                // Activate the record-picker UI (FFI).
-                if (e.RowIndex >= 0 && this == DataGridView.Columns[e.ColumnIndex])
+                if (e.RowIndex >= 0 && e.ColumnIndex == Index)
                 {
-                    var tableRow = DataGridView.Rows[e.RowIndex];
-                    var dataEntryRow = tableRow as DataEntryTableRow;
-                    if (dataEntryRow != null)
-                    {
-                        // https://extract.atlassian.net/browse/ISSUE-13063
-                        // Select the row associated with the button clicked so that selection is
-                        // not lost (clearing the record details section).
-                        tableRow.Selected = true;
-
-                        var recordIdCell = tableRow.Cells[_recordIDColumn.Index];
-                        var initialValue = recordIdCell.Value.ToString();
-
-                        // If a selection was made, apply the new record ID.
-                        string recordId = ShowPickerFFI(dataEntryRow, initialValue);
-                        if (!string.IsNullOrWhiteSpace(recordId))
-                        {
-                            recordIdCell.Value = recordId;
-
-                            // Setting the record ID cell as active helps indicate that a value
-                            // was applied.
-                            DataGridView.ClearSelection();
-                            
-                            // https://extract.atlassian.net/browse/ISSUE-15137
-                            if (recordIdCell.Visible)
-                            {
-                                DataGridView.CurrentCell = recordIdCell;
-                            }
-                        }
-                    }
+                    ActivateRecordPickerFFI(e.RowIndex);
                 }
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI38139");
+            }
+        }
+
+        /// <summary>
+        /// Activates the record-picker UI (FFI) for the specified <see cref="rowIndex"/>.
+        /// </summary>
+        void ActivateRecordPickerFFI(int rowIndex)
+        {
+            var tableRow = DataGridView.Rows[rowIndex];
+            var dataEntryRow = tableRow as DataEntryTableRow;
+            if (dataEntryRow != null)
+            {
+                var recordIdCell = tableRow.Cells[_recordIDColumn.Index];
+                var initialValue = recordIdCell.Value.ToString();
+
+                // https://extract.atlassian.net/browse/ISSUE-13063
+                // Select the row associated with the button clicked so that selection is
+                // not lost (clearing the record details section).
+                // https://extract.atlassian.net/browse/ISSUE-15137
+                // Make sure the record ID cell itself is visible before selecting; else, select the whole row
+                if (recordIdCell.Visible && DataGridView is DataEntryTable dataEntryTable)
+                {
+                    // Setting the record ID cell as active helps indicate that a value
+                    // was applied.
+                    dataEntryTable.SelectCell(recordIdCell);
+                }
+                else
+                {
+                    tableRow.Selected = true;
+                }
+
+                // If a selection was made, apply the new record ID.
+                string recordId = ShowPickerFFI(dataEntryRow, initialValue);
+                if (!string.IsNullOrWhiteSpace(recordId))
+                {
+                    recordIdCell.Value = recordId;
+                }
             }
         }
 
