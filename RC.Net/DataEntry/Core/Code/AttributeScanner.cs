@@ -532,8 +532,9 @@ namespace Extract.DataEntry
         static bool DataValidityMatches(IAttribute attribute,
             AttributeStatusInfo statusInfo, DataValidity targetValidity)
         {
-            // Consider the target attribute status to match targetValidity only for viewable attributes
-            return (statusInfo._isViewable && (targetValidity & statusInfo._dataValidity) != 0);
+            // GetDataValidity factors in viewability and ValidationEnabled status for the control/attribute
+            var attributeValidity = GetDataValidity(attribute);
+            return ((targetValidity & attributeValidity) != 0);
         }
 
         /// <summary>

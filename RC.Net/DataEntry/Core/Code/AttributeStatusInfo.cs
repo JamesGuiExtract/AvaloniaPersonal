@@ -386,6 +386,11 @@ namespace Extract.DataEntry
         DataValidity _dataValidity = DataValidity.Valid;
 
         /// <summary>
+        /// Keeps track of whether validation was enabled for the attribute last time data validity was checked.
+        /// </summary>
+        bool _validationEnabled;
+
+        /// <summary>
         /// A string that allows attributes to be sorted by compared to other display order values.
         /// </summary>
         string _displayOrder;
@@ -2039,10 +2044,11 @@ namespace Extract.DataEntry
                         {
                             element.SetPropertyValue("Enabled", !value.ToBoolean());
                         }
-                        else if (element is IDataEntryControl dataEntryControl
-                            && propertyName == "ValidationEnabled")
+                        
+                        if (element is IDataEntryControl dataEntryControl
+                            && (propertyName == "ValidationEnabled" || propertyName == "Disabled" || propertyName == "Visible"))
                         {
-                            // If validation has been enabled/disabled for the control, update validation
+                            // If validation enabled status has potentially been changed for a control, update validation
                             // for all attributes mapped to the control.
                             RefreshValidation(dataEntryControl);
                         }
@@ -2526,8 +2532,10 @@ namespace Extract.DataEntry
         /// </param>
         /// <param name="dataValidity">A <see cref="DataValidity"/> value indicating whether the
         /// attribute's value is valid, invalid or a validation warning.</param>
+        /// <param name="validationEnabled">Indicates if validation is currently enabled for the field;
+        /// Provide if already known for efficiency, otherwise it will be calculated</param>
         [ComVisible(false)]
-        public static void SetDataValidity(IAttribute attribute, DataValidity dataValidity)
+        public static void SetDataValidity(IAttribute attribute, DataValidity dataValidity, bool? validationEnabled = null)
         {
             try
             {
@@ -2540,7 +2548,14 @@ namespace Extract.DataEntry
                 // no longer initialized)
                 if (statusInfo._dataValidity != dataValidity && statusInfo._initialized)
                 {
-                    statusInfo._dataValidity = dataValidity;
+                    // If validation is not enabled, do not set the underlying _dataValidity to prevent code
+                    // paths where disabled validation end up triggering underlying _dataValidity errors to be
+                    // cleared. _dataValidity should retain any non-valid status for when validation were
+                    // to be re-enabled.
+                    if (validationEnabled ?? IsValidationEnabled(attribute))
+                    {
+                        statusInfo._dataValidity = dataValidity;
+                    }
 
                     OnValidationStateChanged(attribute, dataValidity);
                 }
@@ -2606,6 +2621,14 @@ namespace Extract.DataEntry
                     && control.DataEntryControlHost is DataEntryControlHost host)
                 {
                     validationEnabled &= host.ValidationEnabled == true;
+                }
+
+                // If validationEnabled has changed since last time data validity was checked,
+                // raise ValidationStateChanged so the DEP properly reflects the new status
+                if (statusInfo._validationEnabled != validationEnabled)
+                {
+                    statusInfo._validationEnabled = validationEnabled;
+                    OnValidationStateChanged(attribute, GetDataValidity(attribute));
                 }
 
                 return validationEnabled;

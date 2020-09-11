@@ -1437,19 +1437,24 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    if (_invalidAttributes.Any(attribute =>
-                                AttributeStatusInfo.GetDataValidity(attribute) == DataValidity.Invalid))
+                    // NOTE: _invalidAttributes may contain attributes have underlying 
+                    // _dataValidity errors, but that aren't currenlty reported as invalid
+                    // because of control or attribute viewability or validation enabled status.
+
+                    DataValidity aggregateValidity = DataValidity.Valid;
+
+                    foreach (var attributeValidity in _invalidAttributes
+                        .Select(attribute => AttributeStatusInfo.GetDataValidity(attribute)))
                     {
-                        return DataValidity.Invalid;
+                        if (attributeValidity == DataValidity.Invalid)
+                        {
+                            return DataValidity.Invalid;
+                        }
+
+                        aggregateValidity |= attributeValidity;
                     }
-                    else if (_invalidAttributes.Count > 0)
-                    {
-                        return DataValidity.ValidationWarning;
-                    }
-                    else
-                    {
-                        return DataValidity.Valid;
-                    }
+
+                    return aggregateValidity;
                 }
                 catch (Exception ex)
                 {
@@ -4188,7 +4193,14 @@ namespace Extract.DataEntry
             {
                 if (e.DataValidity == DataValidity.Valid)
                 {
-                    _invalidAttributes.Remove(e.Attribute);
+                    // Do not remove from _invalidAttributes any attributes that currently don't
+                    // have validation enabled; they should continue to be tracked in the case
+                    // validation is re-enabled.
+                    if (_invalidAttributes.Contains(e.Attribute)
+                        && AttributeStatusInfo.IsValidationEnabled(e.Attribute))
+                    {
+                        _invalidAttributes.Remove(e.Attribute);
+                    }
                 }
                 else
                 {

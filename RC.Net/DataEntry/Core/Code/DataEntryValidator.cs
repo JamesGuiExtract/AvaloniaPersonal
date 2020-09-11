@@ -319,13 +319,19 @@ namespace Extract.DataEntry
 
                 // NOTE: Validate may be used only to update auto-complete lists without actually
                 // ever validating based on the list items; in the case that validation is not
-                // enabled, DataValidity.Valid will be returned. Also preventing an item from being
-                // marked invalid without _validationErrorMessage enforces consistency; .Net won't
-                // display validation error icons without error text, so this prevents the situation
-                // where the DataEntry framework considers a value invalid, yet no error icon is
-                // displayed.
-                bool validationEnabled = !string.IsNullOrEmpty(_validationErrorMessage) &&
-                                         AttributeStatusInfo.IsValidationEnabled(attribute);
+                // enabled, DataValidity.Valid will be returned. 
+                bool validationEnabled = AttributeStatusInfo.IsValidationEnabled(attribute);
+
+                // Preventing an item from being marked invalid without _validationErrorMessage
+                // enforces consistency; .Net won't display validation error icons without error
+                // text, so this prevents the situation where the DataEntry framework considers
+                // a value invalid, yet no error icon is displayed.
+                if (validationEnabled && string.IsNullOrEmpty(_validationErrorMessage))
+                {
+                    ValidationEnabled = false;  // Validation status for this validator
+                    validationEnabled = false;  // Overall calculated validation status accounting
+                                                // for control visibility, etc.
+                }
 
                 // If there is a specified validation pattern, check it.
                 if (validationEnabled &&  _validationRegex != null &&
@@ -407,7 +413,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                AttributeStatusInfo.SetDataValidity(attribute, dataValidity);
+                AttributeStatusInfo.SetDataValidity(attribute, dataValidity, validationEnabled);
 
                 return dataValidity;
             }
