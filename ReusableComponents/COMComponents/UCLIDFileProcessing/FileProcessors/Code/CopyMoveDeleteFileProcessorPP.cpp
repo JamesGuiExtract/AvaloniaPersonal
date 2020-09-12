@@ -1,3 +1,4 @@
+
 // CopyMoveDeleteFileProcessorPP.cpp : Implementation of CCopyMoveDeleteFileProcessorPP
 #include "stdafx.h"
 #include "FileProcessors.h"
@@ -139,13 +140,23 @@ STDMETHODIMP CCopyMoveDeleteFileProcessorPP::Apply(void)
 				ipFP->CreateFolder = (m_btnCreateFolder.GetCheck() == BST_CHECKED) 
 					? VARIANT_TRUE : VARIANT_FALSE;
 
-				if (_strcmpi(asString(bstrSrcFileName).c_str(), "<SourceDocName>") == 0)
+				bool bModifySourceDocName = m_btnModifySourceDocName.GetCheck() == BST_CHECKED;
+				if (strcmp(asString(bstrSrcFileName).c_str(), "<SourceDocName>") == 0)
 				{
 					// Set flag for modifing the source doc name
-					ipFP->ModifySourceDocName = asVariantBool(m_btnModifySourceDocName.GetCheck() == BST_CHECKED);
+					ipFP->ModifySourceDocName = asVariantBool(bModifySourceDocName);
 				}
 				else
 				{
+					if (bModifySourceDocName
+						&& MessageBox("Source file must be <SourceDocName> to modify the filename in the database.\r\n\r\n"
+							"If you proceed, the \"Modify SourceDocName in database\" option will be cleared.",
+							"Unable to modify SourceDocName in database",
+							MB_OKCANCEL | MB_ICONWARNING) == IDCANCEL)
+					{
+						return S_FALSE;
+					}
+
 					ipFP->ModifySourceDocName = VARIANT_FALSE;
 				}
 
@@ -675,7 +686,7 @@ void CCopyMoveDeleteFileProcessorPP::updateEnabledState()
 	CString zSrcFileName;
 	m_cmbSrc.GetWindowText(zSrcFileName);
 	BOOL bEnableModifySourceDocName = bDisableForDelete &&
-		_strcmpi(((LPCTSTR)zSrcFileName), "<SourceDocName>") == 0;
+		strcmp(((LPCTSTR)zSrcFileName), "<SourceDocName>") == 0;
 
 	// Disable or enable destination controls
 	m_cmbDst.EnableWindow(bDisableForDelete);
@@ -686,6 +697,7 @@ void CCopyMoveDeleteFileProcessorPP::updateEnabledState()
 	m_radioDstErr.EnableWindow(bDisableForDelete);
 	m_radioDstSkip.EnableWindow(bDisableForDelete);
 	m_radioDstOver.EnableWindow(bDisableForDelete);
+
 	m_btnModifySourceDocName.EnableWindow(bEnableModifySourceDocName);
 
 	// Enable or disable readonly checkbox
