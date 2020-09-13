@@ -640,6 +640,32 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Names of the source documents loaded into the UI that do not currently have any pages represented
+        /// in non-output <see cref="OutputDocuments"/>.
+        /// </summary>
+        public ReadOnlyCollection<string> FullyProcessedSourceDocumentFileNames
+        {
+            get
+            {
+                try
+                {
+                    var activeSources = PendingDocuments.SelectMany(doc =>
+                            doc.PageControls.Select(pageControl =>
+                                pageControl.Page.SourceDocument))
+                            .Distinct();
+
+                    var processedSourceDocuments = _sourceDocuments.Except(activeSources);
+                    
+                    return processedSourceDocuments.Select(doc => doc.FileName).ToList().AsReadOnly();
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI50367");
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets whether there are pending changes available for <see cref="CommitChanges"/>.
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -650,8 +676,24 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (CommitOnlySelection)
                 {
-                    return _primaryPageLayoutControl != null &&
-                        _primaryPageLayoutControl.Documents.Any(doc => doc.Selected);
+                    if (PendingDocuments.Any(doc => doc.Selected))
+                    {
+                        return true;
+                    }
+                    else if (!PendingDocuments.Any(doc => !doc.Selected)
+                        && FullyProcessedSourceDocumentFileNames.Any())
+                    {
+                        // https://extract.atlassian.net/browse/ISSUE-17178
+                        // If the there are no PendingDocuments remaining to be selected, but there is at least
+                        // one source document that has been left if the fully processed state due to page
+                        // deletions/edits, the commit button should remain enabled as a mechanism to allow
+                        // these documents to be cleared from the UI.
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
@@ -1261,10 +1303,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // documents that have been left without any pages. There could also be rare
                 // circumstances where all none of the pages in a previously processed document
                 // are from a different document. In either case, these documents don't represent
-                // an active source document. Disregard these.
+                // an active source document. Disregard these.  
                 var documentsToRemove = _displayedDocuments
-                    .Where(doc => !doc.PageControls.Any(c => c.Page.SourceDocument != null))
-                    .ToArray();
+                .Where(doc => !doc.PageControls.Any(c => c.Page.SourceDocument != null))
+                .ToArray();
                 foreach (var document in documentsToRemove)
                 {
                     _primaryPageLayoutControl.DeleteOutputDocument(document);
@@ -3012,7 +3054,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return _displayedDocuments?.Where(document => !document.OutputProcessed);
+                return _displayedDocuments?.Where(document => 
+                    !document.OutputProcessed && document.PageControls.Any());
             }
         }
 
@@ -3060,7 +3103,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 return CommitOnlySelection &&
                     PendingDocuments.Any() &&
-                    PendingDocuments.All(doc => doc.PageControls.Count == 0 || doc.Selected);
+                    PendingDocuments.All(doc => doc.Selected);
             }
         }
 
@@ -3565,8 +3608,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _updatingCommandStates = true;
 
-                    var nonEmptyDocs = PendingDocuments.Where(doc =>
-                        doc.PageControls.Any()).ToList();
+                    var nonEmptyDocs = PendingDocuments.ToList();
                     var docsWithNonDeletedPages = nonEmptyDocs.Where(doc =>
                         doc.PageControls.Any(c => !c.Deleted));
                     bool isDocDataEdited = docsWithNonDeletedPages.Any(doc =>

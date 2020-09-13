@@ -2290,6 +2290,13 @@ namespace Extract.FileActionManager.FileProcessors
                 return true;
             }
 
+            // https://extract.atlassian.net/browse/ISSUE-17178
+            // Ensure any source documents that may have been left in a comletely processed state 
+            // via pages edits/deletes don't end up getting returned to the pending (they will fail
+            // to load if all output documents have already been produced).
+            ReleaseFiles(_paginationPanel.FullyProcessedSourceDocumentFileNames,
+                _settings.SourceAction, cancelling: false, error: false);
+
             if (FileIds.Any())
             {
                 // Because PaginationPanel.CheckForChanges is not very robust a determining when there
