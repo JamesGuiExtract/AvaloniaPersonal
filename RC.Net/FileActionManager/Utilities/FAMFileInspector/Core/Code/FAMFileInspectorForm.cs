@@ -3759,6 +3759,11 @@ namespace Extract.FileActionManager.Utilities
             Dictionary<ToolStripMenuItem, IExtractReport> reportMenuItems =
                 new Dictionary<ToolStripMenuItem, IExtractReport>();
 
+            // Ensure folders exist
+            // https://extract.atlassian.net/browse/ISSUE-17210
+            Directory.CreateDirectory(ExtractReportUtils.StandardReportFolder);
+            Directory.CreateDirectory(ExtractReportUtils.SavedReportFolder);
+
             // Search all standard and saved reports
             foreach (string reportFileName in
                 Directory.EnumerateFiles(ExtractReportUtils.StandardReportFolder, "*.repx", SearchOption.AllDirectories)
