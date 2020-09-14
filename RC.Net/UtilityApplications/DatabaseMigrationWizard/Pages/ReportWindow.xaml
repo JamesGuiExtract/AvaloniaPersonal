@@ -35,7 +35,8 @@
                     <Button x:Name="WarningButton" Grid.Column="1" Content="Warnings" BorderThickness="2" Click="WarningButton_Click" Focusable="False"></Button>
                     <Button x:Name="InfoButton" Grid.Column="2" Content="Info" BorderThickness="2" Click="InfoButton_Click" Focusable="False"></Button>
                 </Grid>
-                <DataGrid Name="DataGrid1" ItemsSource="{Binding}" AutoGenerateColumns="False" Margin="0,5,0,0" MaxHeight="500px" HorizontalScrollBarVisibility="Visible" AlternatingRowBackground="LightGray" AlternationCount="2">
+                <DataGrid Name="DataGrid1" ItemsSource="{Binding}" AutoGenerateColumns="False" IsReadOnly="True"
+                          Margin="0,5,0,0" MaxHeight="500px" HorizontalScrollBarVisibility="Visible" AlternatingRowBackground="LightGray" AlternationCount="2">
                     <DataGrid.Columns>
                         <mui:DataGridTextColumn Header="Classification" Binding="{Binding Classification}" />
                         <mui:DataGridTextColumn Header="Command" Binding="{Binding Command}" />
