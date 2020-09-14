@@ -46,6 +46,7 @@ namespace DatabaseMigrationWizard.Pages
             {
                 hasLoadedOnce = true;
                 await this.RemoveTabsAndUpdateStatusIcons(false);
+                this.DatabaseServerTextBox.Focus();
             }
         }
 
