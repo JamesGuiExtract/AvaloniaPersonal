@@ -1117,28 +1117,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <param name="dataValidity">The <see cref="DataValidity"/> to use to update it.</param>
         static void UpdateDataValidity(DataEntryPaginationDocumentData documentData, DataValidity dataValidity)
         {
-            switch (dataValidity)
-            {
-                case DataValidity.Invalid:
-                    documentData.SetDataError(true);
-                    documentData.SetDataWarning(false);
-                    break;
-
-                case DataValidity.ValidationWarning:
-                    documentData.SetDataError(false);
-                    documentData.SetDataWarning(true);
-                    break;
-
-                case DataValidity.Invalid | DataValidity.ValidationWarning:
-                    documentData.SetDataError(true);
-                    documentData.SetDataWarning(true);
-                    break;
-
-                case DataValidity.Valid:
-                    documentData.SetDataError(false);
-                    documentData.SetDataWarning(false);
-                    break;
-            }
+            bool hasError = dataValidity.HasFlag(DataValidity.Invalid);
+            bool hasWarning = dataValidity.HasFlag(DataValidity.ValidationWarning);
+            documentData.SetDataError(hasError);
+            documentData.SetDataWarning(hasWarning);
         }
 
         /// <summary>

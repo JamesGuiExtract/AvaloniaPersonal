@@ -1440,21 +1440,9 @@ namespace Extract.DataEntry
                     // NOTE: _invalidAttributes may contain attributes have underlying 
                     // _dataValidity errors, but that aren't currenlty reported as invalid
                     // because of control or attribute viewability or validation enabled status.
-
-                    DataValidity aggregateValidity = DataValidity.Valid;
-
-                    foreach (var attributeValidity in _invalidAttributes
-                        .Select(attribute => AttributeStatusInfo.GetDataValidity(attribute)))
-                    {
-                        if (attributeValidity == DataValidity.Invalid)
-                        {
-                            return DataValidity.Invalid;
-                        }
-
-                        aggregateValidity |= attributeValidity;
-                    }
-
-                    return aggregateValidity;
+                    return _invalidAttributes
+                        .Select(AttributeStatusInfo.GetDataValidity)
+                        .Aggregate(DataValidity.Valid, (acc, v) => acc | v);
                 }
                 catch (Exception ex)
                 {

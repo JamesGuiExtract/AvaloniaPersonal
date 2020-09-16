@@ -1332,7 +1332,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _documentData.SetModified(AttributeStatusInfo.UndoManager.UndoOperationAvailable);
                     _documentData.SetDocumentTypeValidity(_configManager.DocumentTypeIsValid);
-                    _documentData.SetDataError(ActiveDataEntryPanel.DataValidity == DataValidity.Invalid);
+                    _documentData.SetDataError(ActiveDataEntryPanel.DataValidity.HasFlag(DataValidity.Invalid));
                     _documentData.SetSummary(ActiveDataEntryPanel.SummaryDataEntryQuery?.Evaluate().ToString());
                     _documentData.SetSendForReprocessing(ActiveDataEntryPanel.SendForReprocessingFunc(_documentData));
                 }
