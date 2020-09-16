@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
@@ -82,10 +83,7 @@ namespace Extract.FileActionManager.Forms
                 _connection.Close();
 
                 _dataGridView.DataSource = _dataSet.Tables[_tableName];
-                if (_dataGridView.Columns.Contains("ID"))
-                {
-                    _dataGridView.Columns["ID"].ReadOnly = true;
-                }
+                HideColumns(_dataGridView, "ID", "GUID");
 
                 _dataGridView.CellEndEdit += Handle_DataGridView_CellEndEdit;
             }
@@ -96,6 +94,19 @@ namespace Extract.FileActionManager.Forms
         }
 
         #endregion Overrides
+
+        #region Private Methods
+
+        static void HideColumns(DataGridView dg, params string[] columnsToHide)
+        {
+            var columnNames = dg.Columns.Cast<DataGridViewColumn>().Select(c => c.Name);
+            foreach (var name in columnNames.Intersect(columnsToHide, StringComparer.OrdinalIgnoreCase))
+            {
+                dg.Columns[name].Visible = false;
+            }
+        }
+
+        #endregion Private Methods
 
         #region Event Handlers
 
