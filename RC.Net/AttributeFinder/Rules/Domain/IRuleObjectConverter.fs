@@ -25,3 +25,5 @@ type RuleObjectConverter<'DomainClass, 'DomainInterface, 'Dto>() =
         uex.AddDebugData ("Converter dto type", typeof<'Dto>.FullName)
         raise uex
     member this.fromDto mc dto = downcast dto |> this.fromDto mc |> box
+
+type LegacyAttribute() = inherit System.Attribute()

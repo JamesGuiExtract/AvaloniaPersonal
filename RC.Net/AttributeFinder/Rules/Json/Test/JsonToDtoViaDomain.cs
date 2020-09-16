@@ -43,87 +43,87 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         /// Load example JSON RSD files, convert to DTO, save as JSON, and reload to DTO. Compare the DTO object from the original JSON with the DTO object from the saved JSON.
         /// </summary>
         [Test, Category("RulesJsonSerialization")]
-        [TestCase("Resources.RuleSets.Indexing-AddressFinders-AddressFinder.json.rsd", TestName = "Indexing-AddressFinders-AddressFinder.json.rsd")]
-        [TestCase("Resources.RuleSets.Indexing-DocumentDate-commonOH.json.rsd", TestName = "Indexing-DocumentDate-commonOH.json.rsd")]
-        [TestCase("Resources.RuleSets.LabDE-PatientInfo-Name-LabSpecificRules.json.rsd", TestName = "LabDE-PatientInfo-Name-LabSpecificRules.json.rsd")]
-        [TestCase("Resources.RuleSets.LabDE-PatientInfo-Name-reOCR.json.rsd", TestName = "LabDE-PatientInfo-Name-reOCR.json.rsd")]
-        [TestCase("Resources.RuleSets.LabDE-SwipingRules-Date.json.rsd", TestName = "LabDE-SwipingRules-Date.json.rsd")]
-        [TestCase("Resources.RuleSets.LabDE-TestResults-processMultipleDates.json.rsd", TestName = "LabDE-TestResults-processMultipleDates.json.rsd")]
-        [TestCase("Resources.RuleSets.ReusableComponents-getDocAndPagesCC.json.rsd", TestName = "ReusableComponents-getDocAndPagesCC.json.rsd")]
-        [TestCase("Resources.RuleSets.ReusableComponents-getDocAndPagesCChelper.json.rsd", TestName = "ReusableComponents-getDocAndPagesCChelper.json.rsd")]
-        [TestCase("Resources.RuleSets.ReusableComponents-MLFeatureGen-LocationFinder-GetPageBoundaries.json.rsd", TestName = "ReusableComponents-MLFeatureGen-LocationFinder-GetPageBoundaries.json.rsd")]
-        [TestCase("Resources.RuleSets.ReusableComponents-MLFeatureGen-LocationFinder-LocationFinder.json.rsd", TestName = "ReusableComponents-MLFeatureGen-LocationFinder-LocationFinder.json.rsd")]
-        [TestCase("Resources.RuleSets.ReusableComponents-PS-MasterConfidence.json.rsd", TestName = "ReusableComponents-PS-MasterConfidence.json.rsd")]
-        [TestCase("Resources.RuleSets.ReusableComponents-RemoveSubattributeDuplicates.json.rsd", TestName = "ReusableComponents-RemoveSubattributeDuplicates.json.rsd")]
-        [TestCase("Resources.RuleSets.ReusableComponents-spansPages.json.rsd", TestName = "ReusableComponents-spansPages.json.rsd")]
-        [TestCase("Resources.RuleSets.RunTest.json.rsd", TestName = "RunTest.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-CompressAutoPaginationVOA.json.rsd", TestName = "Essentia-Solution-Rules-CompressAutoPaginationVOA.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-CreateDocDescVOA.json.rsd", TestName = "Essentia-Solution-Rules-CreateDocDescVOA.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-DocumentDate-HCdates.json.rsd", TestName = "Essentia-Solution-Rules-DocumentDate-HCdates.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-FilenameFix.json.rsd", TestName = "Essentia-Solution-Rules-FilenameFix.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-findDocumentData.json.rsd", TestName = "Essentia-Solution-Rules-findDocumentData.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-Master.json.rsd", TestName = "Essentia-Solution-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-Master_NoVOA.json.rsd", TestName = "Essentia-Solution-Rules-Master_NoVOA.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-ML-Deleter-deleter.json.rsd", TestName = "Essentia-Solution-Rules-ML-Deleter-deleter.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-ML-Pagination-createProtofeatures.json.rsd", TestName = "Essentia-Solution-Rules-ML-Pagination-createProtofeatures.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-ML-Pagination-getImagePageNumber.json.rsd", TestName = "Essentia-Solution-Rules-ML-Pagination-getImagePageNumber.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-PaginationMaster.json.rsd", TestName = "Essentia-Solution-Rules-PaginationMaster.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-PatientInfo-findDOB.json.rsd", TestName = "Essentia-Solution-Rules-PatientInfo-findDOB.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-ShadowFax.json.rsd", TestName = "Essentia-Solution-Rules-ShadowFax.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-Singles-PaginateSingles.json.rsd", TestName = "Essentia-Solution-Rules-Singles-PaginateSingles.json.rsd")]
-        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-UnsolicitedOrders-PopulateOrderAndCSN.json.rsd", TestName = "Essentia-Solution-Rules-UnsolicitedOrders-PopulateOrderAndCSN.json.rsd")]
-        [TestCase("Resources.RuleSets._Demo-Demo_HIM-Solution-Rules-findDocumentData.json.rsd", TestName = "_Demo-Demo_HIM-Solution-Rules-findDocumentData.json.rsd")]
-        [TestCase("Resources.RuleSets._Demo-Demo_HIM-Solution-Rules-PaginationMaster.json.rsd", TestName = "_Demo-Demo_HIM-Solution-Rules-PaginationMaster.json.rsd")]
-        [TestCase("Resources.RuleSets._Demo-Demo_HIM-Solution-Rules-PaginationRules-main.json.rsd", TestName = "_Demo-Demo_HIM-Solution-Rules-PaginationRules-main.json.rsd")]
-        [TestCase("Resources.RuleSets.American Family-Rules-master.json.rsd", TestName = "American Family-Rules-master.json.rsd")]
-        [TestCase("Resources.RuleSets.American Family-TestingFiles-testAllSingleValues.json.rsd", TestName = "American Family-TestingFiles-testAllSingleValues.json.rsd")]
-        [TestCase("Resources.RuleSets.CA - Sacramento Demo-Rules-SSNRedaction-DOB.json.rsd", TestName = "CA - Sacramento Demo-Rules-SSNRedaction-DOB.json.rsd")]
-        [TestCase("Resources.RuleSets.CA - Santa Clara-Solution-Rules-docTypeOH.json.rsd", TestName = "CA - Santa Clara-Solution-Rules-docTypeOH.json.rsd")]
-        [TestCase("Resources.RuleSets.MN - District - Tyler-Rules-rules.json.rsd", TestName = "MN - District - Tyler-Rules-rules.json.rsd")]
-        [TestCase("Resources.RuleSets.Surefire - Judgments-Solution-Rules-Master.json.rsd", TestName = "Surefire - Judgments-Solution-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.Surefire - SNL-Solution-Rules-Master.json.rsd", TestName = "Surefire - SNL-Solution-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.Surefire-Solution-Rules-Common-selectMajoritySubs.json.rsd", TestName = "Surefire-Solution-Rules-Common-selectMajoritySubs.json.rsd")]
-        [TestCase("Resources.RuleSets.Surefire-Solution-Rules-Master.json.rsd", TestName = "Surefire-Solution-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.TX - Tarrant-DataEntryConfig-SaveVolumeAndPage.json.rsd", TestName = "TX - Tarrant-DataEntryConfig-SaveVolumeAndPage.json.rsd")]
-        [TestCase("Resources.RuleSets.ZZ-Situs-Solution-Rules-Master.json.rsd", TestName = "ZZ-Situs-Solution-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.ZZ-Situs-Solution-Rules-Rent-data.json.rsd", TestName = "ZZ-Situs-Solution-Rules-Rent-data.json.rsd")]
-        [TestCase("Resources.RuleSets.Arcondis-Solution-Rules-CreateTrainingDataAndTryToLearn.json.rsd", TestName = "Arcondis-Solution-Rules-CreateTrainingDataAndTryToLearn.json.rsd")]
-        [TestCase("Resources.RuleSets.Arcondis-Solution-Rules-Ensemble-main.json.rsd", TestName = "Arcondis-Solution-Rules-Ensemble-main.json.rsd")]
-        [TestCase("Resources.RuleSets.Arcondis-Solution-Rules-Ensemble-SensitiveRows.json.rsd", TestName = "Arcondis-Solution-Rules-Ensemble-SensitiveRows.json.rsd")]
-        [TestCase("Resources.RuleSets.Arcondis-Solution-Rules-Master.json.rsd", TestName = "Arcondis-Solution-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.CA - Amador - BMI-Rules-Master.json.rsd", TestName = "CA - Amador - BMI-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.CA - Humboldt - BMI Imaging-Rules-Utils-CChelper.json.rsd", TestName = "CA - Humboldt - BMI Imaging-Rules-Utils-CChelper.json.rsd")]
-        [TestCase("Resources.RuleSets.CA - Marin Vital Records - DFM-Rules-Master.json.rsd", TestName = "CA - Marin Vital Records - DFM-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.CA - Orange - SouthTech-Rules-Master.json.rsd", TestName = "CA - Orange - SouthTech-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.Delta Dental-Rules-Master.json.rsd", TestName = "Delta Dental-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.Demo_IDShield_EDI_sanitize-Rules-People-People.json.rsd", TestName = "Demo_IDShield_EDI_sanitize-Rules-People-People.json.rsd")]
-        [TestCase("Resources.RuleSets.Demo_MGIC-Rules-Master.json.rsd", TestName = "Demo_MGIC-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.Demo_PHI-Rules-MRN-MRNMaster.json.rsd", TestName = "Demo_PHI-Rules-MRN-MRNMaster.json.rsd")]
-        [TestCase("Resources.RuleSets.IL - Ogle-Rules-Master.json.rsd", TestName = "IL - Ogle-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.IN - District Rules - ACS-Rules-Master.json.rsd", TestName = "IN - District Rules - ACS-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.IN - SOS - GCR-Solution-Rules-Master.json.rsd", TestName = "IN - SOS - GCR-Solution-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.IN - SOS-Rules-perPage.json.rsd", TestName = "IN - SOS-Rules-perPage.json.rsd")]
-        [TestCase("Resources.RuleSets.MGIC-Rules-SensitivePageClassifier-makePageClue.json.rsd", TestName = "MGIC-Rules-SensitivePageClassifier-makePageClue.json.rsd")]
-        [TestCase("Resources.RuleSets.MGIC-Utils-OnlyPageClues.json.rsd", TestName = "MGIC-Utils-OnlyPageClues.json.rsd")]
-        [TestCase("Resources.RuleSets.OH - BWC-Rules-Master.json.rsd", TestName = "OH - BWC-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.OH - Cuyahoga Probate Court - Proware-Rules-decrement.json.rsd", TestName = "OH - Cuyahoga Probate Court - Proware-Rules-decrement.json.rsd")]
-        [TestCase("Resources.RuleSets.Pfizer-Rules-Master.json.rsd", TestName = "Pfizer-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.Pfizer-Rules-ML-currency-cellClassifier-getCandidates.json.rsd", TestName = "Pfizer-Rules-ML-currency-cellClassifier-getCandidates.json.rsd")]
-        [TestCase("Resources.RuleSets.Pfizer-Rules-ML-main.json.rsd", TestName = "Pfizer-Rules-ML-main.json.rsd")]
-        [TestCase("Resources.RuleSets.TX - DallasCountyElections-Rules-Master.json.rsd", TestName = "TX - DallasCountyElections-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.WI - Dodge - TriMin-Rules-Master.json.rsd", TestName = "WI - Dodge - TriMin-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.WI - Dodge - TriMin-Rules-Utils-PageCC.json.rsd", TestName = "WI - Dodge - TriMin-Rules-Utils-PageCC.json.rsd")]
-        [TestCase("Resources.RuleSets.WV - SOS UCC-Rules-Master.json.rsd", TestName = "WV - SOS UCC-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.CA - Cedar Sinai-Solution-Rules-Master.json.rsd", TestName = "CA - Cedar Sinai-Solution-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.CA - Cedar Sinai-Solution-Rules-TestResults-getTests.json.rsd", TestName = "CA - Cedar Sinai-Solution-Rules-TestResults-getTests.json.rsd")]
-        [TestCase("Resources.RuleSets.Demo_LabDE-Solution-Rules-DocumentSorter-Master.json.rsd", TestName = "Demo_LabDE-Solution-Rules-DocumentSorter-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.Hurley-Solution-Rules-SplitDeletedPages.json.rsd", TestName = "Hurley-Solution-Rules-SplitDeletedPages.json.rsd")]
-        [TestCase("Resources.RuleSets.Northwestern Memorial Hospital-Solution-Rules-ShadowFax.json.rsd", TestName = "Northwestern Memorial Hospital-Solution-Rules-ShadowFax.json.rsd")]
-        [TestCase("Resources.RuleSets.UW Transplant-Solution-Rules-DocumentSorter-Master.json.rsd", TestName = "UW Transplant-Solution-Rules-DocumentSorter-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.UW Transplant-Solution-Rules-PaginationMaster.json.rsd", TestName = "UW Transplant-Solution-Rules-PaginationMaster.json.rsd")]
-        [TestCase("Resources.RuleSets.UW Transplant-Solution-Rules-Swiping-CollectionDate.json.rsd", TestName = "UW Transplant-Solution-Rules-Swiping-CollectionDate.json.rsd")]
-        [TestCase("Resources.RuleSets.WI - Exact Sciences-Solution-Rules-Master.json.rsd", TestName = "WI - Exact Sciences-Solution-Rules-Master.json.rsd")]
-        [TestCase("Resources.RuleSets.WI - Exact Sciences-Solution-Rules-Master_NoUSS.json.rsd", TestName = "WI - Exact Sciences-Solution-Rules-Master_NoUSS.json.rsd")]
+        [TestCase("Resources.RuleSets.Indexing-AddressFinders-AddressFinder.json.rsd", TestName = "Indexing-AddressFinders-AddressFinder")]
+        [TestCase("Resources.RuleSets.Indexing-DocumentDate-commonOH.json.rsd", TestName = "Indexing-DocumentDate-commonOH")]
+        [TestCase("Resources.RuleSets.LabDE-PatientInfo-Name-LabSpecificRules.json.rsd", TestName = "LabDE-PatientInfo-Name-LabSpecificRules")]
+        [TestCase("Resources.RuleSets.LabDE-PatientInfo-Name-reOCR.json.rsd", TestName = "LabDE-PatientInfo-Name-reOCR")]
+        [TestCase("Resources.RuleSets.LabDE-SwipingRules-Date.json.rsd", TestName = "LabDE-SwipingRules-Date")]
+        [TestCase("Resources.RuleSets.LabDE-TestResults-processMultipleDates.json.rsd", TestName = "LabDE-TestResults-processMultipleDates")]
+        [TestCase("Resources.RuleSets.ReusableComponents-getDocAndPagesCC.json.rsd", TestName = "ReusableComponents-getDocAndPagesCC")]
+        [TestCase("Resources.RuleSets.ReusableComponents-getDocAndPagesCChelper.json.rsd", TestName = "ReusableComponents-getDocAndPagesCChelper")]
+        [TestCase("Resources.RuleSets.ReusableComponents-MLFeatureGen-LocationFinder-GetPageBoundaries.json.rsd", TestName = "ReusableComponents-MLFeatureGen-LocationFinder-GetPageBoundaries")]
+        [TestCase("Resources.RuleSets.ReusableComponents-MLFeatureGen-LocationFinder-LocationFinder.json.rsd", TestName = "ReusableComponents-MLFeatureGen-LocationFinder-LocationFinder")]
+        [TestCase("Resources.RuleSets.ReusableComponents-PS-MasterConfidence.json.rsd", TestName = "ReusableComponents-PS-MasterConfidence")]
+        [TestCase("Resources.RuleSets.ReusableComponents-RemoveSubattributeDuplicates.json.rsd", TestName = "ReusableComponents-RemoveSubattributeDuplicates")]
+        [TestCase("Resources.RuleSets.ReusableComponents-spansPages.json.rsd", TestName = "ReusableComponents-spansPages")]
+        [TestCase("Resources.RuleSets.RunTest.json.rsd", TestName = "RunTest")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-CompressAutoPaginationVOA.json.rsd", TestName = "Essentia-Solution-Rules-CompressAutoPaginationVOA")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-CreateDocDescVOA.json.rsd", TestName = "Essentia-Solution-Rules-CreateDocDescVOA")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-DocumentDate-HCdates.json.rsd", TestName = "Essentia-Solution-Rules-DocumentDate-HCdates")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-FilenameFix.json.rsd", TestName = "Essentia-Solution-Rules-FilenameFix")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-findDocumentData.json.rsd", TestName = "Essentia-Solution-Rules-findDocumentData")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-Master.json.rsd", TestName = "Essentia-Solution-Rules-Master")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-Master_NoVOA.json.rsd", TestName = "Essentia-Solution-Rules-Master_NoVOA")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-ML-Deleter-deleter.json.rsd", TestName = "Essentia-Solution-Rules-ML-Deleter-deleter")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-ML-Pagination-createProtofeatures.json.rsd", TestName = "Essentia-Solution-Rules-ML-Pagination-createProtofeatures")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-ML-Pagination-getImagePageNumber.json.rsd", TestName = "Essentia-Solution-Rules-ML-Pagination-getImagePageNumber")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-PaginationMaster.json.rsd", TestName = "Essentia-Solution-Rules-PaginationMaster")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-PatientInfo-findDOB.json.rsd", TestName = "Essentia-Solution-Rules-PatientInfo-findDOB")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-ShadowFax.json.rsd", TestName = "Essentia-Solution-Rules-ShadowFax")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-Singles-PaginateSingles.json.rsd", TestName = "Essentia-Solution-Rules-Singles-PaginateSingles")]
+        [TestCase("Resources.RuleSets.Essentia-Solution-Rules-UnsolicitedOrders-PopulateOrderAndCSN.json.rsd", TestName = "Essentia-Solution-Rules-UnsolicitedOrders-PopulateOrderAndCSN")]
+        [TestCase("Resources.RuleSets._Demo-Demo_HIM-Solution-Rules-findDocumentData.json.rsd", TestName = "_Demo-Demo_HIM-Solution-Rules-findDocumentData")]
+        [TestCase("Resources.RuleSets._Demo-Demo_HIM-Solution-Rules-PaginationMaster.json.rsd", TestName = "_Demo-Demo_HIM-Solution-Rules-PaginationMaster")]
+        [TestCase("Resources.RuleSets._Demo-Demo_HIM-Solution-Rules-PaginationRules-main.json.rsd", TestName = "_Demo-Demo_HIM-Solution-Rules-PaginationRules-main")]
+        [TestCase("Resources.RuleSets.American Family-Rules-master.json.rsd", TestName = "American Family-Rules-master")]
+        [TestCase("Resources.RuleSets.American Family-TestingFiles-testAllSingleValues.json.rsd", TestName = "American Family-TestingFiles-testAllSingleValues")]
+        [TestCase("Resources.RuleSets.CA - Sacramento Demo-Rules-SSNRedaction-DOB.json.rsd", TestName = "CA - Sacramento Demo-Rules-SSNRedaction-DOB")]
+        [TestCase("Resources.RuleSets.CA - Santa Clara-Solution-Rules-docTypeOH.json.rsd", TestName = "CA - Santa Clara-Solution-Rules-docTypeOH")]
+        [TestCase("Resources.RuleSets.MN - District - Tyler-Rules-rules.json.rsd", TestName = "MN - District - Tyler-Rules-rules")]
+        [TestCase("Resources.RuleSets.Surefire - Judgments-Solution-Rules-Master.json.rsd", TestName = "Surefire - Judgments-Solution-Rules-Master")]
+        [TestCase("Resources.RuleSets.Surefire - SNL-Solution-Rules-Master.json.rsd", TestName = "Surefire - SNL-Solution-Rules-Master")]
+        [TestCase("Resources.RuleSets.Surefire-Solution-Rules-Common-selectMajoritySubs.json.rsd", TestName = "Surefire-Solution-Rules-Common-selectMajoritySubs")]
+        [TestCase("Resources.RuleSets.Surefire-Solution-Rules-Master.json.rsd", TestName = "Surefire-Solution-Rules-Master")]
+        [TestCase("Resources.RuleSets.TX - Tarrant-DataEntryConfig-SaveVolumeAndPage.json.rsd", TestName = "TX - Tarrant-DataEntryConfig-SaveVolumeAndPage")]
+        [TestCase("Resources.RuleSets.ZZ-Situs-Solution-Rules-Master.json.rsd", TestName = "ZZ-Situs-Solution-Rules-Master")]
+        [TestCase("Resources.RuleSets.ZZ-Situs-Solution-Rules-Rent-data.json.rsd", TestName = "ZZ-Situs-Solution-Rules-Rent-data")]
+        [TestCase("Resources.RuleSets.Arcondis-Solution-Rules-CreateTrainingDataAndTryToLearn.json.rsd", TestName = "Arcondis-Solution-Rules-CreateTrainingDataAndTryToLearn")]
+        [TestCase("Resources.RuleSets.Arcondis-Solution-Rules-Ensemble-main.json.rsd", TestName = "Arcondis-Solution-Rules-Ensemble-main")]
+        [TestCase("Resources.RuleSets.Arcondis-Solution-Rules-Ensemble-SensitiveRows.json.rsd", TestName = "Arcondis-Solution-Rules-Ensemble-SensitiveRows")]
+        [TestCase("Resources.RuleSets.Arcondis-Solution-Rules-Master.json.rsd", TestName = "Arcondis-Solution-Rules-Master")]
+        [TestCase("Resources.RuleSets.CA - Amador - BMI-Rules-Master.json.rsd", TestName = "CA - Amador - BMI-Rules-Master")]
+        [TestCase("Resources.RuleSets.CA - Humboldt - BMI Imaging-Rules-Utils-CChelper.json.rsd", TestName = "CA - Humboldt - BMI Imaging-Rules-Utils-CChelper")]
+        [TestCase("Resources.RuleSets.CA - Marin Vital Records - DFM-Rules-Master.json.rsd", TestName = "CA - Marin Vital Records - DFM-Rules-Master")]
+        [TestCase("Resources.RuleSets.CA - Orange - SouthTech-Rules-Master.json.rsd", TestName = "CA - Orange - SouthTech-Rules-Master")]
+        [TestCase("Resources.RuleSets.Delta Dental-Rules-Master.json.rsd", TestName = "Delta Dental-Rules-Master")]
+        [TestCase("Resources.RuleSets.Demo_IDShield_EDI_sanitize-Rules-People-People.json.rsd", TestName = "Demo_IDShield_EDI_sanitize-Rules-People-People")]
+        [TestCase("Resources.RuleSets.Demo_MGIC-Rules-Master.json.rsd", TestName = "Demo_MGIC-Rules-Master")]
+        [TestCase("Resources.RuleSets.Demo_PHI-Rules-MRN-MRNMaster.json.rsd", TestName = "Demo_PHI-Rules-MRN-MRNMaster")]
+        [TestCase("Resources.RuleSets.IL - Ogle-Rules-Master.json.rsd", TestName = "IL - Ogle-Rules-Master")]
+        [TestCase("Resources.RuleSets.IN - District Rules - ACS-Rules-Master.json.rsd", TestName = "IN - District Rules - ACS-Rules-Master")]
+        [TestCase("Resources.RuleSets.IN - SOS - GCR-Solution-Rules-Master.json.rsd", TestName = "IN - SOS - GCR-Solution-Rules-Master")]
+        [TestCase("Resources.RuleSets.IN - SOS-Rules-perPage.json.rsd", TestName = "IN - SOS-Rules-perPage")]
+        [TestCase("Resources.RuleSets.MGIC-Rules-SensitivePageClassifier-makePageClue.json.rsd", TestName = "MGIC-Rules-SensitivePageClassifier-makePageClue")]
+        [TestCase("Resources.RuleSets.MGIC-Utils-OnlyPageClues.json.rsd", TestName = "MGIC-Utils-OnlyPageClues")]
+        [TestCase("Resources.RuleSets.OH - BWC-Rules-Master.json.rsd", TestName = "OH - BWC-Rules-Master")]
+        [TestCase("Resources.RuleSets.OH - Cuyahoga Probate Court - Proware-Rules-decrement.json.rsd", TestName = "OH - Cuyahoga Probate Court - Proware-Rules-decrement")]
+        [TestCase("Resources.RuleSets.Pfizer-Rules-Master.json.rsd", TestName = "Pfizer-Rules-Master")]
+        [TestCase("Resources.RuleSets.Pfizer-Rules-ML-currency-cellClassifier-getCandidates.json.rsd", TestName = "Pfizer-Rules-ML-currency-cellClassifier-getCandidates")]
+        [TestCase("Resources.RuleSets.Pfizer-Rules-ML-main.json.rsd", TestName = "Pfizer-Rules-ML-main")]
+        [TestCase("Resources.RuleSets.TX - DallasCountyElections-Rules-Master.json.rsd", TestName = "TX - DallasCountyElections-Rules-Master")]
+        [TestCase("Resources.RuleSets.WI - Dodge - TriMin-Rules-Master.json.rsd", TestName = "WI - Dodge - TriMin-Rules-Master")]
+        [TestCase("Resources.RuleSets.WI - Dodge - TriMin-Rules-Utils-PageCC.json.rsd", TestName = "WI - Dodge - TriMin-Rules-Utils-PageCC")]
+        [TestCase("Resources.RuleSets.WV - SOS UCC-Rules-Master.json.rsd", TestName = "WV - SOS UCC-Rules-Master")]
+        [TestCase("Resources.RuleSets.CA - Cedar Sinai-Solution-Rules-Master.json.rsd", TestName = "CA - Cedar Sinai-Solution-Rules-Master")]
+        [TestCase("Resources.RuleSets.CA - Cedar Sinai-Solution-Rules-TestResults-getTests.json.rsd", TestName = "CA - Cedar Sinai-Solution-Rules-TestResults-getTests")]
+        [TestCase("Resources.RuleSets.Demo_LabDE-Solution-Rules-DocumentSorter-Master.json.rsd", TestName = "Demo_LabDE-Solution-Rules-DocumentSorter-Master")]
+        [TestCase("Resources.RuleSets.Hurley-Solution-Rules-SplitDeletedPages.json.rsd", TestName = "Hurley-Solution-Rules-SplitDeletedPages")]
+        [TestCase("Resources.RuleSets.Northwestern Memorial Hospital-Solution-Rules-ShadowFax.json.rsd", TestName = "Northwestern Memorial Hospital-Solution-Rules-ShadowFax")]
+        [TestCase("Resources.RuleSets.UW Transplant-Solution-Rules-DocumentSorter-Master.json.rsd", TestName = "UW Transplant-Solution-Rules-DocumentSorter-Master")]
+        [TestCase("Resources.RuleSets.UW Transplant-Solution-Rules-PaginationMaster.json.rsd", TestName = "UW Transplant-Solution-Rules-PaginationMaster")]
+        [TestCase("Resources.RuleSets.UW Transplant-Solution-Rules-Swiping-CollectionDate.json.rsd", TestName = "UW Transplant-Solution-Rules-Swiping-CollectionDate")]
+        [TestCase("Resources.RuleSets.WI - Exact Sciences-Solution-Rules-Master.json.rsd", TestName = "WI - Exact Sciences-Solution-Rules-Master")]
+        [TestCase("Resources.RuleSets.WI - Exact Sciences-Solution-Rules-Master_NoUSS.json.rsd", TestName = "WI - Exact Sciences-Solution-Rules-Master_NoUSS")]
         public static void ExampleRuleSets(string resourceName)
         {
             var rsdPath = _testFiles.GetFile(resourceName);
@@ -176,7 +176,7 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         [TestCase("Resources.RuleObjects.FindFromRSD.json", TestName = "FindFromRSD")]
         [TestCase("Resources.RuleObjects.FindingRuleCondition.json", TestName = "FindingRuleCondition")]
         [TestCase("Resources.RuleObjects.FloatInputValidator.json", TestName = "FloatInputValidator")]
-        [TestCase("Resources.RuleObjects.FSharpPreprocessor.json", TestName = "FSharpPreprocessor")]
+        [TestCase("Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "FSharpPreprocessorV2")]
         [TestCase("Resources.RuleObjects.ImageRegionWithLines.json", TestName = "ImageRegionWithLines")]
         [TestCase("Resources.RuleObjects.InputFinder.json", TestName = "InputFinder")]
         [TestCase("Resources.RuleObjects.InsertCharacters.json", TestName = "InsertCharacters")]
@@ -264,6 +264,46 @@ namespace Extract.AttributeFinder.Rules.Json.Test
 
                         objectsCompared++;
                     }
+                }
+            }
+            Assert.Greater(objectsCompared, 0);
+        }
+
+        /// <summary>
+        /// Load from legacy version and current version json into DTO and compare
+        /// </summary>
+        [TestCase("Resources.RuleObjects.FSharpPreprocessor.json", "Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "FSharpPreprocessor")]
+        public static void LegacyVersionRuleObjects(string legacyResourceName, string currentVersionResourceName)
+        {
+            var legacyJsonFile = _testFiles.GetFile(legacyResourceName);
+            var currentVersionJsonFile = _testFiles.GetFile(currentVersionResourceName);
+            var serializer = JsonSerializer.CreateDefault(RuleObjectJsonSerializer.Settings);
+
+            int objectsCompared = 0;
+            using var legacyStream = new FileStream(legacyJsonFile, FileMode.Open);
+            using var legacyStreamReader = new StreamReader(legacyStream);
+            using var legacyJsonReader = new JsonTextReader(legacyStreamReader);
+
+            using var currentVersionStream = new FileStream(currentVersionJsonFile, FileMode.Open);
+            using var currentVersionStreamReader = new StreamReader(currentVersionStream);
+            using var currentVersionJsonReader = new JsonTextReader(currentVersionStreamReader);
+
+            while (legacyJsonReader.Read())
+            {
+                Assert.That(currentVersionJsonReader.Read());
+
+                if (legacyJsonReader.TokenType == JsonToken.StartObject)
+                {
+                    Assert.That(currentVersionJsonReader.TokenType == JsonToken.StartObject);
+
+                    var dtoInputFromJson = serializer.Deserialize<Dto.ObjectWithDescription>(legacyJsonReader);
+                    var dtoExpectedResultFromJson = serializer.Deserialize<Dto.ObjectWithDescription>(currentVersionJsonReader);
+                    var domain = (IObjectWithDescription)Domain.RuleObjectConverter.ConvertFromDto(dtoInputFromJson);
+                    var (json, dtoFromDomain) = RuleObjectJsonSerializer.Serialize<IObjectWithDescription, Dto.ObjectWithDescription>(domain);
+
+                    Assert.AreEqual(dtoExpectedResultFromJson, dtoFromDomain);
+
+                    objectsCompared++;
                 }
             }
             Assert.Greater(objectsCompared, 0);

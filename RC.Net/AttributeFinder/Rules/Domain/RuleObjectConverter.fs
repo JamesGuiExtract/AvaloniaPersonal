@@ -19,10 +19,18 @@ module RuleObjectConverter =
     |> Seq.map (fun typ -> Activator.CreateInstance typ :?> IRuleObjectConverter)
     |> Seq.toList
 
+  // Does not have a Legacy attribute applied to the type
+  let private isCurrentConverter converter = 
+      converter.GetType().GetCustomAttributes(typeof<LegacyAttribute>, false)
+      |> Seq.isEmpty
+
+  let private currentVersionConverters = 
+    converters |> List.where isCurrentConverter
+
   // Collect all supported ICategorizedComponent descriptions to use for mapping domain object to converters
   // (runtime type tests aren't always reliable with COM rule objects)
   let private descriptionToConverter =
-    converters
+    currentVersionConverters
     |> Seq.choose (fun converter ->
       let domainType = converter.convertsDomain
       match Activator.CreateInstance domainType with
@@ -33,7 +41,7 @@ module RuleObjectConverter =
 
   // Map Domain types to DTO types so that the DTO type doesn't need to be supplied to deserialize
   let private domainTypeToDtoType =
-    converters
+    currentVersionConverters
     |> Seq.map (fun converter -> converter.convertsDomain, converter.convertsDto)
     |> dict
 

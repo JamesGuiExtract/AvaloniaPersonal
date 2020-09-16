@@ -11,7 +11,7 @@ module Evaluator =
 
     // Load a script file with fsi and get the specified functions
     // Assumes the functions are in a module with the same name as the file name, minus extension
-    let evaluate path functionNames includeDirectories =
+    let evaluate path functionNames includeDirectories collectible =
         let fullPath = Path.GetFullPath path
         let scriptDir = Path.GetDirectoryName fullPath
         Extract.ExtractException.Assert("ELI46985", "Path is not a full path", (path = fullPath), "Path", path);
@@ -42,7 +42,7 @@ module Evaluator =
                     yield "-d:FUNCTION_LOADER" // Allow conditional compilation via #if FUNCTION_LOADER
                     yield! (includeDirectories |> Seq.map (sprintf @"-I:""%s"""))
                   } |> Seq.toArray
-                FsiEvaluationSession.Create(fsiConfig, argv, inStream, outStream, errStream, collectible = true)
+                FsiEvaluationSession.Create(fsiConfig, argv, inStream, outStream, errStream, collectible = collectible)
             with
             | ex ->
                 let uex = Extract.ExtractException("ELI47006", "Error creating FSI session", ex)
@@ -80,12 +80,12 @@ module Evaluator =
 
 // Load a single function from a file
 // Throws if the script can't be loaded or the function doesn't exist
-let LoadFunction<'TData>(scriptPath, functionName, ([<ParamArray>] includeDirectories : string[])): Transformation<'TData> =
-    Evaluator.evaluate scriptPath [| functionName |] includeDirectories
+let LoadFunction<'TData>(scriptPath, functionName, collectible, ([<ParamArray>] includeDirectories : string[])): Transformation<'TData> =
+    Evaluator.evaluate scriptPath [| functionName |] includeDirectories collectible
     |> Array.head
 
 // Loads functions from a file
 // Throws if the script can't be loaded or any of the functions don't exist
-let LoadFunctions<'TData>(scriptPath, functionNames, [<ParamArray>] includeDirectories): Transformation<'TData>[] =
+let LoadFunctions<'TData>(scriptPath, functionNames, collectible, [<ParamArray>] includeDirectories): Transformation<'TData>[] =
     let includeDirectories = if includeDirectories = null then [||] else includeDirectories
-    Evaluator.evaluate scriptPath functionNames includeDirectories
+    Evaluator.evaluate scriptPath functionNames includeDirectories collectible

@@ -267,6 +267,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinaryToDto.cs" />
     <Compile Include="LoadFromFile.cs" />
     <Compile Include="JsonToDtoViaDomain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -402,6 +403,7 @@
     <EmbeddedResource Include="Resources\RuleObjects\FindFromRSD.hex.txt" />
     <EmbeddedResource Include="Resources\RuleObjects\FindingRuleCondition.hex.txt" />
     <EmbeddedResource Include="Resources\RuleObjects\FSharpPreprocessor.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\FSharpPreprocessorV2.hex.txt" />
     <EmbeddedResource Include="Resources\RuleObjects\ImageRegionWithLines.hex.txt" />
     <EmbeddedResource Include="Resources\RuleObjects\InputFinder.hex.txt" />
     <EmbeddedResource Include="Resources\RuleObjects\InsertCharacters.hex.txt" />
@@ -587,6 +589,7 @@
     <EmbeddedResource Include="Resources\RuleObjects\FindingRuleCondition.json" />
     <EmbeddedResource Include="Resources\RuleObjects\FloatInputValidator.json" />
     <EmbeddedResource Include="Resources\RuleObjects\FSharpPreprocessor.json" />
+    <EmbeddedResource Include="Resources\RuleObjects\FSharpPreprocessorV2.json" />
     <EmbeddedResource Include="Resources\RuleObjects\ImageRegionWithLines.json" />
     <EmbeddedResource Include="Resources\RuleObjects\InputFinder.json" />
     <EmbeddedResource Include="Resources\RuleObjects\InsertCharacters.json" />

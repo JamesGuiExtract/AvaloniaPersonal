@@ -4,3 +4,9 @@ type FSharpPreprocessor = {
   ScriptPath: string
   FunctionName: string
 }
+
+type FSharpPreprocessorV2 = {
+  ScriptPath: string
+  FunctionName: string
+  Collectible: bool
+}

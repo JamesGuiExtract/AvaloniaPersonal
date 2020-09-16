@@ -40,6 +40,10 @@ namespace Extract.AttributeFinder.Rules
                 InitializeComponent();
 
                 _pathToScriptFilePathTagsButton.PathTags = new AttributeFinderPathTags();
+                string collectibleTooltip = "When checked, memory usage will be lower but some features will not work."
+                    + "\n If you get an exception with 'collectible' in the message, try unchecking this box.";
+                toolTip1.SetToolTip(_collectibleCheckBox, collectibleTooltip);
+                toolTip1.SetToolTip(_collectibleInfoTip, collectibleTooltip);
             }
             catch (Exception ex)
             {
@@ -82,6 +86,7 @@ namespace Extract.AttributeFinder.Rules
                 {
                     _pathToScriptFileTextBox.Text = Settings.ScriptPath;
                     _functionNameTextBox.Text = Settings.FunctionName;
+                    _collectibleCheckBox.Checked = Settings.Collectible;
                 }
             }
             catch (Exception ex)
@@ -113,6 +118,7 @@ namespace Extract.AttributeFinder.Rules
 
                 Settings.ScriptPath = _pathToScriptFileTextBox.Text;
                 Settings.FunctionName = _functionNameTextBox.Text;
+                Settings.Collectible = _collectibleCheckBox.Checked;
 
                 DialogResult = DialogResult.OK;
             }

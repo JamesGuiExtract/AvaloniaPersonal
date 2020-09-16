@@ -33,6 +33,14 @@ namespace Extract.AttributeFinder.Rules
         /// The unqualified name of the function to run
         /// </summary>
         string FunctionName { get; set; }
+
+        /// <summary>
+        /// Whether the generated types can be garbage collected
+        /// </summary>
+        /// <remarks>
+        /// If Collectible is true then some code features will not work but memory usage will be lower
+        /// </remarks>
+        bool Collectible { get; set; }
     }
 
     /// <summary>
@@ -53,7 +61,10 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// Current version.
         /// </summary>
-        const int _CURRENT_VERSION = 1;
+        /// <remarks>
+        /// Version 2: Add Collectible
+        /// </remarks>
+        const int _CURRENT_VERSION = 2;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -125,6 +136,14 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         public string FunctionName { get; set; }
 
+        /// <summary>
+        /// Whether the generated types can be garbage collected
+        /// </summary>
+        /// <remarks>
+        /// If Collectible is true then some code features will not work but memory usage will be lower
+        /// </remarks>
+        public bool Collectible { get; set; } = true;
+
         #endregion Properties
 
         #region IDocumentPreprocessor members
@@ -142,9 +161,10 @@ namespace Extract.AttributeFinder.Rules
                 try
                 {
                     fun = FileDerivedResourceCache.GetCachedObject(
-                        () => FunctionLoader.LoadFunction<AFDocument>(expandedScriptPath, FunctionName, componentDataDir),
+                        () => FunctionLoader.LoadFunction<AFDocument>(expandedScriptPath, FunctionName, Collectible, componentDataDir),
                         expandedScriptPath,
                         componentDataDir, // include this dir so that there will be a unique entry in the cache for each FKB in use
+                        Collectible.ToString(),
                         FunctionName);
 
                 }
@@ -343,6 +363,10 @@ namespace Extract.AttributeFinder.Rules
                 {
                     ScriptPath = reader.ReadString();
                     FunctionName = reader.ReadString();
+                    if (reader.Version >= 2)
+                    {
+                        Collectible = reader.ReadBoolean();
+                    }
 
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
@@ -374,6 +398,7 @@ namespace Extract.AttributeFinder.Rules
                 {
                     writer.Write(ScriptPath);
                     writer.Write(FunctionName);
+                    writer.Write(Collectible);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -440,6 +465,7 @@ namespace Extract.AttributeFinder.Rules
         {
             ScriptPath = source.ScriptPath;
             FunctionName = source.FunctionName;
+            Collectible = source.Collectible;
 
             _dirty = true;
         }

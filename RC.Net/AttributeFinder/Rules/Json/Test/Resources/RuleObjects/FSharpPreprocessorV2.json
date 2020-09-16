@@ -1,191 +1,222 @@
 [
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\CountDistinctNames.fsx",
-      "FunctionName": "AFDoc.getDistinctNameCount"
+      "FunctionName": "AFDoc.getDistinctNameCount",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
-      "FunctionName": "getSensitiveParagraphsOutsideOfTablesFromDocument"
+      "FunctionName": "getSensitiveParagraphsOutsideOfTablesFromDocument",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Tables.fsx",
-      "FunctionName": "test"
+      "FunctionName": "test",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
-      "FunctionName": "predictSensitiveText"
+      "FunctionName": "predictSensitiveText",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\TableScripts.fsx",
-      "FunctionName": "AFDoc.Tabula.createTablesPDFIfMissing"
+      "FunctionName": "AFDoc.Tabula.createTablesPDFIfMissing",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
-      "FunctionName": "getSensitiveLinesOutsideOfTablesFromDocument"
+      "FunctionName": "getSensitiveLinesOutsideOfTablesFromDocument",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
-      "FunctionName": "getTextOutsideOfTablesFromDocument"
+      "FunctionName": "getTextOutsideOfTablesFromDocument",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Ensemble\\Scripts\\AFDoc.fsx",
-      "FunctionName": "tryToLearn"
+      "FunctionName": "tryToLearn",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Ensemble\\Scripts\\AFDoc.fsx",
-      "FunctionName": "createTrainingDataAndTryToLearn"
+      "FunctionName": "createTrainingDataAndTryToLearn",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts.fsx",
-      "FunctionName": "AFDoc.getTextOutsideOfTables"
+      "FunctionName": "AFDoc.getTextOutsideOfTables",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Ensemble\\Scripts\\AFDoc.fsx",
-      "FunctionName": "reLearn"
+      "FunctionName": "reLearn",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts.fsx",
-      "FunctionName": "writeCSV"
+      "FunctionName": "writeCSV",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\TableScripts.fsx",
-      "FunctionName": "AFDoc.getCellsWithFeaturesForNonEmptyPages"
+      "FunctionName": "AFDoc.getCellsWithFeaturesForNonEmptyPages",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
-      "FunctionName": "getSensitiveRowsFromPage"
+      "FunctionName": "getSensitiveRowsFromPage",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
-      "FunctionName": "getNonTablePagesFromDocument"
+      "FunctionName": "getNonTablePagesFromDocument",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\ML\\currency-cellClassifier\\TableScripts.fsx",
-      "FunctionName": "AFDoc.Tabula.createTablesPDFIfMissing"
+      "FunctionName": "AFDoc.Tabula.createTablesPDFIfMissing",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
-      "FunctionName": "getNonRefTablePagesFromDocument"
+      "FunctionName": "getNonRefTablePagesFromDocument",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\..\\Scripts\\AFDoc.fsx",
-      "FunctionName": "findRepeatsForHighConfidenceItems"
+      "FunctionName": "findRepeatsForHighConfidenceItems",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\NERUtils.fsx",
-      "FunctionName": "AFDoc.getSensitiveRows"
+      "FunctionName": "AFDoc.getSensitiveRows",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
-      "FunctionName": "getSensitiveCellsFromDocument"
+      "FunctionName": "getSensitiveCellsFromDocument",
+      "Collectible": true
     }
   },
   {
-    "Type": "FSharpPreprocessor",
+    "Type": "FSharpPreprocessorV2",
     "Description": "",
     "Enabled": true,
     "Object": {
       "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
-      "FunctionName": "getSensitiveRowsFromDocument"
+      "FunctionName": "getSensitiveRowsFromDocument",
+      "Collectible": true
+    }
+  },
+  {
+    "Type": "FSharpPreprocessorV2",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "ScriptPath": "<RSDFileDir>\\Scripts\\AFDoc.fsx",
+      "FunctionName": "getSensitiveRowsFromDocument",
+      "Collectible": false
     }
   }
 ]
