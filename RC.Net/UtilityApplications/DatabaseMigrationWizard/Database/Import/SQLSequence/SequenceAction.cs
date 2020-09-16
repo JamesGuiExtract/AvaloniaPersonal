@@ -94,7 +94,7 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                 'Update'
                 , 'Info'
                 , 'Action'
-                , 'The ASC name will be updated'
+                , 'The ASCName will be updated.'
                 , dbo.Action.ASCName
                 , UpdatingAction.ASCName
             FROM
@@ -132,7 +132,7 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                 'Update'
                 , 'Info'
                 , 'Action'
-                , CONCAT('The MainSequence be updated for this action ', UpdatingAction.ASCName)
+                , CONCAT('The MainSequence flag will be updated for this action ', UpdatingAction.ASCName)
                 , dbo.Action.MainSequence
                 , UpdatingAction.MainSequence
             FROM

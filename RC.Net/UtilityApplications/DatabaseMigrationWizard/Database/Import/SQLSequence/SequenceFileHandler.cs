@@ -168,12 +168,14 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                 ISNULL(UpdatingFileHandler.ApplicationPath, '') <> ISNULL(dbo.FileHandler.ApplicationPath, '')
             ;
             INSERT INTO
-                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
             SELECT
                 'Update'
                 , 'Info'
                 , 'FileHandler'
                 , CONCAT('The Arguments field for ', dbo.FileHandler.AppName ,' will be updated')
+                , CAST(dbo.FileHandler.Arguments AS NVARCHAR(MAX))
+                , CAST(UpdatingFileHandler.Arguments AS NVARCHAR(MAX))
 
             FROM
                 ##FileHandler AS UpdatingFileHandler
@@ -302,7 +304,7 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                 'N/A'
                 , 'Warning'
                 , 'FileHandler'
-                , 'In the filehandler table, the AppName' + ##FileHandler.AppName + ' has a realitive path defined. Please validate all filepaths in the filehandler after importing.'
+                , 'In the filehandler table, the AppName' + ##FileHandler.AppName + ' has a relative path defined. Please validate all filepaths in the filehandler after importing.'
 
             FROM 
                 ##FileHandler

@@ -153,7 +153,16 @@ namespace DatabaseMigrationWizard.Pages
                 {
                     ex.ExtractDisplay("ELI49751");
 
-                    this.PopulateReportingInformation(startTime);
+                    try
+                    {
+                        this.PopulateReportingInformation(startTime);
+                    }
+                    catch (Exception ee)
+                    {
+                        ExtractException extractException = ee.AsExtract("ELI50368");
+                        extractException.AddDebugData("Reporting", "Unable to populate reporting information. Make sure your database is up to date.");
+                        extractException.ExtractDisplay("ELI50369");
+                    }
 
                     App.Current.Dispatcher.Invoke(delegate
                     {

@@ -57,7 +57,7 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             WHERE
                 ##Login.GUID IS NULL
                 AND
-                Login.UserName <> 'Admin'
+                Login.UserName <> 'admin'
             ;
             INSERT INTO
                 dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
@@ -73,7 +73,7 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             WHERE
                 dbo.Login.Guid IS NULL
                 AND
-                ##Login.UserName <> 'Admin'";
+                ##Login.UserName <> 'admin'";
 
         private readonly string UpdateReportingSQL = @"
             INSERT INTO

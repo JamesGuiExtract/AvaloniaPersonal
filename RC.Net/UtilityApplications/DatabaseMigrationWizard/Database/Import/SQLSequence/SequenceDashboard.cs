@@ -127,12 +127,14 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             ;
             --Definition
             INSERT INTO
-                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
             SELECT
                 'Update'
                 , 'Info'
                 , 'Dashboard'
-                , CONCAT('The ', dbo.Dashboard.DashboardName , ' Definition will be updated')
+                , CONCAT('The ', dbo.Dashboard.DashboardName , ' will have its definition updated')
+                , CAST(dbo.Dashboard.Definition AS NVARCHAR(MAX))
+                , CAST(UpdatingDashboard.Definition AS NVARCHAR(MAX))
 
             FROM
                 ##Dashboard AS UpdatingDashboard
@@ -143,12 +145,14 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             ;
             --ExtractedDataDefinition
             INSERT INTO
-                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
             SELECT
                 'Update'
                 , 'Info'
                 , 'Dashboard'
-                , CONCAT('The ', dbo.Dashboard.DashboardName , ' ExtractedDataDefinition will be updated')
+                , CONCAT('The ', dbo.Dashboard.DashboardName , ' will have its ExtractedDataDefinition updated')
+                , CAST(dbo.Dashboard.ExtractedDataDefinition AS NVARCHAR(MAX))
+                , CAST(UpdatingDashboard.ExtractedDataDefinition AS NVARCHAR(MAX))
 
             FROM
                 ##Dashboard AS UpdatingDashboard

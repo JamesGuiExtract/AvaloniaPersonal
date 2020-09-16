@@ -121,12 +121,14 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             ;
             --Settings
             INSERT INTO
-                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
             SELECT
                 'Update'
                 , 'Info'
                 , 'DatabaseService'
-                , CONCAT('The ', dbo.DatabaseService.Description , ' Settings will be updated.')
+                , CONCAT('The ', dbo.DatabaseService.Description , ' will have its settings updated.')
+                , dbo.DatabaseService.Settings
+                , UpdatingDatabaseService.Settings
             FROM
                 ##DatabaseService AS UpdatingDatabaseService
                     

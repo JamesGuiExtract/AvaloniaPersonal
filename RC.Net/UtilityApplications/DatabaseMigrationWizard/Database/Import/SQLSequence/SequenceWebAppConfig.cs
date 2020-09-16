@@ -80,13 +80,14 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
 
 		private readonly string UpdateReportingSQL = @"
             INSERT INTO
-                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message, Old_Value, New_Value)
             SELECT
                 'Update'
                 , 'Info'
                 , 'WebAppConfig'
                 , CONCAT('The WebAppConfig ', dbo.WebAppConfig.Type, ' will have its settings updated')
-
+                , CAST(dbo.WebAppConfig.Settings AS NVARCHAR(MAX))
+                , CAST(UpdatingWebAppConfig.Settings AS NVARCHAR(MAX))
             FROM
                 ##WebAppConfig AS UpdatingWebAppConfig
 
