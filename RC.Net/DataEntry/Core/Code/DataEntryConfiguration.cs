@@ -283,7 +283,12 @@ namespace Extract.DataEntry
                 configuration._config = _config;
                 configuration._tagUtility = _tagUtility;
                 configuration._fileProcessingDB = _fileProcessingDB;
-                configuration._backgroundModel = _backgroundModel;
+
+                // https://extract.atlassian.net/browse/ISSUE-17216
+                // Any AutoUpdateQueries that use TargetProperty will modify the members of this model;
+                // Create a copy so such modifications do not carry over into the load of other
+                // OutputDocuments.
+                configuration._backgroundModel = _backgroundModel.Clone();
 
                 return configuration;
             }
@@ -395,7 +400,7 @@ namespace Extract.DataEntry
                     if (File.Exists(noUiLoadConfigFile))
                     {
                         string noUiLoadConfig = File.ReadAllText(noUiLoadConfigFile);
-                        _backgroundModel = BackgroundModel.FromJson(noUiLoadConfig);
+                        _backgroundModel = BackgroundModel.FromJson(noUiLoadConfig, masterCopy: true);
                     }
                     else
                     {

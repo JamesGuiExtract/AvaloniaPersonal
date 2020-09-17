@@ -14,40 +14,51 @@ namespace Extract.DataEntry
     /// </summary>
     public class BackgroundModel
     {
-        public BackgroundModel() { } 
+        // The serialized JSON representation of this model.
+        string _json;
+
+        public BackgroundModel() { }
+
         public BackgroundModel(DataEntryControlHost controlHost)
         {
-            ValidationEnabled = controlHost.ValidationEnabled;
-
-            // The field models returned will have hierarchy only for fields within specific complex
-            // controls (tables). The fields will need to be organized into the full hierarchy.
-            var unorganizedFieldModels = GetFieldModels(controlHost).ToArray();
-
-            Fields = new List<BackgroundFieldModel>();
-            Controls = new List<BackgroundControlModel>();
-
-            // Loop to build field hierarchy using 
-            foreach (var fieldModel in unorganizedFieldModels)
+            try
             {
-                if (fieldModel.OwningControl.ParentDataEntryControl == null)
+                ValidationEnabled = controlHost.ValidationEnabled;
+
+                // The field models returned will have hierarchy only for fields within specific complex
+                // controls (tables). The fields will need to be organized into the full hierarchy.
+                var unorganizedFieldModels = GetFieldModels(controlHost).ToArray();
+
+                Fields = new List<BackgroundFieldModel>();
+                Controls = new List<BackgroundControlModel>();
+
+                // Loop to build field hierarchy using 
+                foreach (var fieldModel in unorganizedFieldModels)
                 {
-                    Fields.Add(fieldModel);
+                    if (fieldModel.OwningControl.ParentDataEntryControl == null)
+                    {
+                        Fields.Add(fieldModel);
+                    }
+                    else
+                    {
+                        var parentModel = _fieldDictionary[fieldModel.OwningControl.ParentDataEntryControl];
+
+                        // Confirm that the parent has a name since otherwise it won't be in the fieldModels collection
+                        ExtractException.Assert("ELI45636", "Logic exception", !string.IsNullOrEmpty(parentModel?.Name));
+
+                        parentModel.Children.Add(fieldModel);
+                    }
+
+                    Controls.Add(fieldModel.OwningControlModel);
                 }
-                else
-                {
-                    var parentModel = _fieldDictionary[fieldModel.OwningControl.ParentDataEntryControl];
 
-                    // Confirm that the parent has a name since otherwise it won't be in the fieldModels collection
-                    ExtractException.Assert("ELI45636", "Logic exception", !string.IsNullOrEmpty(parentModel?.Name));
-
-                    parentModel.Children.Add(fieldModel);
-                }
-
-                Controls.Add(fieldModel.OwningControlModel);
+                // Sets OwningControl as OwningControlModel for all fields.
+                ApplyOwningControlModels(Fields);
             }
-
-            // Sets OwningControl as OwningControlModel for all fields.
-            ApplyOwningControlModels(Fields);
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50372");
+            }
         }
 
         /// <summary>
@@ -83,9 +94,12 @@ namespace Extract.DataEntry
         {
             try
             {
-                string json = JsonConvert.SerializeObject(this, Formatting.Indented, SerializationSettings);
+                if (string.IsNullOrWhiteSpace(_json))
+                {
+                    _json = JsonConvert.SerializeObject(this, Formatting.Indented, SerializationSettings);
+                }
 
-                return json;
+                return _json;
             }
             catch (Exception ex)
             {
@@ -96,7 +110,10 @@ namespace Extract.DataEntry
         /// <summary>
         /// Deserializes a <see cref="BackgroundModel"/> instance from the provided <see paramref="json"/>.
         /// </summary>
-        public static BackgroundModel FromJson(string json)
+        /// <param name="masterCopy"><c>true</c> if this is to be a master copy from which per-OutputDocument
+        /// instances will be cloned; for master copies which are likely to be cloned; _json will be cached
+        /// for greater effiency.</param>
+        public static BackgroundModel FromJson(string json, bool masterCopy)
         {
             try
             {
@@ -106,11 +123,28 @@ namespace Extract.DataEntry
                 // Sets OwningControl as OwningControlModel for all fields.
                 backgroundModel.ApplyOwningControlModels(backgroundModel.Fields);
 
+                if (masterCopy)
+                {
+                    backgroundModel._json = json;
+                }
+
                 return backgroundModel;
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI50240");
+            }
+        }
+
+        public BackgroundModel Clone()
+        {
+            try
+            {
+                return FromJson(ToJson(), masterCopy: false);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50371");
             }
         }
 
