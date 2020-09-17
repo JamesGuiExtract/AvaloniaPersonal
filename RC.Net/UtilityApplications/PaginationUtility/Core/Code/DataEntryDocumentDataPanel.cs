@@ -395,6 +395,27 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
         }
 
+        /// <summary>
+        /// Displays a validation error for the first error encountered and highlights the invalid
+        /// field.
+        /// </summary>
+        /// <returns><c>true</c> if a validation error was found and displayed; <c>false</c> if no
+        /// validation error was found.</returns>
+        public bool ShowValidationError()
+        {
+            try
+            {
+                // While not clearly indicated by the name, DataCanBeSaved displays any validation
+                // errors that are present. DEPs have overrided DataCanBeSaved, so that method
+                // name or accessibility should be left as is if possible.
+                return !DataCanBeSaved();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50376");
+            }
+        }
+
         #endregion IPaginationDocumentDataPanel
 
         #region Internal Members

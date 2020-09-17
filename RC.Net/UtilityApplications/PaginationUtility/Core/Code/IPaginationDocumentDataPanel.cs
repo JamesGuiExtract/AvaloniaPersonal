@@ -299,6 +299,14 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool GoToNextInvalid(bool includeWarnings);
 
         /// <summary>
+        /// Displays a validation error for the first error encountered and highlights the invalid
+        /// field.
+        /// </summary>
+        /// <returns><c>true</c> if a validation error was found and displayed; <c>false</c> if no
+        /// validation error was found.</returns>
+        public bool ShowValidationError();
+
+        /// <summary>
         /// <c>true</c> if a document type field is available to select from document-type specific
         /// configurations.
         /// </summary>

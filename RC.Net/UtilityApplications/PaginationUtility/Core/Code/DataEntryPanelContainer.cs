@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using static System.FormattableString;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -925,6 +926,36 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI50162");
+            }
+        }
+
+        /// <summary>
+        /// Displays a validation error for the first error encountered and highlights the invalid
+        /// field.
+        /// </summary>
+        /// <returns><c>true</c> if a validation error was found and displayed; <c>false</c> if no
+        /// validation error was found.</returns>
+        public bool ShowValidationError()
+        {
+            try
+            {
+                if (!_configManager.DocumentTypeIsValid)
+                {
+                    new ExtractException("ELI50373",
+                        Invariant($"Document type is invalid: \"{_documentTypeComboBox.Text}\""))
+                        .Display();
+
+                    FocusDocumentType();
+                    return true;
+                }
+                else
+                { 
+                    return ActiveDataEntryPanel.ShowValidationError();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI50374");
             }
         }
 
