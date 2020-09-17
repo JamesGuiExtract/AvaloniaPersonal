@@ -132,6 +132,7 @@ Dlg_SdStartCopy:
 	// Move old reg keys before setup moves files but the ui is finished
    	MoveRegKeys();
    	CopyLicFiles();
+	BackupESFAMServiceFile();
    	 	                      
 	// Install Office Redist
    	InstallOfficeRedist();

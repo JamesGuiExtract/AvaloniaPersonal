@@ -30,6 +30,7 @@
     #define EXTRACT_LM_PRODUCT_CODE "{EB8DE231-8B66-4DE6-A56D-39452D8CF35F}"
     #define LABDE_PRODUCT_CODE "{0E412937-E4FA-4737-A321-00AED69497C7}"
     #define LOG_FILE_PATH CommonAppDataFolder ^ "\\Extract Systems\\LogFiles"
+    #define ESFAMSERVICE_FILE_PATH CommonAppDataFolder ^ "\\Extract Systems\\ESFAMService"
     #define EXCEPTION_FILE_NAME "ExtractException.uex"
     #define UCLID_EXCEPTION_FILE_NAME "UCLIDException.uex"
     #define REG_PATH_DOT_NET_40_INSTALL "\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full"  
@@ -98,6 +99,8 @@
 	prototype BOOL Is64BitSQLCEInstalled();
 	prototype BOOL Is32BitSQLCEInstalled();
 	prototype UninstallSharedItems();
+	prototype STRING GenerateBackupFileName(STRING);
+	prototype BackupESFAMServiceFile();
 	
 
     // your global variables
@@ -297,6 +300,62 @@ end;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
+// Function: GenerateBackupFileName
+//
+//  Purpose: This function adds 
+//			 "YYYY-MM-DD HHhMMmSSs strSourceFile where the YYYY/MM/DD/etc 
+//			 are the year/month/day and other time related fields
+//	Returns: Name for the backup file for the give file
+///////////////////////////////////////////////////////////////////////////////
+function STRING GenerateBackupFileName(strSourceFile)
+	STRING strDest;
+	NUMBER nvResult;
+	STRING strDate;
+	STRING strTime;
+	LIST listDateID;
+	LIST listTimeID;
+	STRING strMonth, strDay, strYear;
+	STRING strHour, strMinute, strSeconds;
+begin
+	// Get the date
+	GetSystemInfo ( DATE , nvResult , strDate );
+	
+	// Separate date into Month, Day, year
+	listDateID = ListCreate(STRINGLIST);
+	StrGetTokens ( listDateID , strDate , "-" );
+	ListGetFirstString ( listDateID, strMonth );
+	ListGetNextString ( listDateID, strDay );
+	ListGetNextString ( listDateID, strYear );
+
+	// Get the time
+	GetSystemInfo ( TIME , nvResult , strTime );  
+	
+	// Separate the Time into Hours, Minutes, Seconds
+	listTimeID = ListCreate(STRINGLIST);
+	StrGetTokens ( listTimeID , strTime , ":" );
+	ListGetFirstString ( listTimeID, strHour );
+	ListGetNextString ( listTimeID, strMinute );
+	ListGetNextString ( listTimeID, strSeconds );
+	  
+	// Add the leading 0 if the month is only 1 digit
+	if (StrLengthChars(strMonth) = 1) then
+		strMonth = '0' + strMonth;
+	endif;
+													 
+	// Add the leading 0 if the day is only 1 digit
+	if (StrLengthChars(strDay) = 1) then
+		strDay = '0' + strDay;
+	endif;
+		
+	strDest = strYear + "-" + strMonth + "-" + strDay;
+	strDest = strDest + " " + strHour + "h" + strMinute + "m" + strSeconds + "s ";
+	strDest = strDest + strSourceFile;
+	return strDest;
+		
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
 // Function: RenameUEXFile
 //
 //  Purpose: This function renames exception file if it exist to
@@ -307,58 +366,44 @@ end;
 function RenameUEXFile()
 	STRING strSource;
 	STRING strDest;
-	NUMBER nvResult;
-	STRING strDate;
-	STRING strTime;
-	LIST listDateID;
-	LIST listTimeID;
-	STRING strMonth, strDay, strYear;
-	STRING strHour, strMinute, strSeconds;
 begin
 	strSource  = LOG_FILE_PATH ^ EXCEPTION_FILE_NAME;
 	
 	// Check if the exception file exists
 	if ( Is( FILE_EXISTS, strSource )) then  
-		// Get the date
-		GetSystemInfo ( DATE , nvResult , strDate );
-		
-		// Separate date into Month, Day, year
-		listDateID = ListCreate(STRINGLIST);
-		StrGetTokens ( listDateID , strDate , "-" );
-		ListGetFirstString ( listDateID, strMonth );
-		ListGetNextString ( listDateID, strDay );
-		ListGetNextString ( listDateID, strYear );
-
-		// Get the time
-		GetSystemInfo ( TIME , nvResult , strTime );  
-		
-		// Separate the Time into Hours, Minutes, Seconds
-		listTimeID = ListCreate(STRINGLIST);
-		StrGetTokens ( listTimeID , strTime , ":" );
-		ListGetFirstString ( listTimeID, strHour );
-		ListGetNextString ( listTimeID, strMinute );
-		ListGetNextString ( listTimeID, strSeconds );
-		  
-		// Add the leading 0 if the month is only 1 digit
-		if (StrLengthChars(strMonth) = 1) then
-			strMonth = '0' + strMonth;
-		endif;
-		                                                 
-		// Add the leading 0 if the day is only 1 digit
-		if (StrLengthChars(strDay) = 1) then
-			strDay = '0' + strDay;
-		endif;
-			
 		// Create the new filename for the exception file
-		strDest = LOG_FILE_PATH ^ "\\";
-		strDest = strDest + strYear + "-" + strMonth + "-" + strDay;
-		strDest = strDest + " " + strHour + "h" + strMinute + "m" + strSeconds + "s ";
-		strDest = strDest + EXCEPTION_FILE_NAME;
+		strDest = LOG_FILE_PATH ^ GenerateBackupFileName(EXCEPTION_FILE_NAME);
 		
 		// Rename exception file
 		RenameFile ( strSource , strDest );
 	endif;
 end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: BackupESFAMServiceFile
+//
+//  Purpose: This function copies ESFAMService file if it exist to
+//			 "YYYY-MM-DD HHhMMmSSs <EXCEPTION_FILE_NAME>" where the YYYY/MM/DD/etc 
+//			 are the year/month/day and other time related fields
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function BackupESFAMServiceFile()
+	STRING strSource;
+	STRING strDest;
+begin
+	strSource  = ESFAMSERVICE_FILE_PATH ^ "ESFAMService.sdf";
+	
+	// Check if the exception file exists
+	if ( Is( FILE_EXISTS, strSource )) then  
+		// Create the new filename for the ESFAMService file
+		strDest = ESFAMSERVICE_FILE_PATH ^ GenerateBackupFileName("ESFAMService.sdf");
+		
+		// Rename ESFAMServiceFile file
+		CopyFile ( strSource , strDest );
+	endif;
+end;
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

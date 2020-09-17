@@ -206,6 +206,7 @@
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{A82B6DBF-7E9C-4E66-B4FF-4BB1BFDBCCF2}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{4536C0B2-E6CF-46C9-B974-2C86140A9DA1}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>esfamconditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{BA65C576-20B4-43CD-B136-B001E714B474}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>esfamservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ESFAMServiceDatabase.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{4D0D186B-A796-4238-8331-25B0CABD5DBB}</td><td>ES_FAM_SERVICE.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>144</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESFDRSService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{EA4B0A1B-C39A-4302-BCC5-3EEC1B00D256}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>esfdrsservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESFileSuppliers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{D7E7C80A-0B5A-494E-836B-F4D1EF4C5751}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>ESFileSuppliers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESIPCService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{C5DDC4E4-E9CC-494F-86DA-B391F0671EC3}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>esipcservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -411,6 +412,7 @@
 		<row><td>DIRPROPERTY5.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>TARGETDIR</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>DOCUMENT_API.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>APIs.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>DOCUME~1|DocumentAPI</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
+		<row><td>ES_FAM_SERVICE.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMS~1|ESFAMService</td><td/><td>0</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>CommonAppDataFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
 		<row><td>FDRS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS_COMMON_APP_DATA.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FDRS</td><td/><td>0</td><td/></row>
@@ -553,6 +555,7 @@
 		<row><td>detectandreportfailure.ini.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>DETECT~1.INI|DetectAndReportFailure.ini</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_PROGRAMDATAFILE_FI&gt;\DetectAndReportFailure.ini</td><td>1</td><td/></row>
 		<row><td>esfamconditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMC~1.DLL|ESFAMConditions.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\ESFAMConditions.dll</td><td>17</td><td/></row>
 		<row><td>esfamservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMS~1.EXE|ESFAMService.exe</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\ESFAMService.exe</td><td>17</td><td/></row>
+		<row><td>esfamservice.sdf.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMServiceDatabase.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMService.sdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_MISC_FILES&gt;\ESFAMService.sdf</td><td>1</td><td/></row>
 		<row><td>esfdrsservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFDRSService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFDRS~1.EXE|ESFDRSService.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\ESFDRSService.exe</td><td>1</td><td/></row>
 		<row><td>esimagecleanup.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESImageCleanup.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESIMAG~1.DLL|ESImageCleanup.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\ESImageCleanup.dll</td><td>17</td><td/></row>
 		<row><td>esipcservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESIPCService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESIPCS~1.EXE|ESIPCService.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\ESIPCService.exe</td><td>1</td><td/></row>
@@ -763,6 +766,7 @@
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_85561DEF_6B21_40FD_9BB4_232D16E11237_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_234A27B5_47C0_4725_B138_600D471D657F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_3BF8EACD_F184_481A_8C95_C43047AD6492_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ESFAMServiceDatabase.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_68045CB7_061F_42CA_AF77_F3D290EB593B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESFDRSService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_4C915BA7_8B0B_47BA_BC40_2E1630B6DE2C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESFileSuppliers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_2CB2C29A_B97A_4EC9_BCBA_F3E035B4D2E1_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ESIPCService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7E94AFBC_F419_4B39_BD46_560BE07C69D0_FILTER</td><td/><td/><td/><td/></row>
@@ -1140,10 +1144,11 @@
 		<row><td>PATH_TO_CLEARIMAGEFILES_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\ClearImageFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CLEARIMAGEFILES_FILES1</td><td>P:\AttributeFinder\ClearImageFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_COMPONENTDATA_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\ComponentData</td><td/><td>2</td></row>
-		<row><td>PATH_TO_DEBUG_FILES</td><td>C:\Engineering\Binaries\Debug</td><td/><td>2</td></row>
+		<row><td>PATH_TO_DEBUG_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\Binaries\Debug</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DOTNETGAC_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DOTNETGAC_FILES1</td><td>\\extract.local\eng\General\ProductDevelopment\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_HELP_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\Help</td><td/><td>2</td></row>
+		<row><td>PATH_TO_MISC_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\RC.Net\FileActionManager\Utilities\ESFAMService\Misc</td><td/><td>2</td></row>
 		<row><td>PATH_TO_ML_PACKAGES_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\RC.Net\APIs</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMMON_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOREC_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
@@ -1481,6 +1486,9 @@
 		<row><td>ID_STRING11.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1033</td><td>type</td><td>0</td><td/><td>-1155351959</td></row>
 		<row><td>ID_STRING12.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1033</td><td>System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe, Version=3.5.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91</td><td>0</td><td/><td>-1155351959</td></row>
 		<row><td>ID_STRING13.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1033</td><td>add[@description=".NET Framework Data Provider for Microsoft SQL Server Compact" and @invariant="System.Data.SqlServerCe.3.5" and @name="Microsoft SQL Server Compact Data Provider" and @type="System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe, Version=3.5.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"]</td><td>0</td><td/><td>-1155351959</td></row>
+		<row><td>ID_STRING14.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1033</td><td>Extract Systems FAM Service</td><td>0</td><td/><td>-2069317458</td></row>
+		<row><td>ID_STRING15.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1033</td><td>Extract Systems FAM Service</td><td>0</td><td/><td>-2069342002</td></row>
+		<row><td>ID_STRING16.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1033</td><td>Manages multiple instances of the Extract Systems FAM for file processing.</td><td>0</td><td/><td>-2069308785</td></row>
 		<row><td>ID_STRING2</td><td>1033</td><td>Extract Systems, LLC.</td><td>0</td><td/><td>194594190</td></row>
 		<row><td>ID_STRING2.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1033</td><td>configuration</td><td>0</td><td/><td>-1155351959</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>*=-Path</td><td>0</td><td/><td>-1936079829</td></row>
@@ -1736,6 +1744,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>ESFAMServiceDatabase.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ESFDRSService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ESFileSuppliers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ESIPCService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -2168,6 +2177,9 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>Registry32.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td><td>.esdx</td><td/><td>Extract Systems Dashboard File</td><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Registry33.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td><td>Extract Systems Dashboard File\DefaultIcon</td><td/><td>"[COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C]DashboardViewer.exe,0</td><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Registry34.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td><td>Extract Systems Dashboard File\shell\open\command</td><td/><td>"[COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C]DashboardViewer.exe" "%1"</td><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>Registry35.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>2</td><td>SYSTEM\CurrentControlSet\Services\EventLog\Application\ESFAMService</td><td/><td/><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>Registry36.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>2</td><td>SYSTEM\CurrentControlSet\Services\EventLog\Application\ESFAMService</td><td>EventMessageFile</td><td>#%C:\Windows\Microsoft.NET\Framework\v4.0.30319\EventLogMessages.dll</td><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>Registry37.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>2</td><td>SYSTEM\CurrentControlSet\Services\EventLog\Application\ESFAMService</td><td>*</td><td/><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Registry4.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>2</td><td>SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ClearImage 7 PDK</td><td/><td/><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Registry5.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>2</td><td>SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ClearImage 7 PDK</td><td>DisplayVersion</td><td>7.1.3241.0</td><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Registry6.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>2</td><td>SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ClearImage 7 PDK</td><td>VersionMajor</td><td>#7</td><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -2229,6 +2241,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">Arguments</col>
 		<col def="I2">Wait</col>
 		<col def="s72">Component_</col>
+		<row><td>InstallESFAMService.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMService</td><td>162</td><td/><td>1</td><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td></row>
 	</table>
 
 	<table name="ServiceInstall">
@@ -2245,6 +2258,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">Arguments</col>
 		<col def="s72">Component_</col>
 		<col def="L255">Description</col>
+		<row><td>ESFAMService.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMService</td><td>##ID_STRING15.CA42753B_6AFC_4293_937C_BCCFA0CC407C##</td><td>16</td><td>3</td><td>1</td><td/><td/><td/><td/><td/><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>##ID_STRING16.CA42753B_6AFC_4293_937C_BCCFA0CC407C##</td></row>
 	</table>
 
 	<table name="Shortcut">
