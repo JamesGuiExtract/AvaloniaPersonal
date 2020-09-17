@@ -253,7 +253,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             dataEntryTableRow3.AutoUpdateQuery = resources.GetString("dataEntryTableRow3.AutoUpdateQuery");
             dataEntryTableRow3.Name = "City";
             dataEntryTableRow3.ValidationErrorMessage = "Unknown city name";
-            dataEntryTableRow3.ValidationQuery = "[BLANK]\r\n<SQL>SELECT DISTINCT [City] FROM [ZipCode]</SQL>";
+            dataEntryTableRow3.ValidationQuery = "<Query ValidationListType=\"ValidationListOnly\">\r\n[BLANK]\r\n<SQL>SELECT DISTINCT [C" +
+    "ity] FROM [ZipCode]</SQL>\r\n</Query>";
             dataEntryTableRow4.AttributeName = "State";
             dataEntryTableRow4.AutoUpdateQuery = resources.GetString("dataEntryTableRow4.AutoUpdateQuery");
             dataEntryTableRow4.Name = "State";
