@@ -14,6 +14,7 @@ using System.Drawing.Printing;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
+using static System.FormattableString;
 
 namespace Extract.UtilityApplications.PaginationUtility
 {
@@ -173,17 +174,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         readonly ToolStripMenuItem _editDocumentDataMenuItem = new ToolStripMenuItem("Edit document data");
 
         /// <summary>
+        /// Context menu option to insert a new document separator (split a document)
+        /// </summary>
+        readonly ToolStripMenuItem _insertDocumentSeparatorMenuItem =
+            new ToolStripMenuItem("Start new document on this page");
+
+        /// <summary>
         /// Context menu option that allows the a document separator prior to the selected page to
         /// be toggled on or off.
         /// </summary>
-        readonly ToolStripMenuItem _toggleDocumentSeparatorMenuItem =
-            new ToolStripMenuItem("Start new document on this page");
+        readonly ToolStripMenuItem _mergeDocumentsMenuItem =
+            new ToolStripMenuItem("Merge selected documents");
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the insert
         /// pagination separator operation.
         /// </summary>
-        ApplicationCommand _toggleDocumentSeparatorCommand;
+        ApplicationCommand _insertDocumentSeparatorCommand;
 
         /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the output operation.
@@ -1351,7 +1358,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                         if (previousPageControl != null)
                         {
                             OutputDocument firstDocument = previousPageControl.Document;
-                            firstDocument.Collapsed = false; //TODO: This call should be moved to merge operation; not appropriate when in the context a document has been submitted.
                             MovePagesToDocument(firstDocument, nextPageControl);
 
                             OnSelectionChanged();
@@ -1913,14 +1919,16 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _editDocumentDataMenuItem.ShowShortcutKeys = true;
                 _editDocumentDataMenuItem.Click += HandleEditDocumentDataSeparator_Click;
 
-                _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Insert";
-                _toggleDocumentSeparatorMenuItem.ShowShortcutKeys = true;
-                _toggleDocumentSeparatorCommand = new ApplicationCommand(Shortcuts,
+                _insertDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Insert";
+                _insertDocumentSeparatorMenuItem.ShowShortcutKeys = true;
+                _insertDocumentSeparatorCommand = new ApplicationCommand(Shortcuts,
                     new Keys[] { Keys.Insert }, HandleAddDocumentSeparator,
                     JoinToolStripItems(
-                        _toggleDocumentSeparatorMenuItem, _paginationUtility.ToggleDocumentSeparatorMenuItem),
+                        _insertDocumentSeparatorMenuItem, _paginationUtility.ToggleDocumentSeparatorMenuItem),
                     false, true, false);
-                _toggleDocumentSeparatorMenuItem.Click += HandleToggleDocumentSeparator_Click;
+                _insertDocumentSeparatorMenuItem.Click += HandleInsertDocumentSeparator_Click;
+
+                _mergeDocumentsMenuItem.Click += HandleMergeDocumentsMenuItem_Click;
 
                 _outputDocumentCommand = new ApplicationCommand(Shortcuts,
                     new Keys[] { Keys.Control | Keys.S }, HandleOutputDocument, null,
@@ -1941,7 +1949,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
                 ContextMenuStrip.Items.Add(_editDocumentDataMenuItem);
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
-                ContextMenuStrip.Items.Add(_toggleDocumentSeparatorMenuItem);
+                ContextMenuStrip.Items.Add(_insertDocumentSeparatorMenuItem);
+                ContextMenuStrip.Items.Add(_mergeDocumentsMenuItem);
                 ContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
                 ContextMenuStrip.Closing += HandleContextMenuStrip_Closing;
 
@@ -2345,9 +2354,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                // Once the context menu is closed, _commandTargetControl should go back to being
+                // Once the context menu is closed, the active control should go back to being
                 // the _commandTargetControl.
-                _commandTargetControl = GetActiveControl();
+                // 9/17/20 SNK: 
+                // 7 years later, it is not entirely clear to me why this would be necessary.
+                // However, it seems clear enough _commandTargetControl should not change if an
+                // item is clicked; This is called before the click hander; UpdateCommandStates
+                // may have configured context menu options against a different target than
+                // would be set here.
+                if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked)
+                {
+                    _commandTargetControl = GetActiveControl();
+                }
             }
             catch (Exception ex)
             {
@@ -2445,14 +2463,68 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         /// <summary>
         /// Handles the <see cref="Control.Click"/> event of the
-        /// <see cref="_toggleDocumentSeparatorMenuItem"/>.
+        /// <see cref="_insertDocumentSeparatorMenuItem"/>.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.
         /// </param>
-        void HandleToggleDocumentSeparator_Click(object sender, EventArgs e)
+        void HandleInsertDocumentSeparator_Click(object sender, EventArgs e)
         {
-            HandleToggleDocumentSeparator(addOnly: false);
+            HandleAddDocumentSeparator();
+        }
+
+        void HandleMergeDocumentsMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var targetDocument = GetValidMergeCommandTarget();
+                if (targetDocument != null)
+                {
+                    using (new UIUpdateLock(this))
+                    {
+                        var lastPageIndex = _flowLayoutPanel.Controls.IndexOf(targetDocument.PageControls.Last());
+                        MoveSelectedControls(this, lastPageIndex + 1);
+
+                        // Reset selection so that the first dropped page (rather than the separator)
+                        // is now the primary selection. Do not explicitly select pagination separators
+                        // which can be re-assigned to other docs based on the new location of pages
+                        ProcessControlSelection(
+                            activeControl: targetDocument.PageControls.First(),
+                            additionalControls: targetDocument.PageControls.ToArray(),
+                            select: true,
+                            modifierKeys: Keys.None);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50377");
+            }
+        }
+
+        /// <summary>
+        /// Gets a document that would be valid to merge all currently selected documents into
+        /// based on the current selection or <c>null</c> if merging is not currently a valid command.
+        /// </summary>
+        OutputDocument GetValidMergeCommandTarget()
+        {
+            // If this is a separator or the previous control is a separator, this could be a valid
+            // merge target.
+            var targetDocument = (_commandTargetControl as PaginationSeparator)?.Document
+                ?? (_commandTargetControl?.PreviousControl as PaginationSeparator)?.Document;
+
+            // Only allow merging fully selected documents that haven't been processed.
+            var documentsToMerge = FullySelectedDocuments.ToList();
+            if (targetDocument != null
+                && !targetDocument.OutputProcessed
+                && !documentsToMerge.Any(doc => doc.OutputProcessed)
+                && documentsToMerge.SequenceEqual(PartiallySelectedDocuments)
+                && documentsToMerge.Except(new[] { targetDocument }).Any())
+            {
+                return targetDocument;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -3629,7 +3701,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             // _commandTargetControl.
             if (_commandTargetControl == null)
             {
-                _toggleDocumentSeparatorCommand.Enabled = false;
+                _insertDocumentSeparatorCommand.Enabled = false;
                 _pasteCommand.Enabled = false;
             }
             else
@@ -3662,42 +3734,25 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
-                _toggleDocumentSeparatorCommand.Enabled =
+                // Allow document to be split only if a single page control is selected and it is not
+                // the first page of a document.
+                _insertDocumentSeparatorCommand.Enabled =
                     enablePageModificationCommands
                     && contextMenuControlIndex > 1
-                    && singlySelectedDocument != null
-                    && !singlySelectedDocument.Collapsed;
-                var asPageThumbnailControl = _commandTargetControl as PageThumbnailControl;
+                    && SelectedControls.Count() == 1
+                    && (_commandTargetControl is PageThumbnailControl pageControl) 
+                    && pageControl != pageControl.Document.PageControls.First();
 
-                // If a separator is selected, or the first page of a document 
-                // (whether that page is marked as deleted or not)
-                if (_toggleDocumentSeparatorCommand.Enabled &&
-                    ((separator != null) ||
-                        (asPageThumbnailControl != null 
-                        && asPageThumbnailControl == asPageThumbnailControl.Document?.PageControls.FirstOrDefault())))
+                var validMergeTarget = enablePageModificationCommands ? GetValidMergeCommandTarget() : null;
+                _mergeDocumentsMenuItem.Enabled = validMergeTarget != null;
+                if (!string.IsNullOrEmpty(validMergeTarget?.Summary))
                 {
-                    _toggleDocumentSeparatorMenuItem.Text = "Merge with previous document";
-                    _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "";
-
-                    // Search for the previous page control to _commandTargetControl.
-                    if (!(_commandTargetControl.PreviousControl is PageThumbnailControl previousPage))
-                    {
-                        previousPage = _commandTargetControl.PreviousControl?.PreviousControl
-                            as PageThumbnailControl;
-                    }
-
-                    // If the previous page belongs to an alread output document, don't allow this document to be merged.
-                    if (previousPage == null || previousPage.Document.OutputProcessed
-                    // Do not allow merge when DEP is open and previous document is not visible.
-                        || DocumentInDataEdit != null)
-                    {
-                        _toggleDocumentSeparatorCommand.Enabled = false;
-                    }
+                    _mergeDocumentsMenuItem.Text = Invariant(
+                        $"Merge selected documents into \"{validMergeTarget.Summary}\"");
                 }
                 else
                 {
-                    _toggleDocumentSeparatorMenuItem.Text = "Start new document on this page";
-                    _toggleDocumentSeparatorMenuItem.ShortcutKeyDisplayString = "Insert";
+                    _mergeDocumentsMenuItem.Text = "Merge selected documents";
                 }
 
                 // Inserted copied items requires there to be copied items and a single selection.
@@ -3736,7 +3791,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _unDeleteCommand.Enabled = false;
             _printCommand.Enabled = false;
             _pasteCommand.Enabled = false;
-            _toggleDocumentSeparatorCommand.Enabled = false;
+            _insertDocumentSeparatorCommand.Enabled = false;
             _outputDocumentCommand.Enabled = false;
 
             Shortcuts.ProcessingShortcut += HandleShortcuts_ProcessingShortcut;
@@ -4972,19 +5027,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles a UI command to add a document separator from before this control.
+        /// Handles a UI command to insert a new document separator (split a document)
         /// </summary>
         internal void HandleAddDocumentSeparator()
-        {
-            HandleToggleDocumentSeparator(addOnly: true);
-        }
-
-        /// <summary>
-        /// Handles a UI command to insert or remove a document separator from before this control.
-        /// </summary>
-        /// <param name="addOnly"><c>true</c> if a separator should only ever be added; <c>false</c>
-        /// if the separator can be both added and removed.</param>
-        internal void HandleToggleDocumentSeparator(bool addOnly)
         {
             try
             {
@@ -4998,14 +5043,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                             targetSeparator = _commandTargetControl.PreviousControl as PaginationSeparator;
                         }
 
-                        if (targetSeparator != null)
-                        {
-                            if (!addOnly)
-                            {
-                                RemovePaginationControl(targetSeparator, true);
-                            }
-                        }
-                        else
+                        if (targetSeparator == null)
                         {
                             int index = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
@@ -5017,7 +5055,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35470");
+                ex.ExtractDisplay("ELI50378");
             }
         }
 
