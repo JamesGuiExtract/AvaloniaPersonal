@@ -245,6 +245,7 @@
 		<col key="yes" def="s72">Name</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
+		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\isregsvr.dll</td></row>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\SFHelper.dll</td></row>
 		<row><td>IsChain.exe</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\IsChain.exe</td></row>
@@ -323,6 +324,7 @@
 		<row><td>Extract.Redaction.Verification.dll</td><td>{DEC2B72C-0860-4D86-80E3-1D0DD6D14F94}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.verificati</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Redaction.dll</td><td>{BE1E239C-C3B7-4027-8488-645FC27F5851}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>extract.redaction.dll</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FlexIndexHelp</td><td>{A9BD080B-7CB4-4954-8BBF-32EA6DADF977}</td><td>TARGET_HELP</td><td>0</td><td/><td>flexindex.chm</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>IDShield.ini</td><td>{4511BA11-0DFD-41E4-9B0F-C6069980BC80}</td><td>INSTALLDIR</td><td>152</td><td/><td>idshield.ini</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldComponents</td><td>{0B818341-9DC6-4923-B336-2FBC659BCF44}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldHelp</td><td>{D0D6E5DA-8D44-45F0-8FDD-325E3C7EE9D6}</td><td>HELP</td><td>8</td><td/><td>idshield.chm</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldOnDemand.exe</td><td>{A37823A6-23A8-4DA3-9B9A-CB7214FD898B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldondemand.exe</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -413,8 +415,12 @@
 		<row><td>ISChainPackageCommit</td><td>1537</td><td>IsChainPackages.dll</td><td>ISChainPackagesCleanup</td><td/><td/></row>
 		<row><td>ISChainPackagePrepare</td><td>1</td><td>IsChainPackages.dll</td><td>ISChainPackages</td><td/><td/></row>
 		<row><td>ISChainPackageRollback</td><td>1281</td><td>IsChainPackages.dll</td><td>ISChainPackagesCleanup</td><td/><td/></row>
+		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
+		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
+		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td>257</td><td>ISSetupFilesHelper</td><td>SFCleanupEx</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td>257</td><td>ISSetupFilesHelper</td><td>SFStartupEx</td><td/><td/></row>
+		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISVerifyScriptingRuntime</td><td>19</td><td/><td>[STANDARD_USE_SETUPEXE]</td><td/><td>Required for installations using InstallScript.</td></row>
 		<row><td>SetARPINSTALLLOCATION</td><td>51</td><td>ARPINSTALLLOCATION</td><td>[INSTALLDIR]</td><td/><td/></row>
 		<row><td>SetAllUsersProfileNT</td><td>51</td><td>ALLUSERSPROFILE</td><td>[%SystemRoot]\Profiles\All Users</td><td/><td/></row>
@@ -1193,6 +1199,7 @@
 		<row><td>SDKMain</td><td>Extract.Redaction.CustomComponentsHelper.dll</td></row>
 		<row><td>SDKMain</td><td>Extract.Redaction.Verification.dll</td></row>
 		<row><td>SDKMain</td><td>Extract.Redaction.dll</td></row>
+		<row><td>SDKMain</td><td>IDShield.ini</td></row>
 		<row><td>SDKMain</td><td>IDShieldComponents</td></row>
 		<row><td>SDKMain</td><td>IDShieldOnDemand.exe</td></row>
 		<row><td>SDKMain</td><td>IDShieldOnDemandShortcut</td></row>
@@ -1229,6 +1236,7 @@
 		<row><td>extract.redaction.verificati</td><td>Extract.Redaction.Verification.dll</td><td>EXTRAC~1.DLL|Extract.Redaction.Verification.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Extract.Redaction.Verification.dll</td><td>17</td><td/></row>
 		<row><td>flexindex.chm</td><td>FlexIndexHelp</td><td>FLEXIN~1.CHM|FLEXIndex.chm</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_HELP_FILES&gt;\FLEXIndex.chm</td><td>17</td><td/></row>
 		<row><td>idshield.chm</td><td>IDShieldHelp</td><td>IDShield.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_HELP_FILES_IDSHIELD&gt;\IDShield.chm</td><td>1</td><td/></row>
+		<row><td>idshield.ini</td><td>IDShield.ini</td><td>IDShield.ini</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_NONSELFREGCOMPO_FILES1&gt;\IDShield.ini</td><td>1</td><td/></row>
 		<row><td>idshieldondemand.exe</td><td>IDShieldOnDemand.exe</td><td>IDSHIE~1.EXE|IDShieldOnDemand.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\IDShieldOnDemand.exe</td><td>1</td><td/></row>
 		<row><td>idshieldstatisticsreporter.e</td><td>IDShieldStatisticsReporter.exe</td><td>IDSHIE~1.EXE|IDShieldStatisticsReporter.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\IDShieldStatisticsReporter.exe</td><td>1</td><td/></row>
 		<row><td>interop.extractredactiontest</td><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>INTERO~1.DLL|Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>1</td><td/></row>
@@ -1386,6 +1394,7 @@
 		<row><td>Extract.Redaction.Verification.dll</td><td/><td/><td>_9455B052_64C2_4C44_BABF_F480528B2F4B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.Redaction.dll</td><td/><td/><td>_B4448636_A587_4E5B_B2D0_3EC1207C1F4A_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FlexIndexHelp</td><td/><td/><td>_4E568C81_CDF3_4602_9111_7E1D69E11C19_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>IDShield.ini</td><td/><td/><td>_9C6DCC11_A878_411D_963F_7997360339F0_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldComponents</td><td/><td/><td>_7BA39CA3_0BE0_42F1_BA2D_6E291210E2AD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldHelp</td><td/><td/><td>_3ACFFCEB_AE1A_434B_9D94_435E77C7116E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldOnDemand.exe</td><td/><td/><td>_354E5060_5577_4F76_A258_507CF7A134BE_FILTER</td><td/><td/><td/><td/></row>
@@ -1463,7 +1472,7 @@
 		<row><td>CoreDashboards</td><td>&lt;PATH_TO_CORE_DASHBOARD_FILES&gt;</td><td>4</td><td/><td/><td>10</td></row>
 		<row><td>ExemptionCodes</td><td>&lt;PATH_TO_EXEMPTIONCODES_FILES&gt;</td><td>4</td><td>*.xml</td><td/><td>2</td></row>
 		<row><td>FlexIndexHelp</td><td>&lt;PATH_TO_HELP_FLEXINDEX&gt;</td><td>4</td><td/><td>FLEXIndex.chm</td><td>10</td></row>
-		<row><td>IDShieldComponents</td><td>&lt;PATH_TO_NONSELFREGCOMPO_FILES&gt;</td><td>4</td><td/><td/><td>0</td></row>
+		<row><td>IDShieldComponents</td><td>&lt;PATH_TO_NONSELFREGCOMPO_FILES&gt;</td><td>4</td><td/><td>IDShield.ini</td><td>0</td></row>
 		<row><td>IDShieldReports</td><td>&lt;PATH_TO_REPORTS_IDSHIELD_FILES&gt;</td><td>4</td><td/><td>Thumbs.db</td><td>10</td></row>
 		<row><td>LabDEFolder</td><td>&lt;PATH_TO_LABDEFOLDER_FILES&gt;</td><td>4</td><td/><td>AlternateTestNameManager.plugin</td><td>10</td></row>
 		<row><td>LabDEReports</td><td>&lt;PATH_TO_REPORTS_FILES_LABDE&gt;</td><td>4</td><td/><td>LabDE high effort files by user.xml, Thumbs.db</td><td>10</td></row>
@@ -1739,6 +1748,7 @@
 		<row><td>PATH_TO_LABDE_HELP_FILES</td><td>P:\DataEntry\LabDE\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_LOGICNP_FILES</td><td>P:\AttributeFinder\RequiredInstalls\LogicNP</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGCOMPO_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\NonSelfRegFiles</td><td/><td>2</td></row>
+		<row><td>PATH_TO_NONSELFREGCOMPO_FILES1</td><td>P:\AttributeFinder\IDShieldInstallation\Files\NonSelfRegComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_NONSELFREGSDKCO_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\NonSelfRegSDKComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_OFFICEREDIST_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\OfficeRedist</td><td/><td>2</td></row>
 		<row><td>PATH_TO_REDIST_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\Redist</td><td/><td>2</td></row>
@@ -4592,7 +4602,7 @@
 		<row><td>CostInitialize</td><td/><td>800</td><td>CostInitialize</td><td/></row>
 		<row><td>CreateFolders</td><td/><td>3700</td><td>CreateFolders</td><td/></row>
 		<row><td>CreateShortcuts</td><td/><td>4500</td><td>CreateShortcuts</td><td/></row>
-		<row><td>DeleteServices</td><td>VersionNT</td><td>2000</td><td>DeleteServices</td><td/></row>
+		<row><td>DeleteServices</td><td>VersionNT AND UPGRADE=0</td><td>2000</td><td>DeleteServices</td><td/></row>
 		<row><td>DuplicateFiles</td><td/><td>4210</td><td>DuplicateFiles</td><td/></row>
 		<row><td>FileCost</td><td/><td>900</td><td>FileCost</td><td/></row>
 		<row><td>FileManager.F12958CC_F693_4837_866A_16AE49AE39E2</td><td>Not Installed</td><td>5</td><td/><td>4</td></row>
@@ -4600,13 +4610,17 @@
 		<row><td>ISChainPackageCommit</td><td>1</td><td>1504</td><td/><td/></row>
 		<row><td>ISChainPackagePrepare</td><td>1</td><td>1500</td><td/><td/></row>
 		<row><td>ISChainPackageRollback</td><td>1</td><td>1502</td><td/><td/></row>
+		<row><td>ISSelfRegisterCosting</td><td/><td>2151</td><td/><td/></row>
+		<row><td>ISSelfRegisterFiles</td><td/><td>5601</td><td/><td/></row>
+		<row><td>ISSelfRegisterFinalize</td><td/><td>6601</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td/><td>6606</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td/><td>3</td><td/><td/></row>
+		<row><td>ISUnSelfRegisterFiles</td><td/><td>2152</td><td/><td/></row>
 		<row><td>InstallFiles</td><td/><td>4000</td><td>InstallFiles</td><td/></row>
 		<row><td>InstallFinalize</td><td/><td>6600</td><td>InstallFinalize</td><td/></row>
 		<row><td>InstallInitialize</td><td/><td>1501</td><td>InstallInitialize</td><td/></row>
 		<row><td>InstallODBC</td><td/><td>5400</td><td>InstallODBC</td><td/></row>
-		<row><td>InstallServices</td><td>VersionNT</td><td>5800</td><td>InstallServices</td><td/></row>
+		<row><td>InstallServices</td><td>VersionNT AND UPGRADE=0</td><td>5800</td><td>InstallServices</td><td/></row>
 		<row><td>InstallValidate</td><td/><td>1400</td><td>InstallValidate</td><td/></row>
 		<row><td>IsolateComponents</td><td/><td>950</td><td>IsolateComponents</td><td/></row>
 		<row><td>LaunchConditions</td><td>Not Installed</td><td>410</td><td>LaunchConditions</td><td/></row>
@@ -4644,7 +4658,7 @@
 		<row><td>SelfUnregModules</td><td/><td>2150</td><td>SelfUnregModules</td><td/></row>
 		<row><td>SetARPINSTALLLOCATION</td><td>Not Installed</td><td>1010</td><td>SetARPINSTALLLOCATION</td><td/></row>
 		<row><td>SetODBCFolders</td><td/><td>1100</td><td>SetODBCFolders</td><td/></row>
-		<row><td>StartServices</td><td>VersionNT</td><td>5900</td><td>StartServices</td><td/></row>
+		<row><td>StartServices</td><td>VersionNT AND UPGRADE=0</td><td>5900</td><td>StartServices</td><td/></row>
 		<row><td>StopServices</td><td>VersionNT</td><td>1900</td><td>StopServices</td><td/></row>
 		<row><td>UnpublishComponents</td><td/><td>1700</td><td>UnpublishComponents</td><td/></row>
 		<row><td>UnpublishFeatures</td><td/><td>1800</td><td>UnpublishFeatures</td><td/></row>
@@ -5058,6 +5072,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>REBOOT</td><td>Suppress</td><td/></row>
 		<row><td>STANDARD_USE_SETUPEXE</td><td>##IDS_STANDARD_USE_SETUPEXE##</td><td/></row>
 		<row><td>SecureCustomProperties</td><td>ARPNOMODIFY;ARPNOREMOVE;ARPSYSTEMCOMPONENT;INSTALLDIR;ISALWAYSINSTALLELEVATED;ISSETUPDRIVEN;IS_NET_API_GROUP_LIST;IS_NET_API_LOGON_DOMAIN_TOKEN;IS_NET_API_LOGON_PASSWORD;IS_NET_API_LOGON_USERNAME;IS_NET_API_LOGON_USERNAME_TOKEN;IS_NET_API_NEW_USER_CONFIRM;IS_NET_API_NEW_USER_GROUP;IS_NET_API_NEW_USER_NAME;IS_NET_API_NEW_USER_PASSWORD;IS_NET_API_NEW_USER_SERVER;IS_NET_API_SERVER_LIST;IS_NET_API_SERVER_NEW_USER_LIST;IS_NET_API_USER_LIST;IS_NEW_USER_CONFIRM_TEXT;IS_NEW_USER_GROUP_TEXT;IS_NEW_USER_NAME_TEXT;IS_NEW_USER_PASSWORD_TEXT;IS_NEW_USER_SERVER_TEXT;IS_SQLSERVER_AUTHENTICATION;IS_SQLSERVER_DATABASE;IS_SQLSERVER_LIST;IS_SQLSERVER_PASSWORD;IS_SQLSERVER_SERVER;IS_SQLSERVER_USERNAME;SUPPORTDIR</td><td/></row>
+		<row><td>UPGRADE</td><td>0</td><td/></row>
 		<row><td>UpgradeCode</td><td>{693217E3-295B-4827-8B47-F66E5FE71C22}</td><td/></row>
 	</table>
 
