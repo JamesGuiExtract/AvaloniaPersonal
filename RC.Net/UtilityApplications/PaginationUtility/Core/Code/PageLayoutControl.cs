@@ -4360,7 +4360,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // Tabbing no selection or from the last page of a document
                     // If for whatever reason a validation is not shown despite DataError
                     // choose to move forward (data will be validated upon submit)
-                    else if (!activeDocument.DataError || !DocumentDataPanel.ShowValidationError())
+                    else if (activeDocument?.DataError != true || DocumentDataPanel?.ShowValidationError() != true)
                     {
                         TabNavigateNextDocument(activeDocument);
                     }
