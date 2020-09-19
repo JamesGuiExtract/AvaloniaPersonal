@@ -3508,10 +3508,15 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             if (nextDocument != null)
             {
+                if (DocumentInDataEdit != null && DocumentInDataEdit != nextDocument)
+                {
+                    DocumentInDataEdit.PaginationSeparator.CloseDataPanel(updateData: true, validateData: false);
+                }
+
                 // Select the selectionTarget and the pageControls that make up the document it is in.
                 // Do not allow handling of modifier keys since modifier keys have a different meaning
                 // for document navigation.
-                ProcessControlSelection(
+                    ProcessControlSelection(
                     activeControl: nextDocument.PageControls.First(),
                     additionalControls: nextDocument.PageControls,
                     select: true,
@@ -3759,6 +3764,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             Shortcuts[Keys.Tab] = HandleTabNavigateForward;
             Shortcuts[Keys.Tab | Keys.Shift] = HandleTabNavigateBackward;
             Shortcuts[Keys.Tab | Keys.Control] = HandleSelectNextDocument;
+            Shortcuts[Keys.Tab | Keys.Control | Keys.Shift] = HandleSelectPreviousDocument;
 
             Shortcuts[Keys.Enter] = HandleOpenDataPanel;
             Shortcuts[Keys.F2] = HandleOpenDataPanel;
@@ -4330,11 +4336,23 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SelectNextDocument(true, onlyUnprocessed: false);
+                SelectNextDocument(forward: true, onlyUnprocessed: false);
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35462");
+            }
+        }
+
+        void HandleSelectPreviousDocument()
+        {
+            try
+            {
+                SelectNextDocument(forward: true, onlyUnprocessed: false);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50380");
             }
         }
 
