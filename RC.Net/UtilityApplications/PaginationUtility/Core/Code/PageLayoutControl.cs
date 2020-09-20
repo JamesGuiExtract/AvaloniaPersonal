@@ -3455,7 +3455,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="forward"><c>true</c> to navigate forward (down) in the panel;
         /// <c>false</c> to navigate up.</param>
-        void SelectNextRowPage(bool forward)
+        /// <param name="useActiveModifierKeys"><c>true</c> to allow active modifier keys to build
+        /// on previous selection, <c>false</c> to clear previous selection.</param>
+        void SelectNextRowPage(bool forward, bool useActiveModifierKeys)
         {
             NavigablePaginationControl navigableControl = GetNextRowNavigableControl(forward);
 
@@ -3473,7 +3475,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else
                 {
-                    var outputDocument = SelectNextDocument(forward, onlyUnprocessed: false);
+                    var outputDocument = SelectNextDocument(forward, onlyUnprocessed: false, useActiveModifierKeys);
                     if (outputDocument == null)
                     {
                         _flowLayoutPanel.VerticalScroll.Value = forward
@@ -3497,30 +3499,33 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// that document are already selected, in which case the next document before/after that
         /// document is selected.
         /// </summary>
-        /// <param name="onlyUnprocessed"><c>true</c> if processed documents should not be selected
-        /// by this method.</param>
         /// <param name="forward"><see langword="true"/> to select the next document if the target
         /// document is already entirely selected; <see langword="false"/> to select the previous.</param>
-
-        OutputDocument SelectNextDocument(bool forward, bool onlyUnprocessed)
+        /// <param name="onlyUnprocessed"><c>true</c> if processed documents should not be selected
+        /// by this method.</param>
+        /// <param name="useActiveModifierKeys"><c>true</c> to allow active modifier keys to build
+        /// on previous selection, <c>false</c> to clear previous selection.</param>
+        OutputDocument SelectNextDocument(bool forward, bool onlyUnprocessed, bool useActiveModifierKeys)
         {
             OutputDocument nextDocument = GetNextDocument(forward, onlyUnprocessed);
 
             if (nextDocument != null)
             {
+                // Only forward tab navigation or escape keys should allow navigation to move away from
+                // a document with an open DEP.
                 if (DocumentInDataEdit != null && DocumentInDataEdit != nextDocument)
                 {
-                    DocumentInDataEdit.PaginationSeparator.CloseDataPanel(updateData: true, validateData: false);
+                    return null;
                 }
 
                 // Select the selectionTarget and the pageControls that make up the document it is in.
                 // Do not allow handling of modifier keys since modifier keys have a different meaning
                 // for document navigation.
-                    ProcessControlSelection(
+                ProcessControlSelection(
                     activeControl: nextDocument.PageControls.First(),
                     additionalControls: nextDocument.PageControls,
                     select: true,
-                    modifierKeys: Keys.None);
+                    modifierKeys: useActiveModifierKeys ? Control.ModifierKeys : Keys.None);
 
                 _flowLayoutPanel.RequestScrollToControl(nextDocument.PaginationSeparator);
             }
@@ -3791,15 +3796,15 @@ namespace Extract.UtilityApplications.PaginationUtility
             Shortcuts[Keys.PageDown | Keys.Shift] = HandleSelectNextPage;
             Shortcuts[Keys.PageDown | Keys.Control | Keys.Shift] = HandleSelectNextPage;
 
-            Shortcuts[Keys.Up] = HandleSelectPreviousRowPage;
-            Shortcuts[Keys.Up | Keys.Control] = HandleSelectPreviousRowPage;
-            Shortcuts[Keys.Up | Keys.Shift] = HandleSelectPreviousRowPage;
-            Shortcuts[Keys.Up | Keys.Control | Keys.Shift] = HandleSelectPreviousRowPage;
+            Shortcuts[Keys.Up] = () => HandleSelectNextRowPage(forward: false, useActiveModifierKeys: true);
+            Shortcuts[Keys.Up | Keys.Control] = () => HandleSelectNextRowPage(forward: false, useActiveModifierKeys: true);
+            Shortcuts[Keys.Up | Keys.Shift] = () => HandleSelectNextRowPage(forward: false, useActiveModifierKeys: true);
+            Shortcuts[Keys.Up | Keys.Control | Keys.Shift] = () => HandleSelectNextRowPage(forward: false, useActiveModifierKeys: true);
 
-            Shortcuts[Keys.Down] = HandleSelectNextRowPage;
-            Shortcuts[Keys.Down | Keys.Control] = HandleSelectNextRowPage;
-            Shortcuts[Keys.Down | Keys.Shift] = HandleSelectNextRowPage;
-            Shortcuts[Keys.Down | Keys.Control | Keys.Shift] = HandleSelectNextRowPage;
+            Shortcuts[Keys.Down] = () => HandleSelectNextRowPage(forward: true, useActiveModifierKeys: true);
+            Shortcuts[Keys.Down | Keys.Control] = () => HandleSelectNextRowPage(forward: true, useActiveModifierKeys: true);
+            Shortcuts[Keys.Down | Keys.Shift] = () => HandleSelectNextRowPage(forward: true, useActiveModifierKeys: true);
+            Shortcuts[Keys.Down | Keys.Control | Keys.Shift] = () => HandleSelectNextRowPage(forward: true, useActiveModifierKeys: true);
 
             Shortcuts[Keys.Home] = HandleSelectFirstPage;
             Shortcuts[Keys.Home | Keys.Control] = HandleSelectFirstPage;
@@ -4210,50 +4215,6 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// Handles a UI command to select the previous page while ignoring the shift key modifier.
-        /// </summary>
-        internal void HandleSelectPreviousPageNoShift()
-        {
-            try
-            {
-                NavigablePaginationControl navigableControl = GetNextNavigableControl(false);
-
-                if (navigableControl != null)
-                {
-                    ProcessControlSelection(
-                        activeControl: navigableControl,
-                        additionalControls: null,
-                        select: true,
-                        modifierKeys: Control.ModifierKeys & ~Keys.Shift);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35832");
-            }
-        }
-
-        /// <summary>
-        /// Handles a UI command to select the previous page.
-        /// </summary>
-        void HandleSelectPreviousSinglePage()
-        {
-            try
-            {
-                NavigablePaginationControl navigableControl = GetNextNavigableControl(false);
-
-                if (navigableControl != null)
-                {
-                    ProcessControlSelection(navigableControl);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35561");
-            }
-        }
-
-        /// <summary>
         /// Handles a UI command to select the first page.
         /// </summary>
         void HandleSelectFirstPage()
@@ -4302,30 +4263,19 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles a UI command to select page down from the currently selected control.
         /// </summary>
-        internal void HandleSelectNextRowPage()
+        /// <param name="forward"><c>true</c> to navigate forward (down) in the panel;
+        /// <c>false</c> to navigate up.</param>
+        /// <param name="useActiveModifierKeys"><c>true</c> to allow active modifier keys to build
+        /// on previous selection, <c>false</c> to clear previous selection.</param>
+        internal void HandleSelectNextRowPage(bool forward, bool useActiveModifierKeys)
         {
             try
             {
-                SelectNextRowPage(forward: true);
+                SelectNextRowPage(forward, useActiveModifierKeys);
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35460");
-            }
-        }
-
-        /// <summary>
-        /// Handles a UI command to select page up from the currently selected control.
-        /// </summary>
-        internal void HandleSelectPreviousRowPage()
-        {
-            try
-            {
-                SelectNextRowPage(forward: false);
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35461");
             }
         }
 
@@ -4336,7 +4286,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SelectNextDocument(forward: true, onlyUnprocessed: false);
+                SelectNextDocument(forward: true, onlyUnprocessed: false, useActiveModifierKeys: false);
             }
             catch (Exception ex)
             {
@@ -4348,7 +4298,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                SelectNextDocument(forward: true, onlyUnprocessed: false);
+                SelectNextDocument(forward: false, onlyUnprocessed: false, useActiveModifierKeys: false);
             }
             catch (Exception ex)
             {
@@ -4420,7 +4370,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 CloseAndSelectDocumentForCommit(activeDocument);
             }
 
-            nextDocument = SelectNextDocument(true, onlyUnprocessed: true);
+            nextDocument = SelectNextDocument(true, onlyUnprocessed: true, useActiveModifierKeys: false);
             if (nextDocument == null)
             {
                 // TODO: Prompt whether to commit batch. Until then, clear control selection when
@@ -4474,7 +4424,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     // If navigating to the previous document, we don't necessarily want to move to
                     // previousControlDocument; use SelectNextDocument to move to a previous document
                     // that has not been processed.
-                    SelectNextDocument(forward: false, onlyUnprocessed: true);
+                    SelectNextDocument(forward: false, onlyUnprocessed: true, useActiveModifierKeys: false);
                 }
                 // Return focus to the DEP from the page controls
                 else if (previousControlDocument != currentDocument && DocumentInDataEdit != null)
