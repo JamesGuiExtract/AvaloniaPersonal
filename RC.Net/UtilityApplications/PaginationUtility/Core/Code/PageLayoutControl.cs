@@ -5036,14 +5036,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                 return false;
             }
 
-            var documentsToMerge = FullySelectedDocuments.ToList();
+            var documentsToMerge = PartiallySelectedDocuments.ToList();
             if (documentsToMerge.Any(doc => doc.OutputProcessed))
             {
                 return false;
             }
 
+            // Merge should be enabled
+            // - If one or more documents are fully selected
+            // - If there is only a single page selected and that page is the first page of document
             if (documentsToMerge.Count > 0
-                && documentsToMerge.SequenceEqual(PartiallySelectedDocuments))
+                && (documentsToMerge.SequenceEqual(FullySelectedDocuments)
+                    || (SelectedPageControls.Count() == 1 && SelectedPageControls.Single().PageNumber == 1)))
             {
                 // A singly selected document should merge into the document above (if any)
                 if (documentsToMerge.Count == 1
@@ -5089,6 +5093,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                     using (new UIUpdateLock(this))
                     {
                         var lastPageIndex = _flowLayoutPanel.Controls.IndexOf(mergeTarget.PageControls.Last());
+
+                        // Fully select all pages of all documents at least partially selected; merges
+                        // should only operate at the document (not per page) level.
+                        foreach (var pageControl in PartiallySelectedDocuments
+                            .SelectMany(doc => doc.PageControls))
+                        {
+                            pageControl.Selected = true;
+                        }
+
                         MoveSelectedControls(this, lastPageIndex + 1);
 
                         // Reset selection so that the first dropped page (rather than the separator)
