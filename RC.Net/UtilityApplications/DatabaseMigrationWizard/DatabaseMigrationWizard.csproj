@@ -167,7 +167,6 @@
     <Compile Include="Database\Export\Tables\SerializeLabDEPatient.cs" />
     <Compile Include="Database\Export\Tables\SerializeLabDEOrder.cs" />
     <Compile Include="Database\Export\Tables\SerializeLabDEEncounter.cs" />
-    <Compile Include="Database\Export\Tables\SerializeAttributeName.cs" />
     <Compile Include="Database\Export\Tables\SerializeAction.cs" />
     <Compile Include="Database\Export\ISerialize.cs" />
     <Compile Include="Database\Import\Dto\LabDEEncounter.cs" />
@@ -177,7 +176,6 @@
     <Compile Include="Database\Import\Dto\LabDEProvider.cs" />
     <Compile Include="Database\Import\Dto\UserCreatedCounter.cs" />
     <Compile Include="Database\Import\Dto\FieldSearch.cs" />
-    <Compile Include="Database\Import\Dto\AttributeName.cs" />
     <Compile Include="Database\Import\Dto\Dashboard.cs" />
     <Compile Include="Database\Import\Dto\DatabaseService.cs" />
     <Compile Include="Database\Import\Dto\FileHandler.cs" />
@@ -200,7 +198,6 @@
     <Compile Include="Database\Import\SQLSequence\SequenceLabDEProvider.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceDataEntryCounterDefinition.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceFieldSearch.cs" />
-    <Compile Include="Database\Import\SQLSequence\SequenceAttributeName.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceDashboard.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceDatabaseService.cs" />
     <Compile Include="Database\Import\SQLSequence\SequenceAttributeSetName.cs" />

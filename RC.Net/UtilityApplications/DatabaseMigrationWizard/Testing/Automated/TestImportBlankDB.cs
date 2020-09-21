@@ -91,20 +91,6 @@ namespace DatabaseMigrationWizard.Test
         /// Tests to make sure AttributeName imported properly.
         /// </summary>
         [Test, Category("Automated")]
-        public static void AttributeName()
-        {
-            var attributeNameFromDB = JsonConvert.DeserializeObject<List<AttributeName>>(BuildAndWriteTable(new SerializeAttributeName()).ToString());
-
-            foreach (var attributeName in DatabaseMigrationWizardTestHelper.AttributeNames)
-            {
-                Assert.IsTrue(attributeNameFromDB.Where(m => m.Equals(attributeName)).Any());
-            }
-        }
-
-        /// <summary>
-        /// Tests to make sure AttributeName imported properly.
-        /// </summary>
-        [Test, Category("Automated")]
         public static void AttributeSetName()
         {
             var attributeSetNameFromDB = JsonConvert.DeserializeObject<List<AttributeSetName>>(BuildAndWriteTable(new SerializeAttributeSetName()).ToString());

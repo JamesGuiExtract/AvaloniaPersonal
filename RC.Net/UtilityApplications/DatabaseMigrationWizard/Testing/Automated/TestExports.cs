@@ -120,20 +120,6 @@ namespace DatabaseMigrationWizard.Test
         }
 
         /// <summary>
-        /// Tests exporting an AttributeName.
-        /// </summary>
-        [Test, Category("Automated")]
-        public static void AttributeName()
-        {
-            var writer = BuildAndWriteTable(new SerializeAttributeName());
-
-            var attributeName = JsonConvert.DeserializeObject<List<AttributeName>>(writer.ToString()).First();
-
-            Assert.AreEqual("TestAttributeName", attributeName.Name);
-            Assert.NotNull(attributeName.Guid);
-        }
-
-        /// <summary>
         /// Tests exporting an AttributeSetName.
         /// </summary>
         [Test, Category("Automated")]

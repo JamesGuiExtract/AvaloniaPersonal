@@ -108,20 +108,6 @@ namespace DatabaseMigrationWizard.Test
         /// Tests to make sure AttributeName imported properly.
         /// </summary>
         [Test, Category("Automated")]
-        public static void AttributeName()
-        {
-            var attributeNameFromDB = JsonConvert.DeserializeObject<List<AttributeName>>(BuildAndWriteTable(new SerializeAttributeName()).ToString());
-
-            foreach (var attributeName in DatabaseMigrationWizardTestHelper.AttributeNames)
-            {
-                Assert.IsTrue(attributeNameFromDB.Where(m => m.Equals(attributeName)).Any());
-            }
-        }
-
-        /// <summary>
-        /// Tests to make sure AttributeName imported properly.
-        /// </summary>
-        [Test, Category("Automated")]
         public static void AttributeSetName()
         {
             var attributeSetNameFromDB = JsonConvert.DeserializeObject<List<AttributeSetName>>(BuildAndWriteTable(new SerializeAttributeSetName()).ToString());
@@ -403,8 +389,6 @@ namespace DatabaseMigrationWizard.Test
             DatabaseMigrationWizardTestHelper.Actions[0].Description = "NewDescription";
             DatabaseMigrationWizardTestHelper.Actions[0].MainSequence = false;
             DatabaseMigrationWizardTestHelper.Actions[0].WorkflowGuid = Guid.Parse("0a3e4811-f55f-49d2-9c6f-0b64cd56961e");
-
-            DatabaseMigrationWizardTestHelper.AttributeNames[0].Name = "NewAttributeName";
 
             DatabaseMigrationWizardTestHelper.AttributeSetNames[0].Description = "NewDescription";
 

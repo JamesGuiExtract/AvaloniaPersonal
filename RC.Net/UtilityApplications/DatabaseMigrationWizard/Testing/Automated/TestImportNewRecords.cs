@@ -106,20 +106,6 @@ namespace DatabaseMigrationWizard.Test
         /// Tests to make sure AttributeName imported properly.
         /// </summary>
         [Test, Category("Automated")]
-        public static void AttributeName()
-        {
-            var attributeNameFromDB = JsonConvert.DeserializeObject<List<AttributeName>>(BuildAndWriteTable(new SerializeAttributeName()).ToString());
-
-            foreach (var attributeName in DatabaseMigrationWizardTestHelper.AttributeNames)
-            {
-                Assert.IsTrue(attributeNameFromDB.Where(m => m.Equals(attributeName)).Any());
-            }
-        }
-
-        /// <summary>
-        /// Tests to make sure AttributeName imported properly.
-        /// </summary>
-        [Test, Category("Automated")]
         public static void AttributeSetName()
         {
             var attributeSetNameFromDB = JsonConvert.DeserializeObject<List<AttributeSetName>>(BuildAndWriteTable(new SerializeAttributeSetName()).ToString());
@@ -398,8 +384,6 @@ namespace DatabaseMigrationWizard.Test
         private static void AddNewRecords()
         {
             DatabaseMigrationWizardTestHelper.Actions.Add(new Database.Input.DataTransformObject.Action() { ASCName = "NewAction", MainSequence = false, ActionGuid = Guid.Parse("3d4c06ac-2b37-41de-ba6d-4ad04f7d98d2"), WorkflowGuid = Guid.Parse("0e7193e0-7416-47b3-b5fe-24e26fdf6520") });
-
-            DatabaseMigrationWizardTestHelper.AttributeNames.Add(new AttributeName() { Name = "Potato", Guid = Guid.Parse("2a3b8a59-acc8-4ca8-9370-bb5d6afe6b30") });
 
             DatabaseMigrationWizardTestHelper.AttributeSetNames.Add(new AttributeSetName() { Description = "TurtleAttributeSet", Guid = Guid.Parse("011ef56c-0cc4-4050-a10e-002f2b2177ce") });
 

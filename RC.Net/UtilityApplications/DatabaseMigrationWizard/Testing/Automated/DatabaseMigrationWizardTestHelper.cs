@@ -16,8 +16,6 @@ namespace DatabaseMigrationWizard.Test
     public class DatabaseMigrationWizardTestHelper
     {
         public Collection<Database.Input.DataTransformObject.Action> Actions { get; } = new Collection<Database.Input.DataTransformObject.Action>();
-
-        public Collection<AttributeName> AttributeNames { get; } = new Collection<AttributeName>();
                
         public Collection<AttributeSetName> AttributeSetNames { get; } = new Collection<AttributeSetName>();
                
@@ -60,7 +58,6 @@ namespace DatabaseMigrationWizard.Test
         public void WriteEverythingToDirectory(string directory)
         {
             WriteTablesHelper<Database.Input.DataTransformObject.Action>(directory + "\\Action.json", this.Actions);
-            WriteTablesHelper<AttributeName>(directory + "\\AttributeName.json", this.AttributeNames);
             WriteTablesHelper<AttributeSetName>(directory + "\\AttributeSetName.json", this.AttributeSetNames);
             WriteTablesHelper<Dashboard>(directory + "\\Dashboard.json", this.Dashboards);
             WriteTablesHelper<DatabaseService>(directory + "\\DatabaseService.json", this.DatabaseServices);
@@ -102,9 +99,6 @@ namespace DatabaseMigrationWizard.Test
             Actions.Add(new Database.Input.DataTransformObject.Action() { ASCName = "TestAction", MainSequence = true, ActionGuid = Guid.Parse("04f0e473-5714-4687-a147-8b7fb6f5335e"), WorkflowGuid = Guid.Parse("0e7193e0-7416-47b3-b5fe-24e26fdf6520") });
             Actions.Add(new Database.Input.DataTransformObject.Action() { ASCName = "TestAction2", ActionGuid = Guid.Parse("ade5baae-0dae-4452-9679-0da6c9c4bf80") });
             Actions.Add(new Database.Input.DataTransformObject.Action() { ASCName = "TestAction2", MainSequence = false, ActionGuid = Guid.Parse("cd27650d-dfe4-44c3-9fc8-96ea99f7a4e2"), WorkflowGuid = Guid.Parse("0e7193e0-7416-47b3-b5fe-24e26fdf6520") });
-
-            AttributeNames.Add(new AttributeName() { Name = "DocumentType", Guid = Guid.Parse("1bdf026e-1a8a-4e61-92e2-60f13f06c984") });
-            AttributeNames.Add(new AttributeName() { Name = "PatientInfo", Guid = Guid.Parse("8d0731a3-482e-4a8e-8df4-8a99789400fa") });
 
             AttributeSetNames.Add(new AttributeSetName() { Description = "TestAttributeSet", Guid = Guid.Parse("7c081610-2f63-4f0c-9a3b-d018176bd5ea") });
             AttributeSetNames.Add(new AttributeSetName() { Description = "Reassign", Guid = Guid.Parse("8dbc6db1-cd76-4329-80f9-74afbc02dd15") });
