@@ -3039,11 +3039,14 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Remove highlights so that when you click on the document type combo the last selected control doesn't show its highlight
+                _activeDataControl?.IndicateActive(false, ActiveSelectionColor);
+
+                // Remove highlights so that when you click on the document type combo the last selected control doesn't show its highlight.
+                // The above line, IndicateActive(false, ActiveSelectionColor), will redisplay the highlight for a table cell
+                // that is in edit mode so this remove highlight call needs to happen after that.
                 // https://extract.atlassian.net/browse/ISSUE-17146
                 RemoveActiveAttributeHighlights();
 
-                _activeDataControl?.IndicateActive(false, ActiveSelectionColor);
                 _activeDataControl = null;
             }
             catch (Exception ex)
