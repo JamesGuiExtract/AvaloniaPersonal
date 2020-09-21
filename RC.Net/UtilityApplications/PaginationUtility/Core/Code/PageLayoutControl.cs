@@ -5057,7 +5057,15 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                     isPreviousDocument = true;
                 }
-                    
+
+                // If there is a DEP open, merging should not be allowed unless the merge is into
+                // the document open for editing (in which case, user may be trying to reverse
+                // an mistaken document split)
+                if (DocumentInDataEdit != null && mergetTarget != DocumentInDataEdit)
+                {
+                    return false;
+                }
+
                 return true;
             }
 
