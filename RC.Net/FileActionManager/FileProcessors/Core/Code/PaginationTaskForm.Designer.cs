@@ -190,7 +190,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._paginationPanel.LoadNextDocumentVisible = true;
             this._paginationPanel.Location = new System.Drawing.Point(0, 0);
             this._paginationPanel.Margin = new System.Windows.Forms.Padding(0);
-            this._paginationPanel.MinimumSize = new System.Drawing.Size(454, 0);
+            this._paginationPanel.MinimumSize = new System.Drawing.Size(510, 0);
             this._paginationPanel.Name = "_paginationPanel";
             this._paginationPanel.OutputExpectedPaginationAttributesFile = false;
             this._paginationPanel.RequireAllPagesToBeViewed = false;

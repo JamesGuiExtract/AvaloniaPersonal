@@ -179,7 +179,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this._toolStripContainer);
-            this.MinimumSize = new System.Drawing.Size(454, 0);
+            this.MinimumSize = new System.Drawing.Size(510, 0);
             this.Name = "PaginationPanel";
             this.Size = new System.Drawing.Size(562, 306);
             this._toolStripContainer.ContentPanel.ResumeLayout(false);
