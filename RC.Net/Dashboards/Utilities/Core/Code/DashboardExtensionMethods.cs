@@ -62,7 +62,7 @@ namespace Extract.Dashboard.Utilities
             if (customParameters != null)
             {
                 var settings = customParameters.ConnectionString.Split(new char[] { ';' }).ToList();
-                var provider = settings.Where(s => s.Contains("XpoProvider"));
+                var provider = settings.Where(s => s.StartsWith("XpoProvider", StringComparison.OrdinalIgnoreCase));
                 builder = new SqlConnectionStringBuilder(string.Join(";", settings.Except(provider).ToArray()));
             }
             else if (sqlParameters != null)
