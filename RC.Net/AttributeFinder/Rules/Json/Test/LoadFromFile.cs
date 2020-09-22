@@ -252,6 +252,17 @@ namespace Extract.AttributeFinder.Rules.Json.Test
             Assert.AreEqual(dtoFromBinary, dtoFromJson);
         }
 
+
+        // Ensure that loading from enctrypted binary and json RSD files
+        [TestCase("Resources.RuleSets.empty.rsd.etf", TestName = "empty_etf")]
+        [TestCase("Resources.RuleSets.empty.json.rsd.etf", TestName = "empty_json_etf")]
+        public static void TestLoadingEncryptedFile(string resourceName)
+        {
+            var rsdPath = _testFiles.GetFile(resourceName);
+            var rulesetFromFile = new RuleSetClass();
+            rulesetFromFile.LoadFrom(rsdPath, false);
+        }
+
         #endregion
     }
 }

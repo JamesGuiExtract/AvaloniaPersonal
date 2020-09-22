@@ -127,6 +127,7 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         [TestCase("Resources.RuleSets.UW Transplant-Solution-Rules-Swiping-CollectionDate.rsd", TestName = "RSD_File_UW Transplant-Solution-Rules-Swiping-CollectionDate")]
         [TestCase("Resources.RuleSets.WI - Exact Sciences-Solution-Rules-Master.rsd", TestName = "RSD_File_WI - Exact Sciences-Solution-Rules-Master")]
         [TestCase("Resources.RuleSets.WI - Exact Sciences-Solution-Rules-Master_NoUSS.rsd", TestName = "RSD_File_WI - Exact Sciences-Solution-Rules-Master_NoUSS")]
+        [TestCase("Resources.RuleSets.empty.rsd", TestName = "RSD_File_empty")]
         public static void ExampleRuleSets(string resourceName)
         {
             var rsdPath = _testFiles.GetFile(resourceName);

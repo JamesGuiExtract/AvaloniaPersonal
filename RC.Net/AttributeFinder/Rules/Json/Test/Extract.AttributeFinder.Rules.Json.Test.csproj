@@ -368,6 +368,8 @@
     <EmbeddedResource Include="Resources\RuleSets\UW Transplant-Solution-Rules-Swiping-CollectionDate.rsd" />
     <EmbeddedResource Include="Resources\RuleSets\WI - Exact Sciences-Solution-Rules-Master.rsd" />
     <EmbeddedResource Include="Resources\RuleSets\WI - Exact Sciences-Solution-Rules-Master_NoUSS.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\empty.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\empty.rsd.etf" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\RuleObjects\AdvancedReplaceString.hex.txt" />
@@ -551,6 +553,8 @@
     <EmbeddedResource Include="Resources\RuleSets\UW Transplant-Solution-Rules-Swiping-CollectionDate.json.rsd" />
     <EmbeddedResource Include="Resources\RuleSets\WI - Exact Sciences-Solution-Rules-Master.json.rsd" />
     <EmbeddedResource Include="Resources\RuleSets\WI - Exact Sciences-Solution-Rules-Master_NoUSS.json.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\empty.json.rsd" />
+    <EmbeddedResource Include="Resources\RuleSets\empty.json.rsd.etf" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\RuleObjects\AdvancedReplaceString.json" />

@@ -77,8 +77,22 @@ namespace Extract.AttributeFinder.Rules.Json
             {
                 var str = FileDerivedResourceCache.ThreadLocalMiscUtils.GetBase64StringFromFile(bstrFileName);
                 var bytes = Convert.FromBase64String(str);
-                bool isValidTextFile = bytes.All(b => b > 0);
+                bool isLongEnough = bytes.Length > 200;
 
+                // Log an exception to help with debugging
+                // https://extract.atlassian.net/browse/ISSUE-17229
+                if (!isLongEnough)
+                {
+                    ExtractException.Log("ELI50381", "Application trace: Insufficient RSD bytes loaded!");
+                }
+
+                // Can this be JSON?
+                bool isValidTextFile =
+                    isLongEnough
+                    && bytes.Contains((byte)'{')
+                    && bytes.All(b => b > 0);
+
+                // This input is probably COM structured storage, not JSON
                 if (!isValidTextFile)
                 {
                     pRuleSet = null;
@@ -95,6 +109,16 @@ namespace Extract.AttributeFinder.Rules.Json
                     // ...and this will do the upgrading
                     rulesetDto = (Dto.RuleSet)Domain.RuleObjectConverter.ConvertToDto(domain);
                 }
+
+                // Something is screwed up. At least provide an exception with the json that this method is seeing
+                // https://extract.atlassian.net/browse/ISSUE-17229
+                if (rulesetDto == null)
+                {
+                    var uex = new ExtractException("ELI50382", "RuleSet from JSON is null!");
+                    uex.AddDebugData("JSON", json);
+                    throw uex;
+                }
+
                 _unmodifiedRuleSet = Dto.RuleSetModule.GetWithCurrentSoftwareVersion(rulesetDto);
 
                 pRuleSet = domain;

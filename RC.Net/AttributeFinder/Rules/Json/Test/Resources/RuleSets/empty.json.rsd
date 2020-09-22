@@ -1,0 +1,32 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {},
+    "GlobalOutputHandler": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}
