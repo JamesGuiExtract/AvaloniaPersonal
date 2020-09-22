@@ -28,24 +28,12 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                 FROM
                     dbo.FAMUser
                 WHERE
+                    dbo.FAMUser.UserName = UpdatingFAMUser.UserName
+                    OR
                     (
-                        dbo.FAMUser.FullUserName = UpdatingFAMUser.FullUserName
-                        OR
-                        (
-                            dbo.FAMUser.FullUserName IS NULL
-                            AND
-                            UpdatingFAMUser.FullUserName IS NULL
-                        )
-                    )
-                    AND
-                    (
-                        dbo.FAMUser.UserName = UpdatingFAMUser.UserName
-                        OR
-                        (
-                            dbo.FAMUser.UserName IS NULL
-                            AND
-                            UpdatingFAMUser.UserName IS NULL
-                        )
+                        dbo.FAMUser.UserName IS NULL
+                        AND
+                        UpdatingFAMUser.UserName IS NULL
                     )
                 )
             ";
@@ -66,27 +54,10 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             FROM
                 dbo.FAMUser
                     LEFT OUTER JOIN ##FAMUser AS UpdatingFAMUser
-                        ON dbo.FAMUser.FullUserName = UpdatingFAMUser.FullUserName
-                        OR
-                        (
-                            dbo.FAMUser.FullUserName IS NULL
-                            AND
-                            UpdatingFAMUser.FullUserName IS NULL
-                        )
-                        AND
-                        (
-                            dbo.FAMUser.UserName = UpdatingFAMUser.UserName
-                            OR
-                            (
-                                dbo.FAMUser.UserName IS NULL
-                                AND
-                                UpdatingFAMUser.UserName IS NULL
-                            )
-                        )
+                        ON dbo.FAMUser.UserName = UpdatingFAMUser.UserName
+
             WHERE
                 UpdatingFAMUser.UserName IS NULL
-                AND
-                UpdatingFAMUser.FullUserName IS NULL
             ;
             INSERT INTO
                 dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
@@ -97,34 +68,28 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                 , CONCAT('The FAMUser ', UpdatingFAMUser.UserName, ' will be added to the database')
             FROM
                 ##FAMUser AS UpdatingFAMUser
+		            LEFT OUTER JOIN dbo.FAMUser
+			            ON UpdatingFAMUser.UserName = dbo.FAMUser.UserName
             WHERE
-                NOT EXISTS
-                (
-                SELECT
-                    *
-                FROM
-                    dbo.FAMUser
-                WHERE
-                    (
-                        dbo.FAMUser.FullUserName = UpdatingFAMUser.FullUserName
-                        OR
-                        (
-                            dbo.FAMUser.FullUserName IS NULL
-                            AND
-                            UpdatingFAMUser.FullUserName IS NULL
-                        )
-                    )
-                    AND
-                    (
-                        dbo.FAMUser.UserName = UpdatingFAMUser.UserName
-                        OR
-                        (
-                            dbo.FAMUser.UserName IS NULL
-                            AND
-                            UpdatingFAMUser.UserName IS NULL
-                        )
-                    )
-                )";
+                dbo.FAMUser.UserName IS NULL
+            ;
+			INSERT INTO
+                dbo.ReportingDatabaseMigrationWizard(Command, Classification, TableName, Message)
+            SELECT
+                'N/A'
+                , 'Warning'
+                , 'FAMUser'
+                , CONCAT('The FAMUser ', UpdatingFAMUser.UserName
+					, ' has a full username of: '
+					, dbo.FAMUser.FullUserName
+					, ' in the database but a value of: '
+					, UpdatingFAMUser.FullUserName
+					, ' in the importing source. This will NOT be updated by this utility so please make manual adjustments as necessary.')
+            FROM
+                ##FAMUser AS UpdatingFAMUser
+					INNER JOIN dbo.FAMUser
+						ON dbo.FAMUser.UserName = UpdatingFAMUser.UserName
+						AND dbo.FAMUser.FullUserName <> UpdatingFAMUser.FullUserName";
 
 		public Priorities Priority => Priorities.High;
 

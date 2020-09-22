@@ -95,7 +95,7 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                             ON dbo.WebAppConfig.Guid = UpdatingWebAppConfig.WebAppConfigGuid
 
             WHERE
-                UpdatingWebAppConfig.Settings NOT LIKE dbo.WebAppConfig.Settings
+                ISNULL(CAST(UpdatingWebAppConfig.Settings AS NVARCHAR(MAX)), '') <> ISNULL(CAST(dbo.WebAppConfig.Settings AS NVARCHAR(MAX)), '')
             ;
 
             INSERT INTO
