@@ -191,18 +191,18 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    if (_selectedIndex != value)
+                    string text = "";
+                    if (value != -1)
                     {
-                        string text = "";
-                        if (value != -1)
+                        var items = Items;
+                        if (value >= 0 && value < items.Count)
                         {
-                            var items = Items;
-                            if (value >= 0 && value < items.Count)
-                            {
-                                text = items[value];
-                            }
+                            text = items[value];
                         }
+                    }
 
+                    if (_selectedIndex != value || Text != text)
+                    {
                         _selectedIndex = value;
 
                         // Set flag while updating the text to avoid generating/searching the list twice
