@@ -4334,8 +4334,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else if (DocumentDataPanel?.PanelControl?.ContainsFocus != true)
                 {
+                    if (activeDocument?.OutputProcessed == true)
+                    {
+                        TabNavigateNextDocument(activeDocument);
+                    }
                     // Tabbing from no selection or any page but the last page of a document
-                    if (activeControl?.NextControl is PageThumbnailControl)
+                    else if (activeControl?.NextControl is PageThumbnailControl)
                     {
                         HandleSelectNextPage();
                     }
@@ -4561,7 +4565,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 // If a panel is open, first attempt to navigate within the panel.
-                if (DocumentDataPanel != null && DocumentDataPanel.GoToNextInvalid(includeWarnings: true))
+                if (DocumentDataPanel != null 
+                    && !DocumentInDataEdit.OutputProcessed
+                    && DocumentDataPanel.GoToNextInvalid(includeWarnings: true))
                 {
                     return;
                 }
@@ -4569,12 +4575,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                 OutputDocument activeDocument = GetActiveDocument(forward: true);
                 OutputDocument document = (DocumentDataPanel == null)
                     ? activeDocument
-                    : GetNextDocument(forward: true, onlyUnprocessed: false) ?? Documents.First();
+                    : GetNextDocument(forward: true, onlyUnprocessed: true) ?? Documents.First();
                 OutputDocument stopSearch = null;
 
                 while (document != stopSearch && !document.DataError && !document.DataWarning)
                 {
-                    document = GetNextDocument(forward: true, onlyUnprocessed: false, document);
+                    document = GetNextDocument(forward: true, onlyUnprocessed: true, document);
                     if (document == null && stopSearch == null)
                     {
                         // Loop from start until we get back to the active document.
