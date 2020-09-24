@@ -483,7 +483,7 @@ namespace Extract.DataEntry
             // TODO: For DataGridView cells the parent is null until some
             // text has been typed so figure out a way to update the control state
             // or arrow keys won't be able to drop down the list
-            if (!_control.Visible || _control.Parent == null)
+            if (!_control.Visible || !_control.Enabled || _control.Parent == null)
             {
                 return;
             }
