@@ -299,6 +299,22 @@ namespace Extract.UtilityApplications.PaginationUtility
                 nextControlLocation.X += control.Width;
             }
 
+            // Resize the last page control in a row so that it extends all the way to the right
+            // edge of the panel. This allows for the (drag)drops to occur anywhere to the right
+            // of the last page in each row.
+            var lastPageControl = parent.Controls
+                .OfType<PaginationControl>()
+                .LastOrDefault()
+                as PageThumbnailControl;
+            if (lastPageControl != null)
+            {
+                var newPadding = parentDisplayRectangle.Right - lastPageControl.Right;
+                lastPageControl.Width = parentDisplayRectangle.Right - lastPageControl.Left;
+                var padding = lastPageControl.Padding;
+                padding.Right = newPadding;
+                lastPageControl.Padding = padding;
+            }
+
             // Prevent unneeded separator when load next document button isn't available.
             var lastControl = parent.Controls
                 .OfType<PaginationControl>()

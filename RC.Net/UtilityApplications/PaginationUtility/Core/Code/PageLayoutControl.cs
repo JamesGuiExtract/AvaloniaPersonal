@@ -83,6 +83,13 @@ namespace Extract.UtilityApplications.PaginationUtility
         PaginationControl _commandTargetControl;
 
         /// <summary>
+        /// Indicates that the _commandTargetControl is the last page of a document and was set
+        /// via a click that occurred to the right of it's DisplayRectangle. Such a selection
+        /// should not generally behave as if _commandTargetControl is an active command target.
+        /// </summary>
+        bool _commandTargetEndOfDocument;
+
+        /// <summary>
         /// The <see cref="PageThumbnailControl"/> whose page is current displayed in the
         /// <see cref="ImageViewer"/>.
         /// </summary>
@@ -790,6 +797,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         // being set to allow shortcuts keys to work even if the control hasn't been
                         // clicked.
                         _commandTargetControl = _primarySelection;
+                        _commandTargetEndOfDocument = false;
                     }
                     else if (!_preventTransientDocumentClose && ImageViewer.IsImageAvailable)
                     {
@@ -2132,6 +2140,12 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var clickedControl = (PaginationControl)sender;
 
+                if (IsAtEndOfDocument(clickedControl, PointToClient(MousePosition)))
+                {
+                    ClearSelection();
+                    return;
+                }
+
                 if (clickedControl != _loadNextDocumentButtonControl)
                 {
                     // [DotNetRCAndUtils:965]
@@ -2335,17 +2349,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                     separator = GetControlAtPoint<PaginationSeparator>(mouseLocation);
                     _commandTargetControl = separator;
                 }
-                if (_commandTargetControl != null && !_commandTargetControl.Selected)
+
+                _commandTargetEndOfDocument = IsAtEndOfDocument(_commandTargetControl, mouseLocation);
+
+                if (_commandTargetControl == null || _commandTargetEndOfDocument)
+                {
+                    ClearSelection();
+                }
+                else if (_commandTargetControl != null && !_commandTargetControl.Selected)
                 {
                     ProcessControlSelection(_commandTargetControl);
                     if (separator != null)
                     {
                         _commandTargetControl = separator;
                     }
-                }
-                else if (_commandTargetControl == null)
-                {
-                    ClearSelection();
                 }
 
                 UpdateCommandStates();
@@ -2354,6 +2371,26 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 ex.ExtractDisplay("ELI35454");
             }
+        }
+
+        /// <summary>
+        /// Indicates whether a click of the specified <see paramref="control"/> at the specified
+        /// <see paramref="mouseLocation"/> represents a click that occured to the right of the
+        /// last page of a document.
+        /// </summary>
+        static bool IsAtEndOfDocument(PaginationControl control, Point mouseLocation)
+        {
+            if (control is PageThumbnailControl && !(control.NextControl is PageThumbnailControl))
+            {
+                var displayRect = control.DisplayRectangle;
+                displayRect.Offset(control.Location);
+                if (mouseLocation.X > displayRect.Right)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -2378,6 +2415,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (e.CloseReason != ToolStripDropDownCloseReason.ItemClicked)
                 {
                     _commandTargetControl = GetActiveControl();
+                    _commandTargetEndOfDocument = false;
                 }
             }
             catch (Exception ex)
@@ -3184,6 +3222,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _lastSelectedControl = control;
                 }
                 _commandTargetControl = control;
+                _commandTargetEndOfDocument = false;
 
                 PrimarySelection = control;
 
@@ -3205,6 +3244,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_commandTargetControl != null)
                 {
                     _commandTargetControl = null;
+                    _commandTargetEndOfDocument = false;
                 }
 
                 if (control == PrimarySelection)
@@ -3239,6 +3279,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (control == _commandTargetControl)
                 {
                     _commandTargetControl = null;
+                    _commandTargetEndOfDocument = false;
                 }
 
                 if (control == PrimarySelection)
@@ -3727,7 +3768,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _pasteCommand.Enabled =
                     enablePageModificationCommands
                     && ClipboardHasData()
-                    && SelectedControls.Count() == 1;
+                    && (SelectedControls.Count() == 1 || _commandTargetEndOfDocument);
             }
 
             // Initiating document output via this control is only allowed if ExternalOutputOnly is
@@ -4675,7 +4716,17 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         int index = _flowLayoutPanel.Controls.IndexOf(_commandTargetControl);
 
+                        if (_commandTargetEndOfDocument)
+                        {
+                            var nextDocument = GetNextDocument(forward: true, onlyUnprocessed: false, _commandTargetControl.Document);
+                            index = _flowLayoutPanel.Controls.IndexOf(nextDocument?.PaginationSeparator);
+                        }
+
                         InsertPages(copiedPages, index);
+
+                        _flowLayoutPanel.RequestScrollToControl(SelectedPageControls.Last(),
+                            topAlignmentOffset: null,
+                            activateScrollToControlForEvent: true);
                     }
                 }
             }
