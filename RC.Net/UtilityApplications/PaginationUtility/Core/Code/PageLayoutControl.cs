@@ -109,6 +109,16 @@ namespace Extract.UtilityApplications.PaginationUtility
         bool _enablePageDisplay = true;
 
         /// <summary>
+        /// Context menu option to select all pages in the active document 
+        /// </summary>
+        readonly ToolStripMenuItem _selectAllMenuItem = new ToolStripMenuItem("Select all document page(s)");
+
+        /// <summary>
+        /// The <see cref="ApplicationCommand"/> that controls the availability of select all.
+        /// </summary>
+        ApplicationCommand _selectAllCommand;
+
+        /// <summary>
         /// Context menu option that allows the selected PaginationControls to be cut.
         /// </summary>
         readonly ToolStripMenuItem _cutMenuItem = new ToolStripMenuItem("Cut page(s)");
@@ -1862,6 +1872,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnLoad(e);
 
+                _selectAllMenuItem.ShortcutKeyDisplayString = "Ctrl + A";
+                _selectAllMenuItem.ShowShortcutKeys = true;
+                _selectAllCommand = new ApplicationCommand(Shortcuts,
+                    new Keys[] { Keys.Control | Keys.A }, HandleSelectAll,
+                    JoinToolStripItems(_selectAllMenuItem),
+                    shortcutsAlwaysEnabled: false, visible: true, enabled: false);
+                _selectAllMenuItem.Click += HandleSelectAllMenuItem_Click;
+
                 _cutMenuItem.ShortcutKeyDisplayString = "Ctrl + X";
                 _cutMenuItem.ShowShortcutKeys = true;
                 _cutCommand = new ApplicationCommand(Shortcuts,
@@ -1958,6 +1976,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 InitializeShortcuts();
 
                 ContextMenuStrip = new ContextMenuStrip();
+                ContextMenuStrip.Items.Add(_selectAllMenuItem);
+                ContextMenuStrip.Items.Add(new ToolStripSeparator());
                 ContextMenuStrip.Items.Add(_cutMenuItem);
                 ContextMenuStrip.Items.Add(_copyMenuItem);
                 ContextMenuStrip.Items.Add(_pasteMenuItem);
@@ -2422,6 +2442,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 ex.ExtractDisplay("ELI35558");
             }
+        }
+
+        /// <summary>
+        /// Handles the Click event of the <see cref="_selectAllMenuItem"/>.
+        /// </summary>
+        void HandleSelectAllMenuItem_Click(object sender, EventArgs e)
+        {
+            HandleSelectAll();
         }
 
         /// <summary>
@@ -3674,6 +3702,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             bool enablePageModificationCommands =
                 !SelectedControls.OfType<PageThumbnailControl>().Any(c => c.Document.OutputProcessed);
 
+            _selectAllCommand.Enabled = enableSelectionBasedCommands;
             _copyCommand.Enabled = enableSelectionBasedCommands;
 
             // The cut command is applicable to separators if the only thing selected is a
@@ -4642,6 +4671,28 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI50157");
+            }
+        }
+
+        /// <summary>
+        /// Handles a UI command to select all pages in the current document.
+        /// </summary>
+        internal void HandleSelectAll()
+        {
+            try
+            {
+                if (PrimarySelection != null)
+                {
+                    ProcessControlSelection(PrimarySelection,
+                        additionalControls: PrimarySelection.Document.PageControls,
+                        select: true,
+                        modifierKeys: Keys.None,
+                        scrollToControl: false);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50385");
             }
         }
 
