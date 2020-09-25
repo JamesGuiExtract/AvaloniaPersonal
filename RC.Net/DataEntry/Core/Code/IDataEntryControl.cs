@@ -41,16 +41,48 @@ namespace Extract.DataEntry
         SuggestLucene = 4,
     }
 
+    public enum AutoDropDownMode
+    {
+        /// <summary>
+        /// Don't automatically show the suggestion list when the control gets focus
+        /// </summary>
+        Never = 0,
+
+        /// <summary>
+        /// Automatically show the suggestion list when the control gets focus
+        /// </summary>
+        Always = 1,
+
+        /// <summary>
+        /// Automatically show the suggestion list when the control gets focus if Text is empty or is only whitespace
+        /// </summary>
+        WhenEmpty = 2,
+    }
+
     /// <summary>
     /// Interface to support use of <see cref="DataEntryAutoCompleteMode"/>
     /// </summary>
     public interface IDataEntryAutoCompleteControl
     {
+        /// <summary>
+        /// The <see cref="DataEntryAutoCompleteMode"/> to use for text box editing controls
+        /// </summary>
         DataEntryAutoCompleteMode AutoCompleteMode
         {
             get;
             set;
         }
+
+        /// <summary>
+        /// Determines whether to show the list as soon as this control gets focus
+        /// </summary>
+        AutoDropDownMode AutoDropDownMode { get; set; }
+
+        /// <summary>
+        /// When <c>true</c> the best match will be automatically selected in the list while typing.
+        /// When <c>false</c> arrow keys or the mouse must be used to select an item.
+        /// </summary>
+        bool AutomaticallySelectBestMatchingItem { get; set; }
     }
 
     /// <summary>

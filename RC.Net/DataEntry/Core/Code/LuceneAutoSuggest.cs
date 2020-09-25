@@ -28,7 +28,7 @@ namespace Extract.DataEntry
         bool _ignoreTextChange;
         bool _ignoreMouseDown;
         bool _suppressListBoxChildLostFocusEvent;
-        bool _suppressControlLostFocusEvent;
+        bool _ignoreControlGotFocusEvent;
 
         // The value to revert to if the dropped down is canceled (closed with escape or lost focus)
         string _acceptedText;
@@ -38,6 +38,9 @@ namespace Extract.DataEntry
 
         // The color to use for the list
         Color _listBoxChildBackColor;
+
+        // List of values for displaying without a search
+        Lazy<string[]> _autoCompleteValues;
 
         #endregion Fields
 
@@ -108,27 +111,18 @@ namespace Extract.DataEntry
                 // Set up all the events we need to handle
                 control.TextChanged += HandleControl_TextChanged;
                 control.LostFocus += HandleControl_LostFocus;
+                control.GotFocus += HandleControl_GotFocus;
                 control.MouseDown += HandleControl_MouseDown;
                 control.HandleDestroyed += HandleControl_HandleDestroyed;
-
-                var canSuppressFocusEvents = control as ICanSuppressFocusEvents;
-                if (canSuppressFocusEvents != null)
-                {
-                    canSuppressFocusEvents.LosingFocus += HandleControl_LosingFocus;
-                }
 
                 // Set up event unregistration
                 _unregister = () =>
                 {
                     control.TextChanged -= HandleControl_TextChanged;
                     control.LostFocus -= HandleControl_LostFocus;
+                    control.GotFocus -= HandleControl_GotFocus;
                     control.MouseDown -= HandleControl_MouseDown;
                     control.HandleDestroyed -= HandleControl_HandleDestroyed;
-
-                    if (canSuppressFocusEvents != null)
-                    {
-                        canSuppressFocusEvents.LosingFocus -= HandleControl_LosingFocus;
-                    }
                 };
             }
             catch (Exception ex)
@@ -267,19 +261,31 @@ namespace Extract.DataEntry
             }
         }
 
-        void HandleControl_LosingFocus(object sender, CancelEventArgs e)
+        // Support auto-drop-down-on-focus
+        void HandleControl_GotFocus(object sender, EventArgs e)
         {
             try
             {
-                if (_suppressControlLostFocusEvent)
+                if (_ignoreControlGotFocusEvent)
                 {
-                    _suppressControlLostFocusEvent = false;
-                    e.Cancel = true;
+                    return;
                 }
+
+                if (_dataEntryAutoCompleteControl.AutoDropDownMode == AutoDropDownMode.Always
+                    || _dataEntryAutoCompleteControl.AutoDropDownMode == AutoDropDownMode.WhenEmpty
+                        && string.IsNullOrWhiteSpace(_control.Text))
+                {
+                    // Mouse clicks fail to auto-drop the list unless this is begin-invoked, I think because
+                    // something the DataEntryControlHost does causes the list to close immediately
+                    _control.BeginInvoke((Action)(() => DropDown(null)));
+                }
+
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI50161");
+                // Avoid potential infinite loop of exception display by logging any exception caught here
+                // https://extract.atlassian.net/browse/ISSUE-17208
+                ex.ExtractLog("ELI50384");
             }
         }
 
@@ -306,7 +312,9 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI50158");
+                // Avoid potential infinite loop of exception display by logging any exception caught here
+                // https://extract.atlassian.net/browse/ISSUE-17208
+                ex.ExtractLog("ELI50158");
             }
         }
 
@@ -335,7 +343,7 @@ namespace Extract.DataEntry
             {
                 _ignoreMouseDown = true;
 
-                DropDown(" ");
+                DropDown(null);
             }
             catch (Exception ex)
             {
@@ -418,8 +426,7 @@ namespace Extract.DataEntry
 
         void InitListControl()
         {
-            if (_dataEntryAutoCompleteControl?.AutoCompleteMode
-                != DataEntryAutoCompleteMode.SuggestLucene)
+            if (_dataEntryAutoCompleteControl.AutoCompleteMode != DataEntryAutoCompleteMode.SuggestLucene)
             {
                 _listBoxChild = null;
             }
@@ -471,10 +478,13 @@ namespace Extract.DataEntry
             }
         }
 
+        // Show suggestions from list using lucene query or show entire list if searchText is null
         void DropDown(string searchText)
         {
+            bool showEntireList = searchText == null;
+
             // Allow user to delete the value without triggering the list to show
-            if (String.IsNullOrEmpty(searchText) && !DroppedDown)
+            if (!showEntireList && searchText.Length == 0 && !DroppedDown)
             {
                 _acceptedText = null;
                 return;
@@ -497,10 +507,17 @@ namespace Extract.DataEntry
 
             _listBoxChild.Items.Clear();
 
-            var suggestions = Provider?.Invoke(searchText)?.ToArray();
-            if (suggestions != null)
+            if (showEntireList)
             {
-                _listBoxChild.Items.AddRange(suggestions);
+                _listBoxChild.Items.AddRange(_autoCompleteValues.Value);
+            }
+            else
+            {
+                var suggestions = Provider?.Invoke(searchText)?.ToArray();
+                if (suggestions != null)
+                {
+                    _listBoxChild.Items.AddRange(suggestions);
+                }
             }
 
             // Show the list even if it's empty when the control is a ComboBox because otherwise the button will appear to be broken
@@ -523,12 +540,13 @@ namespace Extract.DataEntry
                 }
                 _listBoxChild.Height = Math.Min(_ancestorForm.ClientSize.Height - _listBoxChild.Top, totalItemHeight);
 
-                // Select the current item or the first item
-                if (_listBoxChild.Items.Count > 0)
+                // Select the current or best matching item when explicit selection is not required
+                if (_listBoxChild.Items.Count > 0
+                    && (showEntireList || _dataEntryAutoCompleteControl.AutomaticallySelectBestMatchingItem))
                 {
                     string currentText = _control.Text ?? "";
                     int idxOfCurrentText = _listBoxChild.Items.IndexOf(currentText);
-                    if (idxOfCurrentText < 0)
+                    if (idxOfCurrentText < 0 && !showEntireList)
                     {
                         idxOfCurrentText = 0;
                     }
@@ -575,9 +593,18 @@ namespace Extract.DataEntry
 
                 _suppressListBoxChildLostFocusEvent = true;
                 HideTheList();
-                
+
                 // Put focus back on the edit control so that user can type
-                _control.Focus();
+                try
+                {
+                    // Set this flag to prevent the list from dropping down again if AutoDropDownMode is Always
+                    _ignoreControlGotFocusEvent = true;
+                    _control.Focus();
+                }
+                finally
+                {
+                    _ignoreControlGotFocusEvent = false;
+                }
             }
         }
 
@@ -748,6 +775,9 @@ namespace Extract.DataEntry
 
         internal void UpdateAutoCompleteList(IEnumerable<KeyValuePair<string, List<string>>> autoCompleteValues)
         {
+            // Save entire list for quick display (no need to wait for index to be created)
+            _autoCompleteValues = new Lazy<string[]>(() => autoCompleteValues.Select(s => s.Key).ToArray());
+
             ProviderSource = new Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>>(
                 () => new LuceneSuggestionProvider<KeyValuePair<string, List<string>>>(
                     autoCompleteValues,

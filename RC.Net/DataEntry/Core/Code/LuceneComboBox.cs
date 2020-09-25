@@ -8,15 +8,10 @@ using System.Windows.Forms;
 
 namespace Extract.DataEntry
 {
-    public interface ICanSuppressFocusEvents
-    {
-        event EventHandler<CancelEventArgs> LosingFocus;
-    }
-
     /// <summary>
     /// A <see cref="ComboBox"/> that uses a <see cref="LuceneAutoSuggest"/> to display suggestions
     /// </summary>
-    public partial class LuceneComboBox : ComboBox, ICanSuppressFocusEvents, IDataEntryAutoCompleteControl, IRequiresErrorProvider
+    public partial class LuceneComboBox : ComboBox, IDataEntryAutoCompleteControl, IRequiresErrorProvider
     {
         readonly ComboBoxStyle _SUPPORTED_COMBO_BOX_STYLE = ComboBoxStyle.DropDown;
         readonly DataEntryAutoCompleteMode _SUPPORTED_AUTO_COMPLETE_MODE = DataEntryAutoCompleteMode.SuggestLucene;
@@ -71,12 +66,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Raised after this control loses focus but before the <see cref="LostFocus"/> event
-        /// is raised to allow that event to be suppressed
-        /// </summary>
-        public event EventHandler<CancelEventArgs> LosingFocus;
-
-        /// <summary>
         /// Gets or sets the <see cref="DataEntryControlHost"/> to which this control belongs
         /// </summary>
         /// <value>The <see cref="DataEntryControlHost"/> to which this control belongs.</value>
@@ -106,8 +95,25 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Determines whether to show the list as soon as this control gets focus
+        /// </summary>
+        [Category("Data Entry Control")]
+        [DefaultValue(AutoDropDownMode.Never)]
+        public AutoDropDownMode AutoDropDownMode { get; set; }
+
+        /// <summary>
+        /// When <c>false</c> the best match will be automatically selected in the list while typing.
+        /// When <c>true</c> arrow keys or the mouse must be used to select an item.
+        /// </summary>
+        [Category("Data Entry Control")]
+        [DefaultValue(false)]
+        public bool AutomaticallySelectBestMatchingItem { get; set; } = true;
+
+        /// <summary>
         /// The <see cref="DataEntryAutoCompleteMode"/> that this control uses
         /// </summary>
+        [Category("Data Entry Control")]
+        [DefaultValue(DataEntryAutoCompleteMode.SuggestLucene)]
         public new DataEntryAutoCompleteMode AutoCompleteMode
         {
             get => _SUPPORTED_AUTO_COMPLETE_MODE;
@@ -342,27 +348,6 @@ namespace Extract.DataEntry
         {
             _validationErrorProvider = validationErrorProvider;
             _validationWarningErrorProvider = validationWarningErrorProvider;
-        }
-
-        /// <summary>
-        /// Raises the <see cref="LostFocus"/> event
-        /// </summary>
-        protected override void OnLostFocus(EventArgs e)
-        {
-            try
-            {
-                var cancelEvent = new CancelEventArgs();
-                LosingFocus?.Invoke(this, cancelEvent);
-
-                if (!cancelEvent.Cancel)
-                {
-                    base.OnLostFocus(e);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI50166");
-            }
         }
 
         /// <summary>

@@ -693,6 +693,21 @@ namespace Extract.DataEntry
         [Category("Data Entry Table")]
         public DataEntryAutoCompleteMode AutoCompleteMode { get; set; } = DataEntryAutoCompleteMode.SuggestLucene;
 
+        /// <summary>
+        /// Determines whether to show the list as soon as this control gets focus
+        /// </summary>
+        [Category("Data Entry Table")]
+        [DefaultValue(AutoDropDownMode.Never)]
+        public AutoDropDownMode AutoDropDownMode { get; set; }
+
+        /// <summary>
+        /// When <c>false</c> the best match will be automatically selected in the list while typing.
+        /// When <c>true</c> arrow keys or the mouse must be used to select an item.
+        /// </summary>
+        [Category("Data Entry Table")]
+        [DefaultValue(true)]
+        public bool AutomaticallySelectBestMatchingItem { get; set; }
+
         #endregion Properties
 
         #region Methods
