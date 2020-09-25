@@ -230,7 +230,9 @@ namespace Extract.UtilityApplications.PaginationUtility
 
         void InitializeDocumentSeparatorDragTarget(PaginationSeparator separator)
         {
-            if (separator.Collapsed)
+            // separator.Document will be null in case of the separator inserted before the
+            // Load Next Document button.
+            if (separator.Collapsed || separator.Document == null)
             {
                 if (!separator.ShowDragHints)
                 {
@@ -240,7 +242,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 Controls.Remove(_dropLocationIndicator);
                 _activeDragTarget = separator;
 
-                if (_lastDragMove.HasValue
+                if (separator.Document != null
+                    && _lastDragMove.HasValue
                     && (DateTime.Now - _lastDragMove.Value) > new TimeSpan(0, 0, 0, 0, milliseconds: 500))
                 {
                     using (new UIUpdateLock(this))
@@ -263,7 +266,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                     pageThumbnailControl.Height);
             }
 
-            _dropLocationIndex = _flowLayoutPanel.Controls.IndexOf(separator.Document.PageControls.Last()) + 1;
+            _dropLocationIndex = _flowLayoutPanel.Controls.IndexOf(
+                separator.Document?.PageControls?.Last() ?? (Control)separator) + 1;
         }
 
         /// <summary>
@@ -554,7 +558,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI35450");
+                // Displaying an exception while in the midst of drag over freezed the UI.
+                // Log the exception instead.
+                ex.ExtractLog("ELI35450");
             }
         }
 
