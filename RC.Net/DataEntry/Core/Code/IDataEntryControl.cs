@@ -200,6 +200,15 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Indicates whether the control is visible.
+        /// </summary>
+        bool Visible
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets whether the clipboard contents should be cleared after pasting into the
         /// control.
         /// </summary>

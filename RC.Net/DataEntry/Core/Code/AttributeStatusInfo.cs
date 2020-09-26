@@ -626,26 +626,19 @@ namespace Extract.DataEntry
         {
             get
             {
-                if (_noUILoad)
-                {
-                    return _isViewable;
-                }
-                else
-                {
-                    var isViewable = _isViewable
-                        && _owningControl?.Disabled == false
-                        && (_owningControl as Control)?.Visible == true;
+                var isViewable = _isViewable
+                    && _owningControl?.Disabled == false
+                    && _owningControl?.Visible == true;
 
-                    // If the result differs from the last reported state (whether as a result of a
-                    // change to _isViewable, or the control's Disabled or Visible properties), perform
-                    // any actions dependent on the control's viewability.
-                    if (isViewable != _lastReportedViewableState)
-                    {
-                        ProcessViewabilityChange(isViewable, _attribute);
-                    }
-
-                    return isViewable;
+                // If the result differs from the last reported state (whether as a result of a
+                // change to _isViewable, or the control's Disabled or Visible properties), perform
+                // any actions dependent on the control's viewability.
+                if (!_noUILoad && isViewable != _lastReportedViewableState)
+                {
+                    ProcessViewabilityChange(isViewable, _attribute);
                 }
+
+                return isViewable;
             }
 
             set
@@ -4398,8 +4391,7 @@ namespace Extract.DataEntry
                 // Since non-viewable attributes will not be considered invalid, ensure the
                 // validation status is up-to-date for any attribute whose viewed status has
                 // been changed since the original document load.
-                if (_owningControl != null &&
-                    !_owningControl.DataEntryControlHost.ChangingData)
+                if (_owningControl?.DataEntryControlHost?.ChangingData == false)
                 {
                     AttributeStatusInfo.Validate(attribute, false);
                     if (isViewable)
