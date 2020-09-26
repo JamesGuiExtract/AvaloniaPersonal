@@ -40,7 +40,7 @@ namespace Extract.DataEntry
         Color _listBoxChildBackColor;
 
         // List of values for displaying without a search
-        Lazy<string[]> _autoCompleteValues;
+        Lazy<object[]> _autoCompleteValues;
 
         #endregion Fields
 
@@ -277,7 +277,7 @@ namespace Extract.DataEntry
                 {
                     // Mouse clicks fail to auto-drop the list unless this is begin-invoked, I think because
                     // something the DataEntryControlHost does causes the list to close immediately
-                    _control.BeginInvoke((Action)(() => DropDown(null)));
+                    _control.SafeBeginInvoke("ELI50388", () => DropDown(null), displayExceptions: false);
                 }
 
             }
@@ -507,17 +507,13 @@ namespace Extract.DataEntry
 
             _listBoxChild.Items.Clear();
 
-            if (showEntireList)
+            var suggestions = showEntireList
+                ? _autoCompleteValues?.Value
+                : Provider?.Invoke(searchText)?.ToArray();
+
+            if (suggestions != null)
             {
-                _listBoxChild.Items.AddRange(_autoCompleteValues.Value);
-            }
-            else
-            {
-                var suggestions = Provider?.Invoke(searchText)?.ToArray();
-                if (suggestions != null)
-                {
-                    _listBoxChild.Items.AddRange(suggestions);
-                }
+                _listBoxChild.Items.AddRange(suggestions);
             }
 
             // Show the list even if it's empty when the control is a ComboBox because otherwise the button will appear to be broken
@@ -776,7 +772,10 @@ namespace Extract.DataEntry
         internal void UpdateAutoCompleteList(IEnumerable<KeyValuePair<string, List<string>>> autoCompleteValues)
         {
             // Save entire list for quick display (no need to wait for index to be created)
-            _autoCompleteValues = new Lazy<string[]>(() => autoCompleteValues.Select(s => s.Key).ToArray());
+            if (autoCompleteValues != null)
+            {
+                _autoCompleteValues = new Lazy<object[]>(() => autoCompleteValues.Select(s => s.Key).ToArray());
+            }
 
             ProviderSource = new Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>>(
                 () => new LuceneSuggestionProvider<KeyValuePair<string, List<string>>>(
