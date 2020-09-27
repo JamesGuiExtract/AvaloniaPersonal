@@ -211,6 +211,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         ApplicationCommand _mergeDocumentsCommand;
 
         /// <summary>
+        /// Context menu option that allows the selected PaginationControls to be moved from the current
+        /// document(s) into a new, separate document.
+        /// </summary>
+        readonly ToolStripMenuItem _moveToNewDocumentMenuItem = new ToolStripMenuItem("Move page(s) to new document");
+        ApplicationCommand _moveToNewDocumentCommand;
+
+        /// <summary>
+        /// Context menu option that allows the selected PaginationControls to be copied from the current
+        /// document(s) into a new, separate document.
+        /// </summary>
+        readonly ToolStripMenuItem _copyToNewDocumentMenuItem = new ToolStripMenuItem("Copy page(s) to new document");
+        ApplicationCommand _copyToNewDocumentCommand;
+
+        /// <summary>
         /// The <see cref="ApplicationCommand"/> that controls the availability of the output operation.
         /// </summary>
         ApplicationCommand _outputDocumentCommand;
@@ -1969,6 +1983,22 @@ namespace Extract.UtilityApplications.PaginationUtility
                     false, true, false);
                 _mergeDocumentsMenuItem.Click += HandleMergeDocumentsMenuItem_Click;
 
+                _moveToNewDocumentMenuItem.ShortcutKeyDisplayString = "Ctrl + Shift + X";
+                _moveToNewDocumentMenuItem.ShowShortcutKeys = true;
+                _moveToNewDocumentCommand = new ApplicationCommand(Shortcuts,
+                    new Keys[] { Keys.Control | Keys.Shift | Keys.X }, () => HandleMoveToNewDocument(copyPages: false),
+                    JoinToolStripItems(_moveToNewDocumentMenuItem),
+                    false, true, false); ;
+                _moveToNewDocumentMenuItem.Click += HandleMoveToNewDocumentMenuItem_Click;
+
+                _copyToNewDocumentMenuItem.ShortcutKeyDisplayString = "Ctrl + Shift + C";
+                _copyToNewDocumentMenuItem.ShowShortcutKeys = true;
+                _copyToNewDocumentCommand = new ApplicationCommand(Shortcuts,
+                    new Keys[] { Keys.Control | Keys.Shift | Keys.C }, () => HandleMoveToNewDocument(copyPages: true),
+                    JoinToolStripItems(_copyToNewDocumentMenuItem),
+                    false, true, false);
+                _copyToNewDocumentMenuItem.Click += HandleCopyToNewDocumentMenuItem_Click;
+
                 _outputDocumentCommand = new ApplicationCommand(Shortcuts,
                     new Keys[] { Keys.Control | Keys.S }, HandleOutputDocument, null,
                     shortcutsAlwaysEnabled: false, visible: true, enabled: false);
@@ -1992,6 +2022,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                 ContextMenuStrip.Items.Add(new ToolStripSeparator());
                 ContextMenuStrip.Items.Add(_insertDocumentSeparatorMenuItem);
                 ContextMenuStrip.Items.Add(_mergeDocumentsMenuItem);
+                ContextMenuStrip.Items.Add(_moveToNewDocumentMenuItem);
+                ContextMenuStrip.Items.Add(_copyToNewDocumentMenuItem);
+
                 ContextMenuStrip.Opening += HandleContextMenuStrip_Opening;
                 ContextMenuStrip.Closing += HandleContextMenuStrip_Closing;
 
@@ -2558,6 +2591,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         void HandleMergeDocumentsMenuItem_Click(object sender, EventArgs e)
         {
             HandleMergeDocuments(viaKeyboard: false);
+        }
+
+        /// <summary>
+        /// Handles the Click event of the <see cref="_moveToNewDocumentMenuItem"/>.
+        /// </summary>
+        void HandleMoveToNewDocumentMenuItem_Click(object sender, EventArgs e)
+        {
+            HandleMoveToNewDocument(copyPages: false);
+        }
+
+        /// <summary>
+        /// Handles the Click event of the <see cref="_copyToNewDocumentMenuItem"/>.
+        /// </summary>
+        void HandleCopyToNewDocumentMenuItem_Click(object sender, EventArgs e)
+        {
+            HandleMoveToNewDocument(copyPages: true);
         }
 
         /// <summary>
@@ -3698,6 +3747,13 @@ namespace Extract.UtilityApplications.PaginationUtility
                 enableSelectionBasedCommands = false;
             }
 
+            OutputDocument singlySelectedDocument =
+                (FullySelectedDocuments.Count() == 1 && PartiallySelectedDocuments.Count() == 1)
+                ? FullySelectedDocuments.Single()
+                : (SelectedPageControls.Count() == 1)
+                    ? SelectedPageControls.Single().Document
+                    : null;
+
             // Do not allow modification of documents that have already been output.
             bool enablePageModificationCommands =
                 !SelectedControls.OfType<PageThumbnailControl>().Any(c => c.Document.OutputProcessed);
@@ -3740,7 +3796,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             _rotateSelectedPagesClockwiseCommand.Enabled = enableRotationCommands;
             _rotateSelectedPagesCounterclockwiseCommand.Enabled = enableRotationCommands;
 
-            UpdataMergeCommandStatus();
+            UpdateMergeCommandStatus();
+
+            // Do not enable move option when its only real effect would be to remove the existing document data.
+            _moveToNewDocumentCommand.Enabled =
+                enableSelectionBasedCommands
+                && enablePageModificationCommands
+                && singlySelectedDocument?.PageControls.All(c => c.Selected) != true;
+            _copyToNewDocumentCommand.Enabled = enableSelectionBasedCommands;
 
             bool enablePrintCommand = enableSelectionBasedCommands &&
                 SelectedPageControls.ToArray().Length > 0;
@@ -3759,12 +3822,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // Separators cannot be added next to other separators, cannot be the first control
                 // and should only be able to be toggle when there is a single selection.
                 var separator = _commandTargetControl as PaginationSeparator;
-                OutputDocument singlySelectedDocument =
-                    (FullySelectedDocuments.Count() == 1 && PartiallySelectedDocuments.Count() == 1)
-                    ? FullySelectedDocuments.Single()
-                    : (SelectedPageControls.Count() == 1)
-                        ? SelectedPageControls.Single().Document
-                        : null;
 
                 _editDocumentDataMenuItem.Enabled = AllowDataEdit
                     && (separator != null)
@@ -3832,6 +3889,8 @@ namespace Extract.UtilityApplications.PaginationUtility
             _insertDocumentSeparatorCommand.Enabled = false;
             _mergeDocumentsCommand.Enabled = false;
             _outputDocumentCommand.Enabled = false;
+            _copyToNewDocumentCommand.Enabled = false;
+            _moveToNewDocumentCommand.Enabled = false;
 
             Shortcuts.ProcessingShortcut += HandleShortcuts_ProcessingShortcut;
 
@@ -5098,7 +5157,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Updates the text and sets the enabled status of _mergeDocumentsMenuItem based on the current
         /// selection and _commandTargetControl.
         /// </summary>
-        void UpdataMergeCommandStatus()
+        void UpdateMergeCommandStatus()
         {
             bool enableMerge = HasValidMergeCommandTarget(out var mergeTarget, out bool isPreviousDocument);
             _mergeDocumentsCommand.Enabled = enableMerge;
@@ -5226,6 +5285,64 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI50377");
+            }
+        }
+
+        /// <summary>
+        /// Moves or copies the currently selected pages from their existing document(s) to a new
+        /// document.
+        /// </summary>
+        /// <param name="copyPages"><c>true</c> if copies of the page(s) should be added to a new document;
+        /// <c>false</c> if the pages should be cut from their current document(s) before being added to the
+        /// new document.</param>
+        void HandleMoveToNewDocument(bool copyPages)
+        {
+            try
+            {
+                if (SelectedPageControls.Any())
+                {
+                    using var uiLock = new UIUpdateLock(this);
+
+                    var indexToAddDocument = 
+                        _flowLayoutPanel.Controls.IndexOf(
+                            SelectedPageControls
+                                .Last()
+                                .Document
+                                .PageControls
+                                .Last()) 
+                            + 1;
+
+                    var newDocSeparator = new PaginationSeparator(this, CommitOnlySelection);
+                    InsertPaginationControl(newDocSeparator, index: indexToAddDocument);
+
+                    if (copyPages)
+                    {
+                        var copiedPages = SelectedPageControls
+                            .Select(pageControl => new KeyValuePair<Page, bool>(pageControl.Page, pageControl.Deleted))
+                            .ToList();
+                        InsertPages(copiedPages, indexToAddDocument + 1);
+                    }
+                    else
+                    {
+                        MoveSelectedControls(this, indexToAddDocument + 1);
+                    }
+
+                    newDocSeparator.Collapsed = false;
+                    var newDocument = newDocSeparator.Document;
+
+                    // Reset selection so that the first dropped page (rather than the separator)
+                    // is now the primary selection. Do not explicitly select pagination separators
+                    // which can be re-assigned to other docs based on the new location of pages
+                    ProcessControlSelection(
+                        activeControl: newDocument.PageControls.First(),
+                        additionalControls: newDocument.PageControls,
+                        select: true,
+                        modifierKeys: Keys.None);
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50389");
             }
         }
 
