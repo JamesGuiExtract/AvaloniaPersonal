@@ -1529,6 +1529,30 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
+        // Ensure the method fails gracefully (returns false) for a bad PDF file
+        [Test, Category("Automated"), Category("TryGetPage")]
+        public static void Test_GetImagePageFromBadPDF()
+        {
+            var resource = "Resources.TestImage003.tif";
+            string pdfPath = null;
+            try
+            {
+                var tifPath = _testFiles.GetFile(resource);
+
+                // Move to a path ending in .pdf
+                pdfPath = _testFiles.GetFile(resource, tifPath + ".not.a.pdf");
+
+                Assert.False(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, 1, out byte[] imageDataFromPDF));
+            }
+            finally
+            {
+                if (pdfPath is string)
+                {
+                    _testFiles.RemoveFile(resource);
+                }
+            }
+        }
+
         #endregion Public Test Functions
 
         static (FileProcessingDB fileProcessingDb, User user, DocumentController DocumentController)

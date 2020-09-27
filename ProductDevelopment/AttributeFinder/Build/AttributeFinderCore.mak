@@ -378,6 +378,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\grpc*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\FSharp.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(RCNETDir)\APIs\protobuf-net.2.4.0\lib\net40\protobuf-net.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(RCNETDir)\APIs\PDFsharp.1.50.5147\lib\net20\*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
 # This includes System.ValueTuple in the install
 	@COPY /V /Y "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"

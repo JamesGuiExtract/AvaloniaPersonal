@@ -2,7 +2,8 @@
 using Extract.Licensing;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using org.apache.pdfbox.pdmodel;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -2297,7 +2298,7 @@ namespace WebAPI.Models
         private static byte[] GetPageFromPdf(string pdfFileName, int pageNumber)
         {
             var sourceDoc = GetCachedObject(
-                creator: () => PDDocument.load(new java.io.File(pdfFileName)),
+                creator: () => PdfReader.Open(pdfFileName, PdfDocumentOpenMode.Import),
                 monitorPathsForChanges: false, // Change monitors can cause problems with unit testing and could cause issues for the API too
                 paths: new[] { pdfFileName },
                 slidingExpiration: TimeSpan.FromMinutes(1),
@@ -2305,20 +2306,19 @@ namespace WebAPI.Models
                 {
                     // If an entry is being removed because it has expired then it is safe to close the document now.
                     // If it has been removed because of a change monitor or because the entry has been re-added then
-                    // the document could still be in use (let the finalizer for PDDocument close the document)
+                    // the document could still be in use
                     if (entry.RemovedReason == CacheEntryRemovedReason.Expired)
                     {
-                        ((PDDocument)entry.CacheItem.Value).close();
+                        // Note: As of PDFBox 1.50 Dispose doesn't appear to do anything
+                        ((PdfDocument)entry.CacheItem.Value).Dispose();
                     }
                 });
 
-            using (var pageDoc = new PDDocument())
-            using (var pageStream = new java.io.ByteArrayOutputStream())
-            {
-                pageDoc.addPage(sourceDoc.getPage(pageNumber - 1));
-                pageDoc.save(pageStream);
-                return pageStream.toByteArray();
-            }
+            using var pageStream = new MemoryStream();
+            using var pageDoc = new PdfDocument(pageStream);
+            pageDoc.AddPage(sourceDoc.Pages[pageNumber - 1]);
+            pageDoc.Close();
+            return pageStream.ToArray();
         }
 
         /// <summary>

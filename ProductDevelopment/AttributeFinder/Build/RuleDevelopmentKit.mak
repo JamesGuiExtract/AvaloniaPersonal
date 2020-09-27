@@ -117,7 +117,6 @@ CopyFilesToInstallFolder: CreateDestinationFolders
 	@COPY /V /Y  "$(RCDotNetDir)\Core\Testing\Automated\html-report.xslt" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V /Y  "$(BinariesFolder)\nunit.framework.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@XCOPY "$(RCDotNetDir)\APIs\NUnit.ConsoleRunner.3.11.1\tools\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
-	@XCOPY "$(RCDotNetDir)\APIs\PDFsharp.1.50.5147\lib\net20\*.*" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
 	
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.nl"
 	@DIR "$(RDTInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents\RDTCommon.rl"

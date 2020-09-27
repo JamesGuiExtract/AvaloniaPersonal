@@ -133,12 +133,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="IKVM.OpenJDK.Core">
-      <HintPath>..\..\..\RC.Net\APIs\IKVM\lib\IKVM.OpenJDK.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Tabula.IKVM">
-      <HintPath>..\..\..\RC.Net\APIs\Tabula.IKVM\target\Tabula.IKVM.exe</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="1.1.1" />
@@ -162,6 +156,7 @@
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="1.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NSwag.Annotations" Version="13.1.5" />
+    <PackageReference Include="PDFsharp" Version="1.50.5147" />
 	<PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUi" Version="3.0.0" />
