@@ -1158,7 +1158,7 @@ namespace Extract.DataEntry
         /// Determines whether to show the list as soon as this control gets focus
         /// </summary>
         [Category("Data Entry Control")]
-        [DefaultValue(AutoDropDownMode.Never)]
+        [DefaultValue(AutoDropDownMode.WhenEmpty)]
         public AutoDropDownMode AutoDropDownMode { get; set; } = AutoDropDownMode.WhenEmpty;
 
         /// <summary>
@@ -1166,8 +1166,8 @@ namespace Extract.DataEntry
         /// When <c>true</c> arrow keys or the mouse must be used to select an item.
         /// </summary>
         [Category("Data Entry Control")]
-        [DefaultValue(true)]
-        public bool AutomaticallySelectBestMatchingItem { get; set; }
+        [DefaultValue(false)]
+        public bool AutomaticallySelectBestMatchingItem { get; set; } = false;
 
         #endregion IDataEntryControl Properties
 

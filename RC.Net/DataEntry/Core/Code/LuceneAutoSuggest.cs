@@ -771,15 +771,26 @@ namespace Extract.DataEntry
 
         internal void UpdateAutoCompleteList(IEnumerable<KeyValuePair<string, List<string>>> autoCompleteValues)
         {
+            // Avoid using the supplied IEnumerable at a later time in case it is being changed on a different thread
+            // https://extract.atlassian.net/browse/ISSUE-17243
+            var safeAutoCompleteValues = autoCompleteValues?.ToList();
+
             // Save entire list for quick display (no need to wait for index to be created)
-            if (autoCompleteValues != null)
+            // Always create a new lazy instance to avoid a bad index exception
+            // https://extract.atlassian.net/browse/ISSUE-17243
+            _autoCompleteValues = new Lazy<object[]>(() =>
             {
-                _autoCompleteValues = new Lazy<object[]>(() => autoCompleteValues.Select(s => s.Key).ToArray());
-            }
+                var objectArray = new object[safeAutoCompleteValues?.Count ?? 0];
+                for (int i = 0; i < objectArray.Length; i++)
+                {
+                    objectArray[i] = safeAutoCompleteValues[i].Key;
+                }
+                return objectArray;
+            });
 
             ProviderSource = new Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>>(
                 () => new LuceneSuggestionProvider<KeyValuePair<string, List<string>>>(
-                    autoCompleteValues,
+                    safeAutoCompleteValues,
                     s => s.Key,
                     s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s.Key), 1)
                         .Concat(s.Value.Select(aka => new KeyValuePair<string, string>("AKA", aka)))));

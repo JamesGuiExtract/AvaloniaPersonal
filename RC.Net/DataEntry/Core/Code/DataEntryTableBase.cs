@@ -698,15 +698,15 @@ namespace Extract.DataEntry
         /// </summary>
         [Category("Data Entry Table")]
         [DefaultValue(AutoDropDownMode.Never)]
-        public AutoDropDownMode AutoDropDownMode { get; set; }
+        public AutoDropDownMode AutoDropDownMode { get; set; } = AutoDropDownMode.Never;
 
         /// <summary>
         /// When <c>false</c> the best match will be automatically selected in the list while typing.
         /// When <c>true</c> arrow keys or the mouse must be used to select an item.
         /// </summary>
         [Category("Data Entry Table")]
-        [DefaultValue(true)]
-        public bool AutomaticallySelectBestMatchingItem { get; set; }
+        [DefaultValue(false)]
+        public bool AutomaticallySelectBestMatchingItem { get; set; } = false;
 
         #endregion Properties
 
