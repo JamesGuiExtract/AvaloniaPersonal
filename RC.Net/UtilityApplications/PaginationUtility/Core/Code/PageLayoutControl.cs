@@ -5315,8 +5315,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                     var newDocSeparator = new PaginationSeparator(this, CommitOnlySelection);
                     InsertPaginationControl(newDocSeparator, index: indexToAddDocument);
 
+                    PaginationControl primarySelection = null;
+                    List<PaginationControl> additionallySelectedControls = null;
+
                     if (copyPages)
                     {
+                        primarySelection = PrimarySelection;
+                        additionallySelectedControls = SelectedControls.ToList();
+
                         var copiedPages = SelectedPageControls
                             .Select(pageControl => new KeyValuePair<Page, bool>(pageControl.Page, pageControl.Deleted))
                             .ToList();
@@ -5324,18 +5330,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                     else
                     {
+                        primarySelection = SelectedPageControls.First().PreviousControl;
+                        
                         MoveSelectedControls(this, indexToAddDocument + 1);
                     }
 
                     newDocSeparator.Collapsed = false;
-                    var newDocument = newDocSeparator.Document;
 
-                    // Reset selection so that the first dropped page (rather than the separator)
-                    // is now the primary selection. Do not explicitly select pagination separators
-                    // which can be re-assigned to other docs based on the new location of pages
-                    ProcessControlSelection(
-                        activeControl: newDocument.PageControls.First(),
-                        additionalControls: newDocument.PageControls,
+                    // See: https://extract.atlassian.net/browse/ISSUE-17242
+                    // For discussion on why not to select the new document at this point.
+                    ProcessControlSelection(primarySelection,
+                        additionalControls: additionallySelectedControls,
                         select: true,
                         modifierKeys: Keys.None);
                 }
