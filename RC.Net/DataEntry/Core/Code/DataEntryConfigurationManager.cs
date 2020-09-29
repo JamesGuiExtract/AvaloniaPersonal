@@ -294,7 +294,7 @@ namespace Extract.DataEntry
             {
                 return (_registeredDocumentTypes ?? Enumerable.Empty<KeyValuePair<string, string>>())
                     .Select(kv => kv.Key)
-                    .OrderBy(x => x, StringComparer.OrdinalIgnoreCase);
+                    .OrderBy(x => x, StringComparer.InvariantCultureIgnoreCase);
             }
         }
 
