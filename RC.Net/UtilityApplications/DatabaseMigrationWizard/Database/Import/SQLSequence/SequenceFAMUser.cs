@@ -13,29 +13,18 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             )";
 
         private readonly string insertSQL = @"
-             INSERT INTO dbo.FAMUser(UserName, FullUserName)
+            INSERT INTO dbo.FAMUser(UserName, FullUserName)
 
             SELECT
-                UserName
-                , FullUserName
+                UpdatingFAMUser.UserName
+                , UpdatingFAMUser.FullUserName
             FROM 
                 ##FAMUser AS UpdatingFAMUser
+					LEFT OUTER JOIN dbo.FAMUser
+						ON dbo.FAMUser.UserName = UpdatingFAMUser.UserName
+
             WHERE
-                NOT EXISTS
-                (
-                SELECT
-                    *
-                FROM
-                    dbo.FAMUser
-                WHERE
-                    dbo.FAMUser.UserName = UpdatingFAMUser.UserName
-                    OR
-                    (
-                        dbo.FAMUser.UserName IS NULL
-                        AND
-                        UpdatingFAMUser.UserName IS NULL
-                    )
-                )
+                dbo.FAMUser.UserName IS NULL
             ";
 
         private readonly string insertTempTableSQL = @"

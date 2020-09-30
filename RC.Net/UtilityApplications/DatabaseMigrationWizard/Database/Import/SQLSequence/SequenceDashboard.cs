@@ -34,15 +34,7 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                 ##Dashboard AS UpdatingDashboard
                             LEFT OUTER JOIN dbo.FAMUser
                                 ON dbo.FAMUser.UserName = UpdatingDashboard.UserName
-                                AND (
-                                        dbo.FAMUser.FullUserName = UpdatingDashboard.FullUserName
-                                        OR
-                                        (
-                                            UpdatingDashboard.FullUserName IS NULL
-                                            AND
-                                            dbo.FAMUser.FullUserName IS NULL
-                                        )
-                                    )
+
             WHERE
                 dbo.Dashboard.Guid = UpdatingDashboard.DashboardGuid
             ;
@@ -61,15 +53,7 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                 ##Dashboard AS UpdatingDashboard
                         LEFT OUTER JOIN dbo.FAMUser
                             ON dbo.FAMUser.UserName = UpdatingDashboard.UserName
-                            AND (
-                                    dbo.FAMUser.FullUserName = UpdatingDashboard.FullUserName
-                                    OR
-                                    (
-                                        UpdatingDashboard.FullUserName IS NULL
-                                        AND
-                                        dbo.FAMUser.FullUserName IS NULL
-                                    )
-                                )
+
             WHERE
                 UpdatingDashboard.DashboardGuid NOT IN (SELECT Guid FROM dbo.Dashboard)";
 
@@ -175,15 +159,6 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
                 ##Dashboard AS UpdatingDashboard
                     LEFT OUTER JOIN dbo.FAMUser
                         ON dbo.FAMUser.UserName = UpdatingDashboard.UserName
-                        AND (
-                                dbo.FAMUser.FullUserName = UpdatingDashboard.FullUserName
-                                OR
-                                (
-                                    UpdatingDashboard.FullUserName IS NULL
-                                    AND
-                                    dbo.FAMUser.FullUserName IS NULL
-                                )
-                            )
                     
                     INNER JOIN dbo.Dashboard
                         ON dbo.Dashboard.Guid = UpdatingDashboard.DashboardGuid
