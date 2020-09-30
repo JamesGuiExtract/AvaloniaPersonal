@@ -697,3 +697,12 @@ let findRepeats (doc: AFDocument) =
     
     doc.Attribute.SubAttributes.Append(attributesToReturn)
     doc
+
+  
+type CustomObject = CustomObject
+
+// Requires collectible to be false
+let printCustomObject (doc: AFDocument) =
+  printfn "%A" CustomObject
+  doc.Attribute.Value.CreateNonSpatialString("Success", "dummy")
+  doc

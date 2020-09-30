@@ -18,14 +18,14 @@
       "Description": "<FSharp preprocessor>",
       "Enabled": true,
       "Object": {
-        "ScriptPath": "<RSDFileDir>\\Preprocessor.fsx",
-        "FunctionName": "getMetadata",
+        "ScriptPath": "<RSDFileDir>\\Scripts.fsx",
+        "FunctionName": "printCustomObject",
         "Collectible": false
       }
     },
     "IgnorePreprocessorErrors": false,
     "AttributeNameToInfoMap": {
-      "_": {
+      "TestResult": {
         "AttributeRules": [
           {
             "Enabled": true,
@@ -73,53 +73,10 @@
       }
     },
     "GlobalOutputHandler": {
-      "Type": "OutputHandlerSequence",
-      "Description": "Keep the Name and Size<Select multiple output handlers>",
+      "Type": null,
+      "Description": "",
       "Enabled": true,
-      "Object": {
-        "ObjectsVector": [
-          {
-            "Type": "MoveAndModifyAttributes",
-            "Description": "Promote */Name|*/Size<Move and modify attributes>",
-            "Enabled": true,
-            "Object": {
-              "AddAttributeNameToType": false,
-              "AddRootOrParentAttributeType": false,
-              "AddSpecifiedAttributeType": false,
-              "AttributeQuery": "*/Name|*/Size",
-              "DeleteRootOrParentIfAllChildrenMoved": false,
-              "MoveAttributeLevel": "MoveToRoot",
-              "OverwriteAttributeName": "DoNotOverwrite",
-              "RetainAttributeType": true,
-              "SpecifiedAttributeName": "",
-              "SpecifiedAttributeType": ""
-            }
-          },
-          {
-            "Type": "RemoveSubAttributes",
-            "Description": "Remove _<Remove attributes>",
-            "Enabled": true,
-            "Object": {
-              "AttributeSelector": {
-                "Type": "QueryBasedAS",
-                "Object": {
-                  "QueryText": "_"
-                }
-              },
-              "ConditionalRemove": false,
-              "DataScorer": {
-                "Type": null,
-                "Description": "",
-                "Enabled": true,
-                "Object": null
-              },
-              "ScoreCondition": "EQ",
-              "CompareConditionType": "ValueOf",
-              "ScoreToCompare": 0
-            }
-          }
-        ]
-      }
+      "Object": null
     },
     "IgnoreOutputHandlerErrors": false
   }
