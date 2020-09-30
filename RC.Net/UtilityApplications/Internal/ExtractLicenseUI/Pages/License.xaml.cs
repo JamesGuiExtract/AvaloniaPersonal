@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -320,9 +321,9 @@ namespace ExtractLicenseUI
         {
             try
             {
-                var appdataFolder = CreateAndGetTempFolder();
-                this.SelectedOrganization.SelectedLicense.GenerateLicenseFile(appdataFolder);
-                this.CopyFileToClipboard(appdataFolder + @"\" + this.SelectedOrganization.SelectedLicense.LicenseName + ".lic");
+                var fileName = Path.Combine(Path.GetTempPath(), SelectedOrganization.SelectedLicense.LicenseName + ".lic");
+                this.SelectedOrganization.SelectedLicense.GenerateLicenseFile(fileName);
+                this.CopyFileToClipboard(fileName);
             }
             catch(Exception)
             {
@@ -370,25 +371,15 @@ namespace ExtractLicenseUI
         {
             try
             {
-                var appdataFolder = CreateAndGetTempFolder();
-                this.SelectedOrganization.SelectedLicense.GenerateUnlockCode(this.SelectedOrganization, appdataFolder);
-                this.CopyFileToClipboard(appdataFolder + @"\Extract_UnlockLicense.txt");
+                var tempFolder = Path.GetTempPath();
+                var fileName = Path.Combine(tempFolder, LicenseInfo.ExpiringLicenseUnlockFileName);
+                this.SelectedOrganization.SelectedLicense.GenerateUnlockCode(this.SelectedOrganization, tempFolder);
+                this.CopyFileToClipboard(fileName);
             }
             catch(Exception)
             {
                 MessageBox.Show("Unable to copy unlock code to clipboard.");
             }
-        }
-
-        /// <summary>
-        /// Reads the appdata folder, and creates a temp file.
-        /// </summary>
-        /// <returns>A file path to appdata\Extract_systems\Temp</returns>
-        private string CreateAndGetTempFolder()
-        {
-            var appdataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Extract_Systems\temp\";
-            System.IO.Directory.CreateDirectory(appdataFolder);
-            return appdataFolder;
         }
 
         /// <summary>
