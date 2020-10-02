@@ -4291,25 +4291,39 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                var currentControl = GetActiveControl(true);
-                if (currentControl is PageThumbnailControl pageControl && pageControl.Document.Collapsed)
-                {
-                    pageControl.Document.Collapsed = false;
-                }
-                else
-                {
-                    NavigablePaginationControl navigableControl = GetNextNavigableControl(true);
-
-                    if (navigableControl != null)
-                    {
-                        ProcessControlSelection(navigableControl);
-                    }
-                }
+                SelectNavigableControl();
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35456");
             }
+        }
+
+        /// <summary>
+        /// Selects the next navigable control.
+        /// </summary>
+        /// <returns>The control that was selected or <c>null</c> if the next control (if any)
+        /// is not a NavigablePaginationControl.</returns>
+        NavigablePaginationControl SelectNavigableControl()
+        {
+            var currentControl = GetActiveControl(true);
+            if (currentControl is PageThumbnailControl pageControl && pageControl.Document.Collapsed)
+            {
+                pageControl.Document.Collapsed = false;
+                return pageControl;
+            }
+            else
+            {
+                NavigablePaginationControl navigableControl = GetNextNavigableControl(true);
+
+                if (navigableControl != null)
+                {
+                    ProcessControlSelection(navigableControl);
+                    return navigableControl;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -4463,7 +4477,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                 }
                 else if (DocumentDataPanel?.PanelControl?.ContainsFocus != true)
                 {
-                    if (activeDocument?.OutputProcessed == true)
+                    // https://extract.atlassian.net/browse/ISSUE-17256
+                    // CommitOnlySelection == false within DE verification tab and indicates all
+                    // documents will be commited at once. In this case, the behavior to select
+                    // and collapse documents as you go doesn't make sense; just select next page.
+                    if (!CommitOnlySelection)
+                    {
+                        if (SelectNavigableControl() == null)
+                        {
+                            // If on last page, select next document (if any).
+                            SelectNextDocument(forward: true, onlyUnprocessed: true, useActiveModifierKeys: false);
+                        }
+                    }
+                    else if (activeDocument?.OutputProcessed == true)
                     {
                         TabNavigateNextDocument(activeDocument);
                     }
