@@ -349,6 +349,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         uint _documentLoadCount;
 
         /// <summary>
+        /// Indicates when the initial load for a document is occuring.
+        /// </summary>
+        bool _loading;
+
+        /// <summary>
         /// Indicates whether all highlights are currently being shown.
         /// </summary>
         bool _showAllHighlights;
@@ -1916,9 +1921,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         // Load the panel into the _scrollPane
                         LoadDataEntryControlHostPanel();
 
-                        // Load the attributes from the previous DataEntryControlHost
-                        newDataEntryControlHost.LoadData(_configManager.Attributes, _fileName, 
-                            forEditing: true, initialSelection: FieldSelection.First);
+                        // https://extract.atlassian.net/browse/ISSUE-17258
+                        // If the configuration change is happening as part of loading a document,
+                        // don't load the data into the panel now as it will be done by HandleImageFileChanged.
+                        // This prevents data from being loaded twice and ensures initial field selection
+                        // occurs correctly.
+                        if (!_loading)
+                        {
+                            newDataEntryControlHost.LoadData(_configManager.Attributes, _fileName,
+                                forEditing: true, initialSelection: FieldSelection.First);
+                        }
 
                         // Register for events and engage shortcut handlers for the new DEP
                         newDataEntryControlHost.SwipingStateChanged += HandleSwipingStateChanged;
@@ -2080,6 +2092,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _imageViewer.OcrData.SpatialString.ValidatePageDimensions();
                     }
 
+                    _loading = true;
                     _documentLoadCount++;
 
                     // [DataEntry:693]
@@ -2203,6 +2216,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     " document data!", ex);
                 ee.AddDebugData("Event data", e, false);
                 RaiseVerificationException(ee, true);
+            }
+            finally
+            {
+                _loading = false;
             }
         }
 
