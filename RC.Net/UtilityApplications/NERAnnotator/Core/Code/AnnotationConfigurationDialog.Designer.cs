@@ -578,17 +578,17 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(10, 152);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(185, 13);
+            this.label5.Size = new System.Drawing.Size(211, 13);
             this.label5.TabIndex = 3;
-            this.label5.Text = "Path tag function of category VOA file";
+            this.label5.Text = "Path tag function of category VOA/EAV file";
             // 
             // _typesVoaFunctionTextBox
             // 
             this._typesVoaFunctionTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._typesVoaFunctionTextBox.Location = new System.Drawing.Point(209, 149);
+            this._typesVoaFunctionTextBox.Location = new System.Drawing.Point(233, 149);
             this._typesVoaFunctionTextBox.Name = "_typesVoaFunctionTextBox";
-            this._typesVoaFunctionTextBox.Size = new System.Drawing.Size(369, 20);
+            this._typesVoaFunctionTextBox.Size = new System.Drawing.Size(345, 20);
             this._typesVoaFunctionTextBox.TabIndex = 1;
             this._typesVoaFunctionTextBox.TextChanged += new System.EventHandler(this.HandleValueChanged);
             // 

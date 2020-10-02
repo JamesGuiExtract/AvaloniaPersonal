@@ -27,6 +27,7 @@ using GetCharIndexesFunc =
         UCLID_RASTERANDOCRMGMTLib.SpatialString,
         bool,
         System.Collections.Generic.HashSet<int>>;
+using UCLID_AFUTILSLib;
 
 namespace Extract.UtilityApplications.NERAnnotation
 {
@@ -87,6 +88,7 @@ namespace Extract.UtilityApplications.NERAnnotation
             searcher.SetBoundaryResolution(ESpatialEntity.kCharacter);
             return searcher;
         });
+        ThreadLocal<AFUtility> _afUtility = new ThreadLocal<AFUtility>(() => new AFUtilityClass());
 
         Dictionary<string, FSharpFunc<EntitiesAndPage, EntitiesAndPage>> _entityFilteringFunctions;
 
@@ -731,10 +733,10 @@ namespace Extract.UtilityApplications.NERAnnotation
             // Update the AFDocument in the thread-local path tags object so that tags in the types VOA file can be expanded
             _pathTags.Value.Document.Text = uss;
 
-            IUnknownVector typesVoa = new IUnknownVectorClass();
+            IUnknownVector typesVoa;
             if (_settings.UseDatabase && _settings.UseAttributeSetForTypes)
             {
-                typesVoa = GetTypesVoaFromDB(ussPath.Substring(0, ussPath.Length - 4)) ?? typesVoa;
+                typesVoa = GetTypesVoaFromDB(ussPath.Substring(0, ussPath.Length - 4)) ?? new IUnknownVectorClass();
             }
             else
             {
@@ -748,7 +750,7 @@ namespace Extract.UtilityApplications.NERAnnotation
                 }
                 else
                 {
-                    typesVoa.LoadFrom(typesVoaFile, false);
+                    typesVoa = _afUtility.Value.GetAttributesFromFile(typesVoaFile);
                     typesVoa.ReportMemoryUsage();
                 }
             }
