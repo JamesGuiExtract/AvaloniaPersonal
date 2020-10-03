@@ -989,9 +989,18 @@ namespace Extract.DataEntry.LabDE
                     selectionPane.RowData = rowData;
                     selectionPane.UpdateRecordSelectionGrid();
 
-                    if (fileInspectorForm.ShowDialog(DataEntryControlHost) == DialogResult.OK)
+                    try
                     {
-                        return selectionPane.SelectedRecordId;
+                        DataEntryControlHost.DisableKeyboardInput = true;
+
+                        if (fileInspectorForm.ShowDialog(DataEntryControlHost) == DialogResult.OK)
+                        {
+                            return selectionPane.SelectedRecordId;
+                        }
+                    }
+                    finally
+                    {
+                        DataEntryControlHost.DisableKeyboardInput = false;
                     }
                 }
             }
