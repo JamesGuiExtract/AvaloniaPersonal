@@ -1373,7 +1373,7 @@ namespace Extract.DataEntry
                     IAttribute attribute = (IAttribute)attributes.At(i);
                     var fieldModel = fieldModels?.SingleOrDefault(child => child.Name == attribute.Name);
 
-                    AttributeStatusInfo.Initialize(attribute, attributes, fieldModel?.OwningControl, 
+                    AttributeStatusInfo.Initialize(attribute, attributes, fieldModel?.OwningControl,
                         fieldModel?.DisplayOrder, considerPropagated: false, TabStopMode.Never,
                         new DataEntryValidator(), fieldModel?.AutoUpdateQuery, fieldModel?.ValidationQuery);
 
@@ -1392,6 +1392,13 @@ namespace Extract.DataEntry
                         validator.ValidationPattern = fieldModel.ValidationPattern;
                         validator.CorrectCase = fieldModel.ValidationCorrectsCase;
 
+                        // https://extract.atlassian.net/browse/ISSUE-17270
+                        // LastAppliedStringValue is used for preserving auto-applied values in Windows controls not
+                        // yet configured to accept values. This is causing unintended side-effects with the
+                        // FormatValue call below. As BackgroundFieldModels will never be prevented from accepting
+                        // values in the way foreground controls may, reset LastAppliedStringValue to prevent such interference.
+                        statusInfo.LastAppliedStringValue = null;
+                        
                         // Some DataEntry controls may update the value beyond changes defined by auto-update queries.
                         // Use FormatValue mimic value changes that would be imposed by the controls themselves.
                         fieldModel.FormatValue(attribute);
