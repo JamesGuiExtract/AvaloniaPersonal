@@ -525,10 +525,10 @@ namespace Extract.UtilityApplications.NERAnnotation
                     {
                         openDialog.InitialDirectory = Path.GetDirectoryName(_fileName);
                     }
-                    if (openDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    if (openDialog.ShowDialog() == DialogResult.OK)
                     {
                         Cursor.Current = Cursors.WaitCursor;
-                        _settings = NERAnnotatorSettings.LoadFrom(_fileName);
+                        _settings = NERAnnotatorSettings.LoadFrom(openDialog.FileName);
                         _fileName = openDialog.FileName;
                         SetControlValues();
                     }
