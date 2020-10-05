@@ -2193,6 +2193,14 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var clickedControl = (PaginationControl)sender;
 
+                if (clickedControl.Document == null)
+                {
+                    // https://extract.atlassian.net/browse/ISSUE-17267
+                    // Don't allow operations based on the separator the distinguishes the Load Next Document button
+                    ClearSelection();
+                    return;
+                }
+
                 if (IsAtEndOfDocument(clickedControl, PointToClient(MousePosition)))
                 {
                     ClearSelection();
@@ -2400,7 +2408,20 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (_commandTargetControl == null)
                 {
                     separator = GetControlAtPoint<PaginationSeparator>(mouseLocation);
-                    _commandTargetControl = separator;
+                    if (separator != null)
+                    {
+                        if (separator.Document != null)
+                        {
+                            _commandTargetControl = separator;
+                        }
+                        else
+                        {
+                            // https://extract.atlassian.net/browse/ISSUE-17267
+                            // Don't allow operations based on the separator the distinguishes the Load Next Document button
+                            separator = null;
+                            _commandTargetControl = null;
+                        }
+                    }
                 }
 
                 _commandTargetEndOfDocument = IsAtEndOfDocument(_commandTargetControl, mouseLocation);
@@ -3275,6 +3296,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                     }
                 }
 
+                if (LoadNextDocumentVisible)
+                {
+                    _loadNextDocumentButtonControl.Visible = true;
+                }
+
                 _allDocumentsShowing = true;
             }
         }
@@ -3824,7 +3850,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var separator = _commandTargetControl as PaginationSeparator;
 
                 _editDocumentDataMenuItem.Enabled = AllowDataEdit
-                    && (separator != null)
+                    && (separator?.Document != null)
                     && singlySelectedDocument != null;
 
                 if (_editDocumentDataMenuItem.Enabled)
