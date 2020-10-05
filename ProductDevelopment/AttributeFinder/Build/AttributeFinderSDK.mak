@@ -122,6 +122,7 @@ CreateExtractSoftwareInstallCD:
     $(VerifyDir) "$(ExtractSoftwareInstallMediaDir)" "$(ExtractSoftwareInstallFiles)"
 	@COPY /V /Y "$(AFInstallFilesRootDir)\InstallHelp\*.*" "$(ExtractSoftwareInstallFiles)"
 	@COPY /V /Y "$(ExtractSoftwareInstallRootDir)\Support Files\license.txt" "$(ExtractSoftware)\Readme.txt"
+	@COPY /V /Y "$(EngineeringRootDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\ProcessFiles\Code\res\ProcessFiles.ico" "$(ExtractSoftware)\ExtractInstall.ico"
     @DeleteFiles "$(ExtractSoftwareInstallFiles)\*.scc"
 
 CreateFlexDataEntryInstallDir:
