@@ -156,10 +156,7 @@ BOOL CEAVGeneratorDlg::OnInitDialog()
 
 			if (selectRowIdx >= 0 && selectRowIdx < m_listAttributes.GetItemCount())
 			{
-				CRect rect;
-				m_listAttributes.GetItemRect(0, rect, LVIR_BOUNDS);
-				long scrollPos = selectRowIdx * rect.Height();
-				m_listAttributes.Scroll(CSize(0, scrollPos));
+                m_listAttributes.EnsureVisible(selectRowIdx, FALSE);
 				selectListItem(selectRowIdx);
 				highlightAttributeInRow(false);
 			}
@@ -1129,53 +1126,11 @@ void CEAVGeneratorDlg::OnKeydownListDisplay(NMHDR* pNMHDR, LRESULT* pResult)
     {
         NMLVKEYDOWN* nmkd = (NMLVKEYDOWN*)pNMHDR;
 
-        // check what key was pressed (we only care about delete, up arrow, and down arrow
+        // check what key was pressed (we only care about delete)
         switch (nmkd->wVKey)
         {
         case VK_DELETE:
             OnBtnDelete();
-            break;
-
-        case VK_UP:
-            {
-                // up arrow - get the current selection
-                int nItemSelected = getCurrentSelectedListItemIndex();
-
-                // selection will be < 0 if nothing is selected, in which case do nothing
-                if (!(nItemSelected < 0))
-                {
-                    // check for top of the list
-                    if (nItemSelected > 0)
-                    {
-                        // not at the top of the list so move selection up one
-                        nItemSelected--;
-                    }
-
-                    // set the new selection
-                    selectListItem(nItemSelected);
-                }
-            }
-            break;
-
-        case VK_DOWN:
-            {
-                // down arrow - get the current selection
-                int nItemSelected = getCurrentSelectedListItemIndex();
-                
-                // selection will be < 0 if nothing is selected, in which case do nothing
-                if (!(nItemSelected < 0))
-                {
-                    // check for bottom of the list
-                    if (nItemSelected < (m_listAttributes.GetItemCount() - 1))
-                    {
-                        // not at the bottom of the list so move selection down one
-                        nItemSelected++;
-                    }
-
-                    // set the new selection
-                    selectListItem(nItemSelected);
-                }
-            }
             break;
         }
             

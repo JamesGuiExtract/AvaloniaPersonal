@@ -1059,13 +1059,15 @@ void CEAVGeneratorDlg::saveAttributesToVOA(const CString& zFileName)
 //-------------------------------------------------------------------------------------------------
 void CEAVGeneratorDlg::selectListItem(int iIndex)
 {
+    int mask = LVIS_SELECTED | LVIS_FOCUSED;
+
 	// Deselect all
-	m_listAttributes.SetItemState(-1, ~LVIS_SELECTED, LVIS_SELECTED);
+	m_listAttributes.SetItemState(-1, 0, mask);
 
 	// Select requested
 	if (iIndex >= 0 && iIndex < m_listAttributes.GetItemCount())
 	{
-		m_listAttributes.SetItemState(iIndex, LVIS_SELECTED, LVIS_SELECTED);
+		m_listAttributes.SetItemState(iIndex, mask, mask);
 
 		// Set mark so that a shift+click selects multiple items
 		m_listAttributes.SetSelectionMark(iIndex);
