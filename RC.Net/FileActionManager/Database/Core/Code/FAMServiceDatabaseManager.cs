@@ -471,7 +471,7 @@ namespace Extract.FileActionManager.Database
         /// current database file to that location.
         /// </summary>
         /// <returns>The path to the backup file.</returns>
-        string BackupDatabase()
+        public string BackupDatabase()
         {
             string backupFile = FileSystemMethods.BuildTimeStampedBackupFileName(_databaseFile, true);
 

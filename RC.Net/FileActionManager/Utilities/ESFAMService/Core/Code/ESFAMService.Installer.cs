@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Configuration.Install;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Extract.FileActionManager.Utilities
@@ -67,7 +68,16 @@ namespace Extract.FileActionManager.Utilities
             {
                 string databaseFile = ESFAMService.GetDatabaseFileName(_serviceInstaller.ServiceName);
                 var manager = new FAMServiceDatabaseManager(databaseFile);
-                _installerCreatedDatabase = manager.CreateDatabase(true);
+
+                if (!File.Exists(databaseFile))
+                {
+                    _installerCreatedDatabase = manager.CreateDatabase(true);
+                }
+                else
+                {
+                    _installerCreatedDatabase = false;
+                    manager.BackupDatabase();
+                }
 
                 base.OnAfterInstall(savedState);
             }
