@@ -4649,11 +4649,18 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                var activeSeparator = GetActiveDocument(true)?.PaginationSeparator;
-                if (activeSeparator != null && DocumentInDataEdit != activeSeparator.Document)
+                // https://extract.atlassian.net/browse/ISSUE-17278
+                // Except when moving to the next error (which happens in a different handler),
+                // there should be no circumstance where a DEP for a document should be allowed
+                // to open while there is already a DEP open.
+                if (DocumentInDataEdit == null)
                 {
-                    activeSeparator.OpenDataPanel(initialSelection: FieldSelection.First);
-                    activeSeparator.Collapsed = false;
+                    var activeSeparator = GetActiveDocument(null)?.PaginationSeparator;
+                    if (activeSeparator != null)
+                    {
+                        activeSeparator.OpenDataPanel(initialSelection: FieldSelection.First);
+                        activeSeparator.Collapsed = false;
+                    }
                 }
             }
             catch (Exception ex)
