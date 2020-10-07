@@ -3782,7 +3782,8 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             // Do not allow modification of documents that have already been output.
             bool enablePageModificationCommands =
-                !SelectedControls.OfType<PageThumbnailControl>().Any(c => c.Document.OutputProcessed);
+                _commandTargetControl?.Document?.OutputProcessed != true
+                && !SelectedControls.OfType<PageThumbnailControl>().Any(c => c.Document.OutputProcessed);
 
             _selectAllCommand.Enabled = enableSelectionBasedCommands;
             _copyCommand.Enabled = enableSelectionBasedCommands;
@@ -3853,18 +3854,17 @@ namespace Extract.UtilityApplications.PaginationUtility
                     && (separator?.Document != null)
                     && singlySelectedDocument != null;
 
-                if (_editDocumentDataMenuItem.Enabled)
+                if (DocumentInDataEdit != null && DocumentInDataEdit == separator?.Document)
                 {
-                    if (DocumentInDataEdit == separator.Document)
-                    {
-                        _editDocumentDataMenuItem.Text = "Close data panel";
-                        _editDocumentDataMenuItem.ShortcutKeyDisplayString = "Esc or double-click";
-                    }
-                    else
-                    {
-                        _editDocumentDataMenuItem.Text = "Edit document data";
-                        _editDocumentDataMenuItem.ShortcutKeyDisplayString = "Enter or double-click";
-                    }
+                    _editDocumentDataMenuItem.Text = "Close data panel";
+                    _editDocumentDataMenuItem.ShortcutKeyDisplayString = "Esc or double-click";
+                }
+                else
+                {
+                    _editDocumentDataMenuItem.Text = (_commandTargetControl.Document?.OutputProcessed == true)
+                        ? "View document data"
+                        : "Edit document data";
+                    _editDocumentDataMenuItem.ShortcutKeyDisplayString = "Enter or double-click";
                 }
 
                 // Allow document to be split only if a single page control is selected and it is not
