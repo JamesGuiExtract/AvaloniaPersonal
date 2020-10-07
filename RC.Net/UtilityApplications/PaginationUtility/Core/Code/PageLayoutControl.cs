@@ -3521,7 +3521,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             PaginationControl currentControl = GetActiveControl(down);
             if (currentControl == null)
             {
-                return GetNextNavigableControl(down);
+                // Do nothing to prevent selecting page from a different document
+                // https://extract.atlassian.net/browse/ISSUE-17274
+                // https://extract.atlassian.net/browse/ISSUE-17277
+                return null;
             }
 
             var activeDocument = GetActiveDocument(down);
@@ -3931,25 +3934,25 @@ namespace Extract.UtilityApplications.PaginationUtility
             Shortcuts[Keys.F3] = HandleGoToNextInvalid;
             Shortcuts[Keys.Escape] = HandleEscape;
 
-            Shortcuts[Keys.Left] = HandleSelectPreviousPage;
-            Shortcuts[Keys.Left | Keys.Control] = HandleSelectPreviousPage;
-            Shortcuts[Keys.Left | Keys.Shift] = HandleSelectPreviousPage;
-            Shortcuts[Keys.Left | Keys.Control | Keys.Shift] = HandleSelectPreviousPage;
+            Shortcuts[Keys.Left] = HandleLeftArrow;
+            Shortcuts[Keys.Left | Keys.Control] = HandleLeftArrow;
+            Shortcuts[Keys.Left | Keys.Shift] = HandleLeftArrow;
+            Shortcuts[Keys.Left | Keys.Control | Keys.Shift] = HandleLeftArrow;
 
-            Shortcuts[Keys.Right] = HandleSelectNextPage;
-            Shortcuts[Keys.Right | Keys.Control] = HandleSelectNextPage;
-            Shortcuts[Keys.Right | Keys.Shift] = HandleSelectNextPage;
-            Shortcuts[Keys.Right | Keys.Control | Keys.Shift] = HandleSelectNextPage;
+            Shortcuts[Keys.Right] = HandleRightArrow;
+            Shortcuts[Keys.Right | Keys.Control] = HandleRightArrow;
+            Shortcuts[Keys.Right | Keys.Shift] = HandleRightArrow;
+            Shortcuts[Keys.Right | Keys.Control | Keys.Shift] = HandleRightArrow;
 
-            Shortcuts[Keys.PageUp] = HandleSelectPreviousPage;
-            Shortcuts[Keys.PageUp | Keys.Control] = HandleSelectPreviousPage;
-            Shortcuts[Keys.PageUp | Keys.Shift] = HandleSelectPreviousPage;
-            Shortcuts[Keys.PageUp | Keys.Control | Keys.Shift] = HandleSelectPreviousPage;
+            Shortcuts[Keys.PageUp] = HandlePageUp;
+            Shortcuts[Keys.PageUp | Keys.Control] = HandlePageUp;
+            Shortcuts[Keys.PageUp | Keys.Shift] = HandlePageUp;
+            Shortcuts[Keys.PageUp | Keys.Control | Keys.Shift] = HandlePageUp;
 
-            Shortcuts[Keys.PageDown] = HandleSelectNextPage;
-            Shortcuts[Keys.PageDown | Keys.Control] = HandleSelectNextPage;
-            Shortcuts[Keys.PageDown | Keys.Shift] = HandleSelectNextPage;
-            Shortcuts[Keys.PageDown | Keys.Control | Keys.Shift] = HandleSelectNextPage;
+            Shortcuts[Keys.PageDown] = HandlePageDown;
+            Shortcuts[Keys.PageDown | Keys.Control] = HandlePageDown;
+            Shortcuts[Keys.PageDown | Keys.Shift] = HandlePageDown;
+            Shortcuts[Keys.PageDown | Keys.Control | Keys.Shift] = HandlePageDown;
 
             Shortcuts[Keys.Up] = () => HandleSelectNextRowPage(forward: false, useActiveModifierKeys: true);
             Shortcuts[Keys.Up | Keys.Control] = () => HandleSelectNextRowPage(forward: false, useActiveModifierKeys: true);
@@ -3960,16 +3963,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             Shortcuts[Keys.Down | Keys.Control] = () => HandleSelectNextRowPage(forward: true, useActiveModifierKeys: true);
             Shortcuts[Keys.Down | Keys.Shift] = () => HandleSelectNextRowPage(forward: true, useActiveModifierKeys: true);
             Shortcuts[Keys.Down | Keys.Control | Keys.Shift] = () => HandleSelectNextRowPage(forward: true, useActiveModifierKeys: true);
-
-            Shortcuts[Keys.Home] = HandleSelectFirstPage;
-            Shortcuts[Keys.Home | Keys.Control] = HandleSelectFirstPage;
-            Shortcuts[Keys.Home | Keys.Shift] = HandleSelectFirstPage;
-            Shortcuts[Keys.Home | Keys.Control | Keys.Shift] = HandleSelectFirstPage;
-
-            Shortcuts[Keys.End] = HandleSelectLastPage;
-            Shortcuts[Keys.End | Keys.Control] = HandleSelectLastPage;
-            Shortcuts[Keys.End | Keys.Shift] = HandleSelectLastPage;
-            Shortcuts[Keys.End | Keys.Control | Keys.Shift] = HandleSelectLastPage;
 
             // Clear shortcuts that don't apply to this application.
             Shortcuts[Keys.O | Keys.Control] = null;
@@ -4380,52 +4373,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35457");
-            }
-        }
-
-        /// <summary>
-        /// Handles a UI command to select the first page.
-        /// </summary>
-        void HandleSelectFirstPage()
-        {
-            try
-            {
-                NavigablePaginationControl navigableControl =
-                    _flowLayoutPanel.Controls
-                        .OfType<NavigablePaginationControl>()
-                        .FirstOrDefault();
-
-                if (navigableControl != null)
-                {
-                    ProcessControlSelection(navigableControl);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35458");
-            }
-        }
-
-        /// <summary>
-        /// Handles a UI command to select the last page.
-        /// </summary>
-        void HandleSelectLastPage()
-        {
-            try
-            {
-                NavigablePaginationControl navigableControl =
-                    _flowLayoutPanel.Controls
-                        .OfType<NavigablePaginationControl>()
-                        .LastOrDefault();
-
-                if (navigableControl != null)
-                {
-                    ProcessControlSelection(navigableControl);
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI35459");
             }
         }
 
@@ -5415,6 +5362,66 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35472");
+            }
+        }
+
+        void HandleLeftArrow()
+        {
+            try
+            {
+                if (GetActiveControl() is PageThumbnailControl)
+                {
+                    HandleSelectPreviousPage();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50393");
+            }
+        }
+
+        void HandleRightArrow()
+        {
+            try
+            {
+                if (GetActiveControl() is PageThumbnailControl)
+                {
+                    HandleSelectNextPage();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50394");
+            }
+        }
+
+        void HandlePageUp()
+        {
+            try
+            {
+                if (GetActiveControl() is PageThumbnailControl)
+                {
+                    HandleSelectPreviousPage();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50395");
+            }
+        }
+
+        void HandlePageDown()
+        {
+            try
+            {
+                if (GetActiveControl() is PageThumbnailControl)
+                {
+                    HandleSelectNextPage();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI50396");
             }
         }
 
