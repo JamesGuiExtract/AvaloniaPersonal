@@ -27,6 +27,8 @@ namespace Extract.Utilities
         List<string> _items = new List<string>();
         HashSet<string> _fields = new HashSet<string>();
 
+        static readonly object _fsDirectoryInitLock = new object();
+
         #endregion Fields
 
         #region Constructors
@@ -54,7 +56,14 @@ namespace Extract.Utilities
 
                 string tempDirectoryPath = Path.Combine(Path.GetTempPath(), "SuggestionProvider", Path.GetRandomFileName());
                 _tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
-                _directory = FSDirectory.Open(_tempDirectory);
+
+                // Lucene code to open a directory is not threadsafe so lock to prevent exception
+                // https://extract.atlassian.net/browse/ISSUE-17243
+                lock (_fsDirectoryInitLock)
+                {
+                    _directory = FSDirectory.Open(_tempDirectory);
+                }
+
                 _analyzer = new LuceneSuggestionAnalyzer();
                 using (var writer = new IndexWriter(_directory, new IndexWriterConfig(Lucene.Net.Util.LuceneVersion.LUCENE_48, _analyzer)))
                 {
