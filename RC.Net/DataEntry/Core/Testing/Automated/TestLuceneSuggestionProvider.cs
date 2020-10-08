@@ -1,12 +1,14 @@
 ﻿using Extract.Testing.Utilities;
 using Extract.Utilities;
+using Lucene.Net.Support.IO;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Extract.DataEntry.Test
 {
@@ -191,6 +193,24 @@ namespace Extract.DataEntry.Test
             // The top suggestion should not change very often at all
             Assert.Less(avgOneWordChangesTop1, 0.079);
             Assert.Less(avgTwoWordChangesTop1, 0.009);
+        }
+
+        /// <summary>
+        /// Test that a method called via the LuceneSuggestionProvider constructor is thread-safe
+        /// NOTE: This test often passes even with the non-thread-safe caching but if you run it, e.g.,
+        /// 100 times it tends to fail half a dozen times
+        /// </summary>
+        [Test, Category("LuceneSuggestionProvider")]
+        public static void TestGetCanonicalPath()
+        {
+            int i = 0;
+            Parallel.For(0, 5000, _ =>
+            {
+                Interlocked.Increment(ref i);
+                var tempDirPath = Path.Combine(Path.GetTempPath(), "SuggestionProvider", Path.GetRandomFileName());
+                var tempDirInfo = new DirectoryInfo(tempDirPath);
+                Assert.DoesNotThrow(() => tempDirInfo.GetCanonicalPath(), message: "Iteration: " + i);
+            });
         }
 
         #endregion

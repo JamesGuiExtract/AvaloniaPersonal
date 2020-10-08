@@ -786,14 +786,15 @@ namespace Extract.DataEntry
                     objectArray[i] = safeAutoCompleteValues[i].Key;
                 }
                 return objectArray;
-            });
+            }, System.Threading.LazyThreadSafetyMode.PublicationOnly);
 
             ProviderSource = new Lazy<LuceneSuggestionProvider<KeyValuePair<string, List<string>>>>(
                 () => new LuceneSuggestionProvider<KeyValuePair<string, List<string>>>(
                     safeAutoCompleteValues,
                     s => s.Key,
                     s => Enumerable.Repeat(new KeyValuePair<string, string>("Name", s.Key), 1)
-                        .Concat(s.Value.Select(aka => new KeyValuePair<string, string>("AKA", aka)))));
+                        .Concat(s.Value.Select(aka => new KeyValuePair<string, string>("AKA", aka)))),
+                System.Threading.LazyThreadSafetyMode.PublicationOnly);
         }
         #endregion
     }
