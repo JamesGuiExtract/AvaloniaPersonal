@@ -383,9 +383,13 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 # This includes System.ValueTuple in the install
 	@COPY /V /Y "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\System.Reactive.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\System.Reactive.Linq.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 # This makes System.ValueTuple available when installshield runs regasm
 	@COPY /V /Y "$(BinariesFolder)\System.ValueTuple.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(BinariesFolder)\Newtonsoft.Json.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\System.Reactive.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\System.Reactive.Linq.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 
 
 	@COPY /V /Y "$(RCNETDir)\APIs\LogicNP\EZShellExtensions.Net\2011\LogicNP.EZShellExtensions.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 

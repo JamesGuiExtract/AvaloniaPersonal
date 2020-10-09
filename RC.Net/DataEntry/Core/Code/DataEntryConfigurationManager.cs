@@ -2,11 +2,11 @@
 using Extract.FileActionManager.Forms;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
-using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
@@ -288,6 +288,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Gets all document types specified via documentTypeConfigurations in the config file.
         /// </summary>
+        [SuppressMessage("Microsoft.Globalization", "CA1309:Use ordinal StringComparison")]
         public IEnumerable<string> RegisteredDocumentTypes
         {
             get

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -109,7 +111,10 @@ namespace Extract.DataEntry
                 _dataEntryAutoCompleteControl = dataEntryAutoCompleteControl;
 
                 // Set up all the events we need to handle
-                control.TextChanged += HandleControl_TextChanged;
+                var textChangedEventSequence =
+                    Observable.FromEventPattern(h => control.TextChanged += h, h => control.TextChanged -= h)
+                    .Throttle(TimeSpan.FromMilliseconds(200))
+                    .Subscribe(HandleControl_TextChanged);
                 control.LostFocus += HandleControl_LostFocus;
                 control.GotFocus += HandleControl_GotFocus;
                 control.MouseDown += HandleControl_MouseDown;
@@ -118,7 +123,7 @@ namespace Extract.DataEntry
                 // Set up event unregistration
                 _unregister = () =>
                 {
-                    control.TextChanged -= HandleControl_TextChanged;
+                    textChangedEventSequence.Dispose();
                     control.LostFocus -= HandleControl_LostFocus;
                     control.GotFocus -= HandleControl_GotFocus;
                     control.MouseDown -= HandleControl_MouseDown;
@@ -367,7 +372,7 @@ namespace Extract.DataEntry
             }
         }
 
-        void HandleControl_TextChanged(object sender, EventArgs e)
+        void HandleControl_TextChanged(EventPattern<object> _)
         {
             try
             {
@@ -377,8 +382,11 @@ namespace Extract.DataEntry
                     return;
                 }
 
-                string searchText = _control.Text ?? "";
-                DropDown(searchText);
+                _control.SafeBeginInvoke("ELI50397", () =>
+                {
+                    string searchText = _control.Text ?? "";
+                    DropDown(searchText);
+                });
             }
             catch (Exception ex)
             {
