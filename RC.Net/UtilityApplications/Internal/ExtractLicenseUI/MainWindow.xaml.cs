@@ -25,12 +25,18 @@ namespace ExtractLicenseUI
     /// </summary>
     public partial class MainWindow : ModernWindow
     {
-        Link _LicenseLink = new Link() { DisplayName = "License", Source = new Uri("/Pages/License.xaml", UriKind.Relative) };
+        readonly Link _LicenseLink = new Link() { DisplayName = "License", Source = new Uri("/Pages/License.xaml", UriKind.Relative) };
+        readonly Link _ContactLink = new Link() { DisplayName = "Contact", Source = new Uri("/Pages/Contact.xaml", UriKind.Relative) };
+
         private License _LicenseWindow { get; set; }
+
+        private Contact _ContactWindow { get; set; }
 
         public Organization OrganizationWindow { get; set; }
 
         public event EventHandler LicenseWindowCreated;
+
+        public event EventHandler ContactWindowCreated;
 
         public License LicenseWindow
         {
@@ -44,6 +50,22 @@ namespace ExtractLicenseUI
                 {
                     this._LicenseWindow = value;
                     this.LicenseWindowCreated?.Invoke(this, new EventArgs());
+                }
+            }
+        }
+
+        public Contact ContactWindow
+        {
+            get
+            {
+                return this._ContactWindow;
+            }
+            set
+            {
+                if (value != this._ContactWindow)
+                {
+                    this._ContactWindow = value;
+                    this.ContactWindowCreated?.Invoke(this, new EventArgs());
                 }
             }
         }
@@ -69,6 +91,22 @@ namespace ExtractLicenseUI
             {
                 this.LicenseWindow.SelectedOrganization = organization;
                 this.LicenseWindow.ConfigureNavigationOption(licenseNavigationOption);
+            }
+        }
+
+        public void NavigateToContact(Database.Organization organization)
+        {
+            this.ContentSource = _ContactLink.Source;
+            if (ContactWindow == null)
+            {
+                this.ContactWindowCreated += (o, e) =>
+                {
+                    this.ContactWindow.SelectedOrganization = organization;
+                };
+            }
+            else
+            {
+                this.ContactWindow.SelectedOrganization = organization;
             }
         }
     }

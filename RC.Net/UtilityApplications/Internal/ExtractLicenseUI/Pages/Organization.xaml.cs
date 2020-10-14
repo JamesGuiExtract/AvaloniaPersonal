@@ -17,11 +17,12 @@ namespace ExtractLicenseUI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class Organization : UserControl, INotifyPropertyChanged
+    public partial class Organization : UserControl, INotifyPropertyChanged, IDisposable
     {
         private Database.Organization _SelectedOrganization = new Database.Organization();
         private Collection<Database.Organization> _Organizations = new Collection<Database.Organization>();
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public Collection<Database.Organization> Organizations {
             get
             {
@@ -30,7 +31,7 @@ namespace ExtractLicenseUI
             set
             {
                 _Organizations = value;
-                this.NotifyPropertyChanged("Organizations");
+                this.NotifyPropertyChanged(nameof(Organizations));
             }
         }
 
@@ -43,7 +44,7 @@ namespace ExtractLicenseUI
             set
             {
                 _SelectedOrganization = value;
-                this.NotifyPropertyChanged("SelectedOrganization");
+                this.NotifyPropertyChanged(nameof(SelectedOrganization));
                 SortDataGrid(this.LicenseGrid, 4, ListSortDirection.Descending);
             }
         }
@@ -65,9 +66,18 @@ namespace ExtractLicenseUI
             this.MainWindow.OrganizationWindow = this;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent crashing.")]
         private void PopulateOrganizations()
         {
-            this.Organizations = new DatabaseReader().ReadOrganizations();
+            try
+            {
+                using var databaseReader = new DatabaseReader();
+                this.Organizations = databaseReader.ReadOrganizations();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Failed to load organizations.\n" + ex.Message);
+            }
         }
 
         /// <summary>
@@ -78,8 +88,10 @@ namespace ExtractLicenseUI
             foreach(var organization in this.Organizations)
             {
                 organization.Licenses = this.DatabaseReader.GetExtractLicenses(organization.Guid);
+                organization.Contacts = this.DatabaseReader.GetOrganizationContacts(organization.Guid);
             }
             this.SelectedOrganization.Licenses = this.DatabaseReader.GetExtractLicenses(this.SelectedOrganization.Guid);
+            this.SelectedOrganization.Contacts = this.DatabaseReader.GetOrganizationContacts(this.SelectedOrganization.Guid);
             SortDataGrid(this.LicenseGrid, 4, ListSortDirection.Descending);
         }
 
@@ -93,7 +105,9 @@ namespace ExtractLicenseUI
             var selectedOrg = (Database.Organization)this.CustomerName.SelectedItem;
             this.SelectedOrganization = selectedOrg;
             this.SelectedOrganization.Licenses = this.DatabaseReader.GetExtractLicenses(this.SelectedOrganization.Guid);
+            this.SelectedOrganization.Contacts = this.DatabaseReader.GetOrganizationContacts(this.SelectedOrganization.Guid);
             this.CreateNewLicense.IsEnabled = true;
+            this.ViewContacts.IsEnabled = true;
         }
 
         /// <summary>
@@ -187,6 +201,7 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -197,6 +212,23 @@ namespace ExtractLicenseUI
             {
                 MessageBox.Show($@"Cannot open link to: {this.SelectedOrganization.SalesforceHyperlink}");
             }
+        }
+
+        private void ViewContacts_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.NavigateToContact(this.SelectedOrganization);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            this.DatabaseReader.Dispose();
         }
     }
 }

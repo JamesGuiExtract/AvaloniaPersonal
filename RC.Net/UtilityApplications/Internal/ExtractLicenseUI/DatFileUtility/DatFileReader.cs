@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,8 +32,8 @@ namespace ExtractLicenseUI.DatFileUtility
                     // In the components file, everything before the ',' is a ID, everything after is the component name.
                     components.Add(new ComponentModel()
                     {
-                        ComponentID = int.Parse(componentLine.Split(',')[0].ToString()),
-                        ComponentName = componentLine.Split(',')[1].ToString(),
+                        ComponentID = int.Parse(componentLine.Split(',')[0].ToString(CultureInfo.InvariantCulture), CultureInfo.InvariantCulture),
+                        ComponentName = componentLine.Split(',')[1].ToString(CultureInfo.InvariantCulture),
                     });
                 }
             }
@@ -43,7 +44,9 @@ namespace ExtractLicenseUI.DatFileUtility
         public Collection<PackageModel> ReadPackages()
         {
             Collection<PackageModel> packages = new Collection<PackageModel>();
-            var versions = new DatabaseReader().ReadVersions();
+            var databaseReader = new DatabaseReader();
+            var versions = databaseReader.ReadVersions();
+            databaseReader.Dispose();
 
             var directories = Directory.GetDirectories(folderPath);
             foreach (string versionFolder in directories)
@@ -62,7 +65,7 @@ namespace ExtractLicenseUI.DatFileUtility
                 {
                     var package = new PackageModel();
                     // variable
-                    if(packageLine.StartsWith("!"))
+                    if(packageLine.StartsWith("!", StringComparison.OrdinalIgnoreCase))
                     {
                         var packageVarible = new PackageVariable();
 
@@ -85,7 +88,7 @@ namespace ExtractLicenseUI.DatFileUtility
                         packageVariables.Add(packageVarible);
                     }
                     // Package Definition
-                    else if(packageLine.StartsWith("-"))
+                    else if(packageLine.StartsWith("-", StringComparison.OrdinalIgnoreCase))
                     {
                         package.Version = GetVersionGuid(version, versions);
                         package.PackageHeader = packageHeader;
@@ -119,11 +122,12 @@ namespace ExtractLicenseUI.DatFileUtility
             return packages;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "We dont have any tables.")]
         private static Guid GetVersionGuid(string numericVersion, Collection<ExtractVersion> extractVersions)
         {
             foreach(var version in extractVersions)
             {
-                if(version.Version.Equals(numericVersion))
+                if(version.Version.Equals(numericVersion, StringComparison.OrdinalIgnoreCase))
                 {
                     return version.Guid;
                 }
@@ -131,13 +135,17 @@ namespace ExtractLicenseUI.DatFileUtility
             throw new Exception("Version not in the database");
         }
 
-        private Collection<string> RemoveWhiteSpaceAndComents(string[] toProcess)
+        private static Collection<string> RemoveWhiteSpaceAndComents(string[] toProcess)
         {
+            if(toProcess == null)
+            {
+                throw new ArgumentNullException(nameof(toProcess));
+            }
             Collection<string> toReturn = new Collection<string>();
 
             foreach(string process in toProcess)
             {
-                if(!process.Equals(String.Empty) && !process.StartsWith("//"))
+                if(!string.IsNullOrEmpty(process) && !process.StartsWith("//", StringComparison.OrdinalIgnoreCase))
                 {
                     toReturn.Add(process);
                 }
@@ -149,7 +157,7 @@ namespace ExtractLicenseUI.DatFileUtility
         {
             foreach(string variable in package.Variables)
             {
-                HashSet<int> flattenIDs = FlattenPackageVariable(variables.Where(m => m.VariableName.Equals(variable)).First(), variables);
+                HashSet<int> flattenIDs = FlattenPackageVariable(variables.Where(m => m.VariableName.Equals(variable, StringComparison.OrdinalIgnoreCase)).First(), variables);
                 foreach(int id in flattenIDs)
                 {
                     package.VariableIDs.Add(id);
@@ -164,7 +172,7 @@ namespace ExtractLicenseUI.DatFileUtility
             {
                 foreach(var otherVariable in variable.OtherVariables)
                 {
-                    var variableLookup = variables.Where(m => m.VariableName.Equals(otherVariable)).First();
+                    var variableLookup = variables.Where(m => m.VariableName.Equals(otherVariable, StringComparison.OrdinalIgnoreCase)).First();
                     var ids = FlattenPackageVariable(variableLookup, variables);
                     foreach (int id in ids)
                     {

@@ -17,20 +17,24 @@ namespace ExtractLicenseUI.Database
         private bool _allowPackageModification;
         public event PropertyChangedEventHandler PropertyChanged;
 
+
         /// <summary>
         /// All of the components associated with a package.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public Collection<Component> Components { get; set; }
+
 
         /// <summary>
         /// A unique identifier for a package.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Guid is the best name.")]
         public Guid Guid { 
             get {
                 return this._guid;
             } set {
                 this._guid = value;
-                this.OnPropertyChanged("Guid");
+                this.OnPropertyChanged(nameof(Guid));
             } 
         }
 
@@ -45,7 +49,7 @@ namespace ExtractLicenseUI.Database
             set
             {
                 this._name = value;
-                this.OnPropertyChanged("Name");
+                this.OnPropertyChanged(nameof(Name));
             }
         }
 
@@ -60,7 +64,7 @@ namespace ExtractLicenseUI.Database
             set
             {
                 this._extractVersion = value;
-                this.OnPropertyChanged("Version");
+                this.OnPropertyChanged(nameof(Version));
             }
         }
 
@@ -75,7 +79,7 @@ namespace ExtractLicenseUI.Database
             set
             {
                 this._isChecked = value;
-                this.OnPropertyChanged("IsChecked");
+                this.OnPropertyChanged(nameof(IsChecked));
             }
         }
 
@@ -93,7 +97,7 @@ namespace ExtractLicenseUI.Database
             set
             {
                 this._allowPackageModification = value;
-                this.OnPropertyChanged("AllowPackageModification");
+                this.OnPropertyChanged(nameof(AllowPackageModification));
             }
         }
 

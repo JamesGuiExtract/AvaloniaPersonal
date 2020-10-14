@@ -73,7 +73,7 @@ namespace ExtractLicenseUI.Database
         {
             if (e.PropertyName == "IsChecked")
             {
-                OnPropertyChanged("PackagesChecked");
+                OnPropertyChanged(nameof(PackagesChecked));
             }
         }
 

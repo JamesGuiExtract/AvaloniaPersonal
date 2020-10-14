@@ -61,6 +61,7 @@
                             </StackPanel>
                             <StackPanel Grid.Row="4">
                                 <Button x:Name="CreateNewLicense" Content="Create New License" Click="CreateNewLicense_Click" IsEnabled="False"></Button>
+                                <Button x:Name="ViewContacts" Content="View Contacts" Click="ViewContacts_Click" IsEnabled="False"></Button>
                             </StackPanel>
                         </Grid>
 

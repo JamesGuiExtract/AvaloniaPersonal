@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -23,25 +24,28 @@ namespace ExtractLicenseUI
         private ObservableCollection<ExtractVersion> _ExtractVersions = new ObservableCollection<ExtractVersion>();
         private Database.Organization _SelectedOrganization = new Database.Organization();
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public ObservableCollection<PackageHeader> PackageHeaders { 
             get { return this._PackageHeaders; }
             set 
             {
                 _PackageHeaders = value;
-                this.NotifyPropertyChanged("PackageHeaders");
+                this.NotifyPropertyChanged(nameof(PackageHeaders));
             } 
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public ObservableCollection<PackageHeader> ClonedPackageHeaders
         {
             get { return this._ClonedPackageHeaders; }
             set
             {
                 _ClonedPackageHeaders = value;
-                this.NotifyPropertyChanged("ClonedPackageHeaders");
+                this.NotifyPropertyChanged(nameof(ClonedPackageHeaders));
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public ObservableCollection<ExtractVersion> ExtractVersions
         {
             get {
@@ -50,7 +54,7 @@ namespace ExtractLicenseUI
             set
             {
                 _ExtractVersions = value;
-                this.NotifyPropertyChanged("ExtractVersions");
+                this.NotifyPropertyChanged(nameof(ExtractVersions));
             }
         }
 
@@ -62,7 +66,7 @@ namespace ExtractLicenseUI
             set
             {
                 _SelectedOrganization = value;
-                this.NotifyPropertyChanged("SelectedOrganization");
+                this.NotifyPropertyChanged(nameof(SelectedOrganization));
             }
         }
 
@@ -72,7 +76,11 @@ namespace ExtractLicenseUI
 
         public License()
         {
-            this.ExtractVersions = new DatabaseReader().ReadVersions();
+            using (var databaseReader = new DatabaseReader())
+            {
+                this.ExtractVersions = databaseReader.ReadVersions();
+            }
+                
             InitializeComponent();
             this.Form.DataContext = this;
             this.MainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
@@ -84,6 +92,8 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "We don't have localized tables.")]
         private void SaveButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             if (!IsValid(this.Form))
@@ -102,8 +112,9 @@ namespace ExtractLicenseUI
                 }
                 
                 this.SelectedOrganization.SelectedLicense.GenerateNewLicenseKey(this.SelectedOrganization, this.GetSelectedPackages());
-                new DatabaseWriter().WriteLicense(this.SelectedOrganization);
-                new DatabaseWriter().WritePackages(this.SelectedOrganization.SelectedLicense, this.GetSelectedPackages());
+                using var databaseWriter = new DatabaseWriter();
+                databaseWriter.WriteLicense(this.SelectedOrganization);
+                databaseWriter.WritePackages(this.SelectedOrganization.SelectedLicense, this.GetSelectedPackages());
                 this.MainWindow.OrganizationWindow.RefreshLicenses();
                 this.ConfigureNavigationOption(LicenseNavigationOptions.ViewLicense);
             }
@@ -121,19 +132,19 @@ namespace ExtractLicenseUI
                 licenseName += this.SelectedOrganization.State + "_";
             }
             licenseName += this.SelectedOrganization.CustomerName + "_";
-            if(this.PackageHeaders.Where(m => m.Name.ToUpper().Contains("FLEX INDEX") && m.PackagesChecked).Any())
+            if(this.PackageHeaders.Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("FLEX INDEX") && m.PackagesChecked).Any())
             {
                 licenseName += "FlexIndex_";
             }
-            if (this.PackageHeaders.Where(m => m.Name.ToUpper().Contains("ID SHIELD") && m.PackagesChecked).Any())
+            if (this.PackageHeaders.Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("ID SHIELD") && m.PackagesChecked).Any())
             {
                 licenseName += "IDShield_";
             }
-            if (this.PackageHeaders.Where(m => m.Name.ToUpper().Contains("LABDE") && m.PackagesChecked).Any())
+            if (this.PackageHeaders.Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE") && m.PackagesChecked).Any())
             {
                 licenseName += "LabDE_";
             }
-            if(this.GetSelectedPackages().Where(m => m.Name.ToUpper().Contains("SERVER")).Any())
+            if(this.GetSelectedPackages().Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("SERVER")).Any())
             {
                 licenseName += "Server_";
             }
@@ -146,7 +157,7 @@ namespace ExtractLicenseUI
                 : "Universal_";
             licenseName += this.SelectedOrganization.SelectedLicense.IsPermanent
                 ? "Full"
-                : ((DateTime)this.SelectedOrganization.SelectedLicense.ExpiresOn).Date.ToString("yyyy-MM-dd");
+                : ((DateTime)this.SelectedOrganization.SelectedLicense.ExpiresOn).Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             return licenseName;
         }
 
@@ -181,7 +192,8 @@ namespace ExtractLicenseUI
         /// <param name="e"></param>
         private void ExtractVersion_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.PackageHeaders = new DatabaseReader().ReadPackages(this.SelectedOrganization.SelectedLicense.ExtractVersion);
+            using var databaseReader = new DatabaseReader();
+            this.PackageHeaders = databaseReader.ReadPackages(this.SelectedOrganization.SelectedLicense.ExtractVersion);
         }
 
         /// <summary>
@@ -233,7 +245,8 @@ namespace ExtractLicenseUI
             newLicense.ExtractVersion = this.SelectedOrganization.SelectedLicense.ExtractVersion;
             this.SelectedOrganization.SelectedLicense = newLicense;
 
-            this.PackageHeaders = new DatabaseReader().ReadPackages(newLicense.ExtractVersion);
+            using var databaseReader = new DatabaseReader();
+            this.PackageHeaders = databaseReader.ReadPackages(newLicense.ExtractVersion);
         }
 
         /// <summary>
@@ -286,6 +299,7 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void SaveLicenseToFile_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             try
@@ -312,11 +326,13 @@ namespace ExtractLicenseUI
             }
         }
 
+
         /// <summary>
         /// Copies the active license to the clipboard.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "This prevents crashing.")]
         private void CopyLicenseToClipboard_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -336,6 +352,7 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void SaveUnlockCodeToFile_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -362,11 +379,13 @@ namespace ExtractLicenseUI
             }
         }
 
+
         /// <summary>
         /// Copies the unlock code to the clipboard.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void CopyUnlockCodeToClipboard_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -382,10 +401,12 @@ namespace ExtractLicenseUI
             }
         }
 
+
         /// <summary>
         /// Copies the file to the clipboard.
         /// </summary>
         /// <param name="filePath"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void CopyFileToClipboard(string filePath)
         {
             try
@@ -400,11 +421,13 @@ namespace ExtractLicenseUI
             }
         }
 
+
         /// <summary>
         /// Opens the hyper link in default browser.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -435,7 +458,8 @@ namespace ExtractLicenseUI
                     this.SelectedOrganization.SelectedLicense.AllowErrorValidation = true;
                     break;
                 case LicenseNavigationOptions.ViewLicense:
-                    this.PackageHeaders = new DatabaseReader().ReadPackages(this.SelectedOrganization.SelectedLicense);
+                    using (var databaseReader = new DatabaseReader())
+                        this.PackageHeaders = databaseReader.ReadPackages(this.SelectedOrganization.SelectedLicense);
                     this.SelectedOrganization.SelectedLicense.AllowErrorValidation = false;
                     break;
                 case LicenseNavigationOptions.None: break;

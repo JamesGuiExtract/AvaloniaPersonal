@@ -43,9 +43,11 @@ namespace ExtractLicenseUI.Database
             this.IsActive = true;
         }
 
+
         /// <summary>
         /// The unique identifier for the license.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Guid is the best name.")]
         public Guid Guid
         {
             get { return this._Guid; }
@@ -54,7 +56,7 @@ namespace ExtractLicenseUI.Database
                 if (this._Guid != value)
                 {
                     this._Guid = value;
-                    OnPropertyChanged("Guid");
+                    OnPropertyChanged(nameof(Guid));
                 }
             }
         }
@@ -70,7 +72,7 @@ namespace ExtractLicenseUI.Database
                 if (this._IsPermanent != value)
                 {
                     this._IsPermanent = value;
-                    OnPropertyChanged("IsPermanent");
+                    OnPropertyChanged(nameof(IsPermanent));
                 }
             }
         }
@@ -94,6 +96,7 @@ namespace ExtractLicenseUI.Database
         /// <summary>
         /// Also called user license string. This is what is received in emails.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         public string RequestKey
         {
             get { return this._RequestKey; }
@@ -111,7 +114,7 @@ namespace ExtractLicenseUI.Database
                     this.MachineName = string.Empty;
                 }
 
-                OnPropertyChanged("RequestKey");
+                OnPropertyChanged(nameof(RequestKey));
             }
         }
 
@@ -123,7 +126,7 @@ namespace ExtractLicenseUI.Database
                 if(this._IssuedBy != value)
                 {
                     this._IssuedBy = value;
-                    OnPropertyChanged("IssuedBy");
+                    OnPropertyChanged(nameof(IssuedBy));
                 }
             } 
         }
@@ -139,7 +142,7 @@ namespace ExtractLicenseUI.Database
                 if (this._IssuedOn != value)
                 {
                     this._IssuedOn = value;
-                    OnPropertyChanged("IssuedOn");
+                    OnPropertyChanged(nameof(IssuedOn));
                 }
             }
         }
@@ -155,7 +158,7 @@ namespace ExtractLicenseUI.Database
                 if (this._ExpiresOn != value)
                 {
                     this._ExpiresOn = value;
-                    OnPropertyChanged("ExpiresOn");
+                    OnPropertyChanged(nameof(ExpiresOn));
                 }
                 this.IsPermanent = this._ExpiresOn != null ? false : true;
             }
@@ -172,7 +175,7 @@ namespace ExtractLicenseUI.Database
                 if (this._IsActive != value)
                 {
                     this._IsActive = value;
-                    OnPropertyChanged("IsActive");
+                    OnPropertyChanged(nameof(IsActive));
                 }
             }
         }
@@ -188,7 +191,7 @@ namespace ExtractLicenseUI.Database
                 if (this._TransferLicense != value)
                 {
                     this._TransferLicense = value;
-                    OnPropertyChanged("TransferLicense");
+                    OnPropertyChanged(nameof(TransferLicense));
                 }
             }
         }
@@ -204,7 +207,7 @@ namespace ExtractLicenseUI.Database
                 if (this._MachineName != value)
                 {
                     this._MachineName = value;
-                    OnPropertyChanged("MachineName");
+                    OnPropertyChanged(nameof(MachineName));
                 }
             }
         }
@@ -220,7 +223,7 @@ namespace ExtractLicenseUI.Database
                 if (this._Comments != value)
                 {
                     this._Comments = value;
-                    OnPropertyChanged("Comments");
+                    OnPropertyChanged(nameof(Comments));
                 }
             }
         }
@@ -236,7 +239,7 @@ namespace ExtractLicenseUI.Database
                 if (this._Isproduction != value)
                 {
                     this._Isproduction = value;
-                    OnPropertyChanged("IsProduction");
+                    OnPropertyChanged(nameof(IsProduction));
                 }
             }
         }
@@ -253,7 +256,7 @@ namespace ExtractLicenseUI.Database
                 {
                     this._LicenseKey = value;
                     this.LicenseInfo = new LicenseInfo(this._LicenseKey);
-                    OnPropertyChanged("LicenseKey");
+                    OnPropertyChanged(nameof(LicenseKey));
                 }
             }
         }
@@ -285,7 +288,7 @@ namespace ExtractLicenseUI.Database
                 if (this._SDKPassword != value)
                 {
                     this._SDKPassword = value;
-                    OnPropertyChanged("SDKPassword");
+                    OnPropertyChanged(nameof(SDKPassword));
                 }
             }
         }
@@ -298,7 +301,7 @@ namespace ExtractLicenseUI.Database
             set
             {
                 this._ExtractVersion = value;
-                OnPropertyChanged("ExtractVersion");
+                OnPropertyChanged(nameof(ExtractVersion));
             }
         }
 
@@ -313,7 +316,7 @@ namespace ExtractLicenseUI.Database
                 if (this._LicenseName != value)
                 {
                     this._LicenseName = value;
-                    OnPropertyChanged("LicenseName");
+                    OnPropertyChanged(nameof(LicenseName));
                 }
             }
         }
@@ -382,10 +385,21 @@ namespace ExtractLicenseUI.Database
         /// <param name="packages">A list of packages to generate the license for.</param>
         public void GenerateNewLicenseKey(Organization organization, Collection<Package> packages)
         {
-            var databaseReader = new DatabaseReader();
-            foreach(var package in packages)
+            if(organization == null)
             {
-                package.Components = databaseReader.ReadComponents(package);
+                throw new ArgumentNullException(nameof(organization));
+            }
+            if(packages == null)
+            {
+                throw new ArgumentNullException(nameof(packages));
+            }
+
+            using (var databaseReader = new DatabaseReader())
+            {
+                foreach (var package in packages)
+                {
+                    package.Components = databaseReader.ReadComponents(package);
+                }
             }
 
             var uniqueComponentIDs = GetUniquePackgeCompontentIDs(packages);
@@ -404,6 +418,10 @@ namespace ExtractLicenseUI.Database
 
         public void GenerateUnlockCode(Organization organization, string folderPath)
         {
+            if (organization == null)
+            {
+                throw new ArgumentNullException(nameof(organization));
+            }
             this.PrepareLicenseInfo(organization);
             this.LicenseInfo.GenerateUnlockCodeFile(folderPath, DateTime.Now.AddDays(30));
         }
@@ -428,7 +446,7 @@ namespace ExtractLicenseUI.Database
         /// </summary>
         /// <param name="packages">A collection of packages</param>
         /// <returns>A unique set of packgeID's</returns>
-        private HashSet<int> GetUniquePackgeCompontentIDs(Collection<Package> packages)
+        private static HashSet<int> GetUniquePackgeCompontentIDs(Collection<Package> packages)
         {
             HashSet<int> uniqueIDs = new HashSet<int>();
             foreach(var package in packages)

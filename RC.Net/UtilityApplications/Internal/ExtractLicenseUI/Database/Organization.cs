@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using FirstFloor.ModernUI.Presentation;
 
 namespace ExtractLicenseUI.Database
@@ -12,10 +14,21 @@ namespace ExtractLicenseUI.Database
         private string _SalesforceHyperlink = string.Empty;
         private ExtractLicense _SelectedLicense = new ExtractLicense();
         private Collection<ExtractLicense> _Licenses = new Collection<ExtractLicense>();
+        private ObservableCollection<Contact> _Contacts = new ObservableCollection<Contact>();
+
+        public Organization()
+        {
+            this.Contacts.CollectionChanged += delegate
+            {
+                OnPropertyChanged(nameof(Contacts));
+            };
+        }
+
 
         /// <summary>
         /// A unique identifier for the organization.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Guid is the best name.")]
         public Guid Guid { get; set; }
 
         /// <summary>
@@ -32,7 +45,7 @@ namespace ExtractLicenseUI.Database
                 if(this._CustomerName != value)
                 {
                     this._CustomerName = value;
-                    OnPropertyChanged("CustomerName");
+                    OnPropertyChanged(nameof(CustomerName));
                 }
             } 
         }
@@ -46,7 +59,7 @@ namespace ExtractLicenseUI.Database
                 if(this._Reseller != value)
                 {
                     this._Reseller = value;
-                    OnPropertyChanged("Reseller");
+                    OnPropertyChanged(nameof(Reseller));
                 }
             } 
         }
@@ -65,19 +78,36 @@ namespace ExtractLicenseUI.Database
                 {
                     this._SalesforceHyperlink = @"https://www.salesforce.com/";
                 }
-                OnPropertyChanged("SalesforceHyperlink");
+                OnPropertyChanged(nameof(SalesforceHyperlink));
             } 
         }
+
 
         /// <summary>
         /// All of the licenses associated with a particular customer.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public Collection<ExtractLicense> Licenses {
             get { return this._Licenses; }
             set
             {
                 this._Licenses = value;
-                OnPropertyChanged("Licenses");
+                OnPropertyChanged(nameof(Licenses));
+            }
+        }
+
+
+        /// <summary>
+        /// All of the contacts associated with an organization.
+        /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
+        public ObservableCollection<Contact> Contacts
+        {
+            get { return this._Contacts; }
+            set
+            {
+                this._Contacts = value;
+                OnPropertyChanged(nameof(Contacts));
             }
         }
 
@@ -89,7 +119,7 @@ namespace ExtractLicenseUI.Database
             set
             {
                 this._SelectedLicense = value;
-                OnPropertyChanged("SelectedLicense");
+                OnPropertyChanged(nameof(SelectedLicense));
             }
         }
     }

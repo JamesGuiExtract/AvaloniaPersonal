@@ -9,9 +9,11 @@ namespace ExtractLicenseUI.Database
         private Guid _Guid;
         private string _Version;
 
+
         /// <summary>
         /// A unique identifier for the version.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Guid is the best name.")]
         public Guid Guid
         {
             get { return this._Guid; }
@@ -20,7 +22,7 @@ namespace ExtractLicenseUI.Database
                 if (this._Guid != value)
                 {
                     this._Guid = value;
-                    OnPropertyChanged("Guid");
+                    OnPropertyChanged(nameof(Guid));
                 }
             }
         }
@@ -36,7 +38,7 @@ namespace ExtractLicenseUI.Database
                 if (this._Version != value)
                 {
                     this._Version = value;
-                    OnPropertyChanged("Version");
+                    OnPropertyChanged(nameof(Version));
                 }
             }
         }

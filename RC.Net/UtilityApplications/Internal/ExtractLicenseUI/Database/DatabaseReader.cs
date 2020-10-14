@@ -3,6 +3,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
 
 namespace ExtractLicenseUI.Database
@@ -86,6 +87,10 @@ namespace ExtractLicenseUI.Database
         /// <returns>Returns a collection of components for a package.</returns>
         public Collection<Component> ReadComponents(Package package)
         {
+            if(package == null)
+            {
+                throw new ArgumentNullException(nameof(package));
+            }
             Collection<Component> components = new Collection<Component>();
             string sql = @"
                 SELECT 
@@ -107,7 +112,7 @@ namespace ExtractLicenseUI.Database
                         while (reader.Read())
                         {
                             components.Add(new Component() {
-                                ComponentID = int.Parse(reader["ID"].ToString()),
+                                ComponentID = int.Parse(reader["ID"].ToString(), CultureInfo.InvariantCulture),
                                 ComponentName = reader["Name"].ToString()
                             });
                         }
@@ -125,10 +130,14 @@ namespace ExtractLicenseUI.Database
         /// <returns></returns>
         public ObservableCollection<PackageHeader> ReadPackages(ExtractVersion version)
         {
+            if(version == null)
+            {
+                throw new ArgumentNullException(nameof(version));
+            }
             using (SqlCommand command = new SqlCommand("Select GUID, Name, PackageHeader FROM [Package] WHERE Version_GUID = @Version ORDER BY PackageHeader", this.SqlConnection))
             {
                 command.Parameters.AddWithValue("@Version", version.Guid);
-                return this.ReadPackagesFromDB(command, version, true);
+                return ReadPackagesFromDB(command, version, true);
             }
         }
 
@@ -139,6 +148,10 @@ namespace ExtractLicenseUI.Database
         /// <returns></returns>
         public ObservableCollection<PackageHeader> ReadPackages(ExtractLicense license)
         {
+            if(license == null)
+            {
+                throw new ArgumentNullException(nameof(license));
+            }
             string sql = @"
                 Select 
 	                GUID
@@ -152,7 +165,7 @@ namespace ExtractLicenseUI.Database
             using (SqlCommand command = new SqlCommand(sql, this.SqlConnection))
             {
                 command.Parameters.AddWithValue("@LicenseGuid", license.Guid);
-                return this.ReadPackagesFromDB(command, license.ExtractVersion, false);
+                return ReadPackagesFromDB(command, license.ExtractVersion, false);
             }
         }
 
@@ -185,7 +198,7 @@ namespace ExtractLicenseUI.Database
         /// <param name="version">The version to read</param>
         /// <param name="allowPackageModification">If viewing a license false, if a new license true.</param>
         /// <returns></returns>
-        private ObservableCollection<PackageHeader> ReadPackagesFromDB(SqlCommand command, ExtractVersion version, bool allowPackageModification)
+        private static ObservableCollection<PackageHeader> ReadPackagesFromDB(SqlCommand command, ExtractVersion version, bool allowPackageModification)
         {
             ObservableCollection<PackageHeader> packageHeaders = new ObservableCollection<PackageHeader>();
             
@@ -197,7 +210,7 @@ namespace ExtractLicenseUI.Database
                     while (reader.Read())
                     {
                         string packageHeader = reader["PackageHeader"].ToString();
-                        if (header == null || !packageHeader.Equals(header.Name))
+                        if (header == null || !packageHeader.Equals(header.Name, StringComparison.OrdinalIgnoreCase))
                         {
                             header = new PackageHeader() { Name = packageHeader };
                             packageHeaders.Add(header);
@@ -218,11 +231,13 @@ namespace ExtractLicenseUI.Database
             return packageHeaders;
         }
 
+
         /// <summary>
         /// Get all licenses associated with an organization.
         /// </summary>
         /// <param name="OrganizationGuid">The organization guid to read from.</param>
         /// <returns>A collection of licenses.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Its safe.")]
         public Collection<ExtractLicense> GetExtractLicenses(Guid OrganizationGuid)
         {
             Collection<ExtractLicense> extractLicenses = new Collection<ExtractLicense>();
@@ -263,10 +278,10 @@ WHERE
                                 Guid = Guid.Parse(reader["Guid"].ToString()),
                                 RequestKey = reader["Request_Key"]?.ToString(),
                                 IssuedBy = reader["Issued_By"].ToString(),
-                                IssuedOn = DateTime.Parse(reader["Issued_On"].ToString()),
-                                ExpiresOn = reader["Expires_On"]?.ToString() == string.Empty ? (DateTime?)null : DateTime.Parse(reader["Expires_On"].ToString()),
+                                IssuedOn = DateTime.Parse(reader["Issued_On"].ToString(), CultureInfo.InvariantCulture),
+                                ExpiresOn = string.IsNullOrEmpty(reader["Expires_On"]?.ToString()) ? (DateTime?)null : DateTime.Parse(reader["Expires_On"].ToString(), CultureInfo.InvariantCulture),
                                 IsActive = bool.Parse(reader["Active"].ToString()),
-                                TransferLicense = reader["Transfer_License"].ToString() == string.Empty ? (Guid?)null : Guid.Parse(reader["Transfer_License"].ToString()),
+                                TransferLicense = string.IsNullOrEmpty(reader["Transfer_License"].ToString()) ? (Guid?)null : Guid.Parse(reader["Transfer_License"].ToString()),
                                 ExtractVersion = new ExtractVersion() 
                                 { 
                                     Guid = Guid.Parse(reader["Extract_Version_GUID"].ToString()), 
@@ -289,6 +304,56 @@ WHERE
             }
 
             return extractLicenses;
+        }
+
+
+
+        /// <summary>
+        /// Gets all of the contacts for a given organization.
+        /// </summary>
+        /// <param name="OrganizationGuid">The GUID of the organization</param>
+        /// <returns>Returns an observable collection of the organization contacts</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "Its secure.")]
+        public ObservableCollection<Contact> GetOrganizationContacts(Guid OrganizationGuid)
+        {
+            ObservableCollection<Contact> Contacts = new ObservableCollection<Contact>();
+            using (SqlCommand command = new SqlCommand(
+$@"SELECT 
+	[GUID]
+    , [First_Name]
+    , [Last_Name]
+    , [Email_Address]
+    , [Phone_Number]
+    , [Organization_GUID]
+    , [Title]
+FROM 
+	[dbo].[Contact]
+WHERE
+    [Organization_GUID] = '{OrganizationGuid}'", this.SqlConnection))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var contactToAdd = new Contact()
+                            {
+                                Guid = Guid.Parse(reader["Guid"].ToString()),
+                                FirstName = reader["First_Name"].ToString(),
+                                LastName = reader["Last_Name"].ToString(),
+                                EmailAddress = reader["Email_Address"].ToString(),
+                                PhoneNumber = reader["Phone_Number"].ToString(),
+                                Title = reader["Title"].ToString(),
+                            };
+
+                            Contacts.Add(contactToAdd);
+                        }
+                    }
+                }
+            }
+
+            return Contacts;
         }
     }
 }

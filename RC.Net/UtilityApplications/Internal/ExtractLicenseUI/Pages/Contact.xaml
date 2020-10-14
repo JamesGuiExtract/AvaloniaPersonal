@@ -3,9 +3,63 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI">
     <ScrollViewer>
-        <StackPanel>
-            <TextBlock Text="MODERN UI FOR WPF" Style="{StaticResource Heading2}" />
-            <TextBlock Text="Implement Org contacts here. (currently unused)" />
+        <StackPanel x:Name="Form" Orientation="Vertical">
+            <StackPanel.Resources>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal" />
+                    <Setter Property="Margin" Value="0,0,0,4" />
+                </Style>
+                <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+                    <Setter Property="Width" Value="130" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+                <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                    <Setter Property="Padding" Value="0,3" />
+                </Style>
+                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
+                    <Setter Property="Padding" Value="0,3" />
+                </Style>
+            </StackPanel.Resources>
+            <Border BorderThickness="1" BorderBrush="Black" Padding="3,5,3,0" Margin="0,5,0,5">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel>
+                        <Label Content="Customer Name" Target="{Binding ElementName=CustomerName}"></Label>
+                        <TextBlock Name="CustomerName" Width="150" Text="{Binding SelectedOrganization.CustomerName}"></TextBlock>
+                    </StackPanel>
+                    <StackPanel>
+                        <Label Content="Reseller" Target="{Binding ElementName=Reseller}"></Label>
+                        <TextBlock x:Name="Reseller" Width="150" Text="{Binding SelectedOrganization.Reseller, Mode=TwoWay, ValidatesOnDataErrors=True}"></TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <Border BorderThickness="1" BorderBrush="Black" Padding="3,5,3,0" Margin="0,5,0,5">
+                <StackPanel Orientation="Vertical">
+                    <DataGrid x:Name="ContactGrid" 
+                                  ItemsSource="{Binding SelectedOrganization.Contacts}" 
+                                  AutoGenerateColumns="False" 
+                                  MaxHeight="500px">
+                        <DataGrid.Columns>
+                            <mui:DataGridTextColumn Header="First Name" Binding="{Binding FirstName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"></mui:DataGridTextColumn>
+                            <mui:DataGridTextColumn Header="Last Name" Binding="{Binding LastName}"></mui:DataGridTextColumn>
+                            <mui:DataGridTextColumn Header="Email Address" Binding="{Binding EmailAddress, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"></mui:DataGridTextColumn>
+                            <mui:DataGridTextColumn Header="Phone Number" Binding="{Binding PhoneNumber}"></mui:DataGridTextColumn>
+                            <mui:DataGridTextColumn Header="Title" Binding="{Binding Title}"></mui:DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Delete">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button x:Name="DeleteContact" Click="DeleteContact_Click" Content="Delete Contact"></Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                        <DataGrid.ItemContainerStyle>
+                            <Style TargetType="DataGridRow">
+                                <EventSetter x:Name="ContactRow" Event="LostFocus" Handler="DataGridRow_LostFocus"></EventSetter>
+                            </Style>
+                        </DataGrid.ItemContainerStyle>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

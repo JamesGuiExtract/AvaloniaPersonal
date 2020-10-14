@@ -1,22 +1,112 @@
-﻿using System;
+﻿using FirstFloor.ModernUI.Presentation;
+using System;
+using System.ComponentModel;
 
 namespace ExtractLicenseUI.Database
 {
-    /// <summary>
-    /// Currently un-used until later revisions.
-    /// </summary>
-    public class Contact
+    public class Contact : NotifyPropertyChanged, IDataErrorInfo
     {
-        public Guid Guid { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Guid is the best name.")]
+        public Guid Guid { get; set; } = Guid.NewGuid();
 
-        public string FirstName { get; set; }
+        private string _FirstName { get; set; }
 
-        public string LastName { get; set; }
+        private string _LastName { get; set; }
 
-        public string EmailAddress { get; set; }
+        private string _EmailAddress { get; set; }
 
-        public string PhoneNumber { get; set; }
+        private string _PhoneNumber { get; set; }
 
-        public string Title { get; set; }
+        private string _Title { get; set; }
+
+        public string FirstName
+        {
+            get { return this._FirstName; }
+            set
+            {
+                if (this._FirstName != value)
+                {
+                    this._FirstName = value;
+                    OnPropertyChanged(nameof(FirstName));
+                }
+            }
+        }
+
+        public string LastName
+        {
+            get { return this._LastName; }
+            set
+            {
+                if (this._LastName != value)
+                {
+                    this._LastName = value;
+                    OnPropertyChanged(nameof(LastName));
+                }
+            }
+        }
+
+        public string EmailAddress
+        {
+            get { return this._EmailAddress; }
+            set
+            {
+                if (this._EmailAddress != value)
+                {
+                    this._EmailAddress = value;
+                    OnPropertyChanged(nameof(EmailAddress));
+                }
+            }
+        }
+
+        public string PhoneNumber
+        {
+            get { return this._PhoneNumber; }
+            set
+            {
+                if (this._PhoneNumber != value)
+                {
+                    this._PhoneNumber = value;
+                    OnPropertyChanged(nameof(PhoneNumber));
+                }
+            }
+        }
+
+        public string Title
+        {
+            get { return this._Title; }
+            set
+            {
+                if (this._Title != value)
+                {
+                    this._Title = value;
+                    OnPropertyChanged(nameof(Title));
+                }
+            }
+        }
+
+        public string Error
+        {
+            get { return null; }
+        }
+
+        /// <summary>
+        /// Used for WPF validation. Validates each property.
+        /// </summary>
+        /// <param name="columnName">The property to validate.</param>
+        /// <returns></returns>
+        public string this[string columnName]
+        {
+            get
+            {
+                switch (columnName)
+                {
+                    case "FirstName":
+                        return string.IsNullOrEmpty(this.FirstName) ? "Required!" : null;
+                    case "EmailAddress":
+                        return string.IsNullOrEmpty(this.EmailAddress) ? "Required!" : null;
+                }
+                return null;
+            }
+        }
     }
 }

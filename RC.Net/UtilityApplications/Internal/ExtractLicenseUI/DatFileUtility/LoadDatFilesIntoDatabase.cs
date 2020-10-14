@@ -13,7 +13,7 @@ namespace ExtractLicenseUI.DatFileUtility
     {
 
         private static SqlConnection SqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
-		private static readonly string InsertComponentQuery = @"
+        private const string InsertComponentQuery = @"
 INSERT INTO dbo.Component
 (
 	[ID]
@@ -24,7 +24,7 @@ VALUES
     @ID
     , @Name
 )";
-        private static readonly string InsertPackageQuery = @"
+        private const string InsertPackageQuery = @"
 INSERT INTO dbo.Package
 (
     Guid
@@ -40,7 +40,7 @@ VALUES
     , @VersionGUID
 )";
 
-        private static readonly string InsertPackageComponentMapping = @"
+        private const string InsertPackageComponentMapping = @"
 INSERT INTO dbo.PackageComponentMapping
 (
 	[Package_Guid]
