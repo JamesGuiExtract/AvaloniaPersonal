@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Database.Test;
+﻿using Extract.AttributeFinder;
+using Extract.FileActionManager.Database.Test;
 using Extract.FileActionManager.FileProcessors;
 using Extract.Imaging;
 using Extract.Testing.Utilities;
@@ -58,6 +59,9 @@ namespace Extract.Web.WebAPI.Test
 
         static readonly string _COMPUTE_ACTION = "Compute";
         static readonly string _VERIFY_ACTION = "Verify";
+
+        // TestCaseSource for ProcessAnnotationConfirmShrink 
+        static string[] _attributeNames = new[] { "HCData", "MCData", "LCData", "Manual" };
 
         #endregion Constants
 
@@ -295,9 +299,9 @@ namespace Extract.Web.WebAPI.Test
 
             try
             {
-                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles, "jane_doe","");
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles, "jane_doe", "");
 
-                Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message,"Password is empty");
+                Assert.AreEqual(((ErrorResult)(((ObjectResult)controller.Login(user)).Value)).Error.Message, "Password is empty");
             }
             finally
             {
@@ -702,7 +706,7 @@ namespace Extract.Web.WebAPI.Test
 
                 LogInToWebApp(controller, user);
                 var openDocumentResult = OpenDocument(controller, 1);
-                
+
                 controller.CloseDocument(openDocumentResult.Id, commit: false)
                     .AssertGoodResult<NoContentResult>();
 
@@ -908,6 +912,51 @@ namespace Extract.Web.WebAPI.Test
 
                 controller.Logout()
                     .AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        [TestCaseSource("_attributeNames")]
+        public static void ProcessAnnotationConfirmShrink(string attributeName)
+        {
+            string dbName = "AppBackendAPI_Test_ProcessAnnotation";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+
+                LogInToWebApp(controller, user);
+                var openDocumentResult = OpenDocument(controller, 3);
+                Assert.AreEqual(3, openDocumentResult.Id);
+
+                string voaFile = _testFileNames[2] + ".voa";
+                var voa = new IUnknownVectorClass();
+                voa.LoadFrom(voaFile, false);
+                var mapper = new AttributeMapper(voa, EWorkflowType.kExtraction);
+                var documentAttribute = mapper.MapAttribute((IAttribute)voa.At(1), true);
+                documentAttribute.Name = attributeName;
+
+                // Increase height so that the zone encloses some empty page
+                var heightBefore = 500;
+                documentAttribute.SpatialPosition.LineInfo[0].SpatialLineZone.Height = heightBefore;
+
+                var processAnnotationResult = controller.ProcessAnnotation(openDocumentResult.Id, 1, new ProcessAnnotationParameters() { Annotation = documentAttribute, Definition = "{ AutoShrinkRedactionZones: {} }", OperationType = "modify" });
+                processAnnotationResult.AssertResultCode(200, "ProcessAnnotation is failing");
+
+                var modifiedAttribute = ((OkObjectResult)processAnnotationResult).Value as DocumentAttribute;
+                var heightAfter = modifiedAttribute.SpatialPosition.LineInfo[0].SpatialLineZone.Height;
+
+                // Ensure the attribute is significantly smaller
+                Assert.Less(heightAfter, 400);
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
             }
             finally
             {
