@@ -83,14 +83,8 @@ namespace ExtractLicenseUI
         /// </summary>
         public void RefreshLicenses()
         {
-            foreach(var organization in this.Organizations)
-            {
-                organization.Licenses = this.DatabaseReader.GetExtractLicenses(organization.Guid);
-                organization.Contacts = this.DatabaseReader.GetOrganizationContacts(organization.Guid);
-            }
             this.SelectedOrganization.Licenses = this.DatabaseReader.GetExtractLicenses(this.SelectedOrganization.Guid);
             this.SelectedOrganization.Contacts = this.DatabaseReader.GetOrganizationContacts(this.SelectedOrganization.Guid);
-            SortDataGrid(this.LicenseGrid, 4, ListSortDirection.Descending);
         }
 
         /// <summary>
@@ -106,6 +100,7 @@ namespace ExtractLicenseUI
             this.SelectedOrganization.Contacts = this.DatabaseReader.GetOrganizationContacts(this.SelectedOrganization.Guid);
             this.CreateNewLicense.IsEnabled = true;
             this.ViewContacts.IsEnabled = true;
+            SortDataGrid(this.LicenseGrid, 4, ListSortDirection.Descending);
         }
 
         /// <summary>

@@ -161,7 +161,9 @@ namespace ExtractLicenseUI.Database
 	                [Package] 
 		                INNER JOIN SelectedPackagesInLicense
 			                ON SelectedPackagesInLicense.Package_Guid = [Package].[GUID]
-			                AND SelectedPackagesInLicense.License_Guid = @LicenseGuid";
+			                AND SelectedPackagesInLicense.License_Guid = @LicenseGuid
+                ORDER BY
+                    PackageHeader";
             using (SqlCommand command = new SqlCommand(sql, this.SqlConnection))
             {
                 command.Parameters.AddWithValue("@LicenseGuid", license.Guid);
@@ -210,7 +212,7 @@ namespace ExtractLicenseUI.Database
                     while (reader.Read())
                     {
                         string packageHeader = reader["PackageHeader"].ToString();
-                        if (header == null || !packageHeader.Equals(header.Name, StringComparison.OrdinalIgnoreCase))
+                        if (header == null || !packageHeader.Equals(header.Name, StringComparison.CurrentCultureIgnoreCase))
                         {
                             header = new PackageHeader() { Name = packageHeader };
                             packageHeaders.Add(header);
@@ -282,9 +284,9 @@ WHERE
                                 ExpiresOn = string.IsNullOrEmpty(reader["Expires_On"]?.ToString()) ? (DateTime?)null : DateTime.Parse(reader["Expires_On"].ToString(), CultureInfo.InvariantCulture),
                                 IsActive = bool.Parse(reader["Active"].ToString()),
                                 TransferLicense = string.IsNullOrEmpty(reader["Transfer_License"].ToString()) ? (Guid?)null : Guid.Parse(reader["Transfer_License"].ToString()),
-                                ExtractVersion = new ExtractVersion() 
-                                { 
-                                    Guid = Guid.Parse(reader["Extract_Version_GUID"].ToString()), 
+                                ExtractVersion = new ExtractVersion()
+                                {
+                                    Guid = Guid.Parse(reader["Extract_Version_GUID"].ToString()),
                                     Version = reader["Version"].ToString()
                                 },
                                 MachineName = reader["Machine_Name"].ToString(),
@@ -295,6 +297,7 @@ WHERE
                                 SDKPassword = reader["SDK_Password"].ToString(),
                                 LicenseName = reader["License_Name"].ToString(),
                                 RestrictByDiskSerialNumber = bool.Parse(reader["Restrict_By_Disk_Serial_Number"].ToString()),
+                                IsPermanent = string.IsNullOrEmpty(reader["Expires_On"]?.ToString()) ? true : false,
                             };
 
                             extractLicenses.Add(licenseToAdd);

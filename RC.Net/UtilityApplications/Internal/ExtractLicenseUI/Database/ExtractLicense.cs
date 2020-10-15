@@ -72,6 +72,7 @@ namespace ExtractLicenseUI.Database
                 {
                     this._IsPermanent = value;
                     OnPropertyChanged(nameof(IsPermanent));
+                    OnPropertyChanged(nameof(ExpiresOn));
                 }
             }
         }
@@ -158,7 +159,6 @@ namespace ExtractLicenseUI.Database
                     this._ExpiresOn = value;
                     OnPropertyChanged(nameof(ExpiresOn));
                 }
-                this.IsPermanent = this._ExpiresOn != null ? false : true;
             }
         }
 

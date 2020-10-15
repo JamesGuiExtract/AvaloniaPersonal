@@ -71,7 +71,7 @@
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Expires On" Target="{Binding ElementName=ExpiresOn}"></Label>
-                                    <DatePicker x:Name="ExpiresOn" Width="150" SelectedDate="{Binding SelectedOrganization.SelectedLicense.ExpiresOn, ValidatesOnDataErrors=True}" ToolTip="{Binding Path=(Validation.Errors)[0].ErrorContent, ElementName=ExpiresOn}" >
+                                    <DatePicker x:Name="ExpiresOn" Width="150" SelectedDate="{Binding SelectedOrganization.SelectedLicense.ExpiresOn, Mode=TwoWay, ValidatesOnDataErrors=True}" ToolTip="{Binding Path=(Validation.Errors)[0].ErrorContent, ElementName=ExpiresOn}" >
                                     </DatePicker>
                                 </StackPanel>
                                 <StackPanel>
@@ -177,21 +177,13 @@
                         </StackPanel>
                         <StackPanel>
                             <Button x:Name="SaveButton" Content="Save" Click="SaveButton_Click"></Button>
-                        </StackPanel>
-                        <StackPanel>
+                            <Button x:Name="UpdateButton" Content="Update" Click="UpdateButton_Click"></Button>
                             <Button x:Name="CloneButton" Content="Clone License" Click="CloneButton_Click"></Button>
-                        </StackPanel>
-                        <StackPanel>
                             <Button x:Name="SaveLicenseToFile" Content="Save license to file" Click="SaveLicenseToFile_Click"></Button>
-                        </StackPanel>
-                        <StackPanel>
                             <Button x:Name="CopyLicenseToClipboard" Content="Copy license to clipboard" Click="CopyLicenseToClipboard_Click"></Button>
-                        </StackPanel>
-                        <StackPanel>
                             <Button x:Name="SaveUnlockCodeToFile" Content="Save unlock code to file" Click="SaveUnlockCodeToFile_Click"></Button>
-                        </StackPanel>
-                        <StackPanel>
                             <Button x:Name="CopyUnlockCodeToClipboard" Content="Copy unlock code to clipboard" Click="CopyUnlockCodeToClipboard_Click"></Button>
+                            <Button x:Name="EditLicense" Content="Edit" Click="EditLicense_Click"></Button>
                         </StackPanel>
                     </StackPanel>
                 </Border>

@@ -52,47 +52,61 @@ VALUES
     , @LicenseGuid
 )";
 
-        private readonly string InsertLicenseQuery = @"
-INSERT INTO dbo.License
-(
-    [Guid]
-	, [Organization_GUID]
-	, [Request_Key]
-	, [Issued_By]
-	, [Issued_On]
-	, [Expires_On]
-	, [Active]
-	, [Transfer_License]
-	, [Machine_Name]
-	, [Comments]
-	, [Production]
-	, [License_Key]
-	, [Signed_Transfer_Form]
-	, [SDK_Password]
-	, [Extract_Version_GUID]
-	, [License_Name]
-    , [Restrict_By_Disk_Serial_Number]
-)
-VALUES
-(
-    @Guid
-    , @Organization_GUID
-	, @Request_Key
-	, @Issued_By
-	, @Issued_On
-	, @Expires_On
-	, @Active
-	, @Transfer_License
-	, @Machine_Name
-	, @Comments
-	, @Production
-	, @License_Key
-	, @Signed_Transfer_Form
-	, @SDK_Password
-	, @Extract_Version_GUID
-	, @License_Name
-    , @Restrict_By_Disk_Serial_Number
-)";
+        private readonly string InsertUpdateLicenseQuery = @"
+IF NOT EXISTS(SELECT GUID FROM dbo.License WHERE GUID like @GUID)
+BEGIN
+	INSERT INTO dbo.License
+	(
+		[Guid]
+		, [Organization_GUID]
+		, [Request_Key]
+		, [Issued_By]
+		, [Issued_On]
+		, [Expires_On]
+		, [Active]
+		, [Transfer_License]
+		, [Machine_Name]
+		, [Comments]
+		, [Production]
+		, [License_Key]
+		, [Signed_Transfer_Form]
+		, [SDK_Password]
+		, [Extract_Version_GUID]
+		, [License_Name]
+		, [Restrict_By_Disk_Serial_Number]
+	)
+	VALUES
+	(
+		@Guid
+		, @Organization_GUID
+		, @Request_Key
+		, @Issued_By
+		, @Issued_On
+		, @Expires_On
+		, @Active
+		, @Transfer_License
+		, @Machine_Name
+		, @Comments
+		, @Production
+		, @License_Key
+		, @Signed_Transfer_Form
+		, @SDK_Password
+		, @Extract_Version_GUID
+		, @License_Name
+		, @Restrict_By_Disk_Serial_Number
+	)
+END
+
+UPDATE
+	dbo.License
+SET
+	Comments = @Comments
+	, Signed_Transfer_Form = @Signed_Transfer_Form
+	, Active = @Active
+	, Production = @Production
+	, License_Name = @License_Name
+WHERE
+	dbo.License.GUID = @GUID";
 
         public DatabaseWriter()
         {
@@ -113,7 +127,7 @@ VALUES
             {
                 throw new ArgumentNullException(nameof(organization));
             }
-            using (SqlCommand command = new SqlCommand(InsertLicenseQuery, SqlConnection))
+            using (SqlCommand command = new SqlCommand(InsertUpdateLicenseQuery, SqlConnection))
             {
                 command.Parameters.AddWithValue("@Guid", organization.SelectedLicense.Guid);
                 command.Parameters.AddWithValue("@Organization_GUID", organization.Guid);

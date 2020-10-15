@@ -152,7 +152,9 @@ namespace ExtractLicenseUI
                 : "Universal_";
             licenseName += this.SelectedOrganization.SelectedLicense.IsPermanent
                 ? "Full"
-                : ((DateTime)this.SelectedOrganization.SelectedLicense.ExpiresOn).Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                : this.SelectedOrganization.SelectedLicense.ExpiresOn != null 
+                    ? ((DateTime)this.SelectedOrganization.SelectedLicense.ExpiresOn).Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) 
+                    : "Invalid Date";
             return licenseName;
         }
 
@@ -462,9 +464,18 @@ namespace ExtractLicenseUI
         /// <param name="option">The licenseNavigationOption to restrict controls for.</param>
         private void UpdateFormControls(LicenseNavigationOptions option)
         {
+            this.DisableAllControls();
             switch (option)
             {
-                case LicenseNavigationOptions.EditLicense: break;
+                case LicenseNavigationOptions.EditLicense:
+                    this.Comments.IsEnabled = true;
+                    this.SignedTransferForm.IsEnabled = true;
+                    this.IsActive.IsEnabled = true;
+                    this.IsProduction.IsEnabled = true;
+                    this.LicenseName.IsEnabled = true;
+                    this.GenerateLicenseNameButton.Visibility = System.Windows.Visibility.Visible;
+                    this.UpdateButton.Visibility = System.Windows.Visibility.Visible;
+                    break;
                 case LicenseNavigationOptions.CloneLicense:
                     this.ClonedPackageSelector.Visibility = System.Windows.Visibility.Visible;
                     goto case LicenseNavigationOptions.NewLicense;
@@ -480,37 +491,16 @@ namespace ExtractLicenseUI
                     this.ExtractVersion.IsEnabled = true;
                     this.SaveButton.Visibility = System.Windows.Visibility.Visible;
                     this.GenerateRequestKey.Visibility = System.Windows.Visibility.Visible;
-                    this.CloneButton.Visibility = System.Windows.Visibility.Collapsed;
-                    this.SaveLicenseToFile.Visibility = System.Windows.Visibility.Collapsed;
-                    this.CopyLicenseToClipboard.Visibility = System.Windows.Visibility.Collapsed;
-                    this.SaveUnlockCodeToFile.Visibility = System.Windows.Visibility.Collapsed;
-                    this.CopyUnlockCodeToClipboard.Visibility = System.Windows.Visibility.Collapsed;
                     this.GenerateLicenseNameButton.Visibility = System.Windows.Visibility.Visible;
                     this.UseDiskSerialNumber.IsEnabled = true;
                     break;
                 case LicenseNavigationOptions.ViewLicense:
-                    this.RequestKey.IsEnabled = false;
-                    this.LicenseName.IsEnabled = false;
-                    this.GenerateRequestKey.Visibility = System.Windows.Visibility.Collapsed;
-                    this.IsPermanent.IsEnabled = false;
-                    this.ExpiresOn.IsEnabled = false;
-                    this.IsActive.IsEnabled = false;
-                    this.Comments.IsEnabled = false;
-                    this.IsProduction.IsEnabled = false;
-                    this.SignedTransferForm.IsEnabled = false;
-                    this.ExtractVersion.IsEnabled = false;
-                    this.SaveButton.Visibility = System.Windows.Visibility.Collapsed;
                     this.CloneButton.Visibility = System.Windows.Visibility.Visible;
                     this.SaveLicenseToFile.Visibility = System.Windows.Visibility.Visible;
                     this.CopyLicenseToClipboard.Visibility = System.Windows.Visibility.Visible;
-                    this.SaveUnlockCodeToFile.Visibility = System.Windows.Visibility.Visible;
-                    this.CopyUnlockCodeToClipboard.Visibility = System.Windows.Visibility.Visible;
-                    this.GenerateLicenseNameButton.Visibility = System.Windows.Visibility.Collapsed;
-                    this.SaveUnlockCodeToFile.IsEnabled = this.SelectedOrganization.SelectedLicense.IsPermanent ? false : true;
-                    this.CopyUnlockCodeToClipboard.IsEnabled = this.SelectedOrganization.SelectedLicense.IsPermanent ? false : true;
-                    this.UseDiskSerialNumber.IsEnabled = false;
-                    this.ClonedPackageHeaders.Clear();
-                    this.ClonedPackageSelector.Visibility = System.Windows.Visibility.Collapsed;
+                    this.SaveUnlockCodeToFile.Visibility = this.SelectedOrganization.SelectedLicense.IsPermanent? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+                    this.CopyUnlockCodeToClipboard.Visibility = this.SelectedOrganization.SelectedLicense.IsPermanent ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+                    this.EditLicense.Visibility = System.Windows.Visibility.Visible; 
                     break;
                 case LicenseNavigationOptions.None: break;
             }
@@ -525,6 +515,46 @@ namespace ExtractLicenseUI
         private void GenerateLicenseName_Click(object sender, RoutedEventArgs e)
         {
             this.SelectedOrganization.SelectedLicense.LicenseName = GenerateLicenseName();
+        }
+
+        private void EditLicense_Click(object sender, RoutedEventArgs e)
+        {
+            this.ConfigureNavigationOption(LicenseNavigationOptions.EditLicense);
+        }
+
+        private void DisableAllControls()
+        {
+            this.ExtractVersion.IsEnabled = false;
+            this.RequestKey.IsEnabled = false;
+            this.IsPermanent.IsEnabled = false;
+            this.ExpiresOn.IsEnabled = false;
+            this.IssuedOn.IsEnabled = false;
+            this.TransferLicense.IsEnabled = false;
+            this.Comments.IsEnabled = false;
+            this.SDKPassword.IsEnabled = false;
+            this.SignedTransferForm.IsEnabled = false;
+            this.IsActive.IsEnabled = false;
+            this.IsProduction.IsEnabled = false;
+            this.UseDiskSerialNumber.IsEnabled = false;
+            this.LicenseName.IsEnabled = false;
+            this.ClonedPackageSelector.Visibility = System.Windows.Visibility.Collapsed;
+            this.GenerateRequestKey.Visibility = System.Windows.Visibility.Collapsed;
+            this.SaveButton.Visibility = System.Windows.Visibility.Collapsed;
+            this.CloneButton.Visibility = System.Windows.Visibility.Collapsed;
+            this.SaveLicenseToFile.Visibility = System.Windows.Visibility.Collapsed;
+            this.CopyLicenseToClipboard.Visibility = System.Windows.Visibility.Collapsed;
+            this.SaveUnlockCodeToFile.Visibility = System.Windows.Visibility.Collapsed;
+            this.CopyUnlockCodeToClipboard.Visibility = System.Windows.Visibility.Collapsed;
+            this.GenerateLicenseNameButton.Visibility = System.Windows.Visibility.Collapsed;
+            this.EditLicense.Visibility = System.Windows.Visibility.Collapsed;
+            this.UpdateButton.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            using var databaseWriter = new DatabaseWriter();
+            databaseWriter.WriteLicense(this.SelectedOrganization);
+            this.ConfigureNavigationOption(LicenseNavigationOptions.ViewLicense);
         }
     }
 }
