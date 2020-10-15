@@ -153,35 +153,54 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\XML\FullText.xml" />
-    <EmbeddedResource Include="Resources\XML\FullText.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextAttribute.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextAttribute.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextAttributeNoSpatial.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextAttributeNoSpatial.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextAttributeSchema.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchema.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaNoSpatial.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaNoSpatial.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaRemoveEmpty.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaRemoveEmpty.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaRemoveEmptyNoSpatial.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextAttributeSchemaRemoveEmptyNoSpatial.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextNoSpatial.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextNoSpatial.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextSchema.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextSchema.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextSchemaNoSpatial.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextSchemaNoSpatial.sorted.xml" />
-    <EmbeddedResource Include="Resources\XML\Version1NoSpatial.xml" />
-    <EmbeddedResource Include="Resources\XML\Version1NoSpatial.sorted.xml" />
-    <EmbeddedResource Include="Resources\XML\Version1Spatial.xml" />
-    <EmbeddedResource Include="Resources\XML\Version1Spatial.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextSchemaRemoveEmpty.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextSchemaRemoveEmpty.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\FullTextSchemaRemoveEmptyNoSpatial.xml" />
-    <EmbeddedResource Include="Resources\XML\FullTextSchemaRemoveEmptyNoSpatial.sorted.xml" />
     <EmbeddedResource Include="Resources\XML\NoFullTextWithMultilineTextNode.xml" />
-    <EmbeddedResource Include="Resources\XML\NoFullTextWithMultilineTextNode.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\Version1NoSpatial.xml" />
+    <EmbeddedResource Include="Resources\XML\Version1Spatial.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullText.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextAttribute.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextAttributeNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextAttributeSchema.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextAttributeSchemaNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextAttributeSchemaRemoveEmpty.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextAttributeSchemaRemoveEmptyNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextSchema.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextSchemaNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextSchemaRemoveEmpty.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\FullTextSchemaRemoveEmptyNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\NoFullTextWithMultilineTextNode.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\Version1NoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByName\Version1Spatial.sorted.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullText.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextAttribute.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextAttributeNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextAttributeSchema.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextAttributeSchemaNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextAttributeSchemaRemoveEmpty.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextAttributeSchemaRemoveEmptyNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextSchema.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextSchemaNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextSchemaRemoveEmpty.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\FullTextSchemaRemoveEmptyNoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\NoFullTextWithMultilineTextNode.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\Version1NoSpatial.sorted.xml" />
+    <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\Version1Spatial.sorted.xml" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_COMLMLib">

@@ -1,4 +1,4 @@
-﻿<FlexData>
+<FlexData xsi:noNamespaceSchemaLocation="test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <LabInfo>
     <Address>
       <Address1>

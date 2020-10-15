@@ -30,27 +30,47 @@ namespace Extract.Utilities.Test
             "Resources.XML.NoFullTextWithMultilineTextNode.xml",
         };
 
-        static readonly string[] _expected = new string[]
+        static readonly string[] _expectedAlphaByName = new string[]
         {
-            "Resources.XML.FullText.sorted.xml",
-            "Resources.XML.FullTextAttribute.sorted.xml",
-            "Resources.XML.FullTextAttributeNoSpatial.sorted.xml",
-            "Resources.XML.FullTextAttributeSchema.sorted.xml",
-            "Resources.XML.FullTextAttributeSchemaNoSpatial.sorted.xml",
-            "Resources.XML.FullTextAttributeSchemaRemoveEmpty.sorted.xml",
-            "Resources.XML.FullTextAttributeSchemaRemoveEmptyNoSpatial.sorted.xml",
-            "Resources.XML.FullTextNoSpatial.sorted.xml",
-            "Resources.XML.FullTextSchema.sorted.xml",
-            "Resources.XML.FullTextSchemaNoSpatial.sorted.xml",
-            "Resources.XML.Version1NoSpatial.sorted.xml",
-            "Resources.XML.Version1Spatial.sorted.xml",
-            "Resources.XML.FullTextSchemaRemoveEmpty.sorted.xml",
-            "Resources.XML.FullTextSchemaRemoveEmptyNoSpatial.sorted.xml",
-            "Resources.XML.NoFullTextWithMultilineTextNode.sorted.xml",
+            "Resources.XML.AlphaByName.FullText.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextAttribute.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextAttributeNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextAttributeSchema.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextAttributeSchemaNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextAttributeSchemaRemoveEmpty.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextAttributeSchemaRemoveEmptyNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextSchema.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextSchemaNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByName.Version1NoSpatial.sorted.xml",
+            "Resources.XML.AlphaByName.Version1Spatial.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextSchemaRemoveEmpty.sorted.xml",
+            "Resources.XML.AlphaByName.FullTextSchemaRemoveEmptyNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByName.NoFullTextWithMultilineTextNode.sorted.xml",
+        };
+
+        static readonly string[] _expectedAlphaByNameFTF = new string[]
+        {
+            "Resources.XML.AlphaByNameFullTextFirst.FullText.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextAttribute.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextAttributeNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextAttributeSchema.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextAttributeSchemaNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextAttributeSchemaRemoveEmpty.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextAttributeSchemaRemoveEmptyNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextSchema.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextSchemaNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.Version1NoSpatial.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.Version1Spatial.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextSchemaRemoveEmpty.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.FullTextSchemaRemoveEmptyNoSpatial.sorted.xml",
+            "Resources.XML.AlphaByNameFullTextFirst.NoFullTextWithMultilineTextNode.sorted.xml",
         };
 
         static TestFileManager<TestXmlTransformer> _testFiles;
-        static XmlTransformer _alphaSortTransformer;
+        static XmlTransformer _alphaSortTransformer = new XmlTransformer(XmlTransformer.StyleSheets.AlphaSortName);
+        static XmlTransformer _alphaSortFTFTransformer = new XmlTransformer(XmlTransformer.StyleSheets.AlphaSortNameFullTextFirst);
 
         /// <summary>
         /// Performs initialization needed for the entire test run.
@@ -71,20 +91,11 @@ namespace Extract.Utilities.Test
             _testFiles?.Dispose();
         }
 
-        /// <summary>
-        /// Test alphabetic sort with various XML formats
-        /// </summary>
-        [Test, Category("Automated")]
-        
-        public static void AlphabeticSort([Range(0, _NUM_INPUTS - 1)] int index)
+        // Helper method to test a single transform on a single example
+        static void TestTransformer(XmlTransformer transformer, string expected, string input)
         {
-            // Validate the inputs/outputs/range constant
-            Assert.AreEqual(_inputs.Length, _NUM_INPUTS);
-            Assert.AreEqual(_inputs.Length, _expected.Length);
-
             // Run the test
-            var transformer = _alphaSortTransformer ??= new XmlTransformer(XmlTransformer.StyleSheets.AlphaSortName);
-            var x = GetResult(_inputs[index], transformer, _expected[index]);
+            var x = GetResult(input, transformer, expected);
 
             // Validate the expected value:
             //   This transform formats the XML in addition to sorting it
@@ -96,25 +107,84 @@ namespace Extract.Utilities.Test
         }
 
         /// <summary>
+        /// Test alphabetic sort with various XML formats
+        /// </summary>
+        [Test, Category("Automated")]
+        
+        public static void AlphabeticSort([Range(0, _NUM_INPUTS - 1)] int index)
+        {
+            var transformer = _alphaSortTransformer;
+            var expected = _expectedAlphaByName;
+
+            // Validate the inputs/outputs/range constant
+            Assert.AreEqual(_inputs.Length, _NUM_INPUTS);
+            Assert.AreEqual(_inputs.Length, expected.Length);
+
+            TestTransformer(transformer, expected[index], _inputs[index]);
+        }
+
+        /// <summary>
+        /// Test alphabetic sort, fulltext-first, with various XML formats
+        /// </summary>
+        [Test, Category("Automated")]
+        
+        public static void AlphabeticSortFullTextFirst([Range(0, _NUM_INPUTS - 1)] int index)
+        {
+            var transformer = _alphaSortFTFTransformer;
+            var expected = _expectedAlphaByNameFTF;
+
+            // Validate the inputs/outputs/range constant
+            Assert.AreEqual(_inputs.Length, _NUM_INPUTS);
+            Assert.AreEqual(_inputs.Length, expected.Length);
+
+            TestTransformer(transformer, expected[index], _inputs[index]);
+        }
+
+        // Helper method to test a double transform on a single example
+        static void TestTransformTwice(XmlTransformer transformer, string expected, string input)
+        {
+            // Run the first test
+            var x = GetResult(input, transformer, expected);
+            Assert.AreEqual(x.Expected, x.Output);
+
+            // Transform the output of the first test again
+            using var inputStream = GetStreamFromString(x.Output);
+            x = GetResult(inputStream, transformer, expected);
+            Assert.AreEqual(x.Expected, x.Output);
+        }
+
+        /// <summary>
         /// Test running the transform twice to make sure the result is stable (no extra whitespace added)
         /// </summary>
         [Test, Category("Automated")]
         
         public static void TransformTwice([Range(0, _NUM_INPUTS - 1)] int index)
         {
+            var transformer = _alphaSortTransformer;
+            var expected = _expectedAlphaByName;
+
             // Validate the inputs/outputs/range constant
             Assert.AreEqual(_inputs.Length, _NUM_INPUTS);
-            Assert.AreEqual(_inputs.Length, _expected.Length);
+            Assert.AreEqual(_inputs.Length, expected.Length);
 
-            // Run the first test
-            var transformer = _alphaSortTransformer ??= new XmlTransformer(XmlTransformer.StyleSheets.AlphaSortName);
-            var x = GetResult(_inputs[index], transformer, _expected[index]);
-            Assert.AreEqual(x.Expected, x.Output);
+            TestTransformTwice(transformer, expected[index], _inputs[index]);
+        }
 
-            // Transform the output of the first test again
-            using var inputStream = GetStreamFromString(x.Output);
-            x = GetResult(inputStream, transformer, _expected[index]);
-            Assert.AreEqual(x.Expected, x.Output);
+        /// <summary>
+        /// Test running the FTF transform twice to make sure the result is stable (no extra whitespace added)
+        /// </summary>
+        [Test, Category("Automated")]
+        
+        public static void TransformTwiceFTF([Range(0, _NUM_INPUTS - 1)] int index)
+        {
+            var transformer = _alphaSortFTFTransformer;
+            var expected = _expectedAlphaByNameFTF;
+
+            // Validate the inputs/outputs/range constant
+            Assert.AreEqual(_inputs.Length, _NUM_INPUTS);
+            Assert.AreEqual(_inputs.Length, expected.Length);
+
+            TestTransformTwice(transformer, expected[index], _inputs[index]);
         }
 
         static TestData GetResult(string inputResource, XmlTransformer transformer, string expectedResource)

@@ -1,4 +1,4 @@
-﻿<FlexData xsi:noNamespaceSchemaLocation="test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<FlexData xsi:noNamespaceSchemaLocation="test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Field FieldName="LabInfo">
     <Field FieldName="Address">
       <Field FieldName="Address1">

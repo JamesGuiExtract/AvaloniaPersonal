@@ -1,13 +1,14 @@
-﻿<FlexData xsi:noNamespaceSchemaLocation="test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<FlexData>
   <LabInfo>
+    <FullText>N/A</FullText>
     <Address>
+      <FullText>N/A</FullText>
       <Address1>
         <FullText>8901 WEST LINCOLN AVENUE</FullText>
       </Address1>
       <City>
         <FullText>WEST ALLIS</FullText>
       </City>
-      <FullText>N/A</FullText>
       <State>
         <FullText>WI</FullText>
       </State>
@@ -15,21 +16,20 @@
         <FullText>53227</FullText>
       </ZipCode>
     </Address>
-    <FullText>N/A</FullText>
   </LabInfo>
   <PatientInfo>
+    <FullText>N/A</FullText>
     <DOB>
       <FullText>08/08/2000</FullText>
     </DOB>
-    <FullText>N/A</FullText>
     <Gender>
       <FullText>M</FullText>
     </Gender>
     <Name>
+      <FullText>DOE, BERT</FullText>
       <First>
         <FullText>BERT</FullText>
       </First>
-      <FullText>DOE, BERT</FullText>
       <Last>
         <FullText>DOE</FullText>
       </Last>
@@ -38,16 +38,17 @@
   <PhysicianInfo>
     <FullText>N/A</FullText>
     <OrderingPhysicianName>
+      <FullText>DOE, RICHARD</FullText>
       <First>
         <FullText>RICHARD</FullText>
       </First>
-      <FullText>DOE, RICHARD</FullText>
       <Last>
         <FullText>DOE</FullText>
       </Last>
     </OrderingPhysicianName>
   </PhysicianInfo>
   <Test>
+    <FullText>N/A</FullText>
     <CollectionDate>
       <FullText>08/08/2008</FullText>
     </CollectionDate>
@@ -55,10 +56,10 @@
       <FullText>09:18</FullText>
     </CollectionTime>
     <Component>
+      <FullText>GLUCOSE</FullText>
       <Flag>
         <FullText>H</FullText>
       </Flag>
-      <FullText>GLUCOSE</FullText>
       <OriginalName>
         <FullText>GLUCOSE</FullText>
       </OriginalName>
@@ -75,7 +76,6 @@
         <FullText>143</FullText>
       </Value>
     </Component>
-    <FullText>N/A</FullText>
     <Name>
       <FullText>GLUCOSE</FullText>
     </Name>
@@ -84,6 +84,7 @@
     </OrderCode>
   </Test>
   <Test>
+    <FullText>N/A</FullText>
     <CollectionDate>
       <FullText>08/08/2008</FullText>
     </CollectionDate>
@@ -91,10 +92,10 @@
       <FullText>09:18</FullText>
     </CollectionTime>
     <Component>
+      <FullText>HEMOGLOBIN A1C</FullText>
       <Flag>
         <FullText>H</FullText>
       </Flag>
-      <FullText>HEMOGLOBIN A1C</FullText>
       <OriginalName>
         <FullText>HEMOGLOBIN A1C</FullText>
       </OriginalName>
@@ -111,7 +112,6 @@
         <FullText>7.5</FullText>
       </Value>
     </Component>
-    <FullText>N/A</FullText>
     <Name>
       <FullText>GLYCOHEMOGLOBIN A1C</FullText>
     </Name>

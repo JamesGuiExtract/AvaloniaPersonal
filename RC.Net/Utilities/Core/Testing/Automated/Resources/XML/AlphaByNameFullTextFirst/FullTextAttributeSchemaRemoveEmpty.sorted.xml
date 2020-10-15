@@ -1,6 +1,8 @@
-﻿<FlexData xsi:noNamespaceSchemaLocation="test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<FlexData xsi:noNamespaceSchemaLocation="test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <LabInfo>
+    <FullText AverageCharConfidence="100">N/A</FullText>
     <Address>
+      <FullText AverageCharConfidence="100">N/A</FullText>
       <Address1>
         <FullText AverageCharConfidence="98">8901 WEST LINCOLN AVENUE</FullText>
         <SpatialLine PageNumber="1">
@@ -17,7 +19,6 @@
           <SpatialLineZone StartX="1616" StartY="1475" EndX="1867" EndY="1475" Height="27" />
         </SpatialLine>
       </City>
-      <FullText AverageCharConfidence="100">N/A</FullText>
       <SpatialLine PageNumber="1">
         <LineText AverageCharConfidence="100">N/A</LineText>
         <SpatialLineBounds Top="1456" Left="993" Bottom="1490" Right="2113" />
@@ -40,7 +41,6 @@
         </SpatialLine>
       </ZipCode>
     </Address>
-    <FullText AverageCharConfidence="100">N/A</FullText>
     <SpatialLine PageNumber="1">
       <LineText AverageCharConfidence="100">N/A</LineText>
       <SpatialLineBounds Top="38" Left="200" Bottom="2914" Right="2318" />
@@ -48,6 +48,7 @@
     </SpatialLine>
   </LabInfo>
   <PatientInfo>
+    <FullText AverageCharConfidence="90">N/A</FullText>
     <DOB>
       <FullText AverageCharConfidence="98">08/08/2000</FullText>
       <SpatialLine PageNumber="1">
@@ -56,7 +57,6 @@
         <SpatialLineZone StartX="1647" StartY="460" EndX="1872" EndY="460" Height="37" />
       </SpatialLine>
     </DOB>
-    <FullText AverageCharConfidence="90">N/A</FullText>
     <Gender>
       <FullText AverageCharConfidence="80">M</FullText>
       <SpatialLine PageNumber="1">
@@ -66,6 +66,7 @@
       </SpatialLine>
     </Gender>
     <Name>
+      <FullText AverageCharConfidence="74">DOE, BERT</FullText>
       <First>
         <FullText AverageCharConfidence="72">BERT</FullText>
         <SpatialLine PageNumber="1">
@@ -74,7 +75,6 @@
           <SpatialLineZone StartX="312" StartY="776" EndX="405" EndY="776" Height="27" />
         </SpatialLine>
       </First>
-      <FullText AverageCharConfidence="74">DOE, BERT</FullText>
       <Last>
         <FullText AverageCharConfidence="76">DOE</FullText>
         <SpatialLine PageNumber="1">
@@ -98,6 +98,7 @@
   <PhysicianInfo>
     <FullText>N/A</FullText>
     <OrderingPhysicianName>
+      <FullText AverageCharConfidence="66">DOE, RICHARD</FullText>
       <First>
         <FullText AverageCharConfidence="64">RICHARD</FullText>
         <SpatialLine PageNumber="1">
@@ -106,7 +107,6 @@
           <SpatialLineZone StartX="642" StartY="870" EndX="803" EndY="870" Height="27" />
         </SpatialLine>
       </First>
-      <FullText AverageCharConfidence="66">DOE, RICHARD</FullText>
       <Last>
         <FullText AverageCharConfidence="70">DOE</FullText>
         <SpatialLine PageNumber="1">
@@ -123,6 +123,7 @@
     </OrderingPhysicianName>
   </PhysicianInfo>
   <Test>
+    <FullText>N/A</FullText>
     <CollectionDate>
       <FullText AverageCharConfidence="100">08/08/2008</FullText>
       <SpatialLine PageNumber="1">
@@ -144,6 +145,7 @@
       </SpatialLine>
     </CollectionTime>
     <Component>
+      <FullText AverageCharConfidence="100">GLUCOSE</FullText>
       <Flag>
         <FullText AverageCharConfidence="40">H</FullText>
         <SpatialLine PageNumber="1">
@@ -152,7 +154,6 @@
           <SpatialLineZone StartX="823" StartY="1098" EndX="845" EndY="1098" Height="25" />
         </SpatialLine>
       </Flag>
-      <FullText AverageCharConfidence="100">GLUCOSE</FullText>
       <OriginalName>
         <FullText AverageCharConfidence="100">GLUCOSE</FullText>
         <SpatialLine PageNumber="1">
@@ -194,7 +195,6 @@
         </SpatialLine>
       </Value>
     </Component>
-    <FullText>N/A</FullText>
     <Name>
       <FullText>GLUCOSE</FullText>
     </Name>
@@ -203,6 +203,7 @@
     </OrderCode>
   </Test>
   <Test>
+    <FullText>N/A</FullText>
     <CollectionDate>
       <FullText AverageCharConfidence="100">08/08/2008</FullText>
       <SpatialLine PageNumber="1">
@@ -224,6 +225,7 @@
       </SpatialLine>
     </CollectionTime>
     <Component>
+      <FullText AverageCharConfidence="90">HEMOGLOBIN A1C</FullText>
       <Flag>
         <FullText AverageCharConfidence="40">H</FullText>
         <SpatialLine PageNumber="1">
@@ -232,7 +234,6 @@
           <SpatialLineZone StartX="824" StartY="1191" EndX="845" EndY="1191" Height="27" />
         </SpatialLine>
       </Flag>
-      <FullText AverageCharConfidence="90">HEMOGLOBIN A1C</FullText>
       <OriginalName>
         <FullText AverageCharConfidence="90">HEMOGLOBIN A1C</FullText>
         <SpatialLine PageNumber="1">
@@ -274,7 +275,6 @@
         </SpatialLine>
       </Value>
     </Component>
-    <FullText>N/A</FullText>
     <Name>
       <FullText>GLYCOHEMOGLOBIN A1C</FullText>
     </Name>

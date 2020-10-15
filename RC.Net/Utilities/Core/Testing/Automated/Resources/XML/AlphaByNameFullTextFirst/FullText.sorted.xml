@@ -1,6 +1,8 @@
-﻿<FlexData xsi:noNamespaceSchemaLocation="test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<FlexData>
   <Field FieldName="LabInfo">
+    <FullText AverageCharConfidence="100">N/A</FullText>
     <Field FieldName="Address">
+      <FullText AverageCharConfidence="100">N/A</FullText>
       <Field FieldName="Address1">
         <FullText AverageCharConfidence="98">8901 WEST LINCOLN AVENUE</FullText>
         <SpatialLine PageNumber="1">
@@ -33,14 +35,12 @@
           <SpatialLineZone StartX="1995" StartY="1476" EndX="2113" EndY="1476" Height="29" />
         </SpatialLine>
       </Field>
-      <FullText AverageCharConfidence="100">N/A</FullText>
       <SpatialLine PageNumber="1">
         <LineText AverageCharConfidence="100">N/A</LineText>
         <SpatialLineBounds Top="1456" Left="993" Bottom="1490" Right="2113" />
         <SpatialLineZone StartX="993" StartY="1473" EndX="2113" EndY="1473" Height="35" />
       </SpatialLine>
     </Field>
-    <FullText AverageCharConfidence="100">N/A</FullText>
     <SpatialLine PageNumber="1">
       <LineText AverageCharConfidence="100">N/A</LineText>
       <SpatialLineBounds Top="38" Left="200" Bottom="2914" Right="2318" />
@@ -48,6 +48,7 @@
     </SpatialLine>
   </Field>
   <Field FieldName="PatientInfo">
+    <FullText AverageCharConfidence="90">N/A</FullText>
     <Field FieldName="DOB">
       <FullText AverageCharConfidence="98">08/08/2000</FullText>
       <SpatialLine PageNumber="1">
@@ -65,6 +66,7 @@
       </SpatialLine>
     </Field>
     <Field FieldName="Name">
+      <FullText AverageCharConfidence="74">DOE, BERT</FullText>
       <Field FieldName="First">
         <FullText AverageCharConfidence="72">BERT</FullText>
         <SpatialLine PageNumber="1">
@@ -81,14 +83,12 @@
           <SpatialLineZone StartX="219" StartY="777" EndX="288" EndY="777" Height="25" />
         </SpatialLine>
       </Field>
-      <FullText AverageCharConfidence="74">DOE, BERT</FullText>
       <SpatialLine PageNumber="1">
         <LineText AverageCharConfidence="74">DOE, BERT</LineText>
         <SpatialLineBounds Top="763" Left="219" Bottom="789" Right="405" />
         <SpatialLineZone StartX="219" StartY="776" EndX="405" EndY="776" Height="27" />
       </SpatialLine>
     </Field>
-    <FullText AverageCharConfidence="90">N/A</FullText>
     <SpatialLine PageNumber="1">
       <LineText AverageCharConfidence="90">N/A</LineText>
       <SpatialLineBounds Top="38" Left="200" Bottom="2914" Right="2318" />
@@ -96,7 +96,9 @@
     </SpatialLine>
   </Field>
   <Field FieldName="PhysicianInfo">
+    <FullText>N/A</FullText>
     <Field FieldName="OrderingPhysicianName">
+      <FullText AverageCharConfidence="66">DOE, RICHARD</FullText>
       <Field FieldName="First">
         <FullText AverageCharConfidence="64">RICHARD</FullText>
         <SpatialLine PageNumber="1">
@@ -113,16 +115,15 @@
           <SpatialLineZone StartX="544" StartY="870" EndX="613" EndY="870" Height="25" />
         </SpatialLine>
       </Field>
-      <FullText AverageCharConfidence="66">DOE, RICHARD</FullText>
       <SpatialLine PageNumber="1">
         <LineText AverageCharConfidence="66">DOE, RICHARD</LineText>
         <SpatialLineBounds Top="857" Left="544" Bottom="883" Right="803" />
         <SpatialLineZone StartX="544" StartY="870" EndX="803" EndY="870" Height="27" />
       </SpatialLine>
     </Field>
-    <FullText>N/A</FullText>
   </Field>
   <Field FieldName="Test">
+    <FullText>N/A</FullText>
     <Field FieldName="CollectionDate">
       <FullText AverageCharConfidence="100">08/08/2008</FullText>
       <SpatialLine PageNumber="1">
@@ -144,6 +145,7 @@
       </SpatialLine>
     </Field>
     <Field FieldName="Component">
+      <FullText AverageCharConfidence="100">GLUCOSE</FullText>
       <Field FieldName="Flag">
         <FullText AverageCharConfidence="40">H</FullText>
         <SpatialLine PageNumber="1">
@@ -187,7 +189,6 @@
           <SpatialLineZone StartX="1034" StartY="1097" EndX="1100" EndY="1097" Height="29" />
         </SpatialLine>
       </Field>
-      <FullText AverageCharConfidence="100">GLUCOSE</FullText>
       <SpatialLine PageNumber="1">
         <LineText AverageCharConfidence="100">GLUCOSE</LineText>
         <SpatialLineBounds Top="1085" Left="194" Bottom="1109" Right="356" />
@@ -200,9 +201,9 @@
     <Field FieldName="OrderCode">
       <FullText>GLU</FullText>
     </Field>
-    <FullText>N/A</FullText>
   </Field>
   <Field FieldName="Test">
+    <FullText>N/A</FullText>
     <Field FieldName="CollectionDate">
       <FullText AverageCharConfidence="100">08/08/2008</FullText>
       <SpatialLine PageNumber="1">
@@ -224,6 +225,7 @@
       </SpatialLine>
     </Field>
     <Field FieldName="Component">
+      <FullText AverageCharConfidence="90">HEMOGLOBIN A1C</FullText>
       <Field FieldName="Flag">
         <FullText AverageCharConfidence="40">H</FullText>
         <SpatialLine PageNumber="1">
@@ -267,7 +269,6 @@
           <SpatialLineZone StartX="1035" StartY="1189" EndX="1101" EndY="1189" Height="29" />
         </SpatialLine>
       </Field>
-      <FullText AverageCharConfidence="90">HEMOGLOBIN A1C</FullText>
       <SpatialLine PageNumber="1">
         <LineText AverageCharConfidence="90">HEMOGLOBIN A1C</LineText>
         <SpatialLineBounds Top="1174" Left="194" Bottom="1202" Right="519" />
@@ -280,6 +281,8 @@
     <Field FieldName="OrderCode">
       <FullText>GLYH</FullText>
     </Field>
-    <FullText>N/A</FullText>
+  </Field>
+  <Field FieldName="WhitespaceAttribute">
+    <FullText AverageCharConfidence="100"> </FullText>
   </Field>
 </FlexData>

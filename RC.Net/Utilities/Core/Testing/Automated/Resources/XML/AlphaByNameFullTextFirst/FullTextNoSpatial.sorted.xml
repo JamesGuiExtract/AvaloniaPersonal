@@ -1,6 +1,8 @@
-﻿<FlexData xsi:noNamespaceSchemaLocation="test" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<FlexData>
   <Field FieldName="LabInfo">
+    <FullText>N/A</FullText>
     <Field FieldName="Address">
+      <FullText>N/A</FullText>
       <Field FieldName="Address1">
         <FullText>8901 WEST LINCOLN AVENUE</FullText>
       </Field>
@@ -13,11 +15,10 @@
       <Field FieldName="ZipCode">
         <FullText>53227</FullText>
       </Field>
-      <FullText>N/A</FullText>
     </Field>
-    <FullText>N/A</FullText>
   </Field>
   <Field FieldName="PatientInfo">
+    <FullText>N/A</FullText>
     <Field FieldName="DOB">
       <FullText>08/08/2000</FullText>
     </Field>
@@ -25,29 +26,29 @@
       <FullText>M</FullText>
     </Field>
     <Field FieldName="Name">
+      <FullText>DOE, BERT</FullText>
       <Field FieldName="First">
         <FullText>BERT</FullText>
       </Field>
       <Field FieldName="Last">
         <FullText>DOE</FullText>
       </Field>
-      <FullText>DOE, BERT</FullText>
     </Field>
-    <FullText>N/A</FullText>
   </Field>
   <Field FieldName="PhysicianInfo">
+    <FullText>N/A</FullText>
     <Field FieldName="OrderingPhysicianName">
+      <FullText>DOE, RICHARD</FullText>
       <Field FieldName="First">
         <FullText>RICHARD</FullText>
       </Field>
       <Field FieldName="Last">
         <FullText>DOE</FullText>
       </Field>
-      <FullText>DOE, RICHARD</FullText>
     </Field>
-    <FullText>N/A</FullText>
   </Field>
   <Field FieldName="Test">
+    <FullText>N/A</FullText>
     <Field FieldName="CollectionDate">
       <FullText>08/08/2008</FullText>
     </Field>
@@ -55,6 +56,7 @@
       <FullText>09:18</FullText>
     </Field>
     <Field FieldName="Component">
+      <FullText>GLUCOSE</FullText>
       <Field FieldName="Flag">
         <FullText>H</FullText>
       </Field>
@@ -73,7 +75,6 @@
       <Field FieldName="Value">
         <FullText>143</FullText>
       </Field>
-      <FullText>GLUCOSE</FullText>
     </Field>
     <Field FieldName="Name">
       <FullText>GLUCOSE</FullText>
@@ -81,9 +82,9 @@
     <Field FieldName="OrderCode">
       <FullText>GLU</FullText>
     </Field>
-    <FullText>N/A</FullText>
   </Field>
   <Field FieldName="Test">
+    <FullText>N/A</FullText>
     <Field FieldName="CollectionDate">
       <FullText>08/08/2008</FullText>
     </Field>
@@ -91,6 +92,7 @@
       <FullText>09:18</FullText>
     </Field>
     <Field FieldName="Component">
+      <FullText>HEMOGLOBIN A1C</FullText>
       <Field FieldName="Flag">
         <FullText>H</FullText>
       </Field>
@@ -109,7 +111,6 @@
       <Field FieldName="Value">
         <FullText>7.5</FullText>
       </Field>
-      <FullText>HEMOGLOBIN A1C</FullText>
     </Field>
     <Field FieldName="Name">
       <FullText>GLYCOHEMOGLOBIN A1C</FullText>
@@ -117,6 +118,5 @@
     <Field FieldName="OrderCode">
       <FullText>GLYH</FullText>
     </Field>
-    <FullText>N/A</FullText>
   </Field>
 </FlexData>
