@@ -22,7 +22,6 @@ namespace ExtractLicenseUI
         private Database.Organization _SelectedOrganization = new Database.Organization();
         private Collection<Database.Organization> _Organizations = new Collection<Database.Organization>();
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public Collection<Database.Organization> Organizations {
             get
             {
@@ -66,7 +65,6 @@ namespace ExtractLicenseUI
             this.MainWindow.OrganizationWindow = this;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent crashing.")]
         private void PopulateOrganizations()
         {
             try
@@ -201,7 +199,6 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             try

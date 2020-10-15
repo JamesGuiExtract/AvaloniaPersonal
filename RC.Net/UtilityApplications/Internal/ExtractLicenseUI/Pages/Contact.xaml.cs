@@ -61,7 +61,6 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void DeleteContact_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -90,7 +89,6 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void DataGridRow_LostFocus(object sender, RoutedEventArgs e)
         {
             try

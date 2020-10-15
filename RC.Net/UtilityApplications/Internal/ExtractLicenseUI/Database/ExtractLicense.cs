@@ -47,7 +47,6 @@ namespace ExtractLicenseUI.Database
         /// <summary>
         /// The unique identifier for the license.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Guid is the best name.")]
         public Guid Guid
         {
             get { return this._Guid; }
@@ -96,7 +95,6 @@ namespace ExtractLicenseUI.Database
         /// <summary>
         /// Also called user license string. This is what is received in emails.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         public string RequestKey
         {
             get { return this._RequestKey; }

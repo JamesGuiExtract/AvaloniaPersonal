@@ -28,7 +28,6 @@ namespace ExtractLicenseUI.Database
         /// <summary>
         /// A unique identifier for the organization.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Guid is the best name.")]
         public Guid Guid { get; set; }
 
         /// <summary>
@@ -86,7 +85,6 @@ namespace ExtractLicenseUI.Database
         /// <summary>
         /// All of the licenses associated with a particular customer.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public Collection<ExtractLicense> Licenses {
             get { return this._Licenses; }
             set
@@ -100,7 +98,6 @@ namespace ExtractLicenseUI.Database
         /// <summary>
         /// All of the contacts associated with an organization.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public ObservableCollection<Contact> Contacts
         {
             get { return this._Contacts; }

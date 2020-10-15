@@ -24,7 +24,6 @@ namespace ExtractLicenseUI
         private ObservableCollection<ExtractVersion> _ExtractVersions = new ObservableCollection<ExtractVersion>();
         private Database.Organization _SelectedOrganization = new Database.Organization();
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public ObservableCollection<PackageHeader> PackageHeaders { 
             get { return this._PackageHeaders; }
             set 
@@ -34,7 +33,6 @@ namespace ExtractLicenseUI
             } 
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public ObservableCollection<PackageHeader> ClonedPackageHeaders
         {
             get { return this._ClonedPackageHeaders; }
@@ -45,7 +43,6 @@ namespace ExtractLicenseUI
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public ObservableCollection<ExtractVersion> ExtractVersions
         {
             get {
@@ -92,8 +89,6 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "We don't have localized tables.")]
         private void SaveButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             if (!IsValid(this.Form))
@@ -299,7 +294,6 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void SaveLicenseToFile_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             try
@@ -332,7 +326,6 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "This prevents crashing.")]
         private void CopyLicenseToClipboard_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -352,7 +345,6 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void SaveUnlockCodeToFile_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -385,7 +377,6 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void CopyUnlockCodeToClipboard_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -406,7 +397,6 @@ namespace ExtractLicenseUI
         /// Copies the file to the clipboard.
         /// </summary>
         /// <param name="filePath"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void CopyFileToClipboard(string filePath)
         {
             try
@@ -427,7 +417,6 @@ namespace ExtractLicenseUI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Prevent program crashing.")]
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
             try

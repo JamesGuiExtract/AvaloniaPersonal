@@ -13,7 +13,6 @@ namespace ExtractLicenseUI.Database
         /// <summary>
         /// A unique identifier for the version.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Guid is the best name.")]
         public Guid Guid
         {
             get { return this._Guid; }

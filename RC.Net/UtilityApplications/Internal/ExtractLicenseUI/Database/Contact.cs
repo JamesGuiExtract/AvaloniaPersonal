@@ -6,7 +6,6 @@ namespace ExtractLicenseUI.Database
 {
     public class Contact : NotifyPropertyChanged, IDataErrorInfo
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Guid is the best name.")]
         public Guid Guid { get; set; } = Guid.NewGuid();
 
         private string _FirstName { get; set; }

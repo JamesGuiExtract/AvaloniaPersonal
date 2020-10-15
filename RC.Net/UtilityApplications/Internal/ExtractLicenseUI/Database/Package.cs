@@ -21,14 +21,12 @@ namespace ExtractLicenseUI.Database
         /// <summary>
         /// All of the components associated with a package.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "This would change WPF interactions.")]
         public Collection<Component> Components { get; set; }
 
 
         /// <summary>
         /// A unique identifier for a package.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Guid is the best name.")]
         public Guid Guid { 
             get {
                 return this._guid;
