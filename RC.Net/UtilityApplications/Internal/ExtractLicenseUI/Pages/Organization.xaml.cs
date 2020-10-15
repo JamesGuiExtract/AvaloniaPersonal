@@ -139,10 +139,6 @@ namespace ExtractLicenseUI
         /// <param name="licenseNavigationOption">The mode to see the license in</param>
         private void NavigateToLicense(ExtractLicense extractLicense, LicenseNavigationOptions licenseNavigationOption)
         {
-            if(licenseNavigationOption == LicenseNavigationOptions.ViewLicense)
-            {
-                extractLicense.AllowErrorValidation = false;
-            }
             this.SelectedOrganization.SelectedLicense = extractLicense;
 
             MainWindow.NavigateToLicense(this.SelectedOrganization, licenseNavigationOption);

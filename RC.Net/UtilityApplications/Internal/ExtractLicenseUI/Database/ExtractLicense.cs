@@ -29,11 +29,6 @@ namespace ExtractLicenseUI.Database
         private ExtractVersion _ExtractVersion = new ExtractVersion();
         private LicenseInfo LicenseInfo = new LicenseInfo();
 
-        /// <summary>
-        /// This turns off error validation. Helpful for when viewing a license.
-        /// </summary>
-        public bool AllowErrorValidation { get; set; } = true;
-
         public ExtractLicense()
         {
             this.Guid = Guid.NewGuid();
@@ -336,31 +331,28 @@ namespace ExtractLicenseUI.Database
         {
             get
             {
-                if(AllowErrorValidation)
+                switch (columnName)
                 {
-                    switch (columnName)
-                    {
-                        case "LicenseName":
-                            return string.IsNullOrEmpty(this.LicenseName) ? "Required Value" : null;
-                        case "ExtractVersion":
-                            return string.IsNullOrEmpty(ExtractVersion.Version) ? "Select a Version" : null;
-                        case "ExpiresOn":
-                            if (this.ExpiresOn != null && this.ExpiresOn < DateTime.Now)
-                            {
-                                return "Select a later Date";
-                            }
-                            else if (!this.IsPermanent && this.ExpiresOn == null)
-                            {
-                                return "Select a date";
-                            }
-                            break;
-                        case "RequestKey":
-                            if (this.RestrictByDiskSerialNumber)
-                            {
-                                return string.IsNullOrEmpty(this.RequestKey) ? "Required Value" : null;
-                            }
-                            break;
-                    }
+                    case "LicenseName":
+                        return string.IsNullOrEmpty(this.LicenseName) ? "Required Value" : null;
+                    case "ExtractVersion":
+                        return string.IsNullOrEmpty(ExtractVersion.Version) ? "Select a Version" : null;
+                    case "ExpiresOn":
+                        if (this.ExpiresOn != null && this.ExpiresOn < DateTime.Now)
+                        {
+                            return "Select a later Date";
+                        }
+                        else if (!this.IsPermanent && this.ExpiresOn == null)
+                        {
+                            return "Select a date";
+                        }
+                        break;
+                    case "RequestKey":
+                        if (this.RestrictByDiskSerialNumber)
+                        {
+                            return string.IsNullOrEmpty(this.RequestKey) ? "Required Value" : null;
+                        }
+                        break;
                 }
 
                 return null;

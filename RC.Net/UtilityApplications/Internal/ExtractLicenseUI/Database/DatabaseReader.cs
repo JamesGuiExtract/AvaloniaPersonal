@@ -309,8 +309,6 @@ WHERE
             return extractLicenses;
         }
 
-
-
         /// <summary>
         /// Gets all of the contacts for a given organization.
         /// </summary>

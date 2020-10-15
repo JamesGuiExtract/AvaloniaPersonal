@@ -446,12 +446,10 @@ namespace ExtractLicenseUI
                 case LicenseNavigationOptions.NewLicense:
                     this.PackageHeaders = new ObservableCollection<PackageHeader>();
                     this.ClonedPackageHeaders.Clear();
-                    this.SelectedOrganization.SelectedLicense.AllowErrorValidation = true;
                     break;
                 case LicenseNavigationOptions.ViewLicense:
                     using (var databaseReader = new DatabaseReader())
                         this.PackageHeaders = databaseReader.ReadPackages(this.SelectedOrganization.SelectedLicense);
-                    this.SelectedOrganization.SelectedLicense.AllowErrorValidation = false;
                     break;
                 case LicenseNavigationOptions.None: break;
             }
