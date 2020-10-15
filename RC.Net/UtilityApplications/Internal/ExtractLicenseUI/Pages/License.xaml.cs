@@ -475,6 +475,7 @@ namespace ExtractLicenseUI
                     this.UpdateButton.Visibility = System.Windows.Visibility.Visible;
                     break;
                 case LicenseNavigationOptions.CloneLicense:
+                    this.CloneLabel.Visibility = System.Windows.Visibility.Visible;
                     this.ClonedPackageSelector.Visibility = System.Windows.Visibility.Visible;
                     goto case LicenseNavigationOptions.NewLicense;
                 case LicenseNavigationOptions.NewLicense:
@@ -546,6 +547,7 @@ namespace ExtractLicenseUI
             this.GenerateLicenseNameButton.Visibility = System.Windows.Visibility.Collapsed;
             this.EditLicense.Visibility = System.Windows.Visibility.Collapsed;
             this.UpdateButton.Visibility = System.Windows.Visibility.Collapsed;
+            this.CloneLabel.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)

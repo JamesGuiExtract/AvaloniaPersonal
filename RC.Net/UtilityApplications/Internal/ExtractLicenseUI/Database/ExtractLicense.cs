@@ -20,7 +20,7 @@ namespace ExtractLicenseUI.Database
         private string _MachineName;
         private string _Comments;
         private bool _Isproduction;
-        private bool _UseDiskSerialNumber = true;
+        private bool _RestrictByDiskSerialNumber = true;
         private string _LicenseKey;
         private bool _SignedLicenseTransferForm;
         private bool _IsPermanent;
@@ -77,13 +77,13 @@ namespace ExtractLicenseUI.Database
         /// </summary>
         public bool RestrictByDiskSerialNumber
         {
-            get { return this._UseDiskSerialNumber; }
+            get { return this._RestrictByDiskSerialNumber; }
             set
             {
-                if (this._UseDiskSerialNumber != value)
+                if (this._RestrictByDiskSerialNumber != value)
                 {
-                    this._UseDiskSerialNumber = value;
-                    OnPropertyChanged("UseDiskSerialNumber");
+                    this._RestrictByDiskSerialNumber = value;
+                    OnPropertyChanged(nameof(RestrictByDiskSerialNumber));
                 }
             }
         }
@@ -251,7 +251,7 @@ namespace ExtractLicenseUI.Database
                     this.LicenseInfo = new LicenseInfo(this._LicenseKey);
                     OnPropertyChanged(nameof(LicenseKey));
                 }
-            }
+            } 
         }
 
         /// <summary>
@@ -351,6 +351,12 @@ namespace ExtractLicenseUI.Database
                         if (this.RestrictByDiskSerialNumber)
                         {
                             return string.IsNullOrEmpty(this.RequestKey) ? "Required Value" : null;
+                        }
+                        break;
+                    case "Comments":
+                        if(this.Comments?.Length >= 4000)
+                        {
+                            return "Your comment is too long. The database is limited to 4000 characters.";
                         }
                         break;
                 }

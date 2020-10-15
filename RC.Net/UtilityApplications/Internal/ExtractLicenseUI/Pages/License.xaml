@@ -82,6 +82,10 @@
                                     <Button x:Name="GenerateRequestKey" Content="Generate Request Key" Click="GenerateRequestKey_Click"></Button>
                                 </StackPanel>
                                 <StackPanel>
+                                    <Label Content="Restrict by DiskSerial Number" Target="{Binding ElementName=UseDiskSerialNumber}" Width="180px"></Label>
+                                    <CheckBox x:Name="UseDiskSerialNumber" Width="150" IsChecked="{Binding SelectedOrganization.SelectedLicense.RestrictByDiskSerialNumber}" Click="UpdateRequestKey"></CheckBox>
+                                </StackPanel>
+                                <StackPanel>
                                     <Label Content="Permanent" Target="{Binding ElementName=IsPermanent}"></Label>
                                     <CheckBox x:Name="IsPermanent" Width="150" IsChecked="{Binding SelectedOrganization.SelectedLicense.IsPermanent}" Click="IsPermanent_Click"></CheckBox>
                                 </StackPanel>
@@ -108,10 +112,6 @@
                                     <TextBox x:Name="MachineName" Width="150" Text="{Binding SelectedOrganization.SelectedLicense.MachineName, ValidatesOnDataErrors=True}" IsEnabled="False"></TextBox>
                                 </StackPanel>
                                 <StackPanel>
-                                    <Label Content="Comments" Target="{Binding ElementName=Comments}"></Label>
-                                    <TextBox x:Name="Comments" Width="150" Text="{Binding SelectedOrganization.SelectedLicense.Comments}"></TextBox>
-                                </StackPanel>
-                                <StackPanel>
                                     <Label Content="SDK Password" Target="{Binding ElementName=SDKPassword}"></Label>
                                     <TextBlock x:Name="SDKPassword" Width="150" Text="{Binding SelectedOrganization.SelectedLicense.SDKPassword}" IsEnabled="False"></TextBlock>
                                 </StackPanel>
@@ -131,53 +131,59 @@
                                     <Label Content="Production" Target="{Binding ElementName=IsProduction}"></Label>
                                     <CheckBox x:Name="IsProduction" Width="150" IsChecked="{Binding SelectedOrganization.SelectedLicense.IsProduction}"></CheckBox>
                                 </StackPanel>
-                                <StackPanel>
-                                    <Label Content="Restrict by DiskSerial Number" Target="{Binding ElementName=UseDiskSerialNumber}" Width="180px"></Label>
-                                    <CheckBox x:Name="UseDiskSerialNumber" Width="150" IsChecked="{Binding SelectedOrganization.SelectedLicense.RestrictByDiskSerialNumber}" Click="UpdateRequestKey"></CheckBox>
-                                </StackPanel>
                             </StackPanel>
                             
                             <StackPanel Orientation="Horizontal" Height="420px">
                                 <ScrollViewer>
-                                    <TreeView x:Name="PackageSelector" ItemsSource="{Binding PackageHeaders}">
-                                        <TreeView.Resources>
-                                            <HierarchicalDataTemplate DataType="{x:Type Database:PackageHeader}" ItemsSource="{Binding Packages}">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <CheckBox IsEnabled="False" IsChecked="{Binding PackagesChecked, Mode=OneWay}"></CheckBox>
-                                                    <TextBlock Text="{Binding Name}"></TextBlock>
-                                                </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Label x:Name="CloneLabel" Content="Clone"></Label>
+                                        <TreeView x:Name="PackageSelector" ItemsSource="{Binding PackageHeaders}">
+                                            <TreeView.Resources>
+                                                <HierarchicalDataTemplate DataType="{x:Type Database:PackageHeader}" ItemsSource="{Binding Packages}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <CheckBox IsEnabled="False" IsChecked="{Binding PackagesChecked, Mode=OneWay}"></CheckBox>
+                                                        <TextBlock Text="{Binding Name}"></TextBlock>
+                                                    </StackPanel>
 
-                                            </HierarchicalDataTemplate>
-                                            <DataTemplate DataType="{x:Type Database:Package}">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="{Binding AllowPackageModification}"></CheckBox>
-                                                    <TextBlock Text="{Binding Name}"></TextBlock>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </TreeView.Resources>
-                                    </TreeView>
+                                                </HierarchicalDataTemplate>
+                                                <DataTemplate DataType="{x:Type Database:Package}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="{Binding AllowPackageModification}"></CheckBox>
+                                                        <TextBlock Text="{Binding Name}"></TextBlock>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </TreeView.Resources>
+                                        </TreeView>
+                                    </StackPanel>
                                 </ScrollViewer>
                                 <ScrollViewer x:Name="ClonedPackageSelector" Visibility="Collapsed">
-                                    <TreeView ItemsSource="{Binding ClonedPackageHeaders}" >
-                                        <TreeView.Resources>
-                                            <HierarchicalDataTemplate DataType="{x:Type Database:PackageHeader}" ItemsSource="{Binding Packages}">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <CheckBox IsEnabled="False" IsChecked="{Binding PackagesChecked, Mode=OneWay}"></CheckBox>
-                                                    <TextBlock Text="{Binding Name}"></TextBlock>
-                                                </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Label Content="Original"></Label>
+                                        <TreeView ItemsSource="{Binding ClonedPackageHeaders}"  >
+                                            <TreeView.Resources>
+                                                <HierarchicalDataTemplate DataType="{x:Type Database:PackageHeader}" ItemsSource="{Binding Packages}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <CheckBox IsEnabled="False" IsChecked="{Binding PackagesChecked, Mode=OneWay}"></CheckBox>
+                                                        <TextBlock Text="{Binding Name}"></TextBlock>
+                                                    </StackPanel>
 
-                                            </HierarchicalDataTemplate>
-                                            <DataTemplate DataType="{x:Type Database:Package}">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="False"></CheckBox>
-                                                    <TextBlock Text="{Binding Name}"></TextBlock>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </TreeView.Resources>
-                                    </TreeView>
+                                                </HierarchicalDataTemplate>
+                                                <DataTemplate DataType="{x:Type Database:Package}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="False"></CheckBox>
+                                                        <TextBlock Text="{Binding Name}"></TextBlock>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </TreeView.Resources>
+                                        </TreeView>
+                                    </StackPanel>
                                 </ScrollViewer>
                             </StackPanel>
 
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="Comments" Target="{Binding ElementName=Comments}"></Label>
+                            <TextBox x:Name="Comments" AcceptsReturn="True" TextWrapping="WrapWithOverflow" Width="800px" Text="{Binding SelectedOrganization.SelectedLicense.Comments, ValidatesOnDataErrors=True, Mode=TwoWay}" ToolTip="{Binding Path=(Validation.Errors)[0].ErrorContent, ElementName=Comments}"></TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label Content="License Name" Target="{Binding ElementName=LicenseName}"></Label>
