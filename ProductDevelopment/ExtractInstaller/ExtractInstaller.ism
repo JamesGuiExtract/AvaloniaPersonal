@@ -329,7 +329,6 @@
 		<row><td>IDShieldHelp</td><td>{D0D6E5DA-8D44-45F0-8FDD-325E3C7EE9D6}</td><td>HELP</td><td>8</td><td/><td>idshield.chm</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldOnDemand.exe</td><td>{A37823A6-23A8-4DA3-9B9A-CB7214FD898B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldondemand.exe</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldOnDemandShortcut</td><td>{2076706E-8F56-4516-93C0-5ADBB4C8FC10}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>IDShieldReports</td><td>{EBD8982B-68E8-41A2-AF73-CC50371C0B4B}</td><td>STANDARD_REPORTS1</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>IDShieldStatisticsReporter.exe</td><td>{E4593422-EE49-4A44-94A0-0FC9C230817E}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>idshieldstatisticsreporter.e</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ISRegistryComponent</td><td>{BB5CF529-C4A7-46DD-AC5A-F35EB2E1E0E6}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td>{B8FF0255-1CA6-48A0-8BD5-3CFB7A976086}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>interop.extractredactiontest</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -337,7 +336,6 @@
 		<row><td>LabDECppCC.dll</td><td>{54078BE4-C4A4-4FD6-8E5F-4DBAC7C61893}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>labdecppcc.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>LabDEFolder</td><td>{F8B0585C-259A-4172-8687-7838FC3DBF95}</td><td>LAB_DE</td><td>8</td><td/><td>alternatetestnamemanager.plu</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>LabDEHelp</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td>labde.chm</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>LabDEReports</td><td>{54169BEE-5EA8-44BD-A6E1-2AC7380B9DDA}</td><td>STANDARD_REPORTS</td><td>8</td><td/><td>labde_high_effort_files_by_u</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionCC.dll</td><td>{609DD8EB-6620-4A9E-AE69-452AE7A103C8}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>RedactionCC.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SDKComponents</td><td>{520CC137-57D4-420C-AF6E-B3F95C8BD13B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1203,14 +1201,12 @@
 		<row><td>SDKMain</td><td>IDShieldComponents</td></row>
 		<row><td>SDKMain</td><td>IDShieldOnDemand.exe</td></row>
 		<row><td>SDKMain</td><td>IDShieldOnDemandShortcut</td></row>
-		<row><td>SDKMain</td><td>IDShieldReports</td></row>
 		<row><td>SDKMain</td><td>IDShieldStatisticsReporter.exe</td></row>
 		<row><td>SDKMain</td><td>ISRegistryComponent</td></row>
 		<row><td>SDKMain</td><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td></row>
 		<row><td>SDKMain</td><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td></row>
 		<row><td>SDKMain</td><td>LabDECppCC.dll</td></row>
 		<row><td>SDKMain</td><td>LabDEFolder</td></row>
-		<row><td>SDKMain</td><td>LabDEReports</td></row>
 		<row><td>SDKMain</td><td>RedactionCC.dll</td></row>
 		<row><td>SDKMain</td><td>RedactionTester.dll</td></row>
 		<row><td>SDKMain</td><td>SDKComponents</td></row>
@@ -1243,7 +1239,6 @@
 		<row><td>interop.uclid_redactioncusto</td><td>Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>INTERO~1.DLL|Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_CORE_DOTNET&gt;\Interop.UCLID_REDACTIONCUSTOMCOMPONENTSLib.dll</td><td>17</td><td/></row>
 		<row><td>labde.chm</td><td>LabDEHelp</td><td>LabDE.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDE_HELP_FILES&gt;\LabDE.chm</td><td>1</td><td/></row>
 		<row><td>labde.rl</td><td>AllOtherFiles</td><td>LabDE.rl</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDENONSELFREGFILES_FI&gt;\LabDE.rl</td><td>1</td><td/></row>
-		<row><td>labde_high_effort_files_by_u</td><td>LabDEReports</td><td>LabDE high effort files by user.xml</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_REPORTS_FILES_LABDE&gt;\LabDE high effort files by user.xml</td><td>1</td><td/></row>
 		<row><td>labdecppcc.dll</td><td>LabDECppCC.dll</td><td>LABDEC~1.DLL|LabDECppCC.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\LabDECppCC.dll</td><td>1</td><td/></row>
 		<row><td>redactiontester.dll</td><td>RedactionTester.dll</td><td>REDACT~1.DLL|RedactionTester.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGIDSHIELD_FILES&gt;\RedactionTester.dll</td><td>17</td><td/></row>
 	</table>
@@ -1399,7 +1394,6 @@
 		<row><td>IDShieldHelp</td><td/><td/><td>_3ACFFCEB_AE1A_434B_9D94_435E77C7116E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldOnDemand.exe</td><td/><td/><td>_354E5060_5577_4F76_A258_507CF7A134BE_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldOnDemandShortcut</td><td/><td/><td>_77D29F78_9753_4C5A_A2E7_108D7C10DFBC_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>IDShieldReports</td><td/><td/><td>_D75641A4_26B2_483C_9F23_EC64F514AA49_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>IDShieldStatisticsReporter.exe</td><td/><td/><td>_27B09558_8477_43BF_BB56_9F17C65912C2_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISRegistryComponent</td><td/><td/><td>_731CD13E_7DAC_4B8E_A684_926E3E2A6CCD_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.EXTRACTREDACTIONTESTERLib.dll</td><td/><td/><td>_7F682677_36CD_4BA5_B4B7_8944329E36E2_FILTER</td><td/><td/><td/><td/></row>
@@ -1407,7 +1401,6 @@
 		<row><td>LabDECppCC.dll</td><td/><td/><td>_F769C092_0120_401A_B74A_7198A4B11B1C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>LabDEFolder</td><td/><td/><td>_4720FFCA_BC22_4E12_B442_FA549FA1FA19_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>LabDEHelp</td><td/><td/><td>_10883AA1_60F1_460D_A0E0_D91F6169AF21_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>LabDEReports</td><td/><td/><td>_D2822A61_C91B_40B5_9F32_E99BF4A6A776_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RedactionCC.dll</td><td/><td/><td>_03DC90EE_03CF_4902_9272_0C41A69D5B61_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RedactionTester.dll</td><td/><td/><td>_E3C82770_0C8B_4480_812B_48AA19DB7EBA_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SDKComponents</td><td/><td/><td>_194782D1_93CC_4676_B268_CA86FF42B50D_FILTER</td><td/><td/><td/><td/></row>
@@ -1473,9 +1466,7 @@
 		<row><td>ExemptionCodes</td><td>&lt;PATH_TO_EXEMPTIONCODES_FILES&gt;</td><td>4</td><td>*.xml</td><td/><td>2</td></row>
 		<row><td>FlexIndexHelp</td><td>&lt;PATH_TO_HELP_FLEXINDEX&gt;</td><td>4</td><td/><td>FLEXIndex.chm</td><td>10</td></row>
 		<row><td>IDShieldComponents</td><td>&lt;PATH_TO_NONSELFREGCOMPO_FILES&gt;</td><td>4</td><td/><td>IDShield.ini</td><td>0</td></row>
-		<row><td>IDShieldReports</td><td>&lt;PATH_TO_REPORTS_IDSHIELD_FILES&gt;</td><td>4</td><td/><td>Thumbs.db</td><td>10</td></row>
 		<row><td>LabDEFolder</td><td>&lt;PATH_TO_LABDEFOLDER_FILES&gt;</td><td>4</td><td/><td>AlternateTestNameManager.plugin</td><td>10</td></row>
-		<row><td>LabDEReports</td><td>&lt;PATH_TO_REPORTS_FILES_LABDE&gt;</td><td>4</td><td/><td>LabDE high effort files by user.xml, Thumbs.db</td><td>10</td></row>
 	</table>
 
 	<table name="ISFeatureExtended">
