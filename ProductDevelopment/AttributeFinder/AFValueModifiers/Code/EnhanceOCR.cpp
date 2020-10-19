@@ -1003,7 +1003,7 @@ void CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, IOCRParametersPtr ipOCRPara
 						// update the progress status any further.
 						m_ipProgressStatus = __nullptr;
 
-						if (!bRetried)
+						if (!bRetried && !Contains(ue.getTopText(), "Too many lines"))
 						{
 							UCLIDException uexOuter("ELI36715",
 								"Enhance OCR attempt failed; retrying...", ue);
@@ -1013,7 +1013,7 @@ void CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, IOCRParametersPtr ipOCRPara
 							continue;
 						}
 
-						throw ue;
+						throw;
 					}
 				}
 
@@ -1628,7 +1628,9 @@ ISpatialStringSearcherPtr CEnhanceOCR::setCurrentPage(IAFDocumentPtr ipDoc, long
 	}
 
 	// Load the current page's image.
-	m_apPageBitmap.reset(new LeadToolsBitmap(m_strSourceDocName, nPage, 0));
+	// Avoid using dithering to convert to bitonal. Dithering creates problems for line finding, causes extremely long processing times.
+	// https://extract.atlassian.net/browse/ISSUE-17298
+	m_apPageBitmap.reset(new LeadToolsBitmap(m_strSourceDocName, nPage, 0, 1, false, true));
 	ASSERT_RESOURCE_ALLOCATION("ELI36529", m_apPageBitmap.get() != __nullptr);
 
 	ISpatialStringSearcherPtr ipSearcher = getSpatialStringSearcher();

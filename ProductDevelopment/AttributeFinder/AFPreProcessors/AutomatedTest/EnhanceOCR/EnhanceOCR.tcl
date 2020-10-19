@@ -1,0 +1,1 @@
+UCLIDAFCoreTest.AutomatedRuleSetTester;;EnhanceOCR.dat

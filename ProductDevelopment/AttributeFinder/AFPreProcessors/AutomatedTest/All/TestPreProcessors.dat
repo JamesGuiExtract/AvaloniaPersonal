@@ -36,3 +36,6 @@
 
 // Test FSharpPreprocessor
 <FILE>;..\FSharpPreprocessor\FSharpPreprocessor.dat
+
+// Test EnhanceOCR
+<FILE>;..\EnhanceOCR\EnhanceOCR.dat

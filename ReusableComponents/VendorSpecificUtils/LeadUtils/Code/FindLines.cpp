@@ -48,6 +48,9 @@ static const int gnFAT_LINE_CUTTOFF = 25;
 static const int gnFAT_LINE_MAX_CHECK_PERCENT = 25;
 static const int gnFAT_LINE_LENGTH_OVERLAP = 85;
 
+// Too many lines cause unacceptable processing times
+static const int gnMAX_LINES_TO_PROCESS = 1000;
+
 //-------------------------------------------------------------------------------------------------
 // Statics
 //-------------------------------------------------------------------------------------------------
@@ -136,71 +139,82 @@ void LeadToolsLineFinder::findLines(pBITMAPHANDLE pBitmap, L_UINT uFlags, vector
 	INIT_EXCEPTION_AND_TRACING("MLI03285");
 
 	try
-	{	
-		_lastCodePos = "10";
-
-		ASSERT_ARGUMENT("ELI18846", pBitmap != __nullptr);
-
-		m_bHorizontal = (uFlags == LINEREMOVE_HORIZONTAL);
-
-		// Verify that Document support is licensed.  Needed for L_LineRemoveBitmap
-		unlockDocumentSupport();
-
-		// Before processing a line, clear any exception from a previous call
-		m_bException = false;
-
-		// Set horizontal/vertical setting
-		m_lr.uRemoveFlags = uFlags;
-
-		// Assign the currently targeted bitmap and line vector
-		m_pBitmap = pBitmap;
-		m_pvecLines = &rvecLines;
-
-		_lastCodePos = "20";
-
-		// Call L_LineRemoveBitmap to search for lines.  lineRemoveCB will be called for
-		// each line that is discovered.  Pass a pointer to this class to the function
-		// to allow lineRemoveCB to add this line to the current collection.
+	{
+		try
 		{
-			LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+			_lastCodePos = "10";
 
-			int nRet = L_LineRemoveBitmap(m_pBitmap, &m_lr, lineRemoveCB, (LPVOID*)this, 0);
+			ASSERT_ARGUMENT("ELI18846", pBitmap != __nullptr);
 
-			_lastCodePos = "30";
+			m_bHorizontal = (uFlags == LINEREMOVE_HORIZONTAL);
 
-			// If the exception flag is set, throw the exception.
-			if (m_bException)
+			// Verify that Document support is licensed.  Needed for L_LineRemoveBitmap
+			unlockDocumentSupport();
+
+			// Before processing a line, clear any exception from a previous call
+			m_bException = false;
+
+			// Set horizontal/vertical setting
+			m_lr.uRemoveFlags = uFlags;
+
+			// Assign the currently targeted bitmap and line vector
+			m_pBitmap = pBitmap;
+			m_pvecLines = &rvecLines;
+
+			_lastCodePos = "20";
+
+			// Call L_LineRemoveBitmap to search for lines.  lineRemoveCB will be called for
+			// each line that is discovered.  Pass a pointer to this class to the function
+			// to allow lineRemoveCB to add this line to the current collection.
 			{
-				throw m_ue;
+				LeadToolsLicenseRestrictor leadToolsLicenseGuard;
+
+				int nRet = L_LineRemoveBitmap(m_pBitmap, &m_lr, lineRemoveCB, (LPVOID*)this, 0);
+
+				_lastCodePos = "30";
+
+				// If the exception flag is set, throw the exception.
+				if (m_bException)
+				{
+					throw m_ue;
+				}
+
+				// If the return value from L_LineRemoveBitmap otherwise indicates failure, throw an exception
+				throwExceptionIfNotSuccess(nRet, "ELI19045", "Failure when searching for image lines!");
 			}
 
-			// If the return value from L_LineRemoveBitmap otherwise indicates failure, throw an exception
-			throwExceptionIfNotSuccess(nRet, "ELI19045", "Failure when searching for image lines!");
+			ASSERT_RUNTIME_CONDITION("ELI51403", m_pvecLines->size() <= gnMAX_LINES_TO_PROCESS, "Too many lines detected: " + asString(m_pvecLines->size()));
+
+			// [P16:2884] A higher LINEREMOVE::iWall settings means some lines will have a larger width
+			// than appropriate.  Attempt to correct such lines.
+			correctFatLines(rvecLines);
+
+			_lastCodePos = "40";
+
+			// Merge lines only after correctFatLines so that fat lines do not trigger lines to merge
+			// inappropriately
+			mergeLines(rvecLines);
+
+			_lastCodePos = "50";
+
+			// If line fragment extension is enabled, execute
+			if (m_bExtendLineFragments)
+			{
+				extendLines();
+			}
+
+			_lastCodePos = "60";
+
+			// Clear the pointers to the vector and bitmap now that processing is complete.
+			m_pvecLines = NULL;
+			m_pBitmap = NULL;
 		}
-
-		// [P16:2884] A higher LINEREMOVE::iWall settings means some lines will have a larger width
-		// than appropriate.  Attempt to correct such lines.
-		correctFatLines(rvecLines);
-
-		_lastCodePos = "40";
-
-		// Merge lines only after correctFatLines so that fat lines do not trigger lines to merge
-		// inappropriately
-		mergeLines(rvecLines);
-
-		_lastCodePos = "50";
-
-		// If line fragment extension is enabled, execute
-		if (m_bExtendLineFragments)
+		catch (...)
 		{
-			extendLines();
+			m_pvecLines = NULL;
+			m_pBitmap = NULL;
+			throw;
 		}
-
-		_lastCodePos = "60";
-
-		// Clear the pointers to the vector and bitmap now that processing is complete.
-		m_pvecLines = NULL;
-		m_pBitmap = NULL;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI19496");
 }
@@ -274,6 +288,8 @@ void LeadToolsLineFinder::correctFatLines(vector<LineRect>& rvecLines)
 			LINEREMOVE lr(m_lr);
 			lr.iWall = m_lr.iWall / 2;
 			L_LineRemoveBitmap(&hBitmapRegion, &lr, lineRemoveCB, (LPVOID *)this, 0);
+
+			ASSERT_RUNTIME_CONDITION("ELI51404", m_pvecLines->size() <= gnMAX_LINES_TO_PROCESS, "Too many lines detected: " + asString(m_pvecLines->size()));
 
 			_lastCodePos = "50";
 
