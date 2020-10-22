@@ -44,6 +44,9 @@ namespace Extract.DataEntry
         // List of values for displaying without a search
         Lazy<object[]> _autoCompleteValues;
 
+        // To detect redundant calls
+        bool _disposedValue = false;
+
         #endregion Fields
 
         #region Properties
@@ -62,8 +65,10 @@ namespace Extract.DataEntry
                     var old = _providerSource;
 
                     _providerSource = value;
-                    Provider = s => _providerSource.Value.GetSuggestions(s,
-                        excludeLowScoring: true);
+
+                    Provider = search => _providerSource.Value.GetSuggestions(search.Text,
+                        maxSuggestions: search.MaxSuggestions ?? int.MaxValue,
+                        excludeLowScoring: search.ExcludeLowScoring);
 
                     if (old != null && old.IsValueCreated)
                     {
@@ -82,7 +87,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Function that returns suggestions based on a search string
         /// </summary>
-        private Func<string, IEnumerable<object>> Provider { get; set; }
+        private Func<Search, IEnumerable<object>> Provider { get; set; }
 
         /// <summary>
         /// Whether the suggestion list is showing
@@ -282,7 +287,9 @@ namespace Extract.DataEntry
                 {
                     // Mouse clicks fail to auto-drop the list unless this is begin-invoked, I think because
                     // something the DataEntryControlHost does causes the list to close immediately
-                    _control.SafeBeginInvoke("ELI50388", () => DropDown(null), displayExceptions: false);
+                    _control.SafeBeginInvoke("ELI50388",
+                        () => DropDown(new Search(null, _dataEntryAutoCompleteControl), true),
+                        displayExceptions: false);
                 }
 
             }
@@ -347,8 +354,7 @@ namespace Extract.DataEntry
             try
             {
                 _ignoreMouseDown = true;
-
-                DropDown(null);
+                DropDown(new Search(null, _dataEntryAutoCompleteControl), true);
             }
             catch (Exception ex)
             {
@@ -376,16 +382,9 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_ignoreTextChange)
-                {
-                    _ignoreTextChange = false;
-                    return;
-                }
-
                 _control.SafeBeginInvoke("ELI50397", () =>
                 {
-                    string searchText = _control.Text ?? "";
-                    DropDown(searchText);
+                    DropDown(new Search(_control.Text, _dataEntryAutoCompleteControl), false);
                 });
             }
             catch (Exception ex)
@@ -486,16 +485,25 @@ namespace Extract.DataEntry
             }
         }
 
-        // Show suggestions from list using lucene query or show entire list if searchText is null
-        void DropDown(string searchText)
+        // Show suggestions list. Select current item if specified.
+        void DropDown(Search search, bool selectCurrentItemIfPossible)
         {
-            bool showEntireList = searchText == null;
-
-            // Allow user to delete the value without triggering the list to show
-            if (!showEntireList && searchText.Length == 0 && !DroppedDown)
+            var forTextChangedEvent = search.Text != null;
+            if (forTextChangedEvent)
             {
-                _acceptedText = null;
-                return;
+                if (_ignoreTextChange)
+                {
+                    _ignoreTextChange = false;
+                    return;
+                }
+
+                // Allow user to delete the value without triggering the list to show
+                string searchText = _control.Text;
+                if (searchText != null && searchText.Length == 0 && !DroppedDown)
+                {
+                    _acceptedText = null;
+                    return;
+                }
             }
 
             // TODO: For DataGridView cells the parent is null until some
@@ -513,12 +521,11 @@ namespace Extract.DataEntry
                 return;
             }
 
-            _listBoxChild.Items.Clear();
-
-            var suggestions = showEntireList
+            var suggestions = search.ShowEntireList
                 ? _autoCompleteValues?.Value
-                : Provider?.Invoke(searchText)?.ToArray();
+                : Provider?.Invoke(search)?.ToArray();
 
+            _listBoxChild.Items.Clear();
             if (suggestions != null)
             {
                 _listBoxChild.Items.AddRange(suggestions);
@@ -546,11 +553,11 @@ namespace Extract.DataEntry
 
                 // Select the current or best matching item when explicit selection is not required
                 if (_listBoxChild.Items.Count > 0
-                    && (showEntireList || _dataEntryAutoCompleteControl.AutomaticallySelectBestMatchingItem))
+                    && (selectCurrentItemIfPossible || _dataEntryAutoCompleteControl.AutomaticallySelectBestMatchingItem))
                 {
                     string currentText = _control.Text ?? "";
                     int idxOfCurrentText = _listBoxChild.Items.IndexOf(currentText);
-                    if (idxOfCurrentText < 0 && !showEntireList)
+                    if (idxOfCurrentText < 0 && !selectCurrentItemIfPossible)
                     {
                         idxOfCurrentText = 0;
                     }
@@ -749,11 +756,10 @@ namespace Extract.DataEntry
         #endregion IMessageFilter
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
@@ -766,7 +772,7 @@ namespace Extract.DataEntry
                     RemoveMessageFilter();
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
@@ -804,6 +810,26 @@ namespace Extract.DataEntry
                         .Concat(s.Value.Select(aka => new KeyValuePair<string, string>("AKA", aka)))),
                 System.Threading.LazyThreadSafetyMode.PublicationOnly);
         }
+        #endregion
+
+        #region Private Classes
+
+        class Search
+        {
+            public string Text { get; }
+            public bool ShowEntireList { get; }
+            public int? MaxSuggestions { get; }
+            public bool ExcludeLowScoring { get; }
+
+            public Search(string text, IDataEntryAutoCompleteControl control)
+            {
+                Text = text;
+                ShowEntireList = string.IsNullOrWhiteSpace(text);
+                MaxSuggestions = control.LimitNumberOfSuggestions;
+                ExcludeLowScoring = !control.ShowLowScoringSuggestions;
+            }
+        }
+
         #endregion
     }
 }

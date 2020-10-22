@@ -110,6 +110,20 @@ namespace Extract.DataEntry
         public bool AutomaticallySelectBestMatchingItem { get; set; } = true;
 
         /// <summary>
+        /// The maximum number of suggestions to show in response to typed text (non-whitespace)
+        /// </summary>
+        [Category("Data Entry Control")]
+        [DefaultValue(null)]
+        public int? LimitNumberOfSuggestions { get; set; }
+
+        /// <summary>
+        /// Whether to show suggestions that score much lower than the best scoring suggestions
+        /// </summary>
+        [Category("Data Entry Control")]
+        [DefaultValue(false)]
+        public bool ShowLowScoringSuggestions { get; set; }
+
+        /// <summary>
         /// The <see cref="DataEntryAutoCompleteMode"/> that this control uses
         /// </summary>
         [Category("Data Entry Control")]
