@@ -1,0 +1,199 @@
+[Duplicate]
+[Other - Print Only]
+[Reprocess]
+[Send as Email Attachment]
+[Send to Clerical Team]
+[Send to Lab Team]
+[Send to Referral Team]
+[Skip]
+Acknowledgement of Advanced Directive
+Acknowledgement Of Newborn Name
+Advanced Directive
+Agreement
+Allograft Transplant Tracking
+AMA
+Anesthesia Consent
+Anesthesia Data
+Assessment
+Auth For TX/AOB/NPP
+Auth to Disclose PHI to Others
+Auth to Disclose PHI to Publix Pharmacy
+Auth to Receive PHI via Text Msg
+Autopsy Consent
+Autopsy Report
+Bedside Procedure
+BEH Correspondence In
+BEH Correspondence Out
+Behavior Contract
+Billing Data
+Billing Data - Historical Outpatient Enc
+Birth Record
+Blood Bank Data
+Blood Transfusion Consent
+Blood Transfusion Refusal
+BMA Interpretation
+Body Maps
+Bone Marrow Harvesting Consent
+Cardiac Cath
+CE Authorization Form
+Chemo Medication
+Choice Practitioner
+Clinical Insurance Review
+CMS
+CMS Notice of Discharge
+Code Blue
+Coding Summary
+Confidential Communication
+Consent Form
+Consent Form - Historical
+Consent Form - Historical Inpatient Enc
+Consent Form - Historical Outpatient Enc
+Consent to Treat
+Consults
+Consults - Historical Inpatient Enc
+Correspondence In
+Correspondence In - Historical BEH Outpatient Enc
+Correspondence In - Historical Outpatient Enc
+Correspondence Out
+Correspondence Out - Historical Outpatient Enc
+Death Certificate
+Diagnostic Studies
+Diagnostic Studies - Historical
+Diagnostic Studies - Historical Inpatient Enc
+Diagnostic Studies - Historical Outpatient Enc
+Diagnostic Study Consent
+Diagnostic Tests
+Directory Opt Out
+Discharge Authorization Waiver Document
+Discharge Data
+Discharge Data - Historical Inpatient Enc
+Discharge Instruction
+Discharge Summ
+Donor Psy Evaluation
+Driver's License
+ECG/ECHO
+ED Consent
+ED Provider Notes
+Electrophysiology Report
+Emergency Services Ambulance Rpt
+Emergency Services Child Abuse Data
+Emergency Services Data
+Emergency Services Data - Historical
+Emergency Services Data - Historical Inpatient Enc
+Emergency Services Data - Historical Outpatient Enc
+Emergency Services Resuscitation Flow Sheet
+Expired Pt Data
+Expired Pt Data - Historical
+Expired Pt Data - Historical Inpatient Enc
+Expired Pt Data - Historical Outpatient Enc
+External Hist and Physical
+Face Sheet - Historical Inpatient Enc
+Filed In Error
+Financial Responsibility
+Flow Sheets
+Flow Sheets - Historical Inpatient Enc
+Genetics Pedigree
+Hem/Onc Yrly Consent
+HIM ROI Authorization
+Hist and Physical
+Hist and Physical - Historical Inpatient Enc
+HL7 Test
+Home Health Service
+Hospital Admissions Consent
+Hospital Outpatient Observation Notice
+Immediate Post Op Note
+Immunization Record
+Implant-Explant Record
+Insurance Card
+Intake Questionnaire
+Interagency Communication
+Lab Data
+Lab Data - Historical
+Lab Data - Historical Inpatient Enc
+Lab Data - Historical Outpatient Enc
+Lab Results
+Legal Documents
+Legal Documents - Historical
+Legal Documents - Historical Inpatient Enc
+Legal Documents - Historical Outpatient Enc
+Limited Liability Notice
+MAR
+MAR - Historical Inpatient Enc
+Medical Imaging
+Medicare Outpatient Observation Notice
+Medication Data
+Medication Reconciliation
+Minor's Auth to Treat
+My Nemours
+NemoursLink
+Newborn Hearing Screen
+No Show Appointment
+Office Visit
+Oncology Summary
+Op Report
+Operative Data
+Operative Data - Historical
+Operative Data - Historical Inpatient Enc
+Operative Data - Historical Outpatient Enc
+Orders
+Orders - Historical Inpatient Enc
+Organ Donation Consent
+Organ Donation Data
+Path Report
+Patient Admission Data
+Patient Rights Acknowledgement
+Patient w/o Legal Guardian Auth to Treat
+Patient/Family Progress Notes
+Photography Consent
+Photos
+Photos - Historical
+Photos - Historical Inpatient Enc
+Photos - Historical Outpatient Enc
+Plan of Care
+Post Op Instructions
+Power of Attorney Document
+Pre Cert Data
+Pre-Transfer Record
+Progress Notes
+Progress Notes - Historical
+Progress Notes - Historical Inpatient Enc
+Progress Notes - Historical Outpatient Enc
+Progress Notes Ambulatory
+Progress Notes Urgent Care
+Rapid Response
+Red Cross Lab Data
+Referral
+Referral Attachment
+Release Of Information
+Release Of Information - Historical Outpatient Enc
+Request For Amendment
+Request For Restriction
+Research Study Consent
+Resuscitation Flow Sheet
+Rightfax Overflow
+RightFax test
+Risk Documents
+Roadmap
+Seizure Record
+Sensitive Notes
+Sensitive Notes - Historical BEH Outpatient Enc
+Snapshot - Historical Outpatient Enc
+Social Services
+SOT
+Storage of Stem Cells Consent
+Surgical Path
+Synagis Injections
+Teaching Record
+Teaching Record - Historical Inpatient Enc
+Telehealth Member Agreement
+Tele-medicine Consent
+Telephone Consent to Treat
+Therapeutic Services
+Transplant Data
+Transport Record
+Tricare Notice of Rights
+Vaccine Consent
+Vaccine Information Sheet Review
+Vaccine Refusal
+Video
+zzClinical Insurance Review

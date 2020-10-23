@@ -209,8 +209,15 @@ namespace Extract.DataEntry.Test
                 Interlocked.Increment(ref i);
                 var tempDirPath = Path.Combine(Path.GetTempPath(), "SuggestionProvider", Path.GetRandomFileName());
                 var tempDirInfo = new DirectoryInfo(tempDirPath);
-                Assert.DoesNotThrow(() => tempDirInfo.GetCanonicalPath(), message: "Iteration: " + i);
+                Assert.DoesNotThrow(() => tempDirInfo.GetCanonicalPath(), message: UtilityMethods.FormatInvariant($"Iteration: {i}"));
             });
+        }
+
+        [Test, Category("LuceneAutoSuggest"), Category("Interactive")]
+        public static void TestAutoSuggestControls()
+        {
+            using var demo = new AutoSuggestDemo();
+            demo.Run();
         }
 
         #endregion
