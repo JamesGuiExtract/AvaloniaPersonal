@@ -69,11 +69,12 @@ namespace Extract.DataEntry
                     {
                         try
                         {
-                            return _providerSource.Value.GetSuggestions(search.Text,
+                            return value.Value.GetSuggestions(search.Text,
                                 maxSuggestions: search.MaxSuggestions ?? int.MaxValue,
-                                excludeLowScoring: search.ExcludeLowScoring);
+                                excludeLowScoring: search.ExcludeLowScoring)
+                            .ToArray(); // Materialize the enumerable here to make sure any exceptions are handled appropriately
                         }
-                        catch (Exception) when (_providerSource.Value.IsDisposed)
+                        catch (Exception) when (value.Value.IsDisposed)
                         {
                             // Ignore exception caused by the provider getting disposed of while searching
                             return new object[0];
@@ -89,7 +90,7 @@ namespace Extract.DataEntry
                     // (Use of lazy objects helps prevent the UI from opening sluggishly
                     //  https://extract.atlassian.net/browse/ISSUE-15673
                     // )
-                    Task.Factory.StartNew(() => _providerSource.Value);
+                    Task.Factory.StartNew(() => value.Value);
                 }
             }
         }
@@ -97,7 +98,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Function that returns suggestions based on a search string
         /// </summary>
-        private Func<Search, IEnumerable<object>> Provider { get; set; }
+        private Func<Search, object[]> Provider { get; set; }
 
         /// <summary>
         /// Whether the suggestion list is showing
@@ -543,7 +544,7 @@ namespace Extract.DataEntry
         {
             var suggestions = await Task.Run(() => search.ShowEntireList
                 ? _autoCompleteValues?.Value
-                : Provider?.Invoke(search)?.ToArray());
+                : Provider?.Invoke(search));
 
             return suggestions;
         }

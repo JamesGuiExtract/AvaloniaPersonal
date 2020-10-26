@@ -1416,7 +1416,7 @@ namespace Extract.DataEntry
                             _luceneAutoSuggest.SetDataEntryControlHost(DataEntryControlHost);
                             _luceneAutoSuggest.SetListBackColor(_color);
                             _luceneAutoSuggest.UpdateAutoCompleteList(autoCompleteValues);
-
+                            _luceneAutoSuggest.SetText(_editingControl.Text, ignoreNextTextChangedEvent: false);
                         }
                         else
                         {
@@ -3116,10 +3116,6 @@ namespace Extract.DataEntry
                 if (dataEntryCell != null && dataEntryCell.Attribute != null &&
                     base.CurrentCell.Value.ToString() != _editingControl.Text)
                 {
-                    if (AutoCompleteMode == DataEntryAutoCompleteMode.SuggestLucene)
-                    {
-                        _luceneAutoSuggest?.SetText(_editingControl.Text, ignoreNextTextChangedEvent: false);
-                    }
                     // Since DataGridViewCells are not normally modified in real-time as text is
                     // changed, apply changes from the editing control to the cell here.
                     base.CurrentCell.Value = _editingControl.Text;

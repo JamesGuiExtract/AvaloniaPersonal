@@ -299,6 +299,9 @@ namespace Extract.Utilities
         {
             if (!IsDisposed)
             {
+                // Set flag so that errors caused by disposing can be attributed properly
+                IsDisposed = true;
+
                 // Dispose of these even if this is being called from the
                 // destructor, so that they release locks on the index files
                 _analyzer?.Dispose();
@@ -315,8 +318,6 @@ namespace Extract.Utilities
                     catch
                     { }
                 }
-
-                IsDisposed = true;
             }
         }
 
