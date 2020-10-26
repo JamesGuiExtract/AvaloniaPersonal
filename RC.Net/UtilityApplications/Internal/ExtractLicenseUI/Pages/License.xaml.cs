@@ -244,6 +244,25 @@ namespace ExtractLicenseUI
 
             using var databaseReader = new DatabaseReader();
             this.PackageHeaders = databaseReader.ReadPackages(newLicense.ExtractVersion);
+
+            this.CopyVersionCheckmarks();
+        }
+
+        private void CopyVersionCheckmarks()
+        {
+            foreach(var clonedPackageHeader in this.ClonedPackageHeaders)
+            {
+                var packagesToCheck = this.PackageHeaders
+                    .Where(header => header.Name.Equals(clonedPackageHeader.Name, StringComparison.OrdinalIgnoreCase))
+                    .SelectMany(x => x.Packages);
+                foreach(var package in packagesToCheck)
+                {
+                    if(clonedPackageHeader.Packages.Where(clonedPackage => clonedPackage.Name.Equals(package.Name, StringComparison.OrdinalIgnoreCase)).Any())
+                    {
+                        package.IsChecked = true;
+                    }
+                }
+            }
         }
 
         /// <summary>
