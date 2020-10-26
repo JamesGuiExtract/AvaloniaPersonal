@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -63,12 +64,21 @@ namespace Extract.DataEntry
                 if (_providerSource != value)
                 {
                     var old = _providerSource;
-
                     _providerSource = value;
-
-                    Provider = search => _providerSource.Value.GetSuggestions(search.Text,
-                        maxSuggestions: search.MaxSuggestions ?? int.MaxValue,
-                        excludeLowScoring: search.ExcludeLowScoring);
+                    Provider = search =>
+                    {
+                        try
+                        {
+                            return _providerSource.Value.GetSuggestions(search.Text,
+                                maxSuggestions: search.MaxSuggestions ?? int.MaxValue,
+                                excludeLowScoring: search.ExcludeLowScoring);
+                        }
+                        catch (Exception) when (_providerSource.Value.IsDisposed)
+                        {
+                            // Ignore exception caused by the provider getting disposed of while searching
+                            return new object[0];
+                        }
+                    };
 
                     if (old != null && old.IsValueCreated)
                     {
@@ -115,20 +125,17 @@ namespace Extract.DataEntry
                 _listBoxChildBackColor = control.BackColor;
                 _dataEntryAutoCompleteControl = dataEntryAutoCompleteControl;
 
-                // Set up all the events we need to handle
-                var textChangedEventSequence =
-                    Observable.FromEventPattern(h => control.TextChanged += h, h => control.TextChanged -= h)
-                    .Throttle(TimeSpan.FromMilliseconds(200))
-                    .Subscribe(HandleControl_TextChanged);
+                // Set up event handlers
+                var textChangedHandler = BuildTextChangedEventObserver().Subscribe();
                 control.LostFocus += HandleControl_LostFocus;
                 control.GotFocus += HandleControl_GotFocus;
                 control.MouseDown += HandleControl_MouseDown;
                 control.HandleDestroyed += HandleControl_HandleDestroyed;
 
-                // Set up event unregistration
+                // Set up event handler unregistration
                 _unregister = () =>
                 {
-                    textChangedEventSequence.Dispose();
+                    textChangedHandler.Dispose();
                     control.LostFocus -= HandleControl_LostFocus;
                     control.GotFocus -= HandleControl_GotFocus;
                     control.MouseDown -= HandleControl_MouseDown;
@@ -244,6 +251,29 @@ namespace Extract.DataEntry
 
         #region Event Handlers
 
+        IObservable<Unit> BuildTextChangedEventObserver()
+        {
+            return Observable.FromEventPattern(h => _control.TextChanged += h, h => _control.TextChanged -= h)
+                .Where(_ => IsDropDownRequired(true))
+                .Select(_ => new Search(_control.Text, _dataEntryAutoCompleteControl))
+                // Ignore very rapidly typed keys until the burst is over
+                // This will cause the transforms that follow to run on the threadpool
+                .Throttle(TimeSpan.FromMilliseconds(200), Scheduler.Default)
+                .Select(search => Observable.FromAsync(async () => await GetSuggestions(search)))
+                .Switch() // Keep only the latest result
+                .Select(suggestions =>
+                {
+                    // Current thread is from the thread pool so need to invoke on the UI thread
+                    _control.SafeBeginInvoke("ELI50397", () => DropDown(suggestions, false));
+                    return Unit.Default;
+                })
+                .Catch<Unit, Exception>(ex =>
+                {
+                    ex.ExtractDisplay("ELI51407");
+                    return BuildTextChangedEventObserver(); // Resubscribe to event after error
+                });
+        }
+
         void HandleControl_HandleDestroyed(object sender, EventArgs e)
         {
             try
@@ -272,7 +302,7 @@ namespace Extract.DataEntry
         }
 
         // Support auto-drop-down-on-focus
-        void HandleControl_GotFocus(object sender, EventArgs e)
+        async void HandleControl_GotFocus(object sender, EventArgs e)
         {
             try
             {
@@ -281,15 +311,19 @@ namespace Extract.DataEntry
                     return;
                 }
 
-                if (_dataEntryAutoCompleteControl.AutoDropDownMode == AutoDropDownMode.Always
+                var dropDownOnFocus = _dataEntryAutoCompleteControl.AutoDropDownMode == AutoDropDownMode.Always
                     || _dataEntryAutoCompleteControl.AutoDropDownMode == AutoDropDownMode.WhenEmpty
-                        && string.IsNullOrWhiteSpace(_control.Text))
+                        && string.IsNullOrWhiteSpace(_control.Text);
+
+                if (dropDownOnFocus && IsDropDownRequired())
                 {
+                    var suggestions = await GetSuggestions(new Search(null, _dataEntryAutoCompleteControl));
                     // Mouse clicks fail to auto-drop the list unless this is begin-invoked, I think because
                     // something the DataEntryControlHost does causes the list to close immediately
-                    _control.SafeBeginInvoke("ELI50388",
-                        () => DropDown(new Search(null, _dataEntryAutoCompleteControl), true),
-                        displayExceptions: false);
+                    if (_control.IsHandleCreated) // In case the form is being closed
+                    {
+                        _control.SafeBeginInvoke("ELI50388", () => DropDown(suggestions, true), displayExceptions: false);
+                    }
                 }
 
             }
@@ -349,12 +383,17 @@ namespace Extract.DataEntry
         }
 
 
-        void HandleControl_DropDown(object sender, EventArgs e)
+        async void HandleControl_DropDown(object sender, EventArgs e)
         {
             try
             {
                 _ignoreMouseDown = true;
-                DropDown(new Search(null, _dataEntryAutoCompleteControl), true);
+
+                if (IsDropDownRequired())
+                {
+                    var suggestions = await GetSuggestions(new Search(null, _dataEntryAutoCompleteControl));
+                    DropDown(suggestions, selectCurrentItemIfPossible: true);
+                }
             }
             catch (Exception ex)
             {
@@ -375,21 +414,6 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI50165");
-            }
-        }
-
-        void HandleControl_TextChanged(EventPattern<object> _)
-        {
-            try
-            {
-                _control.SafeBeginInvoke("ELI50397", () =>
-                {
-                    DropDown(new Search(_control.Text, _dataEntryAutoCompleteControl), false);
-                });
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI45353");
             }
         }
 
@@ -485,16 +509,14 @@ namespace Extract.DataEntry
             }
         }
 
-        // Show suggestions list. Select current item if specified.
-        void DropDown(Search search, bool selectCurrentItemIfPossible)
+        bool IsDropDownRequired(bool forTextChangedEvent = false)
         {
-            var forTextChangedEvent = search.Text != null;
             if (forTextChangedEvent)
             {
                 if (_ignoreTextChange)
                 {
                     _ignoreTextChange = false;
-                    return;
+                    return false;
                 }
 
                 // Allow user to delete the value without triggering the list to show
@@ -502,13 +524,34 @@ namespace Extract.DataEntry
                 if (searchText != null && searchText.Length == 0 && !DroppedDown)
                 {
                     _acceptedText = null;
-                    return;
+                    return false;
                 }
             }
 
             // TODO: For DataGridView cells the parent is null until some
             // text has been typed so figure out a way to update the control state
             // or arrow keys won't be able to drop down the list
+            if (!_control.Visible || !_control.Focused || _control.Parent == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        async Task<object[]> GetSuggestions(Search search)
+        {
+            var suggestions = await Task.Run(() => search.ShowEntireList
+                ? _autoCompleteValues?.Value
+                : Provider?.Invoke(search)?.ToArray());
+
+            return suggestions;
+        }
+
+        // Show suggestions from list using lucene query or show entire list if searchText is null
+        void DropDown(object[] suggestions, bool selectCurrentItemIfPossible)
+        {
+            // Double-check that the control is still enabled
             if (!_control.Visible || !_control.Focused || _control.Parent == null)
             {
                 return;
@@ -520,10 +563,6 @@ namespace Extract.DataEntry
             {
                 return;
             }
-
-            var suggestions = search.ShowEntireList
-                ? _autoCompleteValues?.Value
-                : Provider?.Invoke(search)?.ToArray();
 
             _listBoxChild.Items.Clear();
             if (suggestions != null)
@@ -630,6 +669,7 @@ namespace Extract.DataEntry
 
         void RevertSelection()
         {
+            _ignoreTextChange = true;
             _control.Text = _acceptedText;
             if (_control is LuceneComboBox combo)
             {
@@ -810,6 +850,7 @@ namespace Extract.DataEntry
                         .Concat(s.Value.Select(aka => new KeyValuePair<string, string>("AKA", aka)))),
                 System.Threading.LazyThreadSafetyMode.PublicationOnly);
         }
+
         #endregion
 
         #region Private Classes

@@ -92,6 +92,15 @@ namespace Extract.Utilities
 
         #endregion Constructors
 
+        #region Properties
+
+        /// <summary>
+        /// Whether this instance has been disposed
+        /// </summary>
+        public bool IsDisposed { get; private set; } = false;
+
+        #endregion Properties
+
         #region Methods
 
         /// <summary>
@@ -285,12 +294,10 @@ namespace Extract.Utilities
         #endregion Methods
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!IsDisposed)
             {
                 // Dispose of these even if this is being called from the
                 // destructor, so that they release locks on the index files
@@ -309,7 +316,7 @@ namespace Extract.Utilities
                     { }
                 }
 
-                disposedValue = true;
+                IsDisposed = true;
             }
         }
 
