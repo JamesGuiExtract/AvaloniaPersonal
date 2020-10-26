@@ -5,6 +5,7 @@
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   xmlns:Database="clr-namespace:ExtractLicenseUI.Database"
+                  xmlns:content="clr-namespace:ExtractLicenseUI.PagesContent"
                   mc:Ignorable="d" 
                   d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
@@ -25,6 +26,7 @@
     </UserControl.Resources>
     <ScrollViewer>
         <StackPanel MinWidth="200">
+            <content:CustomerSelector></content:CustomerSelector>
             <StackPanel x:Name="Form" Orientation="Vertical">
                 <StackPanel.Resources>
                     <Style TargetType="StackPanel">
@@ -42,23 +44,6 @@
                         <Setter Property="Padding" Value="0,3" />
                     </Style>
                 </StackPanel.Resources>
-                <Label Content="Organization"></Label>
-                <Border BorderThickness="1" BorderBrush="Black" Padding="3,5,3,0" Margin="0,5,0,5">
-                    <StackPanel Orientation="Vertical">
-                        <StackPanel>
-                            <Label Content="Customer Name" Target="{Binding ElementName=CustomerName}"></Label>
-                            <TextBlock Name="CustomerName" Width="150" Text="{Binding SelectedOrganization.CustomerName}"></TextBlock>
-                        </StackPanel>
-                        <StackPanel>
-                            <Label Content="Reseller" Target="{Binding ElementName=Reseller}"></Label>
-                            <TextBlock x:Name="Reseller" Width="150" Text="{Binding SelectedOrganization.Reseller, Mode=TwoWay, ValidatesOnDataErrors=True}"></TextBlock>
-                        </StackPanel>
-                        <StackPanel>
-                            <Label Content="SalesforceHyperlink" Target="{Binding ElementName=SalesforceHyperlink}"></Label>
-                            <TextBlock x:Name="SalesforceHyperlink"><Hyperlink NavigateUri="{Binding SelectedOrganization.SalesforceHyperlink}" ToolTip="{Binding SelectedOrganization.SalesforceHyperlink}" Click="Hyperlink_Click">SalesForce</Hyperlink></TextBlock>
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
 
                 <Label Content="License"></Label>
                 <Border x:Name="LicenseBorder" BorderThickness="1" BorderBrush="Black" Padding="3,5,3,0" Margin="0,5,0,5">
@@ -68,7 +53,7 @@
                                 <StackPanel>
                                     <Label Content="Extract Version" Target="{Binding ElementName=ExtractVersion}"></Label>
                                     <ComboBox x:Name="ExtractVersion" Width="150" 
-                                        SelectedValue="{Binding SelectedOrganization.SelectedLicense.ExtractVersion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                        SelectedValue="{Binding SelectedLicense.ExtractVersion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                         ItemsSource="{Binding ExtractVersions}" 
                                         DisplayMemberPath="Version"
                                         ToolTip="{Binding Path=(Validation.Errors)[0].ErrorContent, ElementName=ExtractVersion}"
@@ -76,31 +61,31 @@
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Request Key" Target="{Binding ElementName=RequestKey}"></Label>
-                                    <TextBox x:Name="RequestKey" Width="150" Text="{Binding SelectedOrganization.SelectedLicense.RequestKey, ValidatesOnDataErrors=True}"></TextBox>
+                                    <TextBox x:Name="RequestKey" Width="150" Text="{Binding SelectedLicense.RequestKey, ValidatesOnDataErrors=True}"></TextBox>
                                 </StackPanel>
                                 <StackPanel>
                                     <Button x:Name="GenerateRequestKey" Content="Generate Request Key" Click="GenerateRequestKey_Click"></Button>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Restrict by DiskSerial Number" Target="{Binding ElementName=UseDiskSerialNumber}" Width="180px"></Label>
-                                    <CheckBox x:Name="UseDiskSerialNumber" Width="150" IsChecked="{Binding SelectedOrganization.SelectedLicense.RestrictByDiskSerialNumber}" Click="UpdateRequestKey"></CheckBox>
+                                    <CheckBox x:Name="UseDiskSerialNumber" Width="150" IsChecked="{Binding SelectedLicense.RestrictByDiskSerialNumber}" Click="UpdateRequestKey"></CheckBox>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Permanent" Target="{Binding ElementName=IsPermanent}"></Label>
-                                    <CheckBox x:Name="IsPermanent" Width="150" IsChecked="{Binding SelectedOrganization.SelectedLicense.IsPermanent}" Click="IsPermanent_Click"></CheckBox>
+                                    <CheckBox x:Name="IsPermanent" Width="150" IsChecked="{Binding SelectedLicense.IsPermanent}" Click="IsPermanent_Click"></CheckBox>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Expires On" Target="{Binding ElementName=ExpiresOn}"></Label>
-                                    <DatePicker x:Name="ExpiresOn" Width="150" SelectedDate="{Binding SelectedOrganization.SelectedLicense.ExpiresOn, Mode=TwoWay, ValidatesOnDataErrors=True}" ToolTip="{Binding Path=(Validation.Errors)[0].ErrorContent, ElementName=ExpiresOn}" >
+                                    <DatePicker x:Name="ExpiresOn" Width="150" SelectedDate="{Binding SelectedLicense.ExpiresOn, Mode=TwoWay, ValidatesOnDataErrors=True}" ToolTip="{Binding Path=(Validation.Errors)[0].ErrorContent, ElementName=ExpiresOn}" >
                                     </DatePicker>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Issued On" Target="{Binding ElementName=IssuedOn}"></Label>
-                                    <TextBlock x:Name="IssuedOn" Width="150" Text="{Binding SelectedOrganization.SelectedLicense.IssuedOn}"></TextBlock>
+                                    <TextBlock x:Name="IssuedOn" Width="150" Text="{Binding SelectedLicense.IssuedOn}"></TextBlock>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Issued By" Target="{Binding ElementName=IssuedBy}"></Label>
-                                    <TextBlock x:Name="IssuedBy" Width="150" Text="{Binding SelectedOrganization.SelectedLicense.IssuedBy}"></TextBlock>
+                                    <TextBlock x:Name="IssuedBy" Width="150" Text="{Binding SelectedLicense.IssuedBy}"></TextBlock>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Transfer License" Target="{Binding ElementName=TransferLicense}"></Label>
@@ -109,27 +94,27 @@
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Machine Name" Target="{Binding ElementName=MachineName}"></Label>
-                                    <TextBox x:Name="MachineName" Width="150" Text="{Binding SelectedOrganization.SelectedLicense.MachineName, ValidatesOnDataErrors=True}" IsEnabled="False"></TextBox>
+                                    <TextBox x:Name="MachineName" Width="150" Text="{Binding SelectedLicense.MachineName, ValidatesOnDataErrors=True}" IsEnabled="False"></TextBox>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="SDK Password" Target="{Binding ElementName=SDKPassword}"></Label>
-                                    <TextBlock x:Name="SDKPassword" Width="150" Text="{Binding SelectedOrganization.SelectedLicense.SDKPassword}" IsEnabled="False"></TextBlock>
+                                    <TextBlock x:Name="SDKPassword" Width="150" Text="{Binding SelectedLicense.SDKPassword}" IsEnabled="False"></TextBlock>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="License Key" Target="{Binding ElementName=LicenseKey}"></Label>
-                                    <TextBlock x:Name="LicenseKey" Width="150" Text="{Binding SelectedOrganization.SelectedLicense.LicenseKey}" ToolTip="{Binding SelectedOrganization.SelectedLicense.LicenseKey}"></TextBlock>
+                                    <TextBlock x:Name="LicenseKey" Width="150" Text="{Binding SelectedLicense.LicenseKey}" ToolTip="{Binding SelectedLicense.LicenseKey}"></TextBlock>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Signed Transfer Form" Target="{Binding ElementName=SignedTransferForm}"></Label>
-                                    <CheckBox x:Name="SignedTransferForm" Width="150" IsChecked="{Binding SelectedOrganization.SelectedLicense.SignedTransferForm}"></CheckBox>
+                                    <CheckBox x:Name="SignedTransferForm" Width="150" IsChecked="{Binding SelectedLicense.SignedTransferForm}"></CheckBox>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Active" Target="{Binding ElementName=IsActive}"></Label>
-                                    <CheckBox x:Name="IsActive" Width="150" IsChecked="{Binding SelectedOrganization.SelectedLicense.IsActive}"></CheckBox>
+                                    <CheckBox x:Name="IsActive" Width="150" IsChecked="{Binding SelectedLicense.IsActive}"></CheckBox>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Production" Target="{Binding ElementName=IsProduction}"></Label>
-                                    <CheckBox x:Name="IsProduction" Width="150" IsChecked="{Binding SelectedOrganization.SelectedLicense.IsProduction}"></CheckBox>
+                                    <CheckBox x:Name="IsProduction" Width="150" IsChecked="{Binding SelectedLicense.IsProduction}"></CheckBox>
                                 </StackPanel>
                             </StackPanel>
                             
@@ -159,7 +144,7 @@
                                 <ScrollViewer x:Name="ClonedPackageSelector" Visibility="Collapsed">
                                     <StackPanel Orientation="Vertical">
                                         <Label Content="Original"></Label>
-                                        <TreeView ItemsSource="{Binding ClonedPackageHeaders}"  >
+                                        <TreeView x:Name="ClonedPackageTreeView" ItemsSource="{Binding ClonedPackageHeaders}"  >
                                             <TreeView.ItemContainerStyle>
                                                 <Style TargetType="{x:Type TreeViewItem}">
                                                     <Setter Property="IsExpanded" Value="True" />
@@ -188,14 +173,14 @@
                         </StackPanel>
                         <StackPanel>
                             <Label Content="Comments" Target="{Binding ElementName=Comments}"></Label>
-                            <TextBox x:Name="Comments" AcceptsReturn="True" TextWrapping="WrapWithOverflow" Width="800px" Text="{Binding SelectedOrganization.SelectedLicense.Comments, ValidatesOnDataErrors=True, Mode=TwoWay}" ToolTip="{Binding Path=(Validation.Errors)[0].ErrorContent, ElementName=Comments}"></TextBox>
+                            <TextBox x:Name="Comments" AcceptsReturn="True" TextWrapping="WrapWithOverflow" Width="800px" Text="{Binding SelectedLicense.Comments, ValidatesOnDataErrors=True, Mode=TwoWay}" ToolTip="{Binding Path=(Validation.Errors)[0].ErrorContent, ElementName=Comments}"></TextBox>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label Content="License Name" Target="{Binding ElementName=LicenseName}"></Label>
-                            <TextBox x:Name="LicenseName" Width="800px" Text="{Binding SelectedOrganization.SelectedLicense.LicenseName}">
+                            <TextBox x:Name="LicenseName" Width="800px" Text="{Binding SelectedLicense.LicenseName}">
                                 <TextBox.Style>
                                     <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-                                        <Setter Property="ToolTipService.ToolTip" Value="{Binding SelectedOrganization.SelectedLicense.LicenseName}"></Setter>
+                                        <Setter Property="ToolTipService.ToolTip" Value="{Binding SelectedLicense.LicenseName}"></Setter>
                                         <Setter Property="ToolTipService.ShowOnDisabled" Value="True"></Setter>
                                     </Style>
                                 </TextBox.Style>

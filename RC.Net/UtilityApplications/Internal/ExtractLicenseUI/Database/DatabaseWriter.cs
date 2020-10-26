@@ -121,31 +121,35 @@ WHERE
         /// <param name="organization">The organization with the selected license</param>
         /// <returns>Returns true if successful</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "The query is using Microsoft parameters. Its safe.")]
-        public bool WriteLicense(Organization organization)
+        public bool WriteLicense(Organization organization, ExtractLicense license)
         {
             if (organization == null)
             {
                 throw new ArgumentNullException(nameof(organization));
             }
+            if (license == null)
+            {
+                throw new ArgumentNullException(nameof(license));
+            }
             using (SqlCommand command = new SqlCommand(InsertUpdateLicenseQuery, SqlConnection))
             {
-                command.Parameters.AddWithValue("@Guid", organization.SelectedLicense.Guid);
+                command.Parameters.AddWithValue("@Guid", license.Guid);
                 command.Parameters.AddWithValue("@Organization_GUID", organization.Guid);
-                command.Parameters.AddWithValue("@Request_Key", HandleNullTypes(organization.SelectedLicense.RequestKey));
-                command.Parameters.AddWithValue("@Issued_By", organization.SelectedLicense.IssuedBy);
-                command.Parameters.AddWithValue("@Issued_On", organization.SelectedLicense.IssuedOn);
-                command.Parameters.AddWithValue("@Expires_On", HandleNullTypes(organization.SelectedLicense.ExpiresOn));
-                command.Parameters.AddWithValue("@Active", organization.SelectedLicense.IsActive);
-                command.Parameters.AddWithValue("@Transfer_License", HandleNullTypes(organization.SelectedLicense.TransferLicense));
-                command.Parameters.AddWithValue("@Machine_Name", organization.SelectedLicense.MachineName);
-                command.Parameters.AddWithValue("@Comments", HandleNullTypes(organization.SelectedLicense.Comments));
-                command.Parameters.AddWithValue("@Production", organization.SelectedLicense.IsProduction);
-                command.Parameters.AddWithValue("@License_Key", organization.SelectedLicense.LicenseKey);
-                command.Parameters.AddWithValue("@Signed_Transfer_Form", organization.SelectedLicense.SignedTransferForm);
-                command.Parameters.AddWithValue("@SDK_Password", HandleNullTypes(organization.SelectedLicense.SDKPassword));
-                command.Parameters.AddWithValue("@Extract_Version_GUID", organization.SelectedLicense.ExtractVersion.Guid);
-                command.Parameters.AddWithValue("@License_Name", organization.SelectedLicense.LicenseName);
-                command.Parameters.AddWithValue("@Restrict_By_Disk_Serial_Number", organization.SelectedLicense.RestrictByDiskSerialNumber);
+                command.Parameters.AddWithValue("@Request_Key", HandleNullTypes(license.RequestKey));
+                command.Parameters.AddWithValue("@Issued_By", license.IssuedBy);
+                command.Parameters.AddWithValue("@Issued_On", license.IssuedOn);
+                command.Parameters.AddWithValue("@Expires_On", HandleNullTypes(license.ExpiresOn));
+                command.Parameters.AddWithValue("@Active", license.IsActive);
+                command.Parameters.AddWithValue("@Transfer_License", HandleNullTypes(license.TransferLicense));
+                command.Parameters.AddWithValue("@Machine_Name", license.MachineName);
+                command.Parameters.AddWithValue("@Comments", HandleNullTypes(license.Comments));
+                command.Parameters.AddWithValue("@Production", license.IsProduction);
+                command.Parameters.AddWithValue("@License_Key", license.LicenseKey);
+                command.Parameters.AddWithValue("@Signed_Transfer_Form", license.SignedTransferForm);
+                command.Parameters.AddWithValue("@SDK_Password", HandleNullTypes(license.SDKPassword));
+                command.Parameters.AddWithValue("@Extract_Version_GUID", license.ExtractVersion.Guid);
+                command.Parameters.AddWithValue("@License_Name", license.LicenseName);
+                command.Parameters.AddWithValue("@Restrict_By_Disk_Serial_Number", license.RestrictByDiskSerialNumber);
                 command.ExecuteNonQuery();
             }
 

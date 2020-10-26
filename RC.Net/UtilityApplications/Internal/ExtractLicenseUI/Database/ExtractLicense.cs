@@ -379,7 +379,7 @@ namespace ExtractLicenseUI.Database
         /// </summary>
         /// <param name="organization">The organization to generate the license for</param>
         /// <param name="packages">A list of packages to generate the license for.</param>
-        public void GenerateNewLicenseKey(Organization organization, Collection<Package> packages)
+        public void GenerateNewLicenseKey(Organization organization, ExtractLicense license, Collection<Package> packages)
         {
             if(organization == null)
             {
@@ -388,6 +388,10 @@ namespace ExtractLicenseUI.Database
             if(packages == null)
             {
                 throw new ArgumentNullException(nameof(packages));
+            }
+            if(license == null)
+            {
+                throw new ArgumentNullException(nameof(license));
             }
 
             using (var databaseReader = new DatabaseReader())
@@ -404,8 +408,8 @@ namespace ExtractLicenseUI.Database
 
             foreach (var id in uniqueComponentIDs)
             {
-                this.LicenseInfo.ComponentIDToInfo[(uint) id] = organization.SelectedLicense.ExpiresOn != null 
-                    ? new ComponentInfo((DateTime)organization.SelectedLicense.ExpiresOn) 
+                this.LicenseInfo.ComponentIDToInfo[(uint) id] = license.ExpiresOn != null 
+                    ? new ComponentInfo((DateTime)license.ExpiresOn) 
                     : new ComponentInfo();
             }
 

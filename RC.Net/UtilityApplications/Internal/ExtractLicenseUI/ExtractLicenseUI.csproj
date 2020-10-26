@@ -92,6 +92,13 @@
     <Compile Include="DatFileUtility\LoadDatFilesIntoDatabase.cs" />
     <Compile Include="DatFileUtility\PackageModel.cs" />
     <Compile Include="DatFileUtility\PackageVariable.cs" />
+    <Compile Include="PagesContent\CustomerSelector.xaml.cs">
+      <DependentUpon>CustomerSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PagesContent\LicenseTable.xaml.cs">
+      <DependentUpon>LicenseTable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Utility\LicenseContainer.cs" />
     <Compile Include="Utility\LicenseNavigation.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -106,17 +113,25 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Pages\License.xaml.cs">
+    <Compile Include="PagesContent\License.xaml.cs">
       <DependentUpon>License.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Organization.xaml.cs">
       <DependentUpon>Organization.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\Contact.xaml.cs">
+    <Compile Include="PagesContent\Contact.xaml.cs">
       <DependentUpon>Contact.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Page Include="Pages\License.xaml">
+    <Page Include="PagesContent\CustomerSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PagesContent\LicenseTable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PagesContent\License.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -124,7 +139,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Pages\Contact.xaml">
+    <Page Include="PagesContent\Contact.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

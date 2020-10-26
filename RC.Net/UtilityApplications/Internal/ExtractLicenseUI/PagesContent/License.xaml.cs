@@ -5,11 +5,14 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using Extract.Licensing.Internal;
 using ExtractLicenseUI.Database;
 using ExtractLicenseUI.Utility;
+using FirstFloor.ModernUI.Windows;
+using FirstFloor.ModernUI.Windows.Navigation;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace ExtractLicenseUI
@@ -17,20 +20,21 @@ namespace ExtractLicenseUI
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class License : UserControl, INotifyPropertyChanged
+    public partial class License : UserControl, INotifyPropertyChanged, IContent
     {
         private ObservableCollection<PackageHeader> _PackageHeaders = new ObservableCollection<PackageHeader>();
         private ObservableCollection<PackageHeader> _ClonedPackageHeaders = new ObservableCollection<PackageHeader>();
         private ObservableCollection<ExtractVersion> _ExtractVersions = new ObservableCollection<ExtractVersion>();
-        private Database.Organization _SelectedOrganization = new Database.Organization();
+        private Database.ExtractLicense _SelectedLicense = new Database.ExtractLicense();
 
-        public ObservableCollection<PackageHeader> PackageHeaders { 
+        public ObservableCollection<PackageHeader> PackageHeaders
+        {
             get { return this._PackageHeaders; }
-            set 
+            set
             {
                 _PackageHeaders = value;
                 this.NotifyPropertyChanged(nameof(PackageHeaders));
-            } 
+            }
         }
 
         public ObservableCollection<PackageHeader> ClonedPackageHeaders
@@ -45,8 +49,9 @@ namespace ExtractLicenseUI
 
         public ObservableCollection<ExtractVersion> ExtractVersions
         {
-            get {
-                return new ObservableCollection<ExtractVersion>(this._ExtractVersions.OrderByDescending(m => m.Version).ToList()); 
+            get
+            {
+                return new ObservableCollection<ExtractVersion>(this._ExtractVersions.OrderByDescending(m => m.Version).ToList());
             }
             set
             {
@@ -55,15 +60,16 @@ namespace ExtractLicenseUI
             }
         }
 
-        public Database.Organization SelectedOrganization {
+        public Database.ExtractLicense SelectedLicense
+        {
             get
             {
-                return this._SelectedOrganization;
+                return this._SelectedLicense;
             }
             set
             {
-                _SelectedOrganization = value;
-                this.NotifyPropertyChanged(nameof(SelectedOrganization));
+                _SelectedLicense = value;
+                this.NotifyPropertyChanged(nameof(SelectedLicense));
             }
         }
 
@@ -73,15 +79,14 @@ namespace ExtractLicenseUI
 
         public License()
         {
+            this.MainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
             using (var databaseReader = new DatabaseReader())
             {
                 this.ExtractVersions = databaseReader.ReadVersions();
             }
-                
+
             InitializeComponent();
             this.Form.DataContext = this;
-            this.MainWindow = ((MainWindow)System.Windows.Application.Current.MainWindow);
-            this.Loaded += LicenseControlLoaded;
         }
 
         /// <summary>
@@ -91,70 +96,85 @@ namespace ExtractLicenseUI
         /// <param name="e"></param>
         private void SaveButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (!IsValid(this.Form))
+            try
             {
-                MessageBox.Show("Please correct all of the validation errors before saving. License was NOT saved", "ExtractLicenseUI", MessageBoxButton.OK);
-            }
-            else if(!this.GetSelectedPackages().Any())
-            {
-                MessageBox.Show("You must select at least one package to license", "ExtractLicenseUI", MessageBoxButton.OK);
-            }
-            else 
-            {
-                if(string.IsNullOrEmpty(this.SelectedOrganization.SelectedLicense.LicenseName))
+                if (!IsValid(this.Form))
                 {
-                    this.SelectedOrganization.SelectedLicense.LicenseName = this.GenerateLicenseName();
+                    MessageBox.Show("Please correct all of the validation errors before saving. License was NOT saved", "ExtractLicenseUI", MessageBoxButton.OK);
                 }
-                
-                this.SelectedOrganization.SelectedLicense.GenerateNewLicenseKey(this.SelectedOrganization, this.GetSelectedPackages());
-                using var databaseWriter = new DatabaseWriter();
-                databaseWriter.WriteLicense(this.SelectedOrganization);
-                databaseWriter.WritePackages(this.SelectedOrganization.SelectedLicense, this.GetSelectedPackages());
-                this.MainWindow.OrganizationWindow.RefreshLicenses();
-                this.ConfigureNavigationOption(LicenseNavigationOptions.ViewLicense);
+                else if (!this.GetSelectedPackages().Any())
+                {
+                    MessageBox.Show("You must select at least one package to license", "ExtractLicenseUI", MessageBoxButton.OK);
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(this.SelectedLicense.LicenseName))
+                    {
+                        this.SelectedLicense.LicenseName = this.GenerateLicenseName();
+                    }
+
+                    this.SelectedLicense.GenerateNewLicenseKey(this.MainWindow.Organization.SelectedOrganization, this.SelectedLicense, this.GetSelectedPackages());
+                    using var databaseWriter = new DatabaseWriter();
+                    databaseWriter.WriteLicense(this.MainWindow.Organization.SelectedOrganization, this.SelectedLicense);
+                    databaseWriter.WritePackages(this.SelectedLicense, this.GetSelectedPackages());
+                    this.MainWindow.Organization.RefreshLicenses();
+                    this.ConfigureNavigationOption(LicenseNavigationOptions.ViewLicense);
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Unable to save license.\n" + ex.Message);
             }
         }
 
         private string GenerateLicenseName()
         {
             string licenseName = string.Empty;
-            if(!String.IsNullOrEmpty(this.SelectedOrganization.Reseller))
+            try
             {
-                licenseName += this.SelectedOrganization.Reseller + "_";
+                if (!String.IsNullOrEmpty(this.MainWindow.Organization.SelectedOrganization.Reseller))
+                {
+                    licenseName += this.MainWindow.Organization.SelectedOrganization.Reseller + "_";
+                }
+                if (!String.IsNullOrEmpty(this.MainWindow.Organization.SelectedOrganization.State))
+                {
+                    licenseName += this.MainWindow.Organization.SelectedOrganization.State + "_";
+                }
+                licenseName += this.MainWindow.Organization.SelectedOrganization.CustomerName + "_";
+                if (this.PackageHeaders.Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("FLEX INDEX") && m.PackagesChecked).Any())
+                {
+                    licenseName += "FlexIndex_";
+                }
+                if (this.PackageHeaders.Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("ID SHIELD") && m.PackagesChecked).Any())
+                {
+                    licenseName += "IDShield_";
+                }
+                if (this.PackageHeaders.Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE") && m.PackagesChecked).Any())
+                {
+                    licenseName += "LabDE_";
+                }
+                if (this.GetSelectedPackages().Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("SERVER")).Any())
+                {
+                    licenseName += "Server_";
+                }
+                else
+                {
+                    licenseName += "Client_";
+                }
+                licenseName += this.SelectedLicense.RestrictByDiskSerialNumber
+                    ? this.SelectedLicense.MachineName + "_"
+                    : "Universal_";
+                licenseName += this.SelectedLicense.IsPermanent
+                    ? "Full"
+                    : this.SelectedLicense.ExpiresOn != null
+                        ? ((DateTime)this.SelectedLicense.ExpiresOn).Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                        : "Invalid Date";
             }
-            if (!String.IsNullOrEmpty(this.SelectedOrganization.State))
+            catch(Exception ex)
             {
-                licenseName += this.SelectedOrganization.State + "_";
+                MessageBox.Show("Unable to generate license name.\n" + ex.Message);
             }
-            licenseName += this.SelectedOrganization.CustomerName + "_";
-            if(this.PackageHeaders.Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("FLEX INDEX") && m.PackagesChecked).Any())
-            {
-                licenseName += "FlexIndex_";
-            }
-            if (this.PackageHeaders.Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("ID SHIELD") && m.PackagesChecked).Any())
-            {
-                licenseName += "IDShield_";
-            }
-            if (this.PackageHeaders.Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("LABDE") && m.PackagesChecked).Any())
-            {
-                licenseName += "LabDE_";
-            }
-            if(this.GetSelectedPackages().Where(m => m.Name.ToUpper(CultureInfo.InvariantCulture).Contains("SERVER")).Any())
-            {
-                licenseName += "Server_";
-            }
-            else
-            {
-                licenseName += "Client_";
-            }
-            licenseName += this.SelectedOrganization.SelectedLicense.RestrictByDiskSerialNumber 
-                ? this.SelectedOrganization.SelectedLicense.MachineName + "_" 
-                : "Universal_";
-            licenseName += this.SelectedOrganization.SelectedLicense.IsPermanent
-                ? "Full"
-                : this.SelectedOrganization.SelectedLicense.ExpiresOn != null 
-                    ? ((DateTime)this.SelectedOrganization.SelectedLicense.ExpiresOn).Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) 
-                    : "Invalid Date";
+            
             return licenseName;
         }
 
@@ -165,7 +185,14 @@ namespace ExtractLicenseUI
         /// <param name="e"></param>
         private void CloneButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            this.ConfigureNavigationOption(LicenseNavigationOptions.CloneLicense);
+            try
+            {
+                this.ConfigureNavigationOption(LicenseNavigationOptions.CloneLicense);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Unable to clone license.\n" + ex.Message);
+            }
         }
 
         /// <summary>
@@ -175,10 +202,17 @@ namespace ExtractLicenseUI
         /// <param name="e"></param>
         private void IsPermanent_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            this.ExpiresOn.IsEnabled = !(bool)this.IsPermanent.IsChecked;
-            if ((bool)this.IsPermanent.IsChecked)
+            try
             {
-                this.ExpiresOn.SelectedDate = null;
+                this.ExpiresOn.IsEnabled = !(bool)this.IsPermanent.IsChecked;
+                if ((bool)this.IsPermanent.IsChecked)
+                {
+                    this.ExpiresOn.SelectedDate = null;
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Unable to make license permanent.\n" + ex.Message);
             }
         }
 
@@ -189,8 +223,15 @@ namespace ExtractLicenseUI
         /// <param name="e"></param>
         private void ExtractVersion_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            using var databaseReader = new DatabaseReader();
-            this.PackageHeaders = databaseReader.ReadPackages(this.SelectedOrganization.SelectedLicense.ExtractVersion);
+            try
+            {
+                using var databaseReader = new DatabaseReader();
+                this.PackageHeaders = databaseReader.ReadPackages(this.SelectedLicense.ExtractVersion);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Unable to read versions from db. \n" + ex.Message);
+            }
         }
 
         /// <summary>
@@ -209,11 +250,11 @@ namespace ExtractLicenseUI
         private Collection<Package> GetSelectedPackages()
         {
             Collection<Package> selectedPackages = new Collection<Package>();
-            foreach(var packageheader in this.PackageHeaders)
+            foreach (var packageheader in this.PackageHeaders)
             {
-                foreach(var package in packageheader.Packages)
+                foreach (var package in packageheader.Packages)
                 {
-                    if(package.IsChecked)
+                    if (package.IsChecked)
                     {
                         selectedPackages.Add(package);
                     }
@@ -231,16 +272,16 @@ namespace ExtractLicenseUI
             this.ClonedPackageHeaders = this.PackageHeaders;
 
             var newLicense = new ExtractLicense();
-            newLicense.IsPermanent = this.SelectedOrganization.SelectedLicense.IsPermanent;
-            newLicense.ExpiresOn = this.SelectedOrganization.SelectedLicense.ExpiresOn;
-            newLicense.RequestKey = this.SelectedOrganization.SelectedLicense.RequestKey;
-            newLicense.IsActive = this.SelectedOrganization.SelectedLicense.IsActive;
-            newLicense.Comments = this.SelectedOrganization.SelectedLicense.Comments;
-            newLicense.IsProduction = this.SelectedOrganization.SelectedLicense.IsProduction;
-            newLicense.SignedTransferForm = this.SelectedOrganization.SelectedLicense.SignedTransferForm;
-            newLicense.SDKPassword = this.SelectedOrganization.SelectedLicense.SDKPassword;
-            newLicense.ExtractVersion = this.SelectedOrganization.SelectedLicense.ExtractVersion;
-            this.SelectedOrganization.SelectedLicense = newLicense;
+            newLicense.IsPermanent = this.SelectedLicense.IsPermanent;
+            newLicense.ExpiresOn = this.SelectedLicense.ExpiresOn;
+            newLicense.RequestKey = this.SelectedLicense.RequestKey;
+            newLicense.IsActive = this.SelectedLicense.IsActive;
+            newLicense.Comments = this.SelectedLicense.Comments;
+            newLicense.IsProduction = this.SelectedLicense.IsProduction;
+            newLicense.SignedTransferForm = this.SelectedLicense.SignedTransferForm;
+            newLicense.SDKPassword = this.SelectedLicense.SDKPassword;
+            newLicense.ExtractVersion = this.SelectedLicense.ExtractVersion;
+            this.SelectedLicense = newLicense;
 
             using var databaseReader = new DatabaseReader();
             this.PackageHeaders = databaseReader.ReadPackages(newLicense.ExtractVersion);
@@ -248,16 +289,19 @@ namespace ExtractLicenseUI
             this.CopyVersionCheckmarks();
         }
 
+        /// <summary>
+        /// When cloning a license, check all of the packages that have the same package header and name.
+        /// </summary>
         private void CopyVersionCheckmarks()
         {
-            foreach(var clonedPackageHeader in this.ClonedPackageHeaders)
+            foreach (var clonedPackageHeader in this.ClonedPackageHeaders)
             {
                 var packagesToCheck = this.PackageHeaders
                     .Where(header => header.Name.Equals(clonedPackageHeader.Name, StringComparison.OrdinalIgnoreCase))
                     .SelectMany(x => x.Packages);
                 foreach(var package in packagesToCheck)
                 {
-                    if(clonedPackageHeader.Packages.Where(clonedPackage => clonedPackage.Name.Equals(package.Name, StringComparison.OrdinalIgnoreCase)).Any())
+                    if (clonedPackageHeader.Packages.Where(clonedPackage => clonedPackage.Name.Equals(package.Name, StringComparison.OrdinalIgnoreCase)).Any())
                     {
                         package.IsChecked = true;
                     }
@@ -291,23 +335,13 @@ namespace ExtractLicenseUI
         }
 
         /// <summary>
-        /// Fired only after the window has loaded.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LicenseControlLoaded(object sender, RoutedEventArgs e)
-        {
-            this.MainWindow.LicenseWindow = this;
-        }
-
-        /// <summary>
         /// Generates a request key.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void GenerateRequestKey_Click(object sender, RoutedEventArgs e)
         {
-            this.SelectedOrganization.SelectedLicense.RequestKey = LicenseInfo.GenerateUserString();
+            this.SelectedLicense.RequestKey = LicenseInfo.GenerateUserString();
         }
 
         /// <summary>
@@ -327,17 +361,17 @@ namespace ExtractLicenseUI
                 {
                     fileDialog.InitialDirectory = @"C:\ProgramData\Extract Systems\LicenseFiles";
                     fileDialog.Title = "Please select a folder to generate the file in";
-                    fileDialog.DefaultFileName = this.SelectedOrganization.SelectedLicense.LicenseName + @".lic";
+                    fileDialog.DefaultFileName = this.SelectedLicense.LicenseName + @".lic";
                     var fileDialogResult = fileDialog.ShowDialog();
                     if (fileDialogResult == CommonFileDialogResult.Ok)
                     {
-                        this.SelectedOrganization.SelectedLicense.GenerateLicenseFile(fileDialog.FileName);
+                        this.SelectedLicense.GenerateLicenseFile(fileDialog.FileName);
                     }
                 }
             }
-            catch(Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to save the license to a file. Make sure you use a valid file name and path.");
+                MessageBox.Show("Unable to save the license to a file. Make sure you use a valid file name and path.\n" + ex.Message);
             }
         }
 
@@ -351,13 +385,13 @@ namespace ExtractLicenseUI
         {
             try
             {
-                var fileName = Path.Combine(Path.GetTempPath(), SelectedOrganization.SelectedLicense.LicenseName + ".lic");
-                this.SelectedOrganization.SelectedLicense.GenerateLicenseFile(fileName);
+                var fileName = Path.Combine(Path.GetTempPath(), SelectedLicense.LicenseName + ".lic");
+                this.SelectedLicense.GenerateLicenseFile(fileName);
                 this.CopyFileToClipboard(fileName);
             }
-            catch(Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to copy license to clipboard");
+                MessageBox.Show("Unable to copy license to clipboard\n" + ex.Message);
             }
         }
 
@@ -382,16 +416,15 @@ namespace ExtractLicenseUI
                     var fileDialogResult = fileDialog.ShowDialog();
                     if (fileDialogResult == CommonFileDialogResult.Ok)
                     {
-                        this.SelectedOrganization.SelectedLicense.GenerateUnlockCode(this.SelectedOrganization, fileDialog.FileName + @"\");
+                        this.SelectedLicense.GenerateUnlockCode(this.MainWindow.Organization.SelectedOrganization, fileDialog.FileName + @"\");
                     }
                 }
             }
-            catch(Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to save unlock code to file. Ensure you use a valid file path");
+                MessageBox.Show("Unable to save unlock code to file. Ensure you use a valid file path\n" + ex.Message);
             }
         }
-
 
         /// <summary>
         /// Copies the unlock code to the clipboard.
@@ -404,15 +437,14 @@ namespace ExtractLicenseUI
             {
                 var tempFolder = Path.GetTempPath();
                 var fileName = Path.Combine(tempFolder, LicenseInfo.ExpiringLicenseUnlockFileName);
-                this.SelectedOrganization.SelectedLicense.GenerateUnlockCode(this.SelectedOrganization, tempFolder);
+                this.SelectedLicense.GenerateUnlockCode(this.MainWindow.Organization.SelectedOrganization, tempFolder);
                 this.CopyFileToClipboard(fileName);
             }
-            catch(Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to copy unlock code to clipboard.");
+                MessageBox.Show("Unable to copy unlock code to clipboard.\n" + ex.Message);
             }
         }
-
 
         /// <summary>
         /// Copies the file to the clipboard.
@@ -426,27 +458,9 @@ namespace ExtractLicenseUI
                 stringCollection.Add(filePath);
                 Clipboard.SetFileDropList(stringCollection);
             }
-            catch(Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show("Unable to copy file to clipboard.");
-            }
-        }
-
-
-        /// <summary>
-        /// Opens the hyper link in default browser.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Hyperlink_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                System.Diagnostics.Process.Start(this.SelectedOrganization.SalesforceHyperlink);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show($@"Cannot open link to: {this.SelectedOrganization.SalesforceHyperlink}");
+                MessageBox.Show("Unable to copy file to clipboard.\n" + ex.Message);
             }
         }
 
@@ -468,7 +482,7 @@ namespace ExtractLicenseUI
                     break;
                 case LicenseNavigationOptions.ViewLicense:
                     using (var databaseReader = new DatabaseReader())
-                        this.PackageHeaders = databaseReader.ReadPackages(this.SelectedOrganization.SelectedLicense);
+                        this.PackageHeaders = databaseReader.ReadPackages(this.SelectedLicense);
                     break;
                 case LicenseNavigationOptions.None: break;
             }
@@ -516,9 +530,9 @@ namespace ExtractLicenseUI
                     this.CloneButton.Visibility = System.Windows.Visibility.Visible;
                     this.SaveLicenseToFile.Visibility = System.Windows.Visibility.Visible;
                     this.CopyLicenseToClipboard.Visibility = System.Windows.Visibility.Visible;
-                    this.SaveUnlockCodeToFile.Visibility = this.SelectedOrganization.SelectedLicense.IsPermanent? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
-                    this.CopyUnlockCodeToClipboard.Visibility = this.SelectedOrganization.SelectedLicense.IsPermanent ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
-                    this.EditLicense.Visibility = System.Windows.Visibility.Visible; 
+                    this.SaveUnlockCodeToFile.Visibility = this.SelectedLicense.IsPermanent ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+                    this.CopyUnlockCodeToClipboard.Visibility = this.SelectedLicense.IsPermanent ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+                    this.EditLicense.Visibility = System.Windows.Visibility.Visible;
                     break;
                 case LicenseNavigationOptions.None: break;
             }
@@ -532,7 +546,7 @@ namespace ExtractLicenseUI
         /// <param name="e"></param>
         private void GenerateLicenseName_Click(object sender, RoutedEventArgs e)
         {
-            this.SelectedOrganization.SelectedLicense.LicenseName = GenerateLicenseName();
+            this.SelectedLicense.LicenseName = GenerateLicenseName();
         }
 
         private void EditLicense_Click(object sender, RoutedEventArgs e)
@@ -571,9 +585,48 @@ namespace ExtractLicenseUI
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            using var databaseWriter = new DatabaseWriter();
-            databaseWriter.WriteLicense(this.SelectedOrganization);
-            this.ConfigureNavigationOption(LicenseNavigationOptions.ViewLicense);
+            try
+            {
+                using var databaseWriter = new DatabaseWriter();
+                databaseWriter.WriteLicense(this.MainWindow.Organization.SelectedOrganization, this.SelectedLicense);
+                this.ConfigureNavigationOption(LicenseNavigationOptions.ViewLicense);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Unable to update license.\n" + ex.Message);
+            }
+        }
+
+        public void OnFragmentNavigation(FragmentNavigationEventArgs e)
+        {
+        }
+
+        public void OnNavigatedFrom(NavigationEventArgs e)
+        {
+        }
+
+        public void OnNavigatedTo(NavigationEventArgs e)
+        {
+            Thread thread = new Thread(new ThreadStart(LoadLicense));
+            thread.Start();
+        }
+
+        /// <summary>
+        /// This is needed because on first load the page has not loaded. Therefore
+        /// any modifications to controls does not take (buttons wont be hidden/disabled etc).
+        /// </summary>
+        private void LoadLicense()
+        {
+            Thread.Sleep(200);
+            this.Dispatcher.Invoke(() =>
+            {
+                this.SelectedLicense = this.MainWindow.LicenseContainer.License;
+                this.ConfigureNavigationOption(this.MainWindow.LicenseContainer.LicenseNavigationOption);
+            });
+        }
+
+        public void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
         }
     }
 }

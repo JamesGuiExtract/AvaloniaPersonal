@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using FirstFloor.ModernUI.Presentation;
 
 namespace ExtractLicenseUI.Database
@@ -12,7 +13,6 @@ namespace ExtractLicenseUI.Database
         private string _CustomerName;
         private string _Reseller;
         private string _SalesforceHyperlink = string.Empty;
-        private ExtractLicense _SelectedLicense = new ExtractLicense();
         private Collection<ExtractLicense> _Licenses = new Collection<ExtractLicense>();
         private ObservableCollection<Contact> _Contacts = new ObservableCollection<Contact>();
 
@@ -23,7 +23,6 @@ namespace ExtractLicenseUI.Database
                 OnPropertyChanged(nameof(Contacts));
             };
         }
-
 
         /// <summary>
         /// A unique identifier for the organization.
@@ -86,14 +85,16 @@ namespace ExtractLicenseUI.Database
         /// All of the licenses associated with a particular customer.
         /// </summary>
         public Collection<ExtractLicense> Licenses {
-            get { return this._Licenses; }
+            get 
+            {
+                return new Collection<ExtractLicense>(this._Licenses.OrderByDescending(x => x.IssuedOn).ToList());
+            }
             set
             {
                 this._Licenses = value;
                 OnPropertyChanged(nameof(Licenses));
             }
         }
-
 
         /// <summary>
         /// All of the contacts associated with an organization.
@@ -108,16 +109,15 @@ namespace ExtractLicenseUI.Database
             }
         }
 
-        /// <summary>
-        /// The active selected license to be modified.
-        /// </summary>
-        public ExtractLicense SelectedLicense {
-            get { return this._SelectedLicense; }
-            set
-            {
-                this._SelectedLicense = value;
-                OnPropertyChanged(nameof(SelectedLicense));
-            }
+        public override bool Equals(object obj)
+        {
+            return obj is Organization organization &&
+                   Guid.Equals(organization.Guid);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Guid.GetHashCode();
         }
     }
 }

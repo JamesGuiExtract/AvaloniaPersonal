@@ -4,34 +4,6 @@
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI">
     <ScrollViewer>
         <StackPanel x:Name="Form" Orientation="Vertical">
-            <StackPanel.Resources>
-                <Style TargetType="StackPanel">
-                    <Setter Property="Orientation" Value="Horizontal" />
-                    <Setter Property="Margin" Value="0,0,0,4" />
-                </Style>
-                <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
-                    <Setter Property="Width" Value="130" />
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                </Style>
-                <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
-                    <Setter Property="Padding" Value="0,3" />
-                </Style>
-                <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
-                    <Setter Property="Padding" Value="0,3" />
-                </Style>
-            </StackPanel.Resources>
-            <Border BorderThickness="1" BorderBrush="Black" Padding="3,5,3,0" Margin="0,5,0,5">
-                <StackPanel Orientation="Vertical">
-                    <StackPanel>
-                        <Label Content="Customer Name" Target="{Binding ElementName=CustomerName}"></Label>
-                        <TextBlock Name="CustomerName" Width="150" Text="{Binding SelectedOrganization.CustomerName}"></TextBlock>
-                    </StackPanel>
-                    <StackPanel>
-                        <Label Content="Reseller" Target="{Binding ElementName=Reseller}"></Label>
-                        <TextBlock x:Name="Reseller" Width="150" Text="{Binding SelectedOrganization.Reseller, Mode=TwoWay, ValidatesOnDataErrors=True}"></TextBlock>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
             <Border BorderThickness="1" BorderBrush="Black" Padding="3,5,3,0" Margin="0,5,0,5">
                 <StackPanel Orientation="Vertical">
                     <DataGrid x:Name="ContactGrid" 

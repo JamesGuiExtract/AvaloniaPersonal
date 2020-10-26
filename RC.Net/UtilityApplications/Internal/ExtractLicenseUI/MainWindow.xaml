@@ -3,15 +3,14 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   Title="License Generator"
+                  ContentSource="/Pages/Organization.xaml"
                   Width="1200px"
                   Height="850px">
     <mui:ModernWindow.MenuLinkGroups>
         <mui:LinkGroup x:Name="MainLinks">
             <mui:LinkGroup.Links>
-                <!--<mui:Link DisplayName="Home" Source="/Pages/Home.xaml" />-->
                 <mui:Link DisplayName="Organization" Source="/Pages/Organization.xaml" />
             </mui:LinkGroup.Links>
         </mui:LinkGroup>
     </mui:ModernWindow.MenuLinkGroups>
-    <ContentControl x:Name="MainContent"></ContentControl>
 </mui:ModernWindow>
