@@ -33,18 +33,53 @@ namespace Extract.Utilities
         /// </summary>
         public bool DivideHyphenatedWords { get; set; } = true;
 
+        /// <summary>
+        /// Whether to stem words (remove prefixes/suffixes)
+        /// </summary>
+        public bool UseStemmer { get; set; } = true;
+
         protected override TokenStreamComponents CreateComponents(string fieldName, TextReader reader)
         {
             Regex regex = new Regex(DivideHyphenatedWords ? _tokenPatternDivideHyphenatedWords : _tokenPatternPreserveHyphenatedWords);
             Tokenizer tokenizer = new PatternTokenizer(reader, regex, 0);
             TokenStream filter = new LowerCaseFilter(LuceneVersion.LUCENE_48, tokenizer);
-            filter = new EnglishPossessiveFilter(LuceneVersion.LUCENE_48, filter);
-            filter = new SnowballFilter(filter, new Lucene.Net.Tartarus.Snowball.Ext.EnglishStemmer());
+            if (UseStemmer)
+            {
+                filter = new EnglishPossessiveFilter(LuceneVersion.LUCENE_48, filter);
+                filter = new SnowballFilter(filter, new Lucene.Net.Tartarus.Snowball.Ext.EnglishStemmer());
+            }
             if (Synonyms != null)
             {
                 filter = new SynonymFilter(filter, Synonyms, true);
             }
             return new TokenStreamComponents(tokenizer, filter);
+        }
+
+        /// <summary>
+        /// Runs analysis on a string and returns the resulting tokens
+        /// </summary>
+        /// <param name="input">A string to process</param>
+        /// <returns>An enumeration of tokens</returns>
+        public static IList<string> GetTokens(Analyzer analyzer, string input, string fieldName = "")
+        {
+            try
+            {
+                static IEnumerable<bool> whileTrue(Func<bool> condition)
+                {
+                    while (condition()) yield return true;
+                }
+
+                using var stream = analyzer.GetTokenStream(fieldName, new StringReader(input));
+                stream.Reset();
+
+                return whileTrue(stream.IncrementToken)
+                    .Select(_ => stream.GetAttribute<ICharTermAttribute>().ToString())
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI51416");
+            }
         }
 
         /// <summary>
@@ -54,22 +89,10 @@ namespace Extract.Utilities
         /// <returns>A processed string</returns>
         public static string ProcessString(string input, SynonymMap synonyms = null)
         {
-            IEnumerable<bool> whileTrue(Func<bool> condition)
-            {
-                while (condition()) yield return true;
-            }
-
             try
             {
-                using (var analyzer = new LuceneSuggestionAnalyzer { Synonyms = synonyms })
-                using (var stream = analyzer.GetTokenStream("", new StringReader(input)))
-                {
-                    stream.Reset();
-
-                    return string.Join(" ",
-                        whileTrue(stream.IncrementToken)
-                        .Select(_ => stream.GetAttribute<ICharTermAttribute>().ToString()));
-                }
+                using var analyzer = new LuceneSuggestionAnalyzer { Synonyms = synonyms };
+                return string.Join(" ", GetTokens(analyzer, input));
             }
             catch (Exception ex)
             {

@@ -71,8 +71,8 @@ namespace Extract.Utilities
                     int rank = 0;
                     foreach (var target in targets.Where(target => !string.IsNullOrWhiteSpace(target)))
                     {
-                        var stdExpanded = string.Join(" ", ProcessString(_fieldAn[DIVIDE_HYPHEN_TOKENIZER_FIELD], target));
-                        var wsExpanded = string.Join(" ", ProcessString(_fieldAn[PRESERVE_HYPHEN_TOKENIZER_FIELD], target));
+                        var stdExpanded = string.Join(" ", LuceneSuggestionAnalyzer.GetTokens(_fieldAn[DIVIDE_HYPHEN_TOKENIZER_FIELD], target));
+                        var wsExpanded = string.Join(" ", LuceneSuggestionAnalyzer.GetTokens(_fieldAn[PRESERVE_HYPHEN_TOKENIZER_FIELD], target));
                         var doc = new Document
                         {
                             new StringField("Name", target, Field.Store.YES),
@@ -119,12 +119,12 @@ namespace Extract.Utilities
 
                 var query = new BooleanQuery();
 
-                var stdProcessed = ProcessString(_fieldAn[DIVIDE_HYPHEN_TOKENIZER_FIELD], searchPhrase).ToList();
+                var stdProcessed = LuceneSuggestionAnalyzer.GetTokens(_fieldAn[DIVIDE_HYPHEN_TOKENIZER_FIELD], searchPhrase);
                 var stdExpanded = string.Join(" ", stdProcessed);
                 var stdParser = new QueryParser(LuceneVersion.LUCENE_48, DIVIDE_HYPHEN_TOKENIZER_FIELD, _analyzer);
                 query.Add(stdParser.Parse(QueryParser.Escape(stdExpanded)), Occur.SHOULD);
 
-                var wsProcessed = ProcessString(_fieldAn[PRESERVE_HYPHEN_TOKENIZER_FIELD], searchPhrase).ToList();
+                var wsProcessed = LuceneSuggestionAnalyzer.GetTokens(_fieldAn[PRESERVE_HYPHEN_TOKENIZER_FIELD], searchPhrase);
                 var wsExpanded = string.Join(" ", wsProcessed);
                 var wsParser = new QueryParser(LuceneVersion.LUCENE_48, PRESERVE_HYPHEN_TOKENIZER_FIELD, _analyzer);
                 Query clause = wsParser.Parse(QueryParser.Escape(wsExpanded));
@@ -175,35 +175,6 @@ namespace Extract.Utilities
             }
         }
 
-        /// <summary>
-        /// Runs analysis on a string and joins the resulting tokens with a space
-        /// </summary>
-        /// <param name="input">A string to process</param>
-        /// <returns>A processed string</returns>
-        static IEnumerable<string> ProcessString(Analyzer analyzer, string input)
-        {
-            IEnumerable<bool> whileTrue(Func<bool> condition) 
-            { 
-                while (condition()) yield return true; 
-            }
-
-            try
-            {
-                using (var stream = analyzer.GetTokenStream("", new StringReader(input)))
-                {
-                    stream.Reset();
-
-                    return whileTrue(stream.IncrementToken)
-                        .Select(_ => stream.GetAttribute<ICharTermAttribute>().ToString())
-                        .ToList();
-
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45491");
-            }
-        }
         #endregion Methods
 
         #region IDisposable Support

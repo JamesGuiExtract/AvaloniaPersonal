@@ -1,4 +1,5 @@
 ﻿using Lucene.Net.Analysis;
+using Lucene.Net.Analysis.Miscellaneous;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers.Classic;
@@ -16,16 +17,21 @@ namespace Extract.Utilities
 {
     public class LuceneSuggestionProvider<T> : IDisposable
     {
+        #region Constants
+
+        const string STEMMED_FIELD = "stemmed";
+
+        #endregion Constants
 
         #region Fields
 
         FSDirectory _directory;
         Analyzer _analyzer;
         DirectoryInfo _tempDirectory;
-        private DirectoryReader _directoryReader;
+        DirectoryReader _directoryReader;
         IndexSearcher _searcher;
         List<string> _items = new List<string>();
-        HashSet<string> _fields = new HashSet<string>();
+        HashSet<string> _fields = new HashSet<string>() { STEMMED_FIELD };
 
         #endregion Fields
 
@@ -55,7 +61,10 @@ namespace Extract.Utilities
                 string tempDirectoryPath = Path.Combine(Path.GetTempPath(), "SuggestionProvider", Path.GetRandomFileName());
                 _tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
                 _directory = FSDirectory.Open(_tempDirectory);
-                _analyzer = new LuceneSuggestionAnalyzer();
+                var stemAnalyzer = new LuceneSuggestionAnalyzer();
+                var noStemAnalyzer = new LuceneSuggestionAnalyzer { UseStemmer = false };
+                var dict = new Dictionary<string, Analyzer> { { STEMMED_FIELD, stemAnalyzer } };
+                _analyzer = new PerFieldAnalyzerWrapper(noStemAnalyzer, dict);
                 using (var writer = new IndexWriter(_directory, new IndexWriterConfig(Lucene.Net.Util.LuceneVersion.LUCENE_48, _analyzer)))
                 {
                     int rank = 0;
@@ -74,6 +83,7 @@ namespace Extract.Utilities
                             _fields.Add(field);
                             if (!string.IsNullOrWhiteSpace(value))
                             {
+                                doc.Add(new TextField(STEMMED_FIELD, value, Field.Store.YES));
                                 doc.Add(new TextField(field, value, Field.Store.YES));
                             }
                         }
@@ -118,39 +128,150 @@ namespace Extract.Utilities
                 {
                     return _items;
                 }
-                else if (excludeLowScoring)
+                else
                 {
-                    var result = GetSuggestionsAndScores(searchPhrase).ToList();
+                    var initialLimit = excludeLowScoring ? int.MaxValue : maxSuggestions;
+                    var result = GetSuggestionsAndScores(searchPhrase, false, initialLimit).ToList();
 
-                    // If the search phrase is at least two chars long, attempt to limit the results
-                    // to only the best by using the standard deviation + median of the scores as a threshold
+                    // If the search phrase is at least two chars long, check the quality of the results
                     if (searchPhrase.Length > 1)
                     {
-                        // Result is sorted by score
-                        var scores = result.Select(t => t.Item2).ToList();
-                        double mean = scores.Average();
-                        double median = scores[scores.Count / 2];
-                        double sigma = Math.Sqrt(scores.Sum(s => Math.Pow(s - mean, 2)) / scores.Count);
-                        double cutoff = median + sigma;
-                        var trimmed = result.Where(t => t.Item2 >= cutoff).Select(t => t.Item1).ToList();
-                        if (trimmed.Any())
+                        // Try again using a fuzzy term for the last term if the results are undifferentiated
+                        if (ShouldTryAgain(searchPhrase, result))
                         {
-                            return trimmed.Take(maxSuggestions);
+                            result = GetSuggestionsAndScores(searchPhrase, true, initialLimit).ToList();
+                        }
+
+                        if (excludeLowScoring)
+                        {
+                            var stats = new Stats(result);
+                            double cutoff = stats.Median + stats.StandardDeviation;
+                            var trimmed = result.Where(t => t.Item2 >= cutoff).Select(t => t.Item1).ToList();
+                            if (trimmed.Any())
+                            {
+                                return trimmed.Take(maxSuggestions);
+                            }
                         }
                     }
 
-                    return result.Select(t => t.Item1).Take(maxSuggestions);
-                }
-                else
-                {
-                    return GetSuggestionsAndScores(searchPhrase, maxSuggestions)
-                        .Select(t => t.Item1);
+                    return result
+                        .Select(t => t.Item1)
+                        .Take(maxSuggestions);
                 }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45447");
             }
+        }
+
+        bool ShouldTryAgain(string searchPhrase, List<Tuple<string, double>> suggestionsAndScores)
+        {
+            var isLastWordCompleteAlready = searchPhrase.Length > 1 && char.IsWhiteSpace(searchPhrase.Last());
+            return !isLastWordCompleteAlready
+                && suggestionsAndScores.Count > 1
+                && suggestionsAndScores[0].Item2 == suggestionsAndScores[suggestionsAndScores.Count - 1].Item2;
+        }
+
+        bool UpdateQueryForField(BooleanQuery query, string searchPhrase, string field, bool considerAllWordsComplete)
+        {
+            Query clause = null;
+
+            // Divide into tokens and normalize (lower-case)
+            var terms = LuceneSuggestionAnalyzer.GetTokens(_analyzer, searchPhrase, field);
+
+            if (!terms.Any())
+            {
+                return false;
+            }
+
+            bool lastTermMightBeIncomplete = !(considerAllWordsComplete || char.IsWhiteSpace(searchPhrase.Last()));
+
+            string escaped = QueryParser.Escape(string.Join(" ", terms));
+
+            // Parse the search string into a query clause using the same analyzer
+            // that was used for building the index
+            if (escaped != null)
+            {
+                var parser = new QueryParser(Lucene.Net.Util.LuceneVersion.LUCENE_48, field, _analyzer);
+                clause = parser.Parse(escaped);
+                query.Add(clause, Occur.SHOULD);
+            }
+
+            // Add a wildcard query if the last term is might be incomplete
+            var lastTerm = terms.Last();
+            if (lastTermMightBeIncomplete)
+            {
+                // If there is only a single term, include a SpanFirstQuery with extra weight.
+                // This query will use position info and will only match items where
+                // the term appears as the first term in the field
+                if (terms.Count == 1)
+                {
+                    clause = new SpanFirstQuery(
+                        new SpanMultiTermQueryWrapper<PrefixQuery>(
+                        new PrefixQuery(new Term(field, lastTerm))), 1);
+                    clause.Boost = 1.1f;
+                    query.Add(clause, Occur.SHOULD);
+
+                    // Also add a non-span-first query
+                    // Exclude the first position from this query so as not to count first position twice
+                    // This query seems to count more than it should... so use 0.5 for the boost
+                    clause = new SpanNotQuery(
+                        include: new SpanMultiTermQueryWrapper<PrefixQuery>(
+                            new PrefixQuery(new Term(field, lastTerm))),
+                        exclude: new SpanFirstQuery(
+                            new SpanMultiTermQueryWrapper<PrefixQuery>(
+                            new PrefixQuery(new Term(field, lastTerm))), 1));
+                    clause.Boost = 0.5f;
+                    query.Add(clause, Occur.SHOULD);
+                }
+                else
+                {
+                    clause = new PrefixQuery(new Term(field, lastTerm));
+                    query.Add(clause, Occur.SHOULD);
+
+                    // Add another clause for all the other terms
+                    // so that the last word isn't counted twice
+                    foreach (var term in terms.Take(terms.Count - 1))
+                    {
+                        query.Add(new TermQuery(new Term(field, term)) {Boost = 0.5f}, Occur.SHOULD);
+                    }
+                }
+            }
+
+            // Add a span first query to boost the first word if there is more than one
+            // word or if not lastTermMightBeIncomplete (to compensate for the lacking prefix query above)
+            if (terms.Count > 1 || !lastTermMightBeIncomplete)
+            {
+                clause = new SpanFirstQuery(new SpanTermQuery(
+                    new Term(field, terms.First())), 1);
+                clause.Boost = 0.1f;
+                query.Add(clause, Occur.SHOULD);
+            }
+
+            // Add a fuzzy query for the last term in case it is a complete word
+            if (!lastTermMightBeIncomplete && lastTerm.Length > 1)
+            {
+                clause = new FuzzyQuery(
+                        new Term(field, lastTerm), lastTerm.Length > 3 ? 2 : 1);
+
+                clause.Boost = 0.1f;
+                query.Add(clause, Occur.SHOULD);
+            }
+
+            // Add a fuzzy query for each term except the last, which was added above.
+            foreach (var term in terms.Take(terms.Count - 1).Where(t => t.Length > 1))
+            {
+                clause = new FuzzyQuery(new Term(field, term), term.Length > 3 ? 2 : 1);
+                clause.Boost = 0.1f;
+                query.Add(clause, Occur.SHOULD);
+            }
+
+            // Add a match-everything clause so that the list remains a constant size
+            // https://extract.atlassian.net/browse/ISSUE-15166
+            query.Add(new MatchAllDocsQuery(), Occur.SHOULD);
+
+            return true;
         }
 
         /// <summary>
@@ -160,7 +281,7 @@ namespace Extract.Utilities
         /// <param name="maxSuggestions">The maximum number of suggestions to return</param>
         [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
         public IEnumerable<Tuple<string, double>> GetSuggestionsAndScores(string searchPhrase,
-            int maxSuggestions = int.MaxValue)
+            bool considerAllWordsComplete, int maxSuggestions)
         {
             try
             {
@@ -169,105 +290,13 @@ namespace Extract.Utilities
                     return _items.Select(s => Tuple.Create(s, 0.0)).Take(maxSuggestions);
                 }
 
-                // The analyzer lower-cases and stems the terms so convert the search string to match
-                var terms = LuceneSuggestionAnalyzer.ProcessString(searchPhrase)
-                    .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (!terms.Any())
-                {
-                    return _items.Select(s => Tuple.Create(s, 0.0)).Take(maxSuggestions);
-                }
-
-                bool lastTermMightBeIncomplete = !char.IsWhiteSpace(searchPhrase.Last());
-
-                string escaped = null;
-                escaped = QueryParser.Escape(string.Join(" ", terms));
-
                 var query = new BooleanQuery();
-                Query clause = null;
                 foreach (var field in _fields)
                 {
-                    // Parse the search string into a query clause using the same analyzer
-                    // that was used for building the index
-                    if (escaped != null)
+                    if (!UpdateQueryForField(query, searchPhrase, field, considerAllWordsComplete))
                     {
-                        var parser = new QueryParser(Lucene.Net.Util.LuceneVersion.LUCENE_48, field, _analyzer);
-                        clause = parser.Parse(escaped);
-                        query.Add(clause, Occur.SHOULD);
+                        return _items.Select(s => Tuple.Create(s, 0.0)).Take(maxSuggestions);
                     }
-
-                    // Add a wildcard query if the last term is might be incomplete
-                    var lastTerm = terms.Last();
-                    if (lastTermMightBeIncomplete)
-                    {
-                        // If there is only a single term, include a SpanFirstQuery with extra weight.
-                        // This query will use position info and will only match items where
-                        // the term appears as the first term in the field
-                        if (terms.Length == 1)
-                        {
-                            clause = new SpanFirstQuery(
-                                new SpanMultiTermQueryWrapper<PrefixQuery>(
-                                new PrefixQuery(new Term(field, lastTerm))), 1);
-                            clause.Boost = 1.1f;
-                            query.Add(clause, Occur.SHOULD);
-
-                            // Also add a non-span-first query
-                            // Exclude the first position from this query so as not to count first position twice
-                            // This query seems to count more than it should... so use 0.5 for the boost
-                            clause = new SpanNotQuery(
-                                include: new SpanMultiTermQueryWrapper<PrefixQuery>(
-                                    new PrefixQuery(new Term(field, lastTerm))),
-                                exclude: new SpanFirstQuery(
-                                    new SpanMultiTermQueryWrapper<PrefixQuery>(
-                                    new PrefixQuery(new Term(field, lastTerm))), 1));
-                            clause.Boost = 0.5f;
-                            query.Add(clause, Occur.SHOULD);
-                        }
-                        else
-                        {
-                            clause = new PrefixQuery(new Term(field, lastTerm));
-                            query.Add(clause, Occur.SHOULD);
-
-                            // Add another clause for all the other terms
-                            // so that the last word isn't counted twice
-                            foreach (var term in terms.Take(terms.Length - 1))
-                            {
-                                query.Add(new TermQuery(new Term(field, term)) {Boost = 0.5f}, Occur.SHOULD);
-                            }
-                        }
-                    }
-
-                    // Add a span first query to boost the first word if there is more than one
-                    // word or if not lastTermMightBeIncomplete (to compensate for the lacking prefix query above)
-                    if (terms.Length > 1 || !lastTermMightBeIncomplete)
-                    {
-                        clause = new SpanFirstQuery(new SpanTermQuery(
-                            new Term(field, terms.First())), 1);
-                        clause.Boost = 0.1f;
-                        query.Add(clause, Occur.SHOULD);
-                    }
-
-                    // Add a fuzzy query for the last term in case it is a complete word
-                    if (!lastTermMightBeIncomplete && lastTerm.Length > 1)
-                    {
-                        clause = new FuzzyQuery(
-                                new Term(field, lastTerm), lastTerm.Length > 3 ? 2 : 1);
-
-                        clause.Boost = 0.1f;
-                        query.Add(clause, Occur.SHOULD);
-                    }
-
-                    // Add a fuzzy query for each term except the last, which was added above.
-                    foreach (var term in terms.Take(terms.Length - 1).Where(t => t.Length > 1))
-                    {
-                        clause = new FuzzyQuery(new Term(field, term), term.Length > 3 ? 2 : 1);
-                        clause.Boost = 0.1f;
-                        query.Add(clause, Occur.SHOULD);
-                    }
-
-                    // Add a match-everything clause so that the list remains a constant size
-                    // https://extract.atlassian.net/browse/ISSUE-15166
-                    query.Add(new MatchAllDocsQuery(), Occur.SHOULD);
                 }
 
                 var topDocs = _searcher.Search(query, maxSuggestions);
@@ -342,5 +371,22 @@ namespace Extract.Utilities
 
         #endregion Destructors
 
+        #region Private Classes
+
+        class Stats
+        {
+            public double Median { get; }
+            public double StandardDeviation { get; }
+            public Stats (IEnumerable<Tuple<string, double>> queryResults)
+            {
+                // Result is sorted by score. See GetSuggestionsAndScores
+                var scores = queryResults.Select(t => t.Item2).ToList();
+                double mean = scores.Average();
+                Median = scores[scores.Count / 2];
+                StandardDeviation = Math.Sqrt(scores.Sum(s => Math.Pow(s - mean, 2)) / scores.Count);
+            }
+        }
+
+        #endregion
     }
 }
