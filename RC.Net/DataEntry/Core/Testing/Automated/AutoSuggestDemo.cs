@@ -12,9 +12,10 @@ namespace Extract.DataEntry.Test
 {
     public partial class AutoSuggestDemo : DataEntryControlHost
     {
-        private List<string> docTypes;
-        List<KeyValuePair<string, List<string>>> procedures;
-        string[][] proceduresForValidator;
+        const string DOCTYPE_RESOURCE_NAME = "Resources.LuceneSuggestionProvider.doctypes.txt";
+        const string PROCEDURE_RESOURCE_NAME = "Resources.LuceneSuggestionProvider.procedures.txt";
+        const string DEPT_RESOURCE_NAME = "Resources.LuceneSuggestionProvider.departments.txt";
+
         List<Control> controls;
         FlowLayoutPanel mainPanel;
 
@@ -22,6 +23,8 @@ namespace Extract.DataEntry.Test
         bool ShowLowScoringSuggestions { get; set; } = false;
         AutoDropDownMode AutoDropDownMode { get; set; } = AutoDropDownMode.Never;
         bool AutomaticallySelectBestMatchingItem { get; set; } = false;
+
+        string ValidationList { get; set; } = PROCEDURE_RESOURCE_NAME;
 
         public AutoSuggestDemo()
         {
@@ -48,10 +51,6 @@ namespace Extract.DataEntry.Test
 
             ExtractException.EndBlockExceptionDisplays();
 
-            docTypes = GetDocumentTypes().ToList();
-            procedures = GetProcedures().ToList();
-            proceduresForValidator = procedures.Select(kv => kv.Value.ToArray()).ToArray();
-
             BuildMainPanels();
             BuildDataEntryControls();
         }
@@ -64,10 +63,11 @@ namespace Extract.DataEntry.Test
             var topPanel = new FlowLayoutPanel { FlowDirection = FlowDirection.LeftToRight, Dock = DockStyle.Top, AutoSize = true };
             mainPanel.Controls.Add(topPanel);
 
-            BuildPropertySetterGroup(topPanel, nameof(IDataEntryAutoCompleteControl.LimitNumberOfSuggestions));
-            BuildPropertySetterGroup(topPanel, nameof(IDataEntryAutoCompleteControl.ShowLowScoringSuggestions));
-            BuildPropertySetterGroup(topPanel, nameof(IDataEntryAutoCompleteControl.AutoDropDownMode));
-            BuildPropertySetterGroup(topPanel, nameof(IDataEntryAutoCompleteControl.AutomaticallySelectBestMatchingItem));
+            BuildPropertySetterGroup(topPanel, nameof(LimitNumberOfSuggestions));
+            BuildPropertySetterGroup(topPanel, nameof(ShowLowScoringSuggestions));
+            BuildPropertySetterGroup(topPanel, nameof(AutoDropDownMode));
+            BuildPropertySetterGroup(topPanel, nameof(AutomaticallySelectBestMatchingItem));
+            BuildPropertySetterGroup(topPanel, nameof(ValidationList));
         }
 
         void BuildPropertySetterGroup(Control container, string propertyName)
@@ -78,7 +78,7 @@ namespace Extract.DataEntry.Test
 
             switch (propertyName)
             {
-                case nameof(IDataEntryAutoCompleteControl.LimitNumberOfSuggestions):
+                case nameof(LimitNumberOfSuggestions):
                     var limitNumberOfSuggestions = new CheckBox { Text = "Limit suggestions for typed text", AutoSize = true };
                     panel.Controls.Add(limitNumberOfSuggestions);
                     var numericBox = new NumericUpDown { Minimum = 1, Maximum = int.MaxValue, Enabled = LimitNumberOfSuggestions.HasValue };
@@ -97,7 +97,7 @@ namespace Extract.DataEntry.Test
                     };
                     break;
 
-                case nameof(IDataEntryAutoCompleteControl.ShowLowScoringSuggestions):
+                case nameof(ShowLowScoringSuggestions):
                     var showLowScoring = new CheckBox { Text = "Show low scoring suggestions", AutoSize = true };
                     panel.Controls.Add(showLowScoring);
                     showLowScoring.Checked = ShowLowScoringSuggestions;
@@ -108,7 +108,7 @@ namespace Extract.DataEntry.Test
                     };
                     break;
 
-                case nameof(IDataEntryAutoCompleteControl.AutoDropDownMode):
+                case nameof(AutoDropDownMode):
                     var never = new RadioButton { Text = "Never", AutoSize = true, Checked = AutoDropDownMode == AutoDropDownMode.Never };
                     panel.Controls.Add(never);
                     var always = new RadioButton { Text = "Always", AutoSize = true, Checked = AutoDropDownMode == AutoDropDownMode.Always };
@@ -130,7 +130,7 @@ namespace Extract.DataEntry.Test
                     whenEmpty.CheckedChanged += changeDelegate;
                     break;
 
-                case nameof(IDataEntryAutoCompleteControl.AutomaticallySelectBestMatchingItem):
+                case nameof(AutomaticallySelectBestMatchingItem):
                     var automaticallySelect = new CheckBox { Text = "Select best matching item automatically", AutoSize = true };
                     panel.Controls.Add(automaticallySelect);
                     automaticallySelect.Checked = AutomaticallySelectBestMatchingItem;
@@ -139,6 +139,28 @@ namespace Extract.DataEntry.Test
                         AutomaticallySelectBestMatchingItem = automaticallySelect.Checked;
                         BuildDataEntryControls();
                     };
+                    break;
+
+                case nameof(ValidationList):
+                    var doctype = new RadioButton { Text = "Document types", AutoSize = true, Checked = ValidationList == DOCTYPE_RESOURCE_NAME };
+                    panel.Controls.Add(doctype);
+                    var procedure = new RadioButton { Text = "Procedures", AutoSize = true, Checked = ValidationList == PROCEDURE_RESOURCE_NAME };
+                    panel.Controls.Add(procedure);
+                    var dept = new RadioButton { Text = "Departments", AutoSize = true, Checked = ValidationList == DEPT_RESOURCE_NAME };
+                    panel.Controls.Add(dept);
+                    EventHandler validationListChangeDelegate = delegate
+                    {
+                        if (doctype.Checked)
+                            ValidationList = DOCTYPE_RESOURCE_NAME;
+                        else if (procedure.Checked)
+                            ValidationList = PROCEDURE_RESOURCE_NAME;
+                        else if (dept.Checked)
+                            ValidationList = DEPT_RESOURCE_NAME;
+                        BuildDataEntryControls();
+                    };
+                    doctype.CheckedChanged += validationListChangeDelegate;
+                    procedure.CheckedChanged += validationListChangeDelegate;
+                    dept.CheckedChanged += validationListChangeDelegate;
                     break;
             }
             container.Controls.Add(group);
@@ -202,17 +224,18 @@ namespace Extract.DataEntry.Test
                 case DataEntryTextBox textBox:
                     textBox.DataEntryControlHost = this;
                     autoSuggest = GetAutoSuggest(textBox);
-                    autoSuggest.UpdateAutoCompleteList(procedures);
+                    autoSuggest.UpdateAutoCompleteList(GetValidationListForDataEntryControl(ValidationList));
                     break;
                 case DataEntryComboBox combo:
                     combo.DataEntryControlHost = this;
                     autoSuggest = GetAutoSuggest(combo);
-                    autoSuggest.UpdateAutoCompleteList(procedures);
-                    CreateValidator(combo).SetAutoCompleteValues(proceduresForValidator);
+                    var valList = GetValidationListForDataEntryControl(ValidationList).ToList();
+                    autoSuggest.UpdateAutoCompleteList(valList);
+                    CreateValidator(combo).SetAutoCompleteValues(valList.Select(kv => kv.Value.ToArray()).ToArray());
                     break;
                 case DocumentTypeComboBox combo:
                     combo.DataEntryControlHost = this;
-                    combo.SetAutoCompleteValues(docTypes);
+                    combo.SetAutoCompleteValues(GetValidationListForDocumentTypeCombo(ValidationList));
                     break;
                 case DataEntryTable table:
                     table.DataEntryControlHost = this;
@@ -223,7 +246,10 @@ namespace Extract.DataEntry.Test
                     tableAttributes.PushBack(tableAttribute);
                     table.SetAttributes(tableAttributes);
                     var validator = (DataEntryValidator)AttributeStatusInfo.GetStatusInfo(attribute).Validator;
-                    validator.SetAutoCompleteValues(proceduresForValidator);
+                    validator.SetAutoCompleteValues(
+                        GetValidationListForDataEntryControl(ValidationList)
+                        .Select(kv => kv.Value.ToArray())
+                        .ToArray());
                     break;
             }
         }
@@ -290,21 +316,21 @@ namespace Extract.DataEntry.Test
             return validator;
         }
 
-        static IEnumerable<string> GetDocumentTypes()
+        static IEnumerable<string> GetValidationListForDocumentTypeCombo(string resourceName)
         {
             using var stream =
                 Assembly.GetExecutingAssembly()
-                .GetManifestResourceStream(typeof(AutoSuggestDemo),"Resources.LuceneSuggestionProvider.doctypes.txt");
+                .GetManifestResourceStream(typeof(AutoSuggestDemo), resourceName);
             using var reader = new StreamReader(stream);
             while (!reader.EndOfStream)
                 yield return reader.ReadLine();
         }
 
-        static IEnumerable<KeyValuePair<string, List<string>>> GetProcedures()
+        static IEnumerable<KeyValuePair<string, List<string>>> GetValidationListForDataEntryControl(string resourceName)
         {
             using var stream =
                 Assembly.GetExecutingAssembly()
-                .GetManifestResourceStream(typeof(AutoSuggestDemo),"Resources.LuceneSuggestionProvider.procedures.txt");
+                .GetManifestResourceStream(typeof(AutoSuggestDemo), resourceName);
             using var reader = new StreamReader(stream);
             while (!reader.EndOfStream)
             {
