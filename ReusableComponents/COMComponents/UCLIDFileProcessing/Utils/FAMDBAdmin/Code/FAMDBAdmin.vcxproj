@@ -110,6 +110,7 @@
       <CLRThreadAttribute>STAThreadingAttribute</CLRThreadAttribute>
       <AdditionalOptions>/Ignore:4249 %(AdditionalOptions)</AdditionalOptions>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>..\..\..\..\..\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -158,6 +159,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <CLRThreadAttribute>STAThreadingAttribute</CLRThreadAttribute>
       <AdditionalOptions>/Ignore:4249 %(AdditionalOptions)</AdditionalOptions>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>..\..\..\..\..\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>

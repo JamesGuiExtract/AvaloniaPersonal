@@ -252,7 +252,11 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\LearningMachineTrainer.exe" /mapout:"$(BinariesFolder)\Map\mapLMTrainer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\MLModelTrainer.exe" /mapout:"$(BinariesFolder)\Map\mapMLModelTrainer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DashboardCreator.exe" /mapout:"$(BinariesFolder)\Map\mapDashboardCreator.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\DashboardCreator.exe"
+	sn -Ra "$(BinariesFolder)\Obfuscated\DashboardCreator.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DashboardViewer.exe" /mapout:"$(BinariesFolder)\Map\mapDashboardViewer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\DashboardViewer.exe"
+	sn -Ra "$(BinariesFolder)\Obfuscated\DashboardViewer.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.ETL.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.ETL.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.ETL.Management.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.ETL.Management.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Dashboard.Utilities.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Dashboard.Utilities.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
