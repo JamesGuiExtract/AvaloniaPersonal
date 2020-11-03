@@ -274,9 +274,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 var firstSourceFileName = pageInfos
-            .OrderBy(sourcePage => !sourcePage.Deleted) // Prefer (but not require) a non-deleted source document
-            .FirstOrDefault()
-            ?.DocumentName;
+                    .OrderBy(sourcePage => !sourcePage.Deleted) // Prefer (but not require) a non-deleted source document
+                    .FirstOrDefault()
+                    ?.DocumentName;
 
                 var sourcePageInfo = (firstSourceFileName == null)
                     ? null

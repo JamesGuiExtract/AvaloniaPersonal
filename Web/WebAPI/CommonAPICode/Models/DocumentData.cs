@@ -2309,7 +2309,7 @@ namespace WebAPI.Models
                     // the document could still be in use
                     if (entry.RemovedReason == CacheEntryRemovedReason.Expired)
                     {
-                        // Note: As of PDFBox 1.50 Dispose doesn't appear to do anything
+                        // Note: As of PDFSharp 1.50 Dispose doesn't appear to do anything
                         ((PdfDocument)entry.CacheItem.Value).Dispose();
                     }
                 });

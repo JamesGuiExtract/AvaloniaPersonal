@@ -1427,6 +1427,12 @@ namespace Extract.UtilityApplications.NERAnnotation
                     _pathTags.Dispose();
                     _pathTags = null;
                 }
+
+                if (_afUtility != null)
+                {
+                    _afUtility.Dispose();
+                    _afUtility = null;
+                }
             }
         }
 

@@ -165,7 +165,7 @@ namespace Extract.Utilities
             }
         }
 
-        bool ShouldTryAgain(string searchPhrase, List<Tuple<string, double>> suggestionsAndScores)
+        static bool ShouldTryAgain(string searchPhrase, List<Tuple<string, double>> suggestionsAndScores)
         {
             var isLastWordCompleteAlready = searchPhrase.Length > 1 && char.IsWhiteSpace(searchPhrase.Last());
             return !isLastWordCompleteAlready

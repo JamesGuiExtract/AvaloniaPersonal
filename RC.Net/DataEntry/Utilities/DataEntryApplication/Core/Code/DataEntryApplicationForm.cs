@@ -3286,10 +3286,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                var sourceFile = e.PageInfo
-                    .Select(pageInfo => pageInfo.DocumentName)
-                    .First();
-
                 ExtractException.Assert("ELI47283", "FileTaskSession was not started.", _fileTaskSessionID.HasValue);
 
                 _paginatedOutputCreationUtility.WritePaginationHistory(
@@ -3310,10 +3306,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                var firstSourceFile = e.DeletedPageInfo
-                    .Select(pageInfo => pageInfo.DocumentName)
-                    .First();
-                
                 ExtractException.Assert("ELI47217", "FileTaskSession was not started.", _fileTaskSessionID.HasValue);
 
                 _paginatedOutputCreationUtility.WritePaginationHistory(

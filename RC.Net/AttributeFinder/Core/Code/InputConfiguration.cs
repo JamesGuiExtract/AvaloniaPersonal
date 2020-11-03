@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -400,7 +401,7 @@ namespace Extract.AttributeFinder
                 writer.WriteLine("AttributesPath: " + AttributesPath);
                 writer.WriteLine("InputPath: " + InputPath);
                 writer.WriteLine("InputPathType: " + InputPathType);
-                writer.WriteLine("TrainingSetPercentage: " + TrainingSetPercentage);
+                writer.WriteLine("TrainingSetPercentage: " + TrainingSetPercentage.ToString(CultureInfo.InvariantCulture));
                 writer.Indent = oldIndent;
             }
             catch (Exception e)
