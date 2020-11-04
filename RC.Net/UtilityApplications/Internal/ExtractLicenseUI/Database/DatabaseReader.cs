@@ -233,6 +233,58 @@ namespace ExtractLicenseUI.Database
             return packageHeaders;
         }
 
+        /// <summary>
+        /// Gets a license from the database based on guid.
+        /// </summary>
+        /// <param name="guid">The guid of the license to get</param>
+        /// <param name="transferLicenseDepth">This prevents infinite recursion. Such as linking two licenses together, or linking a license to itself =).</param>
+        /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "The query uses parameters")]
+        public ExtractLicense GetLicenseFromDatabase(Guid guid, int transferLicenseDepth)
+        {
+            transferLicenseDepth -= 1;
+            ExtractLicense extractLicense = null;
+            using SqlConnection sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString);
+            sqlConnection.Open();
+            using (SqlCommand command = new SqlCommand(
+$@"SELECT 
+	License.[GUID]
+    , [Request_Key]
+    , [Issued_By]
+    , [Issued_On]
+    , [Expires_On]
+    , [Active]
+    , [Transfer_License]
+    , [Upgraded_License]
+    , [Machine_Name]
+    , [Comments]
+    , [Production]
+    , [License_Key]
+    , [Signed_Transfer_Form]
+    , [SDK_Password]
+    , [Extract_Version_GUID]
+    , dbo.ExtractVersion.Version
+    , [License_Name]
+    , [Restrict_By_Disk_Serial_Number]
+FROM 
+	[dbo].[License]
+        LEFT OUTER JOIN dbo.ExtractVersion
+            ON dbo.License.Extract_Version_GUID = dbo.ExtractVersion.GUID
+WHERE
+    [dbo].[License].Guid = @Guid", sqlConnection))
+            {
+                command.Parameters.AddWithValue("@Guid", guid);
+                using SqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        extractLicense = this.CreateNewLicense(reader, transferLicenseDepth);
+                    }
+                }
+            }
+            return extractLicense;
+        }
 
         /// <summary>
         /// Get all licenses associated with an organization.
@@ -252,6 +304,7 @@ $@"SELECT
     , [Expires_On]
     , [Active]
     , [Transfer_License]
+    , [Upgraded_License]
     , [Machine_Name]
     , [Comments]
     , [Production]
@@ -275,30 +328,7 @@ WHERE
                     {
                         while (reader.Read())
                         {
-                            var licenseToAdd = new ExtractLicense()
-                            {
-                                Guid = Guid.Parse(reader["Guid"].ToString()),
-                                RequestKey = reader["Request_Key"]?.ToString(),
-                                IssuedBy = reader["Issued_By"].ToString(),
-                                IssuedOn = DateTime.Parse(reader["Issued_On"].ToString(), CultureInfo.InvariantCulture),
-                                ExpiresOn = string.IsNullOrEmpty(reader["Expires_On"]?.ToString()) ? (DateTime?)null : DateTime.Parse(reader["Expires_On"].ToString(), CultureInfo.InvariantCulture),
-                                IsActive = bool.Parse(reader["Active"].ToString()),
-                                TransferLicense = string.IsNullOrEmpty(reader["Transfer_License"].ToString()) ? (Guid?)null : Guid.Parse(reader["Transfer_License"].ToString()),
-                                ExtractVersion = new ExtractVersion()
-                                {
-                                    Guid = Guid.Parse(reader["Extract_Version_GUID"].ToString()),
-                                    Version = reader["Version"].ToString()
-                                },
-                                MachineName = reader["Machine_Name"].ToString(),
-                                Comments = reader["Comments"].ToString(),
-                                IsProduction = bool.Parse(reader["Production"].ToString()),
-                                LicenseKey = reader["License_Key"].ToString(),
-                                SignedTransferForm = bool.Parse(reader["Signed_Transfer_Form"].ToString()),
-                                SDKPassword = reader["SDK_Password"].ToString(),
-                                LicenseName = reader["License_Name"].ToString(),
-                                RestrictByDiskSerialNumber = bool.Parse(reader["Restrict_By_Disk_Serial_Number"].ToString()),
-                                IsPermanent = string.IsNullOrEmpty(reader["Expires_On"]?.ToString()) ? true : false,
-                            };
+                            var licenseToAdd = CreateNewLicense(reader, 5);
 
                             extractLicenses.Add(licenseToAdd);
                         }
@@ -307,6 +337,39 @@ WHERE
             }
 
             return extractLicenses;
+        }
+
+        private ExtractLicense CreateNewLicense(SqlDataReader reader, int transferLicenseDepth)
+        {
+            if(transferLicenseDepth == 1)
+            {
+                return null;
+            }
+            return new ExtractLicense()
+            {
+                Guid = Guid.Parse(reader["Guid"].ToString()),
+                RequestKey = reader["Request_Key"]?.ToString(),
+                IssuedBy = reader["Issued_By"].ToString(),
+                IssuedOn = DateTime.Parse(reader["Issued_On"].ToString(), CultureInfo.InvariantCulture),
+                ExpiresOn = string.IsNullOrEmpty(reader["Expires_On"]?.ToString()) ? (DateTime?)null : DateTime.Parse(reader["Expires_On"].ToString(), CultureInfo.InvariantCulture),
+                IsActive = bool.Parse(reader["Active"].ToString()),
+                TransferLicense = string.IsNullOrEmpty(reader["Transfer_License"].ToString()) ? null : this.GetLicenseFromDatabase(Guid.Parse(reader["Transfer_License"].ToString()), transferLicenseDepth),
+                UpgradedLicense = string.IsNullOrEmpty(reader["Upgraded_License"].ToString()) ? null : this.GetLicenseFromDatabase(Guid.Parse(reader["Upgraded_License"].ToString()), transferLicenseDepth),
+                ExtractVersion = new ExtractVersion()
+                {
+                    Guid = Guid.Parse(reader["Extract_Version_GUID"].ToString()),
+                    Version = reader["Version"].ToString()
+                },
+                MachineName = reader["Machine_Name"].ToString(),
+                Comments = reader["Comments"].ToString(),
+                IsProduction = bool.Parse(reader["Production"].ToString()),
+                LicenseKey = reader["License_Key"].ToString(),
+                SignedTransferForm = bool.Parse(reader["Signed_Transfer_Form"].ToString()),
+                SDKPassword = reader["SDK_Password"].ToString(),
+                LicenseName = reader["License_Name"].ToString(),
+                RestrictByDiskSerialNumber = bool.Parse(reader["Restrict_By_Disk_Serial_Number"].ToString()),
+                IsPermanent = string.IsNullOrEmpty(reader["Expires_On"]?.ToString()) ? true : false,
+            };
         }
 
         /// <summary>

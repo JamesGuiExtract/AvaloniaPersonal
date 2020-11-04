@@ -88,13 +88,8 @@
                                     <TextBlock x:Name="IssuedBy" Width="150" Text="{Binding SelectedLicense.IssuedBy}"></TextBlock>
                                 </StackPanel>
                                 <StackPanel>
-                                    <Label Content="Transfer License" Target="{Binding ElementName=TransferLicense}"></Label>
-                                    <TextBox x:Name="TransferLicense" Width="150" Text="Not implemented"  IsEnabled="False"></TextBox>
-                                    <!--Text="{Binding SelectedOrganization.SelectedLicense.TransferLicense}" -->
-                                </StackPanel>
-                                <StackPanel>
                                     <Label Content="Machine Name" Target="{Binding ElementName=MachineName}"></Label>
-                                    <TextBox x:Name="MachineName" Width="150" Text="{Binding SelectedLicense.MachineName, ValidatesOnDataErrors=True}" IsEnabled="False"></TextBox>
+                                    <TextBox x:Name="MachineName" Width="150" Text="{Binding SelectedLicense.MachineName, ValidatesOnDataErrors=True}" IsReadOnly="True"></TextBox>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="SDK Password" Target="{Binding ElementName=SDKPassword}"></Label>
@@ -103,10 +98,6 @@
                                 <StackPanel>
                                     <Label Content="License Key" Target="{Binding ElementName=LicenseKey}"></Label>
                                     <TextBlock x:Name="LicenseKey" Width="150" Text="{Binding SelectedLicense.LicenseKey}" ToolTip="{Binding SelectedLicense.LicenseKey}"></TextBlock>
-                                </StackPanel>
-                                <StackPanel>
-                                    <Label Content="Signed Transfer Form" Target="{Binding ElementName=SignedTransferForm}"></Label>
-                                    <CheckBox x:Name="SignedTransferForm" Width="150" IsChecked="{Binding SelectedLicense.SignedTransferForm}"></CheckBox>
                                 </StackPanel>
                                 <StackPanel>
                                     <Label Content="Active" Target="{Binding ElementName=IsActive}"></Label>
@@ -118,7 +109,7 @@
                                 </StackPanel>
                             </StackPanel>
                             
-                            <StackPanel Orientation="Horizontal" Height="420px">
+                            <StackPanel Orientation="Horizontal" MaxHeight="420px">
                                 <ScrollViewer>
                                     <StackPanel Orientation="Vertical">
                                         <Label x:Name="CloneLabel" Content="Clone"></Label>
@@ -141,7 +132,7 @@
                                         </TreeView>
                                     </StackPanel>
                                 </ScrollViewer>
-                                <ScrollViewer x:Name="ClonedPackageSelector" Visibility="Collapsed">
+                                <ScrollViewer x:Name="ClonedPackageSelector" Visibility="Collapsed" MaxHeight="420px">
                                     <StackPanel Orientation="Vertical">
                                         <Label Content="Original"></Label>
                                         <TreeView x:Name="ClonedPackageTreeView" ItemsSource="{Binding ClonedPackageHeaders}"  >
@@ -186,6 +177,24 @@
                                 </TextBox.Style>
                             </TextBox>
                             <Button x:Name="GenerateLicenseNameButton" Content="Generate License Name" Click="GenerateLicenseName_Click"></Button>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="Upgraded From" Target="{Binding ElementName=UpgradedLicense}"></Label>
+                            <TextBox Width="800" Text="{Binding SelectedLicense.UpgradedLicense.LicenseName}" IsReadOnly="True"></TextBox>
+                            <Button x:Name="UpgradedLicense" Content="Link License" Click="UpgradedLicense_Click"></Button>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="Previous Version"></Label>
+                            <TextBox Width="800" Text="{Binding SelectedLicense.UpgradedLicense.ExtractVersion.Version}" IsReadOnly="True"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="Transfered From" Target="{Binding ElementName=TransferLicense}"></Label>
+                            <TextBox Width="800" Text="{Binding SelectedLicense.TransferLicense.LicenseName}" IsReadOnly="True"></TextBox>
+                            <Button x:Name="TransferLicense" Content="Link License" Click="TransferLicense_Click"></Button>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="Signed Transfer Form" Target="{Binding ElementName=SignedTransferForm}"></Label>
+                            <CheckBox x:Name="SignedTransferForm" Width="150" IsChecked="{Binding SelectedLicense.SignedTransferForm}"></CheckBox>
                         </StackPanel>
                         <StackPanel>
                             <Button x:Name="SaveButton" Content="Save" Click="SaveButton_Click"></Button>

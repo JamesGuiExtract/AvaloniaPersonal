@@ -98,6 +98,9 @@
     <Compile Include="PagesContent\LicenseTable.xaml.cs">
       <DependentUpon>LicenseTable.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PagesContent\LinkedLicense.xaml.cs">
+      <DependentUpon>LinkedLicense.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utility\LicenseContainer.cs" />
     <Compile Include="Utility\LicenseNavigation.cs" />
     <Page Include="MainWindow.xaml">
@@ -134,6 +137,10 @@
     <Page Include="PagesContent\License.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PagesContent\LinkedLicense.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\Organization.xaml">
       <Generator>MSBuild:Compile</Generator>

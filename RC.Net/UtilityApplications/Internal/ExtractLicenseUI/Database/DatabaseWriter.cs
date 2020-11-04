@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ExtractLicenseUI.Database
 {
@@ -65,6 +62,7 @@ BEGIN
 		, [Expires_On]
 		, [Active]
 		, [Transfer_License]
+        , [Upgraded_License]
 		, [Machine_Name]
 		, [Comments]
 		, [Production]
@@ -85,6 +83,7 @@ BEGIN
 		, @Expires_On
 		, @Active
 		, @Transfer_License
+        , @Upgraded_License
 		, @Machine_Name
 		, @Comments
 		, @Production
@@ -105,6 +104,8 @@ SET
 	, Active = @Active
 	, Production = @Production
 	, License_Name = @License_Name
+    , Transfer_License = @Transfer_License
+    , Upgraded_License = @Upgraded_License
 WHERE
 	dbo.License.GUID = @GUID";
 
@@ -140,7 +141,8 @@ WHERE
                 command.Parameters.AddWithValue("@Issued_On", license.IssuedOn);
                 command.Parameters.AddWithValue("@Expires_On", HandleNullTypes(license.ExpiresOn));
                 command.Parameters.AddWithValue("@Active", license.IsActive);
-                command.Parameters.AddWithValue("@Transfer_License", HandleNullTypes(license.TransferLicense));
+                command.Parameters.AddWithValue("@Transfer_License", HandleNullTypes(license.TransferLicense?.Guid));
+                command.Parameters.AddWithValue("@Upgraded_License", HandleNullTypes(license.UpgradedLicense?.Guid));
                 command.Parameters.AddWithValue("@Machine_Name", license.MachineName);
                 command.Parameters.AddWithValue("@Comments", HandleNullTypes(license.Comments));
                 command.Parameters.AddWithValue("@Production", license.IsProduction);

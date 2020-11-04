@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="ExtractLicenseUI.PagesContent.LinkedLicense"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ExtractLicenseUI.PagesContent"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="1200">
+    <Grid>
+        <DataGrid x:Name="LicenseGrid" 
+                              ItemsSource="{Binding SelectedOrganization.Licenses, UpdateSourceTrigger=PropertyChanged}" 
+                              AutoGenerateColumns="False" 
+                              MaxHeight="500px"
+                              IsReadOnly="True">
+
+            <DataGrid.Columns>
+                <mui:DataGridTextColumn Header="License Name" Binding="{Binding LicenseName}" MaxWidth="350" ToolTipService.ToolTip="{Binding LicenseName}">
+                    <mui:DataGridTextColumn.CellStyle>
+                        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                            <Setter Property="ToolTip" Value="{Binding LicenseName}"></Setter>
+                        </Style>
+                    </mui:DataGridTextColumn.CellStyle>
+                </mui:DataGridTextColumn>
+                <mui:DataGridTextColumn Header="Machine Name" Binding="{Binding MachineName}"></mui:DataGridTextColumn>
+                <mui:DataGridTextColumn Header="Issued By" Binding="{Binding IssuedBy}"></mui:DataGridTextColumn>
+                <mui:DataGridTextColumn Header="Expires On" Binding="{Binding ExpiresOn}"></mui:DataGridTextColumn>
+                <mui:DataGridTextColumn Header="Issued On" Binding="{Binding IssuedOn}" SortDirection="Descending"></mui:DataGridTextColumn>
+                <mui:DataGridTextColumn Header="Is Active" Binding="{Binding IsActive}"></mui:DataGridTextColumn>
+                <DataGridTemplateColumn Header="License">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button x:Name="LinkLicense" Click="LinkLicense_Click" Content="Link"></Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

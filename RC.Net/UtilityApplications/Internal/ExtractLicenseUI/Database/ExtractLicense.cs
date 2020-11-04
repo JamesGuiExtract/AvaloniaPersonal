@@ -16,7 +16,8 @@ namespace ExtractLicenseUI.Database
         private DateTime _IssuedOn;
         private DateTime? _ExpiresOn = DateTime.Now.AddDays(30);
         private bool _IsActive;
-        private Guid? _TransferLicense;
+        private ExtractLicense _TransferLicense;
+        private ExtractLicense _UpgradedLicense;
         private string _MachineName;
         private string _Comments;
         private bool _Isproduction;
@@ -176,7 +177,7 @@ namespace ExtractLicenseUI.Database
         /// <summary>
         /// If this license was transfered to another one, link it here.
         /// </summary>
-        public Guid? TransferLicense
+        public ExtractLicense TransferLicense
         {
             get { return this._TransferLicense; }
             set
@@ -185,6 +186,22 @@ namespace ExtractLicenseUI.Database
                 {
                     this._TransferLicense = value;
                     OnPropertyChanged(nameof(TransferLicense));
+                }
+            }
+        }
+
+        /// <summary>
+        /// If this license was upgraded link it here.
+        /// </summary>
+        public ExtractLicense UpgradedLicense
+        {
+            get { return this._UpgradedLicense; }
+            set
+            {
+                if (this._UpgradedLicense != value)
+                {
+                    this._UpgradedLicense = value;
+                    OnPropertyChanged(nameof(UpgradedLicense));
                 }
             }
         }

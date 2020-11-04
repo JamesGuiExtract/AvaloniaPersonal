@@ -10,8 +10,10 @@ using System.Windows;
 using System.Windows.Controls;
 using Extract.Licensing.Internal;
 using ExtractLicenseUI.Database;
+using ExtractLicenseUI.PagesContent;
 using ExtractLicenseUI.Utility;
 using FirstFloor.ModernUI.Windows;
+using FirstFloor.ModernUI.Windows.Controls;
 using FirstFloor.ModernUI.Windows.Navigation;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
@@ -506,6 +508,8 @@ namespace ExtractLicenseUI
                     this.LicenseName.IsEnabled = true;
                     this.GenerateLicenseNameButton.Visibility = System.Windows.Visibility.Visible;
                     this.UpdateButton.Visibility = System.Windows.Visibility.Visible;
+                    this.TransferLicense.Visibility = System.Windows.Visibility.Visible;
+                    this.UpgradedLicense.Visibility = System.Windows.Visibility.Visible;
                     break;
                 case LicenseNavigationOptions.CloneLicense:
                     this.CloneLabel.Visibility = System.Windows.Visibility.Visible;
@@ -525,6 +529,8 @@ namespace ExtractLicenseUI
                     this.GenerateRequestKey.Visibility = System.Windows.Visibility.Visible;
                     this.GenerateLicenseNameButton.Visibility = System.Windows.Visibility.Visible;
                     this.UseDiskSerialNumber.IsEnabled = true;
+                    this.TransferLicense.Visibility = System.Windows.Visibility.Visible;
+                    this.UpgradedLicense.Visibility = System.Windows.Visibility.Visible;
                     break;
                 case LicenseNavigationOptions.ViewLicense:
                     this.CloneButton.Visibility = System.Windows.Visibility.Visible;
@@ -561,7 +567,6 @@ namespace ExtractLicenseUI
             this.IsPermanent.IsEnabled = false;
             this.ExpiresOn.IsEnabled = false;
             this.IssuedOn.IsEnabled = false;
-            this.TransferLicense.IsEnabled = false;
             this.Comments.IsEnabled = false;
             this.SDKPassword.IsEnabled = false;
             this.SignedTransferForm.IsEnabled = false;
@@ -581,6 +586,8 @@ namespace ExtractLicenseUI
             this.EditLicense.Visibility = System.Windows.Visibility.Collapsed;
             this.UpdateButton.Visibility = System.Windows.Visibility.Collapsed;
             this.CloneLabel.Visibility = System.Windows.Visibility.Collapsed;
+            this.TransferLicense.Visibility = System.Windows.Visibility.Collapsed;
+            this.UpgradedLicense.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
@@ -627,6 +634,62 @@ namespace ExtractLicenseUI
 
         public void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
+        }
+
+        /// <summary>
+        /// Opens the transfer license dialog, and if a license
+        /// is selected obtains its guid, otherwise nullfies the field.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TransferLicense_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                this.SelectedLicense.TransferLicense = this.CreateLinkedLicenseDialog("Transfer License");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Unable to link a license.\n" + ex.Message);
+            }
+        }
+
+        private void UpgradedLicense_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                this.SelectedLicense.UpgradedLicense = this.CreateLinkedLicenseDialog("Upgraded License");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unable to link a license.\n" + ex.Message);
+            }
+        }
+
+        private ExtractLicense CreateLinkedLicenseDialog(string title)
+        {
+            var modernDialog = new ModernDialog
+            {
+                Title = title,
+                ResizeMode = ResizeMode.CanResize,
+                Width = 1250,
+                MaxWidth = 1250,
+            };
+
+            var transferLicense = new LinkedLicense(this.MainWindow.Organization.SelectedOrganization, modernDialog);
+
+            modernDialog.Content = transferLicense;
+            modernDialog.Buttons = new Button[] { modernDialog.CancelButton };
+            modernDialog.ShowDialog();
+
+            if (modernDialog.MessageBoxResult.Equals(MessageBoxResult.Cancel))
+            {
+                return null;
+            }
+            else
+            {
+                return transferLicense.License;
+            }
         }
     }
 }
