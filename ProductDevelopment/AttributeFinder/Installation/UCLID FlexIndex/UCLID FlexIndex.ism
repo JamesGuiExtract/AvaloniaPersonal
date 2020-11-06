@@ -191,10 +191,6 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>Accord.MachineLearning.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{DDD7F878-1944-46CE-AA31-D7DF7FAED994}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>accord.machinelearning.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Accord.Math.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{E353FF9B-655E-4D6D-BC2E-9B09E80449C5}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>accord.math.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Accord.Neuro.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{EF60479A-C663-4FE1-B4FA-CFFE392FCF5D}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>accord.neuro.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Accord.Statistics.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{8C7549CA-9DFE-48E5-96AB-1BBBD1D50ED9}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>accord.statistics.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{80D6B994-D835-40E8-9853-AF4DA26BD434}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{0A2EF2BF-07F6-4115-9CE9-57308764A533}</td><td>FILE_PROCESSING_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>statisticsreporter.exe.confi.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AppBackendFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{DCBA1BC4-3AB9-4F79-9FFB-F2B2EC7637E8}</td><td>APP_BACKEND_API.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>152</td><td/><td>web.config1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -540,11 +536,7 @@
 		<row><td>UCLIDAFValueFinders.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDAFValueFinders.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDA~1.DLL|UCLIDAFValueFinders.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\UCLIDAFValueFinders.dll</td><td>17</td><td/></row>
 		<row><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDA~1.DLL|UCLIDAFValueModifiers.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\UCLIDAFValueModifiers.dll</td><td>17</td><td/></row>
 		<row><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDF~1.DLL|UCLIDFileProcessing.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\UCLIDFileProcessing.dll</td><td>17</td><td/></row>
-		<row><td>accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Accord.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_ML_PACKAGES_FILES&gt;\Accord.3.0.2\lib\net40\Accord.dll</td><td>1</td><td/></row>
-		<row><td>accord.machinelearning.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Accord.MachineLearning.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ACCORD~1.DLL|Accord.MachineLearning.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_ML_PACKAGES_FILES&gt;\Accord.MachineLearning.3.0.2\lib\net40\Accord.MachineLearning.dll</td><td>1</td><td/></row>
-		<row><td>accord.math.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Accord.Math.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ACCORD~1.DLL|Accord.Math.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_ML_PACKAGES_FILES&gt;\Accord.Math.3.0.2\lib\net40\Accord.Math.dll</td><td>1</td><td/></row>
-		<row><td>accord.neuro.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Accord.Neuro.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ACCORD~1.DLL|Accord.Neuro.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_ML_PACKAGES_FILES&gt;\Accord.Neuro.3.0.2\lib\net40\Accord.Neuro.dll</td><td>1</td><td/></row>
-		<row><td>accord.statistics.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Accord.Statistics.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ACCORD~1.DLL|Accord.Statistics.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_ML_PACKAGES_FILES&gt;\Accord.Statistics.3.0.2\lib\net40\Accord.Statistics.dll</td><td>1</td><td/></row>
+		<row><td>accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Accord.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Accord.dll</td><td>1</td><td/></row>
 		<row><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>adodb.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>adodb.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;ProgramFilesFolder&gt;\microsoft.net\primary interop assemblies\adodb.dll</td><td>1</td><td/></row>
 		<row><td>appsettings.json.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>DocumentAPIFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>appsettings.json</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_WEB_API_DOCUMENT_API_FILES&gt;\appsettings.json</td><td>1</td><td/></row>
 		<row><td>appsettings.json1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>AppBackendFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>appsettings.json</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_WEB_API_APP_BACKEND_FILES&gt;\appsettings.json</td><td>1</td><td/></row>
@@ -751,10 +743,6 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>Accord.MachineLearning.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_F2F184E6_8FFE_4351_9E3B_83D076F3B77A_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Accord.Math.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_3F96EB0E_CD3B_4320_B3E1_34BCE8C18189_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Accord.Neuro.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_2DAD114E_2CED_40B9_B612_44CEF1AB3F3E_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Accord.Statistics.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_50151322_5046_473E_A177_28F2D05B03B7_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_FFB1E815_F8BD_426E_99D7_5EABC602F043_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_496E8BCD_F9F5_4299_93B7_47E98B3A132E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>AppBackendFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_947507DE_FFAB_475E_A751_3195C3FF7662_FILTER</td><td/><td/><td/><td/></row>
@@ -939,6 +927,7 @@
 		<col def="S0">IncludeFiles</col>
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
+		<row><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_RELEASE_FILES&gt;</td><td>4</td><td>Accord*.dll</td><td>Accord.dll</td><td>10</td></row>
 		<row><td>AuthorizationAPIFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_AUTHORIZATIONAPI_NETCOREAPP2.2_FILES&gt;</td><td>4</td><td/><td>Properties, *.development.*, *.dev.*, *.pdb, *.xml, AuthorizationAPI.dll,web.config</td><td>10</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_NONSELFREGCOMMON_FILES&gt;</td><td>4</td><td/><td>AFCommon.rl, RWUtils.dll</td><td>2</td></row>
 		<row><td>ProgramDataFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_PROGRAMDATAFILE_FI&gt;</td><td>4</td><td/><td/><td>10</td></row>
@@ -1729,10 +1718,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="s72">Component</col>
 		<col key="yes" def="s72">ModuleID</col>
 		<col key="yes" def="i2">Language</col>
-		<row><td>Accord.MachineLearning.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
-		<row><td>Accord.Math.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
-		<row><td>Accord.Neuro.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
-		<row><td>Accord.Statistics.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>AppBackendFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
