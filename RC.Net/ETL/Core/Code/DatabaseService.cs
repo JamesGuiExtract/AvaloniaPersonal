@@ -778,10 +778,10 @@ namespace Extract.ETL
                         cmd.CommandText = @"
                             SELECT COALESCE(MIN(CASE WHEN ActiveFAM.ID IS NOT NULL AND DateTimeStamp IS NULL THEN FileTaskSession.ID END) - 1,
                                     MAX(FileTaskSession.ID))
-                                FROM FileTaskSession
-                                INNER JOIN TaskClass ON TaskClass.ID = FileTaskSession.TaskClassID
-                                LEFT JOIN FAMSession ON FAMSessionID = FAMSession.ID
-                                LEFT JOIN ActiveFAM ON FAMSession.ID = ActiveFAM.FAMSessionID 
+                                FROM FileTaskSession WITH (NOLOCK)
+                                INNER JOIN TaskClass WITH (NOLOCK) ON TaskClass.ID = FileTaskSession.TaskClassID
+                                LEFT JOIN FAMSession WITH (NOLOCK) ON FAMSessionID = FAMSession.ID
+                                LEFT JOIN ActiveFAM WITH (NOLOCK) ON FAMSession.ID = ActiveFAM.FAMSessionID 
                         ";
 
                         if (onlyTasksStoringAttributes)
