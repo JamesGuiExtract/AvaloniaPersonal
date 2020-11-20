@@ -107,7 +107,7 @@ namespace Extract.ETL
                 
                 ;WITH TouchedFiles AS (
                 	SELECT FileTaskSession.ID FileTaskSessionID, FileID, FileTaskSession.DateTimeStamp
-                	FROM FileTaskSession INNER JOIN TaskClass ON FileTaskSession.TaskClassID = TaskClass.ID
+                	FROM FileTaskSession WITH (NOLOCK) INNER JOIN TaskClass ON FileTaskSession.TaskClassID = TaskClass.ID
                 	WHERE FileTaskSession.ID > @LastProcessedID AND FileTaskSession.ID <= @LastInBatchID
                         AND TaskClass.GUID IN (
                             '{Constants.TaskClassStoreRetrieveAttributes}',
@@ -139,7 +139,7 @@ namespace Extract.ETL
                     
                     FROM AttributeSetForFile
                     INNER JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
-                    INNER JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID 
+                    INNER JOIN FileTaskSession WITH (NOLOCK) ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID 
                     	AND FileTaskSession.ID <= @LastInBatchID
                     INNER JOIN @FilesTable FT ON FT.FileID = FileTaskSession.FileID 
                     GROUP BY AttributeSetName.Description
@@ -163,13 +163,13 @@ namespace Extract.ETL
                  INNER JOIN MostRecent expected 
                   ON found.Description = @FoundSetName AND Expected.Description = @ExpectedSetName 
                    AND found.FileID = expected.FileID
-                    INNER JOIN FileTaskSession foundFTS 
+                    INNER JOIN FileTaskSession foundFTS WITH (NOLOCK)
                             ON found.MostRecentFileTaskSession = foundFTS.ID
-                    INNER JOIN FAMSession foundFS 
+                    INNER JOIN FAMSession foundFS  WITH (NOLOCK)
                         ON foundFTS.FAMSessionID = foundFS.ID
-                    INNER JOIN FileTaskSession expectedFTS 
+                    INNER JOIN FileTaskSession expectedFTS  WITH (NOLOCK)
                             ON expected.MostRecentFileTaskSession = expectedFTS.ID
-                    INNER JOIN FAMSession expectedFS 
+                    INNER JOIN FAMSession expectedFS  WITH (NOLOCK)
                         ON expectedFTS.FAMSessionID = expectedFS.ID
                  INNER JOIN AttributeSetForFile FoundAttributeSet 
                   ON FoundAttributeSet.FileTaskSessionID = found.MostRecentFileTaskSession 

@@ -109,7 +109,7 @@ namespace Extract.ETL
 	            ,COALESCE([Duration], 0.0) [Duration]
 	            ,COALESCE([OverheadTime], 0.0) [OverheadTime]
 	            ,COALESCE([ActivityTime], 0.0) [ActivityTime]
-            FROM [dbo].[FileTaskSession]
+            FROM [dbo].[FileTaskSession] WITH (NOLOCK)
             INNER JOIN [dbo].[TaskClass]
 	            ON [TaskClass].[ID] = [FileTaskSession].[TaskClassID]
             WHERE [TaskClass].GUID IN (

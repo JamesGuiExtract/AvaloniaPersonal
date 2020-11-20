@@ -56,7 +56,7 @@ namespace Extract.ETL
 				SELECT DISTINCT FileID
 					FROM AttributeSetForFile 
 					INNER JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
-					INNER JOIN FileTaskSession ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID 
+					INNER JOIN FileTaskSession WITH (NOLOCK) ON AttributeSetForFile.FileTaskSessionID = FileTaskSession.ID 
                         AND FileTaskSession.ID >= @StartFileTaskSessionSetID AND FileTaskSession.ID <= @EndFileTaskSessionSetID
 					WHERE AttributeSetName.Description IN (@FoundSetName, @ExpectedSetName)
                     AND FileTaskSession.DateTimeStamp IS NOT NULL
@@ -81,7 +81,7 @@ namespace Extract.ETL
 				;WITH ExpectedFTS AS (
 				SELECT DISTINCT affectedFiles.FileID, MAX(AttributeSetForFile.FileTaskSessionID) AS ID
 					FROM @affectedFiles affectedFiles
-					INNER JOIN FileTaskSession ON affectedFiles.FileID = FileTaskSession.FileID
+					INNER JOIN FileTaskSession WITH (NOLOCK) ON affectedFiles.FileID = FileTaskSession.FileID
                         AND FileTaskSession.ID <= @EndFileTaskSessionSetID AND FileTaskSession.ActionID IS NOT NULL
 					INNER JOIN AttributeSetForFile ON FileTaskSession.ID = AttributeSetForFile.FileTaskSessionID
 					INNER JOIN AttributeSetName ON AttributeSetNameID = AttributeSetName.ID
@@ -95,15 +95,15 @@ namespace Extract.ETL
 					,FileTaskSession.ID AS FoundFTSID
 					,Pagination.ID AS PaginationID
 				FROM ExpectedFTS
-				LEFT JOIN Pagination ON (ExpectedFTS.FileID = Pagination.DestFileID 
+				LEFT JOIN Pagination WITH (NOLOCK) ON (ExpectedFTS.FileID = Pagination.DestFileID 
 					AND Pagination.SourceFileID <> Pagination.DestFileID 
 					AND Pagination.DestPage IS NOT NULL)
-				LEFT JOIN FileTaskSession ON
+				LEFT JOIN FileTaskSession WITH (NOLOCK) ON
 					(FileTaskSession.FileID = ExpectedFTS.FileID OR FileTaskSession.FileID = Pagination.OriginalFileID)
                     AND FileTaskSession.ID <= @EndFileTaskSessionSetID AND FileTaskSession.ActionID IS NOT NULL
 				INNER JOIN AttributeSetForFile ON FileTaskSession.ID = AttributeSetForFile.FileTaskSessionID
 				INNER JOIN AttributeSetName ON AttributeSetNameID = AttributeSetName.ID
-				LEFT JOIN FAMFile ON FileTaskSession.FileID = FAMFile.ID
+				LEFT JOIN FAMFile WITH (NOLOCK) ON FileTaskSession.FileID = FAMFile.ID
 				WHERE AttributeSetName.Description = @FoundSetName
 				)
 
@@ -122,16 +122,16 @@ namespace Extract.ETL
 						,expectedFTS.ActionID ExpectedActionID
 						,expectedFS.FAMUserID ExpectedFAMUserID
 				FROM FoundAndExpectedFTS
-					INNER JOIN FileTaskSession foundFTS ON FoundFTSID = foundFTS.ID
-					INNER JOIN FAMSession foundFS 
+					INNER JOIN FileTaskSession foundFTS WITH (NOLOCK) ON FoundFTSID = foundFTS.ID
+					INNER JOIN FAMSession foundFS  WITH (NOLOCK)
 						ON foundFTS.FAMSessionID = foundFS.ID
 					INNER JOIN FileTaskSession expectedFTS ON ExpectedFTSID = expectedFTS.ID
-					INNER JOIN FAMSession expectedFS 
+					INNER JOIN FAMSession expectedFS WITH (NOLOCK)
 						ON expectedFTS.FAMSessionID = expectedFS.ID
 					INNER JOIN AttributeSetForFile FoundAttributeSet ON FoundAttributeSet.FileTaskSessionID = FoundFTSID
 					INNER JOIN AttributeSetForFile ExpectedAttributeSet ON ExpectedAttributeSet.FileTaskSessionID = ExpectedFTSID
-					LEFT JOIN Pagination ON Pagination.ID = FoundAndExpectedFTS.PaginationID
-					INNER JOIN FAMFile ON foundFTS.FileID = FAMFile.ID
+					LEFT JOIN Pagination WITH (NOLOCK) ON Pagination.ID = FoundAndExpectedFTS.PaginationID
+					INNER JOIN FAMFile WITH (NOLOCK) ON foundFTS.FileID = FAMFile.ID
 					WHERE RANK = 1
 
                 -- Added to reduce deadlocks on communication buffers

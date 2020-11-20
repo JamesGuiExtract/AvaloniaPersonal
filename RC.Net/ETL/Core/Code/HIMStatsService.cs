@@ -88,7 +88,7 @@ namespace Extract.ETL
                 
                 ;WITH TouchedFiles AS (
                 	SELECT FileTaskSession.ID FileTaskSessionID, FileID, FileTaskSession.DateTimeStamp
-                	FROM FileTaskSession INNER JOIN TaskClass ON FileTaskSession.TaskClassID = TaskClass.ID
+                	FROM FileTaskSession WITH (NOLOCK) INNER JOIN TaskClass ON FileTaskSession.TaskClassID = TaskClass.ID
                 	WHERE FileTaskSession.ID > @LastProcessedID AND FileTaskSession.ID <= @LastInBatchID
                         AND ([TaskClass].GUID IN (
                             '{Constants.TaskClassDocumentApi}', 
@@ -117,15 +117,15 @@ namespace Extract.ETL
                             FileTaskSession.ActionID, 
                             ACTION.ASCName, 
                             MAX(Pagination.FileTaskSessionID) FileTaskSessionID
-                     FROM [dbo].[Pagination]
-                          INNER JOIN FileTaskSession ON FileTaskSession.ID =
+                     FROM [dbo].[Pagination] WITH (NOLOCK)
+                          INNER JOIN FileTaskSession WITH (NOLOCK) ON FileTaskSession.ID =
                           Pagination.FileTaskSessionID
                                                         AND FileTaskSession.ID >
                                                         @LastProcessedID
                                                         AND FileTaskSession.ID <=
                                                         @LastInBatchID
                           INNER JOIN ACTION ON FileTaskSession.ActionID = ACTION.ID
-                          INNER JOIN FAMSession ON FAMSession.ID = FileTaskSession.
+                          INNER JOIN FAMSession WITH (NOLOCK) ON FAMSession.ID = FileTaskSession.
                           FAMSessionID
                      WHERE FileTaskSession.ActionID IS NOT NULL
                            AND FileTaskSession.DateTimeStamp IS NOT NULL
@@ -146,14 +146,14 @@ namespace Extract.ETL
                             FileTaskSession.ActionID, 
                             ACTION.ASCName, 
                             MAX(FileTaskSession.ID) [FileTaskSessionID]
-                      FROM FileTaskSession
-                          INNER JOIN FAMSession ON
+                      FROM FileTaskSession WITH (NOLOCK)
+                          INNER JOIN FAMSession WITH (NOLOCK) ON
                           FAMSession.ID = FileTaskSession.FAMSessionID
                           INNER JOIN ACTION ON
                           FileTaskSession.ActionID = ACTION.ID
                           INNER JOIN TaskClass ON
                           FileTaskSession.TaskClassID = TaskClass.ID
-                       INNER JOIN FileActionStatus ON FileActionStatus.FileID = FileTaskSession.FileID 
+                       INNER JOIN FileActionStatus WITH (NOLOCK) ON FileActionStatus.FileID = FileTaskSession.FileID 
                        AND FileActionStatus.ActionID =  FileTaskSession.ActionID 
                        AND FileActionStatus.ActionStatus = 'C'
                      WHERE FileTaskSession.ID > @LastProcessedID
@@ -169,10 +169,10 @@ namespace Extract.ETL
                      AND (FileTaskSession.FileID NOT IN
                      (
                          SELECT SourceFileID
-                         FROM Pagination
+                         FROM Pagination WITH (NOLOCK)
                          UNION
                          SELECT DestFileID
-                         FROM Pagination
+                         FROM Pagination WITH (NOLOCK)
                      ))
                      GROUP BY FAMSession.FAMUserID, 
                               FileTaskSession.FileID, 
