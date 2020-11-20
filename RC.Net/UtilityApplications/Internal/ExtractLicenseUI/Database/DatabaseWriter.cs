@@ -72,6 +72,7 @@ BEGIN
 		, [Extract_Version_GUID]
 		, [License_Name]
 		, [Restrict_By_Disk_Serial_Number]
+        , [Pay_Royalties]
 	)
 	VALUES
 	(
@@ -93,6 +94,7 @@ BEGIN
 		, @Extract_Version_GUID
 		, @License_Name
 		, @Restrict_By_Disk_Serial_Number
+        , @Pay_Royalties
 	)
 END
 
@@ -106,6 +108,7 @@ SET
 	, License_Name = @License_Name
     , Transfer_License = @Transfer_License
     , Upgraded_License = @Upgraded_License
+    , Pay_Royalties = @Pay_Royalties
 WHERE
 	dbo.License.GUID = @GUID";
 
@@ -152,6 +155,7 @@ WHERE
                 command.Parameters.AddWithValue("@Extract_Version_GUID", license.ExtractVersion.Guid);
                 command.Parameters.AddWithValue("@License_Name", license.LicenseName);
                 command.Parameters.AddWithValue("@Restrict_By_Disk_Serial_Number", license.RestrictByDiskSerialNumber);
+                command.Parameters.AddWithValue("@Pay_Royalties", license.PayRoyalties);
                 command.ExecuteNonQuery();
             }
 

@@ -107,6 +107,10 @@
                                     <Label Content="Production" Target="{Binding ElementName=IsProduction}"></Label>
                                     <CheckBox x:Name="IsProduction" Width="150" IsChecked="{Binding SelectedLicense.IsProduction}"></CheckBox>
                                 </StackPanel>
+                                <StackPanel>
+                                    <Label Content="Pay Royalties" Target="{Binding ElementName=PayRoyalties}"></Label>
+                                    <CheckBox x:Name="PayRoyalties" Width="150" IsChecked="{Binding SelectedLicense.PayRoyalties}"></CheckBox>
+                                </StackPanel>
                             </StackPanel>
                             
                             <StackPanel Orientation="Horizontal" MaxHeight="420px">

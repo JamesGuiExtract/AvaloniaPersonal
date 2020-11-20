@@ -22,6 +22,7 @@ namespace ExtractLicenseUI.Database
         private string _Comments;
         private bool _Isproduction;
         private bool _RestrictByDiskSerialNumber = true;
+        private bool _PayRoyalties;
         private string _LicenseKey;
         private bool _SignedLicenseTransferForm;
         private bool _IsPermanent;
@@ -39,6 +40,21 @@ namespace ExtractLicenseUI.Database
             this.IsActive = true;
         }
 
+        /// <summary>
+        /// True or false depending on if we need to pay royalties for using a license.
+        /// </summary>
+        public bool PayRoyalties
+        {
+            get { return this._PayRoyalties; }
+            set
+            {
+                if (this._PayRoyalties != value)
+                {
+                    this._PayRoyalties = value;
+                    OnPropertyChanged(nameof(PayRoyalties));
+                }
+            }
+        }
 
         /// <summary>
         /// The unique identifier for the license.
@@ -97,7 +113,15 @@ namespace ExtractLicenseUI.Database
             get { return this._RequestKey; }
             set
             {
-                this._RequestKey = value;
+                if(value != null)
+                {
+                    //remove all of the white space because its common for it to be copied when copying from an email.
+                    this._RequestKey = value.Replace(@"\s+", string.Empty);
+                }
+                else
+                {
+                    this._RequestKey = value;
+                }
 
                 // We can ignore this exception because its possible for the request key to be null.
                 try

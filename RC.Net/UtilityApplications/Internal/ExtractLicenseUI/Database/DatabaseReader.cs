@@ -266,6 +266,7 @@ $@"SELECT
     , dbo.ExtractVersion.Version
     , [License_Name]
     , [Restrict_By_Disk_Serial_Number]
+    , [Pay_Royalties]
 FROM 
 	[dbo].[License]
         LEFT OUTER JOIN dbo.ExtractVersion
@@ -315,6 +316,7 @@ $@"SELECT
     , dbo.ExtractVersion.Version
     , [License_Name]
     , [Restrict_By_Disk_Serial_Number]
+    , [Pay_Royalties]
 FROM 
 	[dbo].[License]
         LEFT OUTER JOIN dbo.ExtractVersion
@@ -369,6 +371,7 @@ WHERE
                 LicenseName = reader["License_Name"].ToString(),
                 RestrictByDiskSerialNumber = bool.Parse(reader["Restrict_By_Disk_Serial_Number"].ToString()),
                 IsPermanent = string.IsNullOrEmpty(reader["Expires_On"]?.ToString()) ? true : false,
+                PayRoyalties = bool.Parse(reader["Pay_Royalties"].ToString()),
             };
         }
 

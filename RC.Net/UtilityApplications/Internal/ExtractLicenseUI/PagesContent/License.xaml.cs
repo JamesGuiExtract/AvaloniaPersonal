@@ -210,6 +210,13 @@ namespace ExtractLicenseUI
                 if ((bool)this.IsPermanent.IsChecked)
                 {
                     this.ExpiresOn.SelectedDate = null;
+                    this.PayRoyalties.IsEnabled = true;
+                    this.SelectedLicense.PayRoyalties = this.MainWindow.Organization.SelectedOrganization.CustomerName.Equals("Extract Systems", StringComparison.InvariantCultureIgnoreCase) ? false : true;
+                }
+                else
+                {
+                    this.PayRoyalties.IsEnabled = false;
+                    this.SelectedLicense.PayRoyalties = false;
                 }
             }
             catch(Exception ex)
@@ -501,6 +508,7 @@ namespace ExtractLicenseUI
             switch (option)
             {
                 case LicenseNavigationOptions.EditLicense:
+                    this.PayRoyalties.IsEnabled = (bool)this.SelectedLicense.IsPermanent ? true: false;
                     this.Comments.IsEnabled = true;
                     this.SignedTransferForm.IsEnabled = true;
                     this.IsActive.IsEnabled = true;
@@ -562,6 +570,7 @@ namespace ExtractLicenseUI
 
         private void DisableAllControls()
         {
+            this.PayRoyalties.IsEnabled = false;
             this.ExtractVersion.IsEnabled = false;
             this.RequestKey.IsEnabled = false;
             this.IsPermanent.IsEnabled = false;
