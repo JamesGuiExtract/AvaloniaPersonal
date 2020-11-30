@@ -1596,8 +1596,8 @@ bool  FPRecordManager::areFilesProcessingWithParallelize()
 	if (m_bParallelizableEnabled)
 	{
 		// Check database to see if any files are in the pending or processing state (another process is processing files)
-		string strQuery = "SELECT TOP 1 FAMFile.ID FROM dbo.FileActionStatus "
-							"INNER JOIN dbo.FAMFile "
+		string strQuery = "SELECT TOP 1 FAMFile.ID FROM dbo.FileActionStatus WITH (NOLOCK) "
+							"INNER JOIN dbo.FAMFile WITH (NOLOCK) "
 							"  ON FileActionStatus.FileID = FAMFile.ID "
 							"WHERE FileActionStatus.ActionStatus = 'R' "
 							"OR FileActionStatus.ActionStatus = 'P' "

@@ -51,7 +51,7 @@ string QueryCondition::getSummaryString(bool bFirstCondition)
 string QueryCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipFAMDB,
 								  const string& strSelect, long nWorkflowID)
 {
-	string strQuery = "SELECT " + strSelect + " FROM FAMFile " += m_strSQL;
+	string strQuery = "SELECT " + strSelect + " FROM FAMFile WITH (NOLOCK) " += m_strSQL;
 
 	return strQuery;
 }

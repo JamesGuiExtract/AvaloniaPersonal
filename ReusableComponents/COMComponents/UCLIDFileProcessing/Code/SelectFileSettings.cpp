@@ -173,10 +173,10 @@ string SelectFileSettings::buildQueryForWorkflow(UCLID_FILEPROCESSINGLib::IFileP
 
 	if (m_vecConditions.empty())
 	{
-		strQuery = "SELECT DISTINCT " + strSelect + " FROM [FAMFile]";
+		strQuery = "SELECT DISTINCT " + strSelect + " FROM [FAMFile] WITH (NOLOCK";
 		if (nWorkflowID > 0)
 		{
-			strQuery += "INNER JOIN [WorkflowFile] ON [FAMFile].[ID] = [FileID] "
+			strQuery += "INNER JOIN [WorkflowFile] WITH (NOLOCK) ON [FAMFile].[ID] = [FileID] "
 				"AND [WorkflowID] = " + asString(nWorkflowID);
 		}
 	}

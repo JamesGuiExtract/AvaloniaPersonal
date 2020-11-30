@@ -3765,7 +3765,7 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 
 				// Open Recordset that contains only the record with the given ID
 				string strFileSQL = "SELECT FAMFile.ID, COALESCE(ActionStatus, 'U') AS ActionStatus "
-					"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
+					"FROM FAMFile WITH (NOLOCK) LEFT JOIN FileActionStatus WITH (NOLOCK) ON FileActionStatus.FileID = FAMFile.ID "
 					" AND FileActionStatus.ActionID = " + asString(nActionID) + " WHERE FAMFile.ID = " 
 					+ asString (nFileID);
 				ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
@@ -4835,11 +4835,21 @@ bool CFileProcessingDB::GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQue
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
-
-				// Open the Action table
-				ipResultSet->Open(bstrQuery, _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockReadOnly, adCmdText);
-
+				try
+				{
+					try
+					{
+						// Open the Action table
+						ipResultSet->Open(bstrQuery, _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
+							adLockUnspecified, adCmdText);
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51446")
+				}
+				catch (UCLIDException ex)
+				{
+					ex.addDebugInfo("Query", asString(bstrQuery));
+					throw ex;
+				}
 				*ppVal = ipResultSet.Detach();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI23547");
@@ -7835,7 +7845,7 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 				string strSelectSQL = "SELECT FAMFile.ID, FileName, Pages, FileSize, ActionID,"
 					"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
 					"COALESCE(ActionStatus, 'U') AS ActionStatus "
-					"FROM FAMFile LEFT JOIN FileActionStatus ON "
+					"FROM FAMFile WITH (NOLOCK) LEFT JOIN FileActionStatus WITH (NOLOCK) ON "
 					"FAMFile.ID = FileID AND ActionID = " + asString(nActionID) +
 					" WHERE FAMFile.ID = " + asString(nFileId);
 
