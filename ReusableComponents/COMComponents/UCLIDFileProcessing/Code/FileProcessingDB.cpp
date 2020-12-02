@@ -5020,7 +5020,7 @@ STDMETHODIMP CFileProcessingDB::GetCachedPageNumbers(long nFileTaskSessionID, EC
 
 		ipCachedPages->Open(strQuery.c_str(),
 			_variant_t((IDispatch*)ipConnection, true), adOpenStatic,
-			adLockReadOnly, adCmdText);
+			adLockOptimistic, adCmdText);
 
 		// Parse out the string representation of the pages into a vector
 		vector<string> vecPages;

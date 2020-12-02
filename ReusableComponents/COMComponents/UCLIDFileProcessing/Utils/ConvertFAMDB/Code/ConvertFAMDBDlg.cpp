@@ -535,7 +535,7 @@ void CConvertFAMDBDlg::addActionsToNewDB80(_ConnectionPtr ipSourceDBConnection,
 
 		// Open the Action set table in the source DB database
 		ipSourceActionSet->Open( "Action", _variant_t((IDispatch *)ipSourceDBConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdTable );
+			adLockOptimistic, adCmdTable );
 		_lastCodePos = "10";
 
 		long nRecordCount = ipSourceActionSet->GetRecordCount();
@@ -724,7 +724,7 @@ void CConvertFAMDBDlg::copyDBInfoSettings(IFileProcessingDBPtr ipFAMDB, _Connect
 
 		// Open the DBInfo set table in the source DB database
 		ipSourceDBInfoSet->Open( "DBInfo", _variant_t((IDispatch *)ipSourceDBConnection, true), adOpenStatic, 
-			adLockReadOnly, adCmdTable );
+			adLockOptimistic, adCmdTable );
 
 		// While there are records in the Source table
 		while (ipSourceDBInfoSet->adoEOF == VARIANT_FALSE)

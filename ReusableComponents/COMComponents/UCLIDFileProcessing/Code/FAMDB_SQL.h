@@ -1892,8 +1892,8 @@ const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE =
 	"  ,[WorkItemGroup].[FAMSessionID] as WorkGroupFAMSessionID "
 	"  ,[Priority] "
 	"  ,[RunningTaskDescription] "
-	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
-	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
+	"FROM [WorkItem] WITH (NOLOCK) INNER JOIN WorkItemGroup WITH (NOLOCK) ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
+	"INNER JOIN FAMFile WITH (NOLOCK) ON WorkItemGroup.FileID = FAMFile.ID "
 	"WHERE WorkItemGroupID = <WorkItemGroupID> "
 	"AND [Sequence] >= <StartSequence> AND [Sequence] < <EndSequence>";
 
@@ -1913,8 +1913,8 @@ const string gstrGET_FAILED_WORK_ITEM_FOR_GROUP =
 	"  ,[WorkItemGroup].[FAMSessionID] as WorkGroupFAMSessionID "
 	"  ,[Priority] "
 	"  ,[RunningTaskDescription] "
-	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
-	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
+	"FROM [WorkItem] WITH (NOLOCK) INNER JOIN WorkItemGroup WITH (NOLOCK) ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
+	"INNER JOIN FAMFile WITH (NOLOCK) ON WorkItemGroup.FileID = FAMFile.ID "
 	"WHERE WorkItemGroupID = <WorkItemGroupID> "
 	"AND [WorkItem].[Status] = 'F' ";
 
@@ -1925,7 +1925,7 @@ const string gstrGET_WORK_ITEM_GROUP_ID =
 	"		,COUNT(WorkItem.ID) AS CountOfWorkItems "
 	"		,NumberOfWorkItems "
 	"	FROM WorkItemGroup "
-	"	INNER JOIN WorkItem ON WorkItemGroup.ID = WorkItem.WorkItemGroupID "
+	"	INNER JOIN WorkItem WITH (NOLOCK) ON WorkItemGroup.ID = WorkItem.WorkItemGroupID "
 	"	WHERE FileID = <FileID> "
 	"		AND ActionID = <ActionID> "
 	"		AND StringizedSettings = '<StringizedSettings>' "
@@ -2038,10 +2038,10 @@ static const string gstrINSERT_INTO_PAGINATION =
 
 static const string gstrACTIVE_PAGINATION_FILEID = 
 	"SELECT        Pagination.DestFileID \r\n"
-	"FROM            ActiveFAM INNER JOIN \r\n"
-	"                         FAMSession ON ActiveFAM.FAMSessionID = FAMSession.ID INNER JOIN \r\n"
-	"                         FileTaskSession ON FAMSession.ID = FileTaskSession.FAMSessionID INNER JOIN \r\n"
-	"                         Pagination ON FileTaskSession.ID = Pagination.FileTaskSessionID \r\n"
+	"FROM            ActiveFAM WITH (NOLOCK) INNER JOIN \r\n"
+	"                         FAMSession WITH (NOLOCK) ON ActiveFAM.FAMSessionID = FAMSession.ID INNER JOIN \r\n"
+	"                         FileTaskSession WITH (NOLOCK) ON FAMSession.ID = FileTaskSession.FAMSessionID INNER JOIN \r\n"
+	"                         Pagination WITH (NOLOCK) ON FileTaskSession.ID = Pagination.FileTaskSessionID \r\n"
 	"WHERE        (Pagination.DestFileID = <FileID>) \r\n";
 
 static const string gstrALTER_PAGINATION_ALLOW_NULL_DESTFILE = 
@@ -2172,10 +2172,10 @@ static const string gstrGET_ATTRIBUTE_VALUE =
 	"(\r\n"
 	"	SELECT [AttributeSetForFile].[ID], \r\n"
 	"	ROW_NUMBER() OVER(PARTITION BY [AttributeSetNameID], [FileID] ORDER BY [AttributeSetForFile].[ID] DESC) AS [InstanceID] \r\n"
-	"	FROM [AttributeSetForFile] \r\n"
-	"	INNER JOIN [FileTaskSession] ON [FileTaskSessionID] = [FileTaskSession].[ID] \r\n"
+	"	FROM [AttributeSetForFile] WITH (NOLOCK) \r\n"
+	"	INNER JOIN [FileTaskSession] WITH (NOLOCK) ON [FileTaskSessionID] = [FileTaskSession].[ID] \r\n"
 	"	INNER JOIN [AttributeSetName] ON [AttributeSetNameID] = [AttributeSetName].[ID] \r\n"
-	"	INNER JOIN [FAMFile] ON[FileID] = [FAMFile].[ID] \r\n"
+	"	INNER JOIN [FAMFile] WITH (NOLOCK) ON [FileID] = [FAMFile].[ID] \r\n"
 	"	WHERE [AttributeSetName].[Description] = '<AttributeSetName>' \r\n"
 	"	AND [FileName] = '<SourceDocName>' \r\n"
 	"), \r\n"
@@ -2192,7 +2192,7 @@ static const string gstrGET_ATTRIBUTE_VALUE =
 	"			ELSE SUBSTRING([RemainingPath], CHARINDEX('/', [RemainingPath]) + 1, 1000) \r\n"
 	"		END AS [RemainingPath] \r\n"
 	"	FROM [AttributeHierarchy] \r\n"
-	"	INNER JOIN [Attribute] ON [AttributeHierarchy].[ID] IS NULL OR [Attribute].[ParentAttributeID] = [AttributeHierarchy].[ID] \r\n"
+	"	INNER JOIN [Attribute] WITH (NOLOCK) ON [AttributeHierarchy].[ID] IS NULL OR [Attribute].[ParentAttributeID] = [AttributeHierarchy].[ID] \r\n"
 	"	INNER JOIN [AttributeName] ON [AttributeNameID] = [AttributeName].[ID] \r\n"
 	"	INNER JOIN [TargetAttributeSet] ON [Attribute].[AttributeSetForFileID] = [TargetAttributeSet].[ID] \r\n"
 	"	WHERE [TargetAttributeSet].[InstanceID] = 1 \r\n"
