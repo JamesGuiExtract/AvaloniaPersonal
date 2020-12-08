@@ -4405,6 +4405,8 @@
 		<row><td>ID_STRING47</td><td>1033</td><td>608-821-6520</td><td>0</td><td/><td>304652105</td></row>
 		<row><td>ID_STRING48</td><td>0</td><td>NewShortcut8</td><td>0</td><td/><td>975747625</td></row>
 		<row><td>ID_STRING48</td><td>1033</td><td>Database Migration Wizard</td><td>0</td><td/><td>975759913</td></row>
+		<row><td>ID_STRING49</td><td>0</td><td>NewShortcut6</td><td>0</td><td/><td>1177044170</td></row>
+		<row><td>ID_STRING49</td><td>1033</td><td>FAM Service Manager</td><td>0</td><td/><td>1177054410</td></row>
 		<row><td>ID_STRING5</td><td>0</td><td>VOAFIL~1|VOA File Viewer</td><td>0</td><td/><td>1788719624</td></row>
 		<row><td>ID_STRING5</td><td>1033</td><td>FEEDBA~1|Feedback Manager</td><td>0</td><td/><td>2040452583</td></row>
 		<row><td>ID_STRING6</td><td>0</td><td>USSFIL~1|USS File Viewer</td><td>0</td><td/><td>1788709416</td></row>
@@ -5139,6 +5141,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut3</td><td>SDKComponents</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut4</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut5</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut6</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 		<row><td>NewShortcut7</td><td>SDKComponents</td><td/><td>UCLID_FLEXINDEX_SDK</td><td>2</td></row>
 		<row><td>NewShortcut9</td><td>SDKComponents</td><td/><td>newfolder1</td><td>2</td></row>
 	</table>
@@ -5240,6 +5243,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>NewShortcut3</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING6##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]ProcessFiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut4</td><td>newfolder1</td><td>##ID_STRING7##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]RuleTester.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut5</td><td>newfolder1</td><td>##ID_STRING8##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]USSFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut6</td><td>newfolder1</td><td>##ID_STRING49##</td><td>SDKComponents</td><td>[ProgramFilesFolder]Extract Systems\CommonComponents\FAMServiceManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut7</td><td>UCLID_FLEXINDEX_SDK</td><td>##ID_STRING10##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]UserLicense.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut8</td><td>newfolder1</td><td>##ID_STRING48##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]DatabaseMigrationWizard.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 		<row><td>NewShortcut9</td><td>newfolder1</td><td>##ID_STRING24##</td><td>SDKComponents</td><td>[COMMON_COMPONENTS]DetectAndReportFailure.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
