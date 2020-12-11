@@ -352,7 +352,12 @@ namespace Extract.UtilityApplications.PaginationUtility
                         return false;
                     }
 
-                    if (pages.Any(page => page.ImageOrientation != 0))
+                    // If a copy of a page exists outside of an otherwise unmodified document, the document needs
+                    // to be considered modified both so that the source document is not prematurely removed from
+                    // the UI and also to prevent a scenario where the same "unmodified" document could be advanced
+                    // from verification a second time.
+                    // https://extract.atlassian.net/browse/ISSUE-17330
+                    if (pages.Any(page => page.ImageOrientation != 0 || page.MultipleCopiesExist))
                     {
                         return false;
                     }
