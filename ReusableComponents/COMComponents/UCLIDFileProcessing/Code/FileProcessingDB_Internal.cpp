@@ -5298,6 +5298,149 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr& ipConnection,
+	const string& strActionName, long nMaxFiles)
+{
+	// Declare query string so that if there is an exception the query can be added to debug info
+	string strQuery;
+	try
+	{
+		try
+		{
+			// IUnknownVector to hold the FileRecords to return
+			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
+			ASSERT_RESOURCE_ALLOCATION("ELI51462", ipFiles != __nullptr);
+
+			// Revert files before attempting to get the files to process
+			if (!m_bRevertInProgress)
+			{
+				// Begin a transaction
+				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+				// Revert files
+				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+				// Commit the reverted files
+				tgRevert.CommitTrans();
+			}
+
+			// Get ActionID from Name
+			int nActionID = getActionID(ipConnection, strActionName);
+			bool bTransactionSuccessful = false;
+
+			// Start the stopwatch to use to check for transaction timeout
+			StopWatch swTransactionRetryTimeout;
+			swTransactionRetryTimeout.start();
+
+			// Retry the transaction until successful
+			while (!bTransactionSuccessful)
+			{
+				// Begin a transaction
+				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+				try
+				{
+					try
+					{
+						_CommandPtr cmd;
+						cmd.CreateInstance(__uuidof(Command));
+						ASSERT_RESOURCE_ALLOCATION("ELI51466", cmd != __nullptr);
+
+						cmd->ActiveConnection = ipConnection;
+						cmd->CommandText = _bstr_t("dbo.GetFilesToProcessForActionID");
+						cmd->CommandType = adCmdStoredProc;
+						cmd->Parameters->Refresh();
+						cmd->Parameters->Item["@ActionID"]->Value = variant_t(nActionID);
+						cmd->Parameters->Item["@ActionName"]->Value = variant_t(strActionName.c_str());
+						cmd->Parameters->Item["@BatchSize"]->Value = variant_t(nMaxFiles);
+						//TODO: make this so it can process Skipped for all or single user
+						cmd->Parameters->Item["@StatusToQueue"]->Value = variant_t("P");
+						cmd->Parameters->Item["@MachineID"]->Value = variant_t(getMachineID(ipConnection));
+						cmd->Parameters->Item["@UserID"]->Value = variant_t(getFAMUserID(ipConnection));
+						cmd->Parameters->Item["@ActiveFAMID"]->Value = variant_t(m_nActiveFAMID);
+						variant_t vtEmpty;
+						_RecordsetPtr ipFileSet = cmd->Execute(&vtEmpty, &vtEmpty, adCmdStoredProc);
+
+						// Maintains a list of files getting set to processing until the transaction
+						// has completed successfully.
+						vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> tempFileVector;
+						// Fill the ipFiles collection and update the stats
+						while (ipFileSet->adoEOF == VARIANT_FALSE)
+						{
+							FieldsPtr ipFields = ipFileSet->Fields;
+							ASSERT_RESOURCE_ALLOCATION("ELI30403", ipFields != __nullptr);
+
+							// Get the file Record from the fields
+							UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
+								getFileRecordFromFields(ipFields);
+							ASSERT_RESOURCE_ALLOCATION("ELI30404", ipFileRecord != __nullptr);
+
+							// [LegacyRCAndUtils:6225]
+							// Do not add the record to ipFiles until after we have successfully
+							// committed the transaction. If another thread/process has tried to
+							// grab the same file, an "Invalid File State Transition" exception
+							// will be thrown and, therefore, this thread/process should not process
+							// the file.
+							tempFileVector.push_back(ipFileRecord);
+
+							string strFileID = asString(ipFileRecord->FileID);
+
+							// Get the previous state
+							string strFileFromState = getStringField(ipFields, "ASC_From");
+
+							ipFileRecord->FallbackStatus =
+								(UCLID_FILEPROCESSINGLib::EActionStatus)asEActionStatus(strFileFromState);
+
+							ipFileSet->MoveNext();
+						}
+						// Commit the transaction before transfering the data from the recordset
+						tg.CommitTrans();
+						// Now that the transaction has processed correctly, copy the file records
+				// that have been set to processing over to ipFiles.
+						for each (UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord in tempFileVector)
+						{
+							ipFiles->PushBack(ipFileRecord);
+						}
+						bTransactionSuccessful = true;
+						return ipFiles;
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51464");
+				}
+				catch (UCLIDException& ue)
+				{
+					// Check if this is a bad connection
+					if (!isConnectionAlive(ipConnection))
+					{
+						// if the connection is not alive just rethrow the exception 
+						throw ue;
+					}
+
+					// Check to see if the timeout value has been reached
+					if (swTransactionRetryTimeout.getElapsedTime() > m_dGetFilesToProcessTransactionTimeout)
+					{
+						UCLIDException uex("ELI51465", "Application Trace: Transaction retry timed out.", ue);
+						uex.addDebugInfo(gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT,
+							asString(m_dGetFilesToProcessTransactionTimeout));
+						throw uex;
+					}
+
+					// In the case that the exception is because the database has gotten into an
+					// inconsistent state (as with LegacyRCAndUtiles:6350), use a small sleep here to
+					// prevent thousands (or millions) of successive failures which may bog down the
+					// DB and burn through table IDs.
+					Sleep(100);
+				}
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51463");
+	}
+	catch (UCLIDException& ue)
+	{
+		ue.addDebugInfo("Record Query", strQuery, true);
+		throw ue;
+	}
+}
+//--------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
 														   const string& strSelectSQL,
 														   const string& strActionName,

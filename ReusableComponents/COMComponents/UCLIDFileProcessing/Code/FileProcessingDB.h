@@ -1195,6 +1195,9 @@ private:
 		const string& strSelectSQL, const string& strActionName, long nMaxFiles,
 		const string& strAllowedCurrentStatus);
 
+	IIUnknownVectorPtr setFilesToProcessing(bool bDBLocked, const _ConnectionPtr& ipConnection,
+		const string& strActionName, long nMaxFiles);
+
 	// Returns recordset opened as static containing the status record the file with nFileID and 
 	// action nActionID. If the status is unattempted the recordset will be empty
 	_RecordsetPtr getFileActionStatusSet(_ConnectionPtr& ipConnection, long nFileID, long nActionID);

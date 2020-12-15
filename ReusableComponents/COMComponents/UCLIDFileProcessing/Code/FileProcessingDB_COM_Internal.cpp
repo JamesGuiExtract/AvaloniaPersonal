@@ -4061,7 +4061,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				// The previous status of the files to process is expected to be either pending or
 				// skipped.
 				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-					bDBLocked, ipConnection, strSelectSQL, strActionName, nMaxFiles, "PS");
+					bDBLocked, ipConnection, strActionName, nMaxFiles);
 				*pvecFileRecords = ipFiles.Detach();
 			END_CONNECTION_RETRY(ipConnection, "ELI30377");
 		}
