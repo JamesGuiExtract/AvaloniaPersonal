@@ -1233,19 +1233,25 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 int docPosition = GetDocumentPosition(outputDocument);
 
-                // Delete and remove association with separator when removing from layout to ensure
-                // proper associations of separators to documents and to avoid bad selection states
-                // https://extract.atlassian.net/browse/ISSUE-13916
-                // https://extract.atlassian.net/browse/ISSUE-15293
-                // Do this before deleting the page controls because afterwards the separator will have been dissociated from this output document.
-                // Not deleting the separator will cause null references later as in https://extract.atlassian.net/browse/ISSUE-17106
+                // https://extract.atlassian.net/browse/ISSUE-17351
+                // https://extract.atlassian.net/browse/ISSUE-17106
+                // Previous iterations of this method originally attempted to delete the page controls then
+                // the document separator, then (to fix ISSUE-17106) the other way around. Both orderings
+                // can cause hard-to-anticipate side-effects to document composition that occur as controls
+                // are added/removed in the UI. Avoid these by first compiling a list of all controls to be
+                // deleted, then removing the document association of any separator before deleting the controls.
+                var controlsToDelete = outputDocument.PageControls.Cast<PaginationControl>().ToList();
                 if (outputDocument.PaginationSeparator != null)
                 {
-                    DeleteControls(new[] { outputDocument.PaginationSeparator });
+                    // Remove association with separator when removing from layout to ensure proper associations
+                    // of separators to documents and to avoid bad selection states
+                    // https://extract.atlassian.net/browse/ISSUE-13916
+                    // https://extract.atlassian.net/browse/ISSUE-15293
+                    controlsToDelete.Add(outputDocument.PaginationSeparator);
                     outputDocument.PaginationSeparator = null;
                 }
 
-                DeleteControls(outputDocument.PageControls.ToArray());
+                DeleteControls(controlsToDelete);
                 outputDocument.DocumentOutput -= HandleOutputDocument_DocumentOutput;
 
                 return docPosition;
@@ -4031,7 +4037,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Deletes the specified <see paramref="paginationControls"/>.
         /// </summary>
         /// <param name="paginationControls">The <see cref="PaginationControl"/>s to delete.</param>
-        void DeleteControls(PaginationControl[] paginationControls)
+        void DeleteControls(IList<PaginationControl> paginationControls)
         {
             using (new UIUpdateLock(this))
             {
