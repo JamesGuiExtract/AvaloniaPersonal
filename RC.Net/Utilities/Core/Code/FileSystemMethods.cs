@@ -22,15 +22,6 @@ namespace Extract.Utilities
         #region Fields
 
         /// <summary>
-        /// A static object used as a mutex in the temp file name generation to prevent
-        /// multiple threads from generating the same temporary file name.
-        /// </summary>
-        // Note: This mutex name has been copied from TemporaryFile class in BaseUtils.  Do
-        // not change this mutex name without changing the other mutex name.
-        static readonly Mutex _tempFileLock =
-            ThreadingMethods.GetGlobalNamedMutex("Global\\260BA215-4090-4172-B696-FC86B52269B4");
-
-        /// <summary>
         /// Either "C:\Program Files\Extract Systems" or "C:\Program Files (x86)\Extract Systems"
         /// depending on the OS.
         /// </summary>
@@ -297,9 +288,6 @@ namespace Extract.Utilities
                 // Generate a temp file name
                 string fileName = Path.Combine(folder, Path.GetRandomFileName() + extension);
 
-                // Protect the file creation section with mutex
-                _tempFileLock.WaitOne();
-
                 // If the fileName already exists, generate a new file name
                 while (File.Exists(fileName))
                 {
@@ -316,10 +304,6 @@ namespace Extract.Utilities
             {
                 throw new ExtractException("ELI25509",
                     "Failed generating temporary file name.", ex);
-            }
-            finally
-            {
-                _tempFileLock.ReleaseMutex();
             }
         }
 
@@ -352,9 +336,6 @@ namespace Extract.Utilities
                 // Generate a temp folder name
                 string folderName = Path.Combine(parentFolder, GetRandomFileNameWithoutExtension());
 
-                // Protect the folder creation section with mutex
-                _tempFileLock.WaitOne();
-
                 // If the folder name already exists, generate a new folder name
                 while (File.Exists(folderName) || Directory.Exists(folderName))
                 {
@@ -368,10 +349,6 @@ namespace Extract.Utilities
             {
                 throw new ExtractException("ELI36120",
                     "Failed generating temporary folder name.", ex);
-            }
-            finally
-            {
-                _tempFileLock.ReleaseMutex();
             }
         }
 
