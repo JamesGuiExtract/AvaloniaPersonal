@@ -84,6 +84,7 @@
     <Compile Include="TestComUtils.cs" />
     <Compile Include="TestExtractSettings.cs" />
     <Compile Include="TestScheduledEvent.cs" />
+    <Compile Include="TestFileSystemMethods.cs" />
     <Compile Include="TestSystemMethods.cs" />
     <Compile Include="TestUtilityExtensionMethods.cs" />
     <Compile Include="TestUtilityMethods.cs" />

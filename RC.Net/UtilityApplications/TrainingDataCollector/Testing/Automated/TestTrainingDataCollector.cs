@@ -121,8 +121,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 fileProcessingDB.RecordFAMSessionStart("DUMMY", "a", true, true);
 
                 // Populate DB
-                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_inputFolder.Last());
+                _inputFolder.Add(FileSystemMethods.GetTemporaryFolderName());
 
                 var tokenFile = Path.Combine(_inputFolder.Last(), "en-token.nlp.etf");
                 _testFiles.GetFile("Resources.en-token.nlp.etf", tokenFile);

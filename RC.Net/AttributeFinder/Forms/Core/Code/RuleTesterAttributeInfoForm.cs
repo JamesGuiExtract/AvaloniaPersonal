@@ -162,7 +162,7 @@ namespace Extract.AttributeFinder.Forms
         {
             try
             {
-                string tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".uss");
+                string tempFile = FileSystemMethods.GetTemporaryFileName(".uss");
                 pValue.SaveTo(tempFile, true, false);
                 string exe = Path.Combine(FileSystemMethods.CommonComponentsPath, "UssFileViewer.exe");
                 string args = tempFile;

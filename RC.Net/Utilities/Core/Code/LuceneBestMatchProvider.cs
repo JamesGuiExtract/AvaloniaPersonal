@@ -55,8 +55,7 @@ namespace Extract.Utilities
                     return;
                 }
 
-                string tempDirectoryPath = Path.Combine(Path.GetTempPath(), "BestMatchProvider", Path.GetRandomFileName());
-                _tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
+                _tempDirectory = FileSystemMethods.GetTemporaryFolder(Path.Combine(Path.GetTempPath(), "BestMatchProvider"), true);
                 _directory = FSDirectory.Open(_tempDirectory);
                 var divideHyphenAnalyzer = new LuceneSuggestionAnalyzer { Synonyms = expandingSynonyms };
                 var preserveHyphenAnalyzer = new LuceneSuggestionAnalyzer { Synonyms = expandingSynonyms, DivideHyphenatedWords = false };

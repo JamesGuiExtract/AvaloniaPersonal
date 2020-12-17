@@ -250,7 +250,7 @@ namespace LearningMachineTrainer
             int trainSize = trainOutputs.Length;
             int cvSize = cvOutputs.Length;
 
-            string tempFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            string tempFolder = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName().Remove(8, 1));
             Directory.CreateDirectory(tempFolder);
             try
             {
@@ -268,7 +268,7 @@ namespace LearningMachineTrainer
                             "Training iteration: {0} Training error: {1:N4} Validation error: {2:N4}", i, trainError, cvError)
                     });
 
-                    string savedNN = Path.Combine(tempFolder, Path.GetRandomFileName());
+                    string savedNN = Path.Combine(tempFolder, Path.GetRandomFileName() + ".tmp");
                     ann.Save(savedNN);
                     history.Enqueue(Tuple.Create(savedNN, cvError));
 

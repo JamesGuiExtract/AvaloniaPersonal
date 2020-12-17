@@ -945,7 +945,7 @@ namespace LearningMachineTrainer
                 var commentPattern = new Regex(@"(?nx)\A\s*(\#|//).*");
 
                 // Save to a temporary file
-                tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".tmp");
                 using (var outStream = new FileStream(tempFile, FileMode.Create, FileAccess.Write, FileShare.None))
                 using (var streamWriter = new StreamWriter(outStream))
                 {

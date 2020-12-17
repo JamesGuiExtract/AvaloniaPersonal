@@ -434,7 +434,7 @@ namespace Extract.AttributeFinder.Test
         public static void ProbabilityFilterPaginationCoverPages()
         {
             SetPaginationFiles();
-            string tempPath = Path.Combine(_inputFolder.Last(), Path.GetRandomFileName());
+            string tempPath = Path.Combine(_inputFolder.Last(), Path.GetRandomFileName() + ".tmp");
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
@@ -488,7 +488,7 @@ namespace Extract.AttributeFinder.Test
         {
             SetPaginationFiles(withCoverPages: true);
 
-            string tempPath = Path.Combine(_inputFolder.Last(), Path.GetRandomFileName());
+            string tempPath = Path.Combine(_inputFolder.Last(), Path.GetRandomFileName() + ".tmp");
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
@@ -558,7 +558,7 @@ namespace Extract.AttributeFinder.Test
         {
             SetPaginationFiles(withCoverPages: true);
 
-            string tempPath = Path.Combine(_inputFolder.Last(), Path.GetRandomFileName());
+            string tempPath = Path.Combine(_inputFolder.Last(), Path.GetRandomFileName() + ".tmp");
             var lm = new LearningMachine
             {
                 InputConfig = new InputConfiguration
@@ -2290,8 +2290,7 @@ namespace Extract.AttributeFinder.Test
         // These images are stapled together from Demo_LabDE images
         private static void SetPaginationFiles(bool withCoverPages = false)
         {
-            _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-            Directory.CreateDirectory(_inputFolder.Last());
+            _inputFolder.Add(FileSystemMethods.GetTemporaryFolderName());
 
             for (int i = 0; i < 7; i++)
             {
@@ -2344,8 +2343,7 @@ namespace Extract.AttributeFinder.Test
         // These images and voas are mocked-up forms from Exact Sciences
         private static void SetBitmapFiles()
         {
-            _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-            Directory.CreateDirectory(_inputFolder.Last());
+            _inputFolder.Add(FileSystemMethods.GetTemporaryFolderName());
 
             for (int i = 1; i <= 30; i++)
             {
@@ -2369,8 +2367,7 @@ namespace Extract.AttributeFinder.Test
         // These files are from Demo_FlexIndex
         private static void SetDocumentCategorizationFiles()
         {
-            _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-            Directory.CreateDirectory(_inputFolder.Last());
+            _inputFolder.Add(FileSystemMethods.GetTemporaryFolderName());
 
             _categories = new string[]
             {

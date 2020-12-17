@@ -58,8 +58,7 @@ namespace Extract.Utilities
                     return;
                 }
 
-                string tempDirectoryPath = Path.Combine(Path.GetTempPath(), "SuggestionProvider", Path.GetRandomFileName());
-                _tempDirectory = System.IO.Directory.CreateDirectory(tempDirectoryPath);
+                _tempDirectory = FileSystemMethods.GetTemporaryFolder(Path.Combine(Path.GetTempPath(), "SuggestionProvider"), true);
                 _directory = FSDirectory.Open(_tempDirectory);
                 var stemAnalyzer = new LuceneSuggestionAnalyzer();
                 var noStemAnalyzer = new LuceneSuggestionAnalyzer { UseStemmer = false };

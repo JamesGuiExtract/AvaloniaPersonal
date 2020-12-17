@@ -109,8 +109,7 @@ namespace Extract.UtilityApplications.NERAnnotation.Test
         // These images are from Demo_FlexIndex
         private static void SetFiles()
         {
-            _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-            Directory.CreateDirectory(_inputFolder.Last());
+            _inputFolder.Add(FileSystemMethods.GetTemporaryFolderName());
             Directory.CreateDirectory(Path.Combine(_inputFolder.Last(), "Train"));
             Directory.CreateDirectory(Path.Combine(_inputFolder.Last(), "Test"));
 

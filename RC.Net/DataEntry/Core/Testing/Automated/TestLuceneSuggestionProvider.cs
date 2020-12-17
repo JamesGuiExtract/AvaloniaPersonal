@@ -269,8 +269,7 @@ namespace Extract.DataEntry.Test
             Parallel.For(0, 5000, _ =>
             {
                 Interlocked.Increment(ref i);
-                var tempDirPath = Path.Combine(Path.GetTempPath(), "SuggestionProvider", Path.GetRandomFileName());
-                var tempDirInfo = new DirectoryInfo(tempDirPath);
+                var tempDirInfo = FileSystemMethods.GetTemporaryFolder(Path.Combine(Path.GetTempPath(), "SuggestionProvider"), true);
                 Assert.DoesNotThrow(() => tempDirInfo.GetCanonicalPath(), message: UtilityMethods.FormatInvariant($"Iteration: {i}"));
             });
         }

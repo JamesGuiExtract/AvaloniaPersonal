@@ -236,7 +236,7 @@ namespace LearningMachineTrainer
                 };
 
                 // Save to a temporary file
-                tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".tmp");
                 using (var fstream = new FileStream(tempFile, FileMode.Create, FileAccess.Write, FileShare.None))
                 using (var stream = new MemoryStream())
                 using (var options = new CompressionOptions(9))

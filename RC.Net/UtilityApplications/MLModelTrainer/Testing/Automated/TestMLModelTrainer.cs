@@ -467,7 +467,8 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             {
                 var trainingExe = Path.Combine(_inputFolder.Last(), "train.bad.bat");
                 _testFiles.GetFile("Resources.train.bad.bat", trainingExe);
-                var dest = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                var dest = FileSystemMethods.GetTemporaryFileName();
+                File.Delete(dest);
                 var trainer = new MLModelTrainer
                 {
                     ModelName = _MODEL_NAME,
@@ -498,7 +499,8 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             {
                 var testingExe = Path.Combine(_inputFolder.Last(), "test.bad.bat");
                 _testFiles.GetFile("Resources.test.bad.bat", testingExe);
-                var dest = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                var dest = FileSystemMethods.GetTemporaryFileName();
+                File.Delete(dest);
                 var trainer = new MLModelTrainer
                 {
                     ModelName = _MODEL_NAME,
@@ -529,8 +531,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             {
                 CreateTrainingData(dbName, false);
 
-                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_inputFolder.Last());
+                _inputFolder.Add(FileSystemMethods.GetTemporaryFolderName());
 
                 var trainingExe = Path.Combine(_inputFolder.Last(), "copy.bat");
                 _testFiles.GetFile("Resources.copy.bat", trainingExe);
@@ -1060,8 +1061,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     }
                 }
 
-                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_inputFolder.Last());
+                _inputFolder.Add(FileSystemMethods.GetTemporaryFolderName());
 
                 return dbName;
             }
@@ -1090,8 +1090,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 fileProcessingDB.RecordFAMSessionStart("DUMMY", "a", true, true);
 
                 // Populate DB
-                _inputFolder.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_inputFolder.Last());
+                _inputFolder.Add(FileSystemMethods.GetTemporaryFolderName());
 
                 var tokenFile = Path.Combine(_inputFolder.Last(), "en-token.nlp.etf");
                 _testFiles.GetFile("Resources.en-token.nlp.etf", tokenFile);

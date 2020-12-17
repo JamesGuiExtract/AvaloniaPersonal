@@ -965,10 +965,8 @@ namespace Extract.AttributeFinder
         private void SetBagOfWords(IEnumerable<Tuple<string, string>> textsAndCategories,
             Action<StatusArgs> updateStatus, CancellationToken cancellationToken)
         {
-            string tempDirForMainIndexPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            string tempDirForFacetIndexPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            DirectoryInfo tempDirForMainIndex = System.IO.Directory.CreateDirectory(tempDirForMainIndexPath);
-            DirectoryInfo tempDirForFacetIndex = System.IO.Directory.CreateDirectory(tempDirForFacetIndexPath);
+            DirectoryInfo tempDirForMainIndex = FileSystemMethods.GetTemporaryFolder();
+            DirectoryInfo tempDirForFacetIndex = FileSystemMethods.GetTemporaryFolder();
             try
             {
                 using (var mainDir = FSDirectory.Open(tempDirForMainIndex))
@@ -991,17 +989,14 @@ namespace Extract.AttributeFinder
             finally
             {
                 // Delete index
-                foreach (var file in System.IO.Directory.GetFiles(tempDirForMainIndexPath))
+                foreach (var folder in new[] { tempDirForMainIndex.FullName, tempDirForFacetIndex.FullName })
                 {
-                    FileSystemMethods.DeleteFile(file);
+                    foreach (var file in System.IO.Directory.GetFiles(folder))
+                    {
+                        FileSystemMethods.DeleteFile(file);
+                    }
+                    System.IO.Directory.Delete(folder, true);
                 }
-                System.IO.Directory.Delete(tempDirForMainIndexPath, true);
-
-                foreach (var file in System.IO.Directory.GetFiles(tempDirForFacetIndexPath))
-                {
-                    FileSystemMethods.DeleteFile(file);
-                }
-                System.IO.Directory.Delete(tempDirForFacetIndexPath, true);
             }
         }
 

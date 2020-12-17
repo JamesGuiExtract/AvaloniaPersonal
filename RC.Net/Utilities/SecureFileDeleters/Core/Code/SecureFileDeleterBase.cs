@@ -440,7 +440,7 @@ namespace Extract.Utilities.SecureFileDeleters
                 // Loop for each rename attempt.
                 for (int i = 0; i < count; i++)
                 {
-                    string newFileName = Path.Combine(directoryName, Path.GetRandomFileName());
+                    string newFileName = FileSystemMethods.GetTemporaryFileName(directoryName);
                     if (File.Exists(newFileName))
                     {
                         // Ensure the file name doesn't already exist.

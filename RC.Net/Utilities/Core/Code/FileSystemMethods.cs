@@ -329,11 +329,12 @@ namespace Extract.Utilities
         /// The caller is responsible for deleting the temporary folder. After
         /// calling this function the returned folder will exist on the system.
         /// </summary>
-        /// <param name="parentFolder">The folder in which to create the temporary file. Must
-        /// not be <see langword="null"/> or empty string. The folder must exist
-        /// on the current system.</param>
-        /// <returns>The name of the temporary file that was created.</returns>
-        public static string GetTemporaryFolderName(string parentFolder)
+        /// <param name="parentFolder">The folder in which to create the temporary folder. If null or empty then
+        /// <see cref="Path.GetTempPath"/> will be used. The folder must exist
+        /// on the current system unless <see paramref="createParentFolder"/> is <c>true</c>.</param>
+        /// <param name="createParentFolder">Whether to create the parent folder if it doesn't exist</param>
+        /// <returns>The <see cref="DirectoryInfo"/> of the temporary folder that was created.</returns>
+        public static DirectoryInfo GetTemporaryFolder(string parentFolder = null, bool createParentFolder = false)
         {
             try
             {
@@ -344,27 +345,24 @@ namespace Extract.Utilities
                 else
                 {
                     ExtractException.Assert("ELI36119", "Specified folder cannot be found.",
-                        Directory.Exists(parentFolder),
+                        createParentFolder || Directory.Exists(parentFolder),
                         "Folder Name", parentFolder ?? "NULL");
                 }
 
                 // Generate a temp folder name
-                string folderName = Path.Combine(parentFolder, Path.GetRandomFileName());
+                string folderName = Path.Combine(parentFolder, GetRandomFileNameWithoutExtension());
 
                 // Protect the folder creation section with mutex
                 _tempFileLock.WaitOne();
 
                 // If the folder name already exists, generate a new folder name
-                while (File.Exists(folderName))
+                while (File.Exists(folderName) || Directory.Exists(folderName))
                 {
-                    folderName = Path.Combine(parentFolder, Path.GetRandomFileName());
+                    folderName = Path.Combine(parentFolder, GetRandomFileNameWithoutExtension());
                 }
 
                 // Folder name does not exist, create the folder
-                Directory.CreateDirectory(folderName);
-
-                // Return the temporary folder name
-                return folderName;
+                return Directory.CreateDirectory(folderName);
             }
             catch (Exception ex)
             {
@@ -375,6 +373,29 @@ namespace Extract.Utilities
             {
                 _tempFileLock.ReleaseMutex();
             }
+        }
+
+        /// <summary>
+        /// Creates an empty folder in the specified parent folder.
+        /// <para><b>Note:</b></para>
+        /// The caller is responsible for deleting the temporary folder. After
+        /// calling this function the returned folder will exist on the system.
+        /// </summary>
+        /// <param name="parentFolder">The folder in which to create the temporary folder. If null or empty then
+        /// <see cref="Path.GetTempPath"/> will be used. The folder must exist
+        /// on the current system.</param>
+        /// <returns>The name of the temporary folder that was created.</returns>
+        public static string GetTemporaryFolderName(string parentFolder = null)
+        {
+            return GetTemporaryFolder(parentFolder, false).FullName;
+        }
+
+        /// <summary>
+        /// Random 11 character filename with no extension (avoid suspicious temp files)
+        /// </summary>
+        public static string GetRandomFileNameWithoutExtension()
+        {
+            return Path.GetRandomFileName().Remove(8, 1); // Remove '.'
         }
 
         /// <summary>

@@ -249,8 +249,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                 List<FileRecord> records = QueueFiles(db, inputFiles);
 
-                _outputFolders.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_outputFolders.Last());
+                _outputFolders.Add(FileSystemMethods.GetTemporaryFolderName());
 
                 var divideTask = new ProcessRichTextBatchesTask
                 {
@@ -319,8 +318,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                 List<FileRecord> records = QueueFiles(db, inputFiles);
 
-                _outputFolders.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_outputFolders.Last());
+                _outputFolders.Add(FileSystemMethods.GetTemporaryFolderName());
 
                 var task = new ProcessRichTextBatchesTask
                 {
@@ -401,8 +399,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                 FileRecord fileRecord = QueueFiles(db, new[] { inputFile })[0];
 
-                _outputFolders.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_outputFolders.Last());
+                _outputFolders.Add(FileSystemMethods.GetTemporaryFolderName());
 
                 // Divide
                 var task = new ProcessRichTextBatchesTask
@@ -517,8 +514,7 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
                 FileRecord fileRecord = QueueFiles(db, new[] { inputFile }, wfID)[0];
 
-                _outputFolders.Add(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()));
-                Directory.CreateDirectory(_outputFolders.Last());
+                _outputFolders.Add(FileSystemMethods.GetTemporaryFolderName());
 
                 // Divide
                 var task = new ProcessRichTextBatchesTask

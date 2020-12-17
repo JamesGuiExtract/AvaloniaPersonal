@@ -210,7 +210,9 @@
     <Compile Include="DataEntryComboBox.Designer.cs">
       <DependentUpon>DataEntryComboBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="LuceneComboBox.cs" />
+    <Compile Include="LuceneComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="SelectionState.cs" />
     <Compile Include="DocumentTypeComboBox.cs">
       <SubType>Component</SubType>

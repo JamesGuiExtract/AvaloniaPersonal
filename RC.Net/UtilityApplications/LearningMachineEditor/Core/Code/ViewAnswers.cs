@@ -106,7 +106,7 @@ namespace Extract.UtilityApplications.LearningMachineEditor
                             match.Success, "DiffCommandLine", diffCommandLine);
 
                         int splitPoint = match.Index + match.Length;
-                        string fileNameA = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+                        string fileNameA = FileSystemMethods.GetTemporaryFileName();
                         string fileNameB = openDialog.FileName;
                         string exe = diffCommandLine.Substring(0, splitPoint);
                         string args = diffCommandLine.Substring(splitPoint)
