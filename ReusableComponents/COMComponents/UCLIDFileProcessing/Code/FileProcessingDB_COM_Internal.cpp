@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 187;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 188;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -563,7 +563,7 @@ int UpdateToSchemaVersion112(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vecQueries.push_back("EXEC sp_rename 'dbo.FileActionStatus', 'FileActionStatus_Old'");
 		vecQueries.push_back("ALTER TABLE [FileActionStatus_Old] DROP CONSTRAINT [PK_FileActionStatus]");
-		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_112_187);
 		vecQueries.push_back("INSERT INTO [FileActionStatus] "
 			"([ActionID], [FileID], [ActionStatus], [Priority]) "
 			"	SELECT [ActionID], [FileID], [ActionStatus], [FAMFile].[Priority] "
@@ -1071,7 +1071,7 @@ int UpdateToSchemaVersion128(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("ALTER TABLE [SkippedFile] DROP COLUMN [UPIID]");
 		vecQueries.push_back("ALTER TABLE [SkippedFile] ADD [FAMSessionID] INT NULL");
 		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_SESSION_FK);
-		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX_128_187);
 		vecQueries.push_back("ALTER TABLE [QueuedActionStatusChange] DROP COLUMN [UPI]");
 		vecQueries.push_back("ALTER TABLE [QueuedActionStatusChange] ADD [FAMSessionID] INT NULL");
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAM_SESSION_FK);
@@ -2872,6 +2872,42 @@ int UpdateToSchemaVersion187(_ConnectionPtr ipConnection,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50242");
 }
 //-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion188(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 188;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("DROP INDEX [IX_Skipped_File_FAMSession] ON [dbo].[SkippedFile]");
+		vecQueries.push_back("DROP INDEX [IX_Skipped_File] ON [dbo].[SkippedFile]");
+		
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+		vecQueries.push_back("ALTER TABLE [dbo].[FileActionStatus] DROP CONSTRAINT [PK_FileActionStatus]");
+		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_ACTIONID_PRIORITY_FILE_INDEX);
+		vecQueries.push_back("ALTER TABLE [dbo].[FileActionStatus] ADD  CONSTRAINT [PK_FileActionStatus] PRIMARY KEY "
+			"([FileID] ASC,	[ActionID] ASC)");
+		vecQueries.push_back("INSERT INTO DBInfo (Name, Value) VALUES ('UseGetFilesLegacy', '0'");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51468");
+}
+//-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::DefineNewAction_Internal(bool bDBLocked, BSTR strAction, long* pnID)
@@ -3946,36 +3982,15 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			// If the FAM has lost its registration, re-register before continuing with processing.
 			ensureFAMRegistration();
 
-			static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
-
-			string strWhere = "";
-			if (bGetSkippedFiles == VARIANT_TRUE)
+			if (m_bUseGetFilesLegacy)
 			{
-				strWhere = "INNER JOIN SkippedFile ON FileActionStatus.FileID = SkippedFile.FileID "
-					"AND SkippedFile.ActionID = <ActionIDPlaceHolder> WHERE (ActionStatus = 'S'";
-
-				string strUserName = asString(bstrSkippedForUserName);
-				if(!strUserName.empty())
-				{
-					replaceVariable(strUserName, "'", "''");
-					string strUserAnd = " AND SkippedFile.UserName = '" + strUserName + "'";
-					strWhere += strUserAnd;
-				}
-
-				// Only get files that have not been skipped by the current session.
-				strWhere += " AND COALESCE(SkippedFile.FAMSessionID, 0) <> " + asString(m_nFAMSessionID);
+				*pvecFileRecords = getFilesToProcessLegacy(bDBLocked, strActionName, nMaxFiles, asCppBool(bGetSkippedFiles), asString(bstrSkippedForUserName)).Detach();
 			}
 			else
 			{
-				strWhere = "WHERE (ActionStatus = 'P'";
-			}
 
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-			string strActionIDs;
-
-			{
+				// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+				ADODB::_ConnectionPtr ipConnection = __nullptr;
 				BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
@@ -3984,86 +3999,26 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				// Get the action IDs
-				strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strActionName);
-
-				// [LegacyRCAndUtils:6233]
-				// Since the query run by setFilesToProcessing is expensive (even when there are no
-				// pending records available), before calling setFilesToProcessing do a quick and
-				// simple check to see if there are any files available.
-				string strGateKeeperQuery =
-					"IF EXISTS ("
-					"	SELECT TOP 1 [FileActionStatus].[FileID] FROM [FileActionStatus] WITH (NOLOCK) " + strWhere +
-					"		AND [FileActionStatus].[ActionID] IN (<ActionIDPlaceHolder>))"
-					"		OR ([ActionStatus] = 'R' "
-					"		AND [FileActionStatus].[ActionID] IN (<ActionIDPlaceHolder>))"
-					") SELECT 1 AS ID ELSE SELECT 0 AS ID";
-
-				// For the gate keeper query if Skippled file is joined add NOLOCK query hint
-				replaceVariable(strGateKeeperQuery, "INNER JOIN SkippedFile", "INNER JOIN SkippedFile WITH (NOLOCK) ");
-
-				// Update the select statement with the action ID
-				replaceVariable(strGateKeeperQuery, strActionIDPlaceHolder, strActionIDs);
-
-				// The "ID" column for executeCmdQuery will actually be 1 if there are potential
-				// files to process of 0 if there are not.
-				long nFilesToProcess = 0;
-				executeCmdQuery(ipConnection, strGateKeeperQuery, false, &nFilesToProcess);
-
-				// If there are no files available, don't bother calling setFilesToProcessing.
-				if (nFilesToProcess == 0)
+				if (bGetSkippedFiles == VARIANT_TRUE)
 				{
-					IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
-					ASSERT_RESOURCE_ALLOCATION("ELI34145", ipFiles != __nullptr);
+					string strUserName = asString(bstrSkippedForUserName);
 
+					IIUnknownVectorPtr ipFiles = setFilesToProcessing(
+						bDBLocked, ipConnection, strActionName, strUserName.empty() ? "" : strUserName, "S", nMaxFiles);
 					*pvecFileRecords = ipFiles.Detach();
-					
-					return true;
+				}
+				else
+				{
+					// Perform all processing related to setting a file as processing.
+					// The previous status of the files to process is expected to be either pending or
+					// skipped.
+					IIUnknownVectorPtr ipFiles = setFilesToProcessing(
+						bDBLocked, ipConnection, strActionName, "", "P", nMaxFiles);
+					*pvecFileRecords = ipFiles.Detach();
 				}
 
-				END_CONNECTION_RETRY(ipConnection, "ELI34143");
+				END_CONNECTION_RETRY(ipConnection, "ELI51471");
 			}
-
-			// If current session is a web session then deleted files should not be returned
-			// https://extract.atlassian.net/browse/ISSUE-15990
-			string strWorkflowJoin = "";
-			if (m_bCurrentSessionIsWebSession)
-			{
-				long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
-				ASSERT_RUNTIME_CONDITION("ELI46688", nWorkflowID > 0, "Internal logic error: No active workflow for web session");
-
-				strWorkflowJoin = "INNER JOIN WorkflowFile ON WorkflowFile.FileID = FAMFile.ID ";
-				strWhere += " AND WorkflowFile.WorkflowID = " + asString(nWorkflowID) + " AND WorkflowFile.Deleted = 0 ";
-			}
-
-			// Build the from clause
-			string strFrom = "FROM FAMFile INNER JOIN FileActionStatus WITH (ROWLOCK, UPDLOCK, READPAST ) "
-				"ON FileActionStatus.FileID = FAMFile.ID AND FileActionStatus.ActionID IN (<ActionIDPlaceHolder>) "
-				+ strWorkflowJoin
-				+ strWhere + ")";
-
-			// create query to select top records;
-			string strSelectSQL =
-				"SELECT FAMFile.ID, FileName, Pages, FileSize, FileActionStatus.Priority, ActionStatus, FileActionStatus.ActionID " + strFrom;
-
-			BEGIN_CONNECTION_RETRY();
-
-				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
-
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
-
-				// Update the select statement with the action ID
-				replaceVariable(strSelectSQL, strActionIDPlaceHolder, strActionIDs);
-
-				// Perform all processing related to setting a file as processing.
-				// The previous status of the files to process is expected to be either pending or
-				// skipped.
-				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-					bDBLocked, ipConnection, strActionName, nMaxFiles);
-				*pvecFileRecords = ipFiles.Detach();
-			END_CONNECTION_RETRY(ipConnection, "ELI30377");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30644");
 	}
@@ -8019,7 +7974,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 184:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion185);
 				case 185:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion186);
 				case 186:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion187);
-				case 187:
+				case 187:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion188);
+				case 188:
 					break;
 
 				default:

@@ -671,6 +671,9 @@ private:
 	// Wether current session is a web session. If true, no maintenance threads will be started
 	bool m_bCurrentSessionIsWebSession;
 
+	// Flag to indicate that the Older GetFilesToProcess functionality should be used
+	bool m_bUseGetFilesLegacy;
+
 	//-------------------------------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------------------------------
@@ -1195,8 +1198,14 @@ private:
 		const string& strSelectSQL, const string& strActionName, long nMaxFiles,
 		const string& strAllowedCurrentStatus);
 
+	// Marks all files of the specified strStatusToSelect to processing except 'U'.  The processing in this
+	// function includes attempting to auto-revert locked files, recording appropriate entries in
+	// the FAST table and adding an appropriate entry to the locked file table. This method will process using the old
+	// GetFilesToProcess functionality if DBInfo setting UseGetFilesLegacy is 1 otherwise calls
+	// the GetFilesToProcessForActionID to get the files to process
+	// RETURNS: A vector of IFileRecords for the files that were set to processing.
 	IIUnknownVectorPtr setFilesToProcessing(bool bDBLocked, const _ConnectionPtr& ipConnection,
-		const string& strActionName, long nMaxFiles);
+		const string& strActionName, const string& strSkippedUser, const string& strStatusToSelect, long nMaxFiles);
 
 	// Returns recordset opened as static containing the status record the file with nFileID and 
 	// action nActionID. If the status is unattempted the recordset will be empty
@@ -1331,6 +1340,12 @@ private:
 	string getWebAppSetting(const string& strSettings, const string& strSettingName);
 
 	void validateLicense();
+
+	// Contains the Legacy process for GetFilesToProcess - although there have been other changes 
+	// to add Query hints that improve the performance over 11.5.0
+	IIUnknownVectorPtr getFilesToProcessLegacy(bool bDBLocked, string strActionName, long nMaxFiles,
+		bool bGetSkippedFiles,
+		string strSkippedUserName);
 
 	// Internal implementation methods
 	bool DefineNewAction_Internal(bool bDBLocked, BSTR strAction, long* pnID);

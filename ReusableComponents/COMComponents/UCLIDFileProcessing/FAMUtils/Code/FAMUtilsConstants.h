@@ -70,6 +70,8 @@ static const string gstrETL_RESTART = "ETLRestart";
 static const string gstrDASHBOARD_INCLUDE_FILTER = "DashboardIncludeFilter";
 static const string gstrDASHBOARD_EXCLUDE_FILTER = "DashboardExcludeFilter";
 
+static const string gstrUSE_GET_FILES_LEGACY = "UseGetFilesLegacy";
+
 // Feature names
 static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";
 static const string gstrFEATURE_FILE_HANDLER_COPY_FILES = "Files: Copy files";
