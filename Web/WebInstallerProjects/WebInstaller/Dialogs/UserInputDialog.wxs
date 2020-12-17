@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <UI Id="UserRegDialogUI">
+
+      <Property Id="Proceed">proceedbtn</Property>
+      
+      <!--These HAVE to be all caps. Otherwise they dont bind to the control properly.
+      Great link: https://stackoverflow.com/questions/30668723/wix-toolset-how-to-set-a-property -->
+      
+      <Property Id="APPBACKEND_DNS_ENTRY" Value="www.extractAppBackend.com"></Property>
+      <Property Id="DOCUMENTAPI_DNS_ENTRY" Value="www.extractDocumentAPI.com"></Property>
+      <Property Id="IDSVERIFY_DNS_ENTRY" Value="www.extractVerify.com"></Property>
+      <Property Id="WINDOWSAUTHORIZATION_DNS_ENTRY" Value="www.extractWindowsAuthorization.com"></Property>
+
+      <!--I am forceing these checkboxes to be checked, because the behavior is weird if they
+      are defaulted to un-checked. They act like C++ code where they are undefined instead of zero.-->
+      <Property Id="USE_WINDOWS_AUTHORIZATION" Value="1"></Property>
+      <Property Id="FORCE_REDACTION_TYPE_TO_BE_SET" Value="1"></Property>
+      <Property Id="CREATE_HOSTS_ENTRIES" Value="1"></Property>
+      
+      <Binary Id="proceedbtn" SourceFile="images/proceedbtn.bmp"/>
+      <Binary Id="headerPic" SourceFile="images/header.bmp"/>
+
+      <Dialog Id="UserRegDialog" Width="400" Height="500" Title="Web Application User Input">
+
+        <Control Id="background" Type="Bitmap" Text="bgPic" Height="500" Width="400" X="0" Y="0" TabSkip="no" />
+        <Control Id="header" Type="Bitmap" Text="headerPic" Height="50" Width="400" X="0" Y="0" TabSkip="no" />
+        <Control Id="headerText"  Type="Text" X="65" Y="10" Width="320" Height="40" Transparent="yes" Text="{\TahomaBig}User Input" />
+
+        <Control Id="explanationText" X="45" Y="75" NoWrap="no" RightAligned="no" Transparent="yes" Type="Text" Width="250" Height="100" Text="{\TahomaNormal}Username and password are REQUIRED." />
+
+        <Control Id="appBackendDNSLabel" Type="Text" X="45" Y="120" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}AppBackendDNSEntry:" />
+        <Control Id="appBackendDNSTextBox" Type="Edit" X="130" Y="117" Text="[APPBACKEND_DNS_ENTRY]"  Height="17" Width="200" Property="APPBACKEND_DNS_ENTRY"  />
+
+        <Control Id="documentApiDnsLabel" Type="Text" X="45" Y="140" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}DocumentAPIDNSEntry" />
+        <Control Id="documentApiDnsTextBox" Text="[DOCUMENTAPI_DNS_ENTRY]" Type="Edit" X="130" Y="137"  Height="17" Width="200" Property="DOCUMENTAPI_DNS_ENTRY"  />
+
+        <Control Id="idsVerifyDnsLabel" Type="Text" X="45" Y="160" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}VerifyDNSEntry" />
+        <Control Id="idsVerifyDnsTextBox" Text="[IDSVERIFY_DNS_ENTRY]" Type="Edit" X="130" Y="157"  Height="17" Width="200" Property="IDSVERIFY_DNS_ENTRY"  />
+
+        <Control Id="winAuthDnsLabel" Type="Text" X="45" Y="180" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}WinAuthDNSEntry" />
+        <Control Id="winAuthDnsTextBox" Text="[WINDOWSAUTHORIZATION_DNS_ENTRY]" Type="Edit" X="130" Y="177"  Height="17" Width="200" Property="WINDOWSAUTHORIZATION_DNS_ENTRY"  />
+
+        <Control Id="userNameLabel" Type="Text" X="45" Y="200" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}UserName" />
+        <Control Id="userNameTextBox" Text="[APPPOOL_USER_NAME]" Type="Edit" X="130" Y="197"  Height="17" Width="200" Property="APPPOOL_USER_NAME"  />
+
+        <Control Id="passwordLabel" Type="Text" X="45" Y="220" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}Password" />
+        <Control Id="passwordTextBox" Password="yes" Text="[APPPOOL_USER_PASSWORD]" Type="Edit" X="130" Y="217"  Height="17" Width="200" Property="APPPOOL_USER_PASSWORD"  />
+
+        <Control Id="domainLabel" Type="Text" X="45" Y="240" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}Domain" />
+        <Control Id="domainTextBox" Text="[APPPOOL_USER_DOMAIN]" Type="Edit" X="130" Y="237"  Height="17" Width="200" Property="APPPOOL_USER_DOMAIN"  />
+
+        <Control Id="forceRedactionTypeLabel" Type="Text" X="45" Y="260" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}Force Redaction Type" />
+        <Control Id="forceRedactionTypeTextBox" CheckBoxValue="[FORCE_REDACTION_TYPE_TO_BE_SET]" Type="CheckBox" X="130" Y="257"  Height="17" Width="200" Property="FORCE_REDACTION_TYPE_TO_BE_SET"  />
+
+        <Control Id="windowsAuthTypeLabel" Type="Text" X="45" Y="280" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}Windows Auth" />
+        <Control Id="windowsAuthTypeTextBox" CheckBoxValue="[USE_WINDOWS_AUTHORIZATION]" Type="CheckBox" X="130" Y="277"  Height="17" Width="200" Property="USE_WINDOWS_AUTHORIZATION"  />
+
+        <Control Id="databaseServerLabel" Type="Text" X="45" Y="300" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}Database Server" />
+        <Control Id="databaseServerTextBox" Text="[DATABASE_SERVER]" Type="Edit" X="130" Y="297"  Height="17" Width="200" Property="DATABASE_SERVER"  />
+        
+        <Control Id="databaseNameLabel" Type="Text" X="45" Y="320" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}Database Name" />
+        <Control Id="databaseNameTextBox" Text="[DATABASE_NAME]" Type="Edit" X="130" Y="317"  Height="17" Width="200" Property="DATABASE_NAME"  />
+
+        <Control Id="databaseWorkflowLabel" Type="Text" X="45" Y="340" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}Database Workflow" />
+        <Control Id="databaseWorkflowTextBox" Text="[DATABASE_WORKFLOW]" Type="Edit" X="130" Y="337"  Height="17" Width="200" Property="DATABASE_WORKFLOW"  />
+
+        <Control Id="createHostsEntriesLabel" Type="Text" X="45" Y="360" Height="17" Width="85" Transparent="yes" Text="{\TahomaNormal}Create Hosts Entries" />
+        <Control Id="createHostsEntriesTextBox" CheckBoxValue="[CREATE_HOSTS_ENTRIES]" Type="CheckBox" X="130" Y="357"  Height="17" Width="200" Property="CREATE_HOSTS_ENTRIES"  />
+
+
+        <Control Id="proceedButton" Type="PushButton" Text="[Proceed]" Height="32" Width="111" X="80" Y="460" Bitmap="yes">
+          <!--Executes the c# custom actions BEFORE running any of the other code in Product.
+          Ideally this would execute after, but I do not currently know how to do this-->
+          <Publish Event="DoAction" Value="ModifyHostsFile">1</Publish>
+          <Publish Event="DoAction" Value="ModifyWebConfig">1</Publish>
+          <Publish Event="DoAction" Value="UpdateAppSettings">1</Publish>
+          <Publish Event="EndDialog" Value="Return">1</Publish>
+        </Control>
+
+        <Control Id="cancelButton" Type="PushButton" Text="[Cancel]" Height="32" Width="111" X="195" Y="460" Cancel="yes" Bitmap="yes">
+          <Publish Event="EndDialog" Value="Exit" />
+        </Control>
+      </Dialog>
+    </UI>
+
+    <InstallUISequence>
+      <Show Dialog="UserRegDialog" After="SetupDialog" />
+    </InstallUISequence>
+  </Fragment>
+
+  <Fragment>
+    <Binary Id="CustomActionBinary" SourceFile="$(var.WebInstallerCustomActions.TargetDir)$(var.WebInstallerCustomActions.TargetName).CA.dll"/>
+    <CustomAction Id="ModifyHostsFile" BinaryKey="CustomActionBinary" DllEntry="ModifyHostsFile"  />
+    <CustomAction Id="ModifyWebConfig" BinaryKey="CustomActionBinary" DllEntry="ModifyWebConfig"  />
+    <CustomAction Id="UpdateAppSettings" BinaryKey="CustomActionBinary" DllEntry="UpdateAppSettings"  />
+    <CustomAction Id="UpdateAngularSettings" BinaryKey="CustomActionBinary" DllEntry="UpdateAngularSettings"  />
+  </Fragment>
+</Wix>

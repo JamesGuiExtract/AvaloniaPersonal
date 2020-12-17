@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="IISMain" Name="inetpub">
+          <Directory Id="INSTALLLOCATION" Name="Extract Systems">
+            <Directory Id="IDSVerify" Name="IDSVerify"></Directory>
+            <Directory Id="AppBackendAPI" Name="AppBackendAPI"></Directory>
+            <Directory Id="DocumentAPI" Name="DocumentAPI"></Directory>
+            <Directory Id="AuthorizationAPI" Name="AuthorizationAPI">
+              <Directory Id="Properties" Name="Properties"></Directory>
+            </Directory>
+          </Directory>
+      </Directory>
+    </Directory>
+	</Fragment>
+</Wix>

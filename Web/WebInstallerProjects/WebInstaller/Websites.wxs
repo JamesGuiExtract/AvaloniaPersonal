@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix
+  xmlns="http://schemas.microsoft.com/wix/2006/wi"
+  xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+  xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension">
+  <Fragment>
+    <Component Id="AppBackend" Guid="{3AC86481-CCA4-44FB-9406-87E1BE407E9D}" Directory="AppBackendAPI">
+      <util:User Id="AppPoolUser" CreateUser="no" Name="[APPPOOL_USER_NAME]" Password="[APPPOOL_USER_PASSWORD]" Domain="[APPPOOL_USER_DOMAIN]"></util:User>
+      <CreateFolder></CreateFolder>
+      <iis:WebSite Id="AppBackend" Description="ExtractAppBackend" Directory="AppBackendAPI">
+        <iis:WebAddress Id="AllUnassigned" Header="[APPBACKEND_DNS_ENTRY]" Port="80"/>
+        <iis:WebApplication Id="AppBackendAPIWebApp" Name="ExtractAppBackend" WebAppPool="ExtractAppBackend"></iis:WebApplication>
+      </iis:WebSite>
+      <iis:WebAppPool 
+        Id="ExtractAppBackend" 
+        Name="ExtractAppBackend"
+        ManagedRuntimeVersion="v4.0" 
+        ManagedPipelineMode="Integrated"
+        Identity="other"
+        User="AppPoolUser"/>
+    </Component>
+
+    <Component Id="DocAPI" Guid="{7E4E23D7-362D-4321-824E-20E46BD42E75}" Directory="DocumentAPI">
+      <CreateFolder></CreateFolder>
+      <iis:WebSite Id="ExtractDocumentAPI" Description="ExtractDocumentAPI" Directory="DocumentAPI">
+        <iis:WebAddress Id="AllUnassigned2" Header="[DOCUMENTAPI_DNS_ENTRY]" Port="80"/>
+        <iis:WebApplication Id="DocumentAPIWebApp" Name="ExtractDocumentAPI" WebAppPool="ExtractDocumentAPI"></iis:WebApplication>
+      </iis:WebSite>
+      <iis:WebAppPool 
+        Id="ExtractDocumentAPI" 
+        Name="ExtractDocumentAPI" 
+        ManagedRuntimeVersion="v4.0" 
+        ManagedPipelineMode="Integrated"
+        Identity="other"
+        User="AppPoolUser"/>
+    </Component>
+
+    <Component Id="ExtractVerify" Guid="{4699E1C0-643A-4EB9-B5D0-71751C321EE2}" Directory="IDSVerify">
+      <CreateFolder></CreateFolder>
+      <iis:WebSite Id="IDSVerify" Description="ExtractVerify" Directory="IDSVerify">
+        <iis:WebAddress Id="AllUnassigned3" Header="[IDSVERIFY_DNS_ENTRY]" Port="80"/>
+        <iis:WebApplication Id="ExtractVerifyWebApp" Name="ExtractVerify" WebAppPool="ExtractVerify"></iis:WebApplication>
+      </iis:WebSite>
+      <iis:WebAppPool Id="ExtractVerify" Name="ExtractVerify" ManagedRuntimeVersion="v4.0" ManagedPipelineMode="Integrated"/>
+    </Component>
+
+    <Component Id="WindowsAuthorization" Guid="{71223115-46A4-4B6B-A283-629B9DA5A46C}" Directory="AuthorizationAPI">
+      <CreateFolder></CreateFolder>
+      <iis:WebSite Id="AuthorizationAPI" Description="ExtractAuthorization" Directory="AuthorizationAPI">
+        <iis:WebAddress Id="AllUnassigned4" Header="[WINDOWSAUTHORIZATION_DNS_ENTRY]" Port="80"/>
+        <iis:WebApplication Id="AuthorizationWebApp" Name="ExtractAuthorization" WebAppPool="ExtractAuthorization"></iis:WebApplication>
+        <iis:WebDirProperties Id="WebProperties" AnonymousAccess="no" WindowsAuthentication="yes" AuthenticationProviders="NTLM,Negotiate"/>
+      </iis:WebSite>
+      <iis:WebAppPool Id="ExtractAuthorization" Name="ExtractAuthorization" ManagedRuntimeVersion="v4.0" ManagedPipelineMode="Integrated"/>
+    </Component>
+  </Fragment>
+</Wix>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension">
+
+<!--Give a unique ID per platform.-->
+  <?if $(var.Platform)=x64 ?>
+  <?define ProductCode = "{A7FDAB35-3345-4664-9FF5-92328DD8C5C0}"?>
+  <?else?>
+  <?define ProductCode = "{EA596C76-FF8F-4981-A46B-6F9A340205A3}"?>
+  <?endif?>
+
+  <!--Variable Definitions-->
+  <?define UpgradeCode = "{6F8F51B0-B7C7-46AB-B210-D8715A902048}"?>
+  <?define BuildVersion = 1.2.3.4?>
+  
+  <!--Define main product.-->
+	<Product 
+    Id="$(var.ProductCode)" 
+    Name="!(loc.ProductName_$(var.Platform))" 
+    Language="!(loc.Language)" 
+    Version="$(var.BuildVersion)" 
+    Manufacturer="!(loc.Company)" 
+    UpgradeCode="$(var.UpgradeCode)">
+    
+    <!--Information included in the UN-install window.-->
+		<Package 
+      InstallerVersion="200" 
+      Compressed="yes" 
+      InstallScope="perMachine"
+      Manufacturer="!(loc.Company)"
+      Description="!(loc.Description)"
+      Keywords="!(loc.Keywords)"
+      Comments="!(loc.Comments)"
+      Languages="!(loc.Language)"/>
+
+		<MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
+    
+    <!--Include .cab file into .msi file.-->
+		<MediaTemplate EmbedCab="yes" />
+
+    <!--<Icon Id="icon.ico" SourceFile="$(var.LearningWix.ProjectDir)\app.ico"/>-->
+    <!--Use the icon.ico in the add and remove programs-->
+    <!--<Property Id="ARPPRODUCTICON">icon.ico</Property>-->
+    <!--Help/support website goes in add/remove programs.-->
+    <Property Id="ARPURLINFOABOUT">https://www.extractsystems.com</Property>
+
+    <!--Create a basic UI for the installer.-->
+    <UIRef Id="SetupDialogUI" />
+    
+    <Binary Id="bgPic" SourceFile="images/bg.bmp"/>
+    <Binary Id="cancelbtn" SourceFile="images/cancelbtn.bmp"/>
+    <Property Id="Cancel">cancelbtn</Property>
+    
+    <!--Files to install, start menu links, any other folders to make/install, reg entries.-->
+		<Feature Id="ProductFeature" Title="WebInstaller" Level="1">
+      <ComponentGroupRef Id="CopyAPIFolders"/>
+      <ComponentGroupRef Id="PublishedComponents"/>
+      <ComponentRef Id="AppBackend"/>
+      <ComponentRef Id="DocAPI"/>
+      <ComponentRef Id="ExtractVerify"/>
+      <ComponentRef Id="WindowsAuthorization"/>
+		</Feature>
+    <InstallExecuteSequence>
+      <Custom Action="UpdateAngularSettings" OnExit="success"></Custom>
+    </InstallExecuteSequence>
+	</Product>
+</Wix>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.10</ProductVersion>
+    <ProjectGuid>2d7f9cd7-d9d6-4df3-8789-b0f52001b164</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>WebInstaller</OutputName>
+    <OutputType>Package</OutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+    <SuppressIces>ICE20;ICE60</SuppressIces>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Components.wxs" />
+    <Compile Include="ComponentsGenerated.wxs" />
+    <Compile Include="Dialogs\ProgressDialog.wxs" />
+    <Compile Include="Dialogs\SetupDialog.wxs" />
+    <Compile Include="Dialogs\UserInputDialog.wxs" />
+    <Compile Include="Websites.wxs" />
+    <Compile Include="Directories.wxs" />
+    <Compile Include="Product.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="LocalVariables.wxl" />
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixIIsExtension">
+      <HintPath>$(WixExtDir)\WixIIsExtension.dll</HintPath>
+      <Name>WixIIsExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="images\bg.bmp" />
+    <Content Include="images\cancelbtn.bmp" />
+    <Content Include="images\header.bmp" />
+    <Content Include="images\installbtn.bmp" />
+    <Content Include="images\proceedbtn.bmp" />
+    <Content Include="images\progressbar.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WebInstallerCustomActions\WebInstallerCustomActions.csproj">
+      <Name>WebInstallerCustomActions</Name>
+      <Project>{698369de-ad45-4767-b8c9-b8233f7e0408}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="images\" />
+    <Folder Include="Dialogs" />
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
+  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
+    <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
+  </Target>
+  <PropertyGroup Condition="'$(WebInstallPath)'==''">
+    <WebInstallPath>\\extract.local\Eng\Builds\Web\Internal\v1.0.57</WebInstallPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants>BasePath=$(WebInstallPath)</DefineConstants>
+  </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <ItemGroup>
+      <HarvestDirectory Include="$(BasePath)">
+        <DirectoryRefId>IDSVerify</DirectoryRefId>
+        <SuppressRootDirectory>true</SuppressRootDirectory>
+        <SuppressCom>true</SuppressCom>
+        <SuppressRegistry>true</SuppressRegistry>
+        <ComponentGroupName>PublishedComponents</ComponentGroupName>
+        <PreprocessorVariable>var.BasePath</PreprocessorVariable>
+      </HarvestDirectory>
+    </ItemGroup>
+  </Target>
+</Project>

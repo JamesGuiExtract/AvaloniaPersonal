@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Bundle Name="Extract Web Installer" Version="1.0.0.0" Manufacturer="Extract Systems" UpgradeCode="bc577eca-a45b-4703-b36a-61819a315be8">
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense" />
+		<Chain>
+      <PackageGroupRef Id="InstallIIS"/>
+      
+      <MsiPackage Id="IISCors" SourceFile="IISCORS_amd64.msi"></MsiPackage>
+      <MsiPackage Id="URLRewrite" SourceFile="rewrite_amd64_en-US.msi"></MsiPackage>
+
+      <ExePackage
+        Id="InstallNetCoreHosting"
+        SourceFile="dotnet-hosting-2.2.7-win.exe" Vital="no"></ExePackage>
+      
+      <!--Main Web Files-->
+      <MsiPackage DisplayInternalUI="yes" SourceFile="$(var.WebInstaller.TargetDir)\WebInstaller.msi"></MsiPackage>
+		</Chain>
+	</Bundle>
+</Wix>

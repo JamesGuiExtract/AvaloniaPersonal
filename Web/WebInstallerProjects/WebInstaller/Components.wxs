@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+    
+    <!--Copy the files from the default install folder to inetpub-->
+    <Property Id="ExtractAuthorizationAPIFolder" Value="C:\Program Files (x86)\Extract Systems\APIs\AuthorizationAPI"></Property>
+    <Property Id="ExtractAuthorizationAPIPropertiesFolder" Value="C:\Program Files (x86)\Extract Systems\APIs\AuthorizationAPI\Properties"></Property>
+    <Property Id="ExtractAppBackendAPI" Value="C:\Program Files (x86)\Extract Systems\APIs\AppBackendAPI"></Property>
+    <Property Id="ExtractDocumentAPI" Value="C:\Program Files (x86)\Extract Systems\APIs\DocumentAPI"></Property>
+    
+    <ComponentGroup Id="CopyAPIFolders">
+      <Component Id="CopyAuthAPI" Directory="AuthorizationAPI" Guid="{AC0D110E-65F3-4994-BC17-18CB95244E5A}" >
+        <CreateFolder></CreateFolder>
+        <CopyFile Id="CopyFolder" SourceProperty="ExtractAuthorizationAPIFolder" DestinationDirectory="AuthorizationAPI" SourceName="*"/>
+      </Component>
+    
+      <Component Id="CopyProperties" Directory="Properties" Guid="{19CC6BB6-4903-40E9-8704-4E016CDFD1A9}" >
+        <CreateFolder></CreateFolder>
+        <CopyFile Id="CopyFolder1" SourceProperty="ExtractAuthorizationAPIPropertiesFolder" DestinationDirectory="Properties" SourceName="*"/>
+      </Component>
+    
+      <Component Id="CopyAppBackend" Directory="AppBackendAPI" Guid="{BA1FB237-93D4-4289-AAA9-E8434A894F69}" >
+        <CreateFolder></CreateFolder>
+        <CopyFile Id="CopyFolder2" SourceProperty="ExtractAppBackendAPI" DestinationDirectory="AppBackendAPI" SourceName="*"/>
+      </Component>
+    
+      <Component Id="CopyDocAPI" Directory="DocumentAPI" Guid="{21D3943A-99F9-44E4-9F63-80405221CC91}" >
+        <CreateFolder></CreateFolder>
+        <CopyFile Id="CopyFolder3" SourceProperty="ExtractDocumentAPI" DestinationDirectory="DocumentAPI" SourceName="*"/>
+      </Component>
+    </ComponentGroup>
+	</Fragment>
+</Wix>
