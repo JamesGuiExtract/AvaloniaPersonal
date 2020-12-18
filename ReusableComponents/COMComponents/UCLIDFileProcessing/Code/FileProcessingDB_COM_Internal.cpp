@@ -2897,7 +2897,7 @@ int UpdateToSchemaVersion188(_ConnectionPtr ipConnection,
 		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_ACTIONID_PRIORITY_FILE_INDEX);
 		vecQueries.push_back("ALTER TABLE [dbo].[FileActionStatus] ADD  CONSTRAINT [PK_FileActionStatus] PRIMARY KEY "
 			"([FileID] ASC,	[ActionID] ASC)");
-		vecQueries.push_back("INSERT INTO DBInfo (Name, Value) VALUES ('UseGetFilesLegacy', '0'");
+		vecQueries.push_back("INSERT INTO DBInfo (Name, Value) VALUES ('UseGetFilesLegacy', '0')");
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -3982,7 +3982,9 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			// If the FAM has lost its registration, re-register before continuing with processing.
 			ensureFAMRegistration();
 
-			if (m_bUseGetFilesLegacy)
+			// Currently when running all workflows use legacy
+			// and if requested
+			if (m_bRunningAllWorkflows || m_bUseGetFilesLegacy)
 			{
 				*pvecFileRecords = getFilesToProcessLegacy(bDBLocked, strActionName, nMaxFiles, asCppBool(bGetSkippedFiles), asString(bstrSkippedForUserName)).Detach();
 			}
