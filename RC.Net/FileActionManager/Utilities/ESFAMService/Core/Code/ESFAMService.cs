@@ -4,6 +4,7 @@ using Extract.Licensing;
 using Extract.Utilities;
 using FAMProcessLib;
 using Microsoft.Win32.SafeHandles;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
@@ -22,6 +24,19 @@ using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Utilities
 {
+    /// <summary>
+    /// Messages that can be handled when sent to the named pipe
+    /// </summary>
+    public enum RequestMessage
+    {
+        None = 0,
+
+        /// <summary>
+        /// Get array of identifiers for processes that this process has created and not destroyed
+        /// </summary>
+        GetSpawnedProcessIDs = 1
+    }
+
     /// <summary>
     /// Class that manages the FAM service start/stop and FAMProcess.exe instances.
     /// </summary>
@@ -161,7 +176,12 @@ namespace Extract.FileActionManager.Utilities
         /// <summary>
         /// List of <see cref="DatabaseServiceManager"/> to run against the database.
         /// </summary>
-        ConcurrentBag<DatabaseServiceManager> _databaseServiceManagers = new ConcurrentBag<DatabaseServiceManager>();
+        readonly ConcurrentBag<DatabaseServiceManager> _databaseServiceManagers = new ConcurrentBag<DatabaseServiceManager>();
+
+        /// <summary>
+        /// Keep track of spawned processes so that they can be killed if needed
+        /// </summary>
+        readonly ConcurrentDictionary<int, int> _spawnedProcessIDs = new ConcurrentDictionary<int, int>();
 
         /// <summary>
         /// Mutex to provide synchronized access to data.
@@ -279,6 +299,7 @@ namespace Extract.FileActionManager.Utilities
                     thread.Start(threadData);
                 }
                 StartETL(dbManager);
+                CreatePipeListenerThread();
             }
             catch (Exception ex)
             {
@@ -288,6 +309,77 @@ namespace Extract.FileActionManager.Utilities
                 throw ee;
             }
         }
+
+        void WaitForConnection(NamedPipeServerStream pipeStream)
+        {
+
+            Exception waitForConnectionException = null;
+            AutoResetEvent connectedEvent = new AutoResetEvent(false);
+            pipeStream.BeginWaitForConnection(asyncResult =>
+            {
+                try
+                {
+                    pipeStream.EndWaitForConnection(asyncResult);
+                    connectedEvent.Set();
+                }
+                catch (Exception ex)
+                {
+                    waitForConnectionException = ex;
+                }
+
+            }, null);
+
+            if (WaitHandle.WaitAny(new WaitHandle[] { connectedEvent, _stopProcessing}) == 1)
+            {
+                // Stop waiting if Stop has been called
+                pipeStream.Close();
+            }
+            if (waitForConnectionException != null)
+            {
+                throw waitForConnectionException.AsExtract("ELI51509");
+            }
+        }
+
+        void CreatePipeListenerThread()
+        {
+            new Thread(() =>
+            {
+                var instanceID = Guid.NewGuid().ToString();
+                try
+                {
+                    var pipeName = UtilityMethods.FormatInvariant($"ESFAMServicePipe_{Process.GetCurrentProcess().Id}");
+                    using var pipeStream =
+                        new NamedPipeServerStream(pipeName, PipeDirection.InOut, 50, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+                    WaitForConnection(pipeStream);
+                    CreatePipeListenerThread(); // Listen for new connections
+
+                    StringBuilder messageBuilder = new StringBuilder();
+                    byte[] messageBuffer = new byte[16];
+                    do
+                    {
+                        var bytesRead = pipeStream.Read(messageBuffer, 0, messageBuffer.Length);
+                        var messageChunk = Encoding.UTF8.GetString(messageBuffer, 0, bytesRead);
+                        messageBuilder.Append(messageChunk);
+                    }
+                    while (!pipeStream.IsMessageComplete);
+
+                    var msg = JsonConvert.DeserializeObject<RequestMessage>(messageBuilder.ToString());
+
+                    if (msg == RequestMessage.GetSpawnedProcessIDs)
+                    {
+                        var serialized = JsonConvert.SerializeObject(_spawnedProcessIDs.Keys);
+                        var bytes = Encoding.UTF8.GetBytes(serialized);
+                        pipeStream.Write(bytes, 0, bytes.Length);
+                        pipeStream.WaitForPipeDrain();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ex.ExtractLog("ELI51483");
+                }
+            }).Start();
+        }
+
         /// <summary>
         /// Called when the service is stopping.
         /// </summary>
@@ -529,6 +621,7 @@ namespace Extract.FileActionManager.Utilities
                         // Create the FAM process
                         famProcess = new FileProcessingManagerProcessClass();
                         processID = famProcess.ProcessID;
+                        _spawnedProcessIDs.TryAdd(processID, processID);
                         process = Process.GetProcessById(processID);
 
                         // Provide the service authentication
@@ -678,6 +771,7 @@ namespace Extract.FileActionManager.Utilities
                             {
                                 WaitForProcessToExitAndDispose(ref process, fpsFileName);
                                 famProcess = null;
+                                _spawnedProcessIDs.TryRemove(processID, out var _);
                             }
                         }
                     }
@@ -987,8 +1081,8 @@ namespace Extract.FileActionManager.Utilities
                     {
                         try
                         {
-                        // if _stopProcessing is set return without starting the DatabaseServiceManagers
-                        if (WaitHandle.WaitAny(new WaitHandle[] { _startThreads, _stopProcessing }) == 1)
+                            // if _stopProcessing is set return without starting the DatabaseServiceManagers
+                            if (WaitHandle.WaitAny(new WaitHandle[] { _startThreads, _stopProcessing }) == 1)
                             {
                                 return;
                             }
@@ -1007,14 +1101,13 @@ namespace Extract.FileActionManager.Utilities
                         }
                         catch (ThreadAbortException)
                         {
-                        // Don't log or throw ThreadAboartException
-                    }
+                        // Don't log or throw ThreadAbortException
+                        }
                         catch (Exception ex)
                         {
                             ex.ExtractLog("ELI46288");
                         }
-                    }
-                    ).Start();
+                    }).Start();
                 }
 
                 _lastETLStart = DateTime.Now;

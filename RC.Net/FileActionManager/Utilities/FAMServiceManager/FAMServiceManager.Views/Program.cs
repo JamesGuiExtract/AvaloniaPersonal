@@ -1,7 +1,7 @@
 ﻿using System;
-using static FAMServiceManager.Program;
+using static Extract.FileActionManager.Utilities.FAMServiceManager.Program;
 
-namespace FAMServiceManager.Views
+namespace Extract.FileActionManager.Utilities.FAMServiceManager.Views
 {
     static class Program
     {

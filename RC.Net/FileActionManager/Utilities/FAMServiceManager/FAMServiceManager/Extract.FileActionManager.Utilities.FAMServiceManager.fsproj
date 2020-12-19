@@ -4,16 +4,36 @@
     <UseWpf>true</UseWpf>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PlatformTarget>x86</PlatformTarget>
-    <OutDir>$(SolutionDir)..\..\..\..\..\Binaries\$(Configuration)</OutDir>
+    <OutDir>..\..\..\..\..\Binaries\$(Configuration)</OutDir>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <AssemblyName>FAMServiceManager.Lib</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="FAMService.fs" />
+    <Compile Include="PasswordHelper.fs" />
+    <Compile Include="NamePasswordDialog.fs" />
+    <Compile Include="Model.fs" />
+    <Compile Include="Msgs.fs" />
+    <Compile Include="Cmds.fs" />
+    <Compile Include="Update.fs" />
+    <Compile Include="Bindings.fs" />
     <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="UCLID_COMUTILSLib.dll">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>fa0a706c-13a8-4bf8-8dc7-9f61dd5a8a14</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Elmish.WPF" Version="3.5.6" />
@@ -21,7 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\FSharp\Core\Code\Extract.Utilities.FSharp\Extract.Utilities.FSharp.fsproj" />
     <ProjectReference Include="..\..\..\Database\Core\Code\Extract.FileActionManager.Database.csproj" />
+    <ProjectReference Include="..\..\ESFAMService\Core\Code\ESFAMService.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Data.Linq" />
@@ -29,5 +51,6 @@
     <Reference Include="System.Data.SqlServerCe">
       <HintPath>..\..\..\..\APIs\SqlCompact_3.5\Desktop\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 </Project>

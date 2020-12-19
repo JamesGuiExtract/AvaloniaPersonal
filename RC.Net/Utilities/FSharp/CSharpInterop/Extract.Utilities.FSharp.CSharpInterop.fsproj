@@ -4,7 +4,7 @@
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-    <OutDir>$(SolutionDir)..\..\..\..\..\Binaries\$(Configuration)</OutDir>
+    <OutDir>..\..\..\..\Binaries\$(Configuration)</OutDir>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />

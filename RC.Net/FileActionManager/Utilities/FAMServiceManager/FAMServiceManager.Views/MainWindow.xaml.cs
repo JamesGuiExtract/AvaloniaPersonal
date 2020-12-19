@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace FAMServiceManager
+namespace Extract.FileActionManager.Utilities.FAMServiceManager
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

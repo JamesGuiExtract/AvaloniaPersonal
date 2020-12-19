@@ -115,21 +115,21 @@ namespace Extract.FileActionManager.Utilities
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseServiceManager"/> class.
-        /// If the processString is "ETL" all enabled ETL processes that are not in the ETLProcesses list
-        /// excluding in the given processString will be processed one at a time
+        /// If the processDescription is "ETL" all enabled ETL processes that are not in the ETLProcesses list
+        /// excluding in the given processDescription will be processed one at a time
         /// 
         /// </summary>
-        /// <param name="processString">The string from the FAMService configuration format of "ETL" or "ETL: DatabaseServiceName</param>
+        /// <param name="processDescription">The string from the FAMService configuration format of "ETL" or "ETL: DatabaseServiceName</param>
         /// <param name="serverName">Database server name for ETL processes</param>
         /// <param name="databaseName">Database Name for ETL processes</param>
         /// <param name="etlProcesses">The list of the ETL processes from FAM Service configuration format of "ETL" or "ETL: DatabaseServiceName"</param>
-        public DatabaseServiceManager(string processString, string serverName, string databaseName, List<string> etlProcesses, int numberOfThreads)
+        public DatabaseServiceManager(string processDescription, string serverName, string databaseName, IList<string> etlProcesses, int numberOfThreads)
         {
             try
             {
                 _numberOfThreads = numberOfThreads;
-                _etlString = processString;
-                if (processString == "ETL" && etlProcesses != null)
+                _etlString = processDescription;
+                if (processDescription == "ETL" && etlProcesses != null)
                 {
                     _excludedETLProcesses = etlProcesses
                         .Where(e => !e.Equals(_etlString, StringComparison.OrdinalIgnoreCase))
@@ -228,18 +228,19 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                DatabaseService dbService = _databaseServices[(ScheduledEvent)sender];
+                var sendingEvent = (ScheduledEvent)sender;
+                DatabaseService dbService = _databaseServices[sendingEvent];
 
                 lock (_inEventStartedLock)
                 {
                     // check if the ScheduledEvent is already in this method
-                    if (_inEventStarted[(ScheduledEvent)sender])
+                    if (_inEventStarted[sendingEvent])
                     {
                         return;
                     }
 
                     // Set the flag to true to indicate that the 
-                    _inEventStarted[(ScheduledEvent)sender] = true;
+                    _inEventStarted[sendingEvent] = true;
                 }
 
                 lock (_processingLock)
@@ -286,7 +287,7 @@ namespace Extract.FileActionManager.Utilities
                                 catch (ExtractException processExtractException)
                                 {
                                     dbService.RecordProcessComplete(processExtractException.AsStringizedByteStream());
-                                    throw processExtractException;
+                                    throw;
                                 }
                                 catch (Exception processException)
                                 {
@@ -311,7 +312,7 @@ namespace Extract.FileActionManager.Utilities
                     {
                         lock (_inEventStartedLock)
                         {
-                            _inEventStarted[(ScheduledEvent)sender] = false;
+                            _inEventStarted[sendingEvent] = false;
                         }
                     }
                 }
@@ -452,7 +453,7 @@ namespace Extract.FileActionManager.Utilities
                     bool runAll = _etlString.Equals("ETL", StringComparison.OrdinalIgnoreCase);
                     if (!runAll)
                     {
-                        string etlDescription = _etlString.Substring(_etlString.IndexOf(":") + 1).Trim();
+                        string etlDescription = _etlString.Substring(_etlString.IndexOf(":", StringComparison.Ordinal) + 1).Trim();
                         query += " AND Description = '" + etlDescription.Replace("'", "''") + "'";
                     }
 

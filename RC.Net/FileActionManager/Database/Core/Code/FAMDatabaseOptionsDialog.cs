@@ -263,7 +263,7 @@ namespace Extract.FileActionManager.Database
             }
         }
 
-        private bool AddMissingSettings(FileProcessingDB db, StrToStrMap settings)
+       static bool AddMissingSettings(FileProcessingDB db, StrToStrMap settings)
         {
             bool added = false;
             // Check for the DashboardSettings
