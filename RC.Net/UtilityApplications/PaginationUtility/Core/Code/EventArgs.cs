@@ -577,7 +577,24 @@ namespace Extract.UtilityApplications.PaginationUtility
     }
 
     /// <summary>
-    /// The event arguments for the <see cref="PaginationPanel.CommittingChanges"/>
+    /// The event arguments for the <see cref="PaginationPanel.TabNavigationEndEventArgs"/>
+    /// event.
+    /// </summary>
+    public class TabNavigationEndEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets or sets a value indicating whether the
+        /// <see cref="PaginationPanel.TabNavigationEnd"/> event was handled.
+        /// </summary>
+        public bool Handled
+        {
+            get;
+            set;
+        }
+    }
+
+    /// <summary>
+    /// The event arguments for the <see cref="PaginationPanel.FileTaskSessionRequest"/>
     /// event.
     /// </summary>
     public class FileTaskSessionRequestEventArgs : EventArgs

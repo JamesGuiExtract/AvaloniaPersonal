@@ -203,6 +203,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<EventArgs> LoadNextDocument;
 
         /// <summary>
+        /// Raised to indicate tab navigation has proceeded off the last document.
+        /// </summary>
+        public event EventHandler<TabNavigationEndEventArgs> TabNavigationEnd;
+
+        /// <summary>
         /// Occurs when saving data for a file
         /// </summary>
         public event EventHandler<SavingDataEventArgs> SavingData;
@@ -2699,6 +2704,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// Handles the TabNavigationEnd event of the _primaryPageLayoutControl control.
+        /// </summary>
+        /// the event data.</param>
+        void HandlePrimaryPageLayoutControl_TabNavigationEnd(object sender, TabNavigationEndEventArgs e)
+        {
+            try
+            {
+                TabNavigationEnd?.Invoke(this, e);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI51479");
+            }
+        }
+
+        /// <summary>
         /// Handles <see cref="PageLayoutControl.SuspendingUpdates"/> in order to apply control suspension
         /// that needs to happen at the <see cref="PaginationPanel"/> level.
         /// </summary>
@@ -3097,13 +3118,20 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <value><see langword="true"/> if all documents selected for committal; otherwise,
         /// <see langword="false"/>.
         /// </value>
-        bool AllDocumentsSelected
+        public bool AllDocumentsSelected
         {
             get
             {
-                return CommitOnlySelection &&
-                    PendingDocuments.Any() &&
-                    PendingDocuments.All(doc => doc.Selected);
+                try
+                {
+                    return CommitOnlySelection &&
+                                PendingDocuments.Any() &&
+                                PendingDocuments.All(doc => doc.Selected);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI51481");
+                }
             }
         }
 
@@ -3167,6 +3195,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.StateChanged += HandlePageLayoutControl_StateChanged;
             _primaryPageLayoutControl.LoadNextDocumentRequest += HandlePrimaryPageLayoutControl_LoadNextDocumentRequest;
             _primaryPageLayoutControl.DocumentDataPanelRequest += HandlePrimaryPageLayoutControl_DocumentDataPanelRequest;
+            _primaryPageLayoutControl.TabNavigationEnd += HandlePrimaryPageLayoutControl_TabNavigationEnd;
             _primaryPageLayoutControl.SuspendingUIUpdates += HandlePageLayoutControl_SuspendingUpdates;
             _primaryPageLayoutControl.ResumingUIUpdates += HandlePageLayoutControl_ResumingUpdates;
 

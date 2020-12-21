@@ -390,6 +390,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         public event EventHandler<DocumentDataPanelRequestEventArgs> DocumentDataPanelRequest;
 
         /// <summary>
+        /// Raised to indicate tab navigation has proceeded off the last document.
+        /// </summary>
+        public event EventHandler<TabNavigationEndEventArgs> TabNavigationEnd;
+
+        /// <summary>
         /// Raised when the UI is about to be suspended from drawing, layouts, or accepting input.
         /// </summary>
         public event EventHandler<EventArgs> SuspendingUIUpdates;
@@ -4511,8 +4516,14 @@ namespace Extract.UtilityApplications.PaginationUtility
             nextDocument = SelectNextDocument(true, onlyUnprocessed: true, useActiveModifierKeys: false);
             if (nextDocument == null)
             {
-                // TODO: Prompt whether to commit batch. Until then, clear control selection when
-                // there are no more documents to prevent tab loop at end.
+                // Gives high-level application a chance to prompt to commit.
+                var args = new TabNavigationEndEventArgs();
+                TabNavigationEnd?.Invoke(this, args);
+                if (args.Handled)
+                {
+                    return;
+                }
+
                 ClearSelection();
             }
             else
@@ -4985,7 +4996,6 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 using (PrintDialog printDialog = new PrintDialog())
                 {
-
                     _printDocument = new PrintDocument();
                     _printDocument.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);       // reset margins to none - default is 1"
                     _printDocument.DefaultPageSettings.Color = true;

@@ -766,6 +766,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 _paginationPanel.LoadNextDocument += HandlePaginationPanel_LoadNextDocument;
+                _paginationPanel.TabNavigationEnd += HandlePaginationPanel_TabNavigationEnd;
 
                 // May be null if the an IPaginationDocumentDataPanel is not specified to be used in
                 // this workflow.
@@ -1104,6 +1105,37 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 ex.ExtractDisplay("ELI40088");
+            }
+        }
+
+        /// <summary>
+        /// Handles the TabNavigationEnd event of the _paginationPanel control.
+        /// </summary>
+        void HandlePaginationPanel_TabNavigationEnd(object sender, TabNavigationEndEventArgs e)
+        {
+            try
+            {
+                if (_paginationPanel.CommitEnabled)
+                {
+                    using (var messageBox = new CustomizableMessageBox())
+                    {
+                        messageBox.Caption = "Submit?";
+                        messageBox.Text = _paginationPanel.AllDocumentsSelected
+                            ? "Submit all documents?"
+                            : "Not all documents have been selected to commit.\r\n\r\nSubmit selected documents?";
+                        messageBox.AddStandardButtons(MessageBoxButtons.YesNo);
+
+                        if (messageBox.Show(this) == "Yes")
+                        {
+                            _paginationPanel.CommitChanges();
+                            e.Handled = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI51480");
             }
         }
 

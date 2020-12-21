@@ -843,7 +843,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Initializes a new <see cref="NavigatedOutEventArgs"/> instance.
+        /// Initializes a new <see cref="TabNavigationEventArgs"/> instance.
         /// </summary>
         /// <param name="forward"><c>true</c> if navigating forward out of the DEP; <c>false</c> if navigating backward.</param>
         /// <param name="lastStop"><c>true</c> if the tab navigation is leaving (or has already left) the sending control.
