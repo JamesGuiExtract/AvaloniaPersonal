@@ -1191,7 +1191,7 @@ string CFileProcessingDB::getActionIDsForActiveWorkflow(_ConnectionPtr ipConnect
 
 			// Open the Action table in the database
 			ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-				adOpenDynamic, adLockOptimistic, adCmdText);
+				adOpenStatic, adLockOptimistic, adCmdText);
 
 			while (ipActionSet->adoEOF == VARIANT_FALSE)
 			{
@@ -1597,7 +1597,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
-		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_ACTIONID_PRIORITY_FILE_INDEX);
+		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
@@ -1616,6 +1616,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FAST_FILEID_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_DATETIMESTAMP_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_TASKCLASSID_WITH_ID_SESSIONID_DATE);
 		vecQueries.push_back(gstrCREATE_PAGINATION_ORIGINALFILE_INDEX);
 		vecQueries.push_back(gstrCREATE_PAGINATION_FILETASKSESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_ACTION_INDEX);
@@ -2780,7 +2781,8 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 		try
 		{
 			string strActiveWorkflow = getActiveWorkflow();
-			m_nActiveActionID = getActionID(ipConnection, strActionName, strActiveWorkflow);
+			int actionID = getActionID(ipConnection, strActionName, strActiveWorkflow);
+			m_nActiveActionID = actionID;
 
 			long nWorkflowActionCount = 0;
 			string strWorkflowActionQuery = Util::Format(
@@ -2789,7 +2791,17 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 			executeCmdQuery(ipConnection, strWorkflowActionQuery, false, &nWorkflowActionCount);
 			m_bUsingWorkflowsForCurrentAction = (nWorkflowActionCount > 0);
 			m_bRunningAllWorkflows = (m_bUsingWorkflowsForCurrentAction && strActiveWorkflow == "");
+			m_nProcessStart = 0;
+			m_vecActionsProcessOrder.clear();
 
+			if (m_bRunningAllWorkflows)
+			{
+				loadActionsProcessOrder(ipConnection, strActionName);
+			}
+			else
+			{
+				m_vecActionsProcessOrder.push_back(actionID);
+			}
 
 			// is this really needed here? This should probably be some DB consistancy check done when first connecting to a database
 			if (m_bUsingWorkflowsForCurrentAction)
@@ -2817,6 +2829,33 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 
 		throw ue;
 	}
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::loadActionsProcessOrder(_ConnectionPtr ipConnection, const string& strActionName)
+{
+	string strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strActionName);
+	
+	// Tokenize by either comma, semicolon, or pipe
+	vector<string> vecTokens;
+	m_vecActionsProcessOrder.clear();
+	StringTokenizer::sGetTokens(strActionIDs, ",;|", vecTokens, true);
+	for (int i = 0; i<vecTokens.size(); i++)
+	{
+		long actionID = asLong(vecTokens[i]);
+		long workflowID = getWorkflowID(ipConnection, actionID);
+		UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr workflowDef = __nullptr;
+		if (workflowID > 0)
+		{
+			workflowDef = getWorkflowDefinition(ipConnection, workflowID);
+			for (int n = 0; n < workflowDef->LoadBalanceWeight; n++)
+			{
+				m_vecActionsProcessOrder.push_back(actionID);
+			}
+		}
+		
+	}
+	if (m_vecActionsProcessOrder.size() > 1)
+		shuffleVector(m_vecActionsProcessOrder);
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLockName)
@@ -5054,6 +5093,9 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 
 	try
 	{
+        // Begin a transaction
+        TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
 		// Set the revert in progress flag so only one thread executes this per process
 		m_bRevertInProgress = true;
 
@@ -5111,6 +5153,8 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 			// move to next Processing FAM record
 			ipFileSet->MoveNext();
 		}
+        // Commit the reverted files
+		tgRevert.CommitTrans();
 		m_bRevertInProgress = false;
 	}
 	catch(...)
@@ -5318,21 +5362,9 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI51462", ipFiles != __nullptr);
 
-			// Revert files before attempting to get the files to process
-			if (!m_bRevertInProgress)
-			{
-				// Begin a transaction
-				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
+			// Revert files
+			revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
-				// Revert files
-				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-				// Commit the reverted files
-				tgRevert.CommitTrans();
-			}
-
-			// Get ActionID from Name
-			int nActionID = getActionID(ipConnection, strActionName);
 			bool bTransactionSuccessful = false;
 
 			// Start the stopwatch to use to check for transaction timeout
@@ -5342,71 +5374,48 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			// Retry the transaction until successful
 			while (!bTransactionSuccessful)
 			{
-				// Begin a transaction
-				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
 				try
 				{
 					try
 					{
-						_CommandPtr cmd;
-						cmd.CreateInstance(__uuidof(Command));
-						ASSERT_RESOURCE_ALLOCATION("ELI51466", cmd != __nullptr);
-
-						cmd->ActiveConnection = ipConnection;
-						cmd->CommandText = _bstr_t("dbo.GetFilesToProcessForActionID");
-						cmd->CommandType = adCmdStoredProc;
-						cmd->Parameters->Refresh();
-						cmd->Parameters->Item["@ActionID"]->Value = variant_t(nActionID);
-						cmd->Parameters->Item["@ActionName"]->Value = variant_t(strActionName.c_str());
-						cmd->Parameters->Item["@BatchSize"]->Value = variant_t(nMaxFiles);
-						//TODO: make this so it can process Skipped for all or single user
-						cmd->Parameters->Item["@StatusToQueue"]->Value = variant_t(strStatusToSelect.c_str());
-						cmd->Parameters->Item["@MachineID"]->Value = variant_t(getMachineID(ipConnection));
-						cmd->Parameters->Item["@UserID"]->Value = variant_t(getFAMUserID(ipConnection));
-						cmd->Parameters->Item["@ActiveFAMID"]->Value = variant_t(m_nActiveFAMID);
-						cmd->Parameters->Item["@FAMSessionID"]->Value = variant_t(m_nFAMSessionID);
-						cmd->Parameters->Item["@RecordFASTEntry"]->Value = variant_t(m_bUpdateFASTTable);
-						cmd->Parameters->Item["@SkippedForUser"]->Value = variant_t(strSkippedUser.c_str());
-						variant_t vtEmpty;
-						_RecordsetPtr ipFileSet = cmd->Execute(&vtEmpty, &vtEmpty, adCmdStoredProc);
-
-						// Maintains a list of files getting set to processing until the transaction
-						// has completed successfully.
 						vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> tempFileVector;
-						// Fill the ipFiles collection and update the stats
-						while (ipFileSet->adoEOF == VARIANT_FALSE)
+
+						// Begin a transaction
+						TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+						if (m_bRunningAllWorkflows && m_bLoadBalance)
 						{
-							FieldsPtr ipFields = ipFileSet->Fields;
-							ASSERT_RESOURCE_ALLOCATION("ELI30403", ipFields != __nullptr);
+							int current = m_nProcessStart;
+							int numberAttemptedGets = 0;
 
-							// Get the file Record from the fields
-							UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
-								getFileRecordFromFields(ipFields);
-							ASSERT_RESOURCE_ALLOCATION("ELI30404", ipFileRecord != __nullptr);
+							while (numberAttemptedGets < nMaxFiles)
+							{
+								int actionID = m_vecActionsProcessOrder[current];
+								current = (current + 1) % m_vecActionsProcessOrder.size();
 
-							// [LegacyRCAndUtils:6225]
-							// Do not add the record to ipFiles until after we have successfully
-							// committed the transaction. If another thread/process has tried to
-							// grab the same file, an "Invalid File State Transition" exception
-							// will be thrown and, therefore, this thread/process should not process
-							// the file.
-							tempFileVector.push_back(ipFileRecord);
+								_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, actionID, strActionName,
+									1, strStatusToSelect, strSkippedUser);
 
-							string strFileID = asString(ipFileRecord->FileID);
+								auto results = getFilesFromRecordset(ipFileSet);
+								tempFileVector.insert(tempFileVector.end(), results.begin(), results.end());
 
-							// Get the previous state
-							string strFileFromState = getStringField(ipFields, "ASC_From");
+								numberAttemptedGets += (m_bRunningAllWorkflows ? 1 : nMaxFiles);
+							}
+							// Commit the transaction before transfering the data from the recordset
+							tg.CommitTrans();
+							m_nProcessStart = current;
 
-							ipFileRecord->FallbackStatus =
-								(UCLID_FILEPROCESSINGLib::EActionStatus)asEActionStatus(strFileFromState);
-
-							ipFileSet->MoveNext();
 						}
-						// Commit the transaction before transfering the data from the recordset
-						tg.CommitTrans();
+						else
+						{
+							_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, 0, strActionName,
+								nMaxFiles, strStatusToSelect, strSkippedUser);
+							
+							tempFileVector = getFilesFromRecordset(ipFileSet);
+							tg.CommitTrans();
+						}
 						// Now that the transaction has processed correctly, copy the file records
-				// that have been set to processing over to ipFiles.
+						// that have been set to processing over to ipFiles.
 						for each (UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord in tempFileVector)
 						{
 							ipFiles->PushBack(ipFileRecord);
@@ -5451,6 +5460,72 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 	}
 }
 //--------------------------------------------------------------------------------------------------
+_RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _ConnectionPtr& ipConnection, const int actionID,
+	const string& strActionName, const int nMaxFiles, const string& strStatusToSelect, const string& strSkippedUser)
+{
+	_CommandPtr cmd;
+	cmd.CreateInstance(__uuidof(Command));
+	ASSERT_RESOURCE_ALLOCATION("ELI51466", cmd != __nullptr);
+
+	cmd->ActiveConnection = ipConnection;
+	cmd->CommandText = _bstr_t("dbo.GetFilesToProcessForAction");
+	cmd->CommandType = adCmdStoredProc;
+	cmd->Parameters->Refresh();
+	if (m_bLoadBalance && m_bRunningAllWorkflows)
+		cmd->Parameters->Item["@ActionID"]->Value = variant_t(actionID);
+	int workflowID = getActiveWorkflowID(ipConnection);
+	if (workflowID != -1)
+		cmd->Parameters->Item["@WorkflowID"]->Value = variant_t(workflowID);
+	cmd->Parameters->Item["@ActionName"]->Value = variant_t(strActionName.c_str());
+	cmd->Parameters->Item["@BatchSize"]->Value = variant_t(nMaxFiles);
+	//TODO: make this so it can process Skipped for all or single user
+	cmd->Parameters->Item["@StatusToQueue"]->Value = variant_t(strStatusToSelect.c_str());
+	cmd->Parameters->Item["@MachineID"]->Value = variant_t(getMachineID(ipConnection));
+	cmd->Parameters->Item["@UserID"]->Value = variant_t(getFAMUserID(ipConnection));
+	cmd->Parameters->Item["@ActiveFAMID"]->Value = variant_t(m_nActiveFAMID);
+	cmd->Parameters->Item["@FAMSessionID"]->Value = variant_t(m_nFAMSessionID);
+	cmd->Parameters->Item["@RecordFASTEntry"]->Value = variant_t(m_bUpdateFASTTable);
+	cmd->Parameters->Item["@SkippedForUser"]->Value = variant_t(strSkippedUser.c_str());
+	variant_t vtEmpty;
+	return cmd->Execute(&vtEmpty, &vtEmpty, adCmdStoredProc);
+}
+//--------------------------------------------------------------------------------------------------
+vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> CFileProcessingDB::getFilesFromRecordset(_RecordsetPtr ipFileSet)
+{						
+	// Vector to hold the files
+	vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> tempFileVector;
+	// Fill the ipFiles collection and update the stats
+	while (ipFileSet->adoEOF == VARIANT_FALSE)
+	{
+		FieldsPtr ipFields = ipFileSet->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI30403", ipFields != __nullptr);
+
+		// Get the file Record from the fields
+		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
+			getFileRecordFromFields(ipFields);
+		ASSERT_RESOURCE_ALLOCATION("ELI30404", ipFileRecord != __nullptr);
+
+		// [LegacyRCAndUtils:6225]
+		// Do not add the record to ipFiles until after we have successfully
+		// committed the transaction. If another thread/process has tried to
+		// grab the same file, an "Invalid File State Transition" exception
+		// will be thrown and, therefore, this thread/process should not process
+		// the file.
+		tempFileVector.push_back(ipFileRecord);
+
+		string strFileID = asString(ipFileRecord->FileID);
+
+		// Get the previous state
+		string strFileFromState = getStringField(ipFields, "ASC_From");
+
+		ipFileRecord->FallbackStatus =
+			(UCLID_FILEPROCESSINGLib::EActionStatus)asEActionStatus(strFileFromState);
+
+		ipFileSet->MoveNext();
+	}
+	return tempFileVector;
+}
+//--------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
 														   const string& strSelectSQL,
 														   const string& strActionName,
@@ -5468,17 +5543,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != __nullptr);
 
 			// Revert files before attempting to get the files to process
-			if (!m_bRevertInProgress)
-			{
-				// Begin a transaction
-				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
-				// Revert files
-				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-				// Commit the reverted files
-				tgRevert.CommitTrans();
-			}
+			revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
 			bool bTransactionSuccessful = false;
 
@@ -5686,14 +5751,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	}
 
 	// Run the revert method before checking for in processing file
-	{
-		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
-		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-		tgRevert.CommitTrans();
-	}
+	revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
 	// Check for active processing for the action
 	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
@@ -5735,14 +5793,7 @@ bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 	}
 
 	// Run the revert method before checking for in processing file
-	{
-		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
-		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-		tgRevert.CommitTrans();
-	}
+	revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
 	// Check for active processing 
 	long nActiveFAMCount = 0;

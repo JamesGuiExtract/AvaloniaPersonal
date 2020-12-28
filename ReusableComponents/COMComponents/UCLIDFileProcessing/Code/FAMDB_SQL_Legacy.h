@@ -341,3 +341,13 @@ static const string gstrCREATE_FILE_ACTION_STATUS_112_187 =
 
 static const string gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX_128_187 = "CREATE NONCLUSTERED INDEX "
 "[IX_Skipped_File_FAMSession] ON [SkippedFile]([FAMSessionID])";
+
+
+static const string gstrCREATE_ACTIONSTATUS_ACTIONID_PRIORITY_FILE_INDEX_188 =
+"CREATE UNIQUE CLUSTERED INDEX[IX_ActionStatusActionIDPriorityFileID] ON[dbo].[FileActionStatus] "
+"("
+"	[ActionStatus] ASC,"
+"	[ActionID] ASC,"
+"	[Priority] DESC,"
+"	[FileID] ASC "
+")";

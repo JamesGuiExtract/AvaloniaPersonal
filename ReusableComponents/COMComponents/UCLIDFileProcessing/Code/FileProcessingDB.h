@@ -648,6 +648,16 @@ private:
 	// The file IDs for each defined file set (file set name not case-sensitive)
 	csis_map<vector<int>>::type m_mapFileSets;
 
+	// This is only used when procesing all workflows
+	// It is loaded when processing with the ActionIDs for all the workflows for the ActionName being processes
+	// if Load balancing is being used ActionsIDs will can be in the vector multiple times
+	// the order of the vector is randomized when originally loaded - the files will be processed in the same order
+	// until processing is restarted. Files will be gotten 1 at a time (ignoring the value in the FAM to get more files.
+	vector<int> m_vecActionsProcessOrder;
+
+	// The position in the m_vecActionsProcessOrder vector to start getting files
+	int m_nProcessStart = 0;
+	
 	// The encrypted DatabaseID loaded from the DBInfo table
 	string m_strEncryptedDatabaseID;
 
@@ -677,7 +687,16 @@ private:
 	//-------------------------------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------------------------------
-	
+
+	_RecordsetPtr spGetFilesToProcessForActionID(const _ConnectionPtr& ipConnection, const int actionID,
+		const string& strActionName, const int nMaxFiles, const string& strStatusToSelect, const string& strSkippedUser);
+
+	// Extracts the IFileRecordPtrs from the Recordset
+	vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> getFilesFromRecordset(_RecordsetPtr ipFileSet);
+
+	// Loads the m_vecActionsProcessOrder vector
+	void loadActionsProcessOrder(_ConnectionPtr ipConnection, const string& strActionName);
+
 	// Returns true if there is any active FAM; false otherwise.
 	bool isFAMActiveForAnyAction(bool bDBLocked);
 
@@ -1127,6 +1146,7 @@ private:
 
 	// Method checks for timed out FAM's and reverts file status for ones that are found.
 	// If there are files to revert and bDBLocked is false an exception will be thrown
+    // NOTE: Method performs the revert within a transaction
 	void revertTimedOutProcessingFAMs(bool bDBLocked, const _ConnectionPtr& ipConnection);
 
 	// Method that resets workitems that are marked as processing for FAM's that have timed out

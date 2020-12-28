@@ -30,6 +30,7 @@
 #include <fstream>
 #include <sstream>
 #include <functional>
+#include <random>
 
 using namespace std;
 
@@ -1119,3 +1120,14 @@ EXPORT_BaseUtils char getWindows1252FromUTF8(const string& strCharacter);
 //-------------------------------------------------------------------------------------------------
 // Result will use '\r\n' for newlines if input uses either '\r\n' or '\n' or both
 EXPORT_BaseUtils string normalizeNewlines(const string& strInput);
+//-------------------------------------------------------------------------------------------------
+// Shuffles the order of items the given vector
+template <typename T> 
+vector<T>& shuffleVector(vector<T>& vectorToShuffle)
+{
+    std::random_device rd;
+    std::mt19937 g(rd());
+
+    std::shuffle(vectorToShuffle.begin(), vectorToShuffle.end(), g);
+    return vectorToShuffle;
+}

@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 188;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 189;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2894,7 +2894,7 @@ int UpdateToSchemaVersion188(_ConnectionPtr ipConnection,
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
 		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
 		vecQueries.push_back("ALTER TABLE [dbo].[FileActionStatus] DROP CONSTRAINT [PK_FileActionStatus]");
-		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_ACTIONID_PRIORITY_FILE_INDEX);
+		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_ACTIONID_PRIORITY_FILE_INDEX_188);
 		vecQueries.push_back("ALTER TABLE [dbo].[FileActionStatus] ADD  CONSTRAINT [PK_FileActionStatus] PRIMARY KEY "
 			"([FileID] ASC,	[ActionID] ASC)");
 		vecQueries.push_back("INSERT INTO DBInfo (Name, Value) VALUES ('UseGetFilesLegacy', '0')");
@@ -2906,6 +2906,37 @@ int UpdateToSchemaVersion188(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51468");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion189(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 189;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// The procedure was updated
+		vecQueries.push_back("DROP INDEX [IX_ActionStatusActionIDPriorityFileID] ON [dbo].[FileActionStatus] WITH ( ONLINE = OFF )");
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_TASKCLASSID_WITH_ID_SESSIONID_DATE);
+		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_INDEX);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51491");
 }
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -3819,13 +3850,8 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 					// status.
 					if (*pStatus == kActionProcessing && asCppBool(vbAttemptRevertIfLocked))
 					{
-						// Begin a transaction
-						TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
+                        // Revert files
 						revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-						// Commit the changes to the database
-						tg.CommitTrans();
 
 						// Re-query to see if the status changed as a result of being auto-reverted.
 						ipFileSet->Requery(adOptionUnspecified);
@@ -3984,7 +4010,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 
 			// Currently when running all workflows use legacy
 			// and if requested
-			if (m_bRunningAllWorkflows || m_bUseGetFilesLegacy)
+			if (m_bUseGetFilesLegacy)
 			{
 				*pvecFileRecords = getFilesToProcessLegacy(bDBLocked, strActionName, nMaxFiles, asCppBool(bGetSkippedFiles), asString(bstrSkippedForUserName)).Detach();
 			}
@@ -4329,12 +4355,8 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 
 				if (asCppBool(vbRevertTimedOutFAMs))
 				{
-					// Begin a transaction
-					TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
+                    // Revert files
 					revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-					tg.CommitTrans();
 				}
 				
 				// Begin a transaction
@@ -7977,7 +7999,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 185:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion186);
 				case 186:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion187);
 				case 187:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion188);
-				case 188:
+				case 188:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion189);
+				case 189:
 					break;
 
 				default:
