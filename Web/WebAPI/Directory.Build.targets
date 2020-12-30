@@ -1,0 +1,51 @@
+<Project>
+  <ItemGroup>
+    <PackageReference Update="Microsoft.AspNetCore.Authentication.Cookies" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Localization" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Mvc" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Mvc.Core" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Mvc.Versioning" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Razor.Design" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Routing" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Server.IISIntegration" Version="2.1.*" />
+    <PackageReference Update="Microsoft.AspNetCore.Server.Kestrel" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.Configuration.FileExtensions" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.Configuration.Json" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="2.1.*" /> 
+    <PackageReference Update="Microsoft.Extensions.FileProviders.Composite" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.FileProviders.Physical" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.Logging" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.Options" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
+    <PackageReference Update="Microsoft.Net.Http" Version="2.1.*" />
+    <PackageReference Update="Microsoft.Net.Http.Headers" Version="2.1.*" />
+    <PackageReference Update="Newtonsoft.Json" Version="12.0.3" />	
+    <PackageReference Update="NSwag.Annotations" Version="13.9.4" />
+    <PackageReference Update="PDFsharp" Version="1.50.5147" />
+    <PackageReference Update="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Update="Swashbuckle.AspNetCore.SwaggerGen" Version="5.6.3" />
+    <PackageReference Update="Swashbuckle.AspNetCore.SwaggerUi" Version="5.6.3" />
+    <PackageReference Update="System.Diagnostics.FileVersionInfo" Version="4.3.0" />
+    <PackageReference Update="System.Dynamic.Runtime" Version="4.3.0" />
+    <PackageReference Update="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
+    <PackageReference Update="System.Text.Encoding.CodePages" Version="4.5.0" />
+    <PackageReference Update="System.Threading.Tasks.Parallel" Version="4.3.0" />
+    <PackageReference Update="System.Threading.Thread" Version="4.3.0" />
+    <PackageReference Update="System.Xml.XmlDocument" Version="4.3.0" />
+  </ItemGroup>
+
+  <Target Name="resolveInteropOutputPath" BeforeTargets="ResolveComReferences"
+          Condition="'@(COMReference)'!='' or '@(COMFileReference)'!=''">
+    <PropertyGroup Condition=" '$(InteropOutputPath)' == '' ">
+      <InteropOutputPath>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)</InteropOutputPath>
+    </PropertyGroup>
+  </Target>
+
+</Project>

@@ -14,7 +14,9 @@ namespace WebAPI.Controllers
     /// </summary>
     [Authorize]
     [ApiVersion("3.0")]
+    [ApiVersion("3.1")]
     [Route("api/v3.0/[controller]")]
+    [Route("api/v3.1/[controller]")]
     // All controller versions will be mapped to "api/[controller]"; 
     // Utils.CurrentApiContext.ApiVersion will determine which to us at this route.
     [Route("api/[controller]")]

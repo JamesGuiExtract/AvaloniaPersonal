@@ -802,7 +802,7 @@ namespace WebAPI.Controllers
                     ExtractException.Assert("ELI47192", "The supplied document ID doesn't match the open session's document ID",
                         docID == data.DocumentSessionFileId);
 
-                    return Ok(data.GetMetadataField(metadataField));
+                    return Ok(data.GetMetadataField(docID, metadataField));
                 }
             }
             catch (Exception ex)
@@ -836,7 +836,7 @@ namespace WebAPI.Controllers
                     ExtractException.Assert("ELI47195", "The supplied document ID doesn't match the open session's document ID",
                         docID == data.DocumentSessionFileId);
 
-                    data.SetMetadataField(metadataField, metadataFieldValue);
+                    data.SetMetadataField(docID, metadataField, metadataFieldValue);
 
                     return Ok();
                 }

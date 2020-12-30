@@ -847,15 +847,17 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// Returns the metadata field value from the open document.
+        /// Returns the metadata field value from fileId, otherwise the open document.
         /// </summary>
+        /// <param name="fileId">The document for which metadata should be retrieved.</param>
         /// <param name="metaDataField">The field to obtain the value from</param>
-        /// <returns></returns>
-        public MetadataFieldResult GetMetadataField(string metaDataField)
+        public MetadataFieldResult GetMetadataField(int fileId, string metaDataField)
         {
             try
             {
-                string metadataValue = FileApi.FileProcessingDB.GetMetadataFieldValue(this.DocumentSessionFileId, metaDataField);
+                AssertRequestFileId("ELI51505", fileId);
+
+                string metadataValue = FileApi.FileProcessingDB.GetMetadataFieldValue(fileId, metaDataField);
                 return new MetadataFieldResult { Value = metadataValue };
             }
             catch (Exception ex)
@@ -867,21 +869,23 @@ namespace WebAPI.Models
         /// <summary>
         /// Sets the metadatafield value in the database.
         /// </summary>
+        /// <param name="fileId">The document for which metadata should be retrieved.</param>
         /// <param name="metadataField">The metadata field to assign</param>
         /// <param name="metadataFieldValue">The metadatafield value</param>
-        public void SetMetadataField(string metadataField, string metadataFieldValue)
+        public void SetMetadataField(int fileId, string metadataField, string metadataFieldValue)
         {
             try
             {
+                AssertRequestFileId("ELI51506", fileId);
 
                 try
                 {
-                    FileApi.FileProcessingDB.SetMetadataFieldValue(this.DocumentSessionFileId, metadataField, metadataFieldValue);
+                    FileApi.FileProcessingDB.SetMetadataFieldValue(fileId, metadataField, metadataFieldValue);
                 }
                 catch
                 {
                     HTTPError.Assert("ELI47203", StatusCodes.Status404NotFound,
-                        GetMetadataField(metadataField).Value != null,
+                        GetMetadataField(fileId, metadataField).Value != null,
                         Inv($"The metadata field: {metadataField} is not present in the database"));
 
                     throw;

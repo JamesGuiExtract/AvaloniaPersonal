@@ -18,7 +18,9 @@ namespace WebAPI.Controllers
     /// </summary>
     [Authorize]
     [ApiVersion("3.0")]
+    [ApiVersion("3.1")]
     [Route("api/v3.0/[controller]")]
+    [Route("api/v3.1/[controller]")]
     // All controller versions will be mapped to "api/[controller]"; 
     // Utils.CurrentApiContext.ApiVersion will determine which to us at this route.
     [Route("api/[controller]")] 
@@ -34,8 +36,7 @@ namespace WebAPI.Controllers
         [ProducesResponseType(201, Type = typeof(DocumentIdResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        // NOTE: If method name changes, ContentTypeSpecifier and FileUploadOperation should be updated to match.
-        public IActionResult PostDocument([FromForm] IFormFile file)
+        public IActionResult PostDocument(IFormFile file)
         {
             try
             {
@@ -50,19 +51,12 @@ namespace WebAPI.Controllers
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: true, endSessionOnDispose: true);
 
-                    try
-                    {
-                        var result = data.SubmitFile(file.FileName, fileStream);
-                        string url = Request.Path.HasValue
-                            ? Request.GetDisplayUrl()
-                            : "https://unknown/api/Document";
+                    var result = data.SubmitFile(file.FileName, fileStream);
+                    string url = Request.Path.HasValue
+                        ? Request.GetDisplayUrl()
+                        : "https://unknown/api/Document";
 
-                        return Created(new Uri($"{url}/{result.Id}"), result);
-                    }
-                    finally
-                    {
-                        data.CloseSession();
-                    }
+                    return Created(new Uri($"{url}/{result.Id}"), result);
                 }
             }
             catch (Exception ex)
@@ -147,7 +141,6 @@ namespace WebAPI.Controllers
         [ProducesResponseType(201, Type = typeof(DocumentIdResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        // NOTE: If method name changes, ContentTypeSpecifier should be updated to match.
         public IActionResult PostText([FromForm] string textData)
         {
             try
@@ -159,19 +152,12 @@ namespace WebAPI.Controllers
                 {
                     data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: true, endSessionOnDispose: true);
 
-                    try
-                    {
-                        var result = data.SubmitText(textData);
-                        string url = Request.Path.HasValue
-                            ? Request.GetDisplayUrl()
-                            : "https://unknown/api/Document/Text";
-                        url = url.Replace("/Text", $"/{result.Id}/Text");
-                        return Created(new Uri(url), result);
-                    }
-                    finally
-                    {
-                        data.CloseSession();
-                    }
+                    var result = data.SubmitText(textData);
+                    string url = Request.Path.HasValue
+                        ? Request.GetDisplayUrl()
+                        : "https://unknown/api/Document/Text";
+                    url = url.Replace("/Text", $"/{result.Id}/Text");
+                    return Created(new Uri(url), result);
                 }
             }
             catch (Exception ex)
@@ -335,7 +321,6 @@ namespace WebAPI.Controllers
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
-        // NOTE: If method name changes, ContentTypeSpecifier should be updated to match.
         public IActionResult GetDocumentType(int Id)
         {
             try
@@ -388,7 +373,7 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Replaces the data for the specified document.
         /// Workflow admin note: To be used, the post/verify action must be configured and the
-        /// specified file must be pending in the configured action.
+        /// specified file must be pending/completed/failed in the configured action.
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <param name="documentData">The replacement data for the document</param>
@@ -414,7 +399,6 @@ namespace WebAPI.Controllers
                     {
                         data.PutDocumentResultSet(data.DocumentSessionFileId, documentData);
                         data.CloseDocument(setStatusTo: EActionStatus.kActionCompleted);
-                        data.CloseSession();
                     }
                     catch (Exception ex)
                     {
@@ -423,12 +407,6 @@ namespace WebAPI.Controllers
                         try
                         {
                             data.CloseDocument(setStatusTo: EActionStatus.kActionFailed, exception: ex);
-                        }
-                        catch { }
-
-                        try
-                        {
-                            data.CloseSession();
                         }
                         catch { }
 
@@ -447,7 +425,7 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Adds, updates or deletes specified document data attributes.
         /// Workflow admin note: To be used, the post/verify action must be configured and the
-        /// specified file must be pending in the configured action.
+        /// specified file must be pending/completed/failed in the configured action.
         /// </summary>
         /// <param name="Id">The document ID</param>
         /// <param name="documentData">The changes to apply to the document data</param>
@@ -466,26 +444,19 @@ namespace WebAPI.Controllers
                 // using ensures that the underlying FileApi.InUse flag is cleared on exit
                 using (var data = new DocumentData(User, requireSession: true))
                 {
-                    data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: false, endSessionOnDispose: true); ;
+                    data.OpenSession(User, Request.GetIpAddress(), "DocumentAPI", forQueuing: false, endSessionOnDispose: true);
                     data.OpenDocument(Constants.TaskClassDocumentApi, Id, processSkipped: false, dataUpdateOnly: true);
 
                     try
                     {
                         data.PatchDocumentData(data.DocumentSessionFileId, documentData);
                         data.CloseDocument(setStatusTo: EActionStatus.kActionCompleted);
-                        data.CloseSession();
                     }
                     catch (Exception ex)
                     {
                         try
                         {
                             data.CloseDocument(setStatusTo: EActionStatus.kActionFailed, exception: ex);
-                        }
-                        catch { }
-
-                        try
-                        {
-                            data.CloseSession();
                         }
                         catch { }
 
@@ -516,7 +487,6 @@ namespace WebAPI.Controllers
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
-        // NOTE: If method name changes, ContentTypeSpecifier should be updated to match.
         public IActionResult GetOutputFile(int Id)
         {
             try
@@ -570,6 +540,64 @@ namespace WebAPI.Controllers
             catch (Exception ex)
             {
                 return this.GetAsHttpError(ex, "ELI50042");
+            }
+        }
+
+        /// <summary>
+        /// Gets a metadata field value for a document.
+        /// </summary>
+        /// <param name="Id">The document id for which a metadata field value should be retrieved.</param>
+        /// <param name="metadataField">The metadata field for which the value should be retrieved.</param>
+        [HttpGet("{Id}/MetadataField/{metadataField}")]
+        [Authorize]
+        [MapToApiVersion("3.1")]
+        [ProducesResponseType(200, Type = typeof(MetadataFieldResult))]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
+        public IActionResult GetMetadataField(int Id, string metadataField)
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: false))
+                {
+                    return Ok(data.GetMetadataField(Id, metadataField));
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI51495");
+            }
+        }
+
+        /// <summary>
+        /// Sets a metadata field for a document.
+        /// </summary>
+        /// <param name="Id">The document id for which a metadata field value should be applied.</param>
+        /// <param name="metadataField">The metadata field to which the value should be assigned.</param>
+        /// <param name="metadataFieldValue">The value to assign.</param>
+        /// <returns></returns>
+        [HttpPut("{Id}/MetadataField/{metadataField}")]
+        [Authorize]
+        [MapToApiVersion("3.1")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400, Type = typeof(ErrorResult))]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404, Type = typeof(ErrorResult))]
+        public IActionResult SetMetadataField(int Id, string metadataField, string metadataFieldValue = "")
+        {
+            try
+            {
+                using (var data = new DocumentData(User, requireSession: false))
+                {
+                    data.SetMetadataField(Id, metadataField, metadataFieldValue);
+
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.GetAsHttpError(ex, "ELI51498");
             }
         }
 

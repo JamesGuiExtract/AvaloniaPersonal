@@ -1,18 +1,16 @@
 ﻿using Extract;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Formatters;              // for HttpNoContentOutputFormatter
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
 using WebAPI.Filters;
-using WebAPI.Models;
 using static WebAPI.Utils;
 
 namespace WebAPI
@@ -91,6 +89,7 @@ namespace WebAPI
                     // in JSON (as "null"), instead of returning http error "204 No Content" response
                     options.OutputFormatters.RemoveType<HttpNoContentOutputFormatter>();
                 });
+                services.AddSecurity();
 
                 // Register Swashbuckle/Swagger - auto-generate API documentation
                 var basepath = PlatformServices.Default.Application.ApplicationBasePath;
@@ -101,38 +100,34 @@ namespace WebAPI
 
                 services.AddSwaggerGen(config =>
                 {
-                    config.SwaggerDoc("AppBackendAPI", 
-                        new Info
+                    config.SwaggerDoc("AppBackendAPI",
+                        new OpenApiInfo
                         {
                             Title = "Application Backend API",
                             Description = "Backend API support for web-based verification applications.",
-                            Contact = new Contact
+                            Contact = new OpenApiContact
                             {
                                 Name = "Extract Systems",
                                 Email = "developers@extractsystems.com",
-                                Url = "http://www.extractsystems.com"
+                                Url = new Uri("http://www.extractsystems.com")
                             },
                             Version = "1.0",
-                            License = new License
+                            License = new OpenApiLicense
                             {
                                 Name = "Use under Extract Systems license",
-                                Url = "http://extractsystems.com"
+                                Url = new Uri("http://extractsystems.com")
                             }
-                        });
+                        }); ;
 
                     config.IncludeXmlComments(xmlPath);
-                    config.DescribeAllEnumsAsStrings();
 
-                    // Enables swagger gen to recognize [Authorize] attributes on controllers and actions
-                    config.OperationFilter<AuthorizationHeaderParameterOperationFilter>();
+                    // config.DescribeAllEnumsAsStrings() is obsolete in Swagger v5+; it is supposed to use
+                    // System.Text.Json for serialization and that serialization includes specification for enum
+                    // translation. However, this functionality appears to depend on Asp.Net Core 3.0, so it
+                    // appears for now a filter is necessary.
+                    config.SchemaFilter<EnumsAsStringFilter>();
 
-                    // Register File Upload Operation Filter - this supports upload button in Swagger UI for Document.SubmitFile
-                    config.OperationFilter<FileUploadOperation>();
-
-                    // Mapping FileResult to "file" causes NSwag's automatic client generation to use a return type
-                    // of FileResponse for methods that return PhysicalFileResult. On the client side, FileResponse allows
-                    // for the streaming of the file itself whereas PhysicalFileResult provides only the source paths.
-                    config.MapType<FileResult>(() => new Schema { Type = "file", });
+                    config.EnableAuthorization();
                 });
 
                 services.Configure<ServerOptions>(Configuration);
@@ -153,18 +148,11 @@ namespace WebAPI
         {
             try
             {
-                /*
-                if (env.IsDevelopment())
-                {
-                }
-                */
-
-                // configure authorization and token creation this server provides
-                ConfigureAuth(app);
-
+                app.UseStaticFiles(); // For stylesheet path below
                 app.UseSwagger();
                 app.UseSwaggerUI(config =>
                 {
+                    config.InjectStylesheet("/css/ReplaceHeaderLogo.css");
                     config.RoutePrefix = "documentation";
                     config.DocumentTitle = "Extract Application Backend API";
                     config.SwaggerEndpoint("/swagger/AppBackendAPI/swagger.json", "AppBackendAPI");

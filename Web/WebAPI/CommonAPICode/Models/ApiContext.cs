@@ -28,8 +28,7 @@ namespace WebAPI.Models
         /// <summary>
         /// The current API version 
         /// </summary>
-        public const string CURRENT_VERSION = "3.0";
-
+        public const string CURRENT_VERSION = "3.1";
 
         /// <summary>
         /// This class maintains the essential API context data - Database server name, database name, and workflow name

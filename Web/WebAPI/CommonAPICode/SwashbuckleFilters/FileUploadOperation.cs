@@ -1,9 +1,8 @@
 ﻿using Extract;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace WebAPI.Filters
 {
@@ -16,39 +15,37 @@ namespace WebAPI.Filters
         /// <summary>
         /// This filter will replace the multiple input boxes with file upload control
         /// </summary>
-        /// <param name="operation">Swagger operation</param>
-        /// <param name="context">unused</param>
-        public void Apply(Operation operation, OperationFilterContext context)
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             try
             {
-                // “api” + [optional version] + [Controller name] + [Method Name] + [HTTP Verb]
-                // Or in other words, it is the URL of your controller method, but without “/” + [HTTP Verb]
-                //            if (operation.OperationId.ToLower() == "apidocumentuploadfilepost")
-                if (Regex.IsMatch(operation.OperationId, @"(?ix)Api(V\d+\.\d+)?DocumentPost"))
+                if (context.MethodInfo.Name == "PostDocument")
                 {
-                    // Clear all parameters EXCEPT for the authorization parameter, if it exists. Not doing this
-                    // creates an order dependency - the auth filter needs to be AFTER the file upload filter. If
-                    // the auth filter is removed here, then Swagger won't correctly generate code for SubmitFile.
-                    var operationParameters = new List<IParameter>(operation.Parameters);
+                    // Clear all parameters and add a request body for field for providing document input.
+                    var operationParameters = new List<OpenApiParameter>(operation.Parameters);
                     operation.Parameters.Clear();
 
-                    operation.Parameters.Add(new NonBodyParameter
+                    operation.RequestBody = new OpenApiRequestBody()
                     {
-                        Name = "file",      // Name parameter value must be equal to parameter name of the method
-                        In = "formData",
-                        Description = "Upload File",
-                        Required = true,
-                        Type = "file"
-                    });
-
-                    // For some unknown reason, it seems to be important to add the auth header back to the list
-                    // after the file upload filter. 
-                    var index = operationParameters.FindIndex(p => p.Name.IsEquivalent("Authorization"));
-                    if (index >= 0)
-                    {
-                        operation.Parameters.Add(operationParameters[index]);
-                    }
+                        Content =
+                        {
+                            ["multipart/form-data"] = new OpenApiMediaType()
+                            {
+                                Schema = new OpenApiSchema()
+                                {
+                                    Type = "object",
+                                    Properties =
+                                    {
+                                        ["file"] = new OpenApiSchema()
+                                        {
+                                            Type = "file",
+                                            Format = "binary"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
                 }
             }
             catch (Exception ex)

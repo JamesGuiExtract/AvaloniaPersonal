@@ -30,6 +30,11 @@ namespace Extract.Web.WebAPI.Test
     [NUnit.Framework.Category("DocumentAPI")]
     public class TestDocument
     {
+        // VERSIONS:
+        // 2.0 = LEGACY_VERSION
+        // 3.0 = First version after introducing versioning
+        // 4.0 = CURRENT_VERSION; Added GetMetadataField and SetMetadataField
+
         #region Constants
 
         const int MaxDemo_LabDE_FileId = 18;
@@ -1269,6 +1274,54 @@ namespace Extract.Web.WebAPI.Test
                 includeNonSpatial: true, verboseSpatialData: true, splitMultiPageAttributes: false);
             Assert.IsFalse(docAttr.Attributes.Any(a =>
                 a.SpatialPosition.Pages.Count != a.SpatialPosition.Pages.Distinct().Count()));
+        }
+
+        [Test, Category("Automated")]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_GetMetadataField(string apiVersion)
+        {
+            var dbName = "DocumentAPI_Test_GetMetadataField";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+
+                fileProcessingDb.SetMetadataFieldValue(1, "PatientFirstName", "TestName");
+
+                var metadataFieldResult = controller.GetMetadataField(1, "PatientFirstName").AssertGoodResult<MetadataFieldResult>();
+
+                Assert.AreEqual("TestName", metadataFieldResult.Value);
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test, Category("Automated")]
+        [TestCase(ApiContext.CURRENT_VERSION)]
+        public static void Test_SetMetadataField(string apiVersion)
+        {
+            var dbName = "DocumentAPI_Test_SetMetadataField";
+
+            try
+            {
+                (FileProcessingDB fileProcessingDb, User user, DocumentController controller) =
+                    InitializeAndLogin(apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+
+                controller.SetMetadataField(1, "PatientFirstName", "TestName").AssertGoodResult<NoContentResult>();
+
+                string dbValue = fileProcessingDb.GetMetadataFieldValue(1, "PatientFirstName");
+
+                Assert.AreEqual("TestName", dbValue);
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
         }
 
         /// <summary>

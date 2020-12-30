@@ -12,7 +12,9 @@ namespace WebAPI.Controllers
     /// Users (controller) class
     /// </summary>
     [ApiVersion("3.0")]
+    [ApiVersion("3.1")]
     [Route("api/v3.0/[controller]")]
+    [Route("api/v3.1/[controller]")]
     // All controller versions will be mapped to "api/[controller]"; 
     // Utils.CurrentApiContext.ApiVersion will determine which to us at this route.
     [Route("api/[controller]")]
