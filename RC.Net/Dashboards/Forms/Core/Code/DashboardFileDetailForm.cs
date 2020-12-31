@@ -257,7 +257,7 @@ namespace Extract.Dashboard.Forms
                             // add the column values as parameters for the query
                             foreach (var kp in _columnValues)
                             {
-                                command.Parameters.AddWithValue("@" + kp.Key, kp.Value);
+                                command.Parameters.AddWithValue("@" + kp.Key, ((object)kp.Value) ?? DBNull.Value);
                             }
                             var gridDataTable = new DataTable();
                             gridDataTable.Locale = CultureInfo.CurrentCulture;
@@ -276,7 +276,7 @@ namespace Extract.Dashboard.Forms
                         }
                         catch (Exception ex)
                         {
-                            ex.ExtractLog("ELI46125");
+                            ex.ExtractDisplay("ELI46125");
                         }
 
                     };
