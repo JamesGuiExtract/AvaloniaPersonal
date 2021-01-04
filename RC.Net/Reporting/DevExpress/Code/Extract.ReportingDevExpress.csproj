@@ -25,7 +25,7 @@
       <Guid>fa0a706c-13a8-4bf8-8dc7-9f61dd5a8a14</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
@@ -33,7 +33,7 @@
       <Guid>a71ee8cd-a2c1-4c5b-a593-12ff4931c820</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>

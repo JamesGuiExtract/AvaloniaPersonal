@@ -1,0 +1,19 @@
+<Project>
+
+  <PropertyGroup Condition="'$(InteropNamespace)'!=''">
+    <InteropPath>$(OutDir)Interop.$(InteropNamespace).dll</InteropPath>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup Condition="'$(CustomBuildStep)'==''">
+    <CustomBuildStep>
+      <Command>
+        tlbimp $(TargetPath) /machine:X86 /sysarray /primary /keyfile:"$(OutDir)..\..\RC.Net\Core\Code\ExtractInternalKey.snk" /silence:3001 /nologo /namespace:$(InteropNamespace) /out:"$(InteropPath)"
+        regasm "$(InteropPath)" /codebase /nologo
+        gacutil -i "$(InteropPath)" /nologo
+      </Command>
+      <Outputs>$(InteropPath)</Outputs>
+      <Inputs>$(TargetPath)</Inputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+
+</Project>

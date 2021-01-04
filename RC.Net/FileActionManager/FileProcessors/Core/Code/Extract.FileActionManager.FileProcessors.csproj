@@ -395,16 +395,17 @@
       <VersionMajor>2</VersionMajor>
       <VersionMinor>8</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
     </COMReference>
     <COMReference Include="AttributeDbMgrComponentsLib">
       <Guid>{0DF6DB5B-F788-42FC-AE9E-EF19CAA78D38}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
@@ -413,7 +414,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
@@ -422,7 +423,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
@@ -431,7 +432,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
@@ -439,7 +440,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
@@ -448,7 +449,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
     <COMReference Include="UCLID_INPUTFUNNELLib">
@@ -456,7 +457,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
@@ -465,7 +466,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
@@ -474,7 +475,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>

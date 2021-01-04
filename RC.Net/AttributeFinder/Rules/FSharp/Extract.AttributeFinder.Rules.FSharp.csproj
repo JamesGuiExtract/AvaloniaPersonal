@@ -42,6 +42,15 @@
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -50,120 +59,12 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
-    <COMReference Include="ADODB">
-      <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>8</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="EXTRACTREDACTIONTESTERLib">
-      <Guid>{A4A34C92-B83C-46C6-8904-CB131E50CC25}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="EXTRACT_FAMCONDITIONSLib">
-      <Guid>{292B3BCA-F371-457C-892A-E4383087C5D4}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="EXTRACT_FILESUPPLIERSLib">
-      <Guid>{ABCBED34-5255-4717-A098-B9D9B505DE93}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_AFCONDITIONSLib">
-      <Guid>{D3DC98FB-A212-409B-B68C-64D1DC430594}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_AFDATASCORERSLib">
-      <Guid>{F0A8FC59-37EE-4EB5-A9C8-C322F851BC88}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_AFDATASCORERSTESTLib">
-      <Guid>{16609C4A-1074-4410-B493-4FF71223BDF9}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_AFFILEPROCESSORSLib">
-      <Guid>{0D45D3B2-CF74-4000-9549-EC5BD95B6A55}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_AFOUTPUTHANDLERSLib">
-      <Guid>{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_AFPREPROCESSORSLib">
-      <Guid>{6E739155-A988-45D0-8FF9-D2718B7B4126}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_AFSELECTORSLib">
-      <Guid>{B2548FD4-6D38-4849-828E-FE0660B45935}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_AFSPLITTERSLib">
-      <Guid>{9C61A6A5-6789-4648-9777-5405D6C517DF}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
@@ -172,25 +73,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_AFVALUEFINDERSLib">
-      <Guid>{55A9DE56-080B-43E0-AC99-02B815C1DF6C}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_AFVALUEMODIFIERSLib">
-      <Guid>{C5230183-3ACC-4C4F-8D91-745FFB3C018E}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
@@ -199,7 +82,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
@@ -208,142 +91,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_COUNTYCUSTOMCOMPONENTSLib">
-      <Guid>{3C187D28-0950-4498-A607-B122D7544DBA}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_DATAENTRYCUSTOMCOMPONENTSLib">
-      <Guid>{035D73E6-27B9-49B7-97AA-9D4E5722679E}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_EXCEPTIONMGMTLib">
-      <Guid>{454F2387-F8A9-4F64-9A5E-7B06784E8751}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_FILEPROCESSINGLib">
-      <Guid>{5FBC9199-D162-4F14-BAD9-090F6AB576C5}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_FILEPROCESSORSLib">
-      <Guid>{961EB40F-4291-4EB7-B615-FAB2ABD620CE}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_GENERALIVLib">
-      <Guid>{203E8934-0C8B-4607-B2F5-84A9167B1107}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_IMAGEUTILSLib">
-      <Guid>{D46831E6-669C-423F-8209-D6A7A80C2ADD}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_INPUTFUNNELLib">
-      <Guid>{775ACC91-32AC-11D6-8259-0050DAD4FF55}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
-      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_REDACTIONCUSTOMCOMPONENTSLib">
-      <Guid>{18CF5BEC-2929-43DD-86E0-7D50F152663A}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_REGEXPRIVLib">
-      <Guid>{98469F15-E4D9-4050-94B5-D47F3DAD5F46}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_SSOCR2Lib">
-      <Guid>{20ED8F87-8A6C-400B-9C41-A6810ECBA3AE}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_SSOCRLib">
-      <Guid>{C0F50AC4-62B2-4D15-A26F-404FEC1D58B2}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_TESTINGFRAMEWORKCORELib">
-      <Guid>{71EDAB5F-25C7-48BC-9AAE-F837C9ED7547}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="UCLID_TESTINGFRAMEWORKINTERFACESLib">
-      <Guid>{B12E5F5E-6EC2-4D38-A57A-D55C4BE683C8}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>

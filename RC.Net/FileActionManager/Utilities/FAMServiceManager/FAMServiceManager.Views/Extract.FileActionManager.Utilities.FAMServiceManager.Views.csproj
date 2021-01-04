@@ -13,8 +13,9 @@
     <AssemblyName>FAMServiceManager</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
     <ApplicationIcon>calc_config_16.ico</ApplicationIcon>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
   </PropertyGroup>
 
   <ItemGroup>

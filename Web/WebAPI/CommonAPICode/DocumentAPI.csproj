@@ -14,6 +14,7 @@
     <AssemblyName>DocumentAPI</AssemblyName>
     <RootNamespace>WebAPI</RootNamespace>
     <Version>2.0.0</Version>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
@@ -45,7 +46,7 @@
       <Guid>5fbc9199-d162-4f14-bad9-090f6ab576c5</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
@@ -53,17 +54,16 @@
       <Guid>0df6db5b-f788-42fc-ae9e-ef19caa78d38</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
-      <Private>false</Private>
       <EmbedInteropTypes>false</EmbedInteropTypes>
     </COMReference>
     <COMReference Include="UCLID_AFCORELib.dll">
       <Guid>69d40760-8162-4822-85d6-c10b02044e9d</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
@@ -71,7 +71,7 @@
       <Guid>a71ee8cd-a2c1-4c5b-a593-12ff4931c820</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
@@ -79,7 +79,7 @@
       <Guid>fa0a706c-13a8-4bf8-8dc7-9f61dd5a8a14</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
@@ -87,7 +87,7 @@
       <Guid>d73f62a5-9e9f-4a65-9690-491af2f77faa</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
@@ -95,7 +95,7 @@
       <Guid>d46831e6-669c-423f-8209-d6a7a80c2add</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
@@ -103,15 +103,16 @@
       <Guid>2a75196c-d9eb-4129-b803-931327f72d5c</Guid>
       <VersionMajor>2</VersionMajor>
       <VersionMinor>8</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
+      <Private>true</Private>
     </COMReference>
     <COMReference Include="UCLID_AFVALUEFINDERSLib.dll">
       <Guid>55a9de56-080b-43e0-ac99-02b815c1df6c</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
@@ -119,7 +120,7 @@
       <Guid>c0f50ac4-62b2-4d15-a26f-404fec1d58b2</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>

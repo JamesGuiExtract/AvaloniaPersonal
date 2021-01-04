@@ -26,7 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="UCLID_COMUTILSLib.dll">
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <VersionMinor>0</VersionMinor>
       <VersionMajor>1</VersionMajor>
       <Guid>fa0a706c-13a8-4bf8-8dc7-9f61dd5a8a14</Guid>

@@ -238,15 +238,16 @@
       <VersionMajor>2</VersionMajor>
       <VersionMinor>8</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
+      <Private>True</Private>
     </COMReference>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
     <COMReference Include="UCLID_AFUTILSLib">
@@ -254,7 +255,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
     <COMReference Include="UCLID_COMLMLib">
@@ -262,7 +263,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
     <COMReference Include="UCLID_COMUTILSLib">
@@ -270,7 +271,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
     <COMReference Include="UCLID_FILEPROCESSINGLib">
@@ -278,7 +279,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
     <COMReference Include="UCLID_FILEPROCESSORSLib">
@@ -286,7 +287,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <Private>True</Private>
     </COMReference>
@@ -295,7 +296,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
     <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
@@ -303,7 +304,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
     <COMReference Include="UCLID_REDACTIONCUSTOMCOMPONENTSLib">
@@ -311,7 +312,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
     <COMReference Include="UCLID_TESTINGFRAMEWORKINTERFACESLib">
@@ -319,7 +320,7 @@
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
   </ItemGroup>

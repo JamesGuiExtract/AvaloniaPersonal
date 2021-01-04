@@ -203,6 +203,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsposeImageFormatConverter", "..\..\..\..\RC.Net\UtilityApplications\CustomApplications\AsposeImageFormatConverter\Core\Code\AsposeImageFormatConverter.csproj", "{B0460A9C-28BA-4C27-8434-C660F19E985B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Forms", "..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj", "{05449E7C-D300-4A2A-AD14-57CE9630B49B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging.Forms", "..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj", "{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}"
 EndProject

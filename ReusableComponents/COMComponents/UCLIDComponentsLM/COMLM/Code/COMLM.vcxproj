@@ -45,7 +45,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="UserMacros">
+    <InteropNamespace>UCLID_COMLMLib</InteropNamespace>
+  </PropertyGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\..\Binaries\Release\</OutDir>
@@ -105,9 +107,6 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\..\Release/COMLM.bsc</OutputFile>
     </Bscmake>
-    <PostBuildEvent>
-      
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CustomBuildStep>
@@ -163,9 +162,6 @@
       <OutputFile>.\..\Debug/COMLM.bsc</OutputFile>
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
-    <PostBuildEvent>
-      
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="COMLM.cpp">

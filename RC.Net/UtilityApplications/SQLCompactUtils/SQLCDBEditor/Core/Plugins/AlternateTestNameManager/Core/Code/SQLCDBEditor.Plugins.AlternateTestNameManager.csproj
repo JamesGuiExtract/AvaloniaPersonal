@@ -141,8 +141,9 @@
     <PreBuildEvent />
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>move "$(TargetPath)" "$(TargetDir)$(TargetName).plugin"
-call CommonDebugPostBuild.bat "$(TargetDir)$(TargetName).plugin"</PostBuildEvent>
+    <!-- Copy, rather than move, the dll so that this doesn't need to build each time the solution builds -->
+    <PostBuildEvent>copy "$(TargetPath)" "$(TargetDir)$(TargetName).plugin" /Y
+      if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetDir)$(TargetName).plugin")</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

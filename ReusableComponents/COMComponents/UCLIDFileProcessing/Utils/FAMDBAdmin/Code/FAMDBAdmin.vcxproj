@@ -18,10 +18,6 @@
     <ProjectGuid>{62DB32BA-115B-427C-A12E-E031C33B3FB2}</ProjectGuid>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <RootNamespace>FAMDBAdmin</RootNamespace>
-    <SccProjectName>FAMDBAdmin</SccProjectName>
-    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
-    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
-    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
     <Keyword>MFCProj</Keyword>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -86,13 +82,11 @@
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>.\..\Debug/FAMDBAdmin.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\..\Debug/</AssemblerListingLocation>
-      <ObjectFileName>.\..\Debug/</ObjectFileName>
-      <ProgramDataBaseFileName>.\..\Debug/</ProgramDataBaseFileName>
+      <PrecompiledHeaderOutputFile>.\..\Debug\FAMDBAdmin.pch</PrecompiledHeaderOutputFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <BrowseInformation>false</BrowseInformation>
+      <XMLDocumentationFileName />
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -100,9 +94,9 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\..\..\..\..\..\Binaries\Debug/FAMDBAdmin.exe</OutputFile>
+      <OutputFile>..\..\..\..\..\..\Binaries\Debug\FAMDBAdmin.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>.\..\Debug/FAMDBAdmin.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\..\Debug\FAMDBAdmin.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>
       </EntryPointSymbol>
@@ -117,7 +111,7 @@
       <AdditionalManifestFiles>..\..\..\..\..\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
     <Bscmake>
-      <OutputFile>.\..\Debug/FAMDBAdmin.bsc</OutputFile>
+      <OutputFile>.\..\Debug\FAMDBAdmin.bsc</OutputFile>
       <PreserveSBR>true</PreserveSBR>
     </Bscmake>
   </ItemDefinitionGroup>
@@ -136,12 +130,13 @@
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderOutputFile>.\..\Release/FAMDBAdmin.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>.\..\Release/</AssemblerListingLocation>
-      <ObjectFileName>.\..\Release/</ObjectFileName>
-      <ProgramDataBaseFileName>.\..\Release/</ProgramDataBaseFileName>
+      <PrecompiledHeaderOutputFile>.\..\Release\FAMDBAdmin.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\..\Release\</AssemblerListingLocation>
+      <ObjectFileName>.\..\Release\</ObjectFileName>
+      <ProgramDataBaseFileName>.\..\Release\</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <XMLDocumentationFileName />
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -149,7 +144,7 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <OutputFile>..\..\..\..\..\..\Binaries\Release/FAMDBAdmin.exe</OutputFile>
+      <OutputFile>..\..\..\..\..\..\Binaries\Release\FAMDBAdmin.exe</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -166,7 +161,7 @@
       <AdditionalManifestFiles>..\..\..\..\..\BaseUtils\Code\manifest.xml;%(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
     <Bscmake>
-      <OutputFile>.\..\Release/FAMDBAdmin.bsc</OutputFile>
+      <OutputFile>.\..\Release\FAMDBAdmin.bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -1,8 +1,8 @@
 <Project>
 
- <PropertyGroup>
-   <LangVersion>latest</LangVersion>
- </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
 
   <ItemGroup>
     <!-- Ensure that referenced DLLs are signed. Added as Directory.Build.props so that it doesn't have to be added to
@@ -10,6 +10,17 @@
     that directly references the package, transitive references apparently need it too) -->
     <PackageReference Include="StrongNamer" Version="0.2.5" />
   </ItemGroup>
+
+  <ItemDefinitionGroup>
+    <!--Change default CopyLocal to false -->
+    <COMReference>
+      <Private>False</Private>
+    </COMReference>
+  </ItemDefinitionGroup>
+
+  <Target Name="UninstallPrimaryInterop" BeforeTargets="CoreCppClean" Condition="'$(InteropNamespace)'!=''">
+    <Exec Command='"$(TargetFrameworkSDKToolsDirectory)gacutil" -u Interop.$(InteropNamespace) /nologo' />
+  </Target>
 
   <Target Name="CleanIntermediateFiles" AfterTargets="Clean">
      <RemoveDir Directories="$(ProjectDir)$(BaseIntermediateOutputPath)" /> <!-- obj -->
