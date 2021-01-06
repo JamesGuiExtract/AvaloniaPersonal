@@ -161,7 +161,7 @@ CopySilentInstallsDir:
 	@XCOPY "$(AFRootDirectory)\SilentInstalls\*.*" "$(ExtractSoftware)\SilentInstalls"
 	
 UpdateLicenseFiles:
-	@IF "$(Branch)"=="master" (
+	@IF "$(Branch)"=="main" (
 		@Echo Updating Licensing Files...
 		@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDComponentsLM\COMLMCore\Code\*.dat" "$(BinariesFolder)"
 		@COPY /V /Y "$(BinariesFolder)\Components.dat" "$(DeveloperLicensing)"

@@ -6,7 +6,7 @@ IF NOT EXIST %BUILD_DRIVE%%BUILD_DIRECTORY% MKDIR %BUILD_DRIVE%%BUILD_DIRECTORY%
 SET TAGLOGFILE=%BUILD_DRIVE%%BUILD_DIRECTORY%\TagVersion.log
 
 if "%~1"=="" (
-	SET Branch=master
+	SET Branch=main
 ) else (
 	SET Branch=%~1
 )
@@ -118,8 +118,8 @@ SET FKBBuildNeeded=False
 
 SET PATH=%PATH%;;C:\Program Files\Git\bin\
 
-:: Only Build FKB if the is master
-IF "%Branch%" == "master" (
+:: Only Build FKB if the is main
+IF "%Branch%" == "main" (
     FOR /F "tokens=*" %%F IN ('git log -n 1 --format^=format:"True" "%LAST_FKB_TAG%"..HEAD -- ..\ComponentData') DO (
     	SET FKBBuildNeeded=%%F
     )
