@@ -128,7 +128,6 @@
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
 		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\ISLockPermissions.dll</td></row>
-		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\isregsvr.dll</td></row>
 		<row><td>ISXMLCFG.DLL</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\isxmlcfg.dll</td></row>
 	</table>
 
@@ -350,10 +349,6 @@
 		<col def="S255">ISComments</col>
 		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISXmlCosting</td><td>1</td><td>ISXMLCFG.DLL</td><td>ISXmlCosting</td><td/><td/></row>
 		<row><td>ISXmlFinalize</td><td>1</td><td>ISXMLCFG.DLL</td><td>ISXmlFinalize</td><td/><td/></row>
 		<row><td>ISXmlInstall</td><td>3073</td><td>ISXMLCFG.DLL</td><td>ISXmlInstall</td><td/><td/></row>
@@ -542,7 +537,7 @@
 		<row><td>appsettings.json1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>AppBackendFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>appsettings.json</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_WEB_API_APP_BACKEND_FILES&gt;\appsettings.json</td><td>1</td><td/></row>
 		<row><td>aspose.pdf.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Aspose.Pdf.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ASPOSE~1.DLL|Aspose.Pdf.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Aspose.Pdf.dll</td><td>1</td><td/></row>
 		<row><td>attributedbmgrcomponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>AttributeDBMgrComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ATTRIB~1.DLL|AttributeDBMgrComponents.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\AttributeDBMgrComponents.dll</td><td>1</td><td/></row>
-		<row><td>authorizationapi.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>AuthorizationAPIFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>AuthorizationAPI.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_AUTHORIZATIONAPI_NETCOREAPP2.2_FILES&gt;\AuthorizationAPI.dll</td><td>1</td><td/></row>
+		<row><td>authorizationapi.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>AuthorizationAPIFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>AuthorizationAPI.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_AUTHORIZATIONAPI_NETCOREAPP2.1_FILES&gt;\AuthorizationAPI.dll</td><td>1</td><td/></row>
 		<row><td>detailed_report_for_specific.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Detailed report for specific document.repx</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;SDK_REPORT_PATH&gt;\Detailed report for specific document.repx</td><td>1</td><td/></row>
 		<row><td>detectandreportfailure.ini.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>DETECT~1.INI|DetectAndReportFailure.ini</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_PROGRAMDATAFILE_FI&gt;\DetectAndReportFailure.ini</td><td>1</td><td/></row>
 		<row><td>esfamconditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMC~1.DLL|ESFAMConditions.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\ESFAMConditions.dll</td><td>17</td><td/></row>
@@ -928,7 +923,7 @@
 		<col def="S0">ExcludeFiles</col>
 		<col def="I4">ISAttributes</col>
 		<row><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_RELEASE_FILES&gt;</td><td>4</td><td>Accord*.dll</td><td>Accord.dll</td><td>10</td></row>
-		<row><td>AuthorizationAPIFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_AUTHORIZATIONAPI_NETCOREAPP2.2_FILES&gt;</td><td>4</td><td/><td>Properties, *.development.*, *.dev.*, *.pdb, *.xml, AuthorizationAPI.dll,web.config</td><td>10</td></row>
+		<row><td>AuthorizationAPIFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_AUTHORIZATIONAPI_NETCOREAPP2.1_FILES&gt;</td><td>4</td><td/><td>Properties, *.development.*, *.dev.*, *.pdb, *.xml, AuthorizationAPI.dll,web.config</td><td>10</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_NONSELFREGCOMMON_FILES&gt;</td><td>4</td><td/><td>AFCommon.rl, RWUtils.dll</td><td>2</td></row>
 		<row><td>ProgramDataFolder.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_PROGRAMDATAFILE_FI&gt;</td><td>4</td><td/><td/><td>10</td></row>
 		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;SDK_REPORT_PATH&gt;</td><td>4</td><td/><td>Detailed report for specific document.repx</td><td>2</td></row>
@@ -1128,7 +1123,7 @@
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
 		<row><td>PATH_DOTNET_GAC_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
-		<row><td>PATH_TO_AUTHORIZATIONAPI_NETCOREAPP2.2_FILES</td><td>&lt;PATH_TO_AUTHORIZATIONAP_FILES&gt;bin\Release\netcoreapp2.2</td><td/><td>2</td></row>
+		<row><td>PATH_TO_AUTHORIZATIONAPI_NETCOREAPP2.1_FILES</td><td>&lt;PATH_TO_AUTHORIZATIONAP_FILES&gt;bin\Release\netcoreapp2.1</td><td/><td>2</td></row>
 		<row><td>PATH_TO_AUTHORIZATIONAP_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\..\Web\AuthorizationAPI\AuthorizationAPI</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CLEARIMAGEFILES_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\ClearImageFiles</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CLEARIMAGEFILES_FILES1</td><td>P:\AttributeFinder\ClearImageFiles</td><td/><td>2</td></row>
@@ -1865,10 +1860,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">Condition</col>
 		<row><td>ISLockPermissionsCost</td><td/><td>InstallValidate</td><td>1</td><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td/><td>StartServices</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td/><td>SelfUnregModules</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td/><td>SelfRegModules</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td/><td>ISSelfRegisterCosting</td><td>1</td><td/></row>
 		<row><td>ISXmlCosting</td><td/><td>InstallInitialize</td><td>1</td><td/></row>
 		<row><td>ISXmlFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
 		<row><td>ISXmlInstall</td><td/><td>InstallFiles</td><td>1</td><td/></row>
@@ -1879,8 +1870,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>InstallInitialize</td><td>1500</td><td/><td/><td/></row>
 		<row><td>InstallValidate</td><td>1400</td><td/><td/><td/></row>
 		<row><td>RemoveFiles</td><td>3500</td><td/><td/><td/></row>
-		<row><td>SelfRegModules</td><td>2850</td><td/><td/><td/></row>
-		<row><td>SelfUnregModules</td><td>1100</td><td/><td/><td/></row>
 		<row><td>StartServices</td><td>5900</td><td/><td/><td/></row>
 	</table>
 
