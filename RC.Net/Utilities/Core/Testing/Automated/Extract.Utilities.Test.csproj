@@ -195,6 +195,18 @@
     <EmbeddedResource Include="Resources\XML\AlphaByNameFullTextFirst\Version1Spatial.sorted.xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\XML\Encoding\Windows-1252_NoDeclaration.xml" />
+    <EmbeddedResource Include="Resources\XML\Encoding\Windows-1252_WithDeclaration.xml" />
+    <EmbeddedResource Include="Resources\XML\Encoding\UTF-8_NoDeclaration.xml" />
+    <EmbeddedResource Include="Resources\XML\Encoding\UTF-8_WithDeclaration.xml" />
+    <EmbeddedResource Include="Resources\XML\Encoding\UTF-8_NoBOM_NoDeclaration.xml" />
+    <EmbeddedResource Include="Resources\XML\Encoding\UTF-8_NoBOM_WithDeclaration.xml" />
+    <EmbeddedResource Include="Resources\XML\Encoding\UTF-16_BE_NoDeclaration.xml" />
+    <EmbeddedResource Include="Resources\XML\Encoding\UTF-16_BE_WithDeclaration.xml" />
+    <EmbeddedResource Include="Resources\XML\Encoding\UTF-16_LE_NoDeclaration.xml" />
+    <EmbeddedResource Include="Resources\XML\Encoding\UTF-16_LE_WithDeclaration.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="UCLID_COMLMLib">
       <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
       <VersionMajor>1</VersionMajor>
