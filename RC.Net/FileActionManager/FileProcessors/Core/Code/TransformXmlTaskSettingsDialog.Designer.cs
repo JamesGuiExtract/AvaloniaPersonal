@@ -155,10 +155,10 @@
             this.alphaSortRadioButton.Checked = true;
             this.alphaSortRadioButton.Location = new System.Drawing.Point(10, 17);
             this.alphaSortRadioButton.Name = "alphaSortRadioButton";
-            this.alphaSortRadioButton.Size = new System.Drawing.Size(173, 17);
+            this.alphaSortRadioButton.Size = new System.Drawing.Size(382, 17);
             this.alphaSortRadioButton.TabIndex = 0;
             this.alphaSortRadioButton.TabStop = true;
-            this.alphaSortRadioButton.Text = "Alphabetical sort by node name, @Name, @FieldName";
+            this.alphaSortRadioButton.Text = "Alphabetical sort by node name, @Name, @FieldName (FullText nodes first)";
             this.alphaSortRadioButton.UseVisualStyleBackColor = true;
             // 
             // inputXmlBrowseButton

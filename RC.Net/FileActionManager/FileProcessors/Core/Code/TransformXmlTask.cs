@@ -344,7 +344,7 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 else
                 {
-                    transformer = new XmlTransformer(XmlTransformer.StyleSheets.AlphaSortName);
+                    transformer = new XmlTransformer(XmlTransformer.StyleSheets.AlphaSortNameFullTextFirst);
                 }
             }
             catch (Exception ex)
