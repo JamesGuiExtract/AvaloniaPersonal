@@ -194,7 +194,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			executeCmdQuery(ipConnection, strRemoveSkippedFile + strFileIdList);
 			executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange + strFileIdList);
 			if ((!m_bAllowRestartableProcessing && strState == "P") || strState == "U" 
-                || strState == "C" || strState == "F")
+				|| strState == "C" || strState == "F")
 			{
 				executeCmdQuery(ipConnection, strDeleteWorkItemGroup + strFileIdList);
 			}
@@ -4044,7 +4044,7 @@ IIUnknownVectorPtr CFileProcessingDB::removeProductSpecificDB(bool bOnlyTables, 
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addProductSpecificDB(_ConnectionPtr ipConnection,
-										     IIUnknownVectorPtr ipProdSpecMgrs,
+											 IIUnknownVectorPtr ipProdSpecMgrs,
 											 bool bOnlyTables, bool bAddUserTables)
 {
 	try
@@ -4502,7 +4502,7 @@ void CFileProcessingDB::init80DB()
 }
 //-------------------------------------------------------------------------------------------------
 IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection,
-										      const string& strWorkflow/* =""*/)
+											  const string& strWorkflow/* =""*/)
 {
 	try
 	{
@@ -5093,8 +5093,8 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 
 	try
 	{
-        // Begin a transaction
-        TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
+		// Begin a transaction
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 		// Set the revert in progress flag so only one thread executes this per process
 		m_bRevertInProgress = true;
@@ -5153,7 +5153,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 			// move to next Processing FAM record
 			ipFileSet->MoveNext();
 		}
-        // Commit the reverted files
+		// Commit the reverted files
 		tgRevert.CommitTrans();
 		m_bRevertInProgress = false;
 	}
@@ -5386,25 +5386,28 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						if (m_bRunningAllWorkflows && m_bLoadBalance)
 						{
 							int current = m_nProcessStart;
-							int numberAttemptedGets = 0;
-
-							while (numberAttemptedGets < nMaxFiles)
+							int filesObtainedPreviously;
+							int currentNumberOfFilesObtained = 0;
+							do
 							{
-								int actionID = m_vecActionsProcessOrder[current];
-								current = (current + 1) % m_vecActionsProcessOrder.size();
+								filesObtainedPreviously = currentNumberOfFilesObtained;
+								do
+								{
+									int actionID = m_vecActionsProcessOrder[current];
+									current = (current + 1) % m_vecActionsProcessOrder.size();
 
-								_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, actionID, strActionName,
-									1, strStatusToSelect, strSkippedUser);
+									_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, actionID, strActionName,
+										1, strStatusToSelect, strSkippedUser);
 
-								auto results = getFilesFromRecordset(ipFileSet);
-								tempFileVector.insert(tempFileVector.end(), results.begin(), results.end());
-
-								numberAttemptedGets += (m_bRunningAllWorkflows ? 1 : nMaxFiles);
-							}
+									auto results = getFilesFromRecordset(ipFileSet);
+									tempFileVector.insert(tempFileVector.end(), results.begin(), results.end());
+									currentNumberOfFilesObtained = tempFileVector.size();
+								} while (current != m_nProcessStart && currentNumberOfFilesObtained < nMaxFiles);
+							} while (currentNumberOfFilesObtained < nMaxFiles
+								&& currentNumberOfFilesObtained != filesObtainedPreviously);
 							// Commit the transaction before transfering the data from the recordset
 							tg.CommitTrans();
 							m_nProcessStart = current;
-
 						}
 						else
 						{
