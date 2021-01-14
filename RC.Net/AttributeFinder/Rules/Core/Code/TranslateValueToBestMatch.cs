@@ -639,9 +639,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    #pragma warning disable 618
-                    writer.Write(ComUtilities.GetIPersistStreamInterface(AttributeSelector), clearDirty);
-                    #pragma warning restore 618
+                    writer.Write((IPersistStream)AttributeSelector, clearDirty);
                     writer.Write(SourceListPath);
                     writer.Write(SynonymMapPath);
                     writer.Write(MinimumMatchScore);

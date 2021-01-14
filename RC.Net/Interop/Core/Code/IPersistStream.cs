@@ -30,14 +30,14 @@ namespace Extract.Interop
     [Guid("00000109-0000-0000-C000-000000000046")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix")]
-    public interface IPersistStream : IPersist
+    public interface IPersistStream
     {
         /// <summary>
         /// Returns the class identifier (CLSID) <see cref="Guid"/> for the component object.
         /// </summary>
         /// <param name="classID">Pointer to the location of the CLSID <see cref="Guid"/> on 
         /// return.</param>
-        new void GetClassID(out Guid classID);
+        void GetClassID(out Guid classID);
 
         /// <summary>
         /// Checks the object for changes since it was last saved.

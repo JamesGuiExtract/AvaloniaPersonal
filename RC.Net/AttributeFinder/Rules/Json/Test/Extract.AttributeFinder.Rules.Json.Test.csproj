@@ -556,6 +556,7 @@
     <EmbeddedResource Include="Resources\RuleSets\WI - Exact Sciences-Solution-Rules-Master_NoUSS.json.rsd" />
     <EmbeddedResource Include="Resources\RuleSets\empty.json.rsd" />
     <EmbeddedResource Include="Resources\RuleSets\empty.json.rsd.etf" />
+    <EmbeddedResource Include="Resources\RuleSets\EntityFinder-ScoreEntity.rsd" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\RuleObjects\AdvancedReplaceString.json" />

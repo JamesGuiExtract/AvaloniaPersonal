@@ -384,9 +384,7 @@ namespace Extract.AttributeFinder.Rules
             {
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    #pragma warning disable 618
-                    writer.Write(ComUtilities.GetIPersistStreamInterface(Condition), clearDirty);
-                    #pragma warning restore 618
+                    writer.Write((IPersistStream)Condition, clearDirty);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
