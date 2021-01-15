@@ -2489,7 +2489,7 @@ void CFileProcessingMgmtRole::clear()
 	m_strAction = "";
 
 	// Clear the continuous processing flags
-	m_bKeepProcessingAsAdded = false;
+	m_bKeepProcessingAsAdded = true;
 	m_bOkToStopWhenQueueIsEmpty = false;
 
 	// Clear the error log items
