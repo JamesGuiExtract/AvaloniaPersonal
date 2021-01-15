@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+	<Fragment>
+
+    <util:FileSearch
+      Id="NetCoreInstalled"
+      Variable="NetCoreInstalled"
+      Path="[ProgramFiles64Folder]dotnet\shared\Microsoft.NETCore.App\2.1.24\.version"
+      Result="exists" />
+    
+    <PackageGroup Id="NetCoreInstall">
+      <ExePackage
+        Id="InstallNetCoreHosting"
+        InstallCondition="(NOT NetCoreInstalled)"
+        InstallCommand="/quiet /passive"
+        SourceFile="dotnet-hosting-2.1.24-win.exe" 
+        Vital="yes"
+        Permanent="yes"></ExePackage>
+    </PackageGroup>
+	</Fragment>
+</Wix>

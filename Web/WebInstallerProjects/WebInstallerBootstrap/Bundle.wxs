@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
 	<Bundle Name="Extract Web Installer" Version="1.0.0.0" Manufacturer="Extract Systems" UpgradeCode="bc577eca-a45b-4703-b36a-61819a315be8">
-		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense" />
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+      <bal:WixStandardBootstrapperApplication LicenseUrl="" LogoFile="$(var.ProjectDir)\Extractlogo.png" LogoSideFile="$(var.ProjectDir)\Extractlogo.png" SuppressOptionsUI="yes" SuppressRepair="yes" />
+    </BootstrapperApplicationRef>
 		<Chain>
       <PackageGroupRef Id="InstallIIS"/>
-      
-      <MsiPackage Id="IISCors" SourceFile="IISCORS_amd64.msi"></MsiPackage>
-      <MsiPackage Id="URLRewrite" SourceFile="rewrite_amd64_en-US.msi"></MsiPackage>
 
-      <ExePackage
-        Id="InstallNetCoreHosting"
-        SourceFile="dotnet-hosting-2.2.7-win.exe" Vital="no"></ExePackage>
-      
-      <!--Main Web Files-->
-      <MsiPackage DisplayInternalUI="yes" SourceFile="$(var.WebInstaller.TargetDir)\WebInstaller.msi"></MsiPackage>
+      <MsiPackage Id="IISCors" Permanent="yes" SourceFile="IISCORS_amd64.msi" ForcePerMachine="yes"></MsiPackage>
+      <MsiPackage Id="URLRewrite" Permanent="yes" SourceFile="rewrite_amd64_en-US.msi" ForcePerMachine="yes" ></MsiPackage>
+
+      <PackageGroupRef Id="NetCoreInstall"/>
+
+      <MsiPackage DisplayInternalUI="yes" SourceFile="$(var.WebInstaller.TargetDir)\WebInstallerConfiguration.msi"></MsiPackage>
 		</Chain>
 	</Bundle>
 </Wix>

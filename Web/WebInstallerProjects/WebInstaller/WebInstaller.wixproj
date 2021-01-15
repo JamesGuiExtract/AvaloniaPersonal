@@ -6,7 +6,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>2d7f9cd7-d9d6-4df3-8789-b0f52001b164</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>WebInstaller</OutputName>
+    <OutputName>WebInstallerConfiguration</OutputName>
     <OutputType>Package</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">

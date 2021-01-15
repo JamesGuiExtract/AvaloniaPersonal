@@ -7,14 +7,14 @@
                   Id="IIS_part0"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-WebServerRole"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-WebServerRole"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-WebServerRole"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part1"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-WebServer"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-WebServer"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-WebServer"
                   >
       </ExePackage>
       <!--Common HTTP features-->
@@ -22,35 +22,35 @@
                   Id="IIS_part2"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-CommonHttpFeatures"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-CommonHttpFeatures"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-CommonHttpFeatures"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part3"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-StaticContent"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-StaticContent"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-StaticContent"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part4"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-DefaultDocument"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-DefaultDocument"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-DefaultDocument"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part5"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-DirectoryBrowsing"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-DirectoryBrowsing"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-DirectoryBrowsing"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part6"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-HttpErrors"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-HttpErrors"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-HttpErrors"
                   >
       </ExePackage>
       <!--Health and Diagnostics-->
@@ -58,14 +58,14 @@
                   Id="IIS_part14"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-HealthAndDiagnostics"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-HealthAndDiagnostics"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-HealthAndDiagnostics"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part15"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-HttpLogging"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-HttpLogging"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-HttpLogging"
                   >
       </ExePackage>
       <!--Security-->
@@ -73,28 +73,28 @@
                   Id="IIS_part19"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-Security"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-Security"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-Security"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part20"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-URLAuthorization"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-URLAuthorization"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-URLAuthorization"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part21"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-WindowsAuthentication"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-WindowsAuthentication"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-WindowsAuthentication"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part22"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-RequestFiltering"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-RequestFiltering"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-RequestFiltering"
                   >
       </ExePackage>
       <!--Performance-->
@@ -102,14 +102,14 @@
                   Id="IIS_part24"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-Performance"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-Performance"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-Performance"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part25"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-HttpCompressionStatic"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-HttpCompressionStatic"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-HttpCompressionStatic"
                   >
       </ExePackage>
       <!--Management tools-->
@@ -117,14 +117,14 @@
                   Id="IIS_part26"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-WebServerManagementTools"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-WebServerManagementTools"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-WebServerManagementTools"
                   >
       </ExePackage>
       <ExePackage
                   Id="IIS_part27"
                   SourceFile="run.bat"
                   DisplayName="Installing IIS: IIS-ManagementConsole"
-                  InstallCommand="dism.exe /Online /Enable-Feature /FeatureName:IIS-ManagementConsole"
+                  InstallCommand="C:\windows\SysNative\dism.exe /Online /Enable-Feature /FeatureName:IIS-ManagementConsole"
                   >
       </ExePackage>
     </PackageGroup>

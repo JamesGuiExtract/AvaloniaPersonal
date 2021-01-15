@@ -22,15 +22,23 @@
   <ItemGroup>
     <Compile Include="Bundle.wxs" />
     <Compile Include="IIS.wxs" />
+    <Compile Include="NetCoreHosting.wxs" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
     <WixExtension Include="WixBalExtension">
       <HintPath>$(WixExtDir)\WixBalExtension.dll</HintPath>
       <Name>WixBalExtension</Name>
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="dotnet-hosting-2.2.7-win.exe" />
+    <Content Include="dotnet-hosting-2.1.24-win.exe" />
+    <Content Include="ExtractLogo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="IISCORS_amd64.msi" />
     <Content Include="rewrite_amd64_en-US.msi" />
     <Content Include="run.bat" />

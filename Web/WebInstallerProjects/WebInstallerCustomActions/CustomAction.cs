@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Windows.Forms;
-using System.Xml;
 using System.Xml.Linq;
 using Extract;
 using Microsoft.Deployment.WindowsInstaller;
@@ -10,36 +8,6 @@ namespace WebInstallerCustomActions
 {
     public static class CustomActions
     {
-        [CustomAction]
-        public static ActionResult ModifyHostsFile(Session session)
-        {
-            if(session == null)
-            {
-                throw new NullReferenceException("Session cannot be null");
-            }
-            try
-            {
-                string appbackendDNSEntry = session["APPBACKEND_DNS_ENTRY"];
-                string documentAPIDNSEntry = session["DOCUMENTAPI_DNS_ENTRY"];
-                string idsVerifyDNSEntry = session["IDSVERIFY_DNS_ENTRY"];
-                string windowsAuthDNSEntry = session["WINDOWSAUTHORIZATION_DNS_ENTRY"];
-                if (session["CREATE_HOSTS_ENTRIES"].Equals("1", StringComparison.OrdinalIgnoreCase))
-                {
-                    ModifyHostsFile("127.0.0.1 " + appbackendDNSEntry);
-                    ModifyHostsFile("127.0.0.1 " + documentAPIDNSEntry);
-                    ModifyHostsFile("127.0.0.1 " + idsVerifyDNSEntry);
-                    ModifyHostsFile("127.0.0.1 " + windowsAuthDNSEntry);
-                }
-
-                return ActionResult.Success;
-            }
-            catch (Exception ex)
-            {
-                ex.AsExtract("ELI51502").Log();
-                throw;
-            }
-        }
-
         [CustomAction]
         public static ActionResult UpdateAppSettings(Session session)
         {
@@ -119,8 +87,8 @@ namespace WebInstallerCustomActions
                 dynamic angularJsonDeserial = Newtonsoft.Json.JsonConvert.DeserializeObject(angularJson);
                 angularJsonDeserial["appBackendUrl"] = "http://" + session["APPBACKEND_DNS_ENTRY"];
                 angularJsonDeserial["WindowsAuthenticationUrl"] = "http://" + session["WINDOWSAUTHORIZATION_DNS_ENTRY"];
-                angularJsonDeserial["EnablePasswordLogin"] = !session["USE_WINDOWS_AUTHORIZATION"].Equals("1", StringComparison.OrdinalIgnoreCase);
-                angularJsonDeserial["UseWindowsAuthentication"] = session["USE_WINDOWS_AUTHORIZATION"].Equals("1", StringComparison.OrdinalIgnoreCase);
+                angularJsonDeserial["EnablePasswordLogin"] = !session["CREATE_WINDOWS_AUTHORIZATION_SITE"].Equals("1", StringComparison.OrdinalIgnoreCase);
+                angularJsonDeserial["UseWindowsAuthentication"] = session["CREATE_WINDOWS_AUTHORIZATION_SITE"].Equals("1", StringComparison.OrdinalIgnoreCase);
                 angularJsonDeserial["ForceRedactionTypeToBeSet"] = !session["FORCE_REDACTION_TYPE_TO_BE_SET"].Equals("1", StringComparison.OrdinalIgnoreCase);
 
                 string angularOutput = Newtonsoft.Json.JsonConvert.SerializeObject(angularJsonDeserial, Newtonsoft.Json.Formatting.Indented);
@@ -152,23 +120,6 @@ namespace WebInstallerCustomActions
 
 
             doc.Save(@"C:\Program Files (x86)\Extract Systems\APIs\AuthorizationAPI\web.config");
-        }
-
-        private static bool ModifyHostsFile(string entry)
-        {
-            try
-            {
-                using (StreamWriter w = File.AppendText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), @"drivers\etc\hosts")))
-                {
-                    w.WriteLine(entry);
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.AsExtract("ELI51512").Log();
-                throw;
-            }
         }
     }
 }
