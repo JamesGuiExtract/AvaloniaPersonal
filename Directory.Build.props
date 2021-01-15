@@ -4,7 +4,7 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'!='' or '$(TargetFrameworks)'!=''">
     <!-- Ensure that referenced DLLs are signed. Added as Directory.Build.props so that it doesn't have to be added to
     all projects that reference projects that reference unsigned packages (it is not enough to add only to the project
     that directly references the package, transitive references apparently need it too) -->
