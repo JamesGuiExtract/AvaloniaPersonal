@@ -267,15 +267,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
-    <COMReference Include="UCLID_FILEPROCESSORSLib">
-      <Guid>{961EB40F-4291-4EB7-B615-FAB2ABD620CE}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
     <COMReference Include="UCLID_GENERALIVLib">
       <Guid>{203E8934-0C8B-4607-B2F5-84A9167B1107}</Guid>
       <VersionMajor>1</VersionMajor>

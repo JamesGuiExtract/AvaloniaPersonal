@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Extract.GoogleCloud")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.GoogleCloud")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2021")]
 [assembly: AssemblyTrademark("")]
