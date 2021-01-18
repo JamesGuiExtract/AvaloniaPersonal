@@ -203,7 +203,8 @@ public:
 	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
 	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
 	STDMETHOD(ModifyActionStatusForSelection)(IFAMFileSelector* pFileSelector, BSTR bstrToAction,
-		EActionStatus eaStatus, BSTR bstrFromAction, long* pnNumRecordsModified);
+		EActionStatus eaStatus, BSTR bstrFromAction,
+		VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, long* pnNumRecordsModified);
 	STDMETHOD(GetTags)(IStrToStrMap** ppTags);
 	STDMETHOD(GetTagNames)(IVariantVector** ppTagNames);
 	STDMETHOD(HasTags)(VARIANT_BOOL* pvbVal);
@@ -1418,7 +1419,7 @@ private:
 	bool ClearFileActionComment_Internal(bool bDBLocked, long nFileID, long nActionID);
 	bool ModifyActionStatusForSelection_Internal(bool bDBLocked, IFAMFileSelector* pFileSelector,
 		BSTR bstrToAction, EActionStatus eaStatus, BSTR bstrFromAction, 
-		long* pnNumRecordsModified);
+		VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles, long* pnNumRecordsModified);
 	bool GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags);
 	bool GetTagNames_Internal(bool bDBLocked, IVariantVector **ppTagNames);
 	bool HasTags_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal);

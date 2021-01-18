@@ -2839,7 +2839,7 @@ void CFileProcessingDB::loadActionsProcessOrder(_ConnectionPtr ipConnection, con
 	vector<string> vecTokens;
 	m_vecActionsProcessOrder.clear();
 	StringTokenizer::sGetTokens(strActionIDs, ",;|", vecTokens, true);
-	for (int i = 0; i<vecTokens.size(); i++)
+	for (size_t i = 0; i<vecTokens.size(); i++)
 	{
 		long actionID = asLong(vecTokens[i]);
 		long workflowID = getWorkflowID(ipConnection, actionID);
@@ -7429,8 +7429,12 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 	ipFileRecord->Name = "";
 	ipFileRecord->FileID = 0;
 
+	string strWorkflow = getActiveWorkflow();
 	bool bFromSpecified = !strFromAction.empty();
-	long nToActionID = getActionID(ipConnection, strToAction);
+	long nToActionID = 
+		strWorkflow.empty() 
+		? getActionID(ipConnection, strToAction)
+		: getActionIDNoThrow(ipConnection, strToAction, strWorkflow);
 	long nFromActionID = bFromSpecified
 		? getActionID(ipConnection, strFromAction)
 		: 0;
@@ -7441,8 +7445,6 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 	while (ipFileSet->adoEOF == VARIANT_FALSE)
 	{
 		vecFileIds.push_back(getLongField(ipFileSet->Fields, "ID"));
-
-		nNumRecordsModified++;
 
 		ipFileSet->MoveNext();
 	}
@@ -7474,6 +7476,16 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 			" LEFT JOIN FileActionStatus as FromFAS WITH (NOLOCK) ON FAMFile.ID = FromFAS.FileID AND "
 			"FromFAS.ActionID = " + asString(nFromActionID);
 	}
+
+	if (count > 0 && nToActionID == -1)
+	{
+		// WARNING: This ELI code is referenced by ModifyActionStatusForSelection_Internal. Do not change.
+		UCLIDException ue("ELI51514", Util::Format(
+			"Cannot set %d file(s) in workflow \"%s\"; action \"%s\" does not exist.",
+			count, strWorkflow.c_str(), strToAction.c_str()));
+		throw ue;
+	}
+
 	while (i < count)
 	{
 		map<string, vector<SetFileActionData>> mapFromStatusToId;
@@ -7517,12 +7529,8 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 		{
 			setFileActionState(ipConnection, it->second, strToAction, it->first);
 		}
-	}
 
-	// Set the return value if it is specified
-	if (pnNumRecordsModified != __nullptr)
-	{
-		*pnNumRecordsModified += nNumRecordsModified;
+		nNumRecordsModified += mapFromStatusToId.size();
 	}
 }
 //-------------------------------------------------------------------------------------------------

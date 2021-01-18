@@ -3,6 +3,7 @@ using Extract.Utilities;
 using NUnit.Framework;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using UCLID_FILEPROCESSINGLib;
 
@@ -212,7 +213,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
                 fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, "");
+                    _LABDE_ACTION3, EActionStatus.kActionPending, "", false);
 
                 // Updated statuses
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -228,7 +229,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition(
                     "SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
                 fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION2, EActionStatus.kActionSkipped, "");
+                    _LABDE_ACTION2, EActionStatus.kActionSkipped, "", false);
 
                 // Updated statuses
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -324,7 +325,7 @@ namespace Extract.FileActionManager.Database.Test
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
                 fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION1, EActionStatus.kActionUnattempted, "");
+                    _LABDE_ACTION1, EActionStatus.kActionUnattempted, "", false);
 
                 // Statuses after ModifyActionStatusForSelection in Workflow 1
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -364,7 +365,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
                 fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION3, EActionStatus.kActionPending, "");
+                    _LABDE_ACTION3, EActionStatus.kActionPending, "", false);
 
                 // Statuses after ModifyActionStatusForSelection in Workflow 2
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -385,7 +386,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.Reset();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
                 fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
-                    _LABDE_ACTION2, EActionStatus.kActionSkipped, "");
+                    _LABDE_ACTION2, EActionStatus.kActionSkipped, "", false);
 
                 // Statuses after ModifyActionStatusForSelection for all workflows
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -425,6 +426,152 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsSkipped == 2);
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocuments == 2);
                 Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 2);
+            }
+            finally
+            {
+                _testFiles.RemoveFile(_LABDE_TEST_FILE1);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE2);
+                _testFiles.RemoveFile(_LABDE_TEST_FILE3);
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        // <summary>
+        /// Tests the ModifyActionStatusForSelection method in a database with workflows when
+        /// All Workflows is selected but the target action does not exist for all workflows.
+        /// https://extract.atlassian.net/browse/ISSUE-17380
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void ModifyActionStatusAllWorkflowsWithMissingWorkflowAction()
+        {
+            GeneralMethods.TestSetup();
+
+            _testFiles = new TestFileManager<TestFAMFileProcessing>();
+            _testDbManager = new FAMTestDBManager<TestFAMFileProcessing>();
+
+            string testDbName = "Test_ModifyActionStatusAllWorkflowsWithMissingWorkflowAction";
+
+            try
+            {
+                string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
+                string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
+                string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
+                FileProcessingDB fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+
+                // Initial statuses by File ID
+                //            |  P  |  R  |  S  |  C  |  F 
+                // Workflow 1 ----------------------------
+                //   Action 1   1,2                 
+                //   Action 2   
+                // Workflow 2 ----------------------------
+                //   Action 1   3
+                //   Action 2   
+                //   Action 3 
+
+                int workflowID1 = fileProcessingDb.AddWorkflow(
+                    "Workflow1", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
+
+                fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
+                    true, false, EActionStatus.kActionPending, false, out bool alreadyExists, out EActionStatus previousStatus);
+                fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
+                    true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+
+                int workflowID2 = fileProcessingDb.AddWorkflow(
+                    "Workflow2", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3);
+
+                fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION1, workflowID2, EFilePriority.kPriorityNormal,
+                    true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow1";
+                int workflow1Action2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
+
+                fileProcessingDb.ActiveWorkflow = "Workflow2";
+                int workflow2Action2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
+                int workflow2Action3 = fileProcessingDb.GetActionID(_LABDE_ACTION3);
+
+                fileProcessingDb.ActiveWorkflow = "";
+
+                var fileSelector = new FAMFileSelector();
+                fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
+
+                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION2, EActionStatus.kActionPending, "", vbModifyWhenTargetActionMissingForSomeFiles: false);
+
+                // After setting Action 2 to pending for all workflows
+                //            |  P  |  R  |  S  |  C  |  F 
+                // Workflow 1 ----------------------------
+                //   Action 1   1,2                 
+                //   Action 2   1,2
+                // Workflow 2 ----------------------------
+                //   Action 1   3
+                //   Action 2   3
+                //   Action 3 
+
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 3);
+                Assert.That(fileProcessingDb.GetStats(workflow1Action2, false).NumDocuments == 2);
+                Assert.That(fileProcessingDb.GetStats(workflow2Action2, false).NumDocuments == 1);
+
+                // Action 3 doesn't exist for workflow 1
+                Assert.Throws<COMException>(() => fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION3, EActionStatus.kActionPending, "", vbModifyWhenTargetActionMissingForSomeFiles: false));
+
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsPending == 0);
+
+                // Retry, but allow Action 3 to be set for Workflow 2
+                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION3, EActionStatus.kActionPending, "", vbModifyWhenTargetActionMissingForSomeFiles: true);
+
+
+                // After setting Action 3 to pending for all workflows
+                //            |  P  |  R  |  S  |  C  |  F 
+                // Workflow 1 ----------------------------
+                //   Action 1   1,2                 
+                //   Action 2   1,2
+                // Workflow 2 ----------------------------
+                //   Action 1   3
+                //   Action 2   3
+                //   Action 3   3
+
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsPending == 1);
+                Assert.That(fileProcessingDb.GetStats(workflow2Action3, false).NumDocuments == 1);
+
+                fileSelector.Reset();
+                fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
+                    "INNER JOIN [WorkflowFile] ON [FileID] = [FAMFile].[ID] " +
+                    "WHERE [WorkflowID] = " + workflowID1.ToString(CultureInfo.InvariantCulture));
+
+                // There are no selected files for which Action 3 exists
+                Assert.Throws<COMException>(() => fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION3, EActionStatus.kActionSkipped, "", vbModifyWhenTargetActionMissingForSomeFiles: false));
+
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 0);
+
+                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION3, EActionStatus.kActionSkipped, "", vbModifyWhenTargetActionMissingForSomeFiles: true);
+
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 0);
+
+                fileSelector.Reset();
+                fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
+                    "INNER JOIN [WorkflowFile] ON [FileID] = [FAMFile].[ID] " +
+                    "WHERE [WorkflowID] = " + workflowID2.ToString(CultureInfo.InvariantCulture));
+
+                // No error even though Action 3 doesn't exist in Workflow 1 because no selected files from Workflow 1
+                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                    _LABDE_ACTION3, EActionStatus.kActionSkipped, "", vbModifyWhenTargetActionMissingForSomeFiles: false);
+
+                // After setting Action 3 to skipped for all files in Workflow 2
+                //            |  P  |  R  |  S  |  C  |  F 
+                // Workflow 1 ----------------------------
+                //   Action 1   1,2                 
+                //   Action 2   1,2
+                // Workflow 2 ----------------------------
+                //   Action 1   3
+                //   Action 2   3
+                //   Action 3                3
+
+                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 1);
+                Assert.That(fileProcessingDb.GetStats(workflow2Action3, false).NumDocumentsSkipped == 1);
             }
             finally
             {

@@ -5157,9 +5157,11 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 															IFAMFileSelector* pFileSelector,
 															BSTR bstrToAction, EActionStatus eaStatus, 
 															BSTR bstrFromAction, 
+															VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles,
 															long* pnNumRecordsModified)
 {
 	string strTempWorkflow;
+	bool bMissingActionsInWorkflows = false;
 
 	try
 	{
@@ -5195,6 +5197,7 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 				}
 
 				string strOriginalWorkflow = getActiveWorkflow();
+				vector<UCLIDException> vecMissingActionUEX;
 
 				if (strOriginalWorkflow.empty() && databaseUsingWorkflows(ipConnection))
 				{
@@ -5209,19 +5212,26 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 							setActiveWorkflow(strWorkflow.first);
 							strTempWorkflow = strWorkflow.first;
 
-							if (getActionIDNoThrow(ipConnection, strToAction, strWorkflow.first) <= 0)
+							try
 							{
-								UCLIDException ue("ELI43440", Util::Format(
-									"Action \"%s\" does not exist in workflow.",
-									strToAction.c_str()));
-								// Add workflow as debug for consistency with errors emanating from getActionID()
-								ue.addDebugInfo("Workflow", strWorkflow.first, false);
-								throw ue;
+								modifyActionStatusForSelection(ipFileSelector, strToAction, strStatus,
+									strFromAction, &nNumRecordsModified);
+								strTempWorkflow = "";
 							}
-
-							modifyActionStatusForSelection(ipFileSelector, strToAction, strStatus,
-								strFromAction, &nNumRecordsModified);
-							strTempWorkflow = "";
+							catch (UCLIDException& ue)
+							{
+								if (ue.getTopELI() == "ELI51514")
+								{
+									if (!asCppBool(vbModifyWhenTargetActionMissingForSomeFiles))
+									{
+										vecMissingActionUEX.push_back(ue);
+									}
+								}
+								else
+								{
+									throw ue;
+								}
+							}
 						}
 
 						setActiveWorkflow(strOriginalWorkflow);
@@ -5237,6 +5247,27 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 				{
 					modifyActionStatusForSelection(ipFileSelector, strToAction, strStatus,
 						strFromAction, &nNumRecordsModified);
+				}
+
+				if (vecMissingActionUEX.size() > 0)
+				{
+					unique_ptr<UCLIDException> upuexMissingActions = __nullptr;
+
+					for each (auto ue in vecMissingActionUEX)
+					{
+						upuexMissingActions.reset((upuexMissingActions.get() == __nullptr)
+							? new UCLIDException(ue)
+							: new UCLIDException(ue.getTopELI(), ue.getTopText(), *upuexMissingActions));
+					}
+
+					// WARNING: This ELI code is referenced by CSetActionStatusDlg.applyActionStatusChanges. Do not change.
+					UCLIDException uexMissingActions("ELI51515",
+						Util::Format("Files could be moved because action \"%s\" did not exist in target workflows.",
+							strToAction.c_str()), *upuexMissingActions.get());
+					uexMissingActions.addDebugInfo("Number able to set", nNumRecordsModified, false);
+
+					bMissingActionsInWorkflows = true;
+					throw uexMissingActions;
 				}
 
 				// Commit the transaction
@@ -5259,7 +5290,7 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 			ue.addDebugInfo("Workflow", strTempWorkflow, false);
 		}
 
-		if (!bDBLocked)
+		if (!bDBLocked && !bMissingActionsInWorkflows)
 		{
 			return false;
 		}

@@ -82,6 +82,12 @@ private:
 	//          Closes the dialog if bCloseDialog is true, otherwise the dialog remains open.
 	void applyActionStatusChanges(bool bCloseDialog);
 
+	// In the case that applyActionStatusChanges errored because the target action did not exists
+	// in the workflow of all affected files, prompt user for what to do.
+	// RETURNS: true if user selected to move files that could be move, false if no files should be moved.
+	bool CSetActionStatusDlg::handleCantMoveFilesForAllWorkflows(UCLIDException& ueModifyError,
+		CString& zToActionName, EActionStatus eNewStatus, CString& zFromAction);
+
 	//---------------------------------------------------------------------------------------------
 	// Update controls
 	void updateControls();

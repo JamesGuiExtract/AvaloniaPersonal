@@ -1244,7 +1244,8 @@ library UCLID_FILEPROCESSINGLib
 		//			the status is to be copied from.
 		[id(51), helpstring("method ModifyActionStatusForSelection")] HRESULT ModifyActionStatusForSelection(
 			[in] IFAMFileSelector* pFileSelector, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
-			[in] BSTR bstrFromAction, [out,retval] long* pnNumRecordsModified);
+			[in] BSTR bstrFromAction, VARIANT_BOOL vbModifyWhenTargetActionMissingForSomeFiles,
+			[out,retval] long* pnNumRecordsModified);
 
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to file tagging

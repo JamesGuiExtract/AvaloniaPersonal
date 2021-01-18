@@ -341,8 +341,31 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			uex.addDebugInfo("Query", strQuery);
 
 			// Modify the file status
-			m_ipFAMDB->ModifyActionStatusForSelection(m_ipFileSelector, (LPCTSTR)zToActionName,
-				eNewStatus, (LPCTSTR)zFromAction);
+			try
+			{
+				try
+				{
+					m_ipFAMDB->ModifyActionStatusForSelection(m_ipFileSelector, (LPCTSTR)zToActionName,
+						eNewStatus, (LPCTSTR)zFromAction, /*vbModifyWhenTargetActionMissingForSomeFiles*/ VARIANT_FALSE);
+				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51517");
+			}
+			catch (UCLIDException &ueModifyError)
+			{
+				if (ueModifyError.getTopELI() == "ELI51515")
+				{
+					if (!handleCantMoveFilesForAllWorkflows(ueModifyError, zToActionName, eNewStatus, zFromAction)
+						&& bCloseDialog)
+					{
+						OnOK();
+						return;
+					}
+				}
+				else
+				{
+					throw ueModifyError;
+				}
+			}
 		}
 		else
 		{
@@ -372,6 +395,55 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		MessageBox(zPrompt, "Success", MB_ICONINFORMATION);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14903")
+}
+//-------------------------------------------------------------------------------------------------
+bool CSetActionStatusDlg::handleCantMoveFilesForAllWorkflows(UCLIDException& ueModifyError,
+	CString& zToActionName, EActionStatus eNewStatus, CString& zFromAction)
+{
+	long nCount = 0;
+	for each (auto debugData in ueModifyError.getDebugVector())
+	{
+		if (debugData.GetName() == "Number able to set")
+		{
+			nCount = debugData.GetPair().getLongValue();
+			break;
+		}
+	}
+
+	if (nCount > 0)
+	{
+		CString zPrompt = "The target action of '" + zToActionName +
+			"' does not exist in the workflow(s) of all specified files.\r\n\r\n";
+
+		for (auto uexInner = ueModifyError.getInnerException();
+			uexInner != __nullptr;
+			uexInner = uexInner->getInnerException())
+		{
+			zPrompt += CString(uexInner->getTopText().c_str()) + "\r\n";
+		}
+
+		zPrompt += Util::Format("\r\nDo you want to set the action for the %d "
+			"files from workflows in which the action '%s' exists?",
+			nCount, (LPCTSTR)zToActionName).c_str();
+
+		if (IDYES == MessageBox(zPrompt, "Target action missing", MB_YESNO))
+		{
+			m_ipFAMDB->ModifyActionStatusForSelection(m_ipFileSelector, (LPCTSTR)zToActionName,
+				eNewStatus, (LPCTSTR)zFromAction, /*vbModifyWhenTargetActionMissingForSomeFiles*/ VARIANT_TRUE);
+
+			return true;
+		}
+		else
+		{
+			ueModifyError.log();
+
+			return false;
+		}
+	}
+	else
+	{
+		throw ueModifyError;
+	}
 }
 //-------------------------------------------------------------------------------------------------
 void CSetActionStatusDlg::updateControls() 
