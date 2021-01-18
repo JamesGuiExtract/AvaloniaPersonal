@@ -12,7 +12,7 @@ using System;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.DataEntry.DEP.DemoFlexIndex")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2020")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

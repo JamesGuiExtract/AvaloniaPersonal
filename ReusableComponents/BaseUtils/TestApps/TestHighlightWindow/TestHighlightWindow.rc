@@ -169,7 +169,7 @@ BEGIN
             VALUE "FileDescription", "TestHighlightWindow MFC Application\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "TestHighlightWindow\0"
-            VALUE "LegalCopyright", "Copyright (C) 2020\0"
+            VALUE "LegalCopyright", "Copyright (C) 2021\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "TestHighlightWindow.EXE\0"
             VALUE "ProductName", "TestHighlightWindow Application\0"

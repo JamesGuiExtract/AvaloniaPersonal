@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileDescription", "UCLIDDistanceConverter Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "UCLIDDistanceConverter\0"
-            VALUE "LegalCopyright", "Copyright 2020\0"
+            VALUE "LegalCopyright", "Copyright 2021\0"
             VALUE "OriginalFilename", "UCLIDDistanceConverter.DLL\0"
             VALUE "ProductName", "UCLIDDistanceConverter Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

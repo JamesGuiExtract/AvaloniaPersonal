@@ -92,7 +92,7 @@ BEGIN
             VALUE "FileDescription", "RuleTester MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "RuleTester"
-            VALUE "LegalCopyright", "Copyright (C) 2020 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright (C) 2021 Extract Systems, LLC"
             VALUE "OriginalFilename", "RuleTester.EXE"
             VALUE "ProductName", "RuleTester Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

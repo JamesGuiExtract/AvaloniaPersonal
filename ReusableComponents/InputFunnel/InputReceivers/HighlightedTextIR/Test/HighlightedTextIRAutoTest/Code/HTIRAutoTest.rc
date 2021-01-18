@@ -74,7 +74,7 @@ BEGIN
             VALUE "FileDescription", "HTIRAutoTest Module\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "HTIRAutoTest\0"
-            VALUE "LegalCopyright", "Copyright 2020\0"
+            VALUE "LegalCopyright", "Copyright 2021\0"
             VALUE "OriginalFilename", "HTIRAutoTest.DLL\0"
             VALUE "ProductName", "HTIRAutoTest Module\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"

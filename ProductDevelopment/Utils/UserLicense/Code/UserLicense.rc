@@ -80,7 +80,7 @@ BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,11,17,21,20
     DEFPUSHBUTTON   "OK",IDOK,178,7,50,14,WS_GROUP
     EDITTEXT        IDC_EDIT_VERSION,40,7,129,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "Copyright (C) 2020\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,40,25,119,23
+    LTEXT           "Copyright (C) 2021\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,40,25,119,23
 END
 
 IDD_USERLICENSE_DIALOG DIALOGEX 0, 0, 376, 300
@@ -245,7 +245,7 @@ BEGIN
             VALUE "FileDescription", "UserLicense MFC Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "UserLicense"
-            VALUE "LegalCopyright", "Copyright (C) 2020 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright (C) 2021 Extract Systems, LLC"
             VALUE "OriginalFilename", "UserLicense.EXE"
             VALUE "ProductName", "UserLicense Application"
             VALUE "ProductVersion", "1, 0, 0, 1"

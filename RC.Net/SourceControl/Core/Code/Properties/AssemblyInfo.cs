@@ -12,7 +12,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems LLC")]
 [assembly: AssemblyProduct("Extract.SourceControl")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2020")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

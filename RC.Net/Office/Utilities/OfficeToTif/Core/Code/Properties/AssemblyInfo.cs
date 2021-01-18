@@ -11,7 +11,7 @@ using System.Reflection;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("WordAutomation")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems 2020")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

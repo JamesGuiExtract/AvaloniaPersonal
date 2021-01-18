@@ -107,7 +107,7 @@ BEGIN
             VALUE "FileDescription", "ExtractTRP2.exe"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "ExtractTRP2.exe"
-            VALUE "LegalCopyright", "(c) 2020 Extract Systems.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2021 Extract Systems.  All rights reserved."
             VALUE "OriginalFilename", "ExtractTRP2.exe"
             VALUE "ProductName", "ExtractTRP2"
             VALUE "ProductVersion", "1.0.0.1"

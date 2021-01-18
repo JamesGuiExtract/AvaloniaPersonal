@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
 [assembly: AssemblyProduct("Extract.DataEntry.DEP.HealthNetworkLabs.Properties")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2020")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems, LLC 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

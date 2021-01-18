@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "AFValueModifiers Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "AFValueModifiers"
-            VALUE "LegalCopyright", "Copyright 2020"
+            VALUE "LegalCopyright", "Copyright 2021"
             VALUE "OriginalFilename", "AFValueModifiers.DLL"
             VALUE "ProductName", "AFValueModifiers Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

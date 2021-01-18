@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "CountyCustomComponents Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "CountyCustomComponents"
-            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2020"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2021"
             VALUE "OriginalFilename", "CountyCustomComponents.DLL"
             VALUE "ProductName", "CountyCustomComponents Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

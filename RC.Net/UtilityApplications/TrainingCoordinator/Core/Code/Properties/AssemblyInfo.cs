@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("TrainingCoordinator")]
 [assembly: AssemblyCompany("Extract Systems LLC")]
-[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2020")]
+[assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

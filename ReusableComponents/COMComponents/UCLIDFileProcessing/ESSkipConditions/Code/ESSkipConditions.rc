@@ -72,7 +72,7 @@ BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "ESFAMConditions Module"
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "LegalCopyright", "(c) 2020 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2021 Extract Systems, LLC.  All rights reserved."
             VALUE "InternalName", "ESFAMConditions.dll"
             VALUE "OriginalFilename", "ESFAMConditions.dll"
             VALUE "ProductName", "ESFAMConditions"

@@ -80,7 +80,7 @@ BEGIN
             VALUE "FileDescription", "Extract Exception Utilities"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "Extract.ExceptionUtilities.dll"
-            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2020"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2021"
             VALUE "OriginalFilename", "Extract.ExceptionUtilities.dll"
             VALUE "ProductName", "Extract.ExceptionUtilities.dll"
             VALUE "ProductVersion", "1.0.0.1"

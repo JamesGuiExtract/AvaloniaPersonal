@@ -71,7 +71,7 @@ BEGIN
             VALUE "FileDescription", "UCLIDCOMUtils Module"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "UCLIDCOMUtils"
-            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2020"
+            VALUE "LegalCopyright", "Copyright © Extract Systems, LLC 2021"
             VALUE "OriginalFilename", "UCLIDCOMUtils.DLL"
             VALUE "ProductName", "UCLIDCOMUtils Module"
             VALUE "ProductVersion", "1, 0, 0, 1"

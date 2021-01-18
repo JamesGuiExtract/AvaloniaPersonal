@@ -72,7 +72,7 @@ BEGIN
             VALUE "CompanyName", "Extract Systems"
             VALUE "FileDescription", "LabDE custom components"
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "LegalCopyright", "(c) 2020 Extract Systems, LLC.  All rights reserved."
+            VALUE "LegalCopyright", "(c) 2021 Extract Systems, LLC.  All rights reserved."
             VALUE "InternalName", "LabDECppCC.dll"
             VALUE "OriginalFilename", "LabDECppCC.dll"
             VALUE "ProductName", "LabDECppCC"

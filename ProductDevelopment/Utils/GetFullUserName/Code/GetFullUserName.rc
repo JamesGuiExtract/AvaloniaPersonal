@@ -84,7 +84,7 @@ BEGIN
             VALUE "FileDescription", "GetFullUserName Application"
             VALUE "FileVersion", "1, 0, 0, 1"
             VALUE "InternalName", "GetFullUserName"
-            VALUE "LegalCopyright", "Copyright (C) 2020 Extract Systems, LLC"
+            VALUE "LegalCopyright", "Copyright (C) 2021 Extract Systems, LLC"
             VALUE "OriginalFilename", "GetFullUserName.exe"
             VALUE "ProductName", "GetFullUserName"
             VALUE "ProductVersion", "1, 0, 0, 1"
