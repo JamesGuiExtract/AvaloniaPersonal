@@ -176,7 +176,9 @@ namespace Extract.UtilityApplications.PaginationUtility
                             _thumbnailImage = value.Clone();
                             if (ImageOrientation != 0)
                             {
-                                ImageMethods.RotateImageByDegrees(_thumbnailImage, ImageOrientation);
+                                // Don't use view perspective to rotate because it can fail to work correctly on thumbnails
+                                // https://extract.atlassian.net/browse/ISSUE-17384
+                                ImageMethods.RotateImageByDegrees(_thumbnailImage, ImageOrientation, true);
                             }
 
                             if (oldThumbnailImage != null)
@@ -225,8 +227,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             if (_thumbnailLoaded && _thumbnailImage != null)
                             {
+                                // Don't use view perspective to rotate because it can fail to work correctly on thumbnails
+                                // https://extract.atlassian.net/browse/ISSUE-17384
                                 ImageMethods.RotateImageByDegrees(_thumbnailImage,
-                                    value - _imageOrientation);
+                                    value - _imageOrientation, true);
 
                                 OnOrientationChanged();
                             }
