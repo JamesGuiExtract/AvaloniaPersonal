@@ -14,7 +14,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
-    <ApplicationIcon>calc_config_16.ico</ApplicationIcon>
+    <ApplicationIcon>calc_config.ico</ApplicationIcon>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
   </PropertyGroup>
 
