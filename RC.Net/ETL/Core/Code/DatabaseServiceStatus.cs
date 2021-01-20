@@ -36,8 +36,7 @@ namespace Extract.ETL
         {
             try
             {
-                return JsonConvert.SerializeObject(this,
-                    new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects, Formatting = Formatting.Indented });
+                return JsonConvert.SerializeObject(this, DatabaseService._serializeSettings);
             }
             catch (Exception ex)
             {
@@ -53,8 +52,7 @@ namespace Extract.ETL
         {
             try
             {
-                return (DatabaseServiceStatus)JsonConvert.DeserializeObject(status,
-                    new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+                return (DatabaseServiceStatus)JsonConvert.DeserializeObject(status, DatabaseService._deserializeSettings);
             }
             catch (Exception ex)
             {

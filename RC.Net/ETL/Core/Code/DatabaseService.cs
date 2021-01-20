@@ -23,6 +23,22 @@ namespace Extract.ETL
     [DatabaseService]
     public abstract class DatabaseService : IDisposable, ICloneable, INotifyPropertyChanged
     {
+        internal static JsonSerializerSettings _serializeSettings =
+            new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects, Formatting = Formatting.Indented };
+
+        internal static JsonSerializerSettings _deserializeSettings =
+            new JsonSerializerSettings {
+                TypeNameHandling = TypeNameHandling.Objects,
+                SerializationBinder = new NamespaceMappingSerializationBinder(
+                  new List<KeyValuePair<string, string>> {
+                      new KeyValuePair<string, string>(
+                          "Extract.UtilityApplications.TrainingCoordinator", "Extract.UtilityApplications.MachineLearning"),
+                      new KeyValuePair<string, string>(
+                          "Extract.UtilityApplications.TrainingDataCollector", "Extract.UtilityApplications.MachineLearning"),
+                      new KeyValuePair<string, string>(
+                          "Extract.UtilityApplications.MLModelTrainer", "Extract.UtilityApplications.MachineLearning")
+                  })};
+
         bool _enabled = true;
         int _databaseServiceID;
         string _databaseServer = string.Empty;
@@ -220,8 +236,7 @@ namespace Extract.ETL
         {
             try
             {
-                return JsonConvert.SerializeObject(this,
-                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects, Formatting = Formatting.Indented });
+                return JsonConvert.SerializeObject(this, _serializeSettings);
             }
             catch (Exception ex)
             {
@@ -237,21 +252,7 @@ namespace Extract.ETL
         {
             try
             {
-                JsonSerializerSettings serialSettings = new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.Objects,
-                    SerializationBinder = new NamespaceMappingSerializationBinder(
-                        new List<KeyValuePair<string, string>>
-                        {
-                            new KeyValuePair<string, string>(
-                                "Extract.UtilityApplications.TrainingCoordinator", "Extract.UtilityApplications.MachineLearning"),
-                            new KeyValuePair<string, string>(
-                                "Extract.UtilityApplications.TrainingDataCollector", "Extract.UtilityApplications.MachineLearning"),
-                            new KeyValuePair<string, string>(
-                                "Extract.UtilityApplications.MLModelTrainer", "Extract.UtilityApplications.MachineLearning")
-                        })
-                };
-                return (DatabaseService)JsonConvert.DeserializeObject(settings, serialSettings);
+                return (DatabaseService)JsonConvert.DeserializeObject(settings, _deserializeSettings);
             }
             catch (Exception ex)
             {
