@@ -130,8 +130,8 @@
               <DataTemplate>
                 <StackPanel>
                   <DockPanel Background="BurlyWood">
-                    <Button Command="{Binding Remove}" Content="Uninstall" MinWidth="100" Margin="5" DockPanel.Dock="Left" />
-                    <Button Command="{Binding LaunchConfigEditor}" Content="Edit config file" MinWidth="100" Margin="5" HorizontalAlignment="Right" DockPanel.Dock="Right" />
+                    <Button Command="{Binding LaunchConfigEditor}" Content="Edit config file" MinWidth="100" Margin="5" DockPanel.Dock="Left" />
+                    <Button Command="{Binding Remove}" Content="Uninstall" MinWidth="100" Margin="5" HorizontalAlignment="Right" DockPanel.Dock="Right" />
                   </DockPanel>
                   <ListView ItemsSource="{Binding Settings}" Background="BlanchedAlmond">
                     <ListView.ItemTemplate>

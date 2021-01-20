@@ -310,7 +310,7 @@ namespace Extract.FileActionManager.Utilities
             }
         }
 
-        void WaitForConnection(NamedPipeServerStream pipeStream)
+        bool WaitForConnection(NamedPipeServerStream pipeStream)
         {
 
             Exception waitForConnectionException = null;
@@ -333,44 +333,50 @@ namespace Extract.FileActionManager.Utilities
             {
                 // Stop waiting if Stop has been called
                 pipeStream.Close();
+                return false;
             }
+
             if (waitForConnectionException != null)
             {
                 throw waitForConnectionException.AsExtract("ELI51509");
             }
+
+            return true;
         }
 
         void CreatePipeListenerThread()
         {
             new Thread(() =>
             {
-                var instanceID = Guid.NewGuid().ToString();
                 try
                 {
                     var pipeName = UtilityMethods.FormatInvariant($"ESFAMServicePipe_{Process.GetCurrentProcess().Id}");
                     using var pipeStream =
                         new NamedPipeServerStream(pipeName, PipeDirection.InOut, 50, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
-                    WaitForConnection(pipeStream);
-                    CreatePipeListenerThread(); // Listen for new connections
 
-                    StringBuilder messageBuilder = new StringBuilder();
-                    byte[] messageBuffer = new byte[16];
-                    do
+                    if (WaitForConnection(pipeStream))
                     {
-                        var bytesRead = pipeStream.Read(messageBuffer, 0, messageBuffer.Length);
-                        var messageChunk = Encoding.UTF8.GetString(messageBuffer, 0, bytesRead);
-                        messageBuilder.Append(messageChunk);
-                    }
-                    while (!pipeStream.IsMessageComplete);
+                        CreatePipeListenerThread(); // Listen for new connections
 
-                    var msg = JsonConvert.DeserializeObject<RequestMessage>(messageBuilder.ToString());
+                        StringBuilder messageBuilder = new StringBuilder();
+                        byte[] messageBuffer = new byte[16];
+                        do
+                        {
+                            var bytesRead = pipeStream.Read(messageBuffer, 0, messageBuffer.Length);
+                            var messageChunk = Encoding.UTF8.GetString(messageBuffer, 0, bytesRead);
+                            messageBuilder.Append(messageChunk);
+                        }
+                        while (!pipeStream.IsMessageComplete);
 
-                    if (msg == RequestMessage.GetSpawnedProcessIDs)
-                    {
-                        var serialized = JsonConvert.SerializeObject(_spawnedProcessIDs.Keys);
-                        var bytes = Encoding.UTF8.GetBytes(serialized);
-                        pipeStream.Write(bytes, 0, bytes.Length);
-                        pipeStream.WaitForPipeDrain();
+                        var msg = JsonConvert.DeserializeObject<RequestMessage>(messageBuilder.ToString());
+
+                        if (msg == RequestMessage.GetSpawnedProcessIDs)
+                        {
+                            var serialized = JsonConvert.SerializeObject(_spawnedProcessIDs.Keys);
+                            var bytes = Encoding.UTF8.GetBytes(serialized);
+                            pipeStream.Write(bytes, 0, bytes.Length);
+                            pipeStream.WaitForPipeDrain();
+                        }
                     }
                 }
                 catch (Exception ex)
