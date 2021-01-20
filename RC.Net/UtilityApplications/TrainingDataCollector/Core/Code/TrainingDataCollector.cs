@@ -11,7 +11,6 @@ using System.Transactions;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 
 namespace Extract.UtilityApplications.MachineLearning
 {

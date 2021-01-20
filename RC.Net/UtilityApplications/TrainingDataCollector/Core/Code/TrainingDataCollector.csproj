@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{020455B5-0838-4CCF-AF73-46D539FCF787}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>TrainingDataCollector</RootNamespace>
+    <RootNamespace>Extract.UtilityApplications.MachineLearning</RootNamespace>
     <AssemblyName>TrainingDataCollector</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

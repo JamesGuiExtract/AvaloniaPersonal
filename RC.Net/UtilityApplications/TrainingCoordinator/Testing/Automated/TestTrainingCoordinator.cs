@@ -1,4 +1,5 @@
-﻿using Extract.FileActionManager.Database.Test;
+﻿using Extract.ETL;
+using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
@@ -6,6 +7,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SqlClient;
 using System.IO;
+using System.Reflection;
+using System.Text;
 
 namespace Extract.UtilityApplications.MachineLearning.Test
 {
@@ -30,6 +33,11 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         static FAMTestDBManager<TestTrainingCoordinator> _testDbManager;
 
         public static readonly string DBName = "_TestTrainingCoordinator_FAB72B42-CC90-4E05-8C1C-AC9B2FA16667";
+
+        static readonly string _coordinator_new_namespaces = "Resources.TrainingCoordinator.json";
+        static readonly string _coordinator_old_namespaces = "Resources.TrainingCoordinator.OldNamespaces.json";
+        static readonly string _coordinator_status_new_namespaces = "Resources.TrainingCoordinatorStatus.json";
+        static readonly string _coordinator_status_old_namespaces = "Resources.TrainingCoordinatorStatus.OldNamespaces.json";
 
         #endregion Fields
 
@@ -90,6 +98,14 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             {
                 throw ex.AsExtract("ELI46491");
             }
+        }
+
+        static string GetJsonResource(string resourceName)
+        {
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(TestTrainingCoordinator), resourceName);
+            stream.Position = 0;
+            using var reader = new StreamReader(stream);
+            return reader.ReadToEnd();
         }
 
         #endregion Helper Methods
@@ -158,11 +174,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 {
                     connection.Open();
 
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "UPDATE DatabaseService SET Status = NULL";
-                        cmd.ExecuteNonQuery();
-                    }
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = "UPDATE DatabaseService SET Status = NULL";
+                    cmd.ExecuteNonQuery();
                 }
 
                 // Refresh the status and confirm that the log is cleared
@@ -179,12 +193,10 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 {
                     connection.Open();
 
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "UPDATE DatabaseService SET Status = @Status";
-                        cmd.Parameters.AddWithValue("@Status", statusJson);
-                        cmd.ExecuteNonQuery();
-                    }
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = "UPDATE DatabaseService SET Status = @Status";
+                    cmd.Parameters.AddWithValue("@Status", statusJson);
+                    cmd.ExecuteNonQuery();
                 }
 
                 // Refresh the status and confirm values are back to original values
@@ -198,6 +210,68 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             {
                 _testDbManager.RemoveDatabase(DBName);
             }
+        }
+
+        /// <summary>
+        /// Test that a TrainingCoordinator using current namespaces deserializes without errors
+        /// </summary>
+        [Test, Category("TrainingCoordinator")]
+        public static void TestDeserializingFromNewData()
+        {
+            var input = GetJsonResource(_coordinator_new_namespaces);
+            var deserialized = DatabaseService.FromJson(input);
+            Assert.IsInstanceOf<TrainingCoordinator>(deserialized);
+
+            var roundTripped = deserialized.ToJson();
+            Assert.AreEqual(input, roundTripped);
+        }
+
+        /// <summary>
+        /// Test that a TrainingCoordinator serialized with earlier software version deserializes properly
+        /// </summary>
+        [Test, Category("TrainingCoordinator")]
+        public static void TestDeserializingFromOldData()
+        {
+            var input = GetJsonResource(_coordinator_old_namespaces);
+
+            var deserialized = DatabaseService.FromJson(input);
+            Assert.IsInstanceOf<TrainingCoordinator>(deserialized);
+
+            var expected = GetJsonResource(_coordinator_new_namespaces);
+            var roundTripped = deserialized.ToJson();
+            Assert.AreNotEqual(input, roundTripped);
+            Assert.AreEqual(expected, roundTripped);
+        }
+
+        /// <summary>
+        /// Test that a TrainingCoordinatorStatus using current namespaces deserializes without errors
+        /// </summary>
+        [Test, Category("TrainingCoordinator")]
+        public static void TestDeserializingStatusFromNewData()
+        {
+            var input = GetJsonResource(_coordinator_status_new_namespaces);
+            var deserialized = DatabaseServiceStatus.FromJson(input);
+            Assert.IsInstanceOf<TrainingCoordinator.TrainingCoordinatorStatus>(deserialized);
+
+            var roundTripped = deserialized.ToJson();
+            Assert.AreEqual(input, roundTripped);
+        }
+
+        /// <summary>
+        /// Test that a TrainingCoordinatorStatus serialized with earlier software version deserializes properly
+        /// </summary>
+        [Test, Category("TrainingCoordinator")]
+        public static void TestDeserializingStatusFromOldData()
+        {
+            var input = GetJsonResource(_coordinator_status_old_namespaces);
+
+            var deserialized = DatabaseServiceStatus.FromJson(input);
+            Assert.IsInstanceOf<TrainingCoordinator.TrainingCoordinatorStatus>(deserialized);
+
+            var expected = GetJsonResource(_coordinator_status_new_namespaces);
+            var roundTripped = deserialized.ToJson();
+            Assert.AreNotEqual(input, roundTripped);
+            Assert.AreEqual(expected, roundTripped);
         }
 
         #endregion Tests

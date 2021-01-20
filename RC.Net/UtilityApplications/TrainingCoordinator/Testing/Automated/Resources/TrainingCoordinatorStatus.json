@@ -1,0 +1,21 @@
+{
+  "$type": "Extract.UtilityApplications.MachineLearning.TrainingCoordinator+TrainingCoordinatorStatus, TrainingCoordinator",
+  "Version": 1,
+  "Log": "",
+  "ServiceStatuses": {
+    "$type": "System.Collections.Generic.Dictionary`2[[System.Guid, mscorlib],[Extract.ETL.DatabaseServiceStatus, Extract.ETL]], mscorlib",
+    "ed7def2d-9619-4cce-b775-e52077dfd50a": {
+      "$type": "Extract.UtilityApplications.MachineLearning.TrainingDataCollector+TrainingDataCollectorStatus, TrainingDataCollector",
+      "Version": 1,
+      "LastIDProcessed": 0
+    },
+    "dd91acb9-0fa6-496f-9089-daa70b93ecc9": {
+      "$type": "Extract.UtilityApplications.MachineLearning.MLModelTrainer+MLModelTrainerStatus, MLModelTrainer",
+      "Version": 1,
+      "LastIDProcessed": 0,
+      "LastF1Score": 0.0,
+      "MaximumTrainingRecords": 10000,
+      "MaximumTestingRecords": 10000
+    }
+  }
+}
