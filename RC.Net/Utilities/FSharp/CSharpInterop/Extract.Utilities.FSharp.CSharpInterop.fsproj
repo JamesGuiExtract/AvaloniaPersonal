@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
@@ -13,7 +13,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Compiler.Service" Version="37.0.0" />
-    <PackageReference Update="FSharp.Core" Version="4.6.2" />
+    <PackageReference Update="FSharp.Core" Version="4.6.2" /> <!--Update FSharp.Core to override implicit version of the SDK-->
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0" /> <!--Include this dependency of FSharp.Compiler.Service explicitly in order to match the version used by the web APIs-->
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
     <ProjectReference Include="..\..\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
