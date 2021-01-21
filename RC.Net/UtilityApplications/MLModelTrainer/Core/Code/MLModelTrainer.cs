@@ -29,7 +29,7 @@ namespace Extract.UtilityApplications.MachineLearning
         static readonly string _GET_MLDATA =
             @"SELECT ID, Data FROM
                 (SELECT TOP(@Max) MLData.ID, Data, DateTimeStamp
-                    FROM MLData
+                    FROM MLData WITH (NOLOCK)
                     JOIN MLModel ON MLData.MLModelID = MLModel.ID
                     WHERE Name = @Name
                     AND IsTrainingData = @IsTrainingData
@@ -41,7 +41,7 @@ namespace Extract.UtilityApplications.MachineLearning
         /// Query to get last processed count
         /// </summary>
         static readonly string _GET_LAST_PROCESSED_COUNT =
-            @"SELECT COUNT(*) FROM MLData
+            @"SELECT COUNT(*) FROM MLData WITH (NOLOCK)
                 JOIN MLModel ON MLData.MLModelID = MLModel.ID
                 WHERE Name = @Name
                 AND IsTrainingData = @IsTrainingData
@@ -52,7 +52,7 @@ namespace Extract.UtilityApplications.MachineLearning
         /// Query to get new data count
         /// </summary>
         static readonly string _GET_NEW_DATA_COUNT =
-            @"SELECT COUNT(*) FROM MLData
+            @"SELECT COUNT(*) FROM MLData WITH (NOLOCK)
                 JOIN MLModel ON MLData.MLModelID = MLModel.ID
                 WHERE Name = @Name
                 AND IsTrainingData = @IsTrainingData
@@ -497,6 +497,7 @@ namespace Extract.UtilityApplications.MachineLearning
                     cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
                     cmd.Parameters.AddWithValue("@IsTrainingData", true);
                     cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+                    cmd.CommandTimeout = 0;
 
                     int newCount = 0;
                     using (var reader = cmd.ExecuteReader())
@@ -977,6 +978,7 @@ namespace Extract.UtilityApplications.MachineLearning
                     cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
                     cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
                     cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+                    cmd.CommandTimeout = 0;
 
                     int lastCount = 0;
                     using (var reader = cmd.ExecuteReader())
@@ -1015,6 +1017,7 @@ namespace Extract.UtilityApplications.MachineLearning
                     cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
                     cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
                     cmd.Parameters.AddWithValue("@Max", maxRecords);
+                    cmd.CommandTimeout = 0;
 
                     using (var reader = cmd.ExecuteReader())
                     {

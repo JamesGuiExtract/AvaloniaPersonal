@@ -36,9 +36,9 @@ namespace Extract.UtilityApplications.MachineLearning
 
         static readonly string _GET_AVAILABLE_IDS =
             @"SELECT AttributeSetForFile.ID
-            FROM AttributeSetForFile
-            JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
-            JOIN FileTaskSession ON FileTaskSessionID = FileTaskSession.ID
+            FROM AttributeSetForFile WITH (NOLOCK)
+            JOIN AttributeSetName WITH (NOLOCK) ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
+            JOIN FileTaskSession WITH (NOLOCK) ON FileTaskSessionID = FileTaskSession.ID
                 WHERE Description = @AttributeSetName
                 AND AttributeSetForFile.ID > @LastIDProcessed
                 AND FileTaskSession.DateTimeStamp >= @StartDate
@@ -46,9 +46,9 @@ namespace Extract.UtilityApplications.MachineLearning
 
         static readonly string _GET_NEW_DATA_COUNT =
             @"SELECT COUNT(*)
-            FROM AttributeSetForFile
-            JOIN AttributeSetName ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
-            JOIN FileTaskSession ON FileTaskSessionID = FileTaskSession.ID
+            FROM AttributeSetForFile WITH (NOLOCK)
+            JOIN AttributeSetName WITH (NOLOCK) ON AttributeSetForFile.AttributeSetNameID = AttributeSetName.ID
+            JOIN FileTaskSession WITH (NOLOCK) ON FileTaskSessionID = FileTaskSession.ID
                 WHERE Description = @AttributeSetName
                 AND AttributeSetForFile.ID > @LastIDProcessed
                 AND FileTaskSession.DateTimeStamp >= @StartDate";
@@ -209,6 +209,7 @@ namespace Extract.UtilityApplications.MachineLearning
                         cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
                         cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
                         cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
+                        cmd.CommandTimeout = 0;
 
                         var reader = cmd.ExecuteReader();
                         while (reader.Read())
@@ -330,6 +331,7 @@ namespace Extract.UtilityApplications.MachineLearning
                     cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
                     cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
                     cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
+                    cmd.CommandTimeout = 0;
 
                     var reader = cmd.ExecuteReader();
                     while (reader.Read())
@@ -489,6 +491,7 @@ namespace Extract.UtilityApplications.MachineLearning
                     cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
                     cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
                     cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
+                    cmd.CommandTimeout = 0;
 
                     int newCount = 0;
                     using (var reader = cmd.ExecuteReader())
