@@ -1114,7 +1114,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NuanceUtils", "..\..\..\..\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESConvertUSSToTXT", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Utils\ESConvertUSSToTXT\Code\ESConvertUSSToTXT.vcxproj", "{2ABF7BC9-B805-4308-B9C6-00244C83C258}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.GoogleCloud", "..\..\..\..\..\RC.Net\GoogleCloud\Extract.GoogleCloud.csproj", "{4C79246F-BA4E-4DF4-8495-56133F965743}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.GoogleCloud", "..\..\..\..\..\RC.Net\GoogleCloud\Extract.GoogleCloud.csproj", "{4C79246F-BA4E-4DF4-8495-56133F965743}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1161,7 +1161,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rul
 		{F13286FD-B486-4266-97C5-9DAA62527A2E} = {F13286FD-B486-4266-97C5-9DAA62527A2E}
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Extract.Utilities.FSharp.NERAnnotation", "..\..\..\..\..\RC.Net\Utilities\FSharp\NERAnnotation\Extract.Utilities.FSharp.NERAnnotation.fsproj", "{F18189D2-1BDD-4AE1-B4ED-3BC7BBA98168}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.Utilities.FSharp.NERAnnotation", "..\..\..\..\..\RC.Net\Utilities\FSharp\NERAnnotation\Extract.Utilities.FSharp.NERAnnotation.fsproj", "{F18189D2-1BDD-4AE1-B4ED-3BC7BBA98168}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
@@ -1239,12 +1239,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rul
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Extract.AttributeFinder.Rules.Dto", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Dto\Extract.AttributeFinder.Rules.Dto.fsproj", "{A66FAA6A-B785-4C7B-9590-C04F45007F7F}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.AttributeFinder.Rules.Dto", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Dto\Extract.AttributeFinder.Rules.Dto.fsproj", "{A66FAA6A-B785-4C7B-9590-C04F45007F7F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6DD0855C-6031-49F4-874C-667F3A576345} = {6DD0855C-6031-49F4-874C-667F3A576345}
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Extract.AttributeFinder.Rules.Domain", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Domain\Extract.AttributeFinder.Rules.Domain.fsproj", "{865F2EA2-32AA-4E5C-8C0B-6BCC343741F2}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.AttributeFinder.Rules.Domain", "..\..\..\..\..\RC.Net\AttributeFinder\Rules\Domain\Extract.AttributeFinder.Rules.Domain.fsproj", "{865F2EA2-32AA-4E5C-8C0B-6BCC343741F2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{63FCAC1B-4562-469C-B7C3-DF1D4386FB45} = {63FCAC1B-4562-469C-B7C3-DF1D4386FB45}
 		{A7A54D3D-9716-469B-998C-5288B957B8F9} = {A7A54D3D-9716-469B-998C-5288B957B8F9}
@@ -1302,6 +1302,9 @@ EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.FileActionManager.Utilities.FAMServiceManager.Test", "..\..\..\..\..\RC.Net\FileActionManager\Utilities\FAMServiceManager\FAMServiceManager.Test\Extract.FileActionManager.Utilities.FAMServiceManager.Test.fsproj", "{D39B3BE5-3597-443F-A172-18F07E6A9F7C}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Extract.Utilities.FSharp", "..\..\..\..\..\RC.Net\Utilities\FSharp\Core\Code\Extract.Utilities.FSharp\Extract.Utilities.FSharp.fsproj", "{2B8F5C31-1837-4B1B-AF44-D618930EAFDF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653} = {0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
