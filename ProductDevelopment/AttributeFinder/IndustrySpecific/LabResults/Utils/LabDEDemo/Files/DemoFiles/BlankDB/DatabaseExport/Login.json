@@ -1,0 +1,14 @@
+[
+  {
+    "ID": 1,
+    "UserName": "admin",
+    "Password": "e086da2321be72f0efed683ce1fd3ff5",
+    "Guid": "63a33421-a07d-4e56-a271-2feda2fdbc10"
+  },
+  {
+    "ID": 2,
+    "UserName": "administrator",
+    "Password": "74c76435fc191b73805c4cf60bdab75fc1d751a71afb6dcd",
+    "Guid": "05f99e6b-16ff-44eb-95a8-afeabf7eb441"
+  }
+]

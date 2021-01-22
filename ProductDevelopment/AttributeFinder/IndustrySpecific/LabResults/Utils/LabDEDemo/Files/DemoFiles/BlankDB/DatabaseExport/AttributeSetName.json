@@ -1,0 +1,12 @@
+[
+  {
+    "ID": 1,
+    "Description": "DataFoundByRules",
+    "Guid": "883dff76-075b-4fea-b367-49419a1ffe35"
+  },
+  {
+    "ID": 2,
+    "Description": "DataSavedByOperator",
+    "Guid": "c3c27db0-24e2-4a7e-8b5a-d17814c47562"
+  }
+]

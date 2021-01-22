@@ -1,0 +1,27 @@
+[
+  {
+    "ID": 1,
+    "UserName": "steve_kurth",
+    "FullUserName": null
+  },
+  {
+    "ID": 2,
+    "UserName": "nathaniel_heyer",
+    "FullUserName": null
+  },
+  {
+    "ID": 3,
+    "UserName": "william_parr",
+    "FullUserName": null
+  },
+  {
+    "ID": 4,
+    "UserName": "EXTRACT\\william_parr",
+    "FullUserName": "EXTRACT\\william_parr"
+  },
+  {
+    "ID": 5,
+    "UserName": "Trever_Gannon",
+    "FullUserName": "Trever Gannon"
+  }
+]

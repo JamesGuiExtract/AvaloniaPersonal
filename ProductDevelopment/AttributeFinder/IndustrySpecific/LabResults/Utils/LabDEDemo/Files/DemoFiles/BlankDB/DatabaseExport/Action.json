@@ -1,0 +1,37 @@
+[
+  {
+    "ASCName": "A01_ExtractData",
+    "Description": null,
+    "MainSequence": null,
+    "ActionGuid": "77798afb-1fc3-4e4f-8284-54b83dd20a2b",
+    "WorkflowGuid": null
+  },
+  {
+    "ASCName": "A02_Verify",
+    "Description": null,
+    "MainSequence": null,
+    "ActionGuid": "daca5a3b-c83f-40ff-ad61-3cd8b1567861",
+    "WorkflowGuid": null
+  },
+  {
+    "ASCName": "A03_QA",
+    "Description": null,
+    "MainSequence": null,
+    "ActionGuid": "70939eeb-f552-4b45-810a-3ff48642d6e8",
+    "WorkflowGuid": null
+  },
+  {
+    "ASCName": "B01_ViewNonLab",
+    "Description": null,
+    "MainSequence": null,
+    "ActionGuid": "b5904741-ccd3-4e4f-aec2-174a0191e027",
+    "WorkflowGuid": null
+  },
+  {
+    "ASCName": "Z_AdminAction",
+    "Description": null,
+    "MainSequence": null,
+    "ActionGuid": "bfc1bf21-976f-419f-a174-25ab9b5193ad",
+    "WorkflowGuid": null
+  }
+]

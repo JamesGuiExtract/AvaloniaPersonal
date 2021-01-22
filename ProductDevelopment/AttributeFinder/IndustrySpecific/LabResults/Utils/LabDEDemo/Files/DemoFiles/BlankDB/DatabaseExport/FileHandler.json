@@ -1,0 +1,44 @@
+[
+  {
+    "ID": 1,
+    "Enabled": true,
+    "AppName": "Verify now",
+    "IconPath": null,
+    "ApplicationPath": "\"<CommonComponentsDir>\\RunFPSFile.exe\"",
+    "Arguments": "\"C:\\Demo_LabDE\\FPS\\A02_Verify.fps\" \"<SourceDocName>\" /process",
+    "AdminOnly": false,
+    "AllowMultipleFiles": false,
+    "SupportsErrorHandling": true,
+    "Blocking": true,
+    "WorkflowName": null,
+    "Guid": "b9c03f51-783a-4c2a-814c-05e86d3da38c"
+  },
+  {
+    "ID": 5,
+    "Enabled": true,
+    "AppName": "View data",
+    "IconPath": null,
+    "ApplicationPath": "\"<CommonComponentsDir>\\RunFPSFile.exe\"",
+    "Arguments": "\"C:\\Demo_LabDE\\FileHandlers\\ViewData.fps\" \"<SourceDocName>\" /ignoreDb",
+    "AdminOnly": true,
+    "AllowMultipleFiles": false,
+    "SupportsErrorHandling": true,
+    "Blocking": false,
+    "WorkflowName": null,
+    "Guid": "4ad369e8-d13e-435c-b886-ea3e4ec70d28"
+  },
+  {
+    "ID": 8,
+    "Enabled": true,
+    "AppName": "Make high priority",
+    "IconPath": null,
+    "ApplicationPath": "\"<CommonComponentsDir>\\RunFPSFile.exe\"",
+    "Arguments": "\"C:\\Demo_LabDE\\FileHandlers\\MakeHighPriority.fps\" \"<SourceDocName>\" /queue /forceProcessing /process",
+    "AdminOnly": true,
+    "AllowMultipleFiles": true,
+    "SupportsErrorHandling": true,
+    "Blocking": true,
+    "WorkflowName": null,
+    "Guid": "aba95536-a181-4571-a3a0-6bcd8e6f5001"
+  }
+]

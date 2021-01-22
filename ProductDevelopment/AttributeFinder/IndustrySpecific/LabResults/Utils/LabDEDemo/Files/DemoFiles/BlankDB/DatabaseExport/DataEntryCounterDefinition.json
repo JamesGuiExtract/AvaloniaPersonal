@@ -1,0 +1,18 @@
+[
+  {
+    "ID": 1,
+    "Name": "NumOrders",
+    "AttributeQuery": "Test",
+    "RecordOnLoad": true,
+    "RecordOnSave": true,
+    "Guid": "b6833836-447a-4c36-bfcb-e8acfec154f1"
+  },
+  {
+    "ID": 2,
+    "Name": "NumTests",
+    "AttributeQuery": "Test/Component",
+    "RecordOnLoad": true,
+    "RecordOnSave": true,
+    "Guid": "2f60cb8a-ca6b-408b-901b-06219fdf0130"
+  }
+]

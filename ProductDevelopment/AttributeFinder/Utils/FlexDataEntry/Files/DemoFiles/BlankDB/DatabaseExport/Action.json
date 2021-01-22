@@ -1,0 +1,16 @@
+[
+  {
+    "ASCName": "ExtractData",
+    "Description": null,
+    "MainSequence": null,
+    "ActionGuid": "f044b3f7-454b-4716-9cc0-d186567b5699",
+    "WorkflowGuid": null
+  },
+  {
+    "ASCName": "Verify",
+    "Description": null,
+    "MainSequence": null,
+    "ActionGuid": "fdfc78b4-a2e1-4bbd-904d-981aa447c70e",
+    "WorkflowGuid": null
+  }
+]

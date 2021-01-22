@@ -1,0 +1,62 @@
+[
+  {
+    "ID": 1,
+    "TagName": "User_IgnoreDocument",
+    "TagDescription": "The orders on this document do not need to be sent to the EMR",
+    "Guid": "cb961698-f518-4b80-83d0-139359a6a954"
+  },
+  {
+    "ID": 3,
+    "TagName": "QA_ErrorFound",
+    "TagDescription": "",
+    "Guid": "68462fb2-94c7-4178-8c58-959a8dd0c052"
+  },
+  {
+    "ID": 4,
+    "TagName": "QA_NoErrorsFound",
+    "TagDescription": "",
+    "Guid": "1079a5fe-cbc5-4124-a69c-1263dc155910"
+  },
+  {
+    "ID": 5,
+    "TagName": "User_LabDocument",
+    "TagDescription": "",
+    "Guid": "f1666b3c-d55c-418c-9536-1cebcf8f56d4"
+  },
+  {
+    "ID": 6,
+    "TagName": "User_MissingTestCode",
+    "TagDescription": "",
+    "Guid": "087de848-8861-42be-91b7-2ad459e271fd"
+  },
+  {
+    "ID": 7,
+    "TagName": "User_NonLabDocument",
+    "TagDescription": "",
+    "Guid": "b59f7345-ee6b-4411-9f24-6a3194cb0d4a"
+  },
+  {
+    "ID": 8,
+    "TagName": "User_MultiplePatients",
+    "TagDescription": "",
+    "Guid": "89611263-5b68-4240-b85f-075c6cb29271"
+  },
+  {
+    "ID": 9,
+    "TagName": "User_SendToAnalyst",
+    "TagDescription": "",
+    "Guid": "cbdd985b-b70e-43aa-9c4a-565419619a4b"
+  },
+  {
+    "ID": 10,
+    "TagName": "Admin_ExportedToOnBase",
+    "TagDescription": "",
+    "Guid": "4ae1aeb2-ba62-4c26-9aa1-e8101d829848"
+  },
+  {
+    "ID": 11,
+    "TagName": "Admin_UnableToClassify",
+    "TagDescription": "",
+    "Guid": "260ec28f-cbf2-497b-8140-c017c98c0046"
+  }
+]

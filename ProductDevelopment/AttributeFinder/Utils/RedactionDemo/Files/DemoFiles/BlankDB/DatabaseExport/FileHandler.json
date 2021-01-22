@@ -1,0 +1,16 @@
+[
+  {
+    "ID": 1,
+    "Enabled": true,
+    "AppName": "Verify now",
+    "IconPath": null,
+    "ApplicationPath": "C:\\Program Files (x86)\\Extract Systems\\CommonComponents\\RunFPSFile.exe",
+    "Arguments": "\"C:\\Demo_IDShield\\FPS\\Standard - Verify Redactions.fps\" \"<SourceDocName>\" /process",
+    "AdminOnly": false,
+    "AllowMultipleFiles": false,
+    "SupportsErrorHandling": true,
+    "Blocking": true,
+    "WorkflowName": null,
+    "Guid": "ef6c3679-0ffc-4da4-bb77-42dbd5da5bbf"
+  }
+]

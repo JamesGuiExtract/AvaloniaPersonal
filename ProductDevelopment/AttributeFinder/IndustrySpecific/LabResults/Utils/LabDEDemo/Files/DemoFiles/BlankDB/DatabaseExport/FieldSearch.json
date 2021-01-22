@@ -1,0 +1,16 @@
+[
+  {
+    "ID": 1,
+    "Enabled": true,
+    "FieldName": "Date of Birth",
+    "AttributeQuery": "PatientInfo/DOB",
+    "Guid": "2b4622a9-7421-4844-bb2f-217f4cd5839e"
+  },
+  {
+    "ID": 2,
+    "Enabled": true,
+    "FieldName": "Patient Name",
+    "AttributeQuery": "PatientInfo/Name",
+    "Guid": "8e15e3cb-ad18-43bb-ae66-63bcea32e78f"
+  }
+]

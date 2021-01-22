@@ -1,0 +1,27 @@
+[
+  {
+    "ID": 1,
+    "Name": "PatientFirstName",
+    "Guid": "ee92a38b-369d-4cd3-81b0-6c6a83a7b636"
+  },
+  {
+    "ID": 2,
+    "Name": "PatientLastName",
+    "Guid": "5cef355e-ee76-4eb3-9e2b-af17e67b0d10"
+  },
+  {
+    "ID": 3,
+    "Name": "PatientDOB",
+    "Guid": "73506b25-6be2-47c1-9015-4fb9b39dd679"
+  },
+  {
+    "ID": 4,
+    "Name": "CollectionDate",
+    "Guid": "982cdcc3-27f3-47a3-9624-826e4af499fc"
+  },
+  {
+    "ID": 5,
+    "Name": "StapledInto",
+    "Guid": "c3f34c5c-cd29-4c40-bc7c-20a4dd4f95d0"
+  }
+]

@@ -1,0 +1,272 @@
+[
+  {
+    "ID": 1,
+    "Name": "ActionStatisticsUpdateFreqInSeconds",
+    "Value": "300"
+  },
+  {
+    "ID": 2,
+    "Name": "AllowDynamicTagCreation",
+    "Value": "0"
+  },
+  {
+    "ID": 43,
+    "Name": "AllowRestartableProcessing",
+    "Value": "0"
+  },
+  {
+    "ID": 33,
+    "Name": "AlternateComponentDataDir",
+    "Value": ""
+  },
+  {
+    "ID": 44,
+    "Name": "AttributeCollectionSchemaVersion",
+    "Value": "11"
+  },
+  {
+    "ID": 3,
+    "Name": "AutoCreateActions",
+    "Value": "0"
+  },
+  {
+    "ID": 4,
+    "Name": "AutoDeleteFileActionCommentOnComplete",
+    "Value": "0"
+  },
+  {
+    "ID": 6,
+    "Name": "AutoRevertNotifyEmailList",
+    "Value": ""
+  },
+  {
+    "ID": 7,
+    "Name": "AutoRevertTimeOutInMinutes",
+    "Value": "5"
+  },
+  {
+    "ID": 8,
+    "Name": "CommandTimeout",
+    "Value": "120"
+  },
+  {
+    "ID": 9,
+    "Name": "ConnectionRetryTimeout",
+    "Value": "120"
+  },
+  {
+    "ID": 46,
+    "Name": "DatabaseID",
+    "Value": "feba6211fc91ed565a36d112ca8dfb77947e2941a1245b22d3d4cec0583cad30a82f0eecfe157bec4a790930a882882a3b15c79797258c7d2b4fa71798673f1917ee4df04ecac1f2f68eadbb06d8b5002c51dd65"
+  },
+  {
+    "ID": 28,
+    "Name": "DataEntrySchemaVersion",
+    "Value": "6"
+  },
+  {
+    "ID": 53,
+    "Name": "EmailEnableSettings",
+    "Value": "0"
+  },
+  {
+    "ID": 40,
+    "Name": "EmailPassword",
+    "Value": ""
+  },
+  {
+    "ID": 35,
+    "Name": "EmailPort",
+    "Value": "25"
+  },
+  {
+    "ID": 55,
+    "Name": "EmailPossibleInvalidSenderAddress",
+    "Value": "0"
+  },
+  {
+    "ID": 54,
+    "Name": "EmailPossibleInvalidServer",
+    "Value": "0"
+  },
+  {
+    "ID": 37,
+    "Name": "EmailSenderAddress",
+    "Value": ""
+  },
+  {
+    "ID": 36,
+    "Name": "EmailSenderName",
+    "Value": ""
+  },
+  {
+    "ID": 34,
+    "Name": "EmailServer",
+    "Value": ""
+  },
+  {
+    "ID": 38,
+    "Name": "EmailSignature",
+    "Value": ""
+  },
+  {
+    "ID": 41,
+    "Name": "EmailTimeout",
+    "Value": "0"
+  },
+  {
+    "ID": 39,
+    "Name": "EmailUsername",
+    "Value": ""
+  },
+  {
+    "ID": 42,
+    "Name": "EmailUseSSL",
+    "Value": "0"
+  },
+  {
+    "ID": 29,
+    "Name": "EnableDataEntryCounters",
+    "Value": "0"
+  },
+  {
+    "ID": 56,
+    "Name": "EnableLoadBalancing",
+    "Value": "1"
+  },
+  {
+    "ID": 58,
+    "Name": "ETLRestart",
+    "Value": "2018-10-29T14:38:24.2157941-05:00"
+  },
+  {
+    "ID": 11,
+    "Name": "FAMDBSchemaVersion",
+    "Value": "189"
+  },
+  {
+    "ID": 12,
+    "Name": "GetFilesToProcessTransactionTimeout",
+    "Value": "300"
+  },
+  {
+    "ID": 60,
+    "Name": "IDShieldSchemaVersion",
+    "Value": "6"
+  },
+  {
+    "ID": 57,
+    "Name": "InputActivityTimeout",
+    "Value": "30"
+  },
+  {
+    "ID": 61,
+    "Name": "LabDESchemaVersion",
+    "Value": "17"
+  },
+  {
+    "ID": 14,
+    "Name": "LastDBInfoChange",
+    "Value": "2021-01-22 12:42:28.797"
+  },
+  {
+    "ID": 51,
+    "Name": "LicenseContactEmail",
+    "Value": ""
+  },
+  {
+    "ID": 50,
+    "Name": "LicenseContactOrganization",
+    "Value": ""
+  },
+  {
+    "ID": 52,
+    "Name": "LicenseContactPhone",
+    "Value": ""
+  },
+  {
+    "ID": 15,
+    "Name": "MaxMillisecondsBetweenCheckForFilesToProcess",
+    "Value": "2000"
+  },
+  {
+    "ID": 16,
+    "Name": "MinMillisecondsBetweenCheckForFilesToProcess",
+    "Value": "2000"
+  },
+  {
+    "ID": 17,
+    "Name": "NumberOfConnectionRetries",
+    "Value": "10"
+  },
+  {
+    "ID": 18,
+    "Name": "RequireAuthenticationBeforeRun",
+    "Value": "0"
+  },
+  {
+    "ID": 19,
+    "Name": "RequirePasswordToProcessAllSkippedFiles",
+    "Value": "1"
+  },
+  {
+    "ID": 59,
+    "Name": "RootPathForDashboardExtractedData",
+    "Value": ""
+  },
+  {
+    "ID": 47,
+    "Name": "SendAlertsToExtract",
+    "Value": "0"
+  },
+  {
+    "ID": 48,
+    "Name": "SendAlertsToSpecified",
+    "Value": "0"
+  },
+  {
+    "ID": 20,
+    "Name": "SkipAuthenticationForServiceOnMachines",
+    "Value": ""
+  },
+  {
+    "ID": 49,
+    "Name": "SpecifiedAlertRecipients",
+    "Value": ""
+  },
+  {
+    "ID": 21,
+    "Name": "StoreDBInfoChangeHistory",
+    "Value": "1"
+  },
+  {
+    "ID": 22,
+    "Name": "StoreDocNameChangeHistory",
+    "Value": "1"
+  },
+  {
+    "ID": 23,
+    "Name": "StoreDocTagHistory",
+    "Value": "1"
+  },
+  {
+    "ID": 25,
+    "Name": "StoreFTPEventHistory",
+    "Value": "1"
+  },
+  {
+    "ID": 26,
+    "Name": "UpdateFileActionStateTransitionTable",
+    "Value": "1"
+  },
+  {
+    "ID": 27,
+    "Name": "UpdateQueueEventTable",
+    "Value": "1"
+  },
+  {
+    "ID": 62,
+    "Name": "UseGetFilesLegacy",
+    "Value": "0"
+  }
+]
