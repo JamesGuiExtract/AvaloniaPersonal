@@ -125,6 +125,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             // If the affected control is not currently visible or is offscreen below the current
             // visible ClientRectangle, abort the layout to avoid unnecessary repeated layouts as
             // a large number of documents/pages are loading.
+            // NOTE: This logic has holes in it because there might be other affected controls than the one in the event args
+            // E.g., for https://extract.atlassian.net/browse/ISSUE-17396 the affected control after inserting a pagination separator
+            // is the load next document button, not the new separator and the moved page controls
             if (!ForceNextLayout &&
                 ScrollTarget?.Control == null &&
                 layoutEventArgs?.AffectedControl != null &&
