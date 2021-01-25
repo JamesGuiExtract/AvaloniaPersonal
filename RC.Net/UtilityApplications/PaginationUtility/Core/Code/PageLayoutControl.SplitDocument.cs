@@ -194,6 +194,14 @@ namespace Extract.UtilityApplications.PaginationUtility
                 int index = _flowLayoutPanel.Controls.IndexOf(splitTarget);
                 InitializePaginationControl(
                     new PaginationSeparator(this, CommitOnlySelection), ref index);
+
+                // Ensure that the layout is performed when the load next document button
+                // might get in the way of the normal layout logic.
+                // https://extract.atlassian.net/browse/ISSUE-17396
+                if (LoadNextDocumentVisible)
+                {
+                    ((PaginationLayoutEngine)_flowLayoutPanel.LayoutEngine).ForceNextLayout = true;
+                }
             }
         }
 
