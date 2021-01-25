@@ -4447,14 +4447,15 @@ namespace Extract.UtilityApplications.PaginationUtility
                 var activeSeparator = activeDocument?.PaginationSeparator;
 
                 // Tabbing into a collapsed document
-                if (pageThumbnailIsActive && activeSeparator.Collapsed 
+                if (pageThumbnailIsActive
+                    && activeSeparator?.Collapsed == true
                     && activeDocument?.OutputProcessed == false)
                 {
                     activeSeparator.Collapsed = false;
                 }
                 // Tabbing from an expanded document with a DEP configuration that is not open
                 else if (pageThumbnailIsActive && activeDocument?.OutputProcessed == false
-                    && AllowDataEdit && !activeSeparator.IsDataPanelOpen)
+                    && AllowDataEdit && activeSeparator?.IsDataPanelOpen == false)
                 {
                     activeSeparator.Collapsed = false;
                     activeSeparator.OpenDataPanel(initialSelection: FieldSelection.First);
