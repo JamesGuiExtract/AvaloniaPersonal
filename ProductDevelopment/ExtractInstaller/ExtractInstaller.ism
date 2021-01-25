@@ -339,6 +339,7 @@
 		<row><td>RedactionCC.dll</td><td>{609DD8EB-6620-4A9E-AE69-452AE7A103C8}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>RedactionCC.dll</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>RedactionTester.dll</td><td>{FE6FB54D-7A24-49CD-90FF-A8642E8A116A}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>redactiontester.dll</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SDKComponents</td><td>{520CC137-57D4-420C-AF6E-B3F95C8BD13B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>WebInstall</td><td>{D4A67BC4-27CD-4F5A-8EA0-322D5090BBA1}</td><td>API_INSTALLS</td><td>8</td><td/><td>webinstaller.exe</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -453,6 +454,8 @@
 		<col def="S255">ISFolderName</col>
 		<row><td>AF_COMPONENTS</td><td>EXTRACT_SYSTEMS</td><td>FLEXIN~1|FlexIndexComponents</td><td/><td>0</td><td/></row>
 		<row><td>ALLUSERSPROFILE</td><td>TARGETDIR</td><td>.:ALLUSE~1|All Users</td><td/><td>0</td><td/></row>
+		<row><td>API_INSTALLS</td><td>APIs</td><td>INSTAL~1|Installer</td><td/><td>0</td><td/></row>
+		<row><td>APIs</td><td>INSTALLDIR</td><td>APIs</td><td/><td>0</td><td/></row>
 		<row><td>AdminToolsFolder</td><td>TARGETDIR</td><td>.:Admint~1|AdminTools</td><td/><td>0</td><td/></row>
 		<row><td>AppDataFolder</td><td>TARGETDIR</td><td>.:APPLIC~1|Application Data</td><td/><td>0</td><td/></row>
 		<row><td>CLEAR_IMAGE_DIR</td><td>CommonFilesFolder</td><td>CLEARI~1|ClearImage</td><td/><td>0</td><td/></row>
@@ -1210,6 +1213,7 @@
 		<row><td>SDKMain</td><td>RedactionCC.dll</td></row>
 		<row><td>SDKMain</td><td>RedactionTester.dll</td></row>
 		<row><td>SDKMain</td><td>SDKComponents</td></row>
+		<row><td>SDKMain</td><td>WebInstall</td></row>
 	</table>
 
 	<table name="File">
@@ -1241,6 +1245,7 @@
 		<row><td>labde.rl</td><td>AllOtherFiles</td><td>LabDE.rl</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDENONSELFREGFILES_FI&gt;\LabDE.rl</td><td>1</td><td/></row>
 		<row><td>labdecppcc.dll</td><td>LabDECppCC.dll</td><td>LABDEC~1.DLL|LabDECppCC.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\LabDECppCC.dll</td><td>1</td><td/></row>
 		<row><td>redactiontester.dll</td><td>RedactionTester.dll</td><td>REDACT~1.DLL|RedactionTester.dll</td><td>0</td><td>65535.0.0.0</td><td/><td>0</td><td>1</td><td>&lt;PATH_TO_SELFREGIDSHIELD_FILES&gt;\RedactionTester.dll</td><td>17</td><td/></row>
+		<row><td>webinstaller.exe</td><td>WebInstall</td><td>WebInstaller.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\WebInstaller.exe</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -1404,6 +1409,7 @@
 		<row><td>RedactionCC.dll</td><td/><td/><td>_03DC90EE_03CF_4902_9272_0C41A69D5B61_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>RedactionTester.dll</td><td/><td/><td>_E3C82770_0C8B_4480_812B_48AA19DB7EBA_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SDKComponents</td><td/><td/><td>_194782D1_93CC_4676_B268_CA86FF42B50D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>WebInstall</td><td/><td/><td>_18BD40BC_2D44_40D9_8F59_6764BB936039_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -1743,6 +1749,7 @@
 		<row><td>PATH_TO_NONSELFREGSDKCO_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\NonSelfRegSDKComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_OFFICEREDIST_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\OfficeRedist</td><td/><td>2</td></row>
 		<row><td>PATH_TO_REDIST_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\Redist</td><td/><td>2</td></row>
+		<row><td>PATH_TO_RELEASE_FILES</td><td>&lt;ISProjectFolder&gt;..\..\Binaries\Release</td><td/><td>2</td></row>
 		<row><td>PATH_TO_REPORTS_FILES_LABDE</td><td>P:\DataEntry\LabDE\Files\Reports</td><td/><td>2</td></row>
 		<row><td>PATH_TO_REPORTS_IDSHIELD_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\Reports</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGCORECOMP_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\SelfRegCoreComponents</td><td/><td>2</td></row>
