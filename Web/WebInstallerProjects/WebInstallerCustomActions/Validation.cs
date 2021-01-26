@@ -1,17 +1,12 @@
 ﻿using Extract;
 using Microsoft.Deployment.WindowsInstaller;
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WebInstallerCustomActions
@@ -39,9 +34,8 @@ FROM
 WHERE
 	[Workflow].Name = @Name";
 
-
         [CustomAction]
-        public static string DNSValidation(Session session)
+        public static string HostNameValidation(Session session)
         {
             if (session == null)
             {
@@ -51,22 +45,53 @@ WHERE
             {
                 var validationMessage = string.Empty;
 
-                validationMessage = string.IsNullOrEmpty(session["APPBACKEND_DNS_ENTRY"]) ? validationMessage : validationMessage + $"\nExtract AppBackend API is valid:{TestDNSEntry(session["APPBACKEND_DNS_ENTRY"])}";
-                validationMessage = string.IsNullOrEmpty(session["DOCUMENTAPI_DNS_ENTRY"]) ? validationMessage : validationMessage + $"\nExtract Document API is valid:{TestDNSEntry(session["DOCUMENTAPI_DNS_ENTRY"])}";
-                validationMessage = string.IsNullOrEmpty(session["IDSVERIFY_DNS_ENTRY"]) ? validationMessage : validationMessage + $"\nExtract Verify is valid:{TestDNSEntry(session["IDSVERIFY_DNS_ENTRY"])}";
-                validationMessage = string.IsNullOrEmpty(session["WINDOWSAUTHORIZATION_DNS_ENTRY"]) ? validationMessage : validationMessage + $"\nExtract Authorization API is valid:{TestDNSEntry(session["WINDOWSAUTHORIZATION_DNS_ENTRY"])}";
-
-                if (!string.IsNullOrEmpty(validationMessage))
+                if(!string.IsNullOrEmpty(session["APPBACKEND_DNS_ENTRY"]))
                 {
-                    return $"This test simply checks if the DNS entry provided points to the IP of the computer you are using. If a site is hosted on a different computer then this validation check is not valid.\n" + validationMessage;
+                    var appBackendHost = GetHostEntry(session["APPBACKEND_DNS_ENTRY"]);
+                    validationMessage += $"\n{(appBackendHost != null ? ((char)0x221A).ToString() : "X")}  Extract AppBackend API Host Name Valid";
+                    validationMessage += $"\n{(appBackendHost != null && appBackendHost.AddressList.Contains(GetLocalIPAddress()) ? ((char)0x221A).ToString() : "X")}  Extract AppBackend API IP matches Domain";
                 }
-            
+                if(!string.IsNullOrEmpty(session["DOCUMENTAPI_DNS_ENTRY"]))
+                {
+                    var docAPIHost = GetHostEntry(session["DOCUMENTAPI_DNS_ENTRY"]);
+                    validationMessage += $"\n{(docAPIHost != null ? ((char)0x221A).ToString() : "X")}  Extract Document API Host Name Valid";
+                    validationMessage += $"\n{(docAPIHost != null && docAPIHost.AddressList.Contains(GetLocalIPAddress()) ? ((char)0x221A).ToString() : "X")}  Extract Document API IP matches Domain";                    
+                }
+                if(!string.IsNullOrEmpty(session["IDSVERIFY_DNS_ENTRY"]))
+                {
+                    var verifyHost = GetHostEntry(session["IDSVERIFY_DNS_ENTRY"]);
+                    validationMessage += $"\n{(verifyHost != null ? ((char)0x221A).ToString() : "X")}  Extract Verify Host Name Valid";
+                    validationMessage += $"\n{(verifyHost != null && verifyHost.AddressList.Contains(GetLocalIPAddress()) ? ((char)0x221A).ToString() : "X")}  Extract Verify API IP matches Domain";
+                }
+                if(!string.IsNullOrEmpty(session["WINDOWSAUTHORIZATION_DNS_ENTRY"]))
+                {
+                    var winAuthHost = GetHostEntry(session["WINDOWSAUTHORIZATION_DNS_ENTRY"]);
+                    validationMessage += $"\n{(winAuthHost != null ? ((char)0x221A).ToString() : "X")}  Extract Authorization API Host Name Valid";
+                    validationMessage += $"\n{(winAuthHost != null && winAuthHost.AddressList.Contains(GetLocalIPAddress()) ? ((char)0x221A).ToString() : "X")}  Extract Authorization API IP matches Domain";
+                }
+
+
                 return validationMessage;
             }
             catch (Exception ex)
             {
-                ex.AsExtract("ELI51513").Log();
+                ex.AsExtract("ELI51520").Log();
                 throw;
+            }
+        }
+
+        private static IPHostEntry GetHostEntry(string entryToCheck)
+        {
+            if(entryToCheck == null)
+            {
+                return null;
+            }
+            try
+            {
+                return Dns.GetHostEntry(entryToCheck);
+            }
+            catch (Exception e) when (e is SocketException || e is ArgumentOutOfRangeException) {
+                return null;
             }
         }
 
@@ -77,7 +102,6 @@ WHERE
             bool usernameAndPasswordValid;
             bool userHasPermissionsToDB = false;
             WebsiteVerificationModel websiteVerificationModel = null;
-            bool userHasPermissionToFolder = false;
 
             if (session == null)
             {
@@ -99,20 +123,14 @@ WHERE
                             userHasPermissionsToDB = true;
                             websiteVerificationModel = VerifyWorkflowInformation(session["DATABASE_WORKFLOW"], connection, session);
                             connection.Close();
-                            if (websiteVerificationModel.WorkflowExists)
-                            {
-                                userHasPermissionToFolder = HasPermissionsToFolder(websiteVerificationModel.documentFolder);
-                            }
-
                         }
                         catch (SqlException) { }
                     }
                     ctx.Undo();
                 }
 
-                string validationMessage = DNSValidation(session) + $"\nUser Name and password are valid: {usernameAndPasswordValid}"
-                    + $"\nUser has access to the database: {userHasPermissionsToDB}"
-                    + $"\nUser has permissions to the folder specified in the workflow: {userHasPermissionToFolder}";
+                string validationMessage = HostNameValidation(session) + $"\n{(usernameAndPasswordValid ? ((char)0x221A).ToString() : "X")}  User Name and password"
+                    + $"\n{(userHasPermissionsToDB ? ((char)0x221A).ToString() : "X")}  Database Access";
 
                 if (websiteVerificationModel != null)
                 {
@@ -130,36 +148,17 @@ WHERE
             }
         }
 
-        private static string GetLocalIPAddress()
+        private static IPAddress GetLocalIPAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
             {
                 if (ip.AddressFamily == AddressFamily.InterNetwork)
                 {
-                    return ip.ToString();
+                    return ip;
                 }
             }
             throw new Exception("No network adapters with an IPv4 address in the system!");
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "This is just testing the dns entry. If it fails that is fine.")]
-        private static bool TestDNSEntry(string entry)
-        {
-            var isEntryValid = false;
-            try
-            {
-                foreach (IPAddress ip in Dns.GetHostAddresses(entry))
-                {
-                    if (ip.ToString().Equals(GetLocalIPAddress(), StringComparison.OrdinalIgnoreCase))
-                    {
-                        isEntryValid = true;
-                    }
-                }
-            }
-            catch (Exception) { }
-
-            return isEntryValid;
         }
 
         private static WebsiteVerificationModel VerifyWorkflowInformation(string workflow, SqlConnection connection, Session session)
@@ -189,20 +188,6 @@ WHERE
                 throw;
             }
             return websiteVerificationModel;
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "If an exception occurs here it is fine.")]
-        private static bool HasPermissionsToFolder(string folder)
-        {
-            bool hasPermission = false;
-            try
-            {
-                File.WriteAllText(folder + "\\test.txt", "Testing permissions.");
-                File.Delete(folder + "\\test.txt");
-                hasPermission = true;
-            }
-            catch (Exception) { }
-            return hasPermission;
         }
     }
 

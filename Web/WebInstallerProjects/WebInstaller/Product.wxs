@@ -11,7 +11,7 @@
 
   <!--Variable Definitions-->
   <?define UpgradeCode = "{6F8F51B0-B7C7-46AB-B210-D8715A902048}"?>
-  <?define BuildVersion = 1.2.3.4?>
+  <?define BuildVersion = 1.0.0.1?>
   
   <!--Define main product.-->
 	<Product 
