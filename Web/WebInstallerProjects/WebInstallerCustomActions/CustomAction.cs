@@ -83,7 +83,7 @@ namespace WebInstallerCustomActions
             }
             try
             {
-                string angularJson = File.ReadAllText(@"C:\inetpub\Extract Systems\IDSVerify\json\settings.json");
+                string angularJson = File.ReadAllText(@$"{session["INSTALLLOCATION"].ToString()}IDSVerify\json\settings.json");
                 dynamic angularJsonDeserial = Newtonsoft.Json.JsonConvert.DeserializeObject(angularJson);
                 angularJsonDeserial["appBackendUrl"] = "http://" + session["APPBACKEND_DNS_ENTRY"];
                 angularJsonDeserial["WindowsAuthenticationUrl"] = "http://" + session["WINDOWSAUTHORIZATION_DNS_ENTRY"];
@@ -92,7 +92,7 @@ namespace WebInstallerCustomActions
                 angularJsonDeserial["ForceRedactionTypeToBeSet"] = !session["FORCE_REDACTION_TYPE_TO_BE_SET"].Equals("1", StringComparison.OrdinalIgnoreCase);
 
                 string angularOutput = Newtonsoft.Json.JsonConvert.SerializeObject(angularJsonDeserial, Newtonsoft.Json.Formatting.Indented);
-                File.WriteAllText(@"C:\inetpub\Extract Systems\IDSVerify\json\settings.json", angularOutput);
+                File.WriteAllText(@$"{session["INSTALLLOCATION"].ToString()}IDSVerify\json\settings.json", angularOutput);
                 return ActionResult.Success;
             }
             catch (Exception ex)

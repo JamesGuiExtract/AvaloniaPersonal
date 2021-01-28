@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
-	<Bundle Name="Extract Web Sites" 
+	<Bundle Name="Extract Web Services" 
           Version="!(bind.packageVersion.WebInstallerConfiguration.msi)" 
           Manufacturer="Extract Systems" 
           UpgradeCode="bc577eca-a45b-4703-b36a-61819a315be8">

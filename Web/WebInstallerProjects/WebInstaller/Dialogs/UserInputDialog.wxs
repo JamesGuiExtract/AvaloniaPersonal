@@ -9,7 +9,6 @@
       are defaulted to un-checked. They act like C++ code where they are undefined instead of zero.-->
       <Property Id="FORCE_REDACTION_TYPE_TO_BE_SET" Value="1"></Property>
       
-      <Property Id="CREATE_APP_BACKEND_SITE" Value="1"></Property>
       <Property Id="CREATE_DOCUMENTAPI_SITE" Value="1"></Property>
       <Property Id="CREATE_VERIFY_SITE" Value="1"></Property>
       <Property Id="CREATE_WINDOWS_AUTHORIZATION_SITE" Value="1"></Property>
@@ -17,56 +16,74 @@
 
       <Binary Id="proceedbtn" SourceFile="images/proceedbtn.bmp"/>
       <Binary Id="headerPic" SourceFile="images/header.bmp"/>
+      <Binary Id="grayBgPic" SourceFile="images/bg2.bmp"/>
 
-      <Dialog Id="UserRegDialog" Width="400" Height="370" Title="Extract Web Site Configuration">
-
-        <Control Id="background" Type="Bitmap" Text="bgPic" Height="500" Width="400" X="0" Y="0" TabSkip="no" />
+      <Dialog Id="UserRegDialog" Width="400" Height="370" Title="Extract Web Services Configuration">
+        <Control Id="background" Type="Bitmap" Text="grayBgPic" Height="500" Width="400" X="0" Y="0" TabSkip="no" />
         <Control Id="header" Type="Bitmap" Text="headerPic" Height="50" Width="400" X="0" Y="0" TabSkip="no" />
         <Control Id="headerText"  Type="Text" X="65" Y="10" Width="320" Height="40" Transparent="yes" Text="{\TahomaBig}Site Configuration" />
 
-        <Control Id="Link1" Type="Hyperlink" X="35" Y="52" Width="110" Height="15" >
+        <Control Id="Link1" Type="Hyperlink" X="35" Y="54" Width="110" Height="15" >
           <Text><![CDATA[<a href="https://extract.atlassian.net/wiki/spaces/KB/pages/1209040897/Web+Installer">Web Installer Documenation</a>]]></Text>
         </Control>
-        
-        <Control Id="documentAPICreation" CheckBoxValue="[CREATE_DOCUMENTAPI_SITE]" Type="CheckBox" X="35" Y="67"  Height="15" Width="15" Property="CREATE_DOCUMENTAPI_SITE"  />
-        <Control Id="documentApiDnsLabel" Type="Text" X="50" Y="70" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}DocumentAPI Domain" />
-        <Control Id="documentApiDnsTextBox" Text="[DOCUMENTAPI_DNS_ENTRY]" Type="Edit" X="145" Y="67"  Height="17" Width="200" Property="DOCUMENTAPI_DNS_ENTRY"  />
 
-        <Control Id="verifyCreation" CheckBoxValue="[CREATE_VERIFY_SITE]" Type="CheckBox" X="35" Y="87"  Height="15" Width="15" Property="CREATE_VERIFY_SITE"  />
-        <Control Id="idsVerifyDnsLabel" Type="Text" X="50" Y="90" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Verify Domain" />
-        <Control Id="idsVerifyDnsTextBox" Text="[IDSVERIFY_DNS_ENTRY]" Type="Edit" X="145" Y="87"  Height="17" Width="200" Property="IDSVERIFY_DNS_ENTRY"  />
+        <Control Id="documentAPICreation" CheckBoxValue="[CREATE_DOCUMENTAPI_SITE]" Type="CheckBox" X="35" Y="71" Height="15" Width="110" Text="{\TahomaNormal}Document API Host" Property="CREATE_DOCUMENTAPI_SITE"  />
+        <Control Id="documentApiDnsTextBox" Text="[DOCUMENTAPI_DNS_ENTRY]" Type="Edit" X="145" Y="71"  Height="17" Width="215" Property="DOCUMENTAPI_DNS_ENTRY"  >
+          <Condition Action="enable">CREATE_DOCUMENTAPI_SITE="1"</Condition>
+          <Condition Action="disable"><![CDATA[CREATE_DOCUMENTAPI_SITE<>"1"]]></Condition>
+        </Control>
 
-        <Control Id="appBackendCreation" CheckBoxValue="[CREATE_APP_BACKEND_SITE]" Type="CheckBox" X="50" Y="107"  Height="15" Width="15" Property="CREATE_APP_BACKEND_SITE"  />
-        <Control Id="appBackendDNSLabel" Type="Text" X="65" Y="110" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}AppBackend Domain" />
-        <Control Id="appBackendDNSTextBox" Type="Edit" X="160" Y="107" Text="[APPBACKEND_DNS_ENTRY]"  Height="17" Width="200" Property="APPBACKEND_DNS_ENTRY"  />
+        <Control Id="verifyCreation" CheckBoxValue="[CREATE_VERIFY_SITE]" Type="CheckBox" X="35" Y="91"  Height="15" Width="110" Text="{\TahomaNormal}Verify Host" Property="CREATE_VERIFY_SITE" />
+        <Control Id="idsVerifyDnsTextBox" Text="[IDSVERIFY_DNS_ENTRY]" Type="Edit" X="145" Y="91"  Height="17" Width="215" Property="IDSVERIFY_DNS_ENTRY"  >
+          <Condition Action="enable">CREATE_VERIFY_SITE="1"</Condition>
+          <Condition Action="disable"><![CDATA[CREATE_VERIFY_SITE<>"1"]]></Condition>
+        </Control>
 
-        <Control Id="winAuthCreation" CheckBoxValue="[CREATE_WINDOWS_AUTHORIZATION_SITE]" Type="CheckBox" X="50" Y="127"  Height="15" Width="15" Property="CREATE_WINDOWS_AUTHORIZATION_SITE"  />
-        <Control Id="winAuthDnsLabel" Type="Text" X="65" Y="130" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Windows Auth Domain" />
-        <Control Id="winAuthDnsTextBox" Text="[WINDOWSAUTHORIZATION_DNS_ENTRY]" Type="Edit" X="160" Y="127"  Height="17" Width="200" Property="WINDOWSAUTHORIZATION_DNS_ENTRY"  />
+        <Control Id="appBackendDNSLabel" Type="Text" X="62" Y="114" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}App Backend API Host" >
+          <Condition Action="hide">1</Condition> <!-- hide/show prevents ugly display artifact when enabled status is changed-->
+          <Condition Action="enable">CREATE_VERIFY_SITE="1"</Condition>
+          <Condition Action="disable"><![CDATA[CREATE_VERIFY_SITE<>"1"]]></Condition>
+          <Condition Action="show">1</Condition> 
+        </Control>
+        <Control Id="appBackendDNSTextBox" Type="Edit" X="160" Y="111" Text="[APPBACKEND_DNS_ENTRY]"  Height="17" Width="200" Property="APPBACKEND_DNS_ENTRY"  >
+          <Condition Action="enable">CREATE_VERIFY_SITE="1"</Condition>
+          <Condition Action="disable"><![CDATA[CREATE_VERIFY_SITE<>"1"]]></Condition>
+        </Control>
 
-        <Control Id="forceRedactionTypeTextBox" CheckBoxValue="[FORCE_REDACTION_TYPE_TO_BE_SET]" Type="CheckBox" X="50" Y="147"  Height="15" Width="15" Property="FORCE_REDACTION_TYPE_TO_BE_SET"  />
-        <Control Id="forceRedactionTypeLabel" Type="Text" X="65" Y="150" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Force Redaction Type" />
-        
-        <Control Id="userNameLabel" Type="Text" X="35" Y="170" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}User Name" />
-        <Control Id="userNameTextBox" Text="[APPPOOL_USER_NAME]" Type="Edit" X="130" Y="167"  Height="17" Width="200" Property="APPPOOL_USER_NAME"  />
+        <Control Id="winAuthCreation" CheckBoxValue="[CREATE_WINDOWS_AUTHORIZATION_SITE]" Type="CheckBox" X="50" Y="131"  Height="15" Width="110" Text="{\TahomaNormal}Windows Auth Host" Property="CREATE_WINDOWS_AUTHORIZATION_SITE"  >
+          <Condition Action="enable">CREATE_VERIFY_SITE="1"</Condition>
+          <Condition Action="disable"><![CDATA[CREATE_VERIFY_SITE<>"1"]]></Condition>
+        </Control>
+        <Control Id="winAuthDnsTextBox" Text="[WINDOWSAUTHORIZATION_DNS_ENTRY]" Type="Edit" X="160" Y="131"  Height="17" Width="200" Property="WINDOWSAUTHORIZATION_DNS_ENTRY"  >
+          <Condition Action="enable">CREATE_WINDOWS_AUTHORIZATION_SITE AND CREATE_VERIFY_SITE="1"</Condition>
+          <Condition Action="disable"><![CDATA[CREATE_WINDOWS_AUTHORIZATION_SITE<>"1" OR CREATE_VERIFY_SITE<>"1"]]></Condition>
+        </Control>
 
-        <Control Id="passwordLabel" Type="Text" X="35" Y="190" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Password" />
-        <Control Id="passwordTextBox" Password="yes" Text="[APPPOOL_USER_PASSWORD]" Type="Edit" X="130" Y="187"  Height="17" Width="200" Property="APPPOOL_USER_PASSWORD"  />
+        <Control Id="forceRedactionTypeTextBox" CheckBoxValue="[FORCE_REDACTION_TYPE_TO_BE_SET]" Type="CheckBox" X="50" Y="147"  Height="15" Width="110" Text="{\TahomaNormal}Force Redaction Type" Property="FORCE_REDACTION_TYPE_TO_BE_SET"  >
+          <Condition Action="enable">CREATE_VERIFY_SITE="1"</Condition>
+          <Condition Action="disable"><![CDATA[CREATE_VERIFY_SITE<>"1"]]></Condition>
+        </Control>
 
-        <Control Id="domainLabel" Type="Text" X="35" Y="210" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Domain" />
-        <Control Id="domainTextBox" Text="[APPPOOL_USER_DOMAIN]" Type="Edit" X="130" Y="207"  Height="17" Width="200" Property="APPPOOL_USER_DOMAIN"  />
+        <Control Id="userNameLabel" Type="Text" X="35" Y="174" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}User Name" />
+        <Control Id="userNameTextBox" Text="[APPPOOL_USER_NAME]" Type="Edit" X="130" Y="171"  Height="17" Width="230" Property="APPPOOL_USER_NAME"  />
 
-        <Control Id="databaseServerLabel" Type="Text" X="35" Y="230" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Database Server" />
-        <Control Id="databaseServerTextBox" Text="[DATABASE_SERVER]" Type="Edit" X="130" Y="227"  Height="17" Width="200" Property="DATABASE_SERVER"  />
-        
-        <Control Id="databaseNameLabel" Type="Text" X="35" Y="250" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Database Name" />
-        <Control Id="databaseNameTextBox" Text="[DATABASE_NAME]" Type="Edit" X="130" Y="247"  Height="17" Width="200" Property="DATABASE_NAME"  />
+        <Control Id="passwordLabel" Type="Text" X="35" Y="194" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Password" />
+        <Control Id="passwordTextBox" Password="yes" Text="[APPPOOL_USER_PASSWORD]" Type="Edit" X="130" Y="191"  Height="17" Width="230" Property="APPPOOL_USER_PASSWORD"  />
 
-        <Control Id="databaseWorkflowLabel" Type="Text" X="35" Y="270" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Database Workflow" />
-        <Control Id="databaseWorkflowTextBox" Text="[DATABASE_WORKFLOW]" Type="Edit" X="130" Y="267"  Height="17" Width="200" Property="DATABASE_WORKFLOW"  />
+        <Control Id="domainLabel" Type="Text" X="35" Y="214" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Domain" />
+        <Control Id="domainTextBox" Text="[APPPOOL_USER_DOMAIN]" Type="Edit" X="130" Y="211"  Height="17" Width="230" Property="APPPOOL_USER_DOMAIN"  />
 
-        <Control Id="Validation" Text="Validate Entries" Type="PushButton" X="35" Y="290" Width="100" Height="17">
-          <Publish Event="DoAction" Value="UserNameAndPermissionValidaion">1</Publish>
+        <Control Id="databaseServerLabel" Type="Text" X="35" Y="234" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Database Server" />
+        <Control Id="databaseServerTextBox" Text="[DATABASE_SERVER]" Type="Edit" X="130" Y="231"  Height="17" Width="230" Property="DATABASE_SERVER"  />
+
+        <Control Id="databaseNameLabel" Type="Text" X="35" Y="254" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Database Name" />
+        <Control Id="databaseNameTextBox" Text="[DATABASE_NAME]" Type="Edit" X="130" Y="251"  Height="17" Width="230" Property="DATABASE_NAME"  />
+
+        <Control Id="databaseWorkflowLabel" Type="Text" X="35" Y="274" Height="17" Width="95" Transparent="yes" Text="{\TahomaNormal}Database Workflow" />
+        <Control Id="databaseWorkflowTextBox" Text="[DATABASE_WORKFLOW]" Type="Edit" X="130" Y="271"  Height="17" Width="230" Property="DATABASE_WORKFLOW"  />
+
+        <Control Id="Validation" Text="Validate Entries" Type="PushButton" X="33" Y="297" Width="100" Height="17">
+          <Publish Event="DoAction" Value="UserNameAndPermissionValidation">1</Publish>
         </Control>
 
 
@@ -94,6 +111,6 @@
     <CustomAction Id="ModifyWebConfig" BinaryKey="CustomActionBinary" DllEntry="ModifyWebConfig"  />
     <CustomAction Id="UpdateAppSettings" BinaryKey="CustomActionBinary" DllEntry="UpdateAppSettings"  />
     <CustomAction Id="UpdateAngularSettings" BinaryKey="CustomActionBinary" DllEntry="UpdateAngularSettings"  />
-    <CustomAction Id="UserNameAndPermissionValidaion" BinaryKey="CustomActionBinary" DllEntry="UserNameAndPermissionValidaion"  />
+    <CustomAction Id="UserNameAndPermissionValidation" BinaryKey="CustomActionBinary" DllEntry="UserNameAndPermissionValidation"  />
   </Fragment>
 </Wix>

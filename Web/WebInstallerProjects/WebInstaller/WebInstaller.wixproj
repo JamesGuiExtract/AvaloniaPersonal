@@ -13,7 +13,7 @@
     <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
-    <SuppressIces>ICE20;ICE60</SuppressIces>
+    <SuppressIces>ICE20;ICE60;ICE82</SuppressIces>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="images\bg.bmp" />
+    <Content Include="images\bg2.bmp" />
     <Content Include="images\cancelbtn.bmp" />
     <Content Include="images\header.bmp" />
     <Content Include="images\installbtn.bmp" />

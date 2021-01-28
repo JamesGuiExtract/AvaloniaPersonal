@@ -4,23 +4,7 @@
   xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
   xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension">
   <Fragment>
-    <Component Id="AppBackend" Guid="{3AC86481-CCA4-44FB-9406-87E1BE407E9D}" Directory="AppBackendAPI">
-      <Condition>CREATE_APP_BACKEND_SITE = 1</Condition>
-      <util:User Id="AppPoolUser" CreateUser="no" Name="[APPPOOL_USER_NAME]" Password="[APPPOOL_USER_PASSWORD]" Domain="[APPPOOL_USER_DOMAIN]"></util:User>
-      <CreateFolder></CreateFolder>
-      <iis:WebSite Id="AppBackend" Description="Extract App Backend" Directory="AppBackendAPI">
-        <iis:WebAddress Id="AllUnassigned" Header="[APPBACKEND_DNS_ENTRY]" Port="80"/>
-        <iis:WebApplication Id="AppBackendAPIWebApp" Name="ExtractAppBackend" WebAppPool="ExtractAppBackend"></iis:WebApplication>
-      </iis:WebSite>
-      <iis:WebAppPool 
-        Id="ExtractAppBackend" 
-        Name="ExtractAppBackend"
-        ManagedRuntimeVersion="v4.0" 
-        ManagedPipelineMode="Integrated"
-        Identity="other"
-        User="AppPoolUser"/>
-    </Component>
-
+    
     <Component Id="DocAPI" Guid="{7E4E23D7-362D-4321-824E-20E46BD42E75}" Directory="DocumentAPI">
       <Condition>CREATE_DOCUMENTAPI_SITE = 1</Condition>
       <CreateFolder></CreateFolder>
@@ -47,8 +31,25 @@
       <iis:WebAppPool Id="ExtractVerify" Name="ExtractVerify" ManagedRuntimeVersion="v4.0" ManagedPipelineMode="Integrated"/>
     </Component>
 
+    <Component Id="AppBackend" Guid="{3AC86481-CCA4-44FB-9406-87E1BE407E9D}" Directory="AppBackendAPI">
+      <Condition>CREATE_VERIFY_SITE = 1</Condition>
+      <util:User Id="AppPoolUser" CreateUser="no" Name="[APPPOOL_USER_NAME]" Password="[APPPOOL_USER_PASSWORD]" Domain="[APPPOOL_USER_DOMAIN]"></util:User>
+      <CreateFolder></CreateFolder>
+      <iis:WebSite Id="AppBackend" Description="Extract App Backend API" Directory="AppBackendAPI">
+        <iis:WebAddress Id="AllUnassigned" Header="[APPBACKEND_DNS_ENTRY]" Port="80"/>
+        <iis:WebApplication Id="AppBackendAPIWebApp" Name="ExtractAppBackend" WebAppPool="ExtractAppBackend"></iis:WebApplication>
+      </iis:WebSite>
+      <iis:WebAppPool
+        Id="ExtractAppBackend"
+        Name="ExtractAppBackend"
+        ManagedRuntimeVersion="v4.0"
+        ManagedPipelineMode="Integrated"
+        Identity="other"
+        User="AppPoolUser"/>
+    </Component>
+
     <Component Id="WindowsAuthorization" Guid="{71223115-46A4-4B6B-A283-629B9DA5A46C}" Directory="AuthorizationAPI">
-      <Condition>CREATE_WINDOWS_AUTHORIZATION_SITE = 1</Condition>
+      <Condition>CREATE_VERIFY_SITE = 1 AND CREATE_WINDOWS_AUTHORIZATION_SITE = 1</Condition>
       <CreateFolder></CreateFolder>
       <iis:WebSite Id="AuthorizationAPI" Description="Extract Authorization" Directory="AuthorizationAPI">
         <iis:WebAddress Id="AllUnassigned4" Header="[WINDOWSAUTHORIZATION_DNS_ENTRY]" Port="80"/>

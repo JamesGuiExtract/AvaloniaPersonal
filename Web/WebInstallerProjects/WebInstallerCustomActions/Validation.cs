@@ -45,25 +45,25 @@ WHERE
             {
                 var validationMessage = string.Empty;
 
-                if(!string.IsNullOrEmpty(session["APPBACKEND_DNS_ENTRY"]))
-                {
-                    var appBackendHost = GetHostEntry(session["APPBACKEND_DNS_ENTRY"]);
-                    validationMessage += $"\n{(appBackendHost != null ? ((char)0x221A).ToString() : "X")}  Extract AppBackend API Host Name Valid";
-                    validationMessage += $"\n{(appBackendHost != null && appBackendHost.AddressList.Contains(GetLocalIPAddress()) ? ((char)0x221A).ToString() : "X")}  Extract AppBackend API IP matches Domain";
-                }
-                if(!string.IsNullOrEmpty(session["DOCUMENTAPI_DNS_ENTRY"]))
+                if (session["CREATE_DOCUMENTAPI_SITE"] == "1")
                 {
                     var docAPIHost = GetHostEntry(session["DOCUMENTAPI_DNS_ENTRY"]);
                     validationMessage += $"\n{(docAPIHost != null ? ((char)0x221A).ToString() : "X")}  Extract Document API Host Name Valid";
                     validationMessage += $"\n{(docAPIHost != null && docAPIHost.AddressList.Contains(GetLocalIPAddress()) ? ((char)0x221A).ToString() : "X")}  Extract Document API IP matches Domain";                    
                 }
-                if(!string.IsNullOrEmpty(session["IDSVERIFY_DNS_ENTRY"]))
+                if (session["CREATE_VERIFY_SITE"] == "1")
                 {
                     var verifyHost = GetHostEntry(session["IDSVERIFY_DNS_ENTRY"]);
                     validationMessage += $"\n{(verifyHost != null ? ((char)0x221A).ToString() : "X")}  Extract Verify Host Name Valid";
                     validationMessage += $"\n{(verifyHost != null && verifyHost.AddressList.Contains(GetLocalIPAddress()) ? ((char)0x221A).ToString() : "X")}  Extract Verify API IP matches Domain";
                 }
-                if(!string.IsNullOrEmpty(session["WINDOWSAUTHORIZATION_DNS_ENTRY"]))
+                if (session["CREATE_VERIFY_SITE"] == "1")
+                {
+                    var appBackendHost = GetHostEntry(session["APPBACKEND_DNS_ENTRY"]);
+                    validationMessage += $"\n{(appBackendHost != null ? ((char)0x221A).ToString() : "X")}  Extract AppBackend API Host Name Valid";
+                    validationMessage += $"\n{(appBackendHost != null && appBackendHost.AddressList.Contains(GetLocalIPAddress()) ? ((char)0x221A).ToString() : "X")}  Extract AppBackend API IP matches Domain";
+                }
+                if (session["CREATE_VERIFY_SITE"] == "1" && session["CREATE_WINDOWS_AUTHORIZATION_SITE"] == "1")
                 {
                     var winAuthHost = GetHostEntry(session["WINDOWSAUTHORIZATION_DNS_ENTRY"]);
                     validationMessage += $"\n{(winAuthHost != null ? ((char)0x221A).ToString() : "X")}  Extract Authorization API Host Name Valid";
@@ -96,7 +96,7 @@ WHERE
         }
 
         [CustomAction]
-        public static ActionResult UserNameAndPermissionValidaion(Session session)
+        public static ActionResult UserNameAndPermissionValidation(Session session)
         {
             IntPtr accessToken = IntPtr.Zero;
             bool usernameAndPasswordValid;
