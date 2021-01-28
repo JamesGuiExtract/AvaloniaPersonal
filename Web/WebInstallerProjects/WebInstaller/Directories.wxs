@@ -5,7 +5,7 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="IISMain" Name="inetpub">
           <Directory Id="INSTALLLOCATION" Name="Extract Systems">
-            <Directory Id="IDSVerify" Name="IDSVerify"></Directory>
+            <Directory Id="IDSVerify" Name="IDSVerify" ComponentGuidGenerationSeed="BCFC45BC-7DE5-4FD2-8BE0-6D9FFC9FAC8A"></Directory>
             <Directory Id="AppBackendAPI" Name="AppBackendAPI"></Directory>
             <Directory Id="DocumentAPI" Name="DocumentAPI"></Directory>
             <Directory Id="AuthorizationAPI" Name="AuthorizationAPI">

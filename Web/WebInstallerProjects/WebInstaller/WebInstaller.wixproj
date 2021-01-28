@@ -22,7 +22,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components.wxs" />
-    <Compile Include="ComponentsGenerated.wxs" />
     <Compile Include="Dialogs\ProgressDialog.wxs" />
     <Compile Include="Dialogs\SetupDialog.wxs" />
     <Compile Include="Dialogs\UserInputDialog.wxs" />
@@ -77,8 +76,9 @@
     <DefineConstants>BasePath=$(WebInstallPath)</DefineConstants>
   </PropertyGroup>
   <Target Name="BeforeBuild">
+    <Message Text="Harvesting: '$(WebInstallPath)'" Importance="high"/>
     <ItemGroup>
-      <HarvestDirectory Include="$(BasePath)">
+      <HarvestDirectory Include="$(WebInstallPath)">
         <DirectoryRefId>IDSVerify</DirectoryRefId>
         <SuppressRootDirectory>true</SuppressRootDirectory>
         <SuppressCom>true</SuppressCom>
