@@ -18,7 +18,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>..\..\..\Binaries\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <SuppressIces>ICE20;ICE60</SuppressIces>
+    <SuppressIces>ICE20;ICE60;ICE82</SuppressIces>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components.wxs" />
@@ -77,7 +77,7 @@
     <DefineConstants>BasePath=$(WebInstallPath)</DefineConstants>
   </PropertyGroup>
   <Target Name="BeforeBuild">
-    <Message Text="Harvesting: '$(WebInstallPath)'" Importance="high"/>
+    <Message Text="Harvesting: '$(WebInstallPath)'" Importance="high" />
     <ItemGroup>
       <HarvestDirectory Include="$(WebInstallPath)">
         <DirectoryRefId>IDSVerify</DirectoryRefId>
