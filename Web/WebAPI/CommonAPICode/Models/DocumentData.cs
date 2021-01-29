@@ -407,11 +407,17 @@ namespace WebAPI.Models
                 ExtractException.Assert("ELI49571", "Workflow verify/update action not configured",
                     !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
 
+                // ------------------------------------------------------------
                 // Per GGK request, if a document is already open, return the already open ID
                 // without error
                 // https://extract.atlassian.net/browse/WEB-55
+                // ------------------------------------------------------------
                 // Modified to only return open document if there is no file ID specified so that you can open a specific file with, e.g., http://localhost:4205/?docid=11
-                if (FileApi.DocumentSession.IsOpen && (id < 0 || id == FileApi.DocumentSession.FileId))
+                // ------------------------------------------------------------
+                // Modified to not return the open document if -1 is the file ID
+                // https://extract.atlassian.net/browse/ISSUE-17412
+                // ------------------------------------------------------------
+                if (FileApi.DocumentSession.IsOpen && id == FileApi.DocumentSession.FileId)
                 {
                     return new DocumentIdResult()
                     {
