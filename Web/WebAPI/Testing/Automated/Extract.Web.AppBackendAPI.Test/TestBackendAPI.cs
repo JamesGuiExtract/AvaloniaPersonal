@@ -719,7 +719,7 @@ namespace Extract.Web.WebAPI.Test
                 // Per GGK request, allow second call to OpenDocument to not fail and return the ID of the already
                 // open document.
                 // https://extract.atlassian.net/browse/WEB-55
-                result = controller.OpenDocument();
+                result = controller.OpenDocument(2);
                 openDocumentResult = result.AssertGoodResult<DocumentIdResult>();
                 Assert.AreEqual(2, openDocumentResult.Id);
 
