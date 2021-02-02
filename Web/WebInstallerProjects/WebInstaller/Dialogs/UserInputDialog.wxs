@@ -83,7 +83,7 @@
         <Control Id="databaseWorkflowTextBox" Text="[DATABASE_WORKFLOW]" Type="Edit" X="130" Y="271"  Height="17" Width="230" Property="DATABASE_WORKFLOW"  />
 
         <Control Id="Validation" Text="Validate Entries" Type="PushButton" X="33" Y="297" Width="100" Height="17">
-          <Publish Event="DoAction" Value="UserNameAndPermissionValidation">1</Publish>
+          <Publish Event="DoAction" Value="ValidateSiteConfiguration">1</Publish>
         </Control>
 
 
@@ -111,6 +111,6 @@
     <CustomAction Id="ModifyWebConfig" BinaryKey="CustomActionBinary" DllEntry="ModifyWebConfig"  />
     <CustomAction Id="UpdateAppSettings" BinaryKey="CustomActionBinary" DllEntry="UpdateAppSettings"  />
     <CustomAction Id="UpdateAngularSettings" BinaryKey="CustomActionBinary" DllEntry="UpdateAngularSettings"  />
-    <CustomAction Id="UserNameAndPermissionValidation" BinaryKey="CustomActionBinary" DllEntry="UserNameAndPermissionValidation"  />
+    <CustomAction Id="ValidateSiteConfiguration" BinaryKey="CustomActionBinary" DllEntry="ValidateSiteConfiguration"  />
   </Fragment>
 </Wix>

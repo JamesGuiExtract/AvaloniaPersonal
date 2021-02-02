@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Xml.Linq;
 using Extract;
@@ -11,10 +13,8 @@ namespace WebInstallerCustomActions
         [CustomAction]
         public static ActionResult UpdateAppSettings(Session session)
         {
-            if (session == null)
-            {
-                throw new NullReferenceException("Session cannot be null");
-            }
+            ExtractException.Assert("ELI51533", "Session cannot be null", session != null);
+
             try
             {
                 string appBackendJson = File.ReadAllText(@"C:\Program Files (x86)\Extract Systems\APIs\AppBackendAPI\appsettings.json");
@@ -45,10 +45,8 @@ namespace WebInstallerCustomActions
         [CustomAction]
         public static ActionResult ModifyWebConfig(Session session)
         {
-            if (session == null)
-            {
-                throw new NullReferenceException("Session cannot be null");
-            }
+            ExtractException.Assert("ELI51531", "Session cannot be null", session != null);
+            
             try
             {
                 var appBackendconfig = File.ReadAllText(@"C:\Program Files (x86)\Extract Systems\APIs\AppBackendAPI\web.config");
@@ -77,10 +75,8 @@ namespace WebInstallerCustomActions
         [CustomAction]
         public static ActionResult UpdateAngularSettings(Session session)
         {
-            if (session == null)
-            {
-                throw new NullReferenceException("Session cannot be null");
-            }
+            ExtractException.Assert("ELI51532", "Session cannot be null", session != null);
+
             try
             {
                 string angularJson = File.ReadAllText(@$"{session["INSTALLLOCATION"].ToString()}IDSVerify\json\settings.json");
@@ -102,6 +98,7 @@ namespace WebInstallerCustomActions
             }
         }
 
+        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
         private static void AddCorsToAuthorizationAPI(Session session)
         {
             XDocument doc = XDocument.Load(@"C:\Program Files (x86)\Extract Systems\APIs\AuthorizationAPI\web.config");
@@ -111,7 +108,7 @@ namespace WebInstallerCustomActions
                     new XAttribute("enabled", "true"),
                     new XAttribute("failUnlistedOrigins", "true"),
                     new XElement("add",
-                        new XAttribute("origin", "http://" + session["IDSVERIFY_DNS_ENTRY"].ToLower()),
+                        new XAttribute("origin", "http://" + session["IDSVERIFY_DNS_ENTRY"].ToLowerInvariant()),
                         new XAttribute("allowCredentials", "true"),
                         new XAttribute("maxAge", "120"),
                         new XElement("allowHeaders",
