@@ -307,16 +307,19 @@ namespace Extract.DataEntry.LabDE.Test
                 {
                     // Confirm file ID 3 is pending for now.
                     var doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                    Assert.AreEqual(EActionStatus.kActionPending, doc3Status);
-                    Assert.IsFalse(DoesFileHaveTag(_famDB, 3, IGNORE_TAG));
+                    Assert.AreEqual(EActionStatus.kActionPending, doc3Status, message: "Precondition not met: FileID 3 expected to be pending in the verify action");
+                    Assert.IsFalse(DoesFileHaveTag(_famDB, 3, IGNORE_TAG), message: "Precondition not met: FileID 3 should not have an ignore tag");
 
                     // Confirm file IDs 1, 2, 3 are unattempted in the cleanup action.
                     var doc1CleanupStatus = _famDB.GetFileStatus(1, CLEANUP_ACTION, false);
-                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc1CleanupStatus);
+                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc1CleanupStatus,
+                        message: "Precondition not met: FileID 1 expected to be unattempted in the cleanup action");
                     var doc2CleanupStatus = _famDB.GetFileStatus(2, CLEANUP_ACTION, false);
-                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus);
+                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus,
+                        message: "Precondition not met: FileID 2 expected to be unattempted in the cleanup action");
                     var doc3CleanupStatus = _famDB.GetFileStatus(3, CLEANUP_ACTION, false);
-                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus);
+                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus,
+                        message: "Precondition not met: FileID 3 expected to be unattempted in the cleanup action");
 
                     // Configure typical settings
                     var testFFIColumn = testButton.ActionColumn;
@@ -327,32 +330,36 @@ namespace Extract.DataEntry.LabDE.Test
                     testButton.CleanupAction = CLEANUP_ACTION;
 
                     // Populate info matching ID 3
-                    Assert.IsFalse(testButton.Flash);
+                    Assert.IsFalse(testButton.Flash, message: "Precondition not met: Button is expected to be not flashing");
                     testButton.FirstName = "Bert";
                     testButton.LastName = "Doe";
                     testButton.DOB = "08/08/2000";
                     testButton.CollectionDate = "08/08/2008";
-                    Assert.IsTrue(testButton.Flash);
+                    Assert.IsTrue(testButton.Flash, message: "Postcondition not met: Button is expected to be flashing");
 
                     // [SkipOption]: Skip the file (no other metadata or action changes should occur)
                     using (var ffiFormSkip = testButton.GetTestFAMFileInspector())
                     {
-                        Assert.IsTrue(ffiFormSkip.DisplayedFileIds.SequenceEqual(new[] { 2, 3 }));
+                        CollectionAssert.AreEqual(new[] { 2, 3 }, ffiFormSkip.DisplayedFileIds, message: "Precondition not met for SkipOption");
 
                         // GetValue should have triggered file 3 to be pulled into processing status
                         doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionProcessing, doc3Status);
+                        Assert.AreEqual(EActionStatus.kActionProcessing, doc3Status,
+                            message: "SkipOption: FileID 3 is expected to be processing in the verify action");
 
                         testFFIColumn.SetValue(3, testFFIColumn.SkipOption.Action);
                         testFFIColumn.Apply();
 
                         doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionSkipped, doc3Status);
+                        Assert.AreEqual(EActionStatus.kActionSkipped, doc3Status,
+                            message: "SkipOption: FileID 3 is expected to be skipped in verify action");
 
                         doc2CleanupStatus = _famDB.GetFileStatus(2, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus,
+                            message: "SkipOption: FileID 2 is expected to be unattempted in cleanup action");
                         doc3CleanupStatus = _famDB.GetFileStatus(3, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus,
+                            message: "SkipOption: FileID 3 is expected to be unattempted in cleanup action");
                     }
 
                     // Okay to leave completed for VERIFY_ACTION to ensure it gets pulled back into processing.
@@ -360,24 +367,29 @@ namespace Extract.DataEntry.LabDE.Test
                     // [IgnoreOption]: Complete files, apply IGNORE_TAG
                     using (var ffiFormIgnore = testButton.GetTestFAMFileInspector())
                     {
-                        Assert.IsTrue(ffiFormIgnore.DisplayedFileIds.SequenceEqual(new[] { 2, 3 }));
+                        CollectionAssert.AreEqual(new[] { 2, 3 }, ffiFormIgnore.DisplayedFileIds, message: "Precondition not met for IgnoreOption");
 
                         // GetValue should have triggered file 3 to be pulled into processing status
                         doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionProcessing, doc3Status);
+                        Assert.AreEqual(EActionStatus.kActionProcessing, doc3Status,
+                            message: "IgnoreOption: FileID 3 is expected to be processing in the verify action");
 
                         // [IgnoreOption]: Complete file, apply IGNORE_TAG
                         testFFIColumn.SetValue(3, testFFIColumn.IgnoreOption.Action);
                         testFFIColumn.Apply();
 
                         doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionCompleted, doc3Status);
-                        Assert.IsTrue(DoesFileHaveTag(_famDB, 3, IGNORE_TAG));
+                        Assert.AreEqual(EActionStatus.kActionCompleted, doc3Status,
+                            message: "IgnoreOption: FileID 3 is expected to be completed in the verify action");
+                        Assert.IsTrue(DoesFileHaveTag(_famDB, 3, IGNORE_TAG),
+                            message: "IgnoreOption: FileID 3 is expected to have the ignore tag set");
 
                         doc2CleanupStatus = _famDB.GetFileStatus(2, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus,
+                            message: "IgnoreOption: FileID 2 is expected to be unattempted in cleanup action");
                         doc3CleanupStatus = _famDB.GetFileStatus(3, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionPending, doc3CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionPending, doc3CleanupStatus,
+                            message: "IgnoreOption: FileID 3 is expected to be pending in cleanup action");
                     }
 
                     // Reset cleanup for next test. Okay to leave file 3 completed for VERIFY_ACTION to ensure it gets
@@ -395,7 +407,7 @@ namespace Extract.DataEntry.LabDE.Test
                     // should be applied.
                     using (var ffiFormStaple = testButton.GetTestFAMFileInspector())
                     {
-                        Assert.IsTrue(ffiFormStaple.DisplayedFileIds.SequenceEqual(new[] { 1, 2, 3 }));
+                        CollectionAssert.AreEqual(new[] { 1, 2, 3 }, ffiFormStaple.DisplayedFileIds, message: "Precondition not met for StapleOption");
 
                         testFFIColumn.SetValue(1, testFFIColumn.StapleOption.Action);
                         testFFIColumn.SetValue(3, testFFIColumn.StapleOption.Action);
@@ -404,26 +416,34 @@ namespace Extract.DataEntry.LabDE.Test
                         int totalPages =
                             _famDB.GetFileRecord(updatedFilePaths[FILE_1_FILENAME], VERIFY_ACTION).Pages
                             + _famDB.GetFileRecord(updatedFilePaths[FILE_3_FILENAME], VERIFY_ACTION).Pages;
-                        Assert.AreEqual(totalPages, NuanceImageMethods.GetPageCount(stapledOutputTempFile.FileName));
+                        Assert.AreEqual(totalPages, NuanceImageMethods.GetPageCount(stapledOutputTempFile.FileName),
+                            message: "Stapled output has the wrong number of pages");
 
                         var doc1Status = _famDB.GetFileStatus(1, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionCompleted, doc1Status);
-                        Assert.IsTrue(DoesFileHaveTag(_famDB, 1, STAPLED_TAG));
+                        Assert.AreEqual(EActionStatus.kActionCompleted, doc1Status,
+                            message: "StapleOption: DocID 1 is expected to be completed in the verify action");
+                        Assert.IsTrue(DoesFileHaveTag(_famDB, 1, STAPLED_TAG), message: "StapleOption: DocID 1 is expected to have the stapled tag");
                         Assert.AreEqual(stapledOutputTempFile.FileName,
-                            _famDB.GetMetadataFieldValue(1, STAPLED_INTO_METADATA_FIELD));
+                            _famDB.GetMetadataFieldValue(1, STAPLED_INTO_METADATA_FIELD),
+                            message: "StapleOption: Stapled-into metadata field is expected to be set for DocID 1");
 
                         doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionCompleted, doc3Status);
-                        Assert.IsTrue(DoesFileHaveTag(_famDB, 3, STAPLED_TAG));
+                        Assert.AreEqual(EActionStatus.kActionCompleted, doc3Status,
+                            message: "StapleOption: DocID 3 is expected to be completed in the verify action");
+                        Assert.IsTrue(DoesFileHaveTag(_famDB, 3, STAPLED_TAG), message: "StapleOption: DocID 3 is expected to have the stapled tag");
                         Assert.AreEqual(stapledOutputTempFile.FileName,
-                            _famDB.GetMetadataFieldValue(3, STAPLED_INTO_METADATA_FIELD));
+                            _famDB.GetMetadataFieldValue(3, STAPLED_INTO_METADATA_FIELD),
+                            message: "StapleOption: Stapled-into metadata field is expected to be set for DocID 3");
 
                         doc1CleanupStatus = _famDB.GetFileStatus(1, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionPending, doc1CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionPending, doc1CleanupStatus,
+                            message: "StapleOption: DocID 1 is expected to be pending in the cleanup action");
                         doc2CleanupStatus = _famDB.GetFileStatus(2, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus,
+                            message: "StapleOption: DocID 2 is expected to be unattempted in the cleanup action");
                         doc2CleanupStatus = _famDB.GetFileStatus(3, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionPending, doc3CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionPending, doc3CleanupStatus,
+                            message: "StapleOption: DocID 3 is expected to be pending in the cleanup action");
                     }
                 }
             }
@@ -468,16 +488,19 @@ namespace Extract.DataEntry.LabDE.Test
                 {
                     // Confirm file ID 3 is pending for now.
                     var doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                    Assert.AreEqual(EActionStatus.kActionPending, doc3Status);
-                    Assert.IsFalse(DoesFileHaveTag(_famDB, 3, IGNORE_TAG));
+                    Assert.AreEqual(EActionStatus.kActionPending, doc3Status, message: "Precondition not met: FileID 3 expected to be pending in the verify action");
+                    Assert.IsFalse(DoesFileHaveTag(_famDB, 3, IGNORE_TAG), message: "Precondition not met: FileID 3 should not have an ignore tag");
 
                     // Confirm file IDs 1, 2, 3 are unattempted in the cleanup action.
                     var doc1CleanupStatus = _famDB.GetFileStatus(1, CLEANUP_ACTION, false);
-                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc1CleanupStatus);
+                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc1CleanupStatus,
+                        message: "Precondition not met: FileID 1 expected to be unattempted in the cleanup action");
                     var doc2CleanupStatus = _famDB.GetFileStatus(2, CLEANUP_ACTION, false);
-                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus);
+                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus,
+                        message: "Precondition not met: FileID 2 expected to be unattempted in the cleanup action");
                     var doc3CleanupStatus = _famDB.GetFileStatus(3, CLEANUP_ACTION, false);
-                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus);
+                    Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus,
+                        message: "Precondition not met: FileID 3 expected to be unattempted in the cleanup action");
 
                     // Omit typical settings (aside from StapledDocumentOutput)
                     var testFFIColumn = testButton.ActionColumn;
@@ -488,55 +511,64 @@ namespace Extract.DataEntry.LabDE.Test
                     testButton.CleanupAction = null;
 
                     // Populate info matching ID 3
-                    Assert.IsFalse(testButton.Flash);
+                    Assert.IsFalse(testButton.Flash, message: "Precondition not met: Button is expected to be not flashing");
                     testButton.FirstName = "Bert";
                     testButton.LastName = "Doe";
                     testButton.DOB = "08/08/2000";
                     testButton.CollectionDate = "08/08/2008";
-                    Assert.IsTrue(testButton.Flash);
+                    Assert.IsTrue(testButton.Flash, message: "Postcondition not met: Button is expected to be flashing");
 
                     // [SkipOption]: Skip the file. (no other metadata or action changes should occur)
                     using (var ffiFormSkip = testButton.GetTestFAMFileInspector())
                     {
-                        Assert.IsTrue(ffiFormSkip.DisplayedFileIds.SequenceEqual(new[] { 2, 3 }));
+                        CollectionAssert.AreEqual(new[] { 2, 3 }, ffiFormSkip.DisplayedFileIds, message: "Precondition not met for SkipOption");
 
                         // GetValue should have triggered file 3 to be pulled into processing status
                         doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionProcessing, doc3Status);
+                        Assert.AreEqual(EActionStatus.kActionProcessing, doc3Status,
+                            message: "SkipOption: FileID 3 is expected to be processing in the verify action");
 
                         testFFIColumn.SetValue(3, testFFIColumn.SkipOption.Action);
                         testFFIColumn.Apply();
 
                         doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionSkipped, doc3Status);
+                        Assert.AreEqual(EActionStatus.kActionSkipped, doc3Status,
+                            message: "SkipOption: FileID 3 is expected to be skipped in verify action");
 
                         doc2CleanupStatus = _famDB.GetFileStatus(2, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus,
+                            message: "SkipOption: FileID 2 is expected to be unattempted in cleanup action");
                         doc3CleanupStatus = _famDB.GetFileStatus(3, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus,
+                            message: "SkipOption: FileID 3 is expected to be unattempted in cleanup action");
                     }
 
                     // [IgnoreOption]: Complete the file; TagForIgnore has not been specified and should not be applied.
                     using (var ffiFormIgnore = testButton.GetTestFAMFileInspector())
                     {
-                        Assert.IsTrue(ffiFormIgnore.DisplayedFileIds.SequenceEqual(new[] { 2, 3 }));
+                        CollectionAssert.AreEqual(new[] { 2, 3 }, ffiFormIgnore.DisplayedFileIds, message: "Precondition not met for IgnoreOption");
 
                         // GetValue should have triggered file 3 to be pulled into processing status
                         doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionProcessing, doc3Status);
+                        Assert.AreEqual(EActionStatus.kActionProcessing, doc3Status,
+                            message: "IgnoreOption: FileID 3 is expected to be processing in the verify action");
 
                         // [IgnoreOption]: Complete file, apply IGNORE_TAG
                         testFFIColumn.SetValue(3, testFFIColumn.IgnoreOption.Action);
                         testFFIColumn.Apply();
 
                         doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionCompleted, doc3Status);
-                        Assert.IsFalse(DoesFileHaveTag(_famDB, 3, IGNORE_TAG));
+                        Assert.AreEqual(EActionStatus.kActionCompleted, doc3Status,
+                            message: "IgnoreOption: FileID 3 is expected to be completed in the verify action");
+                        Assert.IsFalse(DoesFileHaveTag(_famDB, 3, IGNORE_TAG),
+                            message: "IgnoreOption: FileID 3 is not expected to have the ignore tag set");
 
                         doc2CleanupStatus = _famDB.GetFileStatus(2, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus,
+                            message: "IgnoreOption: FileID 2 is expected to be unattempted in cleanup action");
                         doc3CleanupStatus = _famDB.GetFileStatus(3, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus,
+                            message: "IgnoreOption: FileID 3 is expected to be unattempted in cleanup action");
                     }
 
                     // Update metadata for file 1 to trigger it to show as a duplicate of file 2 as well.
@@ -550,7 +582,7 @@ namespace Extract.DataEntry.LabDE.Test
                     // are not specified and should not be applied.
                     using (var ffiFormStaple = testButton.GetTestFAMFileInspector())
                     {
-                        Assert.IsTrue(ffiFormStaple.DisplayedFileIds.SequenceEqual(new[] { 1, 2, 3 }));
+                        CollectionAssert.AreEqual(new[] { 1, 2, 3 }, ffiFormStaple.DisplayedFileIds, message: "Precondition not met for StapleOption");
 
                         testFFIColumn.SetValue(1, testFFIColumn.StapleOption.Action);
                         testFFIColumn.SetValue(3, testFFIColumn.StapleOption.Action);
@@ -559,24 +591,32 @@ namespace Extract.DataEntry.LabDE.Test
                         int totalPages =
                             _famDB.GetFileRecord(updatedFilePaths[FILE_1_FILENAME], VERIFY_ACTION).Pages
                             + _famDB.GetFileRecord(updatedFilePaths[FILE_3_FILENAME], VERIFY_ACTION).Pages;
-                        Assert.AreEqual(totalPages, NuanceImageMethods.GetPageCount(stapledOutputTempFile.FileName));
+                        Assert.AreEqual(totalPages, NuanceImageMethods.GetPageCount(stapledOutputTempFile.FileName),
+                            message: "Stapled output has the wrong number of pages");
 
                         var doc1Status = _famDB.GetFileStatus(1, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionCompleted, doc1Status);
-                        Assert.IsFalse(DoesFileHaveTag(_famDB, 1, STAPLED_TAG));
-                        Assert.IsTrue(string.IsNullOrEmpty(_famDB.GetMetadataFieldValue(1, STAPLED_INTO_METADATA_FIELD)));
+                        Assert.AreEqual(EActionStatus.kActionCompleted, doc1Status,
+                            message: "StapleOption: DocID 1 is expected to be completed in the verify action");
+                        Assert.IsFalse(DoesFileHaveTag(_famDB, 1, STAPLED_TAG), message: "StapleOption: DocID 1 is not expected to have the stapled tag");
+                        Assert.IsTrue(string.IsNullOrEmpty(_famDB.GetMetadataFieldValue(1, STAPLED_INTO_METADATA_FIELD)),
+                            message: "StapleOption: Stapled-into metadata field is not expected to be set for DocID 1");
 
                         doc3Status = _famDB.GetFileStatus(3, VERIFY_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionCompleted, doc3Status);
-                        Assert.IsFalse(DoesFileHaveTag(_famDB, 3, STAPLED_TAG));
-                        Assert.IsTrue(string.IsNullOrEmpty(_famDB.GetMetadataFieldValue(3, STAPLED_INTO_METADATA_FIELD)));
+                        Assert.AreEqual(EActionStatus.kActionCompleted, doc3Status,
+                            message: "StapleOption: DocID 3 is expected to be completed in the verify action");
+                        Assert.IsFalse(DoesFileHaveTag(_famDB, 3, STAPLED_TAG), message: "StapleOption: DocID 3 is not expected to have the stapled tag");
+                        Assert.IsTrue(string.IsNullOrEmpty(_famDB.GetMetadataFieldValue(3, STAPLED_INTO_METADATA_FIELD)),
+                            message: "StapleOption: Stapled-into metadata field is not expected to be set for DocID 3");
 
                         doc1CleanupStatus = _famDB.GetFileStatus(1, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc1CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc1CleanupStatus,
+                            message: "StapleOption: DocID 1 is expected to be unattempted in the cleanup action");
                         doc2CleanupStatus = _famDB.GetFileStatus(2, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc2CleanupStatus,
+                            message: "StapleOption: DocID 2 is expected to be unattempted in the cleanup action");
                         doc2CleanupStatus = _famDB.GetFileStatus(3, CLEANUP_ACTION, false);
-                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus);
+                        Assert.AreEqual(EActionStatus.kActionUnattempted, doc3CleanupStatus,
+                            message: "StapleOption: DocID 3 is expected to be unattempted in the cleanup action");
                     }
                 }
             }

@@ -385,6 +385,10 @@ module Automated =
             | ForceKillSuccess(name, pid::_, []) when name = service.Name && Some (uint32 pid) = serviceModel.PID -> true
             | _ -> false @>
 
+    // Wait half a second to make sure the service status has been updated
+    // https://extract.atlassian.net/browse/ISSUE-17417
+    System.Threading.Thread.Sleep 500
+
     test <@ (FAMService.getFamService service.Name).["State"] = box "Stopped" @>
 
 
@@ -407,6 +411,10 @@ module Automated =
     test <@ match result with
             | ForceKillSuccess(name, [pid], []) when name = service.Name && Some (uint32 pid) = serviceModel.PID -> true
             | _ -> false @>
+
+    // Wait half a second to make sure the service status has been updated
+    // https://extract.atlassian.net/browse/ISSUE-17417
+    System.Threading.Thread.Sleep 500
 
     test <@ (FAMService.getFamService service.Name).["State"] = box "Stopped" @>
 

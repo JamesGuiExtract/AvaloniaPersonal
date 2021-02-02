@@ -49,7 +49,7 @@ namespace Extract.Utilities.Parsers.Test
         public static void SpecifiedLongEnoughTimeout()
         {
             var regexParser = new DotNetRegexParser();
-            regexParser.Pattern = @"(??timeout=00:00:20)^(([0-9a-fA-F]{1,4}:)*([0-9a-fA-F]{1,4}))*(::)$";
+            regexParser.Pattern = @"(??timeout=00:00:40)^(([0-9a-fA-F]{1,4}:)*([0-9a-fA-F]{1,4}))*(::)$";
 
             Assert.DoesNotThrow(() => regexParser.Regex.Match(_INPUT));
         }

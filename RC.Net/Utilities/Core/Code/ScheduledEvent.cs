@@ -1,9 +1,8 @@
-﻿using Extract.Interfaces;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Timers;
@@ -14,6 +13,7 @@ namespace Extract.Utilities
     /// Describes a scheduled event that may recur.
     /// </summary>
     [DataContract]  
+    [Obfuscation(ApplyToMembers=false)]
     public class ScheduledEvent : IDisposable
     {
         #region Constants
