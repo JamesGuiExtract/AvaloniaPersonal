@@ -41,8 +41,7 @@ namespace Extract.AttributeFinder.Rules
     }
 
     /// <summary>
-    /// An <see cref="IAttributeFindingRule"/> that adds the <see cref="T:AFDocument.Attribute"/>
-    /// (and children) as a literal output attribute.
+    /// An <see cref="IAttributeFindingRule"/> that finds bar codes
     /// </summary>
     [ComVisible(true)]
     [Guid("CF66A9BD-2371-4E62-968D-AE8463329D4F")]

@@ -4842,8 +4842,8 @@ void CSpatialString::loadFromGoogleJson(const string& strInputFile, long nPageNu
 	long height = heightIt->value.GetInt();
 	bool hasNormalizedVertices = false;
 	bool hasVertices = false;
-	double widthConvertedFromPoints = width * 300 / 72;
-	double heightConvertedFromPoints = height * 300 / 72;
+	double widthConvertedFromPoints = (double)width * 300 / 72;
+	double heightConvertedFromPoints = (double)height * 300 / 72;
 
 	vector<CPPLetter> letters;
 	vector<double> thetas;

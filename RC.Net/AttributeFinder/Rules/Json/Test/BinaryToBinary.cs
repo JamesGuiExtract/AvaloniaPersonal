@@ -209,7 +209,6 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         [TestCase("Resources.RuleObjects.MergeAttributeTrees.hex.txt", TestName = "MergeAttributeTrees")]
         [TestCase("Resources.RuleObjects.MERSHandler.hex.txt", TestName = "MERSHandler")]
         [TestCase("Resources.RuleObjects.MicrFinderV1.hex.txt", TestName = "MicrFinderV1")]
-        [TestCase("Resources.RuleObjects.MicrFinderV2.hex.txt", TestName = "MicrFinderV2")]
         [TestCase("Resources.RuleObjects.ModifyAttributeValueOH.hex.txt", TestName = "ModifyAttributeValueOH")]
         [TestCase("Resources.RuleObjects.ModifySpatialMode.hex.txt", TestName = "ModifySpatialMode")]
         [TestCase("Resources.RuleObjects.MoveAndModifyAttributes.hex.txt", TestName = "MoveAndModifyAttributes")]

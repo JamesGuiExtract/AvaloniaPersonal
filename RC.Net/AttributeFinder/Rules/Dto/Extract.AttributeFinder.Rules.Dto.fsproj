@@ -16,10 +16,12 @@
     <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
     <WarningsAsErrors>3239;$(WarningsAsErrors)</WarningsAsErrors>
+    <RunPostBuildEvent>1</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="IUseDto.fs" />
     <Compile Include="ObjectWithDescription.fs" />
     <Compile Include="AdvancedReplaceString.fs" />
     <Compile Include="AttributeRule.fs" />
@@ -130,4 +132,7 @@
     <PackageReference Update="FSharp.Core" Version="4.6.2" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="regasm &quot;$(TargetPath)&quot; /tlb /codebase" />
+  </Target>
 </Project>

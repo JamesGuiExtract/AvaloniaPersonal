@@ -42,7 +42,7 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         /// <summary>
         /// Load example JSON RSD files, convert to DTO, save as JSON, and reload to DTO. Compare the DTO object from the original JSON with the DTO object from the saved JSON.
         /// </summary>
-        [Test, Category("RulesJsonSerialization")]
+        [Category("RulesJsonSerialization")]
         [TestCase("Resources.RuleSets.Indexing-AddressFinders-AddressFinder.json.rsd", TestName = "Indexing-AddressFinders-AddressFinder")]
         [TestCase("Resources.RuleSets.Indexing-DocumentDate-commonOH.json.rsd", TestName = "Indexing-DocumentDate-commonOH")]
         [TestCase("Resources.RuleSets.LabDE-PatientInfo-Name-LabSpecificRules.json.rsd", TestName = "LabDE-PatientInfo-Name-LabSpecificRules")]
@@ -194,7 +194,7 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         [TestCase("Resources.RuleObjects.MergeAttributeTrees.json", TestName = "MergeAttributeTrees")]
         [TestCase("Resources.RuleObjects.MERSHandler.json", TestName = "MERSHandler")]
         [TestCase("Resources.RuleObjects.MicrFinderV1.json", TestName = "MicrFinderV1")]
-        [TestCase("Resources.RuleObjects.MicrFinderV2.json", TestName = "MicrFinderV2")]
+        [TestCase("Resources.RuleObjects.MicrFinderV2.1.json", TestName = "MicrFinderV2")]
         [TestCase("Resources.RuleObjects.ModifyAttributeValueOH.json", TestName = "ModifyAttributeValueOH")]
         [TestCase("Resources.RuleObjects.ModifySpatialMode.json", TestName = "ModifySpatialMode")]
         [TestCase("Resources.RuleObjects.MoveAndModifyAttributes.json", TestName = "MoveAndModifyAttributes")]
@@ -273,7 +273,9 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         /// <summary>
         /// Load from legacy version and current version json into DTO and compare
         /// </summary>
-        [TestCase("Resources.RuleObjects.FSharpPreprocessor.json", "Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "FSharpPreprocessor")]
+        [Category("LegacyRulesJsonDeserialization")]
+        [TestCase("Resources.RuleObjects.FSharpPreprocessor.json", "Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "LegacyFSharpPreprocessor")]
+        [TestCase("Resources.RuleObjects.MicrFinderV2.json", "Resources.RuleObjects.MicrFinderV2.1.json", TestName = "LegacyMICRFinder")]
         public static void LegacyVersionRuleObjects(string legacyResourceName, string currentVersionResourceName)
         {
             var legacyJsonFile = _testFiles.GetFile(legacyResourceName);

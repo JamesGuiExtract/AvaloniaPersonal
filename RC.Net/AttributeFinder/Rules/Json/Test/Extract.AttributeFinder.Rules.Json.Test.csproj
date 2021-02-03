@@ -424,6 +424,7 @@
     <EmbeddedResource Include="Resources\RuleObjects\MERSHandler.hex.txt" />
     <EmbeddedResource Include="Resources\RuleObjects\MicrFinderV1.hex.txt" />
     <EmbeddedResource Include="Resources\RuleObjects\MicrFinderV2.hex.txt" />
+    <EmbeddedResource Include="Resources\RuleObjects\MicrFinderV2.1.hex.txt" />
     <EmbeddedResource Include="Resources\RuleObjects\ModifyAttributeValueOH.hex.txt" />
     <EmbeddedResource Include="Resources\RuleObjects\ModifySpatialMode.hex.txt" />
     <EmbeddedResource Include="Resources\RuleObjects\MoveAndModifyAttributes.hex.txt" />
@@ -613,6 +614,7 @@
     <EmbeddedResource Include="Resources\RuleObjects\MERSHandler.json" />
     <EmbeddedResource Include="Resources\RuleObjects\MicrFinderV1.json" />
     <EmbeddedResource Include="Resources\RuleObjects\MicrFinderV2.json" />
+    <EmbeddedResource Include="Resources\RuleObjects\MicrFinderV2.1.json" />
     <EmbeddedResource Include="Resources\RuleObjects\ModifyAttributeValueOH.json" />
     <EmbeddedResource Include="Resources\RuleObjects\ModifySpatialMode.json" />
     <EmbeddedResource Include="Resources\RuleObjects\MoveAndModifyAttributes.json" />

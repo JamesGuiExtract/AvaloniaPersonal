@@ -138,6 +138,10 @@
       <Project>{52C53912-5790-4F68-AB57-6CBC3EF45A14}</Project>
       <Name>Extract.AttributeFinder.Rules</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Rules\Dto\Extract.AttributeFinder.Rules.Dto.fsproj">
+      <Project>{a66faa6a-b785-4c7b-9590-c04f45007f7f}</Project>
+      <Name>Extract.AttributeFinder.Rules.Dto</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Tabula\Code\Extract.AttributeFinder.Tabula.csproj">
       <Project>{59bc0149-830c-4515-be56-32503fa73ad6}</Project>
       <Name>Extract.AttributeFinder.Tabula</Name>

@@ -1114,7 +1114,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NuanceUtils", "..\..\..\..\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESConvertUSSToTXT", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Utils\ESConvertUSSToTXT\Code\ESConvertUSSToTXT.vcxproj", "{2ABF7BC9-B805-4308-B9C6-00244C83C258}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.GoogleCloud", "..\..\..\..\..\RC.Net\GoogleCloud\Extract.GoogleCloud.csproj", "{4C79246F-BA4E-4DF4-8495-56133F965743}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.GoogleCloud", "..\..\..\..\..\RC.Net\GoogleCloud\Core\Code\Extract.GoogleCloud.csproj", "{4C79246F-BA4E-4DF4-8495-56133F965743}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}

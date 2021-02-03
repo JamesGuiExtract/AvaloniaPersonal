@@ -2,9 +2,9 @@
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Parsers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -28,7 +28,7 @@ namespace Extract.AttributeFinder.Rules
     [Guid("732FE480-2DB6-4840-93C5-82E555FFC47E")]
     [CLSCompliant(false)]
     public interface IMicrFinder : IAttributeFindingRule, ICategorizedComponent, IConfigurableObject,
-        ICopyableObject, ILicensedComponent, IPersistStream, IIdentifiableObject
+        ICopyableObject, ILicensedComponent, IPersistStream, IIdentifiableObject, Dto.IUseDto<Dto.MicrFinderV2>
     {
         /// <summary>
         /// MICR lines having an average confidence of at least this value will be returned.
@@ -98,14 +98,25 @@ namespace Extract.AttributeFinder.Rules
         /// Whether to return unrecognized characters (as ^) or not
         /// </summary>
         bool ReturnUnrecognizedCharacters { get; set; }
+
+        /// <summary>
+        /// The type of MICR engine to use
+        /// </summary>
+        Dto.MicrEngineType EngineType { get; set; }
+
+        /// <summary>
+        /// Whether to search all pages or only pages with OCR results
+        /// </summary>
+        bool SearchAllPages { get; set; }
     }
 
     /// <summary>
-    /// An <see cref="IAttributeFindingRule"/> that adds the <see cref="T:AFDocument.Attribute"/>
-    /// (and children) as a literal output attribute.
+    /// An <see cref="IAttributeFindingRule"/> finds MICR lines
     /// </summary>
     [ComVisible(true)]
     [Guid("299DED4B-73FC-4747-9965-A4454A8B562A")]
+    [ClassInterface(ClassInterfaceType.None)]
+    [ComDefaultInterface(typeof(IMicrFinder))]
     [CLSCompliant(false)]
     public class MicrFinder : IdentifiableObject, IMicrFinder
     {
@@ -118,31 +129,14 @@ namespace Extract.AttributeFinder.Rules
 
         /// <summary>
         /// Current version.
+        ///   Version 4: Change to save settings as JSON string
         /// </summary>
-        const int _CURRENT_VERSION = 3;
+        const int _CURRENT_VERSION = 4;
 
         /// <summary>
         /// The license id to validate in licensing calls
         /// </summary>
         const LicenseIdName _LICENSE_ID = LicenseIdName.MicrFindingEngineFeature;
-
-        /// <summary>
-        /// Special MICR chars
-        /// </summary>
-        const char _TRANSIT_CHAR = (char)0x2446;
-        const char _AMOUNT_CHAR = (char)0x2447;
-        const char _ON_US_CHAR = (char)0x2448;
-        const char _DASH_CHAR = (char)0x2449;
-
-        /// <summary>
-        /// Then character Nuance returns when it can not properly recognize a character.
-        /// </summary>
-        const char _UNRECOGNIZED_CHAR = (char)0xFFFD;
-
-        /// <summary>
-        /// Nuance mask to retrieve only confidence from character error level (and exclude the suspect word flag).
-        /// </summary>
-        const int RE_ERROR_LEVEL_MASK = ~0x80;
 
         const string _AUTO_ENCRYPT_KEY = @"Software\Extract Systems\AttributeFinder\Settings\AutoEncrypt";
 
@@ -150,17 +144,7 @@ namespace Extract.AttributeFinder.Rules
 
         #region Fields
 
-        int _highConfidenceThreshold = 80;
-        bool _useLowConfidenceThreshold = true;
-        int _lowConfidenceThreshold = 50;
-        string _filterRegexSpec = @"file://<ComponentDataDir>\Redaction\Common\Checks\MICRFinderFilter.dat.etf";
-        bool _splitRoutingNumber = false;
-        bool _splitAccountNumber = false;
-        bool _splitCheckNumber = false;
-        bool _splitAmount;
-        string _micrSplitterRegexSpec = @"file://<ComponentDataDir>\Redaction\Common\Checks\MICRFinderSplitter.dat.etf";
-        bool _filterCharsWhenSplitting = true;
-        bool _dirty;
+        Dto.MicrFinderV2 _unmodified;
 
         AFDocument _currentDocument;
 
@@ -212,9 +196,6 @@ namespace Extract.AttributeFinder.Rules
             return engine;
         });
 
-        bool _inheritOCRParameters;
-        bool _returnUnrecognizedCharacters;
-
         #endregion Fields
 
         #region Constructors
@@ -243,6 +224,22 @@ namespace Extract.AttributeFinder.Rules
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MicrFinder"/> class from a <see cref="Dto.MicrFinderV2"/>
+        /// </summary>
+        /// <param name="micrFinderSettings">The <see cref="Dto.MicrFinderV2"/> from which settings should be copied.</param>
+        public MicrFinder(Dto.MicrFinderV2 micrFinderSettings)
+        {
+            try
+            {
+                DataTransferObject = micrFinderSettings;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI51546");
+            }
+        }
+
         #endregion Constructors
 
         #region IMicrFinder
@@ -250,244 +247,81 @@ namespace Extract.AttributeFinder.Rules
         /// <summary>
         /// MICR lines having an average confidence of at least this value will be returned.
         /// </summary>
-        public int HighConfidenceThreshold
-        {
-            get
-            {
-                return _highConfidenceThreshold;
-            }
-
-            set
-            {
-                if (value != _highConfidenceThreshold)
-                {
-                    _highConfidenceThreshold = value;
-                    _dirty = true;
-                }
-            }
-        }
+        public int HighConfidenceThreshold { get; set; } = 80;
 
         /// <summary>
         /// If a MICR line's average confidence does not meet <see cref="HighConfidenceThreshold"/>,
         /// it can optionally be compared to the confidence of standard OCR of the same text for inclusion.
         /// </summary>
-        public bool UseLowConfidenceThreshold
-        {
-            get
-            {
-                return _useLowConfidenceThreshold;
-            }
-
-            set
-            {
-                if (value != _useLowConfidenceThreshold)
-                {
-                    _useLowConfidenceThreshold = value;
-                    _dirty = true;
-                }
-            }
-        }
+        public bool UseLowConfidenceThreshold { get; set; } = true;
 
         /// <summary>
         /// In the case of <see cref="UseLowConfidenceThreshold"/>, MICR confidence must have at least
         /// this confidence to quality to compare to standard OCR text.
         /// </summary>
-        public int LowConfidenceThreshold
-        {
-            get
-            {
-                return _lowConfidenceThreshold;
-            }
-
-            set
-            {
-                if (value != _lowConfidenceThreshold)
-                {
-                    _lowConfidenceThreshold = value;
-                    _dirty = true;
-                }
-            }
-        }
+        public int LowConfidenceThreshold { get; set; } = 50;
 
         /// <summary>
         /// Any MICR line, regardless of confidence, must contain a match for this regular expression
         /// to be returned. (if specified)
         /// </summary>
-        public string FilterRegex
-        {
-            get
-            {
-                return _filterRegexSpec;
-            }
-
-            set
-            {
-                if (value != _filterRegexSpec)
-                {
-                    _filterRegexSpec = value;
-                    _dirty = true;
-                }
-            }
-        }
+        public string FilterRegex { get; set; } = @"file://<ComponentDataDir>\Redaction\Common\Checks\MICRFinderFilter.dat.etf";
 
         /// <summary>
         /// Whether to create a sub-attribute for a routing number that can be successfully parsed
         /// from the MICR line.
         /// </summary>
-        public bool SplitRoutingNumber
-        {
-            get
-            {
-                return _splitRoutingNumber;
-            }
-
-            set
-            {
-                if (value != _splitRoutingNumber)
-                {
-                    _splitRoutingNumber = value;
-                    _dirty = true;
-                }
-            }
-        }
+        public bool SplitRoutingNumber { get; set; }
 
         /// <summary>
         /// Whether to create a sub-attribute for an account number that can be successfully parsed
         /// from the MICR line.
         /// </summary>
-        public bool SplitAccountNumber
-        {
-            get
-            {
-                return _splitAccountNumber;
-            }
-
-            set
-            {
-                if (value != _splitAccountNumber)
-                {
-                    _splitAccountNumber = value;
-                    _dirty = true;
-                }
-            }
-        }
+        public bool SplitAccountNumber { get; set; }
 
         /// <summary>
         /// Whether to create a sub-attribute for a check number that can be successfully parsed
         /// from the MICR line.
         /// </summary>
-        public bool SplitCheckNumber
-        {
-            get
-            {
-                return _splitCheckNumber;
-            }
-
-            set
-            {
-                if (value != _splitCheckNumber)
-                {
-                    _splitCheckNumber = value;
-                    _dirty = true;
-                }
-            }
-        }
+        public bool SplitCheckNumber { get; set; }
 
         /// <summary>
         /// Whether to create a sub-attribute for an amount that can be successfully parsed from
         /// the MICR line.
         /// </summary>
-        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
-        public bool SplitAmount
-        {
-            get
-            {
-                return _splitAmount;
-            }
-
-            set
-            {
-                if (value != _splitAmount)
-                {
-                    _splitAmount = value;
-                    _dirty = true;
-                }
-            }
-        }
+        public bool SplitAmount { get; set; }
 
         /// <summary>
         /// The regular expression used to parse the component elements of a MICR line.
         /// </summary>
-        public string MicrSplitterRegex
-        {
-            get
-            {
-                return _micrSplitterRegexSpec;
-            }
-
-            set
-            {
-                if (value != _micrSplitterRegexSpec)
-                {
-                    _micrSplitterRegexSpec = value;
-                    _dirty = true;
-                }
-            }
-        }
+        public string MicrSplitterRegex { get; set; } = @"file://<ComponentDataDir>\Redaction\Common\Checks\MICRFinderSplitter.dat.etf";
 
         /// <summary>
         /// Indicates whether to remove special MICR chars and spaces when splitting components
         /// into sub-attributes.
         /// </summary>
-        public bool FilterCharsWhenSplitting
-        {
-            get
-            {
-                return _filterCharsWhenSplitting;
-            }
-
-            set
-            {
-                if (value != _filterCharsWhenSplitting)
-                {
-                    _filterCharsWhenSplitting = value;
-                    _dirty = true;
-                }
-            }
-        }
+        public bool FilterCharsWhenSplitting { get; set; } = true;
 
         /// <summary>
         /// Whether to use OCRParameters specified in the containing ruleset or the input spatial string
         /// (if <c>true</c>) or to use only built-in parameters (if <c>false</c>)
         /// </summary>
-        public bool InheritOCRParameters
-        {
-            get
-            {
-                return _inheritOCRParameters;
-            }
-            set
-            {
-                _dirty = _dirty || _inheritOCRParameters != value;
-                _inheritOCRParameters = value;
-            }
-        }
+        public bool InheritOCRParameters { get; set; }
 
         /// <summary>
         /// Whether to return unrecognized characters (as ^) or not
         /// </summary>
-        public bool ReturnUnrecognizedCharacters
-        {
-            get
-            {
-                return _returnUnrecognizedCharacters;
-            }
-            set
-            {
-                _dirty = _dirty || _returnUnrecognizedCharacters != value;
-                _returnUnrecognizedCharacters = value;
-            }
-        }
+        public bool ReturnUnrecognizedCharacters { get; set; }
+
+        /// <summary>
+        /// The type of OCR engine to use
+        /// </summary>
+        public Dto.MicrEngineType EngineType { get; set; } = Dto.MicrEngineType.Kofax;
+
+        /// <summary>
+        /// Whether to search all pages or only pages with OCR results
+        /// </summary>
+        public bool SearchAllPages { get; set; } = true;
 
         #endregion IMicrFinder
 
@@ -535,14 +369,11 @@ namespace Extract.AttributeFinder.Rules
                 // Validate the license
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI46911", _COMPONENT_DESCRIPTION);
 
-                // Make a clone to update settings and only copy if ok
-                var cloneOfThis = (MicrFinder)Clone();
-
-                using (MicrFinderSettingsDialog dlg = new MicrFinderSettingsDialog(cloneOfThis))
+                using (MicrFinderSettingsDialog dlg = new MicrFinderSettingsDialog(DataTransferObject))
                 {
                     if (dlg.ShowDialog() == DialogResult.OK)
                     {
-                        CopyFrom(dlg.Settings);
+                        DataTransferObject = dlg.Settings;
                         return true;
                     }
                 }
@@ -648,7 +479,8 @@ namespace Extract.AttributeFinder.Rules
         /// </returns>
         public int IsDirty()
         {
-            return HResult.FromBoolean(_dirty);
+            var isDirty = DataTransferObject.Equals(_unmodified);
+            return HResult.FromBoolean(isDirty);
         }
 
         /// <summary>
@@ -659,7 +491,14 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
-                using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
+                using IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION);
+                if (reader.Version >= 4)
+                {
+                    var json = reader.ReadString();
+                    var dto = JsonConvert.DeserializeObject<Dto.MicrFinderV2>(json);
+                    _unmodified = DataTransferObject = dto;
+                }
+                else
                 {
                     HighConfidenceThreshold = reader.ReadInt32();
                     UseLowConfidenceThreshold = reader.ReadBoolean();
@@ -685,12 +524,15 @@ namespace Extract.AttributeFinder.Rules
                         ReturnUnrecognizedCharacters = true;
                     }
 
+                    EngineType = Dto.MicrEngineType.Kofax;
+                    SearchAllPages = false;
+
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
-                }
 
-                // Freshly loaded object is no longer dirty
-                _dirty = false;
+                    // Freshly loaded object is no longer dirty
+                    _unmodified = DataTransferObject;
+                }
             }
             catch (Exception ex)
             {
@@ -711,31 +553,18 @@ namespace Extract.AttributeFinder.Rules
         {
             try
             {
+                var dto = DataTransferObject;
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    writer.Write(HighConfidenceThreshold);
-                    writer.Write(UseLowConfidenceThreshold);
-                    writer.Write(LowConfidenceThreshold);
-                    writer.Write(FilterRegex);
-                    writer.Write(SplitRoutingNumber);
-                    writer.Write(SplitAccountNumber);
-                    writer.Write(SplitCheckNumber);
-                    writer.Write(SplitAmount);
-                    writer.Write(MicrSplitterRegex);
-                    writer.Write(FilterCharsWhenSplitting);
-                    writer.Write(InheritOCRParameters);
-                    writer.Write(ReturnUnrecognizedCharacters);
+                    var json = JsonConvert.SerializeObject(dto);
+                    writer.Write(json);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
                 }
-
-                // Save the GUID for the IIdentifiableObject interface.
-                SaveGuid(stream);
-
                 if (clearDirty)
                 {
-                    _dirty = false;
+                    _unmodified = dto;
                 }
             }
             catch (Exception ex)
@@ -789,39 +618,20 @@ namespace Extract.AttributeFinder.Rules
         /// </param>
         void CopyFrom(MicrFinder source)
         {
-            HighConfidenceThreshold = source.HighConfidenceThreshold;
-            UseLowConfidenceThreshold = source.UseLowConfidenceThreshold;
-            LowConfidenceThreshold = source.LowConfidenceThreshold;
-            FilterRegex = source.FilterRegex;
-            SplitRoutingNumber = source.SplitRoutingNumber;
-            SplitAccountNumber = source.SplitAccountNumber;
-            SplitCheckNumber = source.SplitCheckNumber;
-            SplitAmount = source.SplitAmount;
-            MicrSplitterRegex = source.MicrSplitterRegex;
-            FilterCharsWhenSplitting = source.FilterCharsWhenSplitting;
-            InheritOCRParameters = source.InheritOCRParameters;
-            ReturnUnrecognizedCharacters = source.ReturnUnrecognizedCharacters;
+            DataTransferObject = source.DataTransferObject;
         }
 
         /// <summary>
         /// Finds MICR lines in <see cref="pDocument"/>.
         /// </summary>
-        /// <param name="pDocument">The document to search.</param>
-        IUnknownVector FindMicrs(AFDocument pDocument)
+        /// <param name="doc">The document to search.</param>
+        IUnknownVector FindMicrs(AFDocument doc)
         {
-            var pagesToSearch = string.Join(",",
-                pDocument.Text.GetPages(false, "")
-                .ToIEnumerable<SpatialString>()
-                .Select(p => p.GetFirstPageNumber()));
-
-            IOCRParameters ocrParams = GetOCRParams(pDocument);
-            var recognized =
-                _ocrEngine.Value.RecognizeTextInImage2(pDocument.Text.SourceDocName,
-                    pagesToSearch, true, null, ocrParams);
+            var recognized = Recognize(doc);
 
             var resultVector = recognized.GetLines()
                 .ToIEnumerable<SpatialString>()
-                .Where(line => QualifyLine(line, pDocument))
+                .Where(line => QualifyLine(line, doc))
                 .Select(line =>
                 {
                     var attribute = new AttributeClass();
@@ -836,16 +646,60 @@ namespace Extract.AttributeFinder.Rules
             return resultVector;
         }
 
+        SpatialString Recognize(AFDocument doc)
+        {
+            var pages = Enumerable.Empty<int>();
+            // If no original recognized text then it is still possible to search MICR on all pages if we have an image file
+            if (SearchAllPages && !String.IsNullOrEmpty(doc.Text.SourceDocName))
+            {
+                pages = null;
+            }
+            else if (doc.Text.HasSpatialInfo())
+            {
+                pages = doc.Text
+                    .GetPages(false, "")
+                    .ToIEnumerable<SpatialString>()
+                    .Select(p => p.GetFirstPageNumber());
+            }
+            else
+            {
+                return new SpatialStringClass();
+            }
+
+            return EngineType switch
+            {
+                Dto.MicrEngineType.Kofax => RecognizeKofax(doc, pages),
+                Dto.MicrEngineType.GdPicture => throw new ExtractException("ELI51589", "Unsupported engine type!"),
+                _ => throw new ExtractException("ELI51470", "Unknown engine type!")
+            };
+        }
+
+        // Search on supplied pages or on all pages if pages is null
+        SpatialString RecognizeKofax(AFDocument doc, IEnumerable<int> pages)
+        {
+            IOCRParameters ocrParams = GetOCRParams(doc);
+
+            if (pages == null)
+            {
+                return _ocrEngine.Value.RecognizeTextInImage(doc.Text.SourceDocName, 1, -1, EFilterCharacters.kNoFilter, null, EOcrTradeOff.kRegistry, true, null, ocrParams);
+            }
+            else
+            {
+                var pagesToSearch = string.Join(",", pages);
+                return _ocrEngine.Value.RecognizeTextInImage2(doc.Text.SourceDocName, pagesToSearch, true, null, ocrParams);
+            }
+        }
+
         IOCRParameters GetOCRParams(AFDocument pDocument)
         {
-            bool truf<T>(T _) { return true; }
+            static bool tru<T>(T _) { return true; }
 
             var ocrParams = InheritOCRParameters
                 ? ((IHasOCRParameters)pDocument).OCRParameters
                     .ToIEnumerable()
                     .Where(p => p.Match(
                         kv => (EOCRParameter)kv.key != EOCRParameter.kOCRType,
-                        truf, truf, truf, truf))
+                        tru, tru, tru, tru))
                     .ToList()
                 : new List<OCRParam>();
 
@@ -953,18 +807,25 @@ namespace Extract.AttributeFinder.Rules
         /// </summary>
         static SpatialString GetOCRText(SpatialString line, SpatialString documentSource)
         {
-            int page = line.GetFirstPageNumber();
+            SpatialString ocrText;
+            if (documentSource.HasSpatialInfo())
+            {
+                int page = line.GetFirstPageNumber();
 
-            SpatialStringSearcher searcher = GetSearcherForPage(page, documentSource);
+                SpatialStringSearcher searcher = GetSearcherForPage(page, documentSource);
 
-            // So that the garbage collector knows of and properly manages the associated
-            // memory.
-            searcher.ReportMemoryUsage();
+                // So that the garbage collector knows of and properly manages the associated
+                // memory.
+                searcher.ReportMemoryUsage();
 
-            LongRectangle bounds = line.GetOCRImageBounds();
-            var ocrText = searcher.GetDataInRegion(bounds, false);
+                LongRectangle bounds = line.GetOCRImageBounds();
+                ocrText = searcher.GetDataInRegion(bounds, false);
+            }
+            else
+            {
+                ocrText = new SpatialStringClass();
+            }
             ocrText.ReportMemoryUsage();
-
             return ocrText;
         }
 
@@ -1168,6 +1029,56 @@ namespace Extract.AttributeFinder.Rules
                 }
 
                 return _miscUtils;
+            }
+        }
+
+        public Dto.MicrFinderV2 DataTransferObject
+        {
+            get
+            {
+                return new Dto.MicrFinderV2(
+                    highConfidenceThreshold: HighConfidenceThreshold,
+                    useLowConfidenceThreshold: UseLowConfidenceThreshold,
+                    lowConfidenceThreshold: LowConfidenceThreshold,
+                    filterRegex: FilterRegex,
+                    splitRoutingNumber: SplitRoutingNumber,
+                    splitAccountNumber: SplitAccountNumber,
+                    splitCheckNumber: SplitCheckNumber,
+                    splitAmount: SplitAmount,
+                    micrSplitterRegex: MicrSplitterRegex,
+                    filterCharsWhenSplitting: FilterCharsWhenSplitting,
+                    inheritOCRParameters: InheritOCRParameters,
+                    returnUnrecognizedCharacters: ReturnUnrecognizedCharacters,
+                    engineType: EngineType,
+                    searchAllPages: SearchAllPages
+                );
+            }
+            set
+            {
+                try
+                {
+                    HighConfidenceThreshold = value.HighConfidenceThreshold;
+                    UseLowConfidenceThreshold = value.UseLowConfidenceThreshold;
+                    LowConfidenceThreshold = value.LowConfidenceThreshold;
+                    FilterRegex = value.FilterRegex;
+                    SplitRoutingNumber = value.SplitRoutingNumber;
+                    SplitAccountNumber = value.SplitAccountNumber;
+                    SplitCheckNumber = value.SplitCheckNumber;
+                    SplitAmount = value.SplitAmount;
+                    MicrSplitterRegex = value.MicrSplitterRegex;
+                    FilterCharsWhenSplitting = value.FilterCharsWhenSplitting;
+                    InheritOCRParameters = value.InheritOCRParameters;
+                    ReturnUnrecognizedCharacters = value.ReturnUnrecognizedCharacters;
+                    // Default to Kofax for old versions without this setting
+                    EngineType = value.EngineType == Dto.MicrEngineType.None
+                        ? Dto.MicrEngineType.Kofax
+                        : value.EngineType;
+                    SearchAllPages = value.SearchAllPages;
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI51547");
+                }
             }
         }
 

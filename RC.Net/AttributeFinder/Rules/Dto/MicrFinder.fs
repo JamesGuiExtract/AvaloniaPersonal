@@ -1,5 +1,14 @@
 namespace Extract.AttributeFinder.Rules.Dto
 
+open System.Runtime.InteropServices
+
+[<ComVisible(true)>]
+[<Guid("293BFA29-6293-465E-9242-7E5C51A7A252")>]
+type MicrEngineType =
+| None = 0
+| Kofax = 1
+| GdPicture = 2
+
 type MicrFinderV2 = {
   FilterCharsWhenSplitting: bool
   FilterRegex: string
@@ -13,6 +22,8 @@ type MicrFinderV2 = {
   SplitCheckNumber: bool
   SplitRoutingNumber: bool
   UseLowConfidenceThreshold: bool
+  SearchAllPages: bool
+  EngineType: MicrEngineType
 }
 
 type MicrFinderV1 = {

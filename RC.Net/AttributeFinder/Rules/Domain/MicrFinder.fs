@@ -1,40 +1,11 @@
 namespace Extract.AttributeFinder.Rules.Domain
-
+   
 module MicrFinderV2 =
   open Extract.AttributeFinder.Rules
 
   module MicrFinder =
-    type MicrFinderClass = MicrFinder
-    open Extract.AttributeFinder.Rules.Dto
-
-    let toDto (domain: IMicrFinder): Dto.MicrFinderV2 =
-      { FilterCharsWhenSplitting = domain.FilterCharsWhenSplitting
-        FilterRegex = domain.FilterRegex
-        HighConfidenceThreshold = domain.HighConfidenceThreshold
-        InheritOCRParameters = domain.InheritOCRParameters
-        LowConfidenceThreshold = domain.LowConfidenceThreshold
-        MicrSplitterRegex = domain.MicrSplitterRegex
-        ReturnUnrecognizedCharacters = domain.ReturnUnrecognizedCharacters
-        SplitAccountNumber = domain.SplitAccountNumber
-        SplitAmount = domain.SplitAmount
-        SplitCheckNumber = domain.SplitCheckNumber
-        SplitRoutingNumber = domain.SplitRoutingNumber
-        UseLowConfidenceThreshold = domain.UseLowConfidenceThreshold }
-
-    let fromDto (dto: Dto.MicrFinderV2) =
-      MicrFinderClass
-        ( FilterCharsWhenSplitting=dto.FilterCharsWhenSplitting,
-          FilterRegex=dto.FilterRegex,
-          HighConfidenceThreshold=dto.HighConfidenceThreshold,
-          InheritOCRParameters=dto.InheritOCRParameters,
-          LowConfidenceThreshold=dto.LowConfidenceThreshold,
-          MicrSplitterRegex=dto.MicrSplitterRegex,
-          ReturnUnrecognizedCharacters=dto.ReturnUnrecognizedCharacters,
-          SplitAccountNumber=dto.SplitAccountNumber,
-          SplitAmount=dto.SplitAmount,
-          SplitCheckNumber=dto.SplitCheckNumber,
-          SplitRoutingNumber=dto.SplitRoutingNumber,
-          UseLowConfidenceThreshold=dto.UseLowConfidenceThreshold )
+    let toDto (domain: IMicrFinder): Dto.MicrFinderV2 = domain.DataTransferObject
+    let fromDto (dto: Dto.MicrFinderV2) = MicrFinder(dto)
 
   type MicrFinderConverter() =
     inherit RuleObjectConverter<MicrFinder, IMicrFinder, Dto.MicrFinderV2>()

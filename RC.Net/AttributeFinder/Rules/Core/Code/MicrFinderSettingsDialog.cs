@@ -39,7 +39,7 @@ namespace Extract.AttributeFinder.Rules
         /// Initializes a new instance of the <see cref="MicrFinderSettingsDialog"/> class.
         /// </summary>
         /// <param name="settings">The <see cref="MicrFinder"/> instance to configure.</param>
-        public MicrFinderSettingsDialog(MicrFinder settings)
+        public MicrFinderSettingsDialog(Dto.MicrFinderV2 settings)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace Extract.AttributeFinder.Rules
         /// Gets or sets the <see cref="MicrFinder"/> to configure.
         /// </summary>
         /// <value>The <see cref="MicrFinder"/> to configure.</value>
-        public MicrFinder Settings
+        public Dto.MicrFinderV2 Settings
         {
             get;
             set;
@@ -99,6 +99,18 @@ namespace Extract.AttributeFinder.Rules
                 _filterCharsWhenSplittingCheckBox.Checked = Settings.FilterCharsWhenSplitting;
                 _inheritOCRParametersCheckBox.Checked = Settings.InheritOCRParameters;
                 _returnUnrecognizedCharactersCheckBox.Checked = Settings.ReturnUnrecognizedCharacters;
+
+                if (Settings.EngineType == Dto.MicrEngineType.Kofax)
+                {
+                    _engineKofaxRadioButton.Checked = true;
+                }
+                else if (Settings.EngineType == Dto.MicrEngineType.GdPicture)
+                {
+                    _engineGdPictureRadioButton.Checked = true;
+                }
+
+                _searchAllPagesRadioButton.Checked = Settings.SearchAllPages;
+                _searchPagesWithTextRadioButton.Checked = !Settings.SearchAllPages;
             }
             catch (Exception ex)
             {
@@ -186,24 +198,59 @@ namespace Extract.AttributeFinder.Rules
                     return;
                 }
 
-                Settings.HighConfidenceThreshold = decimal.ToInt32(_highConfidenceUpDown.Value);
-                Settings.UseLowConfidenceThreshold = _lowConfidenceCheckBox.Checked;
-                Settings.LowConfidenceThreshold = decimal.ToInt32(_lowConfidenceUpDown.Value);
-                Settings.FilterRegex = _filterRegExTextBox.Text;
-                Settings.SplitRoutingNumber = _splitRoutingCheckBox.Checked;
-                Settings.SplitAccountNumber = _splitAccountCheckBox.Checked;
-                Settings.SplitCheckNumber = _splitCheckCheckBox.Checked;
-                Settings.SplitAmount = _splitAmountCheckBox.Checked;
-                Settings.MicrSplitterRegex = _micrSplitterRegexTextBox.Text;
-                Settings.FilterCharsWhenSplitting = _filterCharsWhenSplittingCheckBox.Checked;
-                Settings.InheritOCRParameters = _inheritOCRParametersCheckBox.Checked;
-                Settings.ReturnUnrecognizedCharacters = _returnUnrecognizedCharactersCheckBox.Checked;
+                var engineType = Dto.MicrEngineType.None;
+                if (_engineKofaxRadioButton.Checked)
+                {
+                    engineType = Dto.MicrEngineType.Kofax;
+                }
+                else if (_engineGdPictureRadioButton.Checked)
+                {
+                    engineType = Dto.MicrEngineType.GdPicture;
+                }
+
+                Settings = new Dto.MicrFinderV2(
+                    highConfidenceThreshold: decimal.ToInt32(_highConfidenceUpDown.Value),
+                    useLowConfidenceThreshold: _lowConfidenceCheckBox.Checked,
+                    lowConfidenceThreshold: decimal.ToInt32(_lowConfidenceUpDown.Value),
+                    filterRegex: _filterRegExTextBox.Text,
+                    splitRoutingNumber: _splitRoutingCheckBox.Checked,
+                    splitAccountNumber: _splitAccountCheckBox.Checked,
+                    splitCheckNumber: _splitCheckCheckBox.Checked,
+                    splitAmount: _splitAmountCheckBox.Checked,
+                    micrSplitterRegex: _micrSplitterRegexTextBox.Text,
+                    filterCharsWhenSplitting: _filterCharsWhenSplittingCheckBox.Checked,
+                    inheritOCRParameters: _inheritOCRParametersCheckBox.Checked,
+                    returnUnrecognizedCharacters: _returnUnrecognizedCharactersCheckBox.Checked,
+                    engineType: engineType,
+                    searchAllPages: _searchAllPagesRadioButton.Checked
+                );
 
                 DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI46921");
+            }
+        }
+
+        void EngineRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (_engineKofaxRadioButton.Checked)
+                {
+                    _returnUnrecognizedCharactersCheckBox.Enabled = true;
+                    _inheritOCRParametersCheckBox.Enabled = true;
+                }
+                else if (_engineGdPictureRadioButton.Checked)
+                {
+                    _returnUnrecognizedCharactersCheckBox.Enabled = false;
+                    _inheritOCRParametersCheckBox.Enabled = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI51545");
             }
         }
 

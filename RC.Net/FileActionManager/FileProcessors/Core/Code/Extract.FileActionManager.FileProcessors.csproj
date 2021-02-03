@@ -324,7 +324,7 @@
       <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
       <Name>Extract.Encryption</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\GoogleCloud\Extract.GoogleCloud.csproj">
+    <ProjectReference Include="..\..\..\..\GoogleCloud\Core\Code\Extract.GoogleCloud.csproj">
       <Project>{4c79246f-ba4e-4df4-8495-56133f965743}</Project>
       <Name>Extract.GoogleCloud</Name>
     </ProjectReference>

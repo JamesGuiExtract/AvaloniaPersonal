@@ -1,0 +1,86 @@
+[
+  {
+    "Type": "MicrFinderV2",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FilterCharsWhenSplitting": true,
+      "FilterRegex": "file://<ComponentDataDir>\\Redaction\\Common\\Checks\\MICRFinderFilter.dat.etf",
+      "HighConfidenceThreshold": 80,
+      "InheritOCRParameters": false,
+      "LowConfidenceThreshold": 50,
+      "MicrSplitterRegex": "file://<ComponentDataDir>\\Redaction\\Common\\Checks\\MICRFinderSplitter.dat.etf",
+      "ReturnUnrecognizedCharacters": false,
+      "SplitAccountNumber": false,
+      "SplitAmount": false,
+      "SplitCheckNumber": false,
+      "SplitRoutingNumber": false,
+      "UseLowConfidenceThreshold": true,
+      "SearchAllPages": false,
+      "EngineType": "Kofax"
+    }
+  },
+  {
+    "Type": "MicrFinderV2",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FilterCharsWhenSplitting": true,
+      "FilterRegex": "file://<ComponentDataDir>\\Redaction\\Common\\Checks\\MICRFinderFilter.dat.etf",
+      "HighConfidenceThreshold": 80,
+      "InheritOCRParameters": false,
+      "LowConfidenceThreshold": 50,
+      "MicrSplitterRegex": "file://<ComponentDataDir>\\Redaction\\Common\\Checks\\MICRFinderSplitter.dat.etf",
+      "ReturnUnrecognizedCharacters": true,
+      "SplitAccountNumber": false,
+      "SplitAmount": false,
+      "SplitCheckNumber": false,
+      "SplitRoutingNumber": false,
+      "UseLowConfidenceThreshold": true,
+      "SearchAllPages": false,
+      "EngineType": "Kofax"
+    }
+  },
+  {
+    "Type": "MicrFinderV2",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FilterCharsWhenSplitting": false,
+      "FilterRegex": "",
+      "HighConfidenceThreshold": 0,
+      "InheritOCRParameters": false,
+      "LowConfidenceThreshold": 0,
+      "MicrSplitterRegex": "",
+      "ReturnUnrecognizedCharacters": false,
+      "SplitAccountNumber": false,
+      "SplitAmount": false,
+      "SplitCheckNumber": false,
+      "SplitRoutingNumber": false,
+      "UseLowConfidenceThreshold": false,
+      "SearchAllPages": false,
+      "EngineType": "GdPicture"
+    }
+  },
+  {
+    "Type": "MicrFinderV2",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "FilterCharsWhenSplitting": false,
+      "FilterRegex": "",
+      "HighConfidenceThreshold": 0,
+      "InheritOCRParameters": false,
+      "LowConfidenceThreshold": 0,
+      "MicrSplitterRegex": "",
+      "ReturnUnrecognizedCharacters": false,
+      "SplitAccountNumber": false,
+      "SplitAmount": false,
+      "SplitCheckNumber": false,
+      "SplitRoutingNumber": false,
+      "UseLowConfidenceThreshold": false,
+      "SearchAllPages": true,
+      "EngineType": "GdPicture"
+    }
+  }
+]

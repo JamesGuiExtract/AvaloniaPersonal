@@ -1,6 +1,5 @@
 ﻿namespace Extract.AttributeFinder.Rules.Dto.AssemblyInfo
 
-open System.Reflection
 open System.Runtime.InteropServices
 
 // Setting ComVisible to false makes the types in this assembly not visible

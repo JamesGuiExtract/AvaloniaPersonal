@@ -43,8 +43,9 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         /// <summary>
         /// Load legacy rule objects from binary into DTO and compare with current version loaded from JSON
         /// </summary>
-        [Test, Category("RulesJsonSerialization")]
-        [TestCase("Resources.RuleObjects.FSharpPreprocessor.hex.txt", "Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "FSharpPreprocessor")]
+        [Category("LegacyRulesJsonDeserialization")]
+        [TestCase("Resources.RuleObjects.FSharpPreprocessor.hex.txt", "Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "LegacyFSharpPreprocessor")]
+        [TestCase("Resources.RuleObjects.MicrFinderV2.hex.txt", "Resources.RuleObjects.MicrFinderV2.1.json", TestName = "LegacyMICRFinder")]
         public static void LegacyRuleObjects(string legacyResourceName, string currentVersionResourceName)
         {
             var legacyFile = _testFiles.GetFile(legacyResourceName);
@@ -90,8 +91,9 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         /// <summary>
         /// Load current version rule objects from binary into DTO and compare with current version loaded from JSON
         /// </summary>
-        [Test, Category("RulesJsonSerialization")]
+        [Category("RulesJsonSerialization")]
         [TestCase("Resources.RuleObjects.FSharpPreprocessorV2.hex.txt", "Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "FSharpPreprocessorV2")]
+        [TestCase("Resources.RuleObjects.MicrFinderV2.1.hex.txt", "Resources.RuleObjects.MicrFinderV2.1.json", TestName = "MicrFinderV2.1")]
         public static void CurrentVersionRuleObjects(string binaryResourceName, string currentVersionResourceName)
         {
             var legacyFile = _testFiles.GetFile(binaryResourceName);
@@ -140,7 +142,7 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         /// <summary>
         /// Load from json and save using COM storage encoded as text lines
         /// </summary>
-        [TestCase("Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "Make_FSharpPreprocessorV2_Hex")]
+        [TestCase("Resources.RuleObjects.MicrFinderV2.1.json", TestName = "Make_MicrFinderV2.1.hex")]
         public static void CreateTestData(string resourceName)
         {
             var jsonFile = _testFiles.GetFile(resourceName);
@@ -150,7 +152,7 @@ namespace Extract.AttributeFinder.Rules.Json.Test
             using var jsonStreamReader = new StreamReader(jsonStream);
             using var jsonReader = new JsonTextReader(jsonStreamReader);
 
-            var outputFileName = @"C:\Engineering\RC.Net\AttributeFinder\Rules\Json\Test\Resources\RuleObjects\FSharpPreprocessorV2.hex.txt";
+            var outputFileName = @"C:\Engineering\RC.Net\AttributeFinder\Rules\Json\Test\Resources\RuleObjects\MicrFinderV2.1.hex.txt";
             using var outputStream = new FileStream(outputFileName, FileMode.Create);
             using var outputWriter = new StreamWriter(outputStream, Encoding.ASCII);
 

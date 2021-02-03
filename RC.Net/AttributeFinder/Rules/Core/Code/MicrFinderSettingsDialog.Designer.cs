@@ -39,6 +39,7 @@
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label1;
             this._filterCharsWhenSplittingCheckBox = new System.Windows.Forms.CheckBox();
+            this._micrSplitterRegexPathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._micrSplitterRegexTextBox = new System.Windows.Forms.TextBox();
             this._micrSplitterRegexBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._splitAccountCheckBox = new System.Windows.Forms.CheckBox();
@@ -53,6 +54,7 @@
             this.browseButton1 = new Extract.Utilities.Forms.BrowseButton();
             this._inheritOCRParametersCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this._regexFilterFileNamePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._filterRegExTextBox = new System.Windows.Forms.TextBox();
             this._regexFilterFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
             this._lowConfidenceCheckBox = new System.Windows.Forms.CheckBox();
@@ -61,8 +63,12 @@
             this._lowConfidenceLabel2 = new System.Windows.Forms.Label();
             this._highConfidenceUpDown = new System.Windows.Forms.NumericUpDown();
             this._returnUnrecognizedCharactersCheckBox = new System.Windows.Forms.CheckBox();
-            this._regexFilterFileNamePathTagsButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
-            this._micrSplitterRegexPathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this._engineGdPictureRadioButton = new System.Windows.Forms.RadioButton();
+            this._engineKofaxRadioButton = new System.Windows.Forms.RadioButton();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this._searchPagesWithTextRadioButton = new System.Windows.Forms.RadioButton();
+            this._searchAllPagesRadioButton = new System.Windows.Forms.RadioButton();
             groupBox1 = new System.Windows.Forms.GroupBox();
             infoTip4 = new Extract.Utilities.Forms.InfoTip();
             label4 = new System.Windows.Forms.Label();
@@ -76,6 +82,8 @@
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._lowConfidenceUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._highConfidenceUpDown)).BeginInit();
+            this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -93,10 +101,10 @@
             groupBox1.Controls.Add(this._splitAmountCheckBox);
             groupBox1.Controls.Add(this._splitRoutingCheckBox);
             groupBox1.Controls.Add(this._splitCheckCheckBox);
-            groupBox1.Location = new System.Drawing.Point(11, 202);
+            groupBox1.Location = new System.Drawing.Point(11, 306);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new System.Drawing.Size(578, 194);
-            groupBox1.TabIndex = 2;
+            groupBox1.TabIndex = 4;
             groupBox1.TabStop = false;
             groupBox1.Text = "Split found MICR text into the following sub-attributes";
             // 
@@ -120,6 +128,18 @@
             infoTip4.Size = new System.Drawing.Size(16, 16);
             infoTip4.TabIndex = 6;
             infoTip4.TipText = resources.GetString("infoTip4.TipText");
+            // 
+            // _micrSplitterRegexPathTagButton
+            // 
+            this._micrSplitterRegexPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._micrSplitterRegexPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_micrSplitterRegexPathTagButton.Image")));
+            this._micrSplitterRegexPathTagButton.Location = new System.Drawing.Point(521, 131);
+            this._micrSplitterRegexPathTagButton.Name = "_micrSplitterRegexPathTagButton";
+            this._micrSplitterRegexPathTagButton.PathTags = new Extract.AttributeFinder.AttributeFinderPathTags();
+            this._micrSplitterRegexPathTagButton.Size = new System.Drawing.Size(18, 20);
+            this._micrSplitterRegexPathTagButton.TabIndex = 8;
+            this._micrSplitterRegexPathTagButton.TextControl = this._micrSplitterRegexTextBox;
+            this._micrSplitterRegexPathTagButton.UseVisualStyleBackColor = true;
             // 
             // _micrSplitterRegexTextBox
             // 
@@ -257,10 +277,10 @@
             // _okButton
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._okButton.Location = new System.Drawing.Point(434, 418);
+            this._okButton.Location = new System.Drawing.Point(434, 539);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 23);
-            this._okButton.TabIndex = 4;
+            this._okButton.TabIndex = 6;
             this._okButton.Text = "OK";
             this._okButton.UseVisualStyleBackColor = true;
             this._okButton.Click += new System.EventHandler(this.HandleOkButtonClick);
@@ -269,10 +289,10 @@
             // 
             this._cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._cancelButton.Location = new System.Drawing.Point(515, 418);
+            this._cancelButton.Location = new System.Drawing.Point(515, 539);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(75, 23);
-            this._cancelButton.TabIndex = 5;
+            this._cancelButton.TabIndex = 7;
             this._cancelButton.Text = "Cancel";
             this._cancelButton.UseVisualStyleBackColor = true;
             // 
@@ -321,11 +341,13 @@
             // 
             // _inheritOCRParametersCheckBox
             // 
+            this._inheritOCRParametersCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._inheritOCRParametersCheckBox.AutoSize = true;
-            this._inheritOCRParametersCheckBox.Location = new System.Drawing.Point(26, 402);
+            this._inheritOCRParametersCheckBox.Location = new System.Drawing.Point(26, 506);
             this._inheritOCRParametersCheckBox.Name = "_inheritOCRParametersCheckBox";
             this._inheritOCRParametersCheckBox.Size = new System.Drawing.Size(204, 17);
-            this._inheritOCRParametersCheckBox.TabIndex = 3;
+            this._inheritOCRParametersCheckBox.TabIndex = 5;
             this._inheritOCRParametersCheckBox.Text = "Inherit OCR parameters (advanced)";
             this._inheritOCRParametersCheckBox.UseVisualStyleBackColor = true;
             // 
@@ -346,12 +368,24 @@
             this.groupBox2.Controls.Add(label2);
             this.groupBox2.Controls.Add(this._highConfidenceUpDown);
             this.groupBox2.Controls.Add(label1);
-            this.groupBox2.Location = new System.Drawing.Point(12, 35);
+            this.groupBox2.Location = new System.Drawing.Point(12, 139);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(577, 161);
-            this.groupBox2.TabIndex = 1;
+            this.groupBox2.TabIndex = 3;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Filter";
+            // 
+            // _regexFilterFileNamePathTagsButton
+            // 
+            this._regexFilterFileNamePathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._regexFilterFileNamePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_regexFilterFileNamePathTagsButton.Image")));
+            this._regexFilterFileNamePathTagsButton.Location = new System.Drawing.Point(520, 127);
+            this._regexFilterFileNamePathTagsButton.Name = "_regexFilterFileNamePathTagsButton";
+            this._regexFilterFileNamePathTagsButton.PathTags = new Extract.AttributeFinder.AttributeFinderPathTags();
+            this._regexFilterFileNamePathTagsButton.Size = new System.Drawing.Size(18, 20);
+            this._regexFilterFileNamePathTagsButton.TabIndex = 24;
+            this._regexFilterFileNamePathTagsButton.TextControl = this._filterRegExTextBox;
+            this._regexFilterFileNamePathTagsButton.UseVisualStyleBackColor = true;
             // 
             // _filterRegExTextBox
             // 
@@ -419,38 +453,88 @@
             // 
             // _returnUnrecognizedCharactersCheckBox
             // 
-            this._returnUnrecognizedCharactersCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this._returnUnrecognizedCharactersCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this._returnUnrecognizedCharactersCheckBox.AutoSize = true;
-            this._returnUnrecognizedCharactersCheckBox.Location = new System.Drawing.Point(21, 12);
+            this._returnUnrecognizedCharactersCheckBox.Location = new System.Drawing.Point(21, 116);
             this._returnUnrecognizedCharactersCheckBox.Name = "_returnUnrecognizedCharactersCheckBox";
             this._returnUnrecognizedCharactersCheckBox.Size = new System.Drawing.Size(224, 17);
-            this._returnUnrecognizedCharactersCheckBox.TabIndex = 0;
+            this._returnUnrecognizedCharactersCheckBox.TabIndex = 2;
             this._returnUnrecognizedCharactersCheckBox.Text = "Include unrecognized characters (as ^)";
             this._returnUnrecognizedCharactersCheckBox.UseVisualStyleBackColor = true;
             // 
-            // _regexFilterFileNamePathTagsButton
+            // groupBox3
             // 
-            this._regexFilterFileNamePathTagsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._regexFilterFileNamePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_regexFilterFileNamePathTagsButton.Image")));
-            this._regexFilterFileNamePathTagsButton.Location = new System.Drawing.Point(520, 127);
-            this._regexFilterFileNamePathTagsButton.Name = "_regexFilterFileNamePathTagsButton";
-            this._regexFilterFileNamePathTagsButton.PathTags = new AttributeFinderPathTags();
-            this._regexFilterFileNamePathTagsButton.Size = new System.Drawing.Size(18, 20);
-            this._regexFilterFileNamePathTagsButton.TabIndex = 24;
-            this._regexFilterFileNamePathTagsButton.TextControl = this._filterRegExTextBox;
-            this._regexFilterFileNamePathTagsButton.UseVisualStyleBackColor = true;
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox3.Controls.Add(this._engineGdPictureRadioButton);
+            this.groupBox3.Controls.Add(this._engineKofaxRadioButton);
+            this.groupBox3.Location = new System.Drawing.Point(11, 12);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(578, 46);
+            this.groupBox3.TabIndex = 0;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Engine";
+            this.groupBox3.Enabled = false;
             // 
-            // _micrSplitterRegexPathTagButton
+            // _engineGdPictureRadioButton
             // 
-            this._micrSplitterRegexPathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._micrSplitterRegexPathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_micrSplitterRegexPathTagButton.Image")));
-            this._micrSplitterRegexPathTagButton.Location = new System.Drawing.Point(521, 131);
-            this._micrSplitterRegexPathTagButton.Name = "_micrSplitterRegexPathTagButton";
-            this._micrSplitterRegexPathTagButton.PathTags = new AttributeFinderPathTags();
-            this._micrSplitterRegexPathTagButton.Size = new System.Drawing.Size(18, 20);
-            this._micrSplitterRegexPathTagButton.TabIndex = 8;
-            this._micrSplitterRegexPathTagButton.TextControl = this._micrSplitterRegexTextBox;
-            this._micrSplitterRegexPathTagButton.UseVisualStyleBackColor = true;
+            this._engineGdPictureRadioButton.AutoSize = true;
+            this._engineGdPictureRadioButton.Location = new System.Drawing.Point(66, 21);
+            this._engineGdPictureRadioButton.Name = "_engineGdPictureRadioButton";
+            this._engineGdPictureRadioButton.Size = new System.Drawing.Size(75, 17);
+            this._engineGdPictureRadioButton.TabIndex = 1;
+            this._engineGdPictureRadioButton.TabStop = true;
+            this._engineGdPictureRadioButton.Text = "GdPicture";
+            this._engineGdPictureRadioButton.UseVisualStyleBackColor = true;
+            this._engineGdPictureRadioButton.CheckedChanged += new System.EventHandler(this.EngineRadioButton_CheckedChanged);
+            // 
+            // _engineKofaxRadioButton
+            // 
+            this._engineKofaxRadioButton.AutoSize = true;
+            this._engineKofaxRadioButton.Location = new System.Drawing.Point(7, 21);
+            this._engineKofaxRadioButton.Name = "_engineKofaxRadioButton";
+            this._engineKofaxRadioButton.Size = new System.Drawing.Size(53, 17);
+            this._engineKofaxRadioButton.TabIndex = 0;
+            this._engineKofaxRadioButton.TabStop = true;
+            this._engineKofaxRadioButton.Text = "Kofax";
+            this._engineKofaxRadioButton.UseVisualStyleBackColor = true;
+            this._engineKofaxRadioButton.CheckedChanged += new System.EventHandler(this.EngineRadioButton_CheckedChanged);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox4.Controls.Add(this._searchPagesWithTextRadioButton);
+            this.groupBox4.Controls.Add(this._searchAllPagesRadioButton);
+            this.groupBox4.Location = new System.Drawing.Point(11, 64);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(578, 46);
+            this.groupBox4.TabIndex = 1;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Scope";
+            // 
+            // _searchPagesWithTextRadioButton
+            // 
+            this._searchPagesWithTextRadioButton.AutoSize = true;
+            this._searchPagesWithTextRadioButton.Location = new System.Drawing.Point(85, 21);
+            this._searchPagesWithTextRadioButton.Name = "_searchPagesWithTextRadioButton";
+            this._searchPagesWithTextRadioButton.Size = new System.Drawing.Size(191, 17);
+            this._searchPagesWithTextRadioButton.TabIndex = 1;
+            this._searchPagesWithTextRadioButton.TabStop = true;
+            this._searchPagesWithTextRadioButton.Text = "Only pages with recognized text";
+            this._searchPagesWithTextRadioButton.UseVisualStyleBackColor = true;
+            // 
+            // _searchAllPagesRadioButton
+            // 
+            this._searchAllPagesRadioButton.AutoSize = true;
+            this._searchAllPagesRadioButton.Location = new System.Drawing.Point(7, 21);
+            this._searchAllPagesRadioButton.Name = "_searchAllPagesRadioButton";
+            this._searchAllPagesRadioButton.Size = new System.Drawing.Size(72, 17);
+            this._searchAllPagesRadioButton.TabIndex = 0;
+            this._searchAllPagesRadioButton.TabStop = true;
+            this._searchAllPagesRadioButton.Text = "All pages";
+            this._searchAllPagesRadioButton.UseVisualStyleBackColor = true;
             // 
             // MicrFinderSettingsDialog
             // 
@@ -458,7 +542,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this._cancelButton;
-            this.ClientSize = new System.Drawing.Size(602, 453);
+            this.ClientSize = new System.Drawing.Size(602, 574);
+            this.Controls.Add(this.groupBox4);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this._returnUnrecognizedCharactersCheckBox);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this._inheritOCRParametersCheckBox);
@@ -481,6 +567,10 @@
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._lowConfidenceUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._highConfidenceUpDown)).EndInit();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -513,5 +603,11 @@
         private System.Windows.Forms.Label _lowConfidenceLabel2;
         private System.Windows.Forms.NumericUpDown _highConfidenceUpDown;
         private System.Windows.Forms.CheckBox _returnUnrecognizedCharactersCheckBox;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.RadioButton _engineGdPictureRadioButton;
+        private System.Windows.Forms.RadioButton _engineKofaxRadioButton;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.RadioButton _searchPagesWithTextRadioButton;
+        private System.Windows.Forms.RadioButton _searchAllPagesRadioButton;
     }
 }
