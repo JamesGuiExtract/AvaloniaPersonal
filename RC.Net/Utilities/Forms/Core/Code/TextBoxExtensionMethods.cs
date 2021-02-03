@@ -10,9 +10,9 @@ namespace Extract.Utilities.Forms
     /// </summary>
     public static class TextBoxExtensionMethods
     {
-        // Note that SOH characters have been appended to the string to prevent a user from
+        // Note that zero-width space characters have been appended to the string to prevent a user from
         // typing "Required" in a text box and having that incorrectly match this text.
-        const string REQUIRED_FIELD_MARKER = "Required\x01\x01";
+        const string REQUIRED_FIELD_MARKER = "Required\u200B\u200B";
 
         /// <summary>
         /// Changes the font color and places required marker text into the textbox.

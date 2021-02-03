@@ -244,8 +244,6 @@
             // 
             // _checkUseSsl
             // 
-            this._checkUseSsl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this._checkUseSsl.AutoSize = true;
             this._checkUseSsl.Location = new System.Drawing.Point(35, 129);
             this._checkUseSsl.Name = "_checkUseSsl";

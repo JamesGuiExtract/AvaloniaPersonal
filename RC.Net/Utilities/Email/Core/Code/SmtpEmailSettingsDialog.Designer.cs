@@ -94,7 +94,7 @@
             this.MinimizeBox = false;
             this.Name = "SmtpEmailSettingsDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "FAM Database Email Settings";
+            this.Text = "Email Settings";
             this.ResumeLayout(false);
 
         }
