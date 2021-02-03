@@ -4,7 +4,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <Copyright>Copyright ©  2020</Copyright>
+    <Copyright>Copyright ©  2021</Copyright>
     <Company>Extract Systems, LLC</Company>
     <NeutralLanguage>en-US</NeutralLanguage>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
