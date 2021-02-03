@@ -116,21 +116,12 @@ namespace Extract.Imaging.Forms.Test
             _imageViewerForm.Refresh();
 
             // Send the Ctrl+O key press
-            // [DotNetRCAndUtils:870]
-            // Not sure what is going on, but processing the shortcut key on the current thread
-            // seems to cause a hang. Invoking from another thread doesn't allow the test to
-            // pass, but at least it doesn't hang so that the rest of the tests can be completed.
-            using (new Task(() =>
-                imageViewer.SafeBeginInvoke("ELI35360", () =>
-                    imageViewer.Shortcuts.ProcessKey(Keys.Control | Keys.O))))
-            {
-                Application.DoEvents();
+            imageViewer.Shortcuts.ProcessKey(Keys.Control | Keys.O);
 
-                Assert.That(
-                    MessageBox.Show("Did the Open File dialog appear?", "Did dialog appear?",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button1, 0) == DialogResult.Yes);
-            }
+            Assert.That(
+                MessageBox.Show("Did the Open File dialog appear?", "Did dialog appear?",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button1, 0) == DialogResult.Yes);
         }
 
         #endregion
@@ -173,22 +164,12 @@ namespace Extract.Imaging.Forms.Test
             // Refresh the Image viewer
             _imageViewerForm.Refresh();
 
-            // Send the Ctrl+P key press
-            // [DotNetRCAndUtils:870]
-            // Not sure what is going on, but processing the shortcut key on the current thread
-            // seems to cause a hang. Invoking from another thread doesn't allow the test to
-            // pass, but at least it doesn't hang so that the rest of the tests can be completed.
-            using (new Task(() =>
-                imageViewer.SafeBeginInvoke("ELI35361", () =>
-                    imageViewer.Shortcuts.ProcessKey(Keys.Control | Keys.P))))
-            {
-                Application.DoEvents();
+            imageViewer.Shortcuts.ProcessKey(Keys.Control | Keys.P);
 
-                Assert.That(
-                    MessageBox.Show("Did the Print dialog appear?", "Did dialog appear?",
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button1, 0) == DialogResult.Yes);
-            }
+            Assert.That(
+                MessageBox.Show("Did the Print dialog appear?", "Did dialog appear?",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question,
+                MessageBoxDefaultButton.Button1, 0) == DialogResult.Yes);
         }
 
         #endregion

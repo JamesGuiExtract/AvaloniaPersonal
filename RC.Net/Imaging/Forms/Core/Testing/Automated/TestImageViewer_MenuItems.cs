@@ -1,18 +1,8 @@
-using Extract;
-using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Testing.Utilities;
-using Extract.Utilities;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
-using System.IO;
-using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
-using System.Drawing.Drawing2D;
 
 namespace Extract.Imaging.Forms.Test
 {

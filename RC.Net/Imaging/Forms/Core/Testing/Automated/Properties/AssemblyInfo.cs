@@ -1,8 +1,9 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using NUnit.Framework;
 using System;
+using System.Reflection;
 using System.Resources;
+using System.Runtime.InteropServices;
+using System.Threading;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -39,3 +40,9 @@ using System.Resources;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
+
+// Some tests (e.g., the ones that use a file browser dialog) need to be run in a STA.
+// Since the tests in this assembly share the image viewer form, run all the tests in an STA thread
+// to prevent the STA-requiring tests from failing
+// https://extract.atlassian.net/browse/ISSUE-17418
+[assembly: Apartment(ApartmentState.STA)]
