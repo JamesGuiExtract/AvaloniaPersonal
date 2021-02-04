@@ -55,10 +55,10 @@
 		<Feature Id="ProductFeature" Title="WebInstaller" Level="1">
       <ComponentGroupRef Id="CopyAPIFolders"/>
       <ComponentGroupRef Id="PublishedComponents"/>
-      <ComponentRef Id="AppBackend"/>
-      <ComponentRef Id="DocAPI"/>
-      <ComponentRef Id="ExtractVerify"/>
-      <ComponentRef Id="WindowsAuthorization"/>
+      <ComponentRef Id="ExtractAppBackendAPI"/>
+      <ComponentRef Id="ExtractDocumentAPI"/>
+      <ComponentRef Id="ExtractRedactionVerify"/>
+      <ComponentRef Id="ExtractAuthorizationAPI"/>
 		</Feature>
     <InstallExecuteSequence>
       <RegisterProduct Suppress="yes" />

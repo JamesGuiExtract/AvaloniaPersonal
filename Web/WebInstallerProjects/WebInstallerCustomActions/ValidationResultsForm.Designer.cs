@@ -14,10 +14,21 @@ namespace WebInstallerCustomActions
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
-                components.Dispose();
+                components?.Dispose();
+                components = null;
+
+                _validImage?.Dispose();
+                _validImage = null;
+
+                _errorImage?.Dispose();
+                _errorImage = null;
+
+                _warningImage?.Dispose();
+                _warningImage = null;
             }
+
             base.Dispose(disposing);
         }
 
@@ -54,7 +65,7 @@ namespace WebInstallerCustomActions
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(785, 533);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(785, 576);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // _validationTable
@@ -100,7 +111,7 @@ namespace WebInstallerCustomActions
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this._okButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this._okButton.ForeColor = System.Drawing.Color.Black;
-            this._okButton.Location = new System.Drawing.Point(335, 505);
+            this._okButton.Location = new System.Drawing.Point(335, 548);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(115, 23);
             this._okButton.TabIndex = 3;
@@ -111,7 +122,7 @@ namespace WebInstallerCustomActions
             // 
             this.AcceptButton = this._okButton;
             this.CancelButton = this._okButton;
-            this.ClientSize = new System.Drawing.Size(785, 533);
+            this.ClientSize = new System.Drawing.Size(785, 576);
             this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;

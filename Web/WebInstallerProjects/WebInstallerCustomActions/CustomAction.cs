@@ -11,6 +11,7 @@ namespace WebInstallerCustomActions
     public static class CustomActions
     {
         [CustomAction]
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         public static ActionResult UpdateAppSettings(Session session)
         {
             ExtractException.Assert("ELI51533", "Session cannot be null", session != null);
@@ -43,6 +44,7 @@ namespace WebInstallerCustomActions
         }
 
         [CustomAction]
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         public static ActionResult ModifyWebConfig(Session session)
         {
             ExtractException.Assert("ELI51531", "Session cannot be null", session != null);
@@ -73,6 +75,7 @@ namespace WebInstallerCustomActions
         }
 
         [CustomAction]
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
         public static ActionResult UpdateAngularSettings(Session session)
         {
             ExtractException.Assert("ELI51532", "Session cannot be null", session != null);

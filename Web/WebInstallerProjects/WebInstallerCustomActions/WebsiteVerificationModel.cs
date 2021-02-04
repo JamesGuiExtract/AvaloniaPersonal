@@ -1,5 +1,6 @@
 ﻿using Extract;
 using Microsoft.Deployment.WindowsInstaller;
+using Microsoft.Web.Administration;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -37,8 +38,6 @@ FROM
 WHERE
 	[Workflow].Name = @Name";
 
-        Dictionary<string, bool> _usedHostNames = new Dictionary<string, bool>();
-
         public Session Session { get; set; }
         public bool InstallingDocumentAPI { get; set; }
         public bool InstallingVerification { get; set; }
@@ -61,7 +60,20 @@ WHERE
             {
                 this.Session = session;
                 IntPtr accessToken = IntPtr.Zero;
-                UsernameAndPasswordValid = NativeMethods.LogonUser(session["APPPOOL_USER_NAME"], session["APPPOOL_USER_DOMAIN"], session["APPPOOL_USER_PASSWORD"], 2, 0, ref accessToken);
+                UsernameAndPasswordValid = NativeMethods.LogonUser(
+                    session["APPPOOL_USER_NAME"], session["APPPOOL_USER_DOMAIN"], 
+                    session["APPPOOL_USER_PASSWORD"], 
+                    5, // LOGON32_LOGON_SERVICE 
+                    0, ref accessToken);
+                if (!UsernameAndPasswordValid)
+                {
+                    UsernameAndPasswordValid = NativeMethods.LogonUser(
+                        session["APPPOOL_USER_NAME"], session["APPPOOL_USER_DOMAIN"],
+                        session["APPPOOL_USER_PASSWORD"],
+                        2, // LOGON32_LOGON_INTERACTIVE 
+                        0, ref accessToken);
+                }
+
                 InstallingDocumentAPI = Session["CREATE_DOCUMENTAPI_SITE"].Equals("1", StringComparison.OrdinalIgnoreCase);
                 InstallingVerification = Session["CREATE_VERIFY_SITE"].Equals("1", StringComparison.OrdinalIgnoreCase);
                 InstallingAuthenticationAPI = InstallingVerification && Session["CREATE_WINDOWS_AUTHORIZATION_SITE"].Equals("1", StringComparison.OrdinalIgnoreCase);
@@ -74,6 +86,7 @@ WHERE
                 {
                     using WindowsIdentity identity = new WindowsIdentity(accessToken);
                     using WindowsImpersonationContext ctx = identity.Impersonate();
+
                     using SqlConnection connection = new SqlConnection(
                         $"Data Source={session["DATABASE_SERVER"]};Initial Catalog={session["DATABASE_NAME"]};Persist Security Info=true;Integrated Security=SSPI");
                     {
@@ -86,6 +99,7 @@ WHERE
                         }
                         catch (SqlException) { }
                     }
+
                     ctx.Undo();
                 }
             }
@@ -132,49 +146,91 @@ WHERE
 
             using var validationResultsForm = new ValidationResultsForm();
 
-            AddHostMessages(validationResultsForm);
+            AddSiteMessages(validationResultsForm);
             AddUserAccessMessages(validationResultsForm);
             AddWorkflowMessages(validationResultsForm);
 
             validationResultsForm.ShowDialog();
         }
 
-        void AddHostMessages(ValidationResultsForm validationResultsForm)
+        void AddSiteMessages(ValidationResultsForm validationResultsForm)
         {
             validationResultsForm.AddHeading("Host configuration:");
-            _usedHostNames.Clear();
 
             if (!InstallingDocumentAPI && !InstallingVerification)
             {
-                validationResultsForm.AddWarning("No Extract sites have been selected to be installed.");
+                validationResultsForm.AddError("No Extract sites have been selected to be installed.");
             }
+
+            var specifiedSites = new List<SiteInfo>();
 
             if (InstallingDocumentAPI)
             {
-                AddHostMessages(validationResultsForm, Session["DOCUMENTAPI_DNS_ENTRY"], "Extract Document API");
+                specifiedSites.Add(new SiteInfo(Session, "Extract Document API", "DOCUMENTAPI_DNS_ENTRY", "DocumentAPI"));
             }
 
             if (InstallingVerification)
             {
-                AddHostMessages(validationResultsForm, Session["IDSVERIFY_DNS_ENTRY"], "Extract Verify");
-                AddHostMessages(validationResultsForm, Session["APPBACKEND_DNS_ENTRY"], "Extract App Backend API");
+                specifiedSites.Add(new SiteInfo(Session, "Extract Redaction Verify", "IDSVERIFY_DNS_ENTRY", "IDSVerify"));
+                specifiedSites.Add(new SiteInfo(Session, "Extract App Backend API", "APPBACKEND_DNS_ENTRY", "AppBackendAPI"));
+
                 if (InstallingAuthenticationAPI)
                 {
-                    AddHostMessages(validationResultsForm, Session["WINDOWSAUTHORIZATION_DNS_ENTRY"], "Extract Authorization API");
+                    specifiedSites.Add(new SiteInfo(Session, "Extract Authorization API", "WINDOWSAUTHORIZATION_DNS_ENTRY", "AuthorizationAPI"));
                 }
             }
 
-            foreach (var hostName in _usedHostNames
-                .Where(h => h.Value)
-                .Select(h => h.Key))
+            foreach (var site in specifiedSites)
+            {
+                AddHostMessages(validationResultsForm, site);
+            }
+
+            foreach (var hostName in specifiedSites
+                .GroupBy(site => site.Bindings.FirstOrDefault(), StringComparer.OrdinalIgnoreCase)
+                .Where(group => !string.IsNullOrEmpty(group.Key) && group.Count() > 1)
+                .Select(group => group.Key))
             {
                 validationResultsForm.AddWarning(
-                    Invariant($"'{hostName}' has been specified as the host name for multiple sites and will conflict"));
+                    Invariant($"'{hostName}' is the host name for multiple sites and will conflict without use of different ports"));
+            }
+
+            AddDuplicateSiteMessages(validationResultsForm, specifiedSites);
+        }
+
+        void AddDuplicateSiteMessages(ValidationResultsForm validationResultsForm, List<SiteInfo> specifiedSites)
+        {
+            using var iisManager = new ServerManager();
+            var existingSites = iisManager.Sites.Select(site => new SiteInfo(site));
+
+            foreach (var siteName in existingSites
+                .Select(site => site.Name)
+                .Intersect(specifiedSites.Select(site => site.Name), StringComparer.OrdinalIgnoreCase)
+                .Distinct())
+            {
+                validationResultsForm.AddWarning(Invariant($"Site '{siteName}' is already installed"));
+            }
+
+            foreach (var physicalPath in existingSites
+                .Select(site => site.PhysicalPath)
+                .Intersect(specifiedSites.Select(site => site.PhysicalPath), StringComparer.OrdinalIgnoreCase)
+                .Distinct())
+            {
+                validationResultsForm.AddWarning(Invariant($"A site is already installed at path '{Path.Combine(Session["INSTALLLOCATION"], physicalPath)}'"));
+            }
+
+            foreach (var hostName in existingSites
+                .SelectMany(site => site.Bindings)
+                .Intersect(specifiedSites.SelectMany(site => site.Bindings), StringComparer.OrdinalIgnoreCase)
+                .Distinct())
+            {
+                validationResultsForm.AddWarning(
+                    Invariant($"A site is already installed using host name '{hostName}' and will conflict without use of different ports"));
             }
         }
 
-        void AddHostMessages(ValidationResultsForm validationResultsForm, string host, string siteName)
+        static void AddHostMessages(ValidationResultsForm validationResultsForm, SiteInfo site)
         {
+            var host = site.Bindings.FirstOrDefault();
             if (host.Contains('/') || host.Contains(':'))
             {
                 validationResultsForm.AddError(
@@ -186,16 +242,16 @@ WHERE
 
             if (docAPIHost == null)
             {
-                validationResultsForm.AddError(Invariant($"{siteName} host name is missing or invalid"));
+                validationResultsForm.AddError(Invariant($"{site.Name} host name is missing or invalid"));
             }
             else
             {
-                validationResultsForm.AddValid(Invariant($"{siteName} host name valid"));
+                validationResultsForm.AddValid(Invariant($"'{site.Name}' host name valid"));
 
                 var status = docAPIHost.AddressList.Contains(GetLocalIPAddress()) ? ValidationResult.Valid : ValidationResult.Warning;
                 validationResultsForm.AddMessage(status, status == ValidationResult.Valid
-                    ? Invariant($"{siteName} host name verified to target this machine")
-                    : Invariant($"Could not confirm {siteName} host name targets this machine"));
+                    ? Invariant($"'{host}' host name verified to target this machine")
+                    : Invariant($"Could not confirm '{host}' host name targets this machine"));
             }
         }
 
@@ -307,7 +363,7 @@ WHERE
             }
         }
 
-        private IPHostEntry GetHostEntry(string entryToCheck)
+        static IPHostEntry GetHostEntry(string entryToCheck)
         {
             if (string.IsNullOrWhiteSpace(entryToCheck))
             {
@@ -315,15 +371,6 @@ WHERE
             }
             try
             {
-                if (_usedHostNames.TryGetValue(entryToCheck, out bool _))
-                {
-                    _usedHostNames[entryToCheck] = true;
-                }
-                else
-                {
-                    _usedHostNames[entryToCheck] = false;
-                }
-
                 return Dns.GetHostEntry(entryToCheck);
             }
             catch (Exception e) when (e is SocketException || e is ArgumentOutOfRangeException)
@@ -358,6 +405,27 @@ WHERE
             }
             catch (Exception) { }
             return hasPermission;
+        }
+
+        class SiteInfo
+        {
+            public SiteInfo(Site iisSite)
+            {
+                Name = iisSite.Name;
+                Bindings = iisSite.Bindings.Select(b => b.Host).ToList();
+                PhysicalPath = iisSite.Applications["/"].VirtualDirectories["/"].PhysicalPath;
+            }
+
+            public SiteInfo(Session session, string siteName, string hostNameKey, string directory)
+            {
+                Name = siteName;
+                Bindings = new List<string>(new[] { session[hostNameKey] });
+                PhysicalPath = Path.Combine(session["INSTALLLOCATION"], directory);
+            }
+
+            public string Name { get; set; }
+            public List<string> Bindings { get; set; }
+            public string PhysicalPath { get; set; }
         }
     }
 
