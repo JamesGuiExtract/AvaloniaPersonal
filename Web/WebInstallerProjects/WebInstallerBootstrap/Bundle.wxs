@@ -16,7 +16,7 @@
 
       <PackageGroupRef Id="NetCoreInstall"/>
 
-      <MsiPackage Permanent="yes" DisplayInternalUI="yes" SourceFile="$(var.WebInstaller.TargetDir)\WebInstallerConfiguration.msi"></MsiPackage>
+      <MsiPackage Permanent="yes" DisplayInternalUI="yes" SourceFile="$(var.WebInstaller.TargetDir)\WebInstallerConfiguration.msi" ForcePerMachine="yes"></MsiPackage>
 		</Chain>
 	</Bundle>
 </Wix>

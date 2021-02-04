@@ -16,7 +16,7 @@
         InstallCommand="/quiet /passive"
         SourceFile="dotnet-hosting-2.1.24-win.exe" 
         Vital="yes"
-        Permanent="yes"></ExePackage>
+        Permanent="yes" PerMachine="yes"></ExePackage>
     </PackageGroup>
 	</Fragment>
 </Wix>

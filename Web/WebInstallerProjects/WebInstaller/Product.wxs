@@ -65,6 +65,7 @@
       <PublishFeatures Suppress="yes" />
       <PublishProduct Suppress="yes" />
       <Custom Action="UpdateAngularSettings" OnExit="success"></Custom>
+      <ScheduleReboot After="InstallFinalize"></ScheduleReboot>
     </InstallExecuteSequence>
 	</Product>
 </Wix>
