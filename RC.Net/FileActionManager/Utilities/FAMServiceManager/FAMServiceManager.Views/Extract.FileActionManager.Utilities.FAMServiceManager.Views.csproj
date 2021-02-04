@@ -7,11 +7,16 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>Extract.FileActionManager.Utilities.FAMServiceManager</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <OutDir>..\..\..\..\..\Binaries\$(Configuration)</OutDir>
+    <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Copyright>Copyright © Extract Systems, LLC 2021</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <AssemblyName>FAMServiceManager</AssemblyName>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
     <ApplicationIcon>calc_config.ico</ApplicationIcon>

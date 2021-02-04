@@ -4,10 +4,14 @@
     <UseWpf>true</UseWpf>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PlatformTarget>x86</PlatformTarget>
-    <OutDir>..\..\..\..\..\Binaries\$(Configuration)</OutDir>
+    <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Copyright>Copyright © Extract Systems, LLC 2021</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -41,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
-    <ProjectReference Include="..\..\..\..\Utilities\FSharp\Core\Code\Extract.Utilities.FSharp\Extract.Utilities.FSharp.fsproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\FSharp\Core\Code\Extract.Utilities.FSharp.fsproj" />
     <ProjectReference Include="..\..\..\Database\Core\Code\Extract.FileActionManager.Database.csproj" />
     <ProjectReference Include="..\..\ESFAMService\Core\Code\ESFAMService.csproj" />
   </ItemGroup>

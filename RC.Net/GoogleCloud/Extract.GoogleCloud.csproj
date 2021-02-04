@@ -3,12 +3,16 @@
     <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>Extract.GoogleCloud</AssemblyTitle>
     <Product>Extract.GoogleCloud</Product>
-    <Copyright>Copyright © Extract Systems, LLC 2020</Copyright>
+    <Copyright>Copyright © Extract Systems, LLC 2021</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
     <PlatformTarget>x86</PlatformTarget>
-    <OutDir>..\..\Binaries\$(Configuration)</OutDir>
+    <OutputPath>..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

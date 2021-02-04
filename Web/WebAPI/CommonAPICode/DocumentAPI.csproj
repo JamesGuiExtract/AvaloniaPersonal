@@ -13,12 +13,15 @@
     <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
     <AssemblyName>DocumentAPI</AssemblyName>
     <RootNamespace>WebAPI</RootNamespace>
-    <Version>2.0.0</Version>
+    <Copyright>Copyright © Extract Systems, LLC 2021</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <Version>1.0.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AssemblyOriginatorKeyFile>ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <DefineConstants>TRACE;DEBUG;Add_Test_Controller;NET46</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;Add_Test_Controller</DefineConstants>
     <OutputPath>..\..\..\Binaries\Debug\</OutputPath>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
@@ -91,7 +94,7 @@
       <Lcid>0</Lcid>
       <Isolated>false</Isolated>
     </COMReference>
-	<COMReference Include="UCLIDImageUtils.dll">
+    <COMReference Include="UCLIDImageUtils.dll">
       <Guid>d46831e6-669c-423f-8209-d6a7a80c2add</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>

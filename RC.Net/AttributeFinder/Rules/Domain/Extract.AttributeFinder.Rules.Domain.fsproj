@@ -4,16 +4,19 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
     <PlatformTarget>x86</PlatformTarget>
-    <RootNamespace>Extract.AttributeFinder.Rules.Domain</RootNamespace>
-    <AssemblyName>Extract.AttributeFinder.Rules.Domain</AssemblyName>
-    <OutDir>..\..\..\..\Binaries\$(Configuration)</OutDir>
+    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Copyright>Copyright © Extract Systems, LLC 2021</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
     <WarningsAsErrors>3239;$(WarningsAsErrors)</WarningsAsErrors>
+    <NoWarn>FS0087</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

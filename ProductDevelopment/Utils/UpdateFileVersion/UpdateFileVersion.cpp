@@ -319,6 +319,11 @@ bool UpdateVersionInfoInTmpFile(const string& sSrcFileName, const string& sTmpFi
 					{
 						sOutBuf = _T("    <AssemblyVersion>" + sVersion + "</AssemblyVersion>");
 					}
+					// for csproj files (web SDK uses this instead of AssemblyVersion)
+					else if (sInBuf.find(_T("<Version>1.0.0.0</Version>")) != string::npos)
+					{
+						sOutBuf = _T("    <Version>" + sVersion + "</Version>");
+					}
 					// for csproj files (new style)
 					else if (sInBuf.find(_T("<FileVersion>1.0.0.0</FileVersion>")) != string::npos)
 					{
