@@ -272,6 +272,9 @@ module FAMService =
       Some sid
     with | :? IdentityNotMappedException -> None
 
+  let getUserName (sid: SecurityIdentifier) =
+    (sid.Translate typeof<NTAccount>).Value
+
   let private getCfgForServiceLogonRight sids =
     sprintf """[Unicode]
 Unicode=yes
@@ -309,18 +312,19 @@ SeServiceLogonRight = %s""" (sids |> String.concat ",")
     let service = getFamService serviceName :?> ManagementObject
     // Ensure the user has the log-on-as-service right
     match getSID startName with
-    | Some sid -> grantLogOnRights sid
-    | None -> ()
-
-    let propsToChange =
-      [ yield ("StartName", startName)
-        if not (String.IsNullOrEmpty password) then
-          yield ("StartPassword", password)
-      ]
-    service |> setProperties "Change" propsToChange
-
-    let changedPassword = propsToChange.Length = 2
-    changedPassword
+    | Some sid ->
+      grantLogOnRights sid
+      // Translate back to a username to get full name (e.g., with domain)
+      let userName = getUserName sid
+      let propsToChange =
+        [ yield ("StartName", userName)
+          if not (String.IsNullOrEmpty password) then
+            yield ("StartPassword", password)
+        ]
+      service |> setProperties "Change" propsToChange
+      let changedPassword = propsToChange.Length = 2
+      changedPassword
+    | None -> failwithf "Could not resolve %s to a Security Identifier" startName
 
   let startService name =
     let service = getFamService name :?> ManagementObject
