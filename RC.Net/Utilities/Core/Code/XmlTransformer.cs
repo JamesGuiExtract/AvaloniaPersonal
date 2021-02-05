@@ -115,7 +115,6 @@ namespace Extract.Utilities
         {
             try
             {
-                var inputSettings = new XmlReaderSettings();
                 using var reader = GetStreamReader(input, defaultEncoding: Encoding.GetEncoding("Windows-1252"));
                 using var xmlReader = XmlReader.Create(reader);
                 transform.Transform(xmlReader, null, output);

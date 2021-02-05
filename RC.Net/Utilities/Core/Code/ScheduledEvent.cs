@@ -13,7 +13,7 @@ namespace Extract.Utilities
     /// Describes a scheduled event that may recur.
     /// </summary>
     [DataContract]  
-    [Obfuscation(ApplyToMembers=false)]
+    [Obfuscation(Feature = "renaming", Exclude = true)]
     public class ScheduledEvent : IDisposable
     {
         #region Constants

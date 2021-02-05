@@ -375,6 +375,7 @@ namespace Extract.Utilities
         /// <summary>
         /// Random 11 character filename with no extension (avoid suspicious temp files)
         /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public static string GetRandomFileNameWithoutExtension()
         {
             return Path.GetRandomFileName().Remove(8, 1); // Remove '.'
