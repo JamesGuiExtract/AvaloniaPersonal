@@ -3992,7 +3992,10 @@ namespace Extract.FileActionManager.Utilities
             }
             finally
             {
-                _updatingFileList = false;
+                this.SafeBeginInvoke("ELI51581", () =>
+                {
+                    _updatingFileList = false;
+                });
             }
         }
 
