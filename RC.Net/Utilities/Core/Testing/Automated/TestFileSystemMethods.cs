@@ -145,14 +145,12 @@ namespace Extract.Utilities.Test
             try
             {
                 parentFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-                // This will fail because parent dir doesn't exist
-                Assert.Throws<ExtractException>(() => FileSystemMethods.GetTemporaryFolderName(parentFolder));
 
-                // The parent dir still doesn't exist
+                // The parent dir doesn't exist
                 Assert.That(!Directory.Exists(parentFolder));
 
-                Directory.CreateDirectory(parentFolder);
                 var tempFolder = FileSystemMethods.GetTemporaryFolderName(parentFolder);
+
                 Assert.That(Directory.Exists(tempFolder));
             }
             finally

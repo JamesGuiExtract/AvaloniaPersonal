@@ -260,8 +260,8 @@ namespace Extract.Utilities
         /// <param name="extension">The extension for the temporary file
         /// that will be generated.</param>
         /// <param name="folder">The folder in which to create the temporary file. Must
-        /// not be <see langword="null"/> or empty string. The folder must exist
-        /// on the current system.</param>
+        /// not be <see langword="null"/> or empty string. If the folder doesn't exist
+        /// it will be created.</param>
         /// <exception cref="ExtractException">If the <paramref name="folder"/>
         /// is <see langword="null"/> or empty string.</exception>
         /// <exception cref="ExtractException">If the <paramref name="folder"/>
@@ -271,9 +271,13 @@ namespace Extract.Utilities
         {
             try
             {
-                ExtractException.Assert("ELI25508", "Specified folder cannot be found.",
-                    !string.IsNullOrEmpty(folder) && Directory.Exists(folder),
+                ExtractException.Assert("ELI25508", "Folder cannot be empty",
+                    !string.IsNullOrEmpty(folder),
                     "Folder Name", folder ?? "NULL");
+
+                // Create the parent folder if necessary in case GetTempPath returns "C:\Temp\1", e.g.
+                // https://extract.atlassian.net/browse/ISSUE-17427
+                Directory.CreateDirectory(folder);
 
                 if (string.IsNullOrEmpty(extension))
                 {
@@ -359,12 +363,13 @@ namespace Extract.Utilities
         /// calling this function the returned folder will exist on the system.
         /// </summary>
         /// <param name="parentFolder">The folder in which to create the temporary folder. If null or empty then
-        /// <see cref="Path.GetTempPath"/> will be used. The folder must exist
-        /// on the current system.</param>
+        /// <see cref="Path.GetTempPath"/> will be used. If the folder doesn't exist it will be created.</param>
         /// <returns>The name of the temporary folder that was created.</returns>
         public static string GetTemporaryFolderName(string parentFolder = null)
         {
-            return GetTemporaryFolder(parentFolder, false).FullName;
+            // Create the parent folder if necessary in case GetTempPath returns "C:\Temp\1", e.g.
+            // https://extract.atlassian.net/browse/ISSUE-17427
+            return GetTemporaryFolder(parentFolder, createParentFolder: true).FullName;
         }
 
         /// <summary>
