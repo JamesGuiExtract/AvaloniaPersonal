@@ -41,6 +41,15 @@ for /R .\ %%r in (*.rl,*.nl) do (
 		)
 	)
 )
+
+:: set DCOM permissions for FAMProcess
+dcomperm -al {08463A92-A444-48AF-8822-693C4F6E1F08} set users permit level:l
+dcomperm -aa {08463A92-A444-48AF-8822-693C4F6E1F08} set users permit level:l
+
+:: Set DCOM permissions for SSOCR2
+dcomperm -al {752139E2-5977-4AD2-9E26-BE3B9235524C} set users permit level:l
+dcomperm -aa {752139E2-5977-4AD2-9E26-BE3B9235524C} set users permit level:l
+
 popd
 
 endlocal
