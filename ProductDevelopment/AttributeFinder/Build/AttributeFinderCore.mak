@@ -360,6 +360,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y  "$(BinariesFolder)\PredictionEvaluator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(RCNETDir)\APIs\Aspose\Aspose.Pdf for .Net 9.8\License\Aspose.Pdf.lic" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
 	@COPY /V /Y "$(CommonDirectory)\FixMachineConfig.vbs" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
+	@COPY /V /Y "$(CommonDirectory)\FixEverything.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\*.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y  "$(BinariesFolder)\Extract.DataEntry.DEP.DemoFlexIndex.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
