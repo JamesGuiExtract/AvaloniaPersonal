@@ -51,12 +51,12 @@ let createImages singlePageImageFolder minPages maxPages totalPages outputFolder
   if exitCode = 0 then
     output |> Seq.iter (printfn "%s")
   else
-    eprintfn "CreatMultipageImage failed with exit code %d. First error: %s" exitCode (errors |> Seq.head)
+    eprintfn "CreateMultipageImage.exe failed with exit code %d. First error: %s" exitCode (errors |> Seq.head)
 
 
 do
   // USAGE: Supply input folder and output folder, e.g.:
-  //  fsi C:\Demo_IDShield\Input D:\tmp\MultipageImages
+  //  fsi createMultipageImages.fsx C:\Demo_IDShield\Input D:\tmp\MultipageImages
   // NOTE: The input folder should contain single-page images as only the first page of the files will be used
   let argv : string array = fsi.CommandLineArgs |> Array.tail
   let singlePageImageFolder = argv.[0]
