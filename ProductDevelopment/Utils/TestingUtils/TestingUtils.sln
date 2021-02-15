@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.705
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "CreateFAM", "CreateFAM\CreateFAM.fsproj", "{3A1BE099-4BE5-45F7-9304-285D68ACA6E4}"
 EndProject
@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		TestingUtils\TestingUtils.fsx = TestingUtils\TestingUtils.fsx
 	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharpScripts", "FSharpScripts\FSharpScripts.fsproj", "{900F4F68-690A-4408-8595-F4B9C44745B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +48,10 @@ Global
 		{0C273BCE-8835-4818-B7CE-5B10D135D289}.Release|Any CPU.Build.0 = Release|x86
 		{0C273BCE-8835-4818-B7CE-5B10D135D289}.Release|x86.ActiveCfg = Release|x86
 		{0C273BCE-8835-4818-B7CE-5B10D135D289}.Release|x86.Build.0 = Release|x86
+		{900F4F68-690A-4408-8595-F4B9C44745B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{900F4F68-690A-4408-8595-F4B9C44745B0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{900F4F68-690A-4408-8595-F4B9C44745B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{900F4F68-690A-4408-8595-F4B9C44745B0}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
