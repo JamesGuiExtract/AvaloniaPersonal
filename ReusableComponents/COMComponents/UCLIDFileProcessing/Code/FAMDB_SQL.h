@@ -665,6 +665,18 @@ static const string gstrCREATE_FILETASKSESSION_DATETIMESTAMP_WITH_INCLUDES_INDEX
 "	, [ActivityTime] \r\n"
 ") \r\n";
 
+static const string gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_DELETED_INDEX =
+"IF EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_Workflowfile_FileID_WorkflowID_Deleted' AND object_id = OBJECT_ID('WorkflowFile')) \r\n"
+"BEGIN \r\n"
+"	DROP INDEX [IX_Workflowfile_FileID_WorkflowID_Deleted] ON [dbo].[WorkflowFile] \r\n"
+"END \r\n"
+"CREATE NONCLUSTERED INDEX [IX_Workflowfile_FileID_WorkflowID_Deleted] ON[dbo].[WorkflowFile]\r\n"
+"(																							\r\n"
+"	[FileID] ASC,																			\r\n"
+"	[WorkflowID] ASC,																		\r\n"
+"	[Deleted] ASC																			\r\n"
+")";
+
 // Add foreign keys SQL
 static const string gstrADD_ACTION_WORKFLOW_FK =
 	"ALTER TABLE dbo.[Action] "

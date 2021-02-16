@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 189;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 190;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2938,6 +2938,35 @@ int UpdateToSchemaVersion189(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51491");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion190(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 190;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// The procedure was updated
+		vecQueries.push_back(gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_DELETED_INDEX);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51491");
+}
+
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
 //-------------------------------------------------------------------------------------------------
@@ -8031,7 +8060,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 186:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion187);
 				case 187:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion188);
 				case 188:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion189);
-				case 189:
+				case 189:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion190);
+				case 190:
 					break;
 
 				default:
