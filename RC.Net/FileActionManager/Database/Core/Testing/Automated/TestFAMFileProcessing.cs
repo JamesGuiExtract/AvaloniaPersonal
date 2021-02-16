@@ -3,6 +3,7 @@ using Extract.Utilities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -480,9 +481,6 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
-        /// <summary>
-        /// Tests the workflow statistics.
-        /// </summary>
         [Test, Category("Automated")]
         public static void GetFilesToProcessAndNotify()
         {
@@ -562,9 +560,6 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
-        /// <summary>
-        /// Tests the workflow statistics.
-        /// </summary>
         [Test, Category("Automated")]
         public static void GetFilesToProcessAndNotifyWithWorkflows()
         {
@@ -1696,6 +1691,389 @@ namespace Extract.FileActionManager.Database.Test
                 _testDbManager.RemoveDatabase(testDbName);
             }
         }
+
+        /// <summary>
+        /// Tests that a file is considered available for processing even if it is processing in an unrelated action
+        /// </summary>
+        [Test, Category("Automated")]
+        [Parallelizable(ParallelScope.All)]
+        [TestCase(false, 1, false, TestName = "GetFilesToProcess: Can get pending file when it is processing in unrelated action; max of 1 with no load balancing")]
+        [TestCase(false, 1, true, TestName = "GetFilesToProcess: Can get pending file when it is processing in unrelated action; max of 1 with load balancing")]
+        [TestCase(false, 5, false, TestName = "GetFilesToProcess: Can get pending file when it is processing in unrelated action; max of 5 with no load balancing")]
+        [TestCase(false, 5, true, TestName = "GetFilesToProcess: Can get pending file when it is processing in unrelated action; max of 5 with load balancing")]
+        [TestCase(true, 1, false, TestName = "GetFilesToProcess: Can get skipped file when it is processing in unrelated action; max of 1 with no load balancing")]
+        [TestCase(true, 1, true, TestName = "GetFilesToProcess: Can get skipped file when it is processing in unrelated action; max of 1 with load balancing")]
+        [TestCase(true, 5, false, TestName = "GetFilesToProcess: Can get skipped file when it is processing in unrelated action; max of 5 with no load balancing")]
+        [TestCase(true, 5, true, TestName = "GetFilesToProcess: Can get skipped file when it is processing in unrelated action; max of 5 with load balancing")]
+        public static void Test_GetFilesToProcess_Can_Get_File_When_It_Is_Processing_In_Unrelated_Action(
+            bool getSkipped, int maxFilesToGet, bool enableLoadBalancing)
+        {
+            EActionStatus statusToGetFrom = getSkipped ? EActionStatus.kActionSkipped : EActionStatus.kActionPending;
+            string testDBName = Guid.NewGuid().ToString();
+
+            try
+            {
+                using var fpDB = new TwoWorkflows(testDBName, enableLoadBalancing);
+
+                // Add two files and set to pending (or skipped) for action 1 and 2 in workflow 1 and 2
+                int testFile1 = fpDB.addFakeFile(1, getSkipped);
+                fpDB.addFakeFile(2, getSkipped);
+
+                // Restart fam session if processing skipped files or they won't be returned
+                if (getSkipped)
+                {
+                    fpDB.startNewSession(fpDB.wf1);
+                }
+
+                // Set file 1 to processing for action 2 in workflow 1
+                int action2ID = fpDB.wf1.GetActionID(fpDB.action2);
+                fpDB.wf1.SetFileStatusToProcessing(testFile1, action2ID);
+                Assert.AreEqual(EActionStatus.kActionProcessing, fpDB.wf1.GetFileStatus(testFile1, fpDB.action2, false));
+
+                // Confirm that file 1 is pending for action 1 in workflow 1
+                Assert.AreEqual(statusToGetFrom, fpDB.wf1.GetFileStatus(testFile1, fpDB.action1, false));
+
+                // Confirm that file 1 is returned by GetFilesToProcess even though it is processing in action 2
+                var filesToProcess = fpDB.wf1.GetFilesToProcess(fpDB.action1, maxFilesToGet, getSkipped, "")
+                    .ToIEnumerable<IFileRecord>()
+                    .Select(fileRecord => fileRecord.FileID)
+                    .ToList();
+
+                // Confirm that only those files returned plus the previous file are set to Processing
+                Assert.AreEqual(1 + filesToProcess.Count, fpDB.getTotalProcessing());
+
+                Assert.Greater(filesToProcess.Count, 0);
+                Assert.Contains(testFile1, filesToProcess);
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI51551", cex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Tests that a file is not considered available for processing in AllWorkflows mode if it is processing in any workflow for the action
+        /// </summary>
+        [Test, Category("Automated")]
+        [Parallelizable(ParallelScope.All)]
+        [TestCase(false, 1, false, TestName = "GetFilesToProcess: Do not get pending file for AllWorkflows when it is processing in related action; max of 1 with no load balancing")]
+        [TestCase(false, 1, true, TestName = "GetFilesToProcess: Do not get pending file for AllWorkflows when it is processing in related action; max of 1 with load balancing")]
+        [TestCase(false, 5, false, TestName = "GetFilesToProcess: Do not get pending file for AllWorkflows when it is processing in related action; max of 5 with no load balancing")]
+        [TestCase(false, 5, true, TestName = "GetFilesToProcess: Do not get pending file for AllWorkflows when it is processing in related action; max of 5 with load balancing")]
+        [TestCase(true, 1, false, TestName = "GetFilesToProcess: Do not get skipped file for AllWorkflows when it is processing in related action; max of 1 with no load balancing")]
+        [TestCase(true, 1, true, TestName = "GetFilesToProcess: Do not get skipped file for AllWorkflows when it is processing in related action; max of 1 with load balancing")]
+        [TestCase(true, 5, false, TestName = "GetFilesToProcess: Do not get skipped file for AllWorkflows when it is processing in related action; max of 5 with no load balancing")]
+        [TestCase(true, 5, true, TestName = "GetFilesToProcess: Do not get skipped file for AllWorkflows when it is processing in related action; max of 5 with load balancing")]
+        public static void GetFilesToProcess_Do_Not_Get_File_For_AllWorkflows_When_It_Is_Processing_In_Related_Action(
+            bool getSkipped, int maxFilesToGet, bool enableLoadBalancing)
+        {
+            EActionStatus statusToGetFrom = getSkipped ? EActionStatus.kActionSkipped : EActionStatus.kActionPending;
+            string testDBName = Guid.NewGuid().ToString();
+
+            try
+            {
+                using var fpDB = new TwoWorkflows(testDBName, enableLoadBalancing);
+
+                // Add two files and set to pending (or skipped) for action 1 and 2 in workflow 1 and 2
+                int testFile1 = fpDB.addFakeFile(1, getSkipped);
+                fpDB.addFakeFile(2, getSkipped);
+
+                // Set file 1 to processing for action 1 in workflow 1
+                fpDB.wf1.SetFileStatusToProcessing(testFile1, fpDB.wf1.GetActionIDForWorkflow(fpDB.action1, 1));
+                Assert.AreEqual(EActionStatus.kActionProcessing, fpDB.wf1.GetFileStatus(testFile1, fpDB.action1, false));
+
+                // Confirm that file 1 is pending for action 1 in workflow 2
+                Assert.AreEqual(statusToGetFrom, fpDB.wf2.GetFileStatus(testFile1, fpDB.action1, false));
+
+                // Use all workflows to get files
+                // Confirm that file 1 is _not_ returned by GetFilesToProcess even though it is in the queue for action 1 in workflow 2
+                var filesToProcess = fpDB.wfAll.GetFilesToProcess(fpDB.action1, maxFilesToGet, getSkipped, "")
+                    .ToIEnumerable<IFileRecord>()
+                    .Select(fileRecord => fileRecord.FileID)
+                    .ToList();
+
+                // Confirm that only those files returned plus the previous file are set to Processing
+                Assert.AreEqual(1 + filesToProcess.Count, fpDB.getTotalProcessing());
+
+                Assert.Greater(filesToProcess.Count, 0);
+                CollectionAssert.DoesNotContain(filesToProcess, testFile1);
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI51552", cex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Tests that files in multiple workflows can be gotten for processing in AllWorkflows
+        /// </summary>
+        [Test, Category("Automated")]
+        [CLSCompliant(false)]
+        [Parallelizable(ParallelScope.All)]
+        [TestCase(false, 1, 1, false, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 1/1 with no load balancing")]
+        [TestCase(false, 1, 1, true, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 1/1 with load balancing")]
+        [TestCase(false, 1, 2, false, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 1/2 with no load balancing")]
+        [TestCase(false, 1, 2, true, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 1/2 with load balancing")]
+        [TestCase(false, 5, 5, false, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 5/5 with no load balancing")]
+        [TestCase(false, 5, 5, true, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 5/5 with load balancing")]
+        [TestCase(false, 5, 10, false, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 5/10 with no load balancing")]
+        [TestCase(false, 5, 10, true, TestName = "GetFilesToProcess: Can get one copy of pending file for AllWorkflows when it is available in two workflows; max 5/10 with load balancing")]
+        [TestCase(true, 1, 1, false, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 1/1 with no load balancing")]
+        [TestCase(true, 1, 1, true, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 1/1 with load balancing")]
+        [TestCase(true, 1, 2, false, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 1/2 with no load balancing")]
+        [TestCase(true, 1, 2, true, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 1/2 with load balancing")]
+        [TestCase(true, 5, 5, false, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 5/5 with no load balancing")]
+        [TestCase(true, 5, 5, true, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 5/5 with load balancing")]
+        [TestCase(true, 5, 10, false, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 5/10 with no load balancing")]
+        [TestCase(true, 5, 10, true, TestName = "GetFilesToProcess: Can get one copy of skipped file for AllWorkflows when it is available in two workflows; max 5/10 with load balancing")]
+        public static void GetFilesToProcess_Can_Get_File_For_AllWorkflows_When_It_Is_Available_In_Two_Workflows(
+            bool getSkipped, int maxFilesToGet, int filesInDB, bool enableLoadBalancing)
+        {
+            EActionStatus statusToGetFrom = getSkipped ? EActionStatus.kActionSkipped : EActionStatus.kActionPending;
+            string testDBName = Guid.NewGuid().ToString();
+
+            try
+            {
+                using var fpDB = new TwoWorkflows(testDBName, enableLoadBalancing);
+
+                // Add files and set to pending (or skipped) for action 1 and 2 in workflow 1 and 2
+                var fileNumbers = Enumerable.Range(1, filesInDB).ToArray();
+                foreach (var fileNumber in fileNumbers)
+                {
+                    int fileID = fpDB.addFakeFile(fileNumber, getSkipped);
+                    Assert.AreEqual(fileNumber, fileID);
+
+                    // Confirm that file is pending for action 1 in workflow 1 and 2
+                    Assert.AreEqual(statusToGetFrom, fpDB.wf1.GetFileStatus(fileID, fpDB.action1, false));
+                    Assert.AreEqual(statusToGetFrom, fpDB.wf2.GetFileStatus(fileID, fpDB.action1, false));
+                }
+
+                // Use all workflows to get files
+                var filesToProcess = fpDB.wfAll.GetFilesToProcess(fpDB.action1, maxFilesToGet, getSkipped, "")
+                    .ToIEnumerable<IFileRecord>()
+                    .Select(fileRecord => fileRecord.FileID)
+                    .ToList();
+
+                // Confirm that only those files returned are set to Processing
+                Assert.AreEqual(filesToProcess.Count, fpDB.getTotalProcessing());
+
+                // Confirm that all files, up to max, are returned by GetFilesToProcess
+                // Ignore ordering
+                var expectedFiles = fileNumbers.Take(maxFilesToGet).ToArray();
+                CollectionAssert.AreEquivalent(expectedFiles, filesToProcess);
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI51554", cex.Message);
+            }
+        }
+
+        [Test, Category("Automated")]
+        [Parallelizable(ParallelScope.All)]
+        [TestCase(1, false, false, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 1, pending files, no load balancing")]
+        [TestCase(1, false, true, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 1, pending files, load balancing")]
+        [TestCase(1, true, false, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 1, skipped files, no load balancing")]
+        [TestCase(1, true, true, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 1, skipped files, load balancing")]
+        [TestCase(2, false, false, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 2, pending files, no load balancing")]
+        [TestCase(2, false, true, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 2, pending files, load balancing")]
+        [TestCase(2, true, false, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 2, skipped files, no load balancing")]
+        [TestCase(2, true, true, TestName = "GetFilesToProcess: Respect workflow and priority; workflow 2, skipped files, load balancing")]
+        public static void GetFilesToProcess_Respect_Workflow_And_Priority(int workflow, bool getSkipped, bool enableLoadBalancing)
+        {
+            string testDBName = Guid.NewGuid().ToString();
+
+            try
+            {
+                using var fpDB = new TwoWorkflows(testDBName, enableLoadBalancing);
+
+                // Add 100 files with normal priority and set to pending (or skipped) for action 1 and 2 in workflow 1 and 2
+                for (int i = 1; i <= 100; i++)
+                {
+                    fpDB.addFakeFile(i, getSkipped);
+                }
+                // Add 100 files with above normal priority and set to pending (or skipped) for action 1 and 2 in workflow 1 and 2
+                for (int i = 101; i <= 200; i++)
+                {
+                    fpDB.addFakeFile(i, getSkipped, EFilePriority.kPriorityAboveNormal);
+                }
+
+                var currentWorkflow = workflow == 1 ? fpDB.wf1 : fpDB.wf2;
+
+                // Restart fam session if processing skipped files or they won't be returned
+                if (getSkipped)
+                {
+                    fpDB.startNewSession(currentWorkflow);
+                }
+
+                // Set random 100 files to complete for the current workflow
+                var numComplete = 100;
+                var allFiles = Enumerable.Range(1, 200).ToList();
+                CollectionMethods.Shuffle(allFiles);
+
+                var completeFiles = allFiles.Take(numComplete).ToList();
+                foreach (var fileID in completeFiles)
+                {
+                    currentWorkflow.NotifyFileProcessed(fileID, fpDB.action1, nWorkflowID: workflow, vbAllowQueuedStatusOverride: false);
+                }
+
+                var pendingFiles = allFiles.Skip(numComplete).ToList();
+                var expectedFiles =
+                    pendingFiles
+                    .OrderBy(fileID => fileID > 100 ? 1 : 2) // above normal priority first
+                    .ThenBy(fileID => fileID)
+                    .Take(50)
+                    .ToArray();
+
+                // Use current workflow to get 50 files
+                var filesToProcess = currentWorkflow.GetFilesToProcess(fpDB.action1, 50, getSkipped, "")
+                    .ToIEnumerable<IFileRecord>()
+                    .ToArray();
+
+                // Confirm that only those files returned are set to Processing
+                Assert.AreEqual(filesToProcess.Count(), fpDB.getTotalProcessing());
+
+                // Confirm that expected files are returned
+                var fileIDsToProcess = filesToProcess
+                    .Select(fileRecord => fileRecord.FileID)
+                    .ToArray();
+                CollectionAssert.AreEqual(expectedFiles, fileIDsToProcess);
+
+                // Confirm that the files are for the correct workflow
+                var workflows = filesToProcess
+                    .Select(fileRecord => fileRecord.WorkflowID)
+                    .Distinct()
+                    .ToArray();
+                CollectionAssert.AreEqual(new[] { workflow }, workflows);
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI51555", cex.Message);
+            }
+        }
+
+
         #endregion Test Methods
+
+        #region Helper Class
+
+        class TwoWorkflows : IDisposable
+        {
+            public readonly string action1 = "Action1";
+            public readonly string action2 = "Action2";
+
+            public readonly FileProcessingDB wf1 = null;
+            public readonly FileProcessingDB wf2 = null;
+            public readonly FileProcessingDB wfAll = null;
+
+            readonly FileProcessingDB[] fpDBs = null;
+            readonly string testDBName;
+
+            public TwoWorkflows(string testDBName, bool enableLoadBalancing)
+            {
+                this.testDBName = testDBName;
+
+                // Setup DB
+                wf1 = _testDbManager.GetNewDatabase(testDBName);
+                wf1.SetDBInfoSetting("EnableLoadBalancing", enableLoadBalancing ? "1" : "0", true, false);
+                wf1.DefineNewAction(action1);
+                wf1.DefineNewAction(action2);
+
+                int workflow1 = wf1.AddWorkflow("Workflow1", EWorkflowType.kUndefined, action1, action2);
+                Assert.AreEqual(1, workflow1);
+                int workflow2 = wf1.AddWorkflow("Workflow2", EWorkflowType.kUndefined, action1, action2);
+                Assert.AreEqual(2, workflow2);
+
+                // Configure a separate object for each workflow configuration needed
+                wf1.ActiveWorkflow = "Workflow1";
+                wf2 = new FileProcessingDBClass
+                {
+                    DatabaseServer = wf1.DatabaseServer,
+                    DatabaseName = wf1.DatabaseName,
+                    ActiveWorkflow = "Workflow2"
+                };
+                wfAll = new FileProcessingDBClass
+                {
+                    DatabaseServer = wf1.DatabaseServer,
+                    DatabaseName = wf1.DatabaseName,
+                    ActiveWorkflow = ""
+                };
+
+                // Start a session for each DB object
+                fpDBs = new[] { wf1, wf2, wfAll };
+                foreach (var fpDB in fpDBs)
+                {
+                    fpDB.RecordFAMSessionStart("Test.fps", action1, true, true);
+                    fpDB.RegisterActiveFAM();
+                }
+            }
+
+            public int addFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal)
+            {
+                var fileName = Path.Combine(Path.GetTempPath(), fileNumber.ToString("N3", CultureInfo.InvariantCulture) + ".tif");
+                int fileID = wf1.AddFileNoQueue(fileName, 0, 0, priority, 1);
+                if (setAsSkipped)
+                {
+                    wf1.SetFileStatusToSkipped(fileID, action1, false, false);
+                    wf1.SetFileStatusToSkipped(fileID, action2, false, false);
+                    wf2.SetFileStatusToSkipped(fileID, action1, false, false);
+                    wf2.SetFileStatusToSkipped(fileID, action2, false, false);
+                }
+                else
+                {
+                    wf1.SetFileStatusToPending(fileID, action1, false);
+                    wf1.SetFileStatusToPending(fileID, action2, false);
+                    wf2.SetFileStatusToPending(fileID, action1, false);
+                    wf2.SetFileStatusToPending(fileID, action2, false);
+                }
+
+                return fileID;
+            }
+
+            public void startNewSession(FileProcessingDB fpDB)
+            {
+                fpDB.UnregisterActiveFAM();
+                fpDB.RecordFAMSessionStop();
+                fpDB.RecordFAMSessionStart("Test.fps", action1, true, true);
+                fpDB.RegisterActiveFAM();
+            }
+
+            public void Dispose()
+            {
+                foreach (var fpDB in fpDBs)
+                {
+                    if (fpDB != null)
+                    {
+                        try
+                        {
+                            // Prevent 'files were reverted' log
+                            fpDB.SetStatusForAllFiles(action1, EActionStatus.kActionUnattempted);
+                            fpDB.SetStatusForAllFiles(action2, EActionStatus.kActionUnattempted);
+                            fpDB.UnregisterActiveFAM();
+                            fpDB.RecordFAMSessionStop();
+                        }
+                        catch { }
+                    }
+                }
+                _testDbManager.RemoveDatabase(testDBName);
+            }
+
+            public int getTotalProcessing()
+            {
+                var action1Stats = wfAll.GetStatsAllWorkflows(action1, false);
+                var action2Stats = wfAll.GetStatsAllWorkflows(action2, false);
+                int totalFilesInDB = action1Stats.NumDocuments + action2Stats.NumDocuments;
+                int notProcessing = 0;
+                notProcessing += action1Stats.NumDocumentsSkipped;
+                notProcessing += action2Stats.NumDocumentsSkipped;
+                notProcessing += action1Stats.NumDocumentsPending;
+                notProcessing += action2Stats.NumDocumentsPending;
+                notProcessing += action1Stats.NumDocumentsComplete;
+                notProcessing += action2Stats.NumDocumentsComplete;
+                notProcessing += action1Stats.NumDocumentsFailed;
+                notProcessing += action2Stats.NumDocumentsFailed;
+                return totalFilesInDB - notProcessing;
+            }
+        }
+        #endregion Helper Class
     }
 }
