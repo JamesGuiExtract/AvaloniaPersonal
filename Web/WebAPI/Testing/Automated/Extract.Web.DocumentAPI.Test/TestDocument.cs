@@ -1289,9 +1289,9 @@ namespace Extract.Web.WebAPI.Test
 
                 fileProcessingDb.SetMetadataFieldValue(1, "PatientFirstName", "TestName");
 
-                var metadataFieldResult = controller.GetMetadataField(1, "PatientFirstName").AssertGoodResult<MetadataFieldResult>();
+                var result = controller.GetMetadataField(1, "PatientFirstName").AssertGoodResult<TextData>();
 
-                Assert.AreEqual("TestName", metadataFieldResult.Value);
+                Assert.AreEqual("TestName", result.Text);
             }
             finally
             {

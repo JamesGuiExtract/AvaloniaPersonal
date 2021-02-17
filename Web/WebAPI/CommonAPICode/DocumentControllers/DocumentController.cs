@@ -549,9 +549,8 @@ namespace WebAPI.Controllers
         /// <param name="Id">The document id for which a metadata field value should be retrieved.</param>
         /// <param name="metadataField">The metadata field for which the value should be retrieved.</param>
         [HttpGet("{Id}/MetadataField/{metadataField}")]
-        [Authorize]
         [MapToApiVersion("3.1")]
-        [ProducesResponseType(200, Type = typeof(MetadataFieldResult))]
+        [ProducesResponseType(200, Type = typeof(TextData))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
@@ -561,7 +560,9 @@ namespace WebAPI.Controllers
             {
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    return Ok(data.GetMetadataField(Id, metadataField));
+                    var result = new TextData { Text = data.GetMetadataField(Id, metadataField).Value };
+
+                    return Ok(result);
                 }
             }
             catch (Exception ex)
@@ -575,22 +576,21 @@ namespace WebAPI.Controllers
         /// </summary>
         /// <param name="Id">The document id for which a metadata field value should be applied.</param>
         /// <param name="metadataField">The metadata field to which the value should be assigned.</param>
-        /// <param name="metadataFieldValue">The value to assign.</param>
+        /// <param name="value">The value to assign.</param>
         /// <returns></returns>
         [HttpPut("{Id}/MetadataField/{metadataField}")]
-        [Authorize]
         [MapToApiVersion("3.1")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
-        public IActionResult SetMetadataField(int Id, string metadataField, string metadataFieldValue = "")
+        public IActionResult SetMetadataField(int Id, string metadataField, [FromForm] string value = "")
         {
             try
             {
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    data.SetMetadataField(Id, metadataField, metadataFieldValue);
+                    data.SetMetadataField(Id, metadataField, value);
 
                     return NoContent();
                 }
