@@ -549,8 +549,9 @@ namespace WebAPI.Controllers
         /// <param name="Id">The document id for which a metadata field value should be retrieved.</param>
         /// <param name="metadataField">The metadata field for which the value should be retrieved.</param>
         [HttpGet("{Id}/MetadataField/{metadataField}")]
+        [Authorize]
         [MapToApiVersion("3.1")]
-        [ProducesResponseType(200, Type = typeof(TextData))]
+        [ProducesResponseType(200, Type = typeof(MetadataFieldResult))]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
         [ProducesResponseType(404, Type = typeof(ErrorResult))]
@@ -560,9 +561,7 @@ namespace WebAPI.Controllers
             {
                 using (var data = new DocumentData(User, requireSession: false))
                 {
-                    var result = new TextData { Text = data.GetMetadataField(Id, metadataField).Value };
-
-                    return Ok(result);
+                    return Ok(data.GetMetadataField(Id, metadataField));
                 }
             }
             catch (Exception ex)
