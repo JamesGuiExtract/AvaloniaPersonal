@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+using System.Collections.Concurrent;
 
 namespace Extract.FileActionManager.Database.Test
 {
@@ -29,7 +30,7 @@ namespace Extract.FileActionManager.Database.Test
         /// <summary>
         /// The FAM databases being actively managed by this instance.
         /// </summary>
-        Dictionary<string, FileProcessingDB> _activeDatabases = new Dictionary<string, FileProcessingDB>();
+        ConcurrentDictionary<string, FileProcessingDB> _activeDatabases = new ConcurrentDictionary<string, FileProcessingDB>();
 
         #endregion Fields
 
@@ -66,9 +67,14 @@ namespace Extract.FileActionManager.Database.Test
                 else
                 {
                     fileProcessingDb = new FileProcessingDB();
-                    _activeDatabases[databaseName] = fileProcessingDb;
                     fileProcessingDb.DatabaseServer = "(local)";
                     fileProcessingDb.CreateNewDB(databaseName, bstrInitWithPassword: "a");
+                    if (!_activeDatabases.TryAdd(databaseName, fileProcessingDb))
+                    {
+                        var ee = new ExtractException("ELI51556", "Database already exists");
+                        ee.AddDebugData("Database name", databaseName, false);
+                        throw ee;
+                    }
 
                     return fileProcessingDb;
                 }
@@ -95,18 +101,12 @@ namespace Extract.FileActionManager.Database.Test
         /// <param name="destinationDBName">The name the database should be restored to.</param>
         public FileProcessingDB GetDatabase(string dbBackupResourceName, string destinationDBName)
         {
-            string backupDbFile = null;
-
             try
             {
                 FileProcessingDB fileProcessingDb = null;
-                if (_activeDatabases.TryGetValue(destinationDBName, out fileProcessingDb))
+                return _activeDatabases.GetOrAdd(destinationDBName, dbName =>
                 {
-                    return fileProcessingDb;
-                }
-                else
-                {
-                    backupDbFile = _backupFileManager.GetFile(dbBackupResourceName);
+                    string backupDbFile = _backupFileManager.GetFile(dbBackupResourceName);
 
                     // In most cases SQL server will not have access to the file; giving access to
                     // all users will allow it access.
@@ -120,13 +120,12 @@ namespace Extract.FileActionManager.Database.Test
 
                     // Get a FileProcessingDB instance to the DB, and use it to upgrade the database schema.
                     fileProcessingDb = new FileProcessingDB();
-                    _activeDatabases[destinationDBName] = fileProcessingDb;
                     fileProcessingDb.DatabaseServer = "(local)";
                     fileProcessingDb.DatabaseName = destinationDBName;
                     fileProcessingDb.UpgradeToCurrentSchema(null);
 
                     return fileProcessingDb;
-                }
+                });
             }
             catch (Exception ex)
             {
@@ -154,7 +153,7 @@ namespace Extract.FileActionManager.Database.Test
             // First try to close all DB connections for the FileProcessingDb instance
             try
             {
-                if (_activeDatabases.TryGetValue(databaseName, out fileProcessingDb))
+                if (_activeDatabases.TryRemove(databaseName, out fileProcessingDb))
                 {
                     fileProcessingDb.CloseAllDBConnections();
                 }
@@ -171,7 +170,6 @@ namespace Extract.FileActionManager.Database.Test
                 if (fileProcessingDb != null)
                 {
                     DBMethods.DropLocalDB(databaseName);
-                    _activeDatabases.Remove(databaseName);
                 }
             }
             catch (Exception ex)
