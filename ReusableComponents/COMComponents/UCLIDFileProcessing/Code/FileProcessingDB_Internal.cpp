@@ -5412,6 +5412,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						}
 						else
 						{
+							int nActionId = m_vecActionsProcessOrder.size() == 1 ? m_vecActionsProcessOrder[0] : 0;
 							_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, 0, strActionName,
 								nMaxFiles, strStatusToSelect, strSkippedUser);
 							
@@ -5475,8 +5476,7 @@ _RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _Connectio
 	cmd->CommandText = _bstr_t("dbo.GetFilesToProcessForAction");
 	cmd->CommandType = adCmdStoredProc;
 	cmd->Parameters->Refresh();
-	if (m_bLoadBalance && m_bRunningAllWorkflows)
-		cmd->Parameters->Item["@ActionID"]->Value = variant_t(actionID);
+	cmd->Parameters->Item["@ActionID"]->Value = variant_t(actionID);
 	int workflowID = getActiveWorkflowID(ipConnection);
 	if (workflowID != -1)
 		cmd->Parameters->Item["@WorkflowID"]->Value = variant_t(workflowID);
@@ -5490,6 +5490,7 @@ _RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _Connectio
 	cmd->Parameters->Item["@FAMSessionID"]->Value = variant_t(m_nFAMSessionID);
 	cmd->Parameters->Item["@RecordFASTEntry"]->Value = variant_t(m_bUpdateFASTTable);
 	cmd->Parameters->Item["@SkippedForUser"]->Value = variant_t(strSkippedUser.c_str());
+	cmd->Parameters->Item["@CheckDeleted"]->Value = variant_t(m_bCurrentSessionIsWebSession);
 	variant_t vtEmpty;
 	return cmd->Execute(&vtEmpty, &vtEmpty, adCmdStoredProc);
 }
