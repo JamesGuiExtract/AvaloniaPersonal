@@ -7424,7 +7424,7 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 
 	// Open the file set
 	ipFileSet->Open(bstrQueryFrom, _variant_t(ipConnection, true),
-		adOpenForwardOnly, adLockOptimistic, adCmdText);
+		adOpenStatic, adLockOptimistic, adCmdText);
 
 	// Create an empty file record object for the random condition.
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
