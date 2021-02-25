@@ -10348,8 +10348,8 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 
 			// Get a list of all of the counters from the database
 			string strQuery = gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE;
-			ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-				adLockOptimistic, adCmdText);
+			ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
+				adLockReadOnly, adCmdText);
 
 			IIUnknownVectorPtr ipSecureCounters(CLSID_IUnknownVector);
 
