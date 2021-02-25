@@ -4876,7 +4876,7 @@ bool CFileProcessingDB::GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQue
 					{
 						// Open the Action table
 						ipResultSet->Open(bstrQuery, _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
-							adLockOptimistic, adCmdText);
+							adLockUnspecified, adCmdText);
 					}
 					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51446")
 				}
