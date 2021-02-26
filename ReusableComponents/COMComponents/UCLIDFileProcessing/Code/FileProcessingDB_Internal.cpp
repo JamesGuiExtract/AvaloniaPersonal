@@ -1191,7 +1191,7 @@ string CFileProcessingDB::getActionIDsForActiveWorkflow(_ConnectionPtr ipConnect
 
 			// Open the Action table in the database
 			ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-				adOpenStatic, adLockOptimistic, adCmdText);
+				adOpenDynamic, adLockOptimistic, adCmdText);
 
 			while (ipActionSet->adoEOF == VARIANT_FALSE)
 			{
@@ -1236,7 +1236,7 @@ string CFileProcessingDB::getActionName(_ConnectionPtr ipConnection, long nActio
 
 		// Open Action table
 		ipAction->Open("Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-			adLockOptimistic, adCmdTableDirect);
+			adLockReadOnly, adCmdTableDirect);
 
 		// Setup criteria to find
 		string strCriteria = "ID = " + asString(nActionID);
@@ -2925,7 +2925,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 				// Open recordset with the locktime 
 				ipLockTable->Open(strGetLock.c_str(), 
 					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				// If we get to here the db connection should be valid
 				bConnectionGood = true;
@@ -3045,7 +3045,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 				// Retrieve the count of active FAMs
 				ipActiveFAMs->Open("SELECT COUNT(*) AS [FAMCount] FROM [ActiveFAM]", 
 					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				ipActiveFAMs->MoveFirst();
 
@@ -3122,7 +3122,7 @@ bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseA
 
 		// Open the set for the user being logged in
 		ipLoginSet->Open(strSQL.c_str(), _variant_t((IDispatch *)getDBConnection(), true), 
-			adOpenStatic, adLockOptimistic, adCmdText);
+			adOpenStatic, adLockReadOnly, adCmdText);
 
 		// user was in the DB if not at the end of file
 		if (ipLoginSet->adoEOF == VARIANT_FALSE)
@@ -3675,7 +3675,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 			_lastCodePos = "10";
 
 			ipDBInfoSet->Open("DBInfo", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-				adLockOptimistic, adCmdTable); 
+				adLockReadOnly, adCmdTable); 
 
 			_lastCodePos = "20";
 
@@ -4521,7 +4521,7 @@ IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection,
 
 		// Open the Action table
 		ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
-			adLockOptimistic, adCmdText);
+			adLockReadOnly, adCmdText);
 
 		// Create StrToStrMap to return the list of actions
 		IStrToStrMapPtr ipActions(CLSID_StrToStrMap);
@@ -4674,7 +4674,7 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 		
 		// Open the record set using the Setting Query		
 		ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenForwardOnly, adLockOptimistic, adCmdText); 
+			adOpenForwardOnly, adLockReadOnly, adCmdText); 
 
 		// Check if any data returned
 		if (ipDBInfoSet->adoEOF == VARIANT_FALSE)
@@ -4725,7 +4725,7 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		ASSERT_RESOURCE_ALLOCATION("ELI27737", ipFileSet != __nullptr);
 
 		ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
-			adOpenForwardOnly, adLockOptimistic, adCmdText);
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Map to track the number of files for each action that are being reset
 		map<string, map<string, int>> map_StatusCounts;
@@ -5120,7 +5120,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 		ASSERT_RESOURCE_ALLOCATION("ELI27813", ipFileSet != __nullptr);
 
 		ipFileSet->Open(strElapsedSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
-			adOpenForwardOnly, adLockOptimistic, adCmdText);
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Step through all of the ActiveFAM records to find dead FAM's
 		while(ipFileSet->adoEOF == VARIANT_FALSE)
@@ -5713,7 +5713,7 @@ bool CFileProcessingDB::doesLoginUserNameExist(const _ConnectionPtr& ipConnectio
 
 	// Open the sql query
 	ipLoginSet->Open(strLoginSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-		adLockOptimistic, adCmdText);
+		adLockReadOnly, adCmdText);
 
 	// if not at the end of file then there is a user by that name.
 	if (!asCppBool(ipLoginSet->adoEOF))
@@ -5739,7 +5739,7 @@ _RecordsetPtr CFileProcessingDB::getFileActionStatusSet(_ConnectionPtr& ipConnec
 			asString(nActionID) + " AND FileID = " + asString(nFileID);
 
 		ipFileActionStatus->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
-			adLockOptimistic, adCmdText);
+			adLockReadOnly, adCmdText);
 
 		return ipFileActionStatus;
 	}
@@ -5769,7 +5769,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 		"WHERE [ASCName] = '" + strActionName + "'";
 
 	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-		adLockOptimistic, adCmdText);
+		adLockReadOnly, adCmdText);
 
 	// if there are any records in ipProcessingSet there is active processing.
 	if (!asCppBool(ipProcessingSet->adoEOF))
@@ -5922,7 +5922,7 @@ void CFileProcessingDB::updateActionStatisticsFromDelta(const _ConnectionPtr& ip
 
 	// Open the set that will give the last id in the delta table for the action
 	ipActionStatisticsDeltaSet->Open(strActionStatisticsDeltaSQL.c_str(),
-		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockOptimistic, adCmdText);
+		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
 
 	// Since the query for the set uses a Aggregate function (MAX) there should always
 	// be at least one record if there is not a problem
@@ -6006,7 +6006,7 @@ set<string> getDBInfoRowNames(const _ConnectionPtr& ipConnection)
 	// Query for all rows in the DBInfo table
 	string strDBInfoQuery = "SELECT [Name] FROM DBInfo";
 	ipResultSet->Open(strDBInfoQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-		adOpenStatic, adLockOptimistic, adCmdText);
+		adOpenStatic, adLockReadOnly, adCmdText);
 
 	// Loop through all DBInfo rows to compile a list of the names (in uppercase).
 	while (!asCppBool(ipResultSet->adoEOF))
@@ -6031,7 +6031,7 @@ set<string> getDBFeatureNames(const _ConnectionPtr& ipConnection)
 	// Query for all rows in the Feature table
 	string strFeaturesQuery = "SELECT [FeatureName] FROM [" + gstrDB_FEATURE + "]";
 	ipResultSet->Open(strFeaturesQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-		adOpenStatic, adLockOptimistic, adCmdText);
+		adOpenStatic, adLockReadOnly, adCmdText);
 
 	// Loop through all Feature table rows to compile a list of the names (in uppercase).
 	while (!asCppBool(ipResultSet->adoEOF))
@@ -6719,7 +6719,7 @@ void CFileProcessingDB::getCounterInfo(map<long, CounterOperation> &mapOfCounter
 	ASSERT_RESOURCE_ALLOCATION("ELI38915", ipResultSet != __nullptr);
 	
 	ipResultSet->Open(gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-		adLockOptimistic, adCmdText);
+		adLockReadOnly, adCmdText);
 	while (!asCppBool(ipResultSet->adoEOF))
 	{
 		DBCounter dbCounter;
@@ -6894,7 +6894,7 @@ bool CFileProcessingDB::isFileInPagination(_ConnectionPtr ipConnection, long nFi
 	ASSERT_RESOURCE_ALLOCATION("ELI40053", ipResultSet != __nullptr);
 	
 	ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-		adLockOptimistic, adCmdText);
+		adLockReadOnly, adCmdText);
 
 	bResult = !asCppBool(ipResultSet->adoEOF);
 
@@ -7011,7 +7011,7 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 			"	WHERE [ID] = %i", nID);
 
 	ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-		adOpenStatic, adLockOptimistic, adCmdText);
+		adOpenStatic, adLockReadOnly, adCmdText);
 
 	if (asCppBool(ipWorkflowSet->adoEOF))
 	{
@@ -7070,7 +7070,7 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 		ASSERT_RESOURCE_ALLOCATION("ELI41919", ipAttributeSetResult != __nullptr);
 
 		ipAttributeSetResult->Open(strAttributeSetQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenStatic, adLockOptimistic, adCmdText);
+			adOpenStatic, adLockReadOnly, adCmdText);
 
 		ASSERT_RUNTIME_CONDITION("ELI41920", !asCppBool(ipAttributeSetResult->adoEOF),
 			"Unknown attribute set ID");
@@ -7097,7 +7097,7 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 		ASSERT_RESOURCE_ALLOCATION("ELI42049", ipMetadataFieldResult != __nullptr);
 
 		ipMetadataFieldResult->Open(strMetadataFieldQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenStatic, adLockOptimistic, adCmdText);
+			adOpenStatic, adLockReadOnly, adCmdText);
 
 		ASSERT_RUNTIME_CONDITION("ELI42050", !asCppBool(ipMetadataFieldResult->adoEOF),
 			"Unknown metadata field ID");
@@ -7156,7 +7156,7 @@ vector<tuple<long, string, bool>> CFileProcessingDB::getWorkflowActions(_Connect
 			"WHERE [WorkflowID] = %i", nWorkflowID);
 
 	ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-		adOpenStatic, adLockOptimistic, adCmdText);
+		adOpenStatic, adLockReadOnly, adCmdText);
 
 	while (!asCppBool(ipActionSet->adoEOF))
 	{
@@ -7189,7 +7189,7 @@ vector<pair<string, string>> CFileProcessingDB::getWorkflowNamesAndIDs(_Connecti
 	string strQuery = "SELECT ID, Name FROM dbo.Workflow";
 		
 	ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
-		adLockOptimistic, adCmdText);
+		adLockReadOnly, adCmdText);
 
 	// Step through all records
 	while (ipWorkflowSet->adoEOF == VARIANT_FALSE)
@@ -7260,7 +7260,7 @@ vector<tuple<long, string>> CFileProcessingDB::getWorkflowStatus(long nFileID,
 		ASSERT_RESOURCE_ALLOCATION("ELI42138", ipWorkflowStatus);
 
 		ipWorkflowStatus->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenForwardOnly, adLockOptimistic, adCmdText);
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		while (ipWorkflowStatus->adoEOF == VARIANT_FALSE)
 		{
@@ -7424,7 +7424,7 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 
 	// Open the file set
 	ipFileSet->Open(bstrQueryFrom, _variant_t(ipConnection, true),
-		adOpenStatic, adLockOptimistic, adCmdText);
+		adOpenForwardOnly, adLockOptimistic, adCmdText);
 
 	// Create an empty file record object for the random condition.
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);

@@ -4351,7 +4351,7 @@ bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrA
 
 			// Open the Action table
 			ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
-				adLockOptimistic, adCmdText);
+				adLockReadOnly, adCmdText);
 
 			UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipAggregateStats(CLSID_ActionStatistics);
 			ASSERT_RESOURCE_ALLOCATION("ELI42087", ipAggregateStats != __nullptr);
@@ -4611,7 +4611,7 @@ bool CFileProcessingDB::ExportFileList_Internal(bool bDBLocked, BSTR strQuery, B
 
 				// get the recordset with the top nMaxFiles 
 				ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				// Open the output file
 				ofstream ofsOutput(strOutFileName.c_str(), ios::out | ios::trunc);
@@ -5388,7 +5388,7 @@ bool CFileProcessingDB::GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags)
 
 				// Open Recordset that contains all the tags and their descriptions
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenForwardOnly, adLockOptimistic, adCmdText);
+					adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 				// Add each tag and description to the map
 				while (ipTagSet->adoEOF == VARIANT_FALSE)
@@ -5454,7 +5454,7 @@ bool CFileProcessingDB::GetTagNames_Internal(bool bDBLocked, IVariantVector **pp
 
 				// Open Recordset that contains the tag names
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenForwardOnly, adLockOptimistic, adCmdText);
+					adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 				// Loop through each tag name and add it to the variant vector
 				while (ipTagSet->adoEOF == VARIANT_FALSE)
@@ -5513,7 +5513,7 @@ bool CFileProcessingDB::HasTags_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal)
 
 				// Open Recordset that contains the tag names
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenForwardOnly, adLockOptimistic, adCmdText);
+					adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 				// Check if there is at least 1 tag
 				bHasTags = ipTagSet->adoEOF == VARIANT_FALSE;
@@ -6090,7 +6090,7 @@ bool CFileProcessingDB::GetFilesWithTags_Internal(bool bDBLocked, IVariantVector
 
 				// Open Recordset that contains the file IDs
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenForwardOnly, adLockOptimistic, adCmdText);
+					adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 				// Loop through each file ID and add it to the variant vector
 				while (ipTagSet->adoEOF == VARIANT_FALSE)
@@ -6157,7 +6157,7 @@ bool CFileProcessingDB::GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVa
 
 				// Open Recordset that contains the file IDs
 				ipTagSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenForwardOnly, adLockOptimistic, adCmdText);
+					adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 				// Loop through each tag name and add it to the vector
 				while (ipTagSet->adoEOF == VARIANT_FALSE)
@@ -6779,7 +6779,7 @@ bool CFileProcessingDB::GetUserCounterValue_Internal(bool bDBLocked, BSTR bstrCo
 
 				// Get the recordset for the specified select query
 				ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				// Check for value in the database
 				if (ipCounterSet->adoEOF == VARIANT_FALSE)
@@ -6840,7 +6840,7 @@ bool CFileProcessingDB::GetUserCounterNames_Internal(bool bDBLocked, IVariantVec
 
 				// Get the recordset for the specified select query
 				ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				// Check for value in the database
 				while (ipCounterSet->adoEOF == VARIANT_FALSE)
@@ -6902,7 +6902,7 @@ bool CFileProcessingDB::GetUserCounterNamesAndValues_Internal(bool bDBLocked, IS
 
 				// Get the recordset for the specified select query
 				ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				// Check for value in the database
 				while (ipCounterSet->adoEOF == VARIANT_FALSE)
@@ -6972,7 +6972,7 @@ bool CFileProcessingDB::IsUserCounterValid_Internal(bool bDBLocked, BSTR bstrCou
 
 				// Get the recordset for the specified select query
 				ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				// Set true if there is a record found false otherwise
 				*pbCounterValid = asVariantBool(ipCounterSet->adoEOF == VARIANT_FALSE);
@@ -7437,7 +7437,7 @@ bool CFileProcessingDB::GetLoginUsers_Internal(bool bDBLocked, IStrToStrMap**  p
 
 				// Open the set of login users
 				ipLoginSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				// Create map to return results
 				IStrToStrMapPtr ipUsers(CLSID_StrToStrMap);
@@ -7850,7 +7850,7 @@ bool CFileProcessingDB::GetFileRecord_Internal(bool bDBLocked, BSTR bstrFile, BS
 
 				// Execute the query to find the file in the database
 				ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				if (!asCppBool(ipFileSet->adoEOF))
 				{
@@ -8364,7 +8364,7 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 				// Open the record set using the Setting Query		
 				ipDBInfoSet->Open(gstrDBINFO_GET_SETTINGS_QUERY.c_str(),
 					_variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly,
-					adLockOptimistic, adCmdText); 
+					adLockReadOnly, adCmdText); 
 
 				while (ipDBInfoSet->adoEOF == VARIANT_FALSE)
 				{
@@ -8599,7 +8599,7 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 			if (bUseOracle)
 			{
 				ipResultSet->Open(gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE.c_str(),
-					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockOptimistic,
+					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
 					adCmdText);
 			}
 			else
@@ -8613,7 +8613,7 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 					replaceVariable(strCountQuery, "<WorkflowID>", asString(nWorkflowID));
 
 					ipResultSet->Open(strCountQuery.c_str(),
-						_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockOptimistic,
+						_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
 						adCmdText);
 				}
 				else if (!m_bDeniedFastCountPermission)
@@ -8626,7 +8626,7 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 							// views FAMFile table.
 							ipResultSet->Open(gstrFAST_TOTAL_FAMFILE_QUERY.c_str(),
 								_variant_t((IDispatch *)ipConnection, true), adOpenStatic,
-								adLockOptimistic, adCmdText);
+								adLockReadOnly, adCmdText);
 
 							bGotFastCount = true;
 						}
@@ -8658,7 +8658,7 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 					// If the user had insufficient permission for the fast query, use the standard
 					// query that will work for all db readers/writers.
 					ipResultSet->Open(gstrSTANDARD_TOTAL_FAMFILE_QUERY.c_str(),
-						_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockOptimistic,
+						_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
 						adCmdText);
 				}
 			}
@@ -8777,7 +8777,7 @@ bool CFileProcessingDB::GetWorkItemsForGroup_Internal(bool bDBLocked, long nWork
 
 				// Execute the query get the set of WorkItems
 				ipWorkItemSet->Open(strWorkItemSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				IIUnknownVectorPtr ipWorkItems(CLSID_IUnknownVector);
 				ASSERT_RESOURCE_ALLOCATION("ELI36876", ipWorkItems != __nullptr);
@@ -8852,7 +8852,7 @@ bool CFileProcessingDB::GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWo
 
 				// Execute the query to find the file in the database
 				ipWorkItemSet->Open(strWorkItemSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 				FieldsPtr ipFields = ipWorkItemSet->Fields;
 				ASSERT_RESOURCE_ALLOCATION("ELI36884", ipFields != __nullptr);
 				pWorkGroupStatus->WorkGroupID = nWorkItemGroupID;
@@ -8898,7 +8898,7 @@ bool CFileProcessingDB::GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWo
 				string strWorkItemGroupSQL = "SELECT NumberOfWorkItems FROM WorkItemGroup WITH (NOLOCK) WHERE ID = " + strWorkItemGroupID; 
 				
 				ipWorkItemGroupSet->Open(strWorkItemGroupSQL.c_str() , _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 				if (ipWorkItemGroupSet->adoEOF == VARIANT_TRUE)
 				{
 					UCLIDException ue("ELI37103", "Work item group not found.");
@@ -9286,7 +9286,7 @@ bool CFileProcessingDB::GetWorkGroupData_Internal(bool bDBLocked, long nWorkItem
 				// Execute the query to get the WorkItemGroup record
 				ipWorkItemGroupSet->Open(strWorkItemGroupSQL.c_str(), 
 					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				// Should only be one record
 				if (!asCppBool(ipWorkItemGroupSet->adoEOF))
@@ -9401,7 +9401,7 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 				// Execute the query to get the WorkItemID if it exists
 				ipWorkItemGroupSet->Open(strGetExisting.c_str(), 
 					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				if (!asCppBool(ipWorkItemGroupSet->adoEOF))
 				{
@@ -9563,7 +9563,7 @@ bool CFileProcessingDB::GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFi
 				ASSERT_RESOURCE_ALLOCATION("ELI37335", ipResultSet != __nullptr);
 
 				ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenStatic, adLockOptimistic, adCmdText);
+					adOpenStatic, adLockReadOnly, adCmdText);
 		
 				// Add all filenames to the return vector.
 				while (!asCppBool(ipResultSet->adoEOF))
@@ -9792,7 +9792,7 @@ bool CFileProcessingDB::GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long
 
 				// Execute the query get the set of WorkItems
 				ipWorkItemSet->Open(strWorkItemSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				IIUnknownVectorPtr ipWorkItems(CLSID_IUnknownVector);
 				ASSERT_RESOURCE_ALLOCATION("ELI37544", ipWorkItems != __nullptr);
@@ -9911,7 +9911,7 @@ bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 
 				// Execute the query get the set of WorkItems
 				ipResult->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				if (!asCppBool(ipResult->adoEOF))
 				{
@@ -9966,7 +9966,7 @@ bool CFileProcessingDB::GetMetadataFieldNames_Internal(bool bDBLocked, IVariantV
 
 				// Open Recordset that contains the metadata field names
 				ipMetadataFieldSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-					adOpenForwardOnly, adLockOptimistic, adCmdText);
+					adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 				// Loop through each metadata field name and add it to the variant vector
 				while (ipMetadataFieldSet->adoEOF == VARIANT_FALSE)
@@ -10348,7 +10348,7 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 
 			// Get a list of all of the counters from the database
 			string strQuery = gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE;
-			ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
+			ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 				adLockReadOnly, adCmdText);
 
 			IIUnknownVectorPtr ipSecureCounters(CLSID_IUnknownVector);
@@ -10428,7 +10428,7 @@ bool CFileProcessingDB::GetSecureCounterName_Internal(bool bDBLocked, long nCoun
 
 				// Open the Action table
 				ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				string strCounterName = "";
 				if (!asCppBool(ipResultSet->adoEOF))
@@ -10591,7 +10591,7 @@ bool CFileProcessingDB::GetSecureCounterValue_Internal(bool bDBLocked, long nCou
 
 				// Open the Action table
 				ipResultSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				if (!asCppBool(ipResultSet->adoEOF))
 				{
@@ -10791,7 +10791,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 
 				// Open the secure counter table
 				ipResultSet->Open(gstrSELECT_SECURE_COUNTER_WITH_MAX_VALUE_CHANGE.c_str(), 
-					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockOptimistic,
+					_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
 					adCmdText);
 
 				vector<DBCounter> vecDBCounters;
@@ -11624,7 +11624,7 @@ bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
 
 				ipActionsToAdd->Open(strQueryActionsToAdd.c_str(),
 					_variant_t((IDispatch *)ipConnection, true),
-					adOpenStatic, adLockOptimistic, adCmdText);
+					adOpenStatic, adLockReadOnly, adCmdText);
 
 				while (!asCppBool(ipActionsToAdd->adoEOF))
 				{
@@ -11953,7 +11953,7 @@ bool CFileProcessingDB::GetWorkflowNameFromActionID_Internal(bool bDBLocked, lon
 			ASSERT_RESOURCE_ALLOCATION("ELI43301", ipWorkflowNameSet != __nullptr);
 
 			ipWorkflowNameSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
-				adLockOptimistic, adCmdText);
+				adLockReadOnly, adCmdText);
 
 			// There should be at least one record
 			if (!asCppBool(ipWorkflowNameSet->adoEOF))
@@ -12286,7 +12286,7 @@ bool CFileProcessingDB::GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSour
 			replaceVariable(strQuery, "<AttributePath>", pth);
 
 			ipResult->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
-				adLockOptimistic, adCmdText);
+				adLockReadOnly, adCmdText);
 
 			if (!asCppBool(ipResult->adoEOF))
 			{
@@ -12564,7 +12564,7 @@ bool CFileProcessingDB::GetMLModels_Internal(bool bDBLocked, IStrToStrMap * * pm
 				string strQuery = "SELECT * FROM [MLModel]";
 
 				ipModelSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
-					adLockOptimistic, adCmdText);
+					adLockReadOnly, adCmdText);
 
 				// Create StrToStrMap to return the list of models
 				IStrToStrMapPtr ipModels(CLSID_StrToStrMap);
@@ -12643,7 +12643,7 @@ bool CFileProcessingDB::GetActiveUsers_Internal(bool bDBLocked, BSTR bstrAction,
 			ASSERT_RESOURCE_ALLOCATION("ELI45528", ipUserNames != __nullptr);
 
 			ipUserNames->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly,
-				adLockOptimistic, adCmdText);
+				adLockReadOnly, adCmdText);
 
 			IVariantVectorPtr ipVecUserNames(CLSID_VariantVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI45529", ipVecUserNames != __nullptr);
@@ -12703,7 +12703,7 @@ bool CFileProcessingDB::AbortFAMSession_Internal(bool bDBLocked, long nFAMSessio
 			ASSERT_RESOURCE_ALLOCATION("ELI46247", ipActiveFAMSet != __nullptr);
 
 			ipActiveFAMSet->Open(strQueryActiveFAM.c_str(),
-				_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockOptimistic, adCmdText);
+				_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
 
 			if (ipActiveFAMSet->adoEOF == VARIANT_FALSE)
 			{
@@ -13066,7 +13066,7 @@ bool CFileProcessingDB::GetCachedFileTaskSessionData_InternalHelper(ADODB::_Conn
 
 		ipCachedDataRows->Open(strCursorQuery.c_str(),
 			_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
-			adLockOptimistic, adCmdText);
+			adLockReadOnly, adCmdText);
 
 		// Store page data to map to allow page output to be ordered by page.
 		long nPageCount = 0;
@@ -13180,7 +13180,7 @@ bool CFileProcessingDB::GetCachedFileTaskSessionData_QueryCachedData(_Connection
 
 		ipCachedDataRow->Open(strCursorQuery.c_str(),
 			_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
-			adLockOptimistic, adCmdText);
+			adLockReadOnly, adCmdText);
 
 		if (ipCachedDataRow->adoEOF == VARIANT_FALSE)
 		{
@@ -13386,7 +13386,7 @@ bool CFileProcessingDB::GetUncommittedAttributeData_Internal(bool bDBLocked, lon
 				asString(bstrExceptIfMoreRecentAttributeSetName));
 
 			ipCachedDataRow->Open(strCursorQuery.c_str(),
-				_variant_t((IDispatch*)ipConnection, true), adOpenStatic, adLockOptimistic, adCmdText);
+				_variant_t((IDispatch*)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
 			while (ipCachedDataRow->adoEOF == VARIANT_FALSE)
 			{
 				IVariantVectorPtr ipRowData(CLSID_VariantVector);
