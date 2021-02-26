@@ -869,7 +869,7 @@ bool CIDShieldProductDBMgr::GetResultsForQuery_Internal(bool bDBLocked, BSTR bst
 
 			// Open the Action table
 			ipResultSet->Open( bstrQuery, _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
-				adLockOptimistic, adCmdText );
+				adLockReadOnly, adCmdText );
 
 			*ppVal = ipResultSet.Detach();
 
