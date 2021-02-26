@@ -767,11 +767,24 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 				if (m_eMode == kNonSpatialMode)
 				{
 					saveToStorageObject(stdstrFullFileName, getThisAsCOMPtr(), asCppBool(bCompress), asCppBool(bClearDirty));
+					waitForFileToBeReadable(stdstrFullFileName);
 				}
 				else
 				{
 					IIUnknownVectorPtr pages = getThisAsCOMPtr()->GetPages(VARIANT_FALSE, "");
 					savePagesToArchive(stdstrFullFileName, pages, asCppBool(bCompress));
+					waitForFileToBeReadable(stdstrFullFileName);
+
+					// Verify that all the pages were saved successfully
+					// https://extract.atlassian.net/browse/ISSUE-17435
+					auto pageMap = loadPagesFromArchive(stdstrFullFileName, true);
+					if (pageMap->size() != pages->Size())
+					{
+						UCLIDException uex("ELI51561", "Incorrect number of pages written!");
+						uex.addDebugInfo("Expected page count", pages->Size());
+						uex.addDebugInfo("Actual page count", pageMap->size());
+						throw uex;
+					}
 				}
 			}
 			catch (...)
@@ -784,9 +797,6 @@ STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress
 
 			// Restore the original source doc name
 			m_strSourceDocName = strSourceDocName;
-
-			// Wait until the file is readable
-			waitForFileToBeReadable(stdstrFullFileName);
 		}
 		else
 		{

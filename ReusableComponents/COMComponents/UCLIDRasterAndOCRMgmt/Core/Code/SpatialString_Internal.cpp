@@ -4740,7 +4740,9 @@ void CSpatialString::savePagesToArchive(const string& strOutputFile, IIUnknownVe
             }
             retries++;
             Sleep(100);
-            z.OpenZip(strOutputFile.c_str(), NULL, bAppend);
+            // Always reopen with bAppend = true when retrying or else the recently added pages will be lost
+			// https://extract.atlassian.net/browse/ISSUE-17435
+            z.OpenZip(strOutputFile.c_str(), NULL, true);
         }
 	}
 }
@@ -4750,13 +4752,14 @@ void CSpatialString::appendToArchive(const string& strOutputFile, bool bCompress
 	IIUnknownVectorPtr pages = getThisAsCOMPtr()->GetPages(VARIANT_FALSE, "");
 	ASSERT_RESOURCE_ALLOCATION("ELI46764", pages != __nullptr);
 
+	// Retrieve the page numbers that already exist in the zip
+	auto preexistingPageMap = loadPagesFromArchive(strOutputFile, true);
+	long preexistingCount = preexistingPageMap->size();
+    long pagesToWriteCount = pages->Size();
+
 	if (bCheckForExistingPages)
 	{
-		// Retrieve the page numbers that already exist in the zip
-		auto existingPageMap = loadPagesFromArchive(strOutputFile, true);
-		long existingCount = existingPageMap->size();
-
-		if (existingCount == 0)
+		if (preexistingCount == 0)
 		{
 			savePagesToArchive(strOutputFile, pages, bCompress);
 		}
@@ -4767,7 +4770,7 @@ void CSpatialString::appendToArchive(const string& strOutputFile, bool bCompress
 			{
 				UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr page = pages->At(i);
 				long firstPage = page->GetFirstPageNumber();
-				ASSERT_RUNTIME_CONDITION("ELI46775", existingPageMap->find(firstPage) == existingPageMap->end(), "Page already exists in the archive");
+				ASSERT_RUNTIME_CONDITION("ELI46775", preexistingPageMap->find(firstPage) == preexistingPageMap->end(), "Page already exists in the archive");
 			}
 
 			savePagesToArchive(strOutputFile, pages, bCompress, true);
@@ -4778,6 +4781,17 @@ void CSpatialString::appendToArchive(const string& strOutputFile, bool bCompress
 		// Append or create without regard to contents
 		savePagesToArchive(strOutputFile, pages, bCompress, true);
 	}
+
+    // Verify that all the pages were saved successfully
+    // https://extract.atlassian.net/browse/ISSUE-17435
+    auto pageMap = loadPagesFromArchive(strOutputFile, true);
+    if (pageMap->size() != preexistingCount + pagesToWriteCount)
+    {
+		UCLIDException uex("ELI51560", "Incorrect number of pages written!");
+		uex.addDebugInfo("Expected page count", preexistingCount + pagesToWriteCount);
+		uex.addDebugInfo("Actual page count", pageMap->size());
+		throw uex;
+    }
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialString::loadFromGoogleJson(const string& strInputFile, long nPageNumber, UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLoadInto)
