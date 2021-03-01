@@ -193,6 +193,17 @@ library UCLID_FILEPROCESSINGLib
 		kClassification = 3
 	} EWorkflowType;
 
+	typedef 
+		[
+			uuid(E58603DB-DD7E-411A-ACF4-2DBC3A93CC9F),
+			helpstring("Tag Types")
+		] 
+	enum TagMatchType 
+	{ 
+		eAnyTag = 0, 
+		eAllTag = 1, 
+		eNoneTag = 2 
+	} TagMatchType;
 
 	typedef
 		[
@@ -2925,6 +2936,13 @@ library UCLID_FILEPROCESSINGLib
 		// ARGS:	bstrFileSet- The file set.
 		[id(9), helpstring("method AddFileSetCondition")] HRESULT AddFileSetCondition(
 			[in] BSTR bstrFileSet);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Adds a tag condition to the current settings.
+		// ARGS:	tag- The tag to set.
+		// TagMatchType - The tag type to match
+		[id(10), helpstring("method AddFileTagCondition")] HRESULT AddFileTagCondition(
+			[in] BSTR tag, [in] TagMatchType tagType);
 	};
 
 	[

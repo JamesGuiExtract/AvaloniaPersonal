@@ -6,6 +6,7 @@
 #include <UCLIDException.h>
 #include <COMUtils.h>
 #include <FAMUtilsConstants.h>
+#include "UCLIDFileProcessing.h"
 
 //--------------------------------------------------------------------------------------------------
 // FileTagCondition 

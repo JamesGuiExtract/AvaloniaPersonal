@@ -1,12 +1,11 @@
 #pragma once
 
 #include "SelectFileCondition.h"
+#include "UCLIDFileProcessing.h"
 
 #include <string>
 #include <vector>
 using namespace std;
-
-enum TagMatchType { eAnyTag = 0, eAllTag = 1, eNoneTag = 2 };
 
 //-------------------------------------------------------------------------------------------------
 // FileTagCondition

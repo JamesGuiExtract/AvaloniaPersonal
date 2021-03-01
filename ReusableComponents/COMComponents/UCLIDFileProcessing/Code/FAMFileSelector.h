@@ -40,6 +40,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(AddActionStatusCondition)(IFileProcessingDB *pFAMDB, BSTR bstrAction,
 		EActionStatus eStatus);
 	STDMETHOD(AddQueryCondition)(BSTR bstrQuery);
+	STDMETHOD(AddFileTagCondition)(BSTR tag, TagMatchType tagType);
 	STDMETHOD(AddFileSetCondition)(BSTR bstrFileSet);
 	STDMETHOD(LimitToSubset)(VARIANT_BOOL bRandomSubset, VARIANT_BOOL bTopSubset,
 		VARIANT_BOOL bUsePercentage, LONG nSubsetSize, LONG nOffset);

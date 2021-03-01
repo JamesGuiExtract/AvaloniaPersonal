@@ -1722,19 +1722,19 @@ namespace Extract.FileActionManager.Database.Test
                 // Restart fam session if processing skipped files or they won't be returned
                 if (getSkipped)
                 {
-                    fpDB.startNewSession(fpDB.wf1);
+                    fpDB.startNewSession(fpDB.workflow1);
                 }
 
                 // Set file 1 to processing for action 2 in workflow 1
-                int action2ID = fpDB.wf1.GetActionID(fpDB.action2);
-                fpDB.wf1.SetFileStatusToProcessing(testFile1, action2ID);
-                Assert.AreEqual(EActionStatus.kActionProcessing, fpDB.wf1.GetFileStatus(testFile1, fpDB.action2, false));
+                int action2ID = fpDB.workflow1.GetActionID(fpDB.action2);
+                fpDB.workflow1.SetFileStatusToProcessing(testFile1, action2ID);
+                Assert.AreEqual(EActionStatus.kActionProcessing, fpDB.workflow1.GetFileStatus(testFile1, fpDB.action2, false));
 
                 // Confirm that file 1 is pending for action 1 in workflow 1
-                Assert.AreEqual(statusToGetFrom, fpDB.wf1.GetFileStatus(testFile1, fpDB.action1, false));
+                Assert.AreEqual(statusToGetFrom, fpDB.workflow1.GetFileStatus(testFile1, fpDB.action1, false));
 
                 // Confirm that file 1 is returned by GetFilesToProcess even though it is processing in action 2
-                var filesToProcess = fpDB.wf1.GetFilesToProcess(fpDB.action1, maxFilesToGet, getSkipped, "")
+                var filesToProcess = fpDB.workflow1.GetFilesToProcess(fpDB.action1, maxFilesToGet, getSkipped, "")
                     .ToIEnumerable<IFileRecord>()
                     .Select(fileRecord => fileRecord.FileID)
                     .ToList();
@@ -1779,15 +1779,15 @@ namespace Extract.FileActionManager.Database.Test
                 fpDB.addFakeFile(2, getSkipped);
 
                 // Set file 1 to processing for action 1 in workflow 1
-                fpDB.wf1.SetFileStatusToProcessing(testFile1, fpDB.wf1.GetActionIDForWorkflow(fpDB.action1, 1));
-                Assert.AreEqual(EActionStatus.kActionProcessing, fpDB.wf1.GetFileStatus(testFile1, fpDB.action1, false));
+                fpDB.workflow1.SetFileStatusToProcessing(testFile1, fpDB.workflow1.GetActionIDForWorkflow(fpDB.action1, 1));
+                Assert.AreEqual(EActionStatus.kActionProcessing, fpDB.workflow1.GetFileStatus(testFile1, fpDB.action1, false));
 
                 // Confirm that file 1 is pending for action 1 in workflow 2
-                Assert.AreEqual(statusToGetFrom, fpDB.wf2.GetFileStatus(testFile1, fpDB.action1, false));
+                Assert.AreEqual(statusToGetFrom, fpDB.workflow2.GetFileStatus(testFile1, fpDB.action1, false));
 
                 // Use all workflows to get files
                 // Confirm that file 1 is _not_ returned by GetFilesToProcess even though it is in the queue for action 1 in workflow 2
-                var filesToProcess = fpDB.wfAll.GetFilesToProcess(fpDB.action1, maxFilesToGet, getSkipped, "")
+                var filesToProcess = fpDB.workflowAll.GetFilesToProcess(fpDB.action1, maxFilesToGet, getSkipped, "")
                     .ToIEnumerable<IFileRecord>()
                     .Select(fileRecord => fileRecord.FileID)
                     .ToList();
@@ -1844,12 +1844,12 @@ namespace Extract.FileActionManager.Database.Test
                     Assert.AreEqual(fileNumber, fileID);
 
                     // Confirm that file is pending for action 1 in workflow 1 and 2
-                    Assert.AreEqual(statusToGetFrom, fpDB.wf1.GetFileStatus(fileID, fpDB.action1, false));
-                    Assert.AreEqual(statusToGetFrom, fpDB.wf2.GetFileStatus(fileID, fpDB.action1, false));
+                    Assert.AreEqual(statusToGetFrom, fpDB.workflow1.GetFileStatus(fileID, fpDB.action1, false));
+                    Assert.AreEqual(statusToGetFrom, fpDB.workflow2.GetFileStatus(fileID, fpDB.action1, false));
                 }
 
                 // Use all workflows to get files
-                var filesToProcess = fpDB.wfAll.GetFilesToProcess(fpDB.action1, maxFilesToGet, getSkipped, "")
+                var filesToProcess = fpDB.workflowAll.GetFilesToProcess(fpDB.action1, maxFilesToGet, getSkipped, "")
                     .ToIEnumerable<IFileRecord>()
                     .Select(fileRecord => fileRecord.FileID)
                     .ToList();
@@ -1897,7 +1897,7 @@ namespace Extract.FileActionManager.Database.Test
                     fpDB.addFakeFile(i, getSkipped, EFilePriority.kPriorityAboveNormal);
                 }
 
-                var currentWorkflow = workflow == 1 ? fpDB.wf1 : fpDB.wf2;
+                var currentWorkflow = workflow == 1 ? fpDB.workflow1 : fpDB.workflow2;
 
                 // Restart fam session if processing skipped files or they won't be returned
                 if (getSkipped)
@@ -1951,6 +1951,198 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
+        /// <summary>
+        /// Gets a random selection of files, sets them to pending in action two, and calls get files to process on them.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void GetFilesToProcessAfterModifyActionStatusForSelectionWithSubsetsRandom()
+        {
+            string testDBName = "TestModifyActionStatusForSelectionWithSubsetsRandom";
+            using var fileProcessingDatabase = new TwoWorkflows(testDBName, false);
+            fileProcessingDatabase.addFakeFile(1, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.addFakeFile(2, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.workflow1.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            try
+            {
+                var fileSelector = new FAMFileSelector();
+                fileSelector.LimitToSubset(bRandomSubset: true, bTopSubset: false, bUsePercentage: true, nSubsetSize: 50, nOffset: -1);
+                fileProcessingDatabase.workflow1.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+
+                var files = fileProcessingDatabase.workflow1.GetFilesToProcess("Action2", 5, false, string.Empty)
+                            .ToIEnumerable<IFileRecord>()
+                            .Select(fileRecord => fileRecord.FileID)
+                            .ToList();
+
+                Assert.That(files.Count == 1);
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI51562", cex.Message);
+            }
+        }
+        
+        /// <summary>
+        /// Gets file two via query condition, sets it to pending in action two, and calls get files to process on it.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void GetFilesToProcessAfterModifyActionStatusForSelectionWithQuerySubSet()
+        {
+            string testDBName = "TestModifyActionStatusForSelectionWithQuerySubSet";
+            using var fileProcessingDatabase = new TwoWorkflows(testDBName, false);
+            fileProcessingDatabase.addFakeFile(1, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.addFakeFile(2, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.workflow1.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            try
+            {
+
+                var fileSelector = new FAMFileSelector();
+                fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2");
+
+                fileProcessingDatabase.workflow1.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+
+                var files = fileProcessingDatabase.workflow1.GetFilesToProcess("Action2", 5, false, string.Empty)
+                            .ToIEnumerable<IFileRecord>()
+                            .Select(fileRecord => fileRecord.FileID)
+                            .ToList();
+
+                Assert.That(files.Contains(2) && files.Count == 1);
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI51563", cex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Gets the top 50% of files (File one) sets it to pending in action two, and gets it to process.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void GetFilesToProcessAfterModifyActionStatusSubSetTop()
+        {
+            string testDBName = "TestGetFilesToProcessAfterModifyActionStatusSubSetTop";
+            using var fileProcessingDatabase = new TwoWorkflows(testDBName, false);
+            fileProcessingDatabase.addFakeFile(1, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.addFakeFile(2, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.workflow1.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            try
+            {
+                var fileSelector = new FAMFileSelector();
+                // Get file one for the selector
+                fileSelector.LimitToSubset(false, true, true, 50, -1);
+
+                // Set file one to pending in action two 
+                fileProcessingDatabase.workflow1.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+
+                // Ensure file one is obtained by gftp
+                var files = fileProcessingDatabase.workflow1.GetFilesToProcess("Action2", 5, false, string.Empty)
+                            .ToIEnumerable<IFileRecord>()
+                            .Select(fileRecord => fileRecord.FileID)
+                            .ToList();
+
+                Assert.That(files.Contains(1) && files.Count == 1);
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI51564", cex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Gets the bottom 50% of files (File two) sets it to pending in action two, and gets it to process.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void GetFilesToProcessAfterModifyActionStatusSubSetBottom()
+        {
+            string testDBName = "TestGetFilesToProcessAfterModifyActionStatusSubSetBottom";
+            using var fileProcessingDatabase = new TwoWorkflows(testDBName, false);
+            fileProcessingDatabase.addFakeFile(1, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.addFakeFile(2, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.workflow1.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            try
+            {
+                var fileSelector = new FAMFileSelector();
+                // Get file two for the selector
+                fileSelector.LimitToSubset(false, false, true, 50, -1);
+
+                // Set file two to pending in action two 
+                fileProcessingDatabase.workflow1.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+
+                // Ensure file two is obtained by gftp
+                var files = fileProcessingDatabase.workflow1.GetFilesToProcess("Action2", 5, false, string.Empty)
+                            .ToIEnumerable<IFileRecord>()
+                            .Select(fileRecord => fileRecord.FileID)
+                            .ToList();
+
+                Assert.That(files.Contains(2) && files.Count == 1);
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI51565", cex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Sets files to pending using a simple condition, then calls get files to process on it.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void GetFilesToProcessAfterModifyActionStatusForSelectionBaseCase()
+        {
+            string testDBName = "TestModifyActionStatusForSelectionBaseCase";
+            using var fileProcessingDatabase = new TwoWorkflows(testDBName, false);
+            fileProcessingDatabase.addFakeFile(1, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.addFakeFile(2, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.workflow1.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            try
+            {
+                var fileSelector = new FAMFileSelector();
+                fileSelector.AddActionStatusCondition(fileProcessingDatabase.workflow1, "Action1", EActionStatus.kActionPending);
+
+                fileProcessingDatabase.workflow1.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+
+                var files = fileProcessingDatabase.workflow1.GetFilesToProcess("Action2", 5, false, string.Empty)
+                            .ToIEnumerable<IFileRecord>()
+                            .Select(fileRecord => fileRecord.FileID)
+                            .ToList();
+                Assert.That(files.Contains(2) && files.Contains(1) && files.Count == 2);
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI51566", cex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Tags the first file, and applies a tag condition. Finally call get files to process on that one file.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void GetFilesToProcessAfterModifyActionStatusForSelectionTags()
+        {
+            string testDBName = "TestModifyActionStatusForSelectionTags";
+            using var fileProcessingDatabase = new TwoWorkflows(testDBName, false);
+            fileProcessingDatabase.addFakeFile(1, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.addFakeFile(2, false, EFilePriority.kPriorityNormal);
+            fileProcessingDatabase.workflow1.AddTag("Test", "", false);
+            fileProcessingDatabase.workflow1.TagFile(1, "Test");
+            fileProcessingDatabase.workflow1.SetStatusForAllFiles("Action2", EActionStatus.kActionUnattempted);
+            try
+            {
+                var fileSelector = new FAMFileSelector();
+                fileSelector.AddFileTagCondition("Test", TagMatchType.eAnyTag);
+                var test = fileSelector.GetResults(fileProcessingDatabase.workflow1);
+                
+                fileProcessingDatabase.workflow1.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
+
+                var files = fileProcessingDatabase.workflow1.GetFilesToProcess("Action2", 5, false, string.Empty)
+                            .ToIEnumerable<IFileRecord>()
+                            .Select(fileRecord => fileRecord.FileID)
+                            .ToList();
+                Assert.That(files.Contains(1) && files.Count == 1);
+            }
+            catch (COMException cex)
+            {
+                throw ExtractException.FromStringizedByteStream("ELI51566", cex.Message);
+            }
+        }
 
         #endregion Test Methods
 
@@ -1961,9 +2153,9 @@ namespace Extract.FileActionManager.Database.Test
             public readonly string action1 = "Action1";
             public readonly string action2 = "Action2";
 
-            public readonly FileProcessingDB wf1 = null;
-            public readonly FileProcessingDB wf2 = null;
-            public readonly FileProcessingDB wfAll = null;
+            public readonly FileProcessingDB workflow1 = null;
+            public readonly FileProcessingDB workflow2 = null;
+            public readonly FileProcessingDB workflowAll = null;
 
             readonly FileProcessingDB[] fpDBs = null;
             readonly string testDBName;
@@ -1973,33 +2165,33 @@ namespace Extract.FileActionManager.Database.Test
                 this.testDBName = testDBName;
 
                 // Setup DB
-                wf1 = _testDbManager.GetNewDatabase(testDBName);
-                wf1.SetDBInfoSetting("EnableLoadBalancing", enableLoadBalancing ? "1" : "0", true, false);
-                wf1.DefineNewAction(action1);
-                wf1.DefineNewAction(action2);
+                this.workflow1 = _testDbManager.GetNewDatabase(testDBName);
+                this.workflow1.SetDBInfoSetting("EnableLoadBalancing", enableLoadBalancing ? "1" : "0", true, false);
+                this.workflow1.DefineNewAction(action1);
+                this.workflow1.DefineNewAction(action2);
 
-                int workflow1 = wf1.AddWorkflow("Workflow1", EWorkflowType.kUndefined, action1, action2);
+                int workflow1 = this.workflow1.AddWorkflow("Workflow1", EWorkflowType.kUndefined, action1, action2);
                 Assert.AreEqual(1, workflow1);
-                int workflow2 = wf1.AddWorkflow("Workflow2", EWorkflowType.kUndefined, action1, action2);
+                int workflow2 = this.workflow1.AddWorkflow("Workflow2", EWorkflowType.kUndefined, action1, action2);
                 Assert.AreEqual(2, workflow2);
 
                 // Configure a separate object for each workflow configuration needed
-                wf1.ActiveWorkflow = "Workflow1";
-                wf2 = new FileProcessingDBClass
+                this.workflow1.ActiveWorkflow = "Workflow1";
+                this.workflow2 = new FileProcessingDBClass
                 {
-                    DatabaseServer = wf1.DatabaseServer,
-                    DatabaseName = wf1.DatabaseName,
+                    DatabaseServer = this.workflow1.DatabaseServer,
+                    DatabaseName = this.workflow1.DatabaseName,
                     ActiveWorkflow = "Workflow2"
                 };
-                wfAll = new FileProcessingDBClass
+                workflowAll = new FileProcessingDBClass
                 {
-                    DatabaseServer = wf1.DatabaseServer,
-                    DatabaseName = wf1.DatabaseName,
+                    DatabaseServer = this.workflow1.DatabaseServer,
+                    DatabaseName = this.workflow1.DatabaseName,
                     ActiveWorkflow = ""
                 };
 
                 // Start a session for each DB object
-                fpDBs = new[] { wf1, wf2, wfAll };
+                fpDBs = new[] { this.workflow1, this.workflow2, workflowAll };
                 foreach (var fpDB in fpDBs)
                 {
                     fpDB.RecordFAMSessionStart("Test.fps", action1, true, true);
@@ -2010,20 +2202,20 @@ namespace Extract.FileActionManager.Database.Test
             public int addFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal)
             {
                 var fileName = Path.Combine(Path.GetTempPath(), fileNumber.ToString("N3", CultureInfo.InvariantCulture) + ".tif");
-                int fileID = wf1.AddFileNoQueue(fileName, 0, 0, priority, 1);
+                int fileID = workflow1.AddFileNoQueue(fileName, 0, 0, priority, 1);
                 if (setAsSkipped)
                 {
-                    wf1.SetFileStatusToSkipped(fileID, action1, false, false);
-                    wf1.SetFileStatusToSkipped(fileID, action2, false, false);
-                    wf2.SetFileStatusToSkipped(fileID, action1, false, false);
-                    wf2.SetFileStatusToSkipped(fileID, action2, false, false);
+                    workflow1.SetFileStatusToSkipped(fileID, action1, false, false);
+                    workflow1.SetFileStatusToSkipped(fileID, action2, false, false);
+                    workflow2.SetFileStatusToSkipped(fileID, action1, false, false);
+                    workflow2.SetFileStatusToSkipped(fileID, action2, false, false);
                 }
                 else
                 {
-                    wf1.SetFileStatusToPending(fileID, action1, false);
-                    wf1.SetFileStatusToPending(fileID, action2, false);
-                    wf2.SetFileStatusToPending(fileID, action1, false);
-                    wf2.SetFileStatusToPending(fileID, action2, false);
+                    workflow1.SetFileStatusToPending(fileID, action1, false);
+                    workflow1.SetFileStatusToPending(fileID, action2, false);
+                    workflow2.SetFileStatusToPending(fileID, action1, false);
+                    workflow2.SetFileStatusToPending(fileID, action2, false);
                 }
 
                 return fileID;
@@ -2059,8 +2251,8 @@ namespace Extract.FileActionManager.Database.Test
 
             public int getTotalProcessing()
             {
-                var action1Stats = wfAll.GetStatsAllWorkflows(action1, false);
-                var action2Stats = wfAll.GetStatsAllWorkflows(action2, false);
+                var action1Stats = workflowAll.GetStatsAllWorkflows(action1, false);
+                var action2Stats = workflowAll.GetStatsAllWorkflows(action2, false);
                 int totalFilesInDB = action1Stats.NumDocuments + action2Stats.NumDocuments;
                 int notProcessing = 0;
                 notProcessing += action1Stats.NumDocumentsSkipped;

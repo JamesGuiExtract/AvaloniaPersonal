@@ -10,6 +10,7 @@
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <ComponentLicenseIDs.h>
+#include "FileTagCondition.h"
 
 //--------------------------------------------------------------------------------------------------
 // CFAMFileSelector
@@ -108,6 +109,29 @@ STDMETHODIMP CFAMFileSelector::AddActionStatusCondition(IFileProcessingDB *pFAMD
 		pCondition->setStatusString(strStatusString);
 		pCondition->setUser(gstrANY_USER);
 				
+		m_settings.addCondition(pCondition);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI35697");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFAMFileSelector::AddFileTagCondition(BSTR tag, TagMatchType tagType)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		FileTagCondition* pCondition = new FileTagCondition();
+
+		std::vector<string> tags;
+		tags.push_back(asString(tag));
+		pCondition->setTags(tags);
+
+		pCondition->setTagType(tagType);
+
 		m_settings.addCondition(pCondition);
 
 		return S_OK;
