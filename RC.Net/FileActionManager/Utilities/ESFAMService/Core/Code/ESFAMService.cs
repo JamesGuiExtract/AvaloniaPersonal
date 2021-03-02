@@ -314,7 +314,7 @@ namespace Extract.FileActionManager.Utilities
         {
 
             Exception waitForConnectionException = null;
-            AutoResetEvent connectedEvent = new AutoResetEvent(false);
+            using AutoResetEvent connectedEvent = new AutoResetEvent(false);
             pipeStream.BeginWaitForConnection(asyncResult =>
             {
                 try
