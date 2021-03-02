@@ -99,6 +99,32 @@ void CFileProcessingDB::postStatusUpdateNotification(EDatabaseWrapperObjectStatu
 	}
 }
 //--------------------------------------------------------------------------------------------------
+set<long> CFileProcessingDB::getSkippedFilesForAction(const _ConnectionPtr& ipConnection,
+													  long nActionId)
+{
+	try
+	{
+		string strQuery = "SELECT FileID FROM SkippedFile WHERE ActionID = " + asString(nActionId);
+
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI30293", ipFileSet != __nullptr);
+
+		// Open the file set
+		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+		set<long> setFileIds;
+		while (ipFileSet->adoEOF == VARIANT_FALSE)
+		{
+			setFileIds.insert(getLongField(ipFileSet->Fields, "FileID"));
+			ipFileSet->MoveNext();
+		}
+
+		return setFileIds;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30294");
+}
+//--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 										   const vector<SetFileActionData>& vecSetData,
 										   string strAction, const string& strState)
@@ -128,7 +154,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				+ "' WHERE ActionID = " + strActionID + " AND FileID IN (";
 			strInsertIntoFAS = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority) "
 				"SELECT FAMFile.ID, " + strActionID + " AS ActionID, '" + strState + "' AS ActionStatus, " +
-				"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority FROM FAMFile WITH (NOLOCK) " +
+				"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority FROM FAMFile " +
 				"LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
 				"AND ActionID = " + strActionID + " WHERE ActionID IS NULL AND FAMFile.ID IN (";
 		}
@@ -146,7 +172,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			+ ") SELECT FAMFile.ID, " + strActionID + " AS ActionID, "
 			+ "COALESCE(ActionStatus, 'U') AS ASC_From, '" + strState + "' AS ASC_To, "
 			+ "GETDATE() AS DateTimeStamp, " + strFAMUser + " AS FAMUserID, " + strMachine
-			+ " AS MachineID FROM FAMFile WITH (NOLOCK) "
+			+ " AS MachineID FROM FAMFile "
 			+ "LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID  AND "
 			+ "FileActionStatus.ActionID = " + strActionID + " "
 			+ "WHERE FAMFile.ID IN (";
@@ -156,7 +182,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		string strAddSkipRecord = strState == "S" ?
 			"INSERT INTO SkippedFile (UserName, FileID, ActionID) SELECT '"
 			+ ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName) + "' AS UserName, FAMFile.ID, "
-			+ strActionID + " AS ActionID FROM FAMFile WITH (NOLOCK) WHERE FAMFile.ID IN (" : "";
+			+ strActionID + " AS ActionID FROM FAMFile WHERE FAMFile.ID IN (" : "";
 
 		// This is used when processing state changes to "U", "C", "F" and if restartable processing
 		// is turned off "P"
@@ -194,7 +220,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			executeCmdQuery(ipConnection, strRemoveSkippedFile + strFileIdList);
 			executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange + strFileIdList);
 			if ((!m_bAllowRestartableProcessing && strState == "P") || strState == "U" 
-				|| strState == "C" || strState == "F")
+                || strState == "C" || strState == "F")
 			{
 				executeCmdQuery(ipConnection, strDeleteWorkItemGroup + strFileIdList);
 			}
@@ -274,12 +300,12 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			"COALESCE(ActionStatus, 'U') AS ActionStatus, "
 			"COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID, "
 			"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID "
-			"FROM FAMFile WITH (NOLOCK) "
+			"FROM FAMFile WITH (ROWLOCK, UPDLOCK)"
 			"LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID " 
 			"	AND SkippedFile.ActionID = " + strActionId + 
-			" LEFT OUTER JOIN FileActionStatus WITH (ROWLOCK, UPDLOCK) ON FileActionStatus.FileID = FAMFile.ID " + 
+			" LEFT OUTER JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID " + 
 			"	AND FileActionStatus.ActionID = " + strActionId + 
-			" LEFT OUTER JOIN QueuedActionStatusChange WITH (ROWLOCK, UPDLOCK) ON QueuedActionStatusChange.ChangeStatus = 'P' "
+			" LEFT OUTER JOIN QueuedActionStatusChange ON QueuedActionStatusChange.ChangeStatus = 'P' "
 			"	AND QueuedActionStatusChange.FileID = FAMFile.ID "
 			"	AND QueuedActionStatusChange.ActionID = " + strActionId +
 			" WHERE FAMFile.ID = " + strFileId;
@@ -899,7 +925,7 @@ long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, string strWor
 			return getActiveWorkflowID(ipConnection);
 		}
 
-		string strQuery = "SELECT [ID] FROM [Workflow] WITH (NOLOCK) WHERE [Workflow].[Name] = '" +
+		string strQuery = "SELECT [ID] FROM [Workflow] WHERE [Workflow].[Name] = '" +
 			strWorkflowName + "'";
 
 		long nWorkflowID = 0;
@@ -1302,7 +1328,7 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 		}
 
 		// Create the from string
-		string strFrom = " FROM FAMFile WITH (NOLOCK) LEFT JOIN FileActionStatus WITH (NOLOCK) "
+		string strFrom = " FROM FAMFile LEFT JOIN FileActionStatus "
 			" ON FAMFile.ID = FileActionStatus.FileID AND FileActionStatus.ActionID = " +
 			asString(nActionID) + " " + strWhereClause;
 		
@@ -1597,7 +1623,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
-		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_INDEX);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
@@ -1616,7 +1642,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FAST_FILEID_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_DATETIMESTAMP_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX);
-		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_TASKCLASSID_WITH_ID_SESSIONID_DATE);
 		vecQueries.push_back(gstrCREATE_PAGINATION_ORIGINALFILE_INDEX);
 		vecQueries.push_back(gstrCREATE_PAGINATION_FILETASKSESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_ACTION_INDEX);
@@ -1624,7 +1649,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_PAGINATION_SOURCEFILE_INDEX);
 		vecQueries.push_back(gstrCREATE_FAMSESSION_ID_FAMUSERID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILETASKSESSION_DATETIMESTAMP_WITH_INCLUDES_INDEX);
-		vecQueries.push_back(gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_DELETED_INDEX);
 
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
@@ -1766,7 +1790,6 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_USAGE_FOR_SPECIFIC_USER_SPECIFIC_DAY_PROCEDURE);
 		vecQueries.push_back(gstrCREATE_TABLE_FROM_COMMA_SEPARATED_LIST_FUNCTION);
 		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE);
-		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -2213,7 +2236,6 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 
 	mapDefaultValues[gstrDASHBOARD_INCLUDE_FILTER] = "";
 	mapDefaultValues[gstrDASHBOARD_EXCLUDE_FILTER] = "";
-	mapDefaultValues[gstrUSE_GET_FILES_LEGACY] = "0";
 
 	// Create a new database ID  or use existing if it has been set
 	ByteStream bsDatabaseID;
@@ -2287,10 +2309,10 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 				"COALESCE(fasTo.ActionStatus, 'U') as ASC_To, "
 				"GETDATE() AS TS_Trans, 'Copy status from " + 
 				strFrom +" to " + strTo + "' AS Comment, " + asString(getFAMUserID(ipConnection)) + 
-				", " + asString(getMachineID(ipConnection)) + " FROM FAMFile WITH (NOLOCK) "
-				" LEFT JOIN FileActionStatus as fasFrom WITH (NOLOCK) ON FAMFile.ID = fasFrom.FileID AND fasFrom.ActionID = " +
+				", " + asString(getMachineID(ipConnection)) + " FROM FAMFile "
+				" LEFT JOIN FileActionStatus as fasFrom ON FAMFile.ID = fasFrom.FileID AND fasFrom.ActionID = " +
 				strFromActionID + 
-				" LEFT JOIN FileActionStatus as fasTo WITH (NOLOCK) ON FAMFile.ID = fasTo.FileID AND fasTo.ActionID = " +
+				" LEFT JOIN FileActionStatus as fasTo ON FAMFile.ID = fasTo.FileID AND fasTo.ActionID = " +
 				strToActionID;
 
 			executeCmdQuery(ipConnection, strTransition);
@@ -2307,8 +2329,8 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 				" FAMFile.ID, " + strToActionID + " AS NewActionID, '" 
 				+ ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName)
 				+ "' AS NewUserName, " + ((m_nFAMSessionID == 0) ? "NULL" : asString(m_nFAMSessionID)) + 
-				" AS FAMSessionID FROM FAMFile WITH (NOLOCK) "
-				"INNER JOIN FileActionStatus WITH (NOLOCK) ON FAMFile.ID = FileActionStatus.FileID AND "
+				" AS FAMSessionID FROM FAMFile "
+				"INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID AND "
 				"FileActionStatus.ActionID = " + strFromActionID + " WHERE ActionStatus = 'S'";
 
 			// Delete the existing skipped records for this action and insert any new ones
@@ -2682,7 +2704,8 @@ void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/
 
 		// Get the Schema Version from the database
 		int iDBSchemaVersion = getDBSchemaVersion();
-		if (iDBSchemaVersion != ms_lFAMDBSchemaVersion)
+		//if (iDBSchemaVersion != ms_lFAMDBSchemaVersion)
+		if (iDBSchemaVersion < ms_lFAMDBSchemaVersion)
 		{
 			// Update the current connection status string
 			m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
@@ -2782,8 +2805,7 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 		try
 		{
 			string strActiveWorkflow = getActiveWorkflow();
-			int actionID = getActionID(ipConnection, strActionName, strActiveWorkflow);
-			m_nActiveActionID = actionID;
+			m_nActiveActionID = getActionID(ipConnection, strActionName, strActiveWorkflow);
 
 			long nWorkflowActionCount = 0;
 			string strWorkflowActionQuery = Util::Format(
@@ -2792,26 +2814,14 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 			executeCmdQuery(ipConnection, strWorkflowActionQuery, false, &nWorkflowActionCount);
 			m_bUsingWorkflowsForCurrentAction = (nWorkflowActionCount > 0);
 			m_bRunningAllWorkflows = (m_bUsingWorkflowsForCurrentAction && strActiveWorkflow == "");
-			m_nProcessStart = 0;
-			m_vecActionsProcessOrder.clear();
 
-			if (m_bRunningAllWorkflows)
-			{
-				loadActionsProcessOrder(ipConnection, strActionName);
-			}
-			else
-			{
-				m_vecActionsProcessOrder.push_back(actionID);
-			}
-
-			// is this really needed here? This should probably be some DB consistancy check done when first connecting to a database
 			if (m_bUsingWorkflowsForCurrentAction)
 			{
 				long nExternalWorkflowFiles = 0;
 				string strExternalFilesQuery = Util::Format(
 					"SELECT COUNT(*) AS [ID] FROM [FileActionStatus] WHERE [ActionID] = '%d'",
-					getActionID(ipConnection, strActionName, ""));
-				executeCmdQuery(ipConnection, strExternalFilesQuery, false, &nExternalWorkflowFiles);
+					m_nActiveActionID);
+				executeCmdQuery(ipConnection, strExternalFilesQuery, false, &nWorkflowActionCount);
 				
 				if (nExternalWorkflowFiles > 0)
 				{
@@ -2830,33 +2840,6 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 
 		throw ue;
 	}
-}
-//--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::loadActionsProcessOrder(_ConnectionPtr ipConnection, const string& strActionName)
-{
-	string strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strActionName);
-	
-	// Tokenize by either comma, semicolon, or pipe
-	vector<string> vecTokens;
-	m_vecActionsProcessOrder.clear();
-	StringTokenizer::sGetTokens(strActionIDs, ",;|", vecTokens, true);
-	for (size_t i = 0; i<vecTokens.size(); i++)
-	{
-		long actionID = asLong(vecTokens[i]);
-		long workflowID = getWorkflowID(ipConnection, actionID);
-		UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr workflowDef = __nullptr;
-		if (workflowID > 0)
-		{
-			workflowDef = getWorkflowDefinition(ipConnection, workflowID);
-			for (int n = 0; n < workflowDef->LoadBalanceWeight; n++)
-			{
-				m_vecActionsProcessOrder.push_back(actionID);
-			}
-		}
-		
-	}
-	if (m_vecActionsProcessOrder.size() > 1)
-		shuffleVector(m_vecActionsProcessOrder);
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLockName)
@@ -3720,7 +3703,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 							_lastCodePos = "80";
 
 							// Get the command timeout
-							m_iCommandTimeout = asLong(getStringField(ipFields, "Value"));
+							m_iCommandTimeout =  asLong(getStringField(ipFields, "Value"));
 						}
 						else if (strValue == gstrUPDATE_QUEUE_EVENT_TABLE)
 						{
@@ -3766,10 +3749,10 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 						{
 							_lastCodePos = "190";
 
-							m_nAutoRevertTimeOutInMinutes = asLong(getStringField(ipFields, "Value"));
+							m_nAutoRevertTimeOutInMinutes =  asLong(getStringField(ipFields, "Value"));
 
-							// [LegacyRCAndUtils:6172]
-							// Don't enforce gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES in debug mode; having a low value is useful in development.
+// [LegacyRCAndUtils:6172]
+// Don't enforce gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES in debug mode; having a low value is useful in development.
 #ifndef _DEBUG
 							// if less that a minimum value this should be reset to the minimum value
 							if (m_nAutoRevertTimeOutInMinutes < gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES)
@@ -3778,14 +3761,14 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 								{
 									string strNewValue = asString(gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
 									// Log application trace exception 
-									UCLIDException ue("ELI29826", "Application trace: AutoRevertTimeOutInMinutes changed to " +
+									UCLIDException ue("ELI29826", "Application trace: AutoRevertTimeOutInMinutes changed to " + 
 										strNewValue + " minutes.");
 									ue.addDebugInfo("Old value", m_nAutoRevertTimeOutInMinutes);
 									ue.addDebugInfo("New value", gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
 									ue.log();
 
 									// Change the setting in the DBInfo table
-									executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
+									executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue + 
 										"' WHERE DBInfo.Name = '" + strValue + "'");
 								}
 								CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
@@ -3810,11 +3793,11 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 						{
 							_lastCodePos = "220";
 
-							m_dGetFilesToProcessTransactionTimeout =
+							m_dGetFilesToProcessTransactionTimeout = 
 								asDouble(getStringField(ipFields, "Value"));
 
 							_lastCodePos = "230";
-
+							
 							// Need to make sure the value is above the minimum
 							if (m_dGetFilesToProcessTransactionTimeout < gdMINIMUM_TRANSACTION_TIMEOUT)
 							{
@@ -3827,15 +3810,15 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 									ue.addDebugInfo("Old value", m_dGetFilesToProcessTransactionTimeout);
 									ue.addDebugInfo("New value", gdMINIMUM_TRANSACTION_TIMEOUT);
 									ue.log();
-
+									
 									_lastCodePos = "240";
 
 									// Change the setting in the DBInfo table 
-									executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
+									executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue + 
 										"' WHERE DBInfo.Name = '" + strValue + "'");
 								}
 								CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31520");
-
+	
 								_lastCodePos = "250";
 
 								m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
@@ -3886,11 +3869,6 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 							_lastCodePos = "330";
 
 							m_bLoadBalance = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrUSE_GET_FILES_LEGACY)
-						{
-							_lastCodePos = "340";
-							m_bUseGetFilesLegacy = getStringField(ipFields, "Value") == "1";
 						}
 					}
 					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
@@ -4045,7 +4023,7 @@ IIUnknownVectorPtr CFileProcessingDB::removeProductSpecificDB(bool bOnlyTables, 
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addProductSpecificDB(_ConnectionPtr ipConnection,
-											 IIUnknownVectorPtr ipProdSpecMgrs,
+										     IIUnknownVectorPtr ipProdSpecMgrs,
 											 bool bOnlyTables, bool bAddUserTables)
 {
 	try
@@ -4503,7 +4481,7 @@ void CFileProcessingDB::init80DB()
 }
 //-------------------------------------------------------------------------------------------------
 IStrToStrMapPtr CFileProcessingDB::getActions(_ConnectionPtr ipConnection,
-											  const string& strWorkflow/* =""*/)
+										      const string& strWorkflow/* =""*/)
 {
 	try
 	{
@@ -4577,6 +4555,49 @@ long CFileProcessingDB::defineNewAction(_ConnectionPtr ipConnection, const strin
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29681");
 }
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, long nActionID,
+													  string strUserName,
+													  const _ConnectionPtr& ipConnection)
+{
+	try
+	{
+		// Clear the vector
+		rvecSkippedFileIDs.clear();
+
+		string strSQL = "SELECT [FileID] FROM [SkippedFile] WHERE [ActionID] = "
+			+ asString(nActionID);
+		if (!strUserName.empty())
+		{
+			// Escape any single quotes
+			replaceVariable(strUserName, "'", "''");
+			strSQL += " AND [UserName] = '" + strUserName + "'";
+		}
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Recordset to contain the files to process
+		_RecordsetPtr ipFileIDSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI26909", ipFileIDSet != __nullptr);
+
+		// get the recordset with skipped file ID's
+		ipFileIDSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+		// Loop through the result set adding the file ID's to the vector
+		while (ipFileIDSet->adoEOF == VARIANT_FALSE)
+		{
+			// Get the file ID and add it to the vector
+			long nFileID = getLongField(ipFileIDSet->Fields, "FileID");
+			rvecSkippedFileIDs.push_back(nFileID);
+
+			// Move to the next record
+			ipFileIDSet->MoveNext();
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26907");
+}
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::clearFileActionComment(const _ConnectionPtr& ipConnection, long nFileID,
 											   long nActionID)
@@ -4637,7 +4658,7 @@ void CFileProcessingDB::validateFileID(const _ConnectionPtr& ipConnection, long 
 {
 	try
 	{
-		string strQuery = "SELECT [FileName] FROM [" + gstrFAM_FILE + "] WITH (NOLOCK) WHERE [ID] = "
+		string strQuery = "SELECT [FileName] FROM [" + gstrFAM_FILE + "] WHERE [ID] = "
 			+ asString(nFileID);
 
 		_RecordsetPtr ipRecord(__uuidof(Recordset));
@@ -4714,8 +4735,8 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 	{
 		// Setup Setting Query
 		string strSQL = "SELECT [LockedFile].[FileID], [LockedFile].[ActionID], StatusBeforeLock, [ActionName] "
-			" FROM LockedFile WITH (NOLOCK) "
-			" INNER JOIN [FileActionStatus] WITH (NOLOCK) ON [LockedFile].[ActionID] = [FileActionStatus].[ActionID]"
+			" FROM LockedFile "
+			" INNER JOIN [FileActionStatus] ON [LockedFile].[ActionID] = [FileActionStatus].[ActionID]"
 			"	AND [LockedFile].[FileID] = [FileActionStatus].[FileID]"
 			" WHERE [LockedFile].[ActiveFAMID] = " + asString(nActiveFAMID) +
 			"	AND [FileActionStatus].[ActionStatus] = 'R'";
@@ -4828,7 +4849,7 @@ void CFileProcessingDB::pingDB()
 			long nFAMSessionID = 0;
 			// Return FAMSessionID as ID so it will populate nFAMSessionID.
 			executeCmdQuery(getDBConnection(),
-				"SELECT [FAMSessionID] AS [ID] FROM [ActiveFAM] WITH (NOLOCK) WHERE [ID] = " + asString(m_nActiveFAMID),
+				"SELECT [FAMSessionID] AS [ID] FROM [ActiveFAM] WHERE [ID] = " + asString(m_nActiveFAMID),
 				false, &nFAMSessionID);
 			if (nFAMSessionID != m_nFAMSessionID)
 			{
@@ -5094,9 +5115,6 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 
 	try
 	{
-		// Begin a transaction
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
 		// Set the revert in progress flag so only one thread executes this per process
 		m_bRevertInProgress = true;
 
@@ -5114,7 +5132,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 		// Query to show the elapsed time since last ping for all ActiveFAM records
 		string strElapsedSQL = "SELECT [ID], "
 			"DATEDIFF(minute,[LastPingTime],GetUTCDate()) as Elapsed "
-			"FROM [ActiveFAM] WITH (NOLOCK)";
+			"FROM [ActiveFAM]";
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI27813", ipFileSet != __nullptr);
@@ -5154,8 +5172,6 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 			// move to next Processing FAM record
 			ipFileSet->MoveNext();
 		}
-		// Commit the reverted files
-		tgRevert.CommitTrans();
 		m_bRevertInProgress = false;
 	}
 	catch(...)
@@ -5350,187 +5366,6 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 	return 0;
 }
 //--------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr& ipConnection,
-	const string& strActionName, const string& strSkippedUser, const string &strStatusToSelect,  long nMaxFiles)
-{
-	// Declare query string so that if there is an exception the query can be added to debug info
-	string strQuery;
-	try
-	{
-		try
-		{
-			// IUnknownVector to hold the FileRecords to return
-			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI51462", ipFiles != __nullptr);
-
-			// Revert files
-			revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-			bool bTransactionSuccessful = false;
-
-			// Start the stopwatch to use to check for transaction timeout
-			StopWatch swTransactionRetryTimeout;
-			swTransactionRetryTimeout.start();
-
-			// Retry the transaction until successful
-			while (!bTransactionSuccessful)
-			{
-				try
-				{
-					try
-					{
-						vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> tempFileVector;
-
-						// Begin a transaction
-						TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
-						if (m_bRunningAllWorkflows && m_bLoadBalance)
-						{
-							int current = m_nProcessStart;
-							int filesObtainedPreviously;
-							int currentNumberOfFilesObtained = 0;
-							do
-							{
-								filesObtainedPreviously = currentNumberOfFilesObtained;
-								do
-								{
-									int actionID = m_vecActionsProcessOrder[current];
-									current = (current + 1) % m_vecActionsProcessOrder.size();
-
-									_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, actionID, strActionName,
-										1, strStatusToSelect, strSkippedUser);
-
-									auto results = getFilesFromRecordset(ipFileSet);
-									tempFileVector.insert(tempFileVector.end(), results.begin(), results.end());
-									currentNumberOfFilesObtained = tempFileVector.size();
-								} while (current != m_nProcessStart && currentNumberOfFilesObtained < nMaxFiles);
-							} while (currentNumberOfFilesObtained < nMaxFiles
-								&& currentNumberOfFilesObtained != filesObtainedPreviously);
-							// Commit the transaction before transfering the data from the recordset
-							tg.CommitTrans();
-							m_nProcessStart = current;
-						}
-						else
-						{
-							int nActionId = m_vecActionsProcessOrder.size() == 1 ? m_vecActionsProcessOrder[0] : 0;
-							_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, 0, strActionName,
-								nMaxFiles, strStatusToSelect, strSkippedUser);
-							
-							tempFileVector = getFilesFromRecordset(ipFileSet);
-							tg.CommitTrans();
-						}
-						// Now that the transaction has processed correctly, copy the file records
-						// that have been set to processing over to ipFiles.
-						for each (UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord in tempFileVector)
-						{
-							ipFiles->PushBack(ipFileRecord);
-						}
-						bTransactionSuccessful = true;
-						return ipFiles;
-					}
-					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51464");
-				}
-				catch (UCLIDException& ue)
-				{
-					// Check if this is a bad connection
-					if (!isConnectionAlive(ipConnection))
-					{
-						// if the connection is not alive just rethrow the exception 
-						throw ue;
-					}
-
-					// Check to see if the timeout value has been reached
-					if (swTransactionRetryTimeout.getElapsedTime() > m_dGetFilesToProcessTransactionTimeout)
-					{
-						UCLIDException uex("ELI51465", "Application Trace: Transaction retry timed out.", ue);
-						uex.addDebugInfo(gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT,
-							asString(m_dGetFilesToProcessTransactionTimeout));
-						throw uex;
-					}
-
-					// In the case that the exception is because the database has gotten into an
-					// inconsistent state (as with LegacyRCAndUtiles:6350), use a small sleep here to
-					// prevent thousands (or millions) of successive failures which may bog down the
-					// DB and burn through table IDs.
-					Sleep(100);
-				}
-			}
-		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51463");
-	}
-	catch (UCLIDException& ue)
-	{
-		ue.addDebugInfo("Record Query", strQuery, true);
-		throw ue;
-	}
-}
-//--------------------------------------------------------------------------------------------------
-_RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _ConnectionPtr& ipConnection, const int actionID,
-	const string& strActionName, const int nMaxFiles, const string& strStatusToSelect, const string& strSkippedUser)
-{
-	_CommandPtr cmd;
-	cmd.CreateInstance(__uuidof(Command));
-	ASSERT_RESOURCE_ALLOCATION("ELI51466", cmd != __nullptr);
-
-	cmd->ActiveConnection = ipConnection;
-	cmd->CommandText = _bstr_t("dbo.GetFilesToProcessForAction");
-	cmd->CommandType = adCmdStoredProc;
-	cmd->Parameters->Refresh();
-	cmd->Parameters->Item["@ActionID"]->Value = variant_t(actionID);
-	int workflowID = getActiveWorkflowID(ipConnection);
-	if (workflowID != -1)
-		cmd->Parameters->Item["@WorkflowID"]->Value = variant_t(workflowID);
-	cmd->Parameters->Item["@ActionName"]->Value = variant_t(strActionName.c_str());
-	cmd->Parameters->Item["@BatchSize"]->Value = variant_t(nMaxFiles);
-	//TODO: make this so it can process Skipped for all or single user
-	cmd->Parameters->Item["@StatusToQueue"]->Value = variant_t(strStatusToSelect.c_str());
-	cmd->Parameters->Item["@MachineID"]->Value = variant_t(getMachineID(ipConnection));
-	cmd->Parameters->Item["@UserID"]->Value = variant_t(getFAMUserID(ipConnection));
-	cmd->Parameters->Item["@ActiveFAMID"]->Value = variant_t(m_nActiveFAMID);
-	cmd->Parameters->Item["@FAMSessionID"]->Value = variant_t(m_nFAMSessionID);
-	cmd->Parameters->Item["@RecordFASTEntry"]->Value = variant_t(m_bUpdateFASTTable);
-	cmd->Parameters->Item["@SkippedForUser"]->Value = variant_t(strSkippedUser.c_str());
-	cmd->Parameters->Item["@CheckDeleted"]->Value = variant_t(m_bCurrentSessionIsWebSession);
-	variant_t vtEmpty;
-	return cmd->Execute(&vtEmpty, &vtEmpty, adCmdStoredProc);
-}
-//--------------------------------------------------------------------------------------------------
-vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> CFileProcessingDB::getFilesFromRecordset(_RecordsetPtr ipFileSet)
-{						
-	// Vector to hold the files
-	vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> tempFileVector;
-	// Fill the ipFiles collection and update the stats
-	while (ipFileSet->adoEOF == VARIANT_FALSE)
-	{
-		FieldsPtr ipFields = ipFileSet->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI30403", ipFields != __nullptr);
-
-		// Get the file Record from the fields
-		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
-			getFileRecordFromFields(ipFields);
-		ASSERT_RESOURCE_ALLOCATION("ELI30404", ipFileRecord != __nullptr);
-
-		// [LegacyRCAndUtils:6225]
-		// Do not add the record to ipFiles until after we have successfully
-		// committed the transaction. If another thread/process has tried to
-		// grab the same file, an "Invalid File State Transition" exception
-		// will be thrown and, therefore, this thread/process should not process
-		// the file.
-		tempFileVector.push_back(ipFileRecord);
-
-		string strFileID = asString(ipFileRecord->FileID);
-
-		// Get the previous state
-		string strFileFromState = getStringField(ipFields, "ASC_From");
-
-		ipFileRecord->FallbackStatus =
-			(UCLID_FILEPROCESSINGLib::EActionStatus)asEActionStatus(strFileFromState);
-
-		ipFileSet->MoveNext();
-	}
-	return tempFileVector;
-}
-//--------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr &ipConnection,
 														   const string& strSelectSQL,
 														   const string& strActionName,
@@ -5548,7 +5383,17 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != __nullptr);
 
 			// Revert files before attempting to get the files to process
-			revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+			if (!m_bRevertInProgress)
+			{
+				// Begin a transaction
+				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+				// Revert files
+				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+				// Commit the reverted files
+				tgRevert.CommitTrans();
+			}
 
 			bool bTransactionSuccessful = false;
 
@@ -5735,7 +5580,7 @@ _RecordsetPtr CFileProcessingDB::getFileActionStatusSet(_ConnectionPtr& ipConnec
 
 		EActionStatus eCurrentStatus = kActionUnattempted;
 
-		string strSQL = "SELECT ActionStatus From FileActionStatus WITH (NOLOCK) WHERE ActionID = " + 
+		string strSQL = "SELECT ActionStatus From FileActionStatus WHERE ActionID = " + 
 			asString(nActionID) + " AND FileID = " + asString(nFileID);
 
 		ipFileActionStatus->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
@@ -5756,15 +5601,22 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	}
 
 	// Run the revert method before checking for in processing file
-	revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+	{
+		// Begin a transaction for the revert 
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+		tgRevert.CommitTrans();
+	}
 
 	// Check for active processing for the action
 	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI31589", ipProcessingSet != __nullptr);
 
 	// Open recordset with ActiveFAM records that show processing on the action
-	string strSQL = "SELECT [UPI] FROM [FAMSession] WITH (NOLOCK) "
-		"INNER JOIN [ActiveFAM] WITH (NOLOCK) ON [FAMSessionID] = [FAMSession].[ID] "
+	string strSQL = "SELECT [UPI] FROM [FAMSession] "
+		"INNER JOIN [ActiveFAM] ON [FAMSessionID] = [FAMSession].[ID] "
 		"INNER JOIN [Action] ON [ActionID] = [Action].[ID] "
 		"WHERE [ASCName] = '" + strActionName + "'";
 
@@ -5798,12 +5650,19 @@ bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 	}
 
 	// Run the revert method before checking for in processing file
-	revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+	{
+		// Begin a transaction for the revert 
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+		tgRevert.CommitTrans();
+	}
 
 	// Check for active processing 
 	long nActiveFAMCount = 0;
 	executeCmdQuery(ipConnection,
-		"SELECT Count([ID]) AS [ID] FROM [ActiveFAM] WITH (NOLOCK)", false, &nActiveFAMCount);
+		"SELECT Count([ID]) AS [ID] FROM [ActiveFAM]", false, &nActiveFAMCount);
 
 	return (nActiveFAMCount > 0);
 }
@@ -5848,7 +5707,7 @@ void CFileProcessingDB::assertNotActiveBeforeSchemaUpdate()
 		_RecordsetPtr ipProcessingFAMCount(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI33960", ipProcessingFAMCount != __nullptr);
 
-		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [dbo].[ActiveFAM] WITH (NOLOCK)",
+		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [dbo].[ActiveFAM]",
 			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
 
 		ipProcessingFAMCount->MoveFirst();
@@ -5867,7 +5726,7 @@ void CFileProcessingDB::assertNotActiveBeforeSchemaUpdate()
 		_RecordsetPtr ipPendingWorkItems(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI39229", ipPendingWorkItems != __nullptr);
 
-		ipPendingWorkItems->Open("SELECT * FROM [dbo].[WorkItem] WITH (NOLOCK) ",
+		ipPendingWorkItems->Open("SELECT * FROM [dbo].[WorkItem]",
 			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
 
 		if (!asCppBool(ipPendingWorkItems->adoEOF))
@@ -7344,7 +7203,7 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 		string strSQL = "INSERT INTO [SkippedFile] ([FileID], [ActionID], [UserName]) ";
 		strSQL += (nWorkflowId > 0)
 			? Util::Format(
-				"(SELECT [FileID] AS ID, %d AS ActionID, '%s' AS UserName FROM [WorkflowFile] WITH (NOLOCK) WHERE [WorkflowID] = %d)",
+				"(SELECT [FileID] AS ID, %d AS ActionID, '%s' AS UserName FROM [WorkflowFile] WHERE [WorkflowID] = %d)",
 				nActionID, strUserName.c_str(), nWorkflowId)
 			: Util::Format(
 				"(SELECT [ID], %d AS ActionID, '%s' AS UserName FROM [FAMFile])",
@@ -7373,7 +7232,7 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 		if (nWorkflowId > 0)
 		{
 			strUpdateStatus +=
-				" INNER JOIN [WorkflowFile] WITH (NOLOCK) ON [FileActionStatus].[FileID] = [WorkflowFile].[FileID]" +
+				" INNER JOIN [WorkflowFile] ON [FileActionStatus].[FileID] = [WorkflowFile].[FileID]" +
 				Util::Format(" AND [WorkflowID] = %d", nWorkflowId);
 		}
 		executeCmdQuery(ipConnection, strUpdateStatus);
@@ -7389,7 +7248,7 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 		{
 			strInsertStatus +=
 				Util::Format(
-					"INNER JOIN [WorkflowFile] WITH (NOLOCK) ON [FAMFile].[ID] = [WorkflowFile].[FileID] AND [WorkflowID] = %d ",
+					"INNER JOIN [WorkflowFile] ON [FAMFile].[ID] = [WorkflowFile].[FileID] AND [WorkflowID] = %d ",
 					nWorkflowId);
 		}
 		strInsertStatus += Util::Format(
@@ -7424,7 +7283,7 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 
 	// Open the file set
 	ipFileSet->Open(bstrQueryFrom, _variant_t(ipConnection, true),
-		adOpenForwardOnly, adLockOptimistic, adCmdText);
+		adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 	// Create an empty file record object for the random condition.
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
@@ -7464,7 +7323,7 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 		strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
 			"COALESCE (ToFAS.Priority, FAMFile.Priority) AS Priority, "
 			"COALESCE (ToFAS.ActionStatus, 'U') AS ToActionStatus "
-			"FROM FAMFile WITH (NOLOCK) LEFT JOIN FileActionStatus as ToFAS WITH (NOLOCK) "
+			"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
 			"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID;
 	}
 	else
@@ -7473,9 +7332,9 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 			"COALESCE(ToFAS.Priority, FAMFile.Priority) AS Priority, "
 			"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus, "
 			"COALESCE(FromFAS.ActionStatus, 'U') AS FromActionStatus "
-			"FROM FAMFile WITH (NOLOCK) LEFT JOIN FileActionStatus as ToFAS WITH (NOLOCK) "
+			"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
 			"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID +
-			" LEFT JOIN FileActionStatus as FromFAS WITH (NOLOCK) ON FAMFile.ID = FromFAS.FileID AND "
+			" LEFT JOIN FileActionStatus as FromFAS ON FAMFile.ID = FromFAS.FileID AND "
 			"FromFAS.ActionID = " + asString(nFromActionID);
 	}
 
@@ -7588,7 +7447,7 @@ void CFileProcessingDB::verifyDestinationActions(ADODB::_ConnectionPtr &ipConnec
 	ASSERT_RESOURCE_ALLOCATION("ELI43438", ipMissingActions != __nullptr);
 
 	ipMissingActions->Open(strMissingActions.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
-		adLockOptimistic, adCmdText);
+		adLockReadOnly, adCmdText);
 
 	if (!asCppBool(ipMissingActions->adoEOF))
 	{
@@ -7677,126 +7536,4 @@ void CFileProcessingDB::setDefaultSessionMemberValues()
 	m_nActiveFAMID = 0;
 	m_nActiveActionID = -1;
 	m_dwLastPingTime = 0;
-}
-//--------------------------------------------------------------------------------------------------
-IIUnknownVectorPtr CFileProcessingDB::getFilesToProcessLegacy(bool bDBLocked, string strActionName, long nMaxFiles,
-	bool bGetSkippedFiles,
-	string strSkippedUserName)
-{
-	static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
-
-	string strWhere = "";
-	if (bGetSkippedFiles)
-	{
-		strWhere = "INNER JOIN SkippedFile ON FileActionStatus.FileID = SkippedFile.FileID "
-			"AND SkippedFile.ActionID = <ActionIDPlaceHolder> WHERE (ActionStatus = 'S'";
-
-		if (!strSkippedUserName.empty())
-		{
-			replaceVariable(strSkippedUserName, "'", "''");
-			string strUserAnd = " AND SkippedFile.UserName = '" + strSkippedUserName + "'";
-			strWhere += strUserAnd;
-		}
-
-		// Only get files that have not been skipped by the current session.
-		strWhere += " AND COALESCE(SkippedFile.FAMSessionID, 0) <> " + asString(m_nFAMSessionID);
-	}
-	else
-	{
-		strWhere = "WHERE (ActionStatus = 'P'";
-	}
-
-	// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-	ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-	string strActionIDs;
-
-	{
-		BEGIN_CONNECTION_RETRY();
-
-		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
-
-		// Make sure the DB Schema is the expected version
-		validateDBSchemaVersion();
-
-		// Get the action IDs
-		strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strActionName);
-
-		// [LegacyRCAndUtils:6233]
-		// Since the query run by setFilesToProcessing is expensive (even when there are no
-		// pending records available), before calling setFilesToProcessing do a quick and
-		// simple check to see if there are any files available.
-		string strGateKeeperQuery =
-			"IF EXISTS ("
-			"	SELECT TOP 1 [FileActionStatus].[FileID] FROM [FileActionStatus] WITH (NOLOCK) " + strWhere +
-			"		AND [FileActionStatus].[ActionID] IN (<ActionIDPlaceHolder>))"
-			"		OR ([ActionStatus] = 'R' "
-			"		AND [FileActionStatus].[ActionID] IN (<ActionIDPlaceHolder>))"
-			") SELECT 1 AS ID ELSE SELECT 0 AS ID";
-
-		// For the gate keeper query if Skippled file is joined add NOLOCK query hint
-		replaceVariable(strGateKeeperQuery, "INNER JOIN SkippedFile", "INNER JOIN SkippedFile WITH (NOLOCK) ");
-
-		// Update the select statement with the action ID
-		replaceVariable(strGateKeeperQuery, strActionIDPlaceHolder, strActionIDs);
-
-		// The "ID" column for executeCmdQuery will actually be 1 if there are potential
-		// files to process of 0 if there are not.
-		long nFilesToProcess = 0;
-		executeCmdQuery(ipConnection, strGateKeeperQuery, false, &nFilesToProcess);
-
-		// If there are no files available, don't bother calling setFilesToProcessing.
-		if (nFilesToProcess == 0)
-		{
-			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI34145", ipFiles != __nullptr);
-
-			return ipFiles;
-		}
-
-		END_CONNECTION_RETRY(ipConnection, "ELI34143");
-	}
-
-	// If current session is a web session then deleted files should not be returned
-	// https://extract.atlassian.net/browse/ISSUE-15990
-	string strWorkflowJoin = "";
-	if (m_bCurrentSessionIsWebSession)
-	{
-		long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
-		ASSERT_RUNTIME_CONDITION("ELI46688", nWorkflowID > 0, "Internal logic error: No active workflow for web session");
-
-		strWorkflowJoin = "INNER JOIN WorkflowFile ON WorkflowFile.FileID = FAMFile.ID ";
-		strWhere += " AND WorkflowFile.WorkflowID = " + asString(nWorkflowID) + " AND WorkflowFile.Deleted = 0 ";
-	}
-
-	// Build the from clause
-	string strFrom = "FROM FAMFile INNER JOIN FileActionStatus WITH (ROWLOCK, UPDLOCK, READPAST ) "
-		"ON FileActionStatus.FileID = FAMFile.ID AND FileActionStatus.ActionID IN (<ActionIDPlaceHolder>) "
-		+ strWorkflowJoin
-		+ strWhere + ")";
-
-	// create query to select top records;
-	string strSelectSQL =
-		"SELECT FAMFile.ID, FileName, Pages, FileSize, FileActionStatus.Priority, ActionStatus, FileActionStatus.ActionID " + strFrom;
-
-	BEGIN_CONNECTION_RETRY();
-
-	// Get the connection for the thread and save it locally.
-	ipConnection = getDBConnection();
-
-	// Make sure the DB Schema is the expected version
-	validateDBSchemaVersion();
-
-	// Update the select statement with the action ID
-	replaceVariable(strSelectSQL, strActionIDPlaceHolder, strActionIDs);
-
-	// Perform all processing related to setting a file as processing.
-	// The previous status of the files to process is expected to be either pending or
-	// skipped.
-	IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-		bDBLocked, ipConnection, strSelectSQL, strActionName, nMaxFiles, "PS");
-	return ipFiles;
-	END_CONNECTION_RETRY(ipConnection, "ELI30377");
-
 }

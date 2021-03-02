@@ -70,8 +70,6 @@ static const string gstrETL_RESTART = "ETLRestart";
 static const string gstrDASHBOARD_INCLUDE_FILTER = "DashboardIncludeFilter";
 static const string gstrDASHBOARD_EXCLUDE_FILTER = "DashboardExcludeFilter";
 
-static const string gstrUSE_GET_FILES_LEGACY = "UseGetFilesLegacy";
-
 // Feature names
 static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";
 static const string gstrFEATURE_FILE_HANDLER_COPY_FILES = "Files: Copy files";
@@ -101,8 +99,8 @@ static const string gstrDEFAULT_SQL_INSTANCE_NAME = "MSSQLSERVER";
 // Query for getting files with a particular tags
 static const string gstrTAG_NAME_VALUE = "<TagNameValue>";
 static const string gstrTAG_QUERY_SELECT = "<SelectFileValues>";
-static const string gstrQUERY_FILES_WITH_TAGS = "SELECT <SelectFileValues> FROM ([FileTag] WITH (NOLOCK) INNER JOIN "
-	"[Tag] ON [FileTag].[TagID] = [Tag].[ID]) INNER JOIN [FAMFile] WITH (NOLOCK) ON [FileTag].[FileID] = "
+static const string gstrQUERY_FILES_WITH_TAGS = "SELECT <SelectFileValues> FROM ([FileTag] INNER JOIN "
+	"[Tag] ON [FileTag].[TagID] = [Tag].[ID]) INNER JOIN [FAMFile] ON [FileTag].[FileID] = "
 	"[FAMFile].[ID] WHERE [Tag].[TagName] = '<TagNameValue>'";
 
 static const string gstrMAIN_DB_LOCK = "Main";

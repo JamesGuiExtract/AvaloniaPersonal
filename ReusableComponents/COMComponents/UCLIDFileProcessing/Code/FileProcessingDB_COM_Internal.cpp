@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 191;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 187;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -563,7 +563,7 @@ int UpdateToSchemaVersion112(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vecQueries.push_back("EXEC sp_rename 'dbo.FileActionStatus', 'FileActionStatus_Old'");
 		vecQueries.push_back("ALTER TABLE [FileActionStatus_Old] DROP CONSTRAINT [PK_FileActionStatus]");
-		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_112_187);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS);
 		vecQueries.push_back("INSERT INTO [FileActionStatus] "
 			"([ActionID], [FileID], [ActionStatus], [Priority]) "
 			"	SELECT [ActionID], [FileID], [ActionStatus], [FAMFile].[Priority] "
@@ -1071,7 +1071,7 @@ int UpdateToSchemaVersion128(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("ALTER TABLE [SkippedFile] DROP COLUMN [UPIID]");
 		vecQueries.push_back("ALTER TABLE [SkippedFile] ADD [FAMSessionID] INT NULL");
 		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_SESSION_FK);
-		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX_128_187);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX);
 		vecQueries.push_back("ALTER TABLE [QueuedActionStatusChange] DROP COLUMN [UPI]");
 		vecQueries.push_back("ALTER TABLE [QueuedActionStatusChange] ADD [FAMSessionID] INT NULL");
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAM_SESSION_FK);
@@ -2872,129 +2872,6 @@ int UpdateToSchemaVersion187(_ConnectionPtr ipConnection,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50242");
 }
 //-------------------------------------------------------------------------------------------------
-int UpdateToSchemaVersion188(_ConnectionPtr ipConnection,
-	long* pnNumSteps,
-	IProgressStatusPtr ipProgressStatus)
-{
-	try
-	{
-		int nNewSchemaVersion = 188;
-
-		if (pnNumSteps != nullptr)
-		{
-			*pnNumSteps += 1;
-			return nNewSchemaVersion;
-		}
-
-		vector<string> vecQueries;
-
-		vecQueries.push_back("DROP INDEX [IX_Skipped_File_FAMSession] ON [dbo].[SkippedFile]");
-		vecQueries.push_back("DROP INDEX [IX_Skipped_File] ON [dbo].[SkippedFile]");
-		
-		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
-		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
-		vecQueries.push_back("ALTER TABLE [dbo].[FileActionStatus] DROP CONSTRAINT [PK_FileActionStatus]");
-		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_ACTIONID_PRIORITY_FILE_INDEX_188);
-		vecQueries.push_back("ALTER TABLE [dbo].[FileActionStatus] ADD  CONSTRAINT [PK_FileActionStatus] PRIMARY KEY "
-			"([FileID] ASC,	[ActionID] ASC)");
-		vecQueries.push_back("INSERT INTO DBInfo (Name, Value) VALUES ('UseGetFilesLegacy', '0')");
-
-		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
-
-		executeVectorOfSQL(ipConnection, vecQueries);
-
-		return nNewSchemaVersion;
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51468");
-}
-//-------------------------------------------------------------------------------------------------
-int UpdateToSchemaVersion189(_ConnectionPtr ipConnection,
-	long* pnNumSteps,
-	IProgressStatusPtr ipProgressStatus)
-{
-	try
-	{
-		int nNewSchemaVersion = 189;
-
-		if (pnNumSteps != nullptr)
-		{
-			*pnNumSteps += 1;
-			return nNewSchemaVersion;
-		}
-
-		vector<string> vecQueries;
-
-		// The procedure was updated
-		vecQueries.push_back("DROP INDEX [IX_ActionStatusActionIDPriorityFileID] ON [dbo].[FileActionStatus] WITH ( ONLINE = OFF )");
-		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
-		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_TASKCLASSID_WITH_ID_SESSIONID_DATE);
-		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_INDEX);
-
-		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
-
-		executeVectorOfSQL(ipConnection, vecQueries);
-
-		return nNewSchemaVersion;
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51491");
-}
-//-------------------------------------------------------------------------------------------------
-int UpdateToSchemaVersion190(_ConnectionPtr ipConnection,
-	long* pnNumSteps,
-	IProgressStatusPtr ipProgressStatus)
-{
-	try
-	{
-		int nNewSchemaVersion = 190;
-
-		if (pnNumSteps != nullptr)
-		{
-			*pnNumSteps += 1;
-			return nNewSchemaVersion;
-		}
-
-		vector<string> vecQueries;
-
-		// The procedure was updated
-		vecQueries.push_back(gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_DELETED_INDEX);
-
-		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
-
-		executeVectorOfSQL(ipConnection, vecQueries);
-
-		return nNewSchemaVersion;
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51553");
-}
-//-------------------------------------------------------------------------------------------------
-int UpdateToSchemaVersion191(_ConnectionPtr ipConnection,
-	long* pnNumSteps,
-	IProgressStatusPtr ipProgressStatus)
-{
-	try
-	{
-		int nNewSchemaVersion = 191;
-
-		if (pnNumSteps != nullptr)
-		{
-			*pnNumSteps += 1;
-			return nNewSchemaVersion;
-		}
-
-		vector<string> vecQueries;
-
-		// The procedure was updated
-		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
-
-		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
-
-		executeVectorOfSQL(ipConnection, vecQueries);
-
-		return nNewSchemaVersion;
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51559");
-}
-//-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::DefineNewAction_Internal(bool bDBLocked, BSTR strAction, long* pnID)
@@ -3888,7 +3765,7 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 
 				// Open Recordset that contains only the record with the given ID
 				string strFileSQL = "SELECT FAMFile.ID, COALESCE(ActionStatus, 'U') AS ActionStatus "
-					"FROM FAMFile WITH (NOLOCK) LEFT JOIN FileActionStatus WITH (NOLOCK) ON FileActionStatus.FileID = FAMFile.ID "
+					"FROM FAMFile LEFT JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID "
 					" AND FileActionStatus.ActionID = " + asString(nActionID) + " WHERE FAMFile.ID = " 
 					+ asString (nFileID);
 				ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
@@ -3906,8 +3783,13 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 					// status.
 					if (*pStatus == kActionProcessing && asCppBool(vbAttemptRevertIfLocked))
 					{
-                        // Revert files
+						// Begin a transaction
+						TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
 						revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+						// Commit the changes to the database
+						tg.CommitTrans();
 
 						// Re-query to see if the status changed as a result of being auto-reverted.
 						ipFileSet->Requery(adOptionUnspecified);
@@ -4064,17 +3946,36 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			// If the FAM has lost its registration, re-register before continuing with processing.
 			ensureFAMRegistration();
 
-			// Currently when running all workflows use legacy
-			// and if requested
-			if (m_bUseGetFilesLegacy)
+			static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
+
+			string strWhere = "";
+			if (bGetSkippedFiles == VARIANT_TRUE)
 			{
-				*pvecFileRecords = getFilesToProcessLegacy(bDBLocked, strActionName, nMaxFiles, asCppBool(bGetSkippedFiles), asString(bstrSkippedForUserName)).Detach();
+				strWhere = "INNER JOIN SkippedFile ON FileActionStatus.FileID = SkippedFile.FileID "
+					"AND SkippedFile.ActionID = <ActionIDPlaceHolder> WHERE (ActionStatus = 'S'";
+
+				string strUserName = asString(bstrSkippedForUserName);
+				if(!strUserName.empty())
+				{
+					replaceVariable(strUserName, "'", "''");
+					string strUserAnd = " AND SkippedFile.UserName = '" + strUserName + "'";
+					strWhere += strUserAnd;
+				}
+
+				// Only get files that have not been skipped by the current session.
+				strWhere += " AND COALESCE(SkippedFile.FAMSessionID, 0) <> " + asString(m_nFAMSessionID);
 			}
 			else
 			{
+				strWhere = "WHERE (ActionStatus = 'P'";
+			}
 
-				// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-				ADODB::_ConnectionPtr ipConnection = __nullptr;
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+			string strActionIDs;
+
+			{
 				BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
@@ -4083,26 +3984,86 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				if (bGetSkippedFiles == VARIANT_TRUE)
-				{
-					string strUserName = asString(bstrSkippedForUserName);
+				// Get the action IDs
+				strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strActionName);
 
-					IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-						bDBLocked, ipConnection, strActionName, strUserName.empty() ? "" : strUserName, "S", nMaxFiles);
-					*pvecFileRecords = ipFiles.Detach();
-				}
-				else
+				// [LegacyRCAndUtils:6233]
+				// Since the query run by setFilesToProcessing is expensive (even when there are no
+				// pending records available), before calling setFilesToProcessing do a quick and
+				// simple check to see if there are any files available.
+				string strGateKeeperQuery =
+					"IF EXISTS ("
+					"	SELECT TOP 1 [FileActionStatus].[FileID] FROM [FileActionStatus] WITH (NOLOCK) " + strWhere +
+					"		AND [FileActionStatus].[ActionID] IN (<ActionIDPlaceHolder>))"
+					"		OR ([ActionStatus] = 'R' "
+					"		AND [FileActionStatus].[ActionID] IN (<ActionIDPlaceHolder>))"
+					") SELECT 1 AS ID ELSE SELECT 0 AS ID";
+
+				// For the gate keeper query if Skippled file is joined add NOLOCK query hint
+				replaceVariable(strGateKeeperQuery, "INNER JOIN SkippedFile", "INNER JOIN SkippedFile WITH (NOLOCK) ");
+
+				// Update the select statement with the action ID
+				replaceVariable(strGateKeeperQuery, strActionIDPlaceHolder, strActionIDs);
+
+				// The "ID" column for executeCmdQuery will actually be 1 if there are potential
+				// files to process of 0 if there are not.
+				long nFilesToProcess = 0;
+				executeCmdQuery(ipConnection, strGateKeeperQuery, false, &nFilesToProcess);
+
+				// If there are no files available, don't bother calling setFilesToProcessing.
+				if (nFilesToProcess == 0)
 				{
-					// Perform all processing related to setting a file as processing.
-					// The previous status of the files to process is expected to be either pending or
-					// skipped.
-					IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-						bDBLocked, ipConnection, strActionName, "", "P", nMaxFiles);
+					IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
+					ASSERT_RESOURCE_ALLOCATION("ELI34145", ipFiles != __nullptr);
+
 					*pvecFileRecords = ipFiles.Detach();
+					
+					return true;
 				}
 
-				END_CONNECTION_RETRY(ipConnection, "ELI51471");
+				END_CONNECTION_RETRY(ipConnection, "ELI34143");
 			}
+
+			// If current session is a web session then deleted files should not be returned
+			// https://extract.atlassian.net/browse/ISSUE-15990
+			string strWorkflowJoin = "";
+			if (m_bCurrentSessionIsWebSession)
+			{
+				long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
+				ASSERT_RUNTIME_CONDITION("ELI46688", nWorkflowID > 0, "Internal logic error: No active workflow for web session");
+
+				strWorkflowJoin = "INNER JOIN WorkflowFile ON WorkflowFile.FileID = FAMFile.ID ";
+				strWhere += " AND WorkflowFile.WorkflowID = " + asString(nWorkflowID) + " AND WorkflowFile.Deleted = 0 ";
+			}
+
+			// Build the from clause
+			string strFrom = "FROM FAMFile INNER JOIN FileActionStatus WITH (ROWLOCK, UPDLOCK, READPAST ) "
+				"ON FileActionStatus.FileID = FAMFile.ID AND FileActionStatus.ActionID IN (<ActionIDPlaceHolder>) "
+				+ strWorkflowJoin
+				+ strWhere + ")";
+
+			// create query to select top records;
+			string strSelectSQL =
+				"SELECT FAMFile.ID, FileName, Pages, FileSize, FileActionStatus.Priority, ActionStatus, FileActionStatus.ActionID " + strFrom;
+
+			BEGIN_CONNECTION_RETRY();
+
+				// Get the connection for the thread and save it locally.
+				ipConnection = getDBConnection();
+
+				// Make sure the DB Schema is the expected version
+				validateDBSchemaVersion();
+
+				// Update the select statement with the action ID
+				replaceVariable(strSelectSQL, strActionIDPlaceHolder, strActionIDs);
+
+				// Perform all processing related to setting a file as processing.
+				// The previous status of the files to process is expected to be either pending or
+				// skipped.
+				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
+					bDBLocked, ipConnection, strSelectSQL, strActionName, nMaxFiles, "PS");
+				*pvecFileRecords = ipFiles.Detach();
+			END_CONNECTION_RETRY(ipConnection, "ELI30377");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30644");
 	}
@@ -4411,8 +4372,12 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 
 				if (asCppBool(vbRevertTimedOutFAMs))
 				{
-                    // Revert files
+					// Begin a transaction
+					TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
 					revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
+
+					tg.CommitTrans();
 				}
 				
 				// Begin a transaction
@@ -4870,21 +4835,11 @@ bool CFileProcessingDB::GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQue
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
-				try
-				{
-					try
-					{
-						// Open the Action table
-						ipResultSet->Open(bstrQuery, _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
-							adLockUnspecified, adCmdText);
-					}
-					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51446")
-				}
-				catch (UCLIDException ex)
-				{
-					ex.addDebugInfo("Query", asString(bstrQuery));
-					throw ex;
-				}
+
+				// Open the Action table
+				ipResultSet->Open(bstrQuery, _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+					adLockReadOnly, adCmdText);
+
 				*ppVal = ipResultSet.Detach();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI23547");
@@ -7831,7 +7786,7 @@ bool CFileProcessingDB::GetFileRecord_Internal(bool bDBLocked, BSTR bstrFile, BS
 			replaceVariable(strFileName, "'", "''");
 
 			// Open a recordset that contain only the record (if it exists) with the given filename
-			string strFileSQL = "SELECT * FROM FAMFile WITH (NOLOCK) WHERE FileName = '" + strFileName + "'";
+			string strFileSQL = "SELECT * FROM FAMFile WHERE FileName = '" + strFileName + "'";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -7911,7 +7866,7 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 				string strSelectSQL = "SELECT FAMFile.ID, FileName, Pages, FileSize, ActionID,"
 					"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority, "
 					"COALESCE(ActionStatus, 'U') AS ActionStatus "
-					"FROM FAMFile WITH (NOLOCK) LEFT JOIN FileActionStatus WITH (NOLOCK) ON "
+					"FROM FAMFile LEFT JOIN FileActionStatus ON "
 					"FAMFile.ID = FileID AND ActionID = " + asString(nActionID) +
 					" WHERE FAMFile.ID = " + asString(nFileId);
 
@@ -8085,11 +8040,7 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 184:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion185);
 				case 185:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion186);
 				case 186:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion187);
-				case 187:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion188);
-				case 188:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion189);
-				case 189:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion190);
-				case 190:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion191);
-				case 191:
+				case 187:
 					break;
 
 				default:
@@ -8832,7 +8783,7 @@ bool CFileProcessingDB::GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWo
 			string strWorkItemGroupID = asString(nWorkItemGroupID);
 
 			// Setup query to get the count of each WorkItem status for the given WorkGroupID
-			string strWorkItemSQL = "SELECT Status, Count(ID) as Total FROM WorkItem WITH (NOLOCK)" 
+			string strWorkItemSQL = "SELECT Status, Count(ID) as Total FROM WorkItem " 
 				" GROUP BY WorkItemGroupID, Status HAVING WorkItemGroupID = " + strWorkItemGroupID;
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
@@ -8895,7 +8846,7 @@ bool CFileProcessingDB::GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWo
 				ASSERT_RESOURCE_ALLOCATION("ELI37102", ipWorkItemGroupSet != __nullptr);
 
 				// Setup query to get the expected number of work items for the given WokrItemGroupID
-				string strWorkItemGroupSQL = "SELECT NumberOfWorkItems FROM WorkItemGroup WITH (NOLOCK) WHERE ID = " + strWorkItemGroupID; 
+				string strWorkItemGroupSQL = "SELECT NumberOfWorkItems FROM WorkItemGroup WHERE ID = " + strWorkItemGroupID; 
 				
 				ipWorkItemGroupSet->Open(strWorkItemGroupSQL.c_str() , _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
 					adLockReadOnly, adCmdText);
@@ -9266,7 +9217,7 @@ bool CFileProcessingDB::GetWorkGroupData_Internal(bool bDBLocked, long nWorkItem
 			string strWorkItemGroupID = asString(nWorkItemGroupID);
 
 			// Setup query to get the WorkItemGroup record
-			string strWorkItemGroupSQL = "SELECT * FROM WorkItemGroup WITH (NOLOCK) WHERE ID = " + strWorkItemGroupID;
+			string strWorkItemGroupSQL = "SELECT * FROM WorkItemGroup WHERE ID = " + strWorkItemGroupID;
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -9541,7 +9492,7 @@ bool CFileProcessingDB::GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFi
 			long nCount = vecFileIDs.size();
 			for (long i = 0; i < nCount;)
 			{
-				string strQuery = "SELECT [FileName] FROM [FAMFile] WITH (NOLOCK) WHERE [ID] IN (";
+				string strQuery = "SELECT [FileName] FROM [FAMFile] WHERE [ID] IN (";
 			
 				// Query in batches of 1000 to avoid any one query taking too much time in the DB
 				// for very large file sets.
@@ -9887,8 +9838,8 @@ bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			string strQuery =
-				"SELECT [Value] FROM [FileMetadataFieldValue] WITH (NOLOCK) "
-					"INNER JOIN [MetadataField] WITH (NOLOCK) ON [MetadataField].[ID] = [FileMetadataFieldValue].[MetadataFieldID] "
+				"SELECT [Value] FROM [FileMetadataFieldValue] "
+					"INNER JOIN [MetadataField] ON [MetadataField].[ID] = [FileMetadataFieldValue].[MetadataFieldID] "
 					"WHERE [FileID] = <FileID> AND [Name] = '<MetadataFieldName>'";
 
 			replaceVariable(strQuery, "<FileID>", asString(nFileID));
@@ -11946,7 +11897,7 @@ bool CFileProcessingDB::GetWorkflowNameFromActionID_Internal(bool bDBLocked, lon
 
 			string strQuery = "SELECT COALESCE( Workflow.Name, '') AS [Name] ";
 			strQuery += "FROM  Action LEFT JOIN ";
-			strQuery += "Workflow WITH (NOLOCK) ON Action.WorkflowID = Workflow.ID ";
+			strQuery += "Workflow ON Action.WorkflowID = Workflow.ID ";
 			strQuery += "WHERE Action.ID = " + asString(nActionID);
 
 			_RecordsetPtr ipWorkflowNameSet(__uuidof(Recordset));
@@ -12628,8 +12579,8 @@ bool CFileProcessingDB::GetActiveUsers_Internal(bool bDBLocked, BSTR bstrAction,
 			ipConnection = getDBConnection();
 
 			string strQuery = "SELECT DISTINCT [UserName] "
-				"FROM [ActiveFAM] WITH (NOLOCK) "
-				"INNER JOIN [FAMSession] WITH (NOLOCK) ON [FAMSessionID] = [FAMSession].[ID] "
+				"FROM [ActiveFAM] "
+				"INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID] "
 				"INNER JOIN [FAMUser] ON [FAMUserID] = [FAMUser].[ID] "
 				"WHERE [ActionID] = <ActionID> AND [Processing] = 1";
 

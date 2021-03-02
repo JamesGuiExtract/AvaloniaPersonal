@@ -2192,7 +2192,7 @@ namespace WebAPI.Models
             {
                 // Don't bother trying to gather data for caching for a session that has already closed.
                 ADODB.Recordset adoRecordset = UtilityFileProcessingDB.GetResultsForQuery(
-                    Inv($"SELECT TOP 1 [ID] FROM [FileTaskSession] WITH (NOLOCK) WHERE [ID] = {documentSessionId} AND [DateTimeStamp] IS NULL"));
+                    Inv($"SELECT TOP 1 [ID] FROM [FileTaskSession] WHERE [ID] = {documentSessionId} AND [DateTimeStamp] IS NULL"));
                 try
                 {
                     if (adoRecordset.EOF)

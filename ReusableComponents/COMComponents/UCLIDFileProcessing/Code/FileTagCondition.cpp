@@ -102,7 +102,7 @@ string FileTagCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFileProcessi
 	if (m_eTagType == eNoneTag)
 	{
 		strQuery +=
-			"(SELECT " + strSelect + " FROM [FAMFile] WITH (NOLOCK) WHERE [FAMFile].[ID] NOT IN ";
+			"(SELECT " + strSelect + " FROM [FAMFile] WHERE [FAMFile].[ID] NOT IN ";
 
 		// The strMainQueryTemp will be used to select the file ids so it needs to 
 		// just return File ID's

@@ -56,7 +56,7 @@ string FilePriorityCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFilePro
 {
 	// Currently there is no workflow-specific priorities.
 
-	string strQuery = "SELECT " + strSelect + " FROM FAMFile WITH (NOLOCK) WHERE FAMFile.Priority = "
+	string strQuery = "SELECT " + strSelect + " FROM FAMFile WHERE FAMFile.Priority = "
 		+ asString((long)m_ePriority);
 
 	return strQuery;

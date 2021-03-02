@@ -60,11 +60,11 @@ string FileSetCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFileProcessi
 	{
 		// If the file set is empty, the normal query will not end up with valid syntax. Use an
 		// always FALSE WHERE clause instead.
-		strQuery = "SELECT " + strSelect + " FROM FAMFile WITH (NOLOCK) WHERE 1 = 0";
+		strQuery = "SELECT " + strSelect + " FROM FAMFile WHERE 1 = 0";
 	}
 	else
 	{
-		strQuery = "SELECT " + strSelect + " FROM FAMFile WITH (NOLOCK) WHERE [ID] IN (";
+		strQuery = "SELECT " + strSelect + " FROM FAMFile WHERE [ID] IN (";
 
 		for (long i = 0; i < nCount; i++)
 		{

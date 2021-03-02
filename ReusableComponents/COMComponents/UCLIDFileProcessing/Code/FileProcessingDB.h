@@ -650,16 +650,6 @@ private:
 	// The file IDs for each defined file set (file set name not case-sensitive)
 	csis_map<vector<int>>::type m_mapFileSets;
 
-	// This is only used when procesing all workflows
-	// It is loaded when processing with the ActionIDs for all the workflows for the ActionName being processes
-	// if Load balancing is being used ActionsIDs will can be in the vector multiple times
-	// the order of the vector is randomized when originally loaded - the files will be processed in the same order
-	// until processing is restarted. Files will be gotten 1 at a time (ignoring the value in the FAM to get more files.
-	vector<int> m_vecActionsProcessOrder;
-
-	// The position in the m_vecActionsProcessOrder vector to start getting files
-	int m_nProcessStart = 0;
-	
 	// The encrypted DatabaseID loaded from the DBInfo table
 	string m_strEncryptedDatabaseID;
 
@@ -683,22 +673,10 @@ private:
 	// Wether current session is a web session. If true, no maintenance threads will be started
 	bool m_bCurrentSessionIsWebSession;
 
-	// Flag to indicate that the Older GetFilesToProcess functionality should be used
-	bool m_bUseGetFilesLegacy;
-
 	//-------------------------------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------------------------------
-
-	_RecordsetPtr spGetFilesToProcessForActionID(const _ConnectionPtr& ipConnection, const int actionID,
-		const string& strActionName, const int nMaxFiles, const string& strStatusToSelect, const string& strSkippedUser);
-
-	// Extracts the IFileRecordPtrs from the Recordset
-	vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> getFilesFromRecordset(_RecordsetPtr ipFileSet);
-
-	// Loads the m_vecActionsProcessOrder vector
-	void loadActionsProcessOrder(_ConnectionPtr ipConnection, const string& strActionName);
-
+	
 	// Returns true if there is any active FAM; false otherwise.
 	bool isFAMActiveForAnyAction(bool bDBLocked);
 
@@ -1120,6 +1098,11 @@ private:
 	// Internal define new action function
 	long defineNewAction(_ConnectionPtr ipConnection, const string& strActionName);
 
+	// Fills a vector with the FileIDs of files skipped by a specific user (or skipped by
+	// all users if strUserName is "")
+	void getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, long nActionID,
+		string strUserName, const _ConnectionPtr& ipConnection);
+
 	// Clears the file action comment for the specified fileID and actionID pair.  If
 	// nActionID == -1 will clear comments for the specified file for all actions.
 	// If nFileID == -1 will clear comments for all files for the specified action.  If
@@ -1148,7 +1131,6 @@ private:
 
 	// Method checks for timed out FAM's and reverts file status for ones that are found.
 	// If there are files to revert and bDBLocked is false an exception will be thrown
-    // NOTE: Method performs the revert within a transaction
 	void revertTimedOutProcessingFAMs(bool bDBLocked, const _ConnectionPtr& ipConnection);
 
 	// Method that resets workitems that are marked as processing for FAM's that have timed out
@@ -1220,14 +1202,8 @@ private:
 		const string& strSelectSQL, const string& strActionName, long nMaxFiles,
 		const string& strAllowedCurrentStatus);
 
-	// Marks all files of the specified strStatusToSelect to processing except 'U'.  The processing in this
-	// function includes attempting to auto-revert locked files, recording appropriate entries in
-	// the FAST table and adding an appropriate entry to the locked file table. This method will process using the old
-	// GetFilesToProcess functionality if DBInfo setting UseGetFilesLegacy is 1 otherwise calls
-	// the GetFilesToProcessForActionID to get the files to process
-	// RETURNS: A vector of IFileRecords for the files that were set to processing.
-	IIUnknownVectorPtr setFilesToProcessing(bool bDBLocked, const _ConnectionPtr& ipConnection,
-		const string& strActionName, const string& strSkippedUser, const string& strStatusToSelect, long nMaxFiles);
+	// Gets a set containing the File ID's for all files that are skipped for the specified action
+	set<long> getSkippedFilesForAction(const _ConnectionPtr& ipConnection, long nActionId);
 
 	// Returns recordset opened as static containing the status record the file with nFileID and 
 	// action nActionID. If the status is unattempted the recordset will be empty
@@ -1362,12 +1338,6 @@ private:
 	string getWebAppSetting(const string& strSettings, const string& strSettingName);
 
 	void validateLicense();
-
-	// Contains the Legacy process for GetFilesToProcess - although there have been other changes 
-	// to add Query hints that improve the performance over 11.5.0
-	IIUnknownVectorPtr getFilesToProcessLegacy(bool bDBLocked, string strActionName, long nMaxFiles,
-		bool bGetSkippedFiles,
-		string strSkippedUserName);
 
 	// Internal implementation methods
 	bool DefineNewAction_Internal(bool bDBLocked, BSTR strAction, long* pnID);

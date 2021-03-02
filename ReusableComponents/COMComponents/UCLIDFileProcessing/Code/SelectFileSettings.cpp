@@ -13,8 +13,7 @@ m_bLimitToSubset(false),
 m_bSubsetIsRandom(true),
 m_bTopSubset(true),
 m_bSubsetUsePercentage(true),
-m_nSubsetSize(0),
-m_nOffset(-1)
+m_nSubsetSize(0)
 {
 }
 //--------------------------------------------------------------------------------------------------
@@ -43,7 +42,6 @@ SelectFileSettings& SelectFileSettings::operator =(const SelectFileSettings &sou
 	m_bTopSubset = source.m_bTopSubset;
 	m_bSubsetUsePercentage = source.m_bSubsetUsePercentage;
 	m_nSubsetSize = source.m_nSubsetSize;
-	m_nOffset = source.m_nOffset;
 
 	// Delete any existing conditions.
 	clearConditions();
@@ -175,10 +173,10 @@ string SelectFileSettings::buildQueryForWorkflow(UCLID_FILEPROCESSINGLib::IFileP
 
 	if (m_vecConditions.empty())
 	{
-		strQuery = "SELECT DISTINCT " + strSelect + " FROM [FAMFile] WITH (NOLOCK)";
+		strQuery = "SELECT DISTINCT " + strSelect + " FROM [FAMFile]";
 		if (nWorkflowID > 0)
 		{
-			strQuery += "INNER JOIN [WorkflowFile] WITH (NOLOCK) ON [FAMFile].[ID] = [FileID] "
+			strQuery += "INNER JOIN [WorkflowFile] ON [FAMFile].[ID] = [FileID] "
 				"AND [WorkflowID] = " + asString(nWorkflowID);
 		}
 	}

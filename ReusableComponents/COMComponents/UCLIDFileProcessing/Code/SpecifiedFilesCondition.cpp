@@ -84,7 +84,7 @@ string SpecifiedFilesCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFileP
 			}
 			string strWhereClause = asString(vecWhereExpressions, false, " OR ");
 
-			strQuery = "SELECT " + strSelect + " FROM FAMFile WITH (NOLOCK) WHERE " + strWhereClause;
+			strQuery = "SELECT " + strSelect + " FROM FAMFile WHERE " + strWhereClause;
 		}
 		break;
 
@@ -92,7 +92,7 @@ string SpecifiedFilesCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFileP
 		{
 			vector<string> vecFileList = convertFileToLines(m_strListFileName);
 
-			strQuery = "SELECT " + strSelect + " FROM FAMFile WITH (NOLOCK) WHERE [FileName] IN ('"
+			strQuery = "SELECT " + strSelect + " FROM FAMFile WHERE [FileName] IN ('"
 				+ asString(vecFileList, false, "','") + "')";
 		}
 		break;

@@ -58,14 +58,14 @@ string ActionStatusCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFilePro
 {
 	ASSERT_ARGUMENT("ELI33785", ipFAMDB != __nullptr);
 	
-	string strQuery = "SELECT " + strSelect + " FROM FAMFile WITH (NOLOCK) ";
+	string strQuery = "SELECT " + strSelect + " FROM FAMFile ";
 
 	long nActionID = ipFAMDB->GetActionIDForWorkflow(m_strAction.c_str(), nWorkflowID);
 
 	// Check if comparing skipped status
 	if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionSkipped)
 	{
-		strQuery += "INNER JOIN SkippedFile WITH (NOLOCK) ON FAMFile.ID = SkippedFile.FileID WHERE "
+		strQuery += "INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE "
 			"(SkippedFile.ActionID = " + asString(nActionID);
 		string strUser = m_strUser;
 		if (strUser != gstrANY_USER)
@@ -79,7 +79,7 @@ string ActionStatusCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFilePro
 		// Get the status as a string
 		string strStatus = ipFAMDB->AsStatusString((UCLID_FILEPROCESSINGLib::EActionStatus)m_nStatus);
 
-		strQuery += " LEFT JOIN FileActionStatus WITH (NOLOCK) ON FAMFile.ID = FileActionStatus.FileID "
+		strQuery += " LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
 			" AND FileActionStatus.ActionID = " + asString(nActionID);
         strQuery += " WHERE (";
 
