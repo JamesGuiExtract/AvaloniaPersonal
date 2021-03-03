@@ -246,6 +246,46 @@ FAMUTILS_API long executeCmdQuery(const _ConnectionPtr& ipDBConnection,
 	bool bDisplayExceptions = false,
 	long* pnOutputID = nullptr);
 
+// Builds a parameterized SQL command
+// strQuery: SQL query that should denote parameters prefixed with "@" symbol (e.g. @ActionID)
+// params:	 Maps each parameter name (including "@") to a _variant_t with the value to apply.
+//			 Supported types: VT_BOOL, VT_INT/VT_I4, VT_I8, VT_BSTR, VT_VOID/VT_NULL
+// NULL on its own will be interpreted as a value, unless in quotes, in which it will be
+// interpreted as the literal string (without quotes). Quotes will be interpreted literally
+// Except if the value is exactly "NULL" (with quotes, case insensitive).
+// e.g. { @Comment, "NULL" } passes null value, { @Comment, "\"NULL\"" } passes 'NULL' as string,
+// { @Comment, "This is \"NULL\"" } passes string: 'This is "NULL"'
+// Values lists can be passed as parameters using the query syntax"@|<[VT_TYPE]>[PARAM_NAME]|".
+// e.g.: "@|<VT_INT>FileIDs|"
+// In this case, the parameter value must be of type BSTR and must contain a comma-delimited list
+// representing all values to be passed in the list.
+// Commas in strings need to be escaped using "\,". e.g.: { @|<VT_BSTR>Names|, "Doe\, Jon, Doe\, Jane" }
+// NULL as a value will be handled the same as described above.
+FAMUTILS_API _CommandPtr buildCmd(const _ConnectionPtr& ipDBConnection,
+	const string &strQuery,
+	vector<pair<string, _variant_t>> params);
+
+// Executes the provided _CommandPtr 
+// if bDisplayExceptions == false any exceptions will be thrown to caller
+// if bDisplayExceptions == true any exceptions will be displayed and 0 will be returned
+FAMUTILS_API void executeCmd(const _CommandPtr& ipCommand, bool bDisplayExceptions = false);
+
+// Executes the provided _CommandPtr, returning the first row's column value corresponding to pvtValue
+// bAllowBlock: true if call should block if necessary read value; false to return false if record is locked
+// bDisplayExceptions: false to throw exceptions to caller, true to display and return 0
+// Returns: true if value was read; false if no value exists or record was locked
+FAMUTILS_API bool executeCmd(const _CommandPtr& ipCommand,
+	bool bDisplayExceptions,
+	bool bAllowLock,
+	const std::string& strResultColumnName,
+	_variant_t* pvtValue);
+
+// Executes the provided _CommandPtr, returning the first row's ID column value  to pnResult
+// bAllowBlock: true if call should block if necessary read ID; false to return false if record is locked
+// Returns: true if value was read; false if no value exists or record was locked
+FAMUTILS_API bool getCmdId(const _CommandPtr& ipCommand, long* pnResult, bool bAllowBlock = true);
+FAMUTILS_API bool getCmdId(const _CommandPtr& ipCommand, long long* pllResult, bool bAllowBlock = true);
+
 // Overload with five arguments that returns named long long value.
 // PROMISE:	To execute the SQL Query and return the number of records affected
 // NOTES:	strSQLQuery must be a query that returns no records

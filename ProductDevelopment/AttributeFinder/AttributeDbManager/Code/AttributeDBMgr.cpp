@@ -1149,20 +1149,10 @@ namespace
 		return llSetNameID;
 	}
 
-	std::string GetInsertRootASFFStatement( longlong llSetNameID, long fileTaskSessionID )
+	_CommandPtr GetInsertRootASFFStatement(_ConnectionPtr ipConnection, longlong llSetNameID, long fileTaskSessionID )
 	{
-		std::string insert =
+		_CommandPtr cmdInsertASFF = buildCmd(ipConnection,
 			"SET NOCOUNT ON \n"
-			"DECLARE @AttributeSetName_ID AS BIGINT;\n"
-			"DECLARE @AttributeSetForFile_ID AS BIGINT;\n"
-			"DECLARE @FileTaskSessionID AS INT;\n"
-			"\n";
-
-		insert += Util::Format( "SELECT @AttributeSetName_ID=%lld;\n"
-								"SELECT @FileTaskSessionID=%ld;\n",
-								llSetNameID,
-								fileTaskSessionID );
-		insert +=
 			"\n"
 			"BEGIN TRY\n"
 			"	INSERT INTO [AttributeSetForFile] ([FileTaskSessionID], [AttributeSetNameID])\n"
@@ -1182,9 +1172,13 @@ namespace
 			"        @ErrorState = ERROR_STATE();\n"
 			"\n"
 			"    RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState)\n"
-			"END CATCH";
+			"END CATCH",
+			{
+				{ "@AttributeSetName_ID", llSetNameID },
+				{ "@FileTaskSessionID", fileTaskSessionID }
+			});
 
-			return insert;
+			return cmdInsertASFF;
 	}
 
 	std::string insertAttributeQueryPreamble =
@@ -1507,16 +1501,16 @@ void CAttributeDBMgr::SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownV
 {
 	try
 	{
-		std::string query = Util::Format( "SELECT * FROM [dbo].[AttributeSetForFile] "
-										  "WHERE [ID] = %lld",
-										  llRootASFF_ID );
+		_CommandPtr cmd = buildCmd(ipConnection,
+			"SELECT * FROM [dbo].[AttributeSetForFile] "
+			"WHERE [ID] = @SetID",
+			{ { "@SetID", llRootASFF_ID} });
 
 		ADODB::_RecordsetPtr ipASFF( __uuidof(Recordset) );
 		ASSERT_RESOURCE_ALLOCATION( "ELI38804", __nullptr != ipASFF );
 
-		auto connectParam = _variant_t( (IDispatch*)ipConnection, true );
-		ipASFF->Open( query.c_str(),
-					  connectParam,
+		ipASFF->Open( (IDispatch *)cmd,
+					  vtMissing,
 					  adOpenDynamic,
 					  adLockOptimistic,
 					  adCmdText );
@@ -1524,7 +1518,7 @@ void CAttributeDBMgr::SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownV
 		if (!RecordsInSet(ipASFF))
 		{
 			UCLIDException ue("ELI38805", "Database record not found");
-			ue.addDebugInfo("Query", query, true);
+			ue.addDebugInfo("Query", asString(cmd->CommandText), true);
 			throw ue;
 		}
 
@@ -1644,8 +1638,9 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 			TransactionGuard tg( ipConnection, adXactRepeatableRead, __nullptr );
 
 			longlong llSetNameID = GetAttributeSetID( strSetName, ipConnection );
-			auto strInsertRootASFF = GetInsertRootASFFStatement( llSetNameID, nFileTaskSessionID );
-			longlong llRootASFF_ID = ExecuteRootInsertASFF( strInsertRootASFF, ipConnection );
+			auto cmdInsertRootASFF = GetInsertRootASFFStatement(ipConnection, llSetNameID, nFileTaskSessionID);
+			longlong llRootASFF_ID = 0;
+			getCmdId(cmdInsertRootASFF, &llRootASFF_ID);
 			SaveVoaDataInASFF( ipConnection, ipAttributes, llRootASFF_ID );
 
 			if (vbStoreDiscreteFields)

@@ -810,14 +810,14 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQ
 {
 	return executeCmdQuery(ipDBConnection, strSQLQuery, "ID", bDisplayExceptions, pnOutputID);
 }
-//-------------------------------------------------------------------------------------------------
-long executeCmdQuery( const _ConnectionPtr& ipDBConnection, 
-					  const std::string& strSQLQuery,
-					  const std::string& resultColumnName,
-					  bool bDisplayExceptions, 
-					  long *pnOutputID )
+// ------------------------------------------------------------------------------------------------ -
+long executeCmdQuery(const _ConnectionPtr& ipDBConnection,
+	const std::string& strSQLQuery,
+	const std::string& resultColumnName,
+	bool bDisplayExceptions,
+	long* pnOutputID)
 {
-	ASSERT_ARGUMENT( "ELI46755", ipDBConnection != nullptr );
+	ASSERT_ARGUMENT("ELI46755", ipDBConnection != nullptr);
 
 	_RecordsetPtr ipResult(__nullptr);
 
@@ -826,7 +826,7 @@ long executeCmdQuery( const _ConnectionPtr& ipDBConnection,
 	{
 		try
 		{
-			if ( pnOutputID == nullptr )
+			if (pnOutputID == nullptr)
 			{
 				ipDBConnection->Execute( strSQLQuery.c_str(),
 										 &vtRecordsAffected, 
@@ -834,27 +834,406 @@ long executeCmdQuery( const _ConnectionPtr& ipDBConnection,
 			}
 			else
 			{
-				ASSERT_ARGUMENT( "ELI46756", !resultColumnName.empty() );
-				ipResult = ipDBConnection->Execute( strSQLQuery.c_str(), 
-																  nullptr, 
-																  adCmdUnknown );
-				ASSERT_RESOURCE_ALLOCATION( "ELI46757", ipResult != nullptr );
+				ASSERT_ARGUMENT("ELI46756", !resultColumnName.empty());
+				ipResult = ipDBConnection->Execute(strSQLQuery.c_str(),
+					nullptr,
+					adCmdUnknown);
+				ASSERT_RESOURCE_ALLOCATION("ELI46757", ipResult != nullptr);
 
 				// If pnOutputID is provided, it is assumed the query will return a 
 				// single record, with a field name contained in resultColumName.
 				ipResult->MoveFirst();
-				*pnOutputID = getLongField( ipResult->Fields, resultColumnName );
+				*pnOutputID = getLongField(ipResult->Fields, resultColumnName);
 			}
 		}
-		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION( "ELI46758" );
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI46758");
+	}
+	catch (UCLIDException& ue)
+	{
+		ue.addDebugInfo("SQL", strSQLQuery, true);
+
+		if (ipResult != __nullptr)
+		{
+			UCLIDException uexOuter = UCLIDException("ELI46759", "Record not found", ue);
+			ue = uexOuter;
+		}
+
+		if (!bDisplayExceptions)
+		{
+			// Rethrow the exception
+			throw ue;
+		}
+
+		// Display exception
+		ue.display();
+		return 0;
+	}
+
+	return vtRecordsAffected.lVal;
+}
+//-------------------------------------------------------------------------------------------------
+// buildCmd helper funcs
+ADODB::DataTypeEnum parseCmdValueType(variant_t vtParamValue);
+ADODB::DataTypeEnum parseCmdListType(string strListDeclaration);
+vector<_variant_t> parseCmdListValues(ADODB::DataTypeEnum dataType, variant_t vtParamValue);
+vector<_ParameterPtr> getCmdParamters(_CommandPtr ipCommand, ADODB::DataTypeEnum dataType, vector<_variant_t> vecParamValues);
+//-------------------------------------------------------------------------------------------------
+_CommandPtr buildCmd(const _ConnectionPtr& ipDBConnection,
+	const string &strQuery, vector<pair<string, _variant_t>> params)
+{
+	try
+	{
+		try
+		{
+			// To store incoming params by their respective position in strQuery; Params may exist
+			// multiple times in map if they appear in multiple locations
+			map<size_t, pair<string, vector<_ParameterPtr>>> orderedParams;
+
+			_CommandPtr ipCommand(__uuidof(Command));
+			ipCommand->ActiveConnection = ipDBConnection;
+			ipCommand->CommandType = adCmdText;
+
+			for each (auto param in params)
+			{
+				vector<_variant_t> vecParamValues;
+
+				string strParamName = param.first;
+				if (strParamName.substr(0, 1) != "@")
+				{
+					UCLIDException ue("ELI51622", "SQL query parameter names must begin with '@'");
+					ue.addDebugInfo("Query", strQuery, true);
+					ue.addDebugInfo("Parameter", strParamName, true);
+					throw ue;
+				}
+
+				variant_t vtParamValue = (param.second == nullptr)
+					? vtMissing
+					: param.second;
+				ADODB::DataTypeEnum dataType;
+
+				if (strParamName.find("@|<") == 0)
+				{
+					dataType = parseCmdListType(strParamName);
+					vector<_variant_t> listValues = parseCmdListValues(dataType, vtParamValue);
+
+					vecParamValues.insert(vecParamValues.end(), listValues.begin(), listValues.end());
+				}
+				else
+				{
+					dataType = parseCmdValueType(vtParamValue);
+
+					vecParamValues.push_back((dataType == adEmpty) ? vtMissing : vtParamValue);
+				}
+
+				for (size_t index = strQuery.find(strParamName);
+					index != string::npos;
+					index = strQuery.find(strParamName, index + 1))
+				{
+					size_t nextCharPos = index + strParamName.length();
+					char nextChar = nextCharPos < strQuery.length()
+						? strQuery.substr(nextCharPos, 1)[0]
+						: 0;
+
+					// Make sure the search hit isn't a subset of a longer parameter name.
+					if (nextChar == 0 ||
+						(!(nextChar >= 'a' && nextChar <='z')
+						 && !(nextChar >= 'A' && nextChar <= 'Z')
+						 && !(nextChar >= '0' && nextChar <= '9')))
+					{
+						vector<_ParameterPtr> paramValues = getCmdParamters(ipCommand, dataType, vecParamValues);
+
+						orderedParams[index] = { strParamName, paramValues };
+					}
+				}
+			}
+
+			string vecReplacedQuery;
+			size_t index = 0;
+			for each (auto param in orderedParams)
+			{
+				int paramPos = param.first;
+				string strParamName = param.second.first;
+				vector<_ParameterPtr> vecParamValues = param.second.second;
+
+				vector<string> vecReplacements;
+				for each (_ParameterPtr paramValue in vecParamValues)
+				{
+					if (paramValue == __nullptr)
+					{
+						vecReplacements.push_back("NULL");
+					}
+					else
+					{
+						ipCommand->Parameters->Append(paramValue);
+						vecReplacements.push_back("?");
+					}
+				}
+
+				vecReplacedQuery += strQuery.substr(index, (paramPos - index)) + asString(vecReplacements, true, ",");
+
+				index = paramPos + strParamName.length();
+			}
+
+			vecReplacedQuery += strQuery.substr(index);
+			ipCommand->CommandText = vecReplacedQuery.c_str();
+
+			return ipCommand;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51600");
+	}
+	catch (UCLIDException& ue)
+	{
+		ue.display();
+		throw ue;
+	}
+}
+//-------------------------------------------------------------------------------------------------
+ADODB::DataTypeEnum parseCmdValueType(variant_t vtParamValue)
+{
+	switch (vtParamValue.vt)
+	{
+	case VT_BOOL:	return adBoolean;
+	case VT_INT:
+	case VT_I4:		return adInteger;
+	case VT_I8:		return adBigInt;
+	case VT_BSTR:	return adChar;
+	case VT_VOID:
+	case VT_ERROR:  // vtMissing will have VT_ERROR type
+	case VT_NULL:	return adEmpty;
+
+	default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51595");
+	}
+}
+//-------------------------------------------------------------------------------------------------
+ADODB::DataTypeEnum parseCmdListType(string strListDeclaration)
+{
+	vector<string> vecNameTokens;
+	StringTokenizer nameTokenizer("@|<>", false, true);
+	nameTokenizer.parse(strListDeclaration, vecNameTokens);
+	string strType = vecNameTokens[3];
+
+	if (_strcmpi(strType.c_str(), "VT_BOOL") == 0)
+	{
+		return adBoolean;
+	}
+	else if (_strcmpi(strType.c_str(), "VT_INT") == 0
+		|| _strcmpi(strType.c_str(), "VT_I4") == 0)
+	{
+		return adInteger;
+	}
+	else if (_strcmpi(strType.c_str(), "VT_I8") == 0)
+	{
+		return adBigInt;
+	}
+	else if (_strcmpi(strType.c_str(), "VT_INT") == 0)
+	{
+		return adChar;
+	}
+	else
+	{
+		THROW_LOGIC_ERROR_EXCEPTION("ELI51620");
+	}
+}
+//-------------------------------------------------------------------------------------------------
+vector<_variant_t> parseCmdListValues(ADODB::DataTypeEnum dataType, variant_t vtParamValue)
+{
+	vector<_variant_t> vecParamValues;
+
+	if (vtParamValue == __nullptr || vtParamValue == vtMissing)
+	{
+		vecParamValues.push_back(vtMissing);
+	}
+	else
+	{
+		ASSERT_ARGUMENT("ELI51619", vtParamValue.vt == VT_BSTR);
+
+		string strList = asString(vtParamValue.bstrVal);
+		replaceVariable(strList, "\\,", "<<<COMMA>>>");
+
+		vector<string> vecValueTokens;
+		StringTokenizer valueTokenizer(',');
+		valueTokenizer.parse(asString(vtParamValue.bstrVal), vecValueTokens);
+		for each (string strValue in vecValueTokens)
+		{
+			replaceVariable(strValue, "<<<COMMA>>>", ",");
+			trim(strValue, " ", " ");
+
+			if (_strcmpi(strValue.c_str(), "NULL") == 0)
+			{
+				vecParamValues.push_back(vtMissing);
+			}
+			else
+			{
+				if (_strcmpi(strValue.c_str(), "\"NULL\""))
+				{
+					trim(strValue, "\"", "\"");
+				}
+
+				switch (dataType)
+				{
+				case adBoolean: vecParamValues.push_back(_variant_t(asCppBool(strValue)));	break;
+				case adInteger: vecParamValues.push_back(_variant_t(asLong(strValue)));		break;
+				case adBigInt:  vecParamValues.push_back(_variant_t(asLongLong(strValue)));	break;
+				case adChar:	vecParamValues.push_back(_variant_t(strValue.c_str()));		break;
+				default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51594");					break;
+				}
+			}
+		}
+	}
+
+	return vecParamValues;
+}
+//-------------------------------------------------------------------------------------------------
+vector<_ParameterPtr> getCmdParamters(_CommandPtr ipCommand, ADODB::DataTypeEnum dataType, vector<_variant_t> vecParamValues)
+{
+	vector<_ParameterPtr> cmdParameters;
+
+	for each (_variant_t vtParamValue in vecParamValues)
+	{
+		if (vtParamValue == vtMissing || dataType == adEmpty)
+		{
+			cmdParameters.push_back(__nullptr);
+		}
+		else
+		{
+			long size;
+			switch (dataType)
+			{
+				case adBoolean: size = 1;									break;
+				case adInteger:	size = 4;									break;
+				case adBigInt:	size = 8;									break;
+				case adChar:	size = ((_bstr_t)vtParamValue).length();	break;
+				case adEmpty:	size = 0;									break;
+				default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51592");
+			}
+		
+			_ParameterPtr paramValue = ipCommand->CreateParameter(
+				_bstr_t(), dataType, adParamInput, size, vtParamValue);
+			cmdParameters.push_back(paramValue);
+		}
+	}
+
+	return cmdParameters;
+}
+//-------------------------------------------------------------------------------------------------
+bool getCmdId(const _CommandPtr& ipCommand, long* pnResult, bool bAllowBlock /*= true*/)
+{
+	variant_t vtId;
+	if (executeCmd(ipCommand, false, bAllowBlock, "ID", &vtId))
+	{
+		if (vtId.vt != VT_I4)
+		{
+			UCLIDException ue("ELI51598", "ID should be a long type");
+			ue.addDebugInfo("Type", vtId.vt);
+			throw ue;
+		}
+
+		*pnResult = vtId.lVal;
+		return true;
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+bool getCmdId(const _CommandPtr& ipCommand, long long* pllResult, bool bAllowBlock /*= true*/)
+{
+	variant_t vtId;
+	if (executeCmd(ipCommand, false, bAllowBlock, "ID", &vtId))
+	{
+		// The value may be of type DECIMAL so we want to convert it to long long
+		if (vtId.vt == VT_DECIMAL)
+		{
+			// Change type to long long
+			vtId.ChangeType(VT_I8);
+		}
+
+		if (vtId.vt != VT_I8)
+		{
+			UCLIDException ue("ELI51602", "ID should be a long long type");
+			ue.addDebugInfo("Type", vtId.vt);
+			throw ue;
+		}
+
+		*pllResult = vtId.llVal;
+		return true;
+	}
+
+	return false;
+}
+//-------------------------------------------------------------------------------------------------
+void executeCmd(const _CommandPtr& ipCommand, bool bDisplayExceptions /*= false*/)
+{
+	ASSERT_ARGUMENT("ELI51626", ipCommand != nullptr);
+
+	try
+	{
+		try
+		{
+			ipCommand->Execute(NULL, NULL, adCmdText | adExecuteNoRecords);
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51627");
+	}
+	catch (UCLIDException& ue)
+	{
+		ue.addDebugInfo("SQL", asString(ipCommand->CommandText), true);
+
+		if (!bDisplayExceptions)
+		{
+			// Rethrow the exception
+			throw ue;
+		}
+
+		// Display exception
+		ue.display();
+	}
+}
+//-------------------------------------------------------------------------------------------------
+bool executeCmd(const _CommandPtr& ipCommand,
+	bool bDisplayExceptions,
+	bool bAllowBlock,
+	const std::string& strResultColumnName,
+	variant_t* pvtValue)
+{
+	ASSERT_ARGUMENT( "ELI51576", ipCommand != nullptr );
+	ASSERT_ARGUMENT( "ELI51625", pvtValue != nullptr );
+
+	_RecordsetPtr ipResult(__nullptr);
+
+	try
+	{
+		try
+		{
+			ASSERT_ARGUMENT( "ELI51577", !strResultColumnName.empty() );
+
+			auto ipResult = ipCommand->Execute(NULL, NULL, bAllowBlock ? adOptionUnspecified : adAsyncFetchNonBlocking );
+			ASSERT_RESOURCE_ALLOCATION("ELI51578", ipResult != nullptr);
+
+			// If pnOutputID is provided, it is assumed the query will return a 
+			// single record, with a field name contained in resultColumnName.
+			if (ipResult->adoEOF == VARIANT_FALSE)
+			{
+				// Get the Field from the fields list
+				FieldsPtr ipFields = ipResult->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI51596", ipFields != __nullptr);
+
+				FieldPtr ipItem = ipResult->Fields->Item[strResultColumnName.c_str()];
+				ASSERT_RESOURCE_ALLOCATION("ELI51597", ipItem != __nullptr);
+
+				*pvtValue = ipItem->Value;
+				return true;
+			}
+
+			return false;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION( "ELI51579" );
 	}
 	catch( UCLIDException& ue )
 	{
-		ue.addDebugInfo( "SQL", strSQLQuery, true );
+		ue.addDebugInfo( "SQL", asString(ipCommand->CommandText), true );
 		
 		if (ipResult != __nullptr)
 		{
-			UCLIDException uexOuter = UCLIDException("ELI43266", "Record not found", ue);
+			UCLIDException uexOuter = UCLIDException("ELI51580", "Record not found", ue);
 			ue = uexOuter;
 		}
 
@@ -866,44 +1245,34 @@ long executeCmdQuery( const _ConnectionPtr& ipDBConnection,
 
 		// Display exception
 		ue.display();
-		return 0;
+		return false;
 	} 
-
-	return vtRecordsAffected.lVal;
 }
 //-------------------------------------------------------------------------------------------------
 long executeCmdQuery( const _ConnectionPtr& ipDBConnection, 
 					  const std::string& strSQLQuery,
-					  const std::string& resultColumnName,
+					  const std::string& strResultColumnName,
 					  bool bDisplayExceptions, 
 					  long long *pnOutputID )
 {
 	ASSERT_ARGUMENT( "ELI38681", ipDBConnection != nullptr );
+	ASSERT_ARGUMENT( "ELI51621", pnOutputID != nullptr );
 
 	variant_t vtRecordsAffected = 0L;
 	try
 	{
 		try
 		{
-			if ( pnOutputID == nullptr )
-			{
-				ipDBConnection->Execute( strSQLQuery.c_str(),
-										 &vtRecordsAffected, 
-										 adCmdText | adExecuteNoRecords );
-			}
-			else
-			{
-				ASSERT_ARGUMENT( "ELI38682", !resultColumnName.empty() );
-				_RecordsetPtr ipResult = ipDBConnection->Execute( strSQLQuery.c_str(), 
-																  nullptr, 
-																  adCmdUnknown );
-				ASSERT_RESOURCE_ALLOCATION( "ELI38683", ipResult != nullptr );
+			ASSERT_ARGUMENT( "ELI38682", !strResultColumnName.empty() );
+			_RecordsetPtr ipResult = ipDBConnection->Execute( strSQLQuery.c_str(), 
+																nullptr, 
+																adCmdUnknown );
+			ASSERT_RESOURCE_ALLOCATION( "ELI38683", ipResult != nullptr );
 
-				// If pnOutputID is provided, it is assumed the query will return a 
-				// single record, with a field name contained in resultColumName.
-				ipResult->MoveFirst();
-				*pnOutputID = getLongLongField( ipResult->Fields, resultColumnName );
-			}
+			// If pnOutputID is provided, it is assumed the query will return a 
+			// single record, with a field name contained in resultColumName.
+			ipResult->MoveFirst();
+			*pnOutputID = getLongLongField( ipResult->Fields, strResultColumnName);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION( "ELI38684" );
 	}
@@ -929,56 +1298,29 @@ long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, cons
 {
 	ASSERT_ARGUMENT("ELI18775", ipDBConnection != __nullptr);
 
-	// Set ID to 0
-	long lID = 0;
-	
-	// Convert apostrophe characters to double apostrophes [FlexIDSCore #3362]
-	string strFileName = rstrKey;
-	replaceVariable(strFileName, "'", "''" );
-
-	// Allocate recordset
-	_RecordsetPtr ipKeySet(__uuidof( Recordset ));
-	ASSERT_RESOURCE_ALLOCATION("ELI18018", ipKeySet != __nullptr );
-
-	// Create Keys sql
-	string strKeySQL = "SELECT ID, " + strKeyCol + " FROM " + strTable + " WHERE " + strKeyCol + " = '" + strFileName + "'";
-
-	CursorTypeEnum eCursorType = (bAddKey) ? adOpenDynamic : adOpenStatic;
-
-	// Open recordset
-	ipKeySet->Open( strKeySQL.c_str(), _variant_t((IDispatch *)ipDBConnection, true), eCursorType, 
-		adLockOptimistic, adCmdText );
-
-	// If adoEOF is true key value was not found
-	if (asCppBool(ipKeySet->adoEOF))
+	variant_t vtId;
+	string strQuery = "SELECT [ID] FROM [" + strTable + "] WHERE [" + strKeyCol + "] = @Value";
+	_variant_t vtValue(rstrKey.c_str());
+	_CommandPtr cmdGetID = buildCmd(ipDBConnection, strQuery, { { "@Value", vtValue} });
+	if (!executeCmd(cmdGetID, false, true, "ID", &vtId))
 	{
-		// Check if add is required
 		if (bAddKey)
 		{
-			ipKeySet->AddNew();
-			setStringField(ipKeySet->Fields, strKeyCol, rstrKey, true);
-			ipKeySet->Update();
+			string strInsertQuery = "INSERT INTO [" + strTable + "] ([" + strKeyCol + "])"
+			" OUTPUT INSERTED.ID VALUES (@Value)";
+			_CommandPtr cmdInsert = buildCmd(ipDBConnection, strInsertQuery.c_str(), { { "@Value", vtValue} });
+			executeCmd(cmdInsert, false, true, "ID", &vtId);
+		}
+	}
 
-			// [LegacyRCAndUtils:6154]
-			// Since IDENT_CURRENT can return the wrong ID when multiple processes are updating the
-			// same table and there is a known bug with SCOPE_IDENTITY() and @@IDENTITY, re-query to
-			// get the ID of the newly added row.
-			return getKeyID(ipDBConnection,strTable, strKeyCol, rstrKey, bAddKey);
-		}
-		else
-		{
-			string strMsg = strKeyCol + " does not exist!";
-			UCLIDException ue("ELI18131", strMsg);
-			ue.addDebugInfo(strKeyCol, rstrKey);
-			throw ue;
-		}
-	}
-	else
+	if (vtId.vt != VT_I4)
 	{
-		lID = getLongField(ipKeySet->Fields, "ID");
-		rstrKey = getStringField(ipKeySet->Fields, strKeyCol );
+		UCLIDException ue("ELI51598", "ID shold be a long type");
+		ue.addDebugInfo("Type", vtId.vt);
+		throw ue;
 	}
-	return lID;
+
+	return vtId.lVal;
 }
 //-------------------------------------------------------------------------------------------------
 void dropConstraint(const _ConnectionPtr& ipDBConnection, const string& strTableName, const string& strConstraint)
@@ -1221,7 +1563,7 @@ FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& i
 		}
 
 		// The ID from the dest table the actions should already be transfered
-		long nID = getKeyID(ipDestDB, strKeyTable, strKeyCol, strKeyValue, bAddKey);		
+		long nID = getKeyID(ipDestDB, strKeyTable, strKeyCol, strKeyValue, bAddKey);
 		_lastCodePos = "30";
 
 		// Set the ID

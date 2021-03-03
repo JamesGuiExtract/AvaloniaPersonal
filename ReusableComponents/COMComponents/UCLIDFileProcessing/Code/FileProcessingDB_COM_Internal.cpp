@@ -3328,16 +3328,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 	{
 		try
 		{
-			// Replace any occurrences of ' with '' this is because SQL Server use the ' to indicate
-			// the beginning and end of a string
 			string strFileName = asString(strFile);
-			replaceVariable(strFileName, "'", "''");
-
-			// Open a recordset that contain only the record (if it exists) with the given filename
-			string strFileSQL = "SELECT * FROM FAMFile WHERE FileName = '" + strFileName + "'";
-			
-			// put the unaltered file name back in the strFileName variable
-			strFileName = asString(strFile);
 
 			// Create the file record to return
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewFileRecord(CLSID_FileRecord);
@@ -3373,11 +3364,16 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 				
 				_lastCodePos = "10";
 
+				// Open a recordset that contain only the record (if it exists) with the given filename
+				_CommandPtr cmdGetFile = buildCmd(ipConnection,
+					"SELECT * FROM FAMFile WHERE FileName = @FileName",
+					{ {"@FileName",  strFile} });
+
 				// Create a pointer to a recordset
 				_RecordsetPtr ipFileSet(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI30360", ipFileSet != __nullptr);
 
-				ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+				ipFileSet->Open((IDispatch*)cmdGetFile, vtMissing, adOpenDynamic,
 					adLockOptimistic, adCmdText);
 
 				_lastCodePos = "30";
@@ -3508,7 +3504,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					// Set the fields from the new file record
 					setFieldsFromFileRecord(ipFields, ipNewFileRecord);
 
-					string strPriority = asString(getLongField(ipFields, "Priority"));
+					long nPriority = getLongField(ipFields, "Priority");
 
 					_lastCodePos = "60";
 
@@ -3550,15 +3546,15 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					_lastCodePos = "80";
 
 					// Create a record in the FileActionStatus table for the status of the new record
-					string strStatusSQL = "INSERT INTO FileActionStatus "
-						"(FileID, ActionID, ActionStatus, Priority) "
-						"VALUES( " + asString(nID) + ", " + asString(nActionID) + ", '" + strNewStatus +
-						"', " + strPriority + ")";
-
-					_lastCodePos = "85";
-
-					// Execute query to insert the new FileActionStatus record
-					executeCmdQuery(ipConnection, strStatusSQL);
+					executeCmd(buildCmd(ipConnection,
+						"INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority) "
+						" VALUES (@FileID, @ActionID, @Status, @Priority)",
+						{
+							{ "@FileID", nID },
+							{ "@ActionID", nActionID },
+							{ "@Status", strNewStatus.c_str() },
+							{ "@Priority", nPriority }
+						}));
 
 					_lastCodePos = "86";
 
@@ -3572,9 +3568,12 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					// [WorkflowFile] row will be added as part of the setStatusForFile call.
 					if (!bAlreadyExistsInWorkflow && nWorkflowID > 0)
 					{
-						executeCmdQuery(ipConnection, Util::Format(
-							"INSERT INTO [WorkflowFile] ([WorkflowID], [FileID]) VALUES (%d,%d)",
-							nWorkflowID, nID));
+						executeCmd(buildCmd(ipConnection,
+							"INSERT INTO [WorkflowFile] ([WorkflowID], [FileID]) VALUES (@WorkflowID, @FileID)",
+							{
+								{ "@WorkflowID", nWorkflowID},
+								{ "@FileID", nID}
+							}));
 					}
 
 					_lastCodePos = "87";
@@ -4868,11 +4867,7 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 		{
 			// Convert setting name and value to string 
 			string strSettingName = asString(bstrSettingName);
-			string strSettingValue = asString(bstrSettingValue);
-
-			// Setup Setting Query
-			string strSQL = gstrDBINFO_SETTING_QUERY;
-			replaceVariable(strSQL, gstrSETTING_NAME, strSettingName);
+			string strSettingValue = asString(bstrSettingValue);		
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -4881,6 +4876,9 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
+
+				_CommandPtr queryCmd = buildCmd(ipConnection, gstrDBINFO_SETTING_QUERY,
+					{ {gstrSETTING_NAME, bstrSettingName} });
 
 				// Make sure the DB Schema is the expected version - actually DO NOT do this here,
 				// as we are setting the DB Info NOW, so attempting to validate the schema can cause
@@ -4895,8 +4893,8 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 				// Open recordset for the DBInfo Settings
-				ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
-					adLockOptimistic, adCmdText); 
+				ipDBInfoSet->Open((IDispatch *)queryCmd, vtMissing, adOpenDynamic,
+					adLockOptimistic, adCmdText);
 
 				// Check if setting record exists
 				bool bExists = ipDBInfoSet->adoEOF == VARIANT_FALSE;
@@ -4936,15 +4934,18 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 						long nUserId = getFAMUserID(ipConnection);
 						long nMachineId = getMachineID(ipConnection);
 						long nDBInfoId = getLongField(ipDBInfoSet->Fields, "ID");
-						replaceVariable(strOldValue, "'", "''");
-						replaceVariable(strSettingValue,  "'", "''");
 
-						string strQuery = Util::Format("INSERT INTO [DBInfoChangeHistory] "
-							"([FAMUserID], [MachineID], [DBInfoID], [OldValue], [NewValue]) "
-							"VALUES (%d, %d, %d, '%s', '%s')", nUserId, nMachineId, nDBInfoId,
-							strOldValue.c_str(), strSettingValue.c_str());
-
-						executeCmdQuery(ipConnection, strQuery);
+						executeCmd(buildCmd(ipConnection,
+							"INSERT INTO [DBInfoChangeHistory] "
+								"([FAMUserID], [MachineID], [DBInfoID], [OldValue], [NewValue]) "
+								"VALUES (@UserId, @MachineId, @DBInfoId, @OldValue, @NewValue)",
+								{
+									{ "@UserId", nUserId},
+									{ "@MachineId", nMachineId},
+									{ "@DBInfoId", nDBInfoId},
+									{ "@OldValue", strOldValue.c_str()},
+									{ "@NewValue", strSettingValue.c_str()}
+								}));
 					}
 				}
 
@@ -10374,14 +10375,14 @@ bool CFileProcessingDB::StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrT
 
 			validateDBSchemaVersion();
 
-			string strInsertSQL = gstrSTART_FILETASKSESSION_DATA;
-			replaceVariable(strInsertSQL, "<FAMSessionID>", asString(m_nFAMSessionID));
-			replaceVariable(strInsertSQL, "<TaskClassGuid>", asString(bstrTaskClassGuid));
-			replaceVariable(strInsertSQL, "<FileID>", asString(nFileID));
-			replaceVariable(strInsertSQL, "<ActionID>", asString(nActionID));
-
-			long nFileTaskSessionID = 0;
-			executeCmdQuery(ipConnection, strInsertSQL, false, pnFileTaskSessionID);
+			getCmdId(buildCmd(ipConnection, gstrSTART_FILETASKSESSION_DATA,
+				{
+					{ "@FAMSessionID", m_nFAMSessionID },
+					{ "@TaskClassGuid", bstrTaskClassGuid },
+					{ "@FileID", nFileID },
+					{ "@ActionID", nActionID }
+				})
+				, pnFileTaskSessionID);
 			
 			END_CONNECTION_RETRY(ipConnection, "ELI38640");
 		}

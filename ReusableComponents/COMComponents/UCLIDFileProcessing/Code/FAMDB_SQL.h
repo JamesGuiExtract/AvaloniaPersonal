@@ -1336,48 +1336,47 @@ static const string gstrCREATE_WORKFLOW_ON_DELETE_TRIGGER =
 
 
 // Query for obtaining the current db lock record with the time it has been locked
-static const string gstrDB_LOCK_NAME_VAL = "<LockName>";
+static const string gstrDB_LOCK_NAME_VAL = "@LockName";
 static const string gstrDB_LOCK_QUERY = 
 	"SELECT LockName, UPI, LockTime, DATEDIFF(second, LockTime, GETUTCDATE()) AS TimeLocked "
-	"FROM LockTable WHERE LockName = '" + gstrDB_LOCK_NAME_VAL + "'";
+	"FROM LockTable WHERE LockName = @LockName";
 
 // Query for deleting specific locks from the lock table
-static const string gstrDELETE_DB_LOCK = "DELETE FROM LockTable WHERE [LockName] = '"
-	+ gstrDB_LOCK_NAME_VAL + "'";
+static const string gstrDELETE_DB_LOCK = "DELETE FROM LockTable WHERE [LockName] = @LockName";
 
 // Query to shrink the current database
 static const string gstrSHRINK_DATABASE = "DBCC SHRINKDATABASE (0)";
 
 // Constant to be replaced in the DBInfo Setting query
-static const string gstrSETTING_NAME = "<SettingName>";
+static const string gstrSETTING_NAME = "@SettingName";
 
 // Query for looking for a specific setting
 // To use run replaceVariable to replace <SettingName>
 // https://extract.atlassian.net/browse/ISSUE-13910
 // To allow for the ability to query settings on old DB's where the schema may have changed,
 // get all columns rather than a hard-coded list.
-static const string gstrDBINFO_SETTING_QUERY = 
-	"SELECT * FROM DBInfo WHERE [Name] = '" + gstrSETTING_NAME + "'";
+static const string gstrDBINFO_SETTING_QUERY =
+	"SELECT * FROM DBInfo WHERE [Name] = " + gstrSETTING_NAME;
 
 // Query for getting all DB info settings
 static const string gstrDBINFO_GET_SETTINGS_QUERY =
 	"SELECT [Name], [Value] FROM DBInfo";
 
 // Constant to be replaced in the DBInfo Setting query
-static const string gstrSETTING_VALUE = "<SettingValue>";
+static const string gstrSETTING_VALUE = "@SettingValue";
 
 // Query for updating the DB info settings
 static const string gstrDBINFO_UPDATE_SETTINGS_QUERY =
-	"UPDATE DBInfo SET [Value] = '" + gstrSETTING_VALUE + "' WHERE [Name] = '"
-	+ gstrSETTING_NAME + "' AND [Value] <> '" + gstrSETTING_VALUE + "'";
+	"UPDATE DBInfo SET [Value] = '" + gstrSETTING_VALUE + "' WHERE [Name] = "
+	+ gstrSETTING_NAME + " AND [Value] <> " + gstrSETTING_VALUE;
 
 // Query for inserting a DBInfo setting if it doesn't exist 
 static const string gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY =
 	"DECLARE @CurrentValue as NVARCHAR(MAX) "
-	"SELECT @CurrentValue = Value FROM DBInfo WHERE Name = '" + gstrSETTING_NAME + "' "
-	"IF (@CurrentValue IS NULL) BEGIN "
+	"SELECT @CurrentValue = Value FROM DBInfo WHERE Name = " + gstrSETTING_NAME +
+	" IF (@CurrentValue IS NULL) BEGIN "
 	"	INSERT INTO DBINFO ([Name], [Value]) "
-	"	VALUES ('" + gstrSETTING_NAME + "', '" + gstrSETTING_VALUE + "') "
+	"	VALUES (" + gstrSETTING_NAME + ", " + gstrSETTING_VALUE + ") "
 	"END "; 
 
 // Query for updating the DB info settings and storing the change history
@@ -1388,8 +1387,8 @@ static const string gstrDBINFO_UPDATE_SETTINGS_QUERY_STORE_HISTORY =
 	+ gstrMACHINE_ID_VAR + ", INSERTED.[ID] AS DBInfoID, "
 	"DELETED.[Value] AS OldValue, INSERTED.[Value] AS NewValue INTO "
 	"@ChangeHistory (UserID, MachineID, DBInfoID, OldValue, NewValue) "
-	"WHERE [Name] = '" + gstrSETTING_NAME + "' AND [Value] <> '" + gstrSETTING_VALUE
-	+ "'; INSERT INTO [DBInfoChangeHistory] ([FAMUserID], [MachineID], [DBInfoID], "
+	"WHERE [Name] = " + gstrSETTING_NAME + " AND [Value] <> " + gstrSETTING_VALUE
+	+ "; INSERT INTO [DBInfoChangeHistory] ([FAMUserID], [MachineID], [DBInfoID], "
 	"[OldValue], [NewValue]) SELECT * FROM @ChangeHistory;";
 
 // Query to set the last DB info changed time
@@ -1661,11 +1660,11 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 // is active. The initial number of files grabbed should be a multiple of this to ensure when the
 // round is sequenced, that there is a statistically appropriate chance which files get left out of
 // the files returned.
-"	SELECT @LoadBalanceRoundSize = CASE WHEN 1 = <LoadBalance> \r\n"
-"			THEN ((<MaxFiles> + SUM(LoadBalanceWeight) - 1) / SUM(LoadBalanceWeight)) * SUM(LoadBalanceWeight) \r\n"
-"			ELSE <MaxFiles> END \r\n"
+"	SELECT @LoadBalanceRoundSize = CASE WHEN 1 = @LoadBalance \r\n"
+"			THEN ((@MaxFiles + SUM(LoadBalanceWeight) - 1) / SUM(LoadBalanceWeight)) * SUM(LoadBalanceWeight) \r\n"
+"			ELSE @MaxFiles END \r\n"
 "		FROM Workflow \r\n"
-"	INNER JOIN Action ON WorkflowID = Workflow.ID AND ASCName = '<ActionName>' \r\n"
+"	INNER JOIN Action ON WorkflowID = Workflow.ID AND ASCName = @ActionName \r\n"
 //	Iteration will generated a sequence of numbers 1 to 10 (The max weight of any given workflow)
 "	;WITH Iteration(Num) AS \r\n"
 "	( \r\n"
@@ -1699,7 +1698,7 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 "   			ROW_NUMBER() OVER (ORDER BY Random), \r\n"
 "   			ROW_NUMBER() OVER (PARTITION BY WorkflowID ORDER BY Random) \r\n"
 "   		FROM WeightedWorkflowList \r\n"
-"   			WHERE 1 = <LoadBalance> \r\n"
+"   			WHERE 1 = @LoadBalance \r\n"
 "   ), \r\n"
 // Selected files is the overall domain of files available with an added FileRepitition column used
 // to weed out duplicate files when processing <All workflows>.
@@ -1710,7 +1709,7 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 "		FROM ( <SelectFilesToProcessQuery> ) T \r\n"
 "	), \r\n"
 // Limited files will restrict the selected files to only those files to be returned. This includes
-// excluding locked or processing files, limiting to <MaxFiles>, and removing duplicate file IDs when
+// excluding locked or processing files, limiting to @MaxFiles, and removing duplicate file IDs when
 // processing on <all workflows> by excluding cases where FileRepetition is > 1.
 "	LimitedFiles AS \r\n"
 "	( \r\n"
@@ -1721,8 +1720,8 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 "				(ROW_NUMBER() OVER(PARTITION BY WorkflowID ORDER BY Priority DESC, SelectedFiles.ID ASC) - 1) % LoadBalanceWeight + 1 AS WorkflowSequence \r\n"
 "			FROM SelectedFiles \r\n"
 "			INNER JOIN Action ON SelectedFiles.ActionID = Action.ID \r\n"
-"			LEFT JOIN Workflow ON 1 = <LoadBalance> AND Action.WorkflowID = Workflow.ID \r\n"
-"			LEFT JOIN LockedFile ON SelectedFiles.ID = LockedFile.FileID AND LockedFile.ActionName = '<ActionName>' \r\n"
+"			LEFT JOIN Workflow ON 1 = @LoadBalance AND Action.WorkflowID = Workflow.ID \r\n"
+"			LEFT JOIN LockedFile ON SelectedFiles.ID = LockedFile.FileID AND LockedFile.ActionName = @ActionName \r\n"
 "			WHERE SelectedFiles.ActionStatus <> 'R' AND LockedFile.FileID IS NULL AND FileRepetition = 1 \r\n"
 //			WorkflowRound and WorkflowSequence will determine the order when load balancing is active,
 //			otherwise they will be NULL and Priority and FileID will determine the order.
@@ -1732,7 +1731,7 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 // balancing is active.
 "	SequencedFiles AS \r\n"
 "	( \r\n"
-"		SELECT TOP(<MaxFiles>) LimitedFiles.* \r\n"
+"		SELECT TOP(@MaxFiles) LimitedFiles.* \r\n"
 "			FROM LimitedFiles \r\n"
 "			LEFT JOIN LoadBalancing ON LimitedFiles.WorkflowID = LoadBalancing.WorkflowID \r\n"
 "				AND LimitedFiles.WorkflowSequence = LoadBalancing.WorkflowSequence \r\n"
@@ -1751,21 +1750,21 @@ static const string gstrGET_FILES_TO_PROCESS_QUERY =
 "	FROM  \r\n"
 "		SequencedFiles \r\n"
 "	INNER JOIN FileActionStatus on FileActionStatus.FileID = SequencedFiles.ID AND FileActionStatus.ActionID = SequencedFiles.ActionID \r\n"
-"	IF (1 = <RecordFASTEntry>) BEGIN"
+"	IF (1 = @RecordFastEntry) BEGIN"
 //	If a file that is currently unattempted is being moved to processing, first add a FAST table
 //	entry from U->P before adding a record from P -> R
 "		INSERT INTO FileActionStateTransition (FileID, ActionID, ASC_From, ASC_To,  \r\n"
 "			DateTimeStamp, FAMUserID, MachineID, Exception, Comment) \r\n"
 "		SELECT id, ActionID, 'U', 'P' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
-"			<UserID> as UserID, <MachineID> as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar \r\n"
+"			@UserID as UserID, @MachineID as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar \r\n"
 "			WHERE ASC_From = 'U'; \r\n"
 "		INSERT INTO FileActionStateTransition (FileID, ActionID,  ASC_From, ASC_To,  \r\n"
 "			DateTimeStamp, FAMUserID, MachineID, Exception, Comment) \r\n"
 "		SELECT id, ActionID, CASE WHEN ASC_From = 'U' THEN 'P' ELSE ASC_From END, 'R' as ASC_To, GETDATE() AS DateTimeStamp,  \r\n"
-"			<UserID> as UserID, <MachineID> as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar \r\n"
+"			@UserID as UserID, @MachineID as MachineID, '' as Exception, '' as Comment FROM @OutputTableVar \r\n"
 "	END; \r\n"
 "	INSERT INTO LockedFile(FileID,ActionID,ActiveFAMID,StatusBeforeLock,ActionName) \r\n"
-"		SELECT [@OutputTableVar].ID, ActionID, <ActiveFAMID> AS ActiveFAMID, ASC_From AS StatusBeforeLock, ASCName FROM @OutputTableVar \r\n"
+"		SELECT [@OutputTableVar].ID, ActionID, @ActiveFAMID AS ActiveFAMID, ASC_From AS StatusBeforeLock, ASCName FROM @OutputTableVar \r\n"
 "			INNER JOIN [Action] ON [ActionID] = [Action].[ID]; \r\n"
 	"	SET NOCOUNT OFF \r\n"
 	"END TRY \r\n"
@@ -2054,7 +2053,7 @@ static const string gstrSTART_FILETASKSESSION_DATA =
 	"  ,[FileID] "
 	"  ,[ActionID])"
 	"  OUTPUT INSERTED.ID"
-	"  VALUES (<FAMSessionID>, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = '<TaskClassGuid>'), <FileID>, <ActionID>)";
+	"  VALUES (@FAMSessionID, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = @TaskClassGuid), @FileID, @ActionID)";
 
 static const string gstrUPDATE_FILETASKSESSION_DATA = 
 	"UPDATE [dbo].[FileTaskSession] SET "
@@ -2147,12 +2146,12 @@ static const string gstrINSERT_INTO_PAGINATION =
 	"			AND [NewPaginations].[SourcePage] = [OriginalPages].[DestPage]";
 
 static const string gstrACTIVE_PAGINATION_FILEID = 
-	"SELECT        Pagination.DestFileID \r\n"
+	"SELECT        Pagination.DestFileID AS ID \r\n"
 	"FROM            ActiveFAM INNER JOIN \r\n"
 	"                         FAMSession ON ActiveFAM.FAMSessionID = FAMSession.ID INNER JOIN \r\n"
 	"                         FileTaskSession ON FAMSession.ID = FileTaskSession.FAMSessionID INNER JOIN \r\n"
 	"                         Pagination ON FileTaskSession.ID = Pagination.FileTaskSessionID \r\n"
-	"WHERE        (Pagination.DestFileID = <FileID>) \r\n";
+	"WHERE        (Pagination.DestFileID = @FileID) \r\n";
 
 static const string gstrALTER_PAGINATION_ALLOW_NULL_DESTFILE = 
 	"ALTER TABLE [dbo].[Pagination] ALTER COLUMN [DestFileID] INT NULL";

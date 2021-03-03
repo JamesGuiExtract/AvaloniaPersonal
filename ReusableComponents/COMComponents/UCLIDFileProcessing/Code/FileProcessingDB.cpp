@@ -771,9 +771,9 @@ STDMETHODIMP CFileProcessingDB::ResetDBLock(void)
 		TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
 		// Delete all Lock records
-		string strDelete = gstrDELETE_DB_LOCK;
-		replaceVariable(strDelete, gstrDB_LOCK_NAME_VAL, gstrMAIN_DB_LOCK);
-		executeCmdQuery(ipConnection, strDelete);
+		executeCmd(
+			buildCmd(ipConnection, gstrDELETE_DB_LOCK,
+				{ { gstrDB_LOCK_NAME_VAL, gstrMAIN_DB_LOCK.c_str() } }));
 		
 		// Commit the changes
 		tg.CommitTrans();
@@ -2060,7 +2060,7 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
-	try
+		try
 	{
 		validateLicense();
 
@@ -2077,11 +2077,13 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM()
 
 		// This creates a record in the ActiveFAM table and the LastPingTime
 		// is set to the current time by default.
-		executeCmdQuery(getDBConnection(), 
-			string("INSERT INTO ActiveFAM (FAMSessionID) ")
-				+ "OUTPUT INSERTED.ID "
-				+ "VALUES ('" + asString(m_nFAMSessionID) + "')",
-			false, (long*)&m_nActiveFAMID);
+		getCmdId(
+			buildCmd(getDBConnection(),
+				"INSERT INTO ActiveFAM (FAMSessionID) "
+				"	OUTPUT INSERTED.ID "
+				"	VALUES (@FAMSessionID)",
+				{ { "@FAMSessionID", m_nFAMSessionID } })
+			, (long *)&m_nActiveFAMID);
 
 		// set FAM registered flag
 		m_bFAMRegistered = true;
