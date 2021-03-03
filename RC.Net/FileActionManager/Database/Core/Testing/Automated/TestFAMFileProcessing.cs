@@ -106,6 +106,96 @@ namespace Extract.FileActionManager.Database.Test
         #region Test Methods
 
         /// <summary>
+        /// Tests updating the file size.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void TestUpdatingFileSize()
+        {
+            string testDbName = "TestUpdatingFileSize";
+            int newFileSize = 100;
+            try
+            {
+                string testFileName = _testFiles.GetFile(_LABDE_TEST_FILE1);
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+
+                var fileRecord = fileProcessingDb.AddFile(
+                    testFileName, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
+                    EActionStatus.kActionPending, true, out var _, out EActionStatus t2);
+
+                fileProcessingDb.SetFileInformationForFile(fileRecord.FileID, newFileSize, -1);
+                var previousPageCount = fileRecord.Pages;
+
+                var updatedFileRecord = fileProcessingDb.GetFileRecord(testFileName, _LABDE_ACTION1);
+                Assert.AreEqual(newFileSize, updatedFileRecord.FileSize);
+                Assert.AreEqual(previousPageCount, updatedFileRecord.Pages);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// <summary>
+        /// Tests updating the file size.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void TestUpdatingPageCount()
+        {
+            string testDbName = "TestUpdatingPageCount";
+            int newPageCount = 10000;
+            try
+            {
+                string testFileName = _testFiles.GetFile(_LABDE_TEST_FILE1);
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+
+                var fileRecord = fileProcessingDb.AddFile(
+                    testFileName, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
+                    EActionStatus.kActionPending, true, out var _, out EActionStatus t2);
+
+                fileProcessingDb.SetFileInformationForFile(fileRecord.FileID, -1, newPageCount);
+                var previousFileSize = fileRecord.FileSize;
+
+                var updatedFileRecord = fileProcessingDb.GetFileRecord(testFileName, _LABDE_ACTION1);
+                Assert.AreEqual(newPageCount, updatedFileRecord.Pages);
+                Assert.AreEqual(previousFileSize, updatedFileRecord.FileSize);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// <summary>
+        /// Tests updating the file size and page count.
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void TestUpdatingPageCountAndFileSize()
+        {
+            string testDbName = "TestUpdatingPageCountAndFileSize";
+            int newPageCount = 10000;
+            int newFileSize = 1000000;
+            try
+            {
+                string testFileName = _testFiles.GetFile(_LABDE_TEST_FILE1);
+                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+
+                var fileRecord = fileProcessingDb.AddFile(
+                    testFileName, _LABDE_ACTION1, _CURRENT_WORKFLOW, EFilePriority.kPriorityNormal, false, false,
+                    EActionStatus.kActionPending, true, out var _, out EActionStatus t2);
+
+                fileProcessingDb.SetFileInformationForFile(fileRecord.FileID, newFileSize, newPageCount);
+
+                var updatedFileRecord = fileProcessingDb.GetFileRecord(testFileName, _LABDE_ACTION1);
+                Assert.AreEqual(newPageCount, updatedFileRecord.Pages);
+                Assert.AreEqual(newFileSize, updatedFileRecord.FileSize);
+            }
+            finally
+            {
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// <summary>
         /// Tests adding, renaming and deleting actions both in an out of a workflow.
         /// </summary>
         [Test, Category("Automated")]
@@ -1985,7 +2075,7 @@ namespace Extract.FileActionManager.Database.Test
         /// Gets file two via query condition, sets it to pending in action two, and calls get files to process on it.
         /// </summary>
         [Test, Category("Automated")]
-        public static void GetFilesToProcessAfterModifyActionStatusForSelectionWithQuerySubSet()
+        public static void GetFilesToProcessAfterModifyActionStatusForSelectionWithQuerySubset()
         {
             string testDBName = "TestModifyActionStatusForSelectionWithQuerySubSet";
             using var fileProcessingDatabase = new TwoWorkflows(testDBName, false);
@@ -2017,7 +2107,7 @@ namespace Extract.FileActionManager.Database.Test
         /// Gets the top 50% of files (File one) sets it to pending in action two, and gets it to process.
         /// </summary>
         [Test, Category("Automated")]
-        public static void GetFilesToProcessAfterModifyActionStatusSubSetTop()
+        public static void GetFilesToProcessAfterModifyActionStatusSubsetTop()
         {
             string testDBName = "TestGetFilesToProcessAfterModifyActionStatusSubSetTop";
             using var fileProcessingDatabase = new TwoWorkflows(testDBName, false);
@@ -2051,7 +2141,7 @@ namespace Extract.FileActionManager.Database.Test
         /// Gets the bottom 50% of files (File two) sets it to pending in action two, and gets it to process.
         /// </summary>
         [Test, Category("Automated")]
-        public static void GetFilesToProcessAfterModifyActionStatusSubSetBottom()
+        public static void GetFilesToProcessAfterModifyActionStatusSubsetBottom()
         {
             string testDBName = "TestGetFilesToProcessAfterModifyActionStatusSubSetBottom";
             using var fileProcessingDatabase = new TwoWorkflows(testDBName, false);
@@ -2128,7 +2218,6 @@ namespace Extract.FileActionManager.Database.Test
             {
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddFileTagCondition("Test", TagMatchType.eAnyTag);
-                var test = fileSelector.GetResults(fileProcessingDatabase.workflow1);
                 
                 fileProcessingDatabase.workflow1.ModifyActionStatusForSelection(fileSelector, "Action2", EActionStatus.kActionPending, "Action1", true);
 

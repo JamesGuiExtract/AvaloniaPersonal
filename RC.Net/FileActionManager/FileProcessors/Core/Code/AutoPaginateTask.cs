@@ -21,6 +21,7 @@ using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 using System.Globalization;
 using UCLID_AFUTILSLib;
+using System.IO;
 
 namespace Extract.FileActionManager.FileProcessors
 {
@@ -1339,11 +1340,13 @@ namespace Extract.FileActionManager.FileProcessors
                 vbAllowQueuedStatusOverride: false,
                 poldStatus: out EActionStatus oldStatus);
 
+            _fileProcessingDB.SetFileInformationForFile(newFileInfo.FileID, new FileInfo(newFileInfo.FileName).Length, -1);
+            
             if (!string.IsNullOrWhiteSpace(AutoPaginatedTag))
             {
                 fileProcessingDB.TagFile(newFileInfo.FileID, AutoPaginatedTag);
             }
-
+            
             var paginationRequest = new PaginationRequest(
                 PaginationRequestType.Automatic,
                 fileTaskSessionID, 

@@ -385,6 +385,7 @@ public:
 	STDMETHOD(DiscardOldCacheData)(long nFileID, long nActionID, long nExceptFileTaskSessionID);
 	STDMETHOD(GetOneTimePassword)(BSTR* pVal);
 	STDMETHOD(get_CurrentDBSchemaVersion)(LONG* pVal);
+	STDMETHOD(SetFileInformationForFile)(int fileID, long long fileSize, int pageCount);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);

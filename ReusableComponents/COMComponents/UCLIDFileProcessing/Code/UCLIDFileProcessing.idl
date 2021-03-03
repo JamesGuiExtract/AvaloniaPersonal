@@ -2175,6 +2175,13 @@ library UCLID_FILEPROCESSINGLib
 		[id(210), helpstring("method GetOneTimePassword")] HRESULT GetOneTimePassword([out, retval] BSTR* pVal);
 
 		[propget, id(211), helpstring("property CurrentDBSchemaVersion")] HRESULT CurrentDBSchemaVersion([out, retval] LONG* pVal);
+
+		// -----------------------------------------------------------------------------------------------
+		// Updates the FAM file table.
+		// FileID: The file ID to update
+		// FileSize: The size of the file
+		// PageCount: The number of pages the document has.
+		[id(212), helpstring("method SetFileInformationForFile")] HRESULT SetFileInformationForFile([in] int fileID, [in] long long fileSize, [in] int pageCount);
 	};
 
 	[

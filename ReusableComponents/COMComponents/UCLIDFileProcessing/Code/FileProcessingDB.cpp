@@ -479,6 +479,67 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFile(long nID, BSTR strAction, long 
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13572");
 }
+
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetFileInformationForFile(int fileID, long long fileSize, int pageCount)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	
+	try
+	{
+		ASSERT_ARGUMENT("ELI51572", fileSize != -1 || pageCount != -1);
+		// Check License
+		validateLicense();
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = __nullptr;
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
+
+		string updateFamFileSQL;
+
+		if (fileSize != -1 && pageCount != -1)
+		{
+			updateFamFileSQL = " UPDATE "
+				" dbo.FAMFile "
+				" SET "
+				" FileSize = " + asString(fileSize) +
+				", Pages = " + asString(pageCount) +
+				" WHERE "
+				" dbo.FAMFile.ID = " + asString(fileID);
+		}
+		else if (fileSize != -1)
+		{
+			updateFamFileSQL = " UPDATE "
+				" dbo.FAMFile "
+				" SET "
+				" FileSize = " + asString(fileSize) +
+				" WHERE "
+				" dbo.FAMFile.ID = " + asString(fileID);
+
+		}
+		else if (pageCount != -1)
+		{
+			updateFamFileSQL = " UPDATE "
+				" dbo.FAMFile "
+				" SET "
+				" Pages = " + asString(pageCount) +
+				" WHERE "
+				" dbo.FAMFile.ID = " + asString(fileID);
+		}
+
+		executeCmdQuery(ipConnection, updateFamFileSQL);
+
+		tg.CommitTrans();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI51583");
+}
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFiles, 
 												  VARIANT_BOOL bGetSkippedFiles,
