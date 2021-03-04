@@ -4075,7 +4075,7 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			if (bGetSkippedFiles == VARIANT_TRUE)
 			{
 				strWhere = "INNER JOIN SkippedFile ON FileActionStatus.FileID = SkippedFile.FileID "
-					"AND SkippedFile.ActionID = <ActionIDPlaceHolder> WHERE (ActionStatus = 'S'";
+					"AND SkippedFile.ActionID IN (<ActionIDPlaceHolder>) WHERE (ActionStatus = 'S'";
 
 				string strUserName = asString(bstrSkippedForUserName);
 				if(!strUserName.empty())
