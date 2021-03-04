@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 187;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 191;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -563,7 +563,7 @@ int UpdateToSchemaVersion112(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vecQueries.push_back("EXEC sp_rename 'dbo.FileActionStatus', 'FileActionStatus_Old'");
 		vecQueries.push_back("ALTER TABLE [FileActionStatus_Old] DROP CONSTRAINT [PK_FileActionStatus]");
-		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_112_187);
 		vecQueries.push_back("INSERT INTO [FileActionStatus] "
 			"([ActionID], [FileID], [ActionStatus], [Priority]) "
 			"	SELECT [ActionID], [FileID], [ActionStatus], [FAMFile].[Priority] "
@@ -1071,7 +1071,7 @@ int UpdateToSchemaVersion128(_ConnectionPtr ipConnection, long* pnNumSteps,
 		vecQueries.push_back("ALTER TABLE [SkippedFile] DROP COLUMN [UPIID]");
 		vecQueries.push_back("ALTER TABLE [SkippedFile] ADD [FAMSessionID] INT NULL");
 		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_SESSION_FK);
-		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX_128_187);
 		vecQueries.push_back("ALTER TABLE [QueuedActionStatusChange] DROP COLUMN [UPI]");
 		vecQueries.push_back("ALTER TABLE [QueuedActionStatusChange] ADD [FAMSessionID] INT NULL");
 		vecQueries.push_back(gstrADD_QUEUED_ACTION_STATUS_CHANGE_FAM_SESSION_FK);
@@ -2870,6 +2870,129 @@ int UpdateToSchemaVersion187(_ConnectionPtr ipConnection,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI50242");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion188(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 188;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("DROP INDEX [IX_Skipped_File_FAMSession] ON [dbo].[SkippedFile]");
+		vecQueries.push_back("DROP INDEX [IX_Skipped_File] ON [dbo].[SkippedFile]");
+
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+		vecQueries.push_back("ALTER TABLE [dbo].[FileActionStatus] DROP CONSTRAINT [PK_FileActionStatus]");
+		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_ACTIONID_PRIORITY_FILE_INDEX_188);
+		vecQueries.push_back("ALTER TABLE [dbo].[FileActionStatus] ADD  CONSTRAINT [PK_FileActionStatus] PRIMARY KEY "
+			"([FileID] ASC,	[ActionID] ASC)");
+		vecQueries.push_back("INSERT INTO DBInfo (Name, Value) VALUES ('UseGetFilesLegacy', '0')");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51468");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion189(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 189;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// The procedure was updated
+		vecQueries.push_back("DROP INDEX [IX_ActionStatusActionIDPriorityFileID] ON [dbo].[FileActionStatus] WITH ( ONLINE = OFF )");
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_TASKCLASSID_WITH_ID_SESSIONID_DATE);
+		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_INDEX);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51491");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion190(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 190;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// The procedure was updated
+		vecQueries.push_back(gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_DELETED_INDEX);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51553");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion191(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 191;
+
+		if (pnNumSteps != nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// The procedure was updated
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51559");
 }
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -8040,7 +8163,11 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 184:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion185);
 				case 185:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion186);
 				case 186:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion187);
-				case 187:
+				case 187:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion188);
+				case 188:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion189);
+				case 189:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion190);
+				case 190:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion191);
+				case 191:
 					break;
 
 				default:

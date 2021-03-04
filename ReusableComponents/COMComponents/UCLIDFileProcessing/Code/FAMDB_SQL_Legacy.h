@@ -326,3 +326,28 @@ static const std::string gstrCREATE_DATABASE_MIGRATION_WIZARD_REPORTING_181 =
 " , [Message] NVARCHAR(512) NOT NULL "
 " , [DateTime] DATETIME NOT NULL DEFAULT GETDATE() "
 " )";
+
+static const string gstrCREATE_FILE_ACTION_STATUS_112_187 =
+"CREATE TABLE [dbo].[FileActionStatus]( "
+"[ActionID] [int] NOT NULL, "
+"[FileID] [int] NOT NULL, "
+"[ActionStatus] [nvarchar](1) NOT NULL, "
+"[Priority] [int] NOT NULL, \r\n"
+"CONSTRAINT [PK_FileActionStatus] PRIMARY KEY CLUSTERED "
+"( "
+"	[FileID] ASC, "
+"	[ActionID] ASC "
+")) ";
+
+static const string gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX_128_187 = "CREATE NONCLUSTERED INDEX "
+"[IX_Skipped_File_FAMSession] ON [SkippedFile]([FAMSessionID])";
+
+
+static const string gstrCREATE_ACTIONSTATUS_ACTIONID_PRIORITY_FILE_INDEX_188 =
+"CREATE UNIQUE CLUSTERED INDEX[IX_ActionStatusActionIDPriorityFileID] ON[dbo].[FileActionStatus] "
+"("
+"	[ActionStatus] ASC,"
+"	[ActionID] ASC,"
+"	[Priority] DESC,"
+"	[FileID] ASC "
+")";

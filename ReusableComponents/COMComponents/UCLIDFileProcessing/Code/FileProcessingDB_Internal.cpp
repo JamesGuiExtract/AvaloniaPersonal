@@ -1623,7 +1623,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
-		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_FAM_SESSION_INDEX);
+		vecQueries.push_back(gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
 		vecQueries.push_back(gstrCREATE_ACTIVE_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FPS_FILE_NAME_INDEX);
@@ -1642,6 +1642,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_FAST_FILEID_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_DATETIMESTAMP_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_FAMSESSION_INDEX);
+		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_TASKCLASSID_WITH_ID_SESSIONID_DATE);
 		vecQueries.push_back(gstrCREATE_PAGINATION_ORIGINALFILE_INDEX);
 		vecQueries.push_back(gstrCREATE_PAGINATION_FILETASKSESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_TASK_SESSION_ACTION_INDEX);
@@ -1649,6 +1650,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_PAGINATION_SOURCEFILE_INDEX);
 		vecQueries.push_back(gstrCREATE_FAMSESSION_ID_FAMUSERID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILETASKSESSION_DATETIMESTAMP_WITH_INCLUDES_INDEX);
+		vecQueries.push_back(gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_DELETED_INDEX);
 
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
@@ -1790,6 +1792,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_USAGE_FOR_SPECIFIC_USER_SPECIFIC_DAY_PROCEDURE);
 		vecQueries.push_back(gstrCREATE_TABLE_FROM_COMMA_SEPARATED_LIST_FUNCTION);
 		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE);
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -2236,6 +2239,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 
 	mapDefaultValues[gstrDASHBOARD_INCLUDE_FILTER] = "";
 	mapDefaultValues[gstrDASHBOARD_EXCLUDE_FILTER] = "";
+	mapDefaultValues[gstrUSE_GET_FILES_LEGACY] = "0";
 
 	// Create a new database ID  or use existing if it has been set
 	ByteStream bsDatabaseID;
@@ -2704,8 +2708,7 @@ void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/
 
 		// Get the Schema Version from the database
 		int iDBSchemaVersion = getDBSchemaVersion();
-		//if (iDBSchemaVersion != ms_lFAMDBSchemaVersion)
-		if (iDBSchemaVersion < ms_lFAMDBSchemaVersion)
+		if (iDBSchemaVersion != ms_lFAMDBSchemaVersion)
 		{
 			// Update the current connection status string
 			m_strCurrentConnectionStatus = gstrWRONG_SCHEMA;
