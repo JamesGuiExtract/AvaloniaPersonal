@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <PlatformTarget>x64</PlatformTarget>
+    <Tailcalls>true</Tailcalls> <!--Do tail call elimination even in debug config-->
+    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <Copyright>Copyright © Extract Systems, LLC 2021</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Arguments.fs" />
+    <Compile Include="NamedPipe.fs" />
+    <Compile Include="Utils.fs" />
+    <Compile Include="FitModel.fs" />
+    <Compile Include="GenerateModel.fs" />
+    <Compile Include="CrossValidate.fs" />
+    <Compile Include="Predict.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="4.6.2" />
+    <PackageReference Include="Argu" Version="6.1.1" />
+    <PackageReference Include="FsPickler" Version="5.3.2" />
+    <PackageReference Include="Microsoft.ML.AutoML" Version="0.17.4" />
+    <PackageReference Include="Unquote" Version="5.0.0" />
+    <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
+    <PackageReference Include="System.Numerics.Vectors" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Utilities\FSharp\Core\Code\Extract.Utilities.FSharp.fsproj" />
+  </ItemGroup>
+
+</Project>

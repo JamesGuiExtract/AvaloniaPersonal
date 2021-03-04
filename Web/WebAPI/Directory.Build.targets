@@ -39,6 +39,8 @@
     <PackageReference Update="System.Threading.Tasks.Parallel" Version="4.3.0" />
     <PackageReference Update="System.Threading.Thread" Version="4.3.0" />
     <PackageReference Update="System.Xml.XmlDocument" Version="4.3.0" />
+    <PackageReference Update="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />
+    <PackageReference Update="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 
   <Target Name="resolveInteropOutputPath" BeforeTargets="ResolveComReferences"

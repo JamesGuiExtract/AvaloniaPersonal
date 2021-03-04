@@ -22,7 +22,11 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Compiler.Service" Version="37.0.0" />
     <PackageReference Update="FSharp.Core" Version="4.6.2" /> <!--Update FSharp.Core to override implicit version of the SDK-->
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.6.0" /> <!--Include this dependency of FSharp.Compiler.Service explicitly in order to match the version used by the web APIs-->
+
+    <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
+    <PackageReference Include="System.Numerics.Vectors" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />

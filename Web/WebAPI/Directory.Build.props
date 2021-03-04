@@ -49,6 +49,10 @@
     <PackageReference Include="System.Threading.Tasks.Parallel" />
     <PackageReference Include="System.Threading.Thread" />
     <PackageReference Include="System.Xml.XmlDocument" />
+
+    <!--Include these dependencies explicitly in order to avoid downgrades -->
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" />
   </ItemGroup>
 
   <Target Name="CleanIntermediateFiles" AfterTargets="Clean">

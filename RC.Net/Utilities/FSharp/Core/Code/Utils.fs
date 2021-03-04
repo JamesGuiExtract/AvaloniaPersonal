@@ -22,11 +22,12 @@ let debugRaise<'a> ex : 'a =
   #endif
 
 let fileExists fname =
-  if String.IsNullOrEmpty fname
-  then None
-  elif File.Exists fname
-  then Some fname
-  else None
+  if String.IsNullOrEmpty fname then
+    None
+  elif File.Exists fname then
+    Some fname
+  else
+    None
 (******************************************************************************************************)
 
 type MaybeBuilder() =
@@ -71,6 +72,26 @@ type RetryBuilder (maxRetries, waitBetweenRetries : int) =
     loop maxRetries
 
 let retry = RetryBuilder (50, 500)
+(******************************************************************************************************)
+
+type RetryUntilTrueBuilder (maxRetries, waitBetweenRetries : int) = 
+  member x.Return(a) = a               // Enable 'return'
+
+  member x.Delay(f) = f                // Gets wrapped body and returns it (as it is)
+                                       // so that the body is passed to 'Run'
+  member x.Zero() = false              // Support if .. then 
+
+  member x.Run(f) =                    // Gets function created by 'Delay'
+    let rec loop n  = 
+      match f (), n with
+      | true, _ -> true
+      | false, 1 -> false
+      | _ ->
+        Thread.Sleep waitBetweenRetries
+        loop (n-1)
+    loop maxRetries
+
+let retryUntilTrue = RetryUntilTrueBuilder (50, 500)
 (******************************************************************************************************)
 
 type NoCase(value) =
@@ -207,6 +228,7 @@ module String =
 (******************************************************************************************************)
 
 open Newtonsoft.Json
+open System.Linq
 
 module Object =
   let toJson<'a> (x: 'a) = 
@@ -224,20 +246,40 @@ module Object =
     |> JsonConvert.DeserializeObject<'a>
 (******************************************************************************************************)
 
+module Seq =
+  let groupsOfAtMost (size: int) (s: seq<'v>) : seq<list<'v>> =
+    seq {
+      let en = s.GetEnumerator ()
+      let more = ref true
+      while !more do
+      let group =
+        [
+          let i = ref 0
+          while !i < size && en.MoveNext () do
+            yield en.Current
+            i := !i + 1
+        ]
+      if List.isEmpty group then
+        more := false
+      else
+        yield group
+    }
+(******************************************************************************************************)
+
 module Array =
   let shuffle (rng: System.Random option) (lst: #IList<'a>) =
-      let Swap i j =
-          let item = lst.[i]
-          lst.[i] <- lst.[j]
-          lst.[j] <- item
-      let rng = match rng with | Some r -> r | None -> System.Random ()
-      let ln = lst.Count
-      [0..(ln - 2)]
-      |> Seq.iter (fun i -> Swap i (rng.Next(i, ln)))
-      lst
+    let Swap i j =
+      let item = lst.[i]
+      lst.[i] <- lst.[j]
+      lst.[j] <- item
+    let rng = match rng with | Some r -> r | None -> System.Random ()
+    let ln = lst.Count
+    [0..(ln - 2)]
+    |> Seq.iter (fun i -> Swap i (rng.Next(i, ln)))
+    lst
 
   module SlightlyParallel =
-    let opts = System.Threading.Tasks.ParallelOptions(MaxDegreeOfParallelism = Environment.ProcessorCount)
+    let opts = System.Threading.Tasks.ParallelOptions(MaxDegreeOfParallelism = Environment.ProcessorCount * 2)
 
     let map f (a: 'a array) =
       let len = a.Length
@@ -246,36 +288,91 @@ module Array =
         result.[i] <- f a.[i]
       )) |> ignore
       result
-
 (******************************************************************************************************)
 
+module ResizeArray =
+  module SlightlyParallel =
+    let opts = System.Threading.Tasks.ParallelOptions(MaxDegreeOfParallelism = Environment.ProcessorCount * 2)
+
+    let map f (a: ResizeArray<'a>): ResizeArray<'b> =
+      let len = a.Count
+      let result = ResizeArray<_>(len)
+      result.AddRange(Enumerable.Repeat(Unchecked.defaultof<'b>, len))
+      System.Threading.Tasks.Parallel.For (0, len, opts, (fun i ->
+        result.[i] <- f a.[i]
+      )) |> ignore
+      result
+(******************************************************************************************************)
+
+let private makePattern =
+  Regex.escape
+  >> Regex.replace """\d""" """\d"""
+  >> Regex.replace """\\\+""" "[+-]"
+(******************************************************************************************************)
+
+let private getTimeInfoForCurrentTime () =
+  let utcNow = DateTime.UtcNow
+  let localNow = utcNow.ToLocalTime ()
+  let zoneOffset =
+    let zone = TimeZoneInfo.Local.GetUtcOffset localNow
+    let prefix = match (zone < TimeSpan.Zero) with | true -> "-" | _ -> "+"
+    prefix + zone.ToString "hhmm"
+  utcNow, localNow, zoneOffset
+
+open System.Globalization
+
 let dayStampForFile () = 
-  let zone = TimeZoneInfo.Local.GetUtcOffset DateTime.Now
-  let prefix = match (zone<TimeSpan.Zero) with | true -> "-" | _ -> "+"
-  System.DateTime.UtcNow.ToString("yyyy-MM-dd") + prefix + zone.ToString("hhss");
+  let utcNow, localNow, zoneOffset = getTimeInfoForCurrentTime ()
+  let utcString = utcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+  let localString = localNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+  sprintf "%s%s=%s" utcString zoneOffset localString
+(******************************************************************************************************)
+
+let dayStampForFilePat = dayStampForFile () |> makePattern
 (******************************************************************************************************)
 
 let timeStampForFile () = 
-  let zone = TimeZoneInfo.Local.GetUtcOffset DateTime.Now
-  let prefix = match (zone<TimeSpan.Zero) with | true -> "-" | _ -> "+"
-  System.DateTime.UtcNow.ToString("yyyy-MM-dd.HH.mm.ss") + prefix + zone.ToString("hhss");
+  let utcNow, localNow, zoneOffset = getTimeInfoForCurrentTime ()
+  let utcString = utcNow.ToString("yyyy-MM-dd.HH.mm.ss", CultureInfo.InvariantCulture)
+  let localString = localNow.ToString("yyyy-MM-dd.HH.mm.ss", CultureInfo.InvariantCulture)
+  sprintf "%s%s=%s" utcString zoneOffset localString
+
+let timeStampForFilePat = timeStampForFile () |> makePattern
+(******************************************************************************************************)
+
+// Return folder names that start with the supplied regex pattern
+let getFoldersStartingWithPattern pattern parentFolderPath =
+  parentFolderPath
+  |> Directory.GetDirectories
+  |> Array.filter (fun dir ->
+    Path.GetFileName dir
+    |> Regex.isMatch ("^" + pattern)
+   )
+(******************************************************************************************************)
+
+// Return file names that start with the supplied regex pattern
+let getFilesStartingWithPattern pattern folderPath =
+  folderPath
+  |> Directory.GetFiles
+  |> Array.filter (fun file ->
+    Path.GetFileName file
+    |> Regex.isMatch ("^" + pattern)
+   )
 (******************************************************************************************************)
 
 let timeStamp () = 
-  let zone = TimeZoneInfo.Local.GetUtcOffset DateTime.Now
-  let prefix = match (zone<TimeSpan.Zero) with | true -> "-" | _ -> "+"
-  System.DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss") + prefix + zone.ToString("hhss");
+  DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)
 (******************************************************************************************************)
 
 let processIDGen =
   let processID = Process.GetCurrentProcess().Id
   let machineName = Environment.MachineName
-  fun () -> sprintf "%s.%d" machineName processID 
+  fun () -> sprintf "%s.%05d" machineName processID 
 (******************************************************************************************************)
 
 let threadIDGen =
   let processID = processIDGen ()
-  fun () -> sprintf "%s.%d" processID Thread.CurrentThread.ManagedThreadId
+  fun () -> sprintf "%s.%03d" processID Thread.CurrentThread.ManagedThreadId
 (******************************************************************************************************)
 
 let logLinePrefixGen =
@@ -293,43 +390,58 @@ type LogMessageType =
 
 type LogMsg =
   | LogMessage of (LogMessageType * string)
-  
-type Logger(logFile: string, logFileSuffixGen, exeName: string, logLinePrefixGen) =
+ 
+type DeleteLogFileInfo = { SuffixPattern: string; MaxFiles: int }
+
+type Logger(logFile: string, ?logFileSuffixGen, ?logLinePrefixGen, ?maxLogFiles) =
   let mutable enabled = true
+  let baseName, logFile =
+    match logFileSuffixGen with
+    | Some f ->
+      let dir = Path.GetDirectoryName logFile
+      let basename = Path.GetFileNameWithoutExtension logFile
+      let extension = if Path.HasExtension logFile then Path.GetExtension logFile else ""
+      basename, Path.Combine (dir, sprintf "%s_%s%s" basename (f ()) extension)
+    | None -> "", logFile
+
+  let deleteOldLogFilesIfRequired logDir =
+    match maxLogFiles with
+    | Some info ->
+      let matchingFiles =
+        logDir
+        |> getFilesStartingWithPattern (sprintf "%s_%s" baseName info.SuffixPattern)
+        |> Array.sort
+      let extra = matchingFiles.Length - info.MaxFiles
+      if extra > 0 then
+        matchingFiles
+        |> Seq.take extra
+        |> Seq.iter (fun file -> try File.Delete file with _ -> ())
+    | _ -> ()
+
   let inner =
     MailboxProcessor.Start(fun inbox ->
       let rec loop () =
         async {
           let! msg = inbox.Receive()
           match msg with
-          | LogMessage (msgType, line) ->
-            let logFile =
-              match logFileSuffixGen with
-              | Some f ->
-                if Path.HasExtension logFile
-                then
-                  let dir = Path.GetDirectoryName logFile
-                  let basename = Path.GetFileNameWithoutExtension logFile
-                  let extension = Path.GetExtension logFile
-                  Path.Combine (dir, sprintf "%s_%s%s" basename (f ()) extension)
-                else
-                  sprintf "%s_%s" logFile (f ())
-              | None -> logFile
-
-            logFile |> Path.GetDirectoryName |> Directory.CreateDirectory |> ignore
+          | LogMessage (_msgType, line) ->
+            let logDir = logFile |> Path.GetDirectoryName
+            logDir |> Directory.CreateDirectory |> ignore
+            if not (File.Exists logFile) then deleteOldLogFilesIfRequired logDir
             File.AppendAllLines (logFile, [line])
 
           return! loop ()
         }
       loop ())
+
   let log msgType msg =
-    if enabled
-    then
+    if enabled then
       let line =
         match logLinePrefixGen with
         | Some f -> f () + ": " + msg
         | None -> msg
       inner.Post (LogMessage (msgType, line))
+
   with
     member x.Log(msgType, msg) = log msgType msg
     member x.Enable() = enabled <- true
@@ -348,17 +460,15 @@ let runProcLogToFile exeName args startDir logFile priority =
     )
   match startDir with | Some d -> procStartInfo.WorkingDirectory <- d | _ -> ()
 
-  let logger = Logger (logFile, None, exeName, None)
+  let logger = Logger(logFile)
   let outputs = List<string>()
   let errors = List<string>()
   let outputHandler (_sender:obj) (args:DataReceivedEventArgs) =
-    if args.Data <> null
-    then
+    if args.Data <> null then
       outputs.Add args.Data
       logger.Log (Information, args.Data)
   let errorHandler (_sender:obj) (args:DataReceivedEventArgs) =
-    if args.Data <> null
-    then
+    if args.Data <> null then
       errors.Add args.Data
       logger.Log (Exception, args.Data)
 
@@ -413,6 +523,29 @@ let runProc exeName args startDir =
   p.ExitCode, cleanOut outputs, cleanOut errors
 (******************************************************************************************************)
 
+let startProc exeName args startDir = 
+  let procStartInfo = 
+    ProcessStartInfo(
+      RedirectStandardOutput = false,
+      RedirectStandardError = false,
+      UseShellExecute = false,
+      CreateNoWindow = true,
+      FileName = exeName,
+      Arguments = args
+    )
+  match startDir with | Some d -> procStartInfo.WorkingDirectory <- d | _ -> ()
+
+  let p = new Process(StartInfo = procStartInfo)
+  let started = 
+    try
+      p.Start()
+    with | ex ->
+      ex.Data.Add("exeName", exeName)
+      reraise()
+  if not started then
+    failwithf "Failed to start process %s" exeName
+(******************************************************************************************************)
+
 let private createTempFile extension =
   retry {
     let fname =
@@ -421,8 +554,7 @@ let private createTempFile extension =
       | Some ext -> basename + ext
       | None -> basename + ".tmp"
 
-    if File.Exists fname
-    then
+    if File.Exists fname then
       failwith "This should almost never happen"
     else
       File.WriteAllText (fname, "")
