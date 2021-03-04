@@ -1,0 +1,57 @@
+[
+  {
+    "ID": 1,
+    "Description": "FoundPagination",
+    "GUID": "72edc098-25f2-406c-999d-3d5be51ed84a"
+  },
+  {
+    "ID": 2,
+    "Description": "DataFoundByRules",
+    "GUID": "c40eba09-276a-4302-b74b-ddac97930835"
+  },
+  {
+    "ID": 3,
+    "Description": "ExpectedPagination",
+    "GUID": "3fdb24ab-819e-404a-bec3-999ada0016d0"
+  },
+  {
+    "ID": 4,
+    "Description": "DataAfterLastVerifyOrQA",
+    "GUID": "7b332ca1-2266-4d94-bb35-c90ee69b4ee4"
+  },
+  {
+    "ID": 5,
+    "Description": "DataFoundByRules_oldOCR",
+    "GUID": "cdefa408-fbf7-4ce2-879c-3aaacae3d8f4"
+  },
+  {
+    "ID": 6,
+    "Description": "ExcludedFromStats",
+    "GUID": "b7113057-3714-4d62-9f26-bbf62b2d22a8"
+  },
+  {
+    "ID": 7,
+    "Description": "ExpectedDataForML",
+    "GUID": "d9435b0d-961b-4bf4-be9f-e62ccc963229"
+  },
+  {
+    "ID": 8,
+    "Description": "ExpectedDocumentDescription",
+    "GUID": "98f0c464-10cf-451f-b8f6-e09865bf9c4f"
+  },
+  {
+    "ID": 11,
+    "Description": "z_DataFoundByOldRules",
+    "GUID": "780409f8-b467-4174-9067-ddb4b155c6d7"
+  },
+  {
+    "ID": 12,
+    "Description": "z_ExpectedsForRuleTesting",
+    "GUID": "4fb3e34e-2f4d-47c7-9fef-cd3808b09590"
+  },
+  {
+    "ID": 13,
+    "Description": "z_DataFoundByNewRules",
+    "GUID": "789d678c-6ec8-432a-bc51-803ffa5e28a3"
+  }
+]

@@ -1,0 +1,326 @@
+[
+  {
+    "ID": 53,
+    "Name": "ActionStatisticsUpdateFreqInSeconds",
+    "Value": "300",
+    "GUID": "2266034a-0ea9-4345-ba8f-8d3f3f9119f4"
+  },
+  {
+    "ID": 54,
+    "Name": "AllowDynamicTagCreation",
+    "Value": "1",
+    "GUID": "7f3bb6ab-d4e3-4bb9-bce7-75a2ce81b213"
+  },
+  {
+    "ID": 55,
+    "Name": "AllowRestartableProcessing",
+    "Value": "0",
+    "GUID": "6400ffad-e94d-47fd-824f-035f06164ffa"
+  },
+  {
+    "ID": 56,
+    "Name": "AlternateComponentDataDir",
+    "Value": "\\\\extractproc1\\Extract\\FKBUpdates",
+    "GUID": "813e262c-05b4-44e7-9aa1-9b2dea39afe6"
+  },
+  {
+    "ID": 49,
+    "Name": "AttributeCollectionSchemaVersion",
+    "Value": "11",
+    "GUID": "3ff9cdd0-8587-4012-b4e6-b0c47fe5dafd"
+  },
+  {
+    "ID": 57,
+    "Name": "AutoCreateActions",
+    "Value": "0",
+    "GUID": "50a84758-c196-4782-84c2-39741bf4620d"
+  },
+  {
+    "ID": 58,
+    "Name": "AutoDeleteFileActionCommentOnComplete",
+    "Value": "0",
+    "GUID": "06254583-0063-4424-ab1a-fcb54a5e4858"
+  },
+  {
+    "ID": 59,
+    "Name": "AutoRevertNotifyEmailList",
+    "Value": "",
+    "GUID": "ae95ae9b-7a07-4712-b7ea-59360227b39f"
+  },
+  {
+    "ID": 60,
+    "Name": "AutoRevertTimeOutInMinutes",
+    "Value": "5",
+    "GUID": "c9cb9ffc-7555-427f-b8b9-83a39096b9f6"
+  },
+  {
+    "ID": 61,
+    "Name": "CommandTimeout",
+    "Value": "120",
+    "GUID": "c314f3d6-3b41-47b3-a4a0-d192f77afc6b"
+  },
+  {
+    "ID": 62,
+    "Name": "ConnectionRetryTimeout",
+    "Value": "120",
+    "GUID": "b67b36b1-b228-4674-8004-8ff61e846754"
+  },
+  {
+    "ID": 11,
+    "Name": "DatabaseID",
+    "Value": "80c110f74ccb1751c28d6fc27acb3ae1c99c604996f42e3542766e9ccc7c59909fdc7c73fd5345a99d18a09e71e564a593a459651fbb1bd32eb321b950cdd9b1f5d8a4e22caedad20489876f1303d6041fcd2165",
+    "GUID": "bf0a97ab-22c7-41a6-a717-488eebdb784c"
+  },
+  {
+    "ID": 50,
+    "Name": "DataEntrySchemaVersion",
+    "Value": "6",
+    "GUID": "8d99275a-f365-48c8-bc5e-a4a44529d276"
+  },
+  {
+    "ID": 63,
+    "Name": "EmailEnableSettings",
+    "Value": "1",
+    "GUID": "8978def4-9271-4776-b475-ebb85190cedf"
+  },
+  {
+    "ID": 64,
+    "Name": "EmailPassword",
+    "Value": "",
+    "GUID": "3ad6129f-fbe9-47ef-b707-b8d19ee05999"
+  },
+  {
+    "ID": 65,
+    "Name": "EmailPort",
+    "Value": "25",
+    "GUID": "de43da1e-38a6-4745-8cf7-4a4b91c027ab"
+  },
+  {
+    "ID": 66,
+    "Name": "EmailPossibleInvalidSenderAddress",
+    "Value": "0",
+    "GUID": "d1734dfb-b47a-4854-8184-80f3f028977b"
+  },
+  {
+    "ID": 67,
+    "Name": "EmailPossibleInvalidServer",
+    "Value": "0",
+    "GUID": "e7be6b9a-0e74-4fbc-acfd-33fa01a84e03"
+  },
+  {
+    "ID": 68,
+    "Name": "EmailSenderAddress",
+    "Value": "EssentiaPRDAlert@EssentiaHealth.org",
+    "GUID": "c0b5bde9-a0f1-43e8-bfab-520d823062f0"
+  },
+  {
+    "ID": 69,
+    "Name": "EmailSenderName",
+    "Value": "EssentiaPRDAlert",
+    "GUID": "583945a5-c6a6-41f6-9281-8c9c17912998"
+  },
+  {
+    "ID": 70,
+    "Name": "EmailServer",
+    "Value": "emailgateway.medcampus.org",
+    "GUID": "16b0819e-b411-4da0-836a-aa43bb480baa"
+  },
+  {
+    "ID": 71,
+    "Name": "EmailSignature",
+    "Value": "",
+    "GUID": "b12514de-f5db-4284-bf08-b5d37244515c"
+  },
+  {
+    "ID": 72,
+    "Name": "EmailTimeout",
+    "Value": "0",
+    "GUID": "f6fb0d41-6443-47db-a309-6ade78cd2660"
+  },
+  {
+    "ID": 73,
+    "Name": "EmailUsername",
+    "Value": "",
+    "GUID": "cc147e6c-e8dd-48f1-adbe-04f745cbbc7b"
+  },
+  {
+    "ID": 74,
+    "Name": "EmailUseSSL",
+    "Value": "0",
+    "GUID": "4978e572-7854-4894-9dc3-9bd02c765d5e"
+  },
+  {
+    "ID": 75,
+    "Name": "EnableDataEntryCounters",
+    "Value": "0",
+    "GUID": "f65b0d00-7eda-45fc-887f-134cefd3ee4a"
+  },
+  {
+    "ID": 76,
+    "Name": "EnableLoadBalancing",
+    "Value": "1",
+    "GUID": "18db1c18-3f76-4dad-972e-a38f79b5e6ae"
+  },
+  {
+    "ID": 99,
+    "Name": "ETLRestart",
+    "Value": "2019-08-13T10:58:50.178-05:00",
+    "GUID": "cd6d69b9-fa8a-4734-8a32-19eb39e06ee8"
+  },
+  {
+    "ID": 26,
+    "Name": "FAMDBSchemaVersion",
+    "Value": "187",
+    "GUID": "204721ba-ed23-49d5-8afd-f47647579610"
+  },
+  {
+    "ID": 77,
+    "Name": "GetFilesToProcessTransactionTimeout",
+    "Value": "300",
+    "GUID": "200c0d8b-fb53-4d28-a70f-61f9071278c2"
+  },
+  {
+    "ID": 101,
+    "Name": "IDShieldSchemaVersion",
+    "Value": "6",
+    "GUID": "49373493-4087-4a80-ae28-7d8912cbe542"
+  },
+  {
+    "ID": 78,
+    "Name": "InputActivityTimeout",
+    "Value": "30",
+    "GUID": "de26365e-d992-4b4d-b9ad-8420403d5b7d"
+  },
+  {
+    "ID": 52,
+    "Name": "LabDESchemaVersion",
+    "Value": "17",
+    "GUID": "5cfe5079-2701-4600-8668-f8a327c3d970"
+  },
+  {
+    "ID": 79,
+    "Name": "LastDBInfoChange",
+    "Value": "2020-08-31 05:23:48.237",
+    "GUID": "443a0de2-bb9e-45cc-b12d-ff01c3c7d301"
+  },
+  {
+    "ID": 80,
+    "Name": "LicenseContactEmail",
+    "Value": "",
+    "GUID": "9c49dc84-1285-43cd-93bf-aed493d4ad4b"
+  },
+  {
+    "ID": 81,
+    "Name": "LicenseContactOrganization",
+    "Value": "",
+    "GUID": "8c71729b-683c-4b9d-a40b-39454237001a"
+  },
+  {
+    "ID": 82,
+    "Name": "LicenseContactPhone",
+    "Value": "",
+    "GUID": "85fd1971-3a23-4637-9b2c-3e4ee0264002"
+  },
+  {
+    "ID": 83,
+    "Name": "MaxMillisecondsBetweenCheckForFilesToProcess",
+    "Value": "2000",
+    "GUID": "6625a424-cff7-47b7-b3dd-1613e9f0adbd"
+  },
+  {
+    "ID": 84,
+    "Name": "MinMillisecondsBetweenCheckForFilesToProcess",
+    "Value": "2000",
+    "GUID": "0fa04af3-30bb-4d5e-84c1-cc9f3d14ede3"
+  },
+  {
+    "ID": 85,
+    "Name": "NumberOfConnectionRetries",
+    "Value": "10",
+    "GUID": "c42ffe53-6232-4d22-8011-b6b83dc04beb"
+  },
+  {
+    "ID": 86,
+    "Name": "RequireAuthenticationBeforeRun",
+    "Value": "0",
+    "GUID": "d2f93489-cf06-4621-b128-f69a7f759264"
+  },
+  {
+    "ID": 87,
+    "Name": "RequirePasswordToProcessAllSkippedFiles",
+    "Value": "0",
+    "GUID": "15fde416-ed30-41fe-81fd-a048c7249ebd"
+  },
+  {
+    "ID": 100,
+    "Name": "RootPathForDashboardExtractedData",
+    "Value": "C:\\ProgramData\\Extract Systems\\Dashboards\\CachedData",
+    "GUID": "7f99169a-c3a6-40e2-a66e-13d40055872c"
+  },
+  {
+    "ID": 88,
+    "Name": "SendAlertsToExtract",
+    "Value": "0",
+    "GUID": "831e4952-a88e-43f5-8c02-22db9684f624"
+  },
+  {
+    "ID": 89,
+    "Name": "SendAlertsToSpecified",
+    "Value": "0",
+    "GUID": "3e24ed74-b2e5-4ea9-bdaf-f3f6f9c75706"
+  },
+  {
+    "ID": 90,
+    "Name": "SkipAuthenticationForServiceOnMachines",
+    "Value": "extractproc2;extractproc1",
+    "GUID": "12d29e6a-fff5-4abb-9ed2-10deb4ef7cce"
+  },
+  {
+    "ID": 91,
+    "Name": "SpecifiedAlertRecipients",
+    "Value": "",
+    "GUID": "3e23ebe5-fa32-4f1b-84d7-ddebcae97e85"
+  },
+  {
+    "ID": 92,
+    "Name": "StoreDBInfoChangeHistory",
+    "Value": "1",
+    "GUID": "6c2d609c-7d4a-44a0-b268-bf9f9c22d66f"
+  },
+  {
+    "ID": 93,
+    "Name": "StoreDocNameChangeHistory",
+    "Value": "1",
+    "GUID": "bdf50dea-1b8a-4a2a-9dd0-c141c74461a6"
+  },
+  {
+    "ID": 94,
+    "Name": "StoreDocTagHistory",
+    "Value": "1",
+    "GUID": "737d6989-1f4a-493e-b3d3-d7090c490ce8"
+  },
+  {
+    "ID": 95,
+    "Name": "StoreFAMSessionHistory",
+    "Value": "1",
+    "GUID": "2de83201-1125-4491-8f88-5b54736cc38e"
+  },
+  {
+    "ID": 96,
+    "Name": "StoreFTPEventHistory",
+    "Value": "1",
+    "GUID": "32a82871-f731-4fa1-817b-0bdf0b95f2c5"
+  },
+  {
+    "ID": 97,
+    "Name": "UpdateFileActionStateTransitionTable",
+    "Value": "1",
+    "GUID": "07964daa-6b64-4b47-9df8-458876e53ef3"
+  },
+  {
+    "ID": 98,
+    "Name": "UpdateQueueEventTable",
+    "Value": "1",
+    "GUID": "2c08ab4d-547e-4848-902c-93b65e94678b"
+  }
+]

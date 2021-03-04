@@ -1,0 +1,27 @@
+[
+  {
+    "ID": 1,
+    "Name": "OutputFile",
+    "Guid": "6967b644-55bb-48df-ba0d-b4fdb3edd438"
+  },
+  {
+    "ID": 2,
+    "Name": "DocumentType",
+    "Guid": "11bcc76a-d94b-4ad1-9c72-ae21a966659f"
+  },
+  {
+    "ID": 4,
+    "Name": "SubmittedByUser",
+    "Guid": "466d908a-d9ca-4220-92df-df072f109674"
+  },
+  {
+    "ID": 5,
+    "Name": "OriginalFileName",
+    "Guid": "fcffb2b0-37c3-42cd-b2a2-72e3d28f8ed0"
+  },
+  {
+    "ID": 6,
+    "Name": "UploadedFromPath",
+    "Guid": "600d64de-bf6d-443b-842a-2dce34f88443"
+  }
+]

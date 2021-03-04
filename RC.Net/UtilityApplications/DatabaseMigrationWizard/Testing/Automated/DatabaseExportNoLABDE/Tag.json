@@ -1,0 +1,1268 @@
+[
+  {
+    "ID": 11,
+    "TagName": "Workflow_ParkRapids",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "52fcc3cf-ded6-425c-8500-975b7bfa1111"
+  },
+  {
+    "ID": 12,
+    "TagName": "ParkRapids_Behavioral Health",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "9c9e92eb-0104-4d24-acbe-3eac465a5189"
+  },
+  {
+    "ID": 13,
+    "TagName": "ParkRapids_Coumadin Clinic",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "260881df-5e6e-458e-ba70-1edb220b9271"
+  },
+  {
+    "ID": 14,
+    "TagName": "ParkRapids_HIS",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "8ace39df-74a7-4690-a043-c83d26e2c14d"
+  },
+  {
+    "ID": 15,
+    "TagName": "ParkRapids_Lab Xray Dept",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "89d02e89-5cad-47fa-b72d-65c76ee26982"
+  },
+  {
+    "ID": 16,
+    "TagName": "ParkRapids_North Nurses Station",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "b171d4d4-d2d9-4d68-a63d-f055620df26f"
+  },
+  {
+    "ID": 17,
+    "TagName": "ParkRapids_Oncology Dept",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "a7f200fa-edd8-4a5d-91eb-d903cdf84b94"
+  },
+  {
+    "ID": 18,
+    "TagName": "ParkRapids_Physical Therapy",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "ee3635fc-df55-4926-b5dc-16c4d5d551a5"
+  },
+  {
+    "ID": 19,
+    "TagName": "ParkRapids_South Nurses Station",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "86c4dc53-c8d3-4878-975f-a1be29148c31"
+  },
+  {
+    "ID": 20,
+    "TagName": "ParkRapids_Surg Ortho Specialists",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "5a038e28-46d0-4d6b-95f6-27dee6f2961d"
+  },
+  {
+    "ID": 21,
+    "TagName": "ParkRapids_Processed",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "54256052-c8f4-4b01-92e6-84aaf3363f83"
+  },
+  {
+    "ID": 22,
+    "TagName": "Duplicate Discard Doc",
+    "TagDescription": "User chose to Dischard Doc from duplicate screen",
+    "GUID": "1d72a1b5-1778-41d7-8053-7205d6578680"
+  },
+  {
+    "ID": 23,
+    "TagName": "Duplicate Stapled Doc",
+    "TagDescription": "User chose to Staple Doc from duplicate screen",
+    "GUID": "58b3ad3e-9bd9-4f9c-a526-efe8f82d9fd7"
+  },
+  {
+    "ID": 24,
+    "TagName": "ParkRapids_FaxTEST_4",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "910cda3c-294d-4a92-9271-b52fe360f713"
+  },
+  {
+    "ID": 35,
+    "TagName": "ParkRapids_HIS West  Park Rapids",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "29fc8042-1a1a-44d5-9dfe-82d1b8298706"
+  },
+  {
+    "ID": 36,
+    "TagName": "ParkRapids_Scan",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "2f772e45-92ac-4ad2-8f4c-56af36895882"
+  },
+  {
+    "ID": 37,
+    "TagName": "ParkRapids_Main",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "1b947924-6986-4164-903a-cbe2cd2137ae"
+  },
+  {
+    "ID": 38,
+    "TagName": "SentToOnBase",
+    "TagDescription": "Tag to indicate that final XML was sent to OnBase via Corepoint",
+    "GUID": "7d07b280-a32e-4fb3-bddb-b3acee3b617e"
+  },
+  {
+    "ID": 39,
+    "TagName": "Workflow_DuluthClinics",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "93339fd8-71ed-4b0b-be95-9ecf88361db2"
+  },
+  {
+    "ID": 40,
+    "TagName": "DuluthClinics_Hermantown",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "a32f0684-1955-4e62-b5ba-182f13d367b2"
+  },
+  {
+    "ID": 41,
+    "TagName": "DuluthClinics_Lakeside",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "388aaa4b-3cc1-4c9b-adbe-15663e62f115"
+  },
+  {
+    "ID": 42,
+    "TagName": "DuluthClinics_Proctor",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "8cb18459-6914-42c0-b53e-378a8b567bef"
+  },
+  {
+    "ID": 43,
+    "TagName": "DuluthClinics_Superior",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "93a8efc3-d9d1-4f42-9a08-2ecf3f9b7fd2"
+  },
+  {
+    "ID": 44,
+    "TagName": "DuluthClinics_West Duluth",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "c1c6165c-4ad7-4a12-9167-ea3223252bb2"
+  },
+  {
+    "ID": 45,
+    "TagName": "DuluthClinics_Lakewalk",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "60f9274d-132c-45b4-a4de-bfe220d5e18c"
+  },
+  {
+    "ID": 46,
+    "TagName": "DuluthClinics_DCDerm",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "14b25fbe-a6b6-40b9-ba62-8d3d7e8b8e08"
+  },
+  {
+    "ID": 47,
+    "TagName": "DuluthClinics_DCEye",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "c8cc9c7e-5621-4f02-bfb1-a5265cfcddf4"
+  },
+  {
+    "ID": 48,
+    "TagName": "DuluthClinics_DCNephrology",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "dda71a77-fd7e-4975-a1dc-b15646789bb9"
+  },
+  {
+    "ID": 49,
+    "TagName": "DuluthClinics_DCObGyn",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "559ca9ee-d642-4c3b-af39-4066031e04ad"
+  },
+  {
+    "ID": 50,
+    "TagName": "DuluthClinics_DCPeds",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "4439d10f-829e-469f-9f6c-7974be0be81e"
+  },
+  {
+    "ID": 51,
+    "TagName": "DuluthClinics_DCRad",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "171f149d-289a-4e9e-b0d8-f9de0198e13e"
+  },
+  {
+    "ID": 52,
+    "TagName": "DuluthClinics_DCROI",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "168c65d8-abea-4c50-a2c8-edf43f5c554a"
+  },
+  {
+    "ID": 53,
+    "TagName": "DuluthClinics_Polinsky",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "0dbf8552-3f64-481a-84eb-c7ba47d03b8d"
+  },
+  {
+    "ID": 54,
+    "TagName": "DuluthClinics_DCHeartVasc",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "513383e1-4364-419d-858f-837c7e03a81d"
+  },
+  {
+    "ID": 55,
+    "TagName": "DuluthClinics_DCEndo",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "939d7bc4-5189-4add-8d38-ec9d24e5c0f2"
+  },
+  {
+    "ID": 56,
+    "TagName": "DuluthClinics_DCHandOrtho",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "f1866dd2-99ee-485a-8806-e33eed8c93c3"
+  },
+  {
+    "ID": 57,
+    "TagName": "DuluthClinics_DCAudiology",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "bb2c82a7-a0c0-411f-af90-b60057c11c97"
+  },
+  {
+    "ID": 58,
+    "TagName": "DuluthClinics_DCOccMed",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "44f5af0b-0820-447d-97d2-48df9982ac65"
+  },
+  {
+    "ID": 59,
+    "TagName": "DuluthClinics_MDPainRehab",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "b7e1f7d3-0db2-49fa-8b47-7e3209f93a4d"
+  },
+  {
+    "ID": 60,
+    "TagName": "DuluthClinics_DCCardioSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "4b73e8b2-8d06-42a5-90ab-38d4e013a123"
+  },
+  {
+    "ID": 61,
+    "TagName": "DuluthClinics_DCUrology",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "8d3025e1-9498-4086-aa6f-d52f8e119f4b"
+  },
+  {
+    "ID": 62,
+    "TagName": "DuluthClinics_DCGastroenterology",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "08ec9896-8ee1-406c-ae45-d441a5a2f4ba"
+  },
+  {
+    "ID": 63,
+    "TagName": "DuluthClinics_DCRadOnc",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "669c8dbb-755b-43c2-8bbc-19a7229c1b96"
+  },
+  {
+    "ID": 64,
+    "TagName": "DuluthClinics_DCGenSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "6d078990-eabc-4d1c-8ae4-8964a0ecd0c2"
+  },
+  {
+    "ID": 65,
+    "TagName": "DuluthClinics_DCOrtho",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "028d0b45-8d36-4770-a1c1-cba279bd95fe"
+  },
+  {
+    "ID": 66,
+    "TagName": "DuluthClinics_DCWeightMgmt",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "df07719c-7463-4bf9-9230-8725d03b6095"
+  },
+  {
+    "ID": 67,
+    "TagName": "DuluthClinics_DCTraumaOrtho",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "153d7827-02ab-42f3-9041-d2f162032822"
+  },
+  {
+    "ID": 68,
+    "TagName": "DuluthClinics_DCMedOrtho",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "ac52a0e4-695e-4153-a9b3-568c0594b8a8"
+  },
+  {
+    "ID": 69,
+    "TagName": "DuluthClinics_DCNeurology",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "07d85064-5607-4cb0-a030-f17c9b9daf5a"
+  },
+  {
+    "ID": 70,
+    "TagName": "DuluthClinics_DCENT",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "6dfd6e78-4734-4671-ab34-88fec4d28ad4"
+  },
+  {
+    "ID": 71,
+    "TagName": "DuluthClinics_DCRheum",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "b5c280ae-a9e9-47f0-972d-9c1dc28f6856"
+  },
+  {
+    "ID": 72,
+    "TagName": "DuluthClinics_DCVascSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "c550ee1b-cc74-4998-a010-f5bee28928da"
+  },
+  {
+    "ID": 73,
+    "TagName": "DuluthClinics_DCBehHlth",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "e55c183e-e8f8-4371-84bf-3f1c4916bed9"
+  },
+  {
+    "ID": 74,
+    "TagName": "DuluthClinics_DCIntMed",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "a2f6c5f2-7edc-49b9-9795-a726a2eeb6a6"
+  },
+  {
+    "ID": 75,
+    "TagName": "DuluthClinics_DCOncResearch",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "0602231c-c408-4263-b124-ca244e5d832c"
+  },
+  {
+    "ID": 76,
+    "TagName": "DuluthClinics_DCPhyMedReh",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "6a44ecaf-9420-436d-b50e-eb174cc62772"
+  },
+  {
+    "ID": 77,
+    "TagName": "DuluthClinics_DCOnc",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "a4b3a2d2-3bca-41c0-9f40-7f1a75126112"
+  },
+  {
+    "ID": 78,
+    "TagName": "DuluthClinics_DCPulmonary",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "6078af76-aec4-4972-9597-08ccd0730cee"
+  },
+  {
+    "ID": 79,
+    "TagName": "DuluthClinics_DCSkinPlastic",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "50f54bba-1ac1-4d1b-952b-02d4c1c4d337"
+  },
+  {
+    "ID": 80,
+    "TagName": "DuluthClinics_DCHIS",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "af489447-9069-44df-aa8e-57e50159239e"
+  },
+  {
+    "ID": 81,
+    "TagName": "DuluthClinics_DCBreast",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "6a527208-d731-4d66-9df8-415c9a1b522d"
+  },
+  {
+    "ID": 82,
+    "TagName": "DuluthClinics_DCPodiatry",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "e5ce1790-670e-4d7b-89c4-7cc59ace7f7d"
+  },
+  {
+    "ID": 83,
+    "TagName": "DuluthClinics_EIRH",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "9ef5f730-101a-4fa4-be94-a12143ade958"
+  },
+  {
+    "ID": 84,
+    "TagName": "DuluthClinics_WorkComp",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "3fb65417-78e3-4ba8-bc8f-a337b255f515"
+  },
+  {
+    "ID": 85,
+    "TagName": "DuluthClinics_DCAllergy",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "acbe1963-942b-47e0-9ecd-30a07dcce50a"
+  },
+  {
+    "ID": 86,
+    "TagName": "DuluthClinics_DC3rdSt3rdFlr",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "eef00fdc-c9e9-4671-9185-a836544458b5"
+  },
+  {
+    "ID": 87,
+    "TagName": "DuluthClinics_DCSurgOrtho",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "2abd95d5-5aa7-4423-a17a-4ea05f82e59d"
+  },
+  {
+    "ID": 88,
+    "TagName": "Workflow_WestClinics",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "9682fb20-af83-4582-bc88-545ba5eccc09"
+  },
+  {
+    "ID": 89,
+    "TagName": "WestClinics_DLHomeHlth",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "87e19e15-1aff-4cd4-8919-f9d7e9939945"
+  },
+  {
+    "ID": 90,
+    "TagName": "WestClinics_DLOrtho",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "e85a302d-99e0-4645-9036-528be2e7d6ca"
+  },
+  {
+    "ID": 91,
+    "TagName": "WestClinics_SUCLAudENT",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "e20e8c31-63aa-46ce-bf4d-d04373cf257c"
+  },
+  {
+    "ID": 92,
+    "TagName": "WestClinics_SUCLOncInf",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "f258bd97-2330-4bfb-a013-c0a0690e3667"
+  },
+  {
+    "ID": 93,
+    "TagName": "WestClinics_SUCLPulm",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "d8ef9aa7-de2d-414e-aa9d-473ec5e52451"
+  },
+  {
+    "ID": 94,
+    "TagName": "WestClinics_SUCLRadOnc",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "882b1429-263d-405a-821e-cfd543fb3b87"
+  },
+  {
+    "ID": 95,
+    "TagName": "DuluthClinics_MDBehHlthAnc",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "92442ac0-08d0-43e5-8ba1-77a9976b814f"
+  },
+  {
+    "ID": 96,
+    "TagName": "WestClinics_SUCLDermPod",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "5334aacd-fe3e-49a9-8ee7-09d42cc2e42d"
+  },
+  {
+    "ID": 97,
+    "TagName": "WestClinics_SUCLIntMed",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "7fb65390-2d38-4733-b6e3-b98e42d6570c"
+  },
+  {
+    "ID": 98,
+    "TagName": "WestClinics_SUCLPeds",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "c97ff15e-a95b-446a-9abb-b37e48777ca7"
+  },
+  {
+    "ID": 99,
+    "TagName": "WestClinics_SUCLPhyMed",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "bf28d3a4-3104-4963-bae8-35e024403ff5"
+  },
+  {
+    "ID": 100,
+    "TagName": "WestClinics_FosHomeHealth",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "d859311e-90fe-407d-b085-f9b6660a8742"
+  },
+  {
+    "ID": 101,
+    "TagName": "WestClinics_DMEHomeHlth",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "5fec6355-c9af-491a-82cb-cc9f58a6ba17"
+  },
+  {
+    "ID": 102,
+    "TagName": "WestClinics_WFCOccMed",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "c6e563d5-c11b-4f72-8dbc-ac4ea656128f"
+  },
+  {
+    "ID": 103,
+    "TagName": "WestClinics_SUCLOphthEye",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "2b41b909-f618-4500-b7a9-73af312c0c8f"
+  },
+  {
+    "ID": 104,
+    "TagName": "WestClinics_ADA",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "a2815953-2334-4af8-9e47-ad81a2ec5ee9"
+  },
+  {
+    "ID": 105,
+    "TagName": "Workflow_WestHospitals",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "3c55536b-cb72-4f5f-b54a-70ac45d79a7e"
+  },
+  {
+    "ID": 106,
+    "TagName": "WestHospitals_DLHMedSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "bc609f08-3909-44e8-9d39-c9ec817f4984"
+  },
+  {
+    "ID": 107,
+    "TagName": "WestClinics_SUCLLab",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "969b3f71-5fd3-4a13-9070-26ebd4c0ae51"
+  },
+  {
+    "ID": 108,
+    "TagName": "WestHospitals_DLHEmergency",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "cb821d4c-4829-440f-8f2d-9d18adb3f310"
+  },
+  {
+    "ID": 109,
+    "TagName": "DuluthClinics_SMMCGriefSupport",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "9a80ef78-d9e4-423e-9b49-5c521b6a6672"
+  },
+  {
+    "ID": 110,
+    "TagName": "WestHospitals_DLHOB",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "7f8a21fa-cf53-47da-8a2d-5035063b0fa9"
+  },
+  {
+    "ID": 111,
+    "TagName": "WestClinics_SUCLPhyTherp",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "afbcf9f5-038a-4bd1-9c6e-600a88e8f199"
+  },
+  {
+    "ID": 112,
+    "TagName": "WestHospitals_DLHCardioPulmonary",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "8a659f39-147e-4f83-9cda-fa01376b81ec"
+  },
+  {
+    "ID": 113,
+    "TagName": "WestHospitals_ADA",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "92bd76e0-efdb-46cf-8a5b-716d297cbf01"
+  },
+  {
+    "ID": 114,
+    "TagName": "DuluthClinics_DCUrgentCare",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "f4a4feca-eba4-4702-a093-6a3c80a7ac74"
+  },
+  {
+    "ID": 115,
+    "TagName": "WestClinics_SUCLElder",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "315d44d7-b025-40e2-9f5f-bff3659c0703"
+  },
+  {
+    "ID": 116,
+    "TagName": "WestHospitals_DLHEndo",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "f069cbf6-1599-48f8-ab66-9dca43617be5"
+  },
+  {
+    "ID": 117,
+    "TagName": "WestHospitals_DLHSurgery",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "93727e26-16bb-45f4-bbbc-3b72a5f4dea7"
+  },
+  {
+    "ID": 118,
+    "TagName": "Workflow_CentralHospitals",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "17579871-93df-429f-85ea-8c5efa9182d3"
+  },
+  {
+    "ID": 119,
+    "TagName": "CentralHospitals_SJMCCancerClinic",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "f5ab18d6-d4cf-4eee-83a5-cb7b0eb30523"
+  },
+  {
+    "ID": 120,
+    "TagName": "CentralHospitals_SJMCMedSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "a86893c0-3e0d-48d9-8348-4f320f5f990c"
+  },
+  {
+    "ID": 121,
+    "TagName": "Workflow_CentralClinics",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "f552cf9f-d1c5-47f7-a5f3-419c3660e6f9"
+  },
+  {
+    "ID": 122,
+    "TagName": "CentralClinics_LakesImaging",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "d9253a62-a912-4549-9f58-6eebe0292a4a"
+  },
+  {
+    "ID": 123,
+    "TagName": "CentralHospitals_SJMCMedical",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "33f2489e-181e-4c8f-9a7d-36c2e08db951"
+  },
+  {
+    "ID": 124,
+    "TagName": "CentralClinics_Baxter",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "f48f3532-f19c-4cc3-8399-ce8a9f26ad9c"
+  },
+  {
+    "ID": 125,
+    "TagName": "CentralHospitals_SJMCHolterEchoStress",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "804b8473-91a1-4b6a-b248-313637bae4d3"
+  },
+  {
+    "ID": 126,
+    "TagName": "CentralClinics_PineRiver",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "af0007c7-852c-4486-8676-add08af16391"
+  },
+  {
+    "ID": 127,
+    "TagName": "CentralHospitals_SJMCOBClinic",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "105ea50d-cddd-4f75-ac06-604c7509929a"
+  },
+  {
+    "ID": 128,
+    "TagName": "CentralClinics_Crosslake",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "78c1896b-ddd1-4881-9a09-bb1cbdc95cfd"
+  },
+  {
+    "ID": 129,
+    "TagName": "CentralClinics_BMC",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "ee99a4ca-510a-419c-948b-0b7563e9edb1"
+  },
+  {
+    "ID": 130,
+    "TagName": "CentralHospitals_SJMCRadEndoSched",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "2b993e32-2187-4183-9604-a5fe588b3160"
+  },
+  {
+    "ID": 131,
+    "TagName": "CentralClinics_Pierz",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "9233483e-760b-4f6c-a11c-678457cd9a36"
+  },
+  {
+    "ID": 132,
+    "TagName": "CentralHospitals_SJMCROI",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "fe2aee71-6899-42ab-9892-0d12f9fb6890"
+  },
+  {
+    "ID": 133,
+    "TagName": "CentralClinics_PequotLakes",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "4e90362b-6b27-478e-943e-6678ba75b54c"
+  },
+  {
+    "ID": 134,
+    "TagName": "CentralHospitals_SJMCInfTherp",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "65818b58-5ee3-4892-98aa-0dbc694ea5cf"
+  },
+  {
+    "ID": 135,
+    "TagName": "CentralClinics_NorthernOrtho",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "979ae23a-9ad7-4ba6-9e87-282c11b058c1"
+  },
+  {
+    "ID": 136,
+    "TagName": "CentralClinics_Hackensack",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "24b2be6e-25ba-4a81-ab9a-6220e5478a8a"
+  },
+  {
+    "ID": 137,
+    "TagName": "CentralClinics_Pillager",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "5266792f-eaa9-4e23-9b89-1567d0c32b84"
+  },
+  {
+    "ID": 138,
+    "TagName": "CentralHospitals_SJMCEndo",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "84a77f03-71d3-4763-9732-1a6325f01a51"
+  },
+  {
+    "ID": 139,
+    "TagName": "CentralHospitals_SJMCGrace",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "86e2210c-ce5b-4d40-8af4-c7e6bda673fb"
+  },
+  {
+    "ID": 140,
+    "TagName": "CentralHospitals_SJMCBirthplace",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "280c9223-2c6d-4ebc-abda-9123c9f7f81e"
+  },
+  {
+    "ID": 141,
+    "TagName": "CentralHospitals_SJMCICU",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "4b4fe2ec-837f-4e4d-863c-590c272b9b6f"
+  },
+  {
+    "ID": 142,
+    "TagName": "CentralHospitals_SJMCFocus",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "116bebbf-205f-453d-9aa7-a6204e4df477"
+  },
+  {
+    "ID": 143,
+    "TagName": "CentralClinics_Emily",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "84a42661-b481-4068-9586-f4425179dc36"
+  },
+  {
+    "ID": 144,
+    "TagName": "CentralHospitals_SJMCCardiology",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "5d10620e-8cf3-4ef1-8ae3-c94e17b5eee4"
+  },
+  {
+    "ID": 145,
+    "TagName": "CentralHospitals_SJMCLakelandPsych",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "57b0371a-a907-4cdf-9579-ebcabef8e81c"
+  },
+  {
+    "ID": 146,
+    "TagName": "WestClinics_Osgood",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "ec61e9f3-a360-47dd-b067-173a0adde8ee"
+  },
+  {
+    "ID": 147,
+    "TagName": "WestClinics_GVHomeHlth",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "e5c7e96e-1a87-4012-bb60-216e1d9c3131"
+  },
+  {
+    "ID": 148,
+    "TagName": "WestClinics_DLCFamPract",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "a502fdd1-81e3-4c15-93c3-35c2d1a97366"
+  },
+  {
+    "ID": 149,
+    "TagName": "DuluthClinics_DCNeuroSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "394659ee-d700-49b0-bc57-0cd27156f0fe"
+  },
+  {
+    "ID": 150,
+    "TagName": "DuluthClinics_West Annex",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "1212265a-ec30-4f5e-ba9b-0dc0cc94a658"
+  },
+  {
+    "ID": 151,
+    "TagName": "DuluthClinics_DMEquipment",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "55d52967-bbcc-449d-8287-b00f6ceb0363"
+  },
+  {
+    "ID": 152,
+    "TagName": "WestClinics_Frazee",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "33aadeb4-bf5b-464e-8b77-f7feffa7c88d"
+  },
+  {
+    "ID": 153,
+    "TagName": "WestClinics_Bagley",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "62ef6444-470d-4888-9526-16c6c40f9dfc"
+  },
+  {
+    "ID": 154,
+    "TagName": "WestClinics_Oklee",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "04e3b5d5-4e6b-4f28-b181-22589077d200"
+  },
+  {
+    "ID": 155,
+    "TagName": "WestClinics_Graceville",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "6b9d2334-c91f-4e28-9996-0f71ca5dde48"
+  },
+  {
+    "ID": 156,
+    "TagName": "WestClinics_Pelican Rapids",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "efd78353-0e45-471b-b734-0fced29deb9f"
+  },
+  {
+    "ID": 157,
+    "TagName": "WestHospitals_32AveROI",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "b4e1f27f-50f3-4346-bbfa-619c4fbdfdb2"
+  },
+  {
+    "ID": 158,
+    "TagName": "WestClinics_Menahga",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "882a6e9f-0ed7-4540-9e8e-5f67bf0a217f"
+  },
+  {
+    "ID": 159,
+    "TagName": "WestHospitals_Graceville",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "d99f7774-db5d-4956-a3f5-6fa405231de8"
+  },
+  {
+    "ID": 160,
+    "TagName": "WestClinics_Walker",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "ebc42e3f-140c-4f7d-ae7d-c8aca51567ec"
+  },
+  {
+    "ID": 161,
+    "TagName": "Workflow_EastHospitals",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "0bfce398-4619-4343-a9f1-05121ebab687"
+  },
+  {
+    "ID": 162,
+    "TagName": "EastHospitals_3NORTH",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "e6dd987b-2a0c-4d91-875f-f7cdca52a7e6"
+  },
+  {
+    "ID": 163,
+    "TagName": "EastHospitals_4EAST",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "6795aca2-96eb-4d79-8856-20062f992123"
+  },
+  {
+    "ID": 164,
+    "TagName": "EastHospitals_4NORTH",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "896ebeea-d5bc-443a-be84-ffb2593aea79"
+  },
+  {
+    "ID": 165,
+    "TagName": "EastHospitals_7WEST",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "e08261d2-645e-4a51-bd2e-e33f2d4e29bf"
+  },
+  {
+    "ID": 166,
+    "TagName": "EastHospitals_8WEST",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "d65226ed-6447-44e5-9308-fce1318a6f52"
+  },
+  {
+    "ID": 167,
+    "TagName": "EastHospitals_Amberwing",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "ba16546e-bc5b-4dfb-b248-7ebc02f32687"
+  },
+  {
+    "ID": 168,
+    "TagName": "EastHospitals_DCEndoscopy",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "631a51eb-95a9-42f4-adcc-a90c204d42ee"
+  },
+  {
+    "ID": 169,
+    "TagName": "EastHospitals_DCHeartVasc",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "295a9a0f-af0d-4563-958d-d5355600008f"
+  },
+  {
+    "ID": 170,
+    "TagName": "EastHospitals_MDBHlth",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "2c0d80d0-6535-4790-940a-fb13646f5165"
+  },
+  {
+    "ID": 171,
+    "TagName": "EastHospitals_MDWound",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "d90de7aa-26f6-44dc-8db1-906455d5b8a4"
+  },
+  {
+    "ID": 172,
+    "TagName": "EastHospitals_SMHSDaySurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "1535be3c-03a4-464f-ad0e-a1aac09046bc"
+  },
+  {
+    "ID": 173,
+    "TagName": "EastHospitals_SMHSLab",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "658d3e94-2a1d-425d-812e-1f836c6d8949"
+  },
+  {
+    "ID": 174,
+    "TagName": "EastHospitals_SMHSMedSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "d9b651b7-7979-4fc6-80c1-049a91cd1e08"
+  },
+  {
+    "ID": 175,
+    "TagName": "EastHospitals_Sandstone",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "9202b3a6-d9b7-4387-9d0c-39c6aa085ee6"
+  },
+  {
+    "ID": 176,
+    "TagName": "EastHospitals_SMHSRad",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "90d56881-e9f1-472f-96dd-85fe5bf191a1"
+  },
+  {
+    "ID": 177,
+    "TagName": "EastHospitals_SMMCCardRehab",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "450f7655-68da-47bc-bdfb-5f0b84eea594"
+  },
+  {
+    "ID": 178,
+    "TagName": "EastHospitals_VirDiaCarPul",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "575aebfb-a993-46fd-8d4f-4902a16df39a"
+  },
+  {
+    "ID": 179,
+    "TagName": "EastHospitals_MDIntPain",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "acd28d7d-0fb2-4c50-9149-b914b090f503"
+  },
+  {
+    "ID": 180,
+    "TagName": "EastHospitals_6EAST",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "66fa651f-ff6b-49aa-a78c-0c1803b5fda1"
+  },
+  {
+    "ID": 181,
+    "TagName": "EastHospitals_MDMedSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "aa77caed-fcff-4632-958a-5c9416a7d304"
+  },
+  {
+    "ID": 182,
+    "TagName": "EastHospitals_GRapidsItasca",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "de2a3370-ff79-4956-949a-de6aa1181c94"
+  },
+  {
+    "ID": 183,
+    "TagName": "EastHospitals_9WEST",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "d24a0d0b-c032-4636-b9ea-9228157accb5"
+  },
+  {
+    "ID": 184,
+    "TagName": "EastHospitals_5EAST",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "a5d585dc-53ba-4cd6-b177-9e6f0436778f"
+  },
+  {
+    "ID": 185,
+    "TagName": "EastHospitals_VirOB",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "c642a490-759a-43bb-a243-208f1c6e24e4"
+  },
+  {
+    "ID": 186,
+    "TagName": "EastHospitals_3EAST",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "66dc6111-26af-476a-9082-26f005774f98"
+  },
+  {
+    "ID": 187,
+    "TagName": "EastHospitals_MDChBHlth",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "d8b43167-965f-4336-a5d8-0d986618d667"
+  },
+  {
+    "ID": 188,
+    "TagName": "EastHospitals_8NSICU",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "e843f6ca-7a1e-40b2-afc4-0421f6581a91"
+  },
+  {
+    "ID": 189,
+    "TagName": "EastHospitals_SMHSER",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "b8d658f2-2bb6-474a-bde3-a1c05211f382"
+  },
+  {
+    "ID": 190,
+    "TagName": "EastHospitals_8EAST",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "e9f4a447-f315-4ad4-8030-c03782101f47"
+  },
+  {
+    "ID": 191,
+    "TagName": "EastHospitals_VirER",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "5de3e991-7995-4eac-8546-92f09c510c05"
+  },
+  {
+    "ID": 192,
+    "TagName": "EastHospitals_ER",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "450b4ada-1867-48b6-b109-324c220ef4b7"
+  },
+  {
+    "ID": 193,
+    "TagName": "EastHospitals_NorthPine",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "9109757d-e344-40a0-af05-d0655e192912"
+  },
+  {
+    "ID": 194,
+    "TagName": "EastHospitals_MDOutptSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "eef62a35-ed7d-4bc8-9b51-9757207c659b"
+  },
+  {
+    "ID": 195,
+    "TagName": "EastHospitals_Dispatch",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "4f33d0fa-9049-4ebb-8a52-34d7db582acd"
+  },
+  {
+    "ID": 196,
+    "TagName": "EastHospitals_VirMedSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "472ade8f-256d-4e51-b8a9-1b8fbdbf8c36"
+  },
+  {
+    "ID": 197,
+    "TagName": "EastHospitals_VirICU",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "9b353d2b-b411-4f09-bf04-b7daff55840e"
+  },
+  {
+    "ID": 198,
+    "TagName": "EastHospitals_SMMCPathology",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "f9b3af75-d9c5-429d-bcfc-c359567c0e65"
+  },
+  {
+    "ID": 199,
+    "TagName": "EastHospitals_MDBurn",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "29c9d6b7-9bdd-4d4f-8f82-982707f86e02"
+  },
+  {
+    "ID": 200,
+    "TagName": "EastHospitals_6WEST",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "786fa6d5-a439-40ff-9dc6-468cac1445b9"
+  },
+  {
+    "ID": 201,
+    "TagName": "EastHospitals_Trauma",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "abbeecc7-b19d-42e9-83cf-84bd8a16f569"
+  },
+  {
+    "ID": 202,
+    "TagName": "EastHospitals_330Hospice",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "98894891-dac7-4301-a3ae-e1892c1d80d6"
+  },
+  {
+    "ID": 203,
+    "TagName": "EastHospitals_7MICU",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "3b2c5bbd-cbd0-4766-be66-713f9db2614c"
+  },
+  {
+    "ID": 204,
+    "TagName": "EastHospitals_330AdultPartHsp",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "4a13394a-31f0-4762-b26f-7858f1409d22"
+  },
+  {
+    "ID": 205,
+    "TagName": "EastHospitals_MDRehab",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "670b9243-2f8e-471a-b108-3d2a799da357"
+  },
+  {
+    "ID": 206,
+    "TagName": "WestClinics_Lake Park",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "99bd4ca8-1745-486d-bb9c-e32f648aeac7"
+  },
+  {
+    "ID": 207,
+    "TagName": "EastHospitals_7SICU",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "03e0030b-ac40-46da-8df4-9386965bb384"
+  },
+  {
+    "ID": 208,
+    "TagName": "EastHospitals_7CICU",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "911a0701-d850-40db-805b-0091d92b8bc8"
+  },
+  {
+    "ID": 209,
+    "TagName": "WestClinics_Fosston",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "19416003-fd1d-49cd-9155-427f80a88f27"
+  },
+  {
+    "ID": 210,
+    "TagName": "EastHospitals_5NICU",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "5ff5a22a-3e87-4fb7-88b0-0c626764f642"
+  },
+  {
+    "ID": 211,
+    "TagName": "EastHospitals_VirInptRehab",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "9c7543fa-bf92-4622-8723-3958e74ad6a1"
+  },
+  {
+    "ID": 212,
+    "TagName": "WestHospitals_Fosston",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "32a701fb-9a30-4812-bbd3-5d5ecf66542c"
+  },
+  {
+    "ID": 213,
+    "TagName": "EastHospitals_SMHSSurg",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "b67ae49d-a5cf-448d-9c90-6470ad94bfa0"
+  },
+  {
+    "ID": 214,
+    "TagName": "DuluthClinics_Ashland",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "bd0d5344-a2dd-483c-9e02-2a2ef18e6092"
+  },
+  {
+    "ID": 215,
+    "TagName": "DuluthClinics_GRapids",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "5de91924-7d22-4bd4-895c-27807763fa46"
+  },
+  {
+    "ID": 216,
+    "TagName": "DuluthClinics_Virginia",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "04d07e02-c860-4025-8522-89c55e224e7f"
+  },
+  {
+    "ID": 217,
+    "TagName": "DuluthClinics_DeerRiver",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "62f62bf5-1d2e-4469-8d07-db034dbb0a8e"
+  },
+  {
+    "ID": 218,
+    "TagName": "DuluthClinics_Ely",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "ccddf47d-fd55-49f6-ba24-f92e23bc5528"
+  },
+  {
+    "ID": 219,
+    "TagName": "DuluthClinics_Hibbing",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "501c549a-c20e-494e-b378-6d393156f281"
+  },
+  {
+    "ID": 220,
+    "TagName": "DuluthClinics_Spooner",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "6cab7af3-f6f7-43fd-a7a3-f4bb290f117b"
+  },
+  {
+    "ID": 221,
+    "TagName": "DuluthClinics_IFalls",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "eea971f8-bec7-44bc-a54b-a7ad790af141"
+  },
+  {
+    "ID": 222,
+    "TagName": "DuluthClinics_NorthPine",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "66fa813f-fd58-4c22-95bb-b9f0a5e575f1"
+  },
+  {
+    "ID": 223,
+    "TagName": "DuluthClinics_Remer",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "dbbbcca9-fa64-40cc-a5b1-db6ce09305d7"
+  },
+  {
+    "ID": 224,
+    "TagName": "WestClinics_Casselton",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "251a865a-4f7c-4175-a510-5f0424663dd2"
+  },
+  {
+    "ID": 225,
+    "TagName": "WestClinics_Moorhead",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "da480479-c4f1-4a8b-a9e4-dc327dde9bd4"
+  },
+  {
+    "ID": 226,
+    "TagName": "WestClinics_West Acres",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "4ca6d32c-c2e7-441e-8daf-75d3961f3bd8"
+  },
+  {
+    "ID": 227,
+    "TagName": "DuluthClinics_Hayward",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "16ba3d53-047a-4d31-9105-2bc203276e1d"
+  },
+  {
+    "ID": 228,
+    "TagName": "EastHospitals_VirAdmin",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "c00b07ba-d5c7-4b23-910e-0fea417838ad"
+  },
+  {
+    "ID": 229,
+    "TagName": "DuluthClinics_Babbitt",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "2308578a-2ad8-4265-bff8-a22504177f93"
+  },
+  {
+    "ID": 230,
+    "TagName": "WestClinics_DL 7 Day",
+    "TagDescription": "Dynamically added by the Manage tags task.",
+    "GUID": "65487de2-9bc3-46b4-a4f9-5d6d406b3dd5"
+  },
+  {
+    "ID": 231,
+    "TagName": "TreversTag",
+    "TagDescription": "UpdatedTagFromEssentia",
+    "GUID": "d20baef3-3047-4d36-93b4-a064a8e6bb94"
+  }
+]

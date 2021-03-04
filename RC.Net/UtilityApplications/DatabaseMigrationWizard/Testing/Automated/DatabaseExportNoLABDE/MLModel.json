@@ -1,0 +1,27 @@
+[
+  {
+    "ID": 1,
+    "Name": "Essentia::Classification",
+    "GUID": "56437325-32ee-474b-8aaf-06a078c13e11"
+  },
+  {
+    "ID": 2,
+    "Name": "Essentia::Dates",
+    "GUID": "4bdaea4f-a371-48ef-ac42-7708edaf522f"
+  },
+  {
+    "ID": 3,
+    "Name": "Essentia::Deleter",
+    "GUID": "16e63259-9ca5-482b-91c9-a88b0d31375a"
+  },
+  {
+    "ID": 4,
+    "Name": "Essentia::DocDesc",
+    "GUID": "c6e6214e-a2b0-46cf-a2de-493c4911bb9f"
+  },
+  {
+    "ID": 5,
+    "Name": "Essentia::Pagination",
+    "GUID": "ec73e083-d2d4-4d75-80bb-042626853d8e"
+  }
+]

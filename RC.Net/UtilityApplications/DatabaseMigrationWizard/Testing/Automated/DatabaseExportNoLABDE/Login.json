@@ -1,0 +1,26 @@
+[
+  {
+    "ID": 1,
+    "UserName": "admin",
+    "Password": "23bcf076d6110ea2f14ec74704b50f7a",
+    "GUID": "ea86fb06-48af-404e-a14e-bd96b3116843"
+  },
+  {
+    "ID": 3,
+    "UserName": "Trever_Gannon",
+    "Password": "4a51ee95dfe64c6f75c61914e1e11b12597541c81cc94316",
+    "GUID": "e6fd5283-f039-4ceb-a328-843667521889"
+  },
+  {
+    "ID": 4,
+    "UserName": "bob",
+    "Password": "",
+    "GUID": "0dd9ba4b-b428-4f78-8d3d-007f0f31d337"
+  },
+  {
+    "ID": 5,
+    "UserName": "McBoberson",
+    "Password": "",
+    "GUID": "97268706-1d64-49e4-9460-1b28e92999cd"
+  }
+]

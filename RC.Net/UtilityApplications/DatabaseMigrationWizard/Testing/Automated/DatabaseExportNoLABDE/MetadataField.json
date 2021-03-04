@@ -1,0 +1,82 @@
+[
+  {
+    "ID": 1,
+    "Name": "Clinic",
+    "GUID": "c92044e9-909e-4117-99db-a57250fc3d99"
+  },
+  {
+    "ID": 2,
+    "Name": "Printer",
+    "GUID": "117eeb39-9dea-4691-bfd7-983b55dda8b8"
+  },
+  {
+    "ID": 3,
+    "Name": "Folder",
+    "GUID": "ba0a57b6-1a1f-4b87-a74d-b8d2ea692ca4"
+  },
+  {
+    "ID": 4,
+    "Name": "PatientLastName",
+    "GUID": "2ddb1f21-a6a6-4ef1-ab05-809fc79f5d16"
+  },
+  {
+    "ID": 5,
+    "Name": "PatientFirstName",
+    "GUID": "174cfb3b-ad7e-44c9-9322-0b8a921d5835"
+  },
+  {
+    "ID": 6,
+    "Name": "PatientDOB",
+    "GUID": "2e0d85a1-dae3-4ac5-885d-459fca0c8112"
+  },
+  {
+    "ID": 7,
+    "Name": "DocumentType",
+    "GUID": "11df1dd7-edd7-4570-a28b-03432824a369"
+  },
+  {
+    "ID": 8,
+    "Name": "DocumentDate",
+    "GUID": "ec62f1fc-88bb-46e5-b1fb-fadeda807118"
+  },
+  {
+    "ID": 9,
+    "Name": "NewCSN",
+    "GUID": "72ecbe9e-c4a0-44ba-9839-88f452a6cfed"
+  },
+  {
+    "ID": 10,
+    "Name": "NewOrderNumber",
+    "GUID": "fe521374-c405-42ca-be6a-651f59ddc4f1"
+  },
+  {
+    "ID": 11,
+    "Name": "DocDateAndType",
+    "GUID": "1a3e1717-07f1-4b46-9bd5-4534ae30c647"
+  },
+  {
+    "ID": 12,
+    "Name": "CollectionDate",
+    "GUID": "a14343a9-0a26-4f82-8d97-1a2279618ab1"
+  },
+  {
+    "ID": 13,
+    "Name": "ParentDocSDN",
+    "GUID": "ec14a127-06e6-4b28-b133-1622471aac05"
+  },
+  {
+    "ID": 14,
+    "Name": "PatientMRN",
+    "GUID": "c9516169-a2cb-434f-8840-4f004ae03a07"
+  },
+  {
+    "ID": 15,
+    "Name": "FileID",
+    "GUID": "3b8477aa-4161-40f8-9444-999e3dd026a5"
+  },
+  {
+    "ID": 16,
+    "Name": "UniqueDocString",
+    "GUID": "7fd1c5b3-6925-4fa9-8f0b-2e861d71fd37"
+  }
+]

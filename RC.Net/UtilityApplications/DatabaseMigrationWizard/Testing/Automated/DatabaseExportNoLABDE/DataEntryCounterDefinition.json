@@ -1,0 +1,10 @@
+[
+  {
+    "ID": 1,
+    "Name": "Test",
+    "AttributeQuery": "<test></test>",
+    "RecordOnLoad": true,
+    "RecordOnSave": true,
+    "GUID": "bb3d7182-0d49-4d58-a814-63b94da8b356"
+  }
+]

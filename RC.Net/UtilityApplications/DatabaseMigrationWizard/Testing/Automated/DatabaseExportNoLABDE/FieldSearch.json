@@ -1,0 +1,30 @@
+[
+  {
+    "ID": 1,
+    "Enabled": true,
+    "FieldName": "Document Type",
+    "AttributeQuery": "/DocumentType",
+    "GUID": "2b69c268-199a-4bb0-ae3c-9e642364b081"
+  },
+  {
+    "ID": 2,
+    "Enabled": true,
+    "FieldName": "Patient Last Name",
+    "AttributeQuery": "/PatientInfo/Name/Last",
+    "GUID": "7d54d814-750f-40ce-a48d-9633fd5b2b82"
+  },
+  {
+    "ID": 3,
+    "Enabled": true,
+    "FieldName": "Patient MRN",
+    "AttributeQuery": "/PatientInfo/MR_Number",
+    "GUID": "638f6742-871f-4cf8-8ec4-b5a33ed7dc88"
+  },
+  {
+    "ID": 4,
+    "Enabled": true,
+    "FieldName": "Batch/File Name Search",
+    "AttributeQuery": "/Filename",
+    "GUID": "c2e07d0a-7cd4-4662-860a-c516ee13cf6d"
+  }
+]
