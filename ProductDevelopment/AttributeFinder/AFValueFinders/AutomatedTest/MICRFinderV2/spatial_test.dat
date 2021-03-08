@@ -9,5 +9,10 @@
 <TESTFOLDER>;test2-micr_plus_no_subattributes.rsd;.\Images;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test2-$FileOf(<SourceDocName>).evoa 
 <TESTFOLDER>;test3-micr_plus_with_subattributes.rsd;.\Images;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test3-$FileOf(<SourceDocName>).evoa
 <TESTFOLDER>;test4-micr_plus_with_unrecognized.rsd;.\Images;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test3-$FileOf(<SourceDocName>).evoa
-// Running on all pages after exluding all pages should give same results as test 1
+
+// Running on all pages after excluding all pages should give same results as test 1
 <TESTFOLDER>;test5-run_on_all_pages.rsd;.\ImagesWithUSS;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test1-$FileOf(<SourceDocName>).evoa
+
+// NOTE: These results are full of false-positives so failures might be a good thing
+// TODO: Add use of a classifier to eliminate the false positives and adjust the EVOAs
+<TESTFOLDER>;test6-gdpicture_micr_finder.rsd;.\ImagesWithUSS;;$DirOf(<SourceDocName>)\..\ExpectedVOAs\test6-$FileOf(<SourceDocName>).evoa

@@ -1,4 +1,5 @@
-﻿using Extract.Interop;
+﻿using Extract.GdPicture;
+using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Parsers;
@@ -669,7 +670,7 @@ namespace Extract.AttributeFinder.Rules
             return EngineType switch
             {
                 Dto.MicrEngineType.Kofax => RecognizeKofax(doc, pages),
-                Dto.MicrEngineType.GdPicture => throw new ExtractException("ELI51589", "Unsupported engine type!"),
+                Dto.MicrEngineType.GdPicture => RecognizeGdPicture(doc.Text.SourceDocName, pages),
                 _ => throw new ExtractException("ELI51470", "Unknown engine type!")
             };
         }
@@ -688,6 +689,22 @@ namespace Extract.AttributeFinder.Rules
                 var pagesToSearch = string.Join(",", pages);
                 return _ocrEngine.Value.RecognizeTextInImage2(doc.Text.SourceDocName, pagesToSearch, true, null, ocrParams);
             }
+        }
+
+        // Search on supplied pages or on all pages if pages is null
+        static SpatialString RecognizeGdPicture(string sourceDocName, IEnumerable<int> pages)
+        {
+            var pagesToSearch = pages?.ToList();
+
+            using var tmpFile = new TemporaryFile(".uss", false);
+            var ussFile = tmpFile.FileName;
+            using var ocrEngine = new GdPictureMicr();
+            ocrEngine.CreateUssFileFromSpecifiedPages(sourceDocName, ussFile, pagesToSearch);
+
+            var spatialString = new SpatialStringClass();
+            spatialString.LoadFrom(ussFile, false);
+            spatialString.ReportMemoryUsage();
+            return spatialString;
         }
 
         IOCRParameters GetOCRParams(AFDocument pDocument)

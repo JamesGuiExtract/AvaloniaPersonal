@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x86</PlatformTarget>
+    <OutDir>..\..\..\..\Binaries\$(Configuration)\</OutDir>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RootNamespace>Extract.GdPicture</RootNamespace>
+    <Copyright>Copyright © Extract Systems, LLC 2022</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="GdPicture" Version="14.1.0.181" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\GoogleCloud\Dto\Code\Extract.GoogleCloud.Dto.fsproj" />
+    <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\APIs\GdPicture.Net.14\Redist\OCR\eng.traineddata">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>tessdata\eng.traineddata</Link>
+    </Content>
+  </ItemGroup>
+
+</Project>

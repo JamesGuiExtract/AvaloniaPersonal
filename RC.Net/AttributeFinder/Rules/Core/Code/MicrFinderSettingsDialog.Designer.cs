@@ -475,7 +475,6 @@
             this.groupBox3.TabIndex = 0;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Engine";
-            this.groupBox3.Enabled = false;
             // 
             // _engineGdPictureRadioButton
             // 

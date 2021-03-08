@@ -1,0 +1,137 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": true,
+    "InsertParentName": "Page",
+    "InsertParentValue": "<PageNumber>",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": null,
+      "Description": "",
+      "Enabled": true,
+      "Object": null
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "micr": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "MICR finder (v2)",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "MicrFinderV2",
+              "Object": {
+                "FilterCharsWhenSplitting": true,
+                "FilterRegex": "file://<ComponentDataDir>\\Redaction\\Common\\Checks\\MICRFinderFilter.dat.etf",
+                "HighConfidenceThreshold": 80,
+                "InheritOCRParameters": false,
+                "LowConfidenceThreshold": 50,
+                "MicrSplitterRegex": "file://<ComponentDataDir>\\Redaction\\Common\\Checks\\MICRFinderSplitter.dat.etf",
+                "ReturnUnrecognizedCharacters": false,
+                "SplitAccountNumber": false,
+                "SplitAmount": false,
+                "SplitCheckNumber": false,
+                "SplitRoutingNumber": false,
+                "UseLowConfidenceThreshold": true,
+                "SearchAllPages": true,
+                "EngineType": "GdPicture"
+              }
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "OutputHandlerSequence",
+      "Description": "<Select multiple output handlers>",
+      "Enabled": true,
+      "Object": {
+        "ObjectsVector": [
+          {
+            "Type": "MoveAndModifyAttributes",
+            "Description": "<Move and modify attributes>",
+            "Enabled": true,
+            "Object": {
+              "AddAttributeNameToType": false,
+              "AddRootOrParentAttributeType": false,
+              "AddSpecifiedAttributeType": false,
+              "AttributeQuery": "*/*",
+              "DeleteRootOrParentIfAllChildrenMoved": true,
+              "MoveAttributeLevel": "MoveToRoot",
+              "OverwriteAttributeName": "DoNotOverwrite",
+              "RetainAttributeType": true,
+              "SpecifiedAttributeName": "",
+              "SpecifiedAttributeType": ""
+            }
+          },
+          {
+            "Type": "RemoveSubAttributes",
+            "Description": "Remove Page<Remove attributes>",
+            "Enabled": true,
+            "Object": {
+              "AttributeSelector": {
+                "Type": "QueryBasedAS",
+                "Object": {
+                  "QueryText": "Page"
+                }
+              },
+              "ConditionalRemove": false,
+              "DataScorer": {
+                "Type": null,
+                "Description": "",
+                "Enabled": true,
+                "Object": null
+              },
+              "ScoreCondition": "EQ",
+              "CompareConditionType": "ValueOf",
+              "ScoreToCompare": 0
+            }
+          }
+        ]
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

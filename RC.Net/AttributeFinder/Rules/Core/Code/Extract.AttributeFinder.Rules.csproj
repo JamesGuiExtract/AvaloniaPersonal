@@ -194,6 +194,7 @@
     <ProjectReference Include="..\..\..\..\DataEntry\LabDE\Core\Code\Extract.DataEntry.LabDE.csproj" />
     <ProjectReference Include="..\..\..\..\DataEntry\Utilities\DataEntryApplication\Core\Code\DataEntryApplication.csproj" />
     <ProjectReference Include="..\..\..\..\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj" />
+    <ProjectReference Include="..\..\..\..\GdPicture\Core\Code\Extract.GdPicture.csproj" />
     <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj" />
     <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj" />
     <ProjectReference Include="..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj" />
