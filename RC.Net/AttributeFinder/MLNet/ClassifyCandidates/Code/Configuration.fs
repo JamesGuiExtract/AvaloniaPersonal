@@ -66,6 +66,7 @@ type ModelConfig = {
   converter: IMLConverter
   buildTrainingPipeline: Expr<unit -> IEstimator<ITransformer>>
   evaluateTestResults: (Logger -> MLContext -> IDataView -> unit) option
+  evaluateCrossValidationResults: (Logger -> MLContext -> string -> unit) option
 }
 
 type Config = {

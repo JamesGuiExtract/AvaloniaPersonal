@@ -292,12 +292,12 @@ module LearnOrTest =
   )
   (****************************************************************************************************)
 
-  type Mode = | LearnMode | TestMode
+  type Mode = | LearnMode | ValidationMode | TestMode
   type ExceptionType = | ExceptionObject of exn | ExceptionPrintout of string seq
 
   // Create and throw an exception
   let handleFailure (logger: Logger) mode (modelName: string) error = (
-    let msg = match mode with | LearnMode -> "Failed to learn!" | TestMode -> "Failed to complete test!"
+    let msg = match mode with | LearnMode -> "Failed to learn!" | ValidationMode -> "Failed to cross validate!" | TestMode -> "Failed to complete test!"
     let uex =
       match error with
       | ExceptionPrintout errors ->
@@ -360,10 +360,36 @@ module LearnOrTest =
     )
     (******************************************************************************************************)
 
+    let crossValidate (modelDefPath: string) trainingDataView (modelConfig: ModelConfig) = (
+      match modelConfig.evaluateCrossValidationResults with
+      | None -> ()
+      | Some evaluateCVResults ->
+        let cvDir = Path.Combine (modelConfig.modelFolder, modelConfig.modelName + "_Validation")
+        try
+          Directory.CreateDirectory cvDir |> ignore
+          let logPath = Path.Combine (sessionLogDir, sprintf "%s-Validation.txt" modelConfig.modelName)
+          let args =
+            sprintf """validate --model-definition-path "%s" --training-data-path "%s" --classifier-type Binary --folds 5 --output-data-folder "%s" """
+                    modelDefPath trainingDataView cvDir
+          let exitCode, _output, error = runProcLogToFile mlNetQueueExe args None logPath config.trainingPriorityClass
+          if exitCode <> 0 then handleFailure ValidationMode modelConfig.modelName (ExceptionPrintout error)
+
+          let logger = Logger(logPath)
+          evaluateCVResults logger (MLContext()) cvDir
+        finally
+          try
+            Directory.Delete (cvDir, true)
+          with e ->
+            ExtractException.Log ("ELI51591", e)
+    )
+
     let learn trainingDataView (modelConfig: ModelConfig) = (
       Directory.CreateDirectory modelConfig.modelFolder |> ignore
       let modelDefPath = sprintf """%s\MLModelDefinition_%s.bin""" modelConfig.modelFolder modelConfig.modelName
       modelConfig.buildTrainingPipeline |> FsPickler.toBinFile modelDefPath
+
+      // Cross validate if there is a supplied evaluation function
+      crossValidate modelDefPath trainingDataView modelConfig
 
       let modelPath = sprintf """%s\.temp.MLModel_%s.zip""" modelConfig.modelFolder modelConfig.modelName
       let logPath = Path.Combine (sessionLogDir, sprintf "%s-Learn.txt" modelConfig.modelName)

@@ -24,7 +24,7 @@ type CrossValidateArgs =
   | [<Mandatory>] Training_Data_Path of dataPath:string
   | [<Mandatory>] Folds of numberOfFolds:int
   | Repetitions of numberOfRepetitions:int
-  | [<Mandatory>] Output_Data_Folder of outputDataPath:string
+  | [<Mandatory>] Output_Data_Folder of outputDataFolder:string
 with
   interface IArgParserTemplate with
     member s.Usage =
