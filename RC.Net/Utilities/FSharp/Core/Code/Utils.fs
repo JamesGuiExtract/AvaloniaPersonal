@@ -246,23 +246,25 @@ module Object =
     |> JsonConvert.DeserializeObject<'a>
 (******************************************************************************************************)
 
+// Break a sequence into batches of the specified size
+// http://www.fssnip.net/1o/title/Break-sequence-into-nelement-subsequences
 module Seq =
   let groupsOfAtMost (size: int) (s: seq<'v>) : seq<list<'v>> =
     seq {
       let en = s.GetEnumerator ()
       let more = ref true
       while !more do
-      let group =
-        [
-          let i = ref 0
-          while !i < size && en.MoveNext () do
-            yield en.Current
-            i := !i + 1
-        ]
-      if List.isEmpty group then
-        more := false
-      else
-        yield group
+        let group =
+          [
+            let i = ref 0
+            while !i < size && en.MoveNext () do
+              yield en.Current
+              i := !i + 1
+          ]
+        if List.isEmpty group then
+          more := false
+        else
+          yield group
     }
 (******************************************************************************************************)
 

@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
     <Tailcalls>true</Tailcalls> <!--Do tail call elimination even in debug config-->
+    <Optimize>false</Optimize> <!-- Optimizing caused odd errors when this assembly is referenced from an F# Preprocessor script-->
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
