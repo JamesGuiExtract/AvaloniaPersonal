@@ -1930,8 +1930,22 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	// Determine requirement for rotation and/or deskew
 	int slope = 0;
 	IMG_ROTATE imgRotate = ROT_NO;
-	THROW_UE_ON_ERROR("ELI12719", "Unable to detect image skew in the OCR engine!",
+	if (kRecDetectImgSkew(0, m_hPage, &slope, &imgRotate) == IMG_BITSPERPIXEL_ERR)
+	{
+		// Trigger II_BW to be generated
+		// https://extract.atlassian.net/browse/ISSUE-17438
+		IMG_INFO info;
+		THROW_UE_ON_ERROR("ELI51593", "Unable to create bitonal image!",
+			kRecGetImgInfo(0, m_hPage, II_BW, &info));
+
+		// Retry skew detection
+		THROW_UE_ON_ERROR("ELI12719", "Unable to detect image skew in the OCR engine!",
 			kRecDetectImgSkew(0, m_hPage, &slope, &imgRotate));
+
+		// I am not sure if the bitonal image will be recreated after doing despeckling
+		// so just in case drop the version of II_BW that was created for deskewing
+		kRecDropImg(m_hPage, II_BW);
+	}
 
 	// Get the orientation to use based on nRotationInDegrees.
 	EOrientation orientation = getOrientation(nRotationInDegrees, imgRotate);
