@@ -95,6 +95,12 @@ namespace Extract.FileActionManager.Conditions
         Dictionary<int, string> _cachedWorkflowNames;
 
         /// <summary>
+        /// To avoid expensive settings validation check, don't repeat validation if it has already
+        /// been done.
+        /// </summary>
+        bool _settingsValidated;
+
+        /// <summary>
         /// <see langword="true"/> if changes have been made to
         /// <see cref="WorkflowCondition"/> since it was created;
         /// <see langword="false"/> if no changes have been made since it was created.
@@ -164,6 +170,7 @@ namespace Extract.FileActionManager.Conditions
                     {
                         _inclusive = value;
                         _dirty = true;
+                        _settingsValidated = false;
                     }
                 }
                 catch (Exception ex)
@@ -194,6 +201,7 @@ namespace Extract.FileActionManager.Conditions
 
                     _selectedWorkflows = (IVariantVector)value.Clone();
                     _dirty = true;
+                    _settingsValidated = false;
                 }
                 catch (Exception ex)
                 {
@@ -221,18 +229,25 @@ namespace Extract.FileActionManager.Conditions
         {
             try
             {
-                var fileProcessingDb = new FileProcessingDB();
-                fileProcessingDb.ConnectLastUsedDBThisProcess();
-
-                if (!fileProcessingDb.UsingWorkflows)
+                // fileProcessingDb.ConnectLastUsedDBThisProcess() is fairly expensive-- db schema checks etc.
+                // Avoid running this for every file while processing; only re-validate if setting have changed.
+                if (!_settingsValidated)
                 {
-                    throw new ExtractException("ELI43475", "The workflow condition requires workflows in the database.");
-                }
+                    var fileProcessingDb = new FileProcessingDB();
+                    fileProcessingDb.ConnectLastUsedDBThisProcess();
 
-                if (SelectedWorkflows.Size == 0)
-                {
-                    throw new ExtractException("ELI43457", _COMPONENT_DESCRIPTION + 
-                        " must have at least one workflow specified.");
+                    if (!fileProcessingDb.UsingWorkflows)
+                    {
+                        throw new ExtractException("ELI43475", "The workflow condition requires workflows in the database.");
+                    }
+
+                    if (SelectedWorkflows.Size == 0)
+                    {
+                        throw new ExtractException("ELI43457", _COMPONENT_DESCRIPTION +
+                            " must have at least one workflow specified.");
+                    }
+
+                    _settingsValidated = true;
                 }
             }
             catch (Exception ex)
@@ -506,6 +521,7 @@ namespace Extract.FileActionManager.Conditions
 
                 // Freshly loaded object is no longer dirty
                 _dirty = false;
+                _settingsValidated = false;
             }
             catch (Exception ex)
             {
@@ -621,6 +637,7 @@ namespace Extract.FileActionManager.Conditions
             SelectedWorkflows = (IVariantVector)source.SelectedWorkflows;
 
             _dirty = true;
+            _settingsValidated = false;
         }
 
         /// <summary>

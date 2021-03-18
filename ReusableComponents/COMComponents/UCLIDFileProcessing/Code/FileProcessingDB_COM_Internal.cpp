@@ -3975,13 +3975,7 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 					// status.
 					if (*pStatus == kActionProcessing && asCppBool(vbAttemptRevertIfLocked))
 					{
-						// Begin a transaction
-						TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
 						revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-						// Commit the changes to the database
-						tg.CommitTrans();
 
 						// Re-query to see if the status changed as a result of being auto-reverted.
 						ipFileSet->Requery(adOptionUnspecified);
@@ -4479,12 +4473,7 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 
 				if (asCppBool(vbRevertTimedOutFAMs))
 				{
-					// Begin a transaction
-					TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
 					revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-					tg.CommitTrans();
 				}
 				
 				// Begin a transaction
@@ -4867,6 +4856,8 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 
 				// Commit transaction
 				tg.CommitTrans();
+
+				m_ipDBInfoSettings = __nullptr;
 
 			END_CONNECTION_RETRY(ipConnection, "ELI27328");
 		}
@@ -8407,10 +8398,11 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 		{
 			ASSERT_ARGUMENT("ELI31895", ppSettings != __nullptr);
 
-			IStrToStrMapPtr ipSettings(CLSID_StrToStrMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI31896", ipSettings != __nullptr);
+			// Create new cached settings instance.
+			m_ipDBInfoSettings.CreateInstance(CLSID_StrToStrMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI31896", m_ipDBInfoSettings != __nullptr);
 
-			ipSettings->CaseSensitive = VARIANT_FALSE;
+			m_ipDBInfoSettings->CaseSensitive = VARIANT_FALSE;
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -8423,28 +8415,9 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
 
-			// Create a pointer to a recordset
-			_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI31897", ipDBInfoSet != __nullptr);
+			loadDBInfoSettings(ipConnection);
 
-			// Open the record set using the Setting Query		
-			ipDBInfoSet->Open(gstrDBINFO_GET_SETTINGS_QUERY.c_str(),
-				_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
-				adLockReadOnly, adCmdText);
-
-			while (ipDBInfoSet->adoEOF == VARIANT_FALSE)
-			{
-				FieldsPtr ipFields = ipDBInfoSet->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI31898", ipFields != __nullptr);
-
-				string strKey = getStringField(ipFields, "Name");
-				string strValue = getStringField(ipFields, "Value");
-				ipSettings->Set(strKey.c_str(), strValue.c_str());
-
-				ipDBInfoSet->MoveNext();
-			}
-
-			*ppSettings = ipSettings.Detach();
+			*ppSettings = m_ipDBInfoSettings;
 
 			END_CONNECTION_RETRY(ipConnection, "ELI31899");
 		}
@@ -8452,6 +8425,8 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 	}
 	catch (UCLIDException& ue)
 	{
+		m_ipDBInfoSettings = __nullptr;
+
 		if (!bDBLocked)
 		{
 			return false;
@@ -8508,6 +8483,8 @@ bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, vector<string
 				}
 
 				tg.CommitTrans();
+
+				m_ipDBInfoSettings = __nullptr;
 
 			END_CONNECTION_RETRY(ipConnection, "ELI31901");
 		}

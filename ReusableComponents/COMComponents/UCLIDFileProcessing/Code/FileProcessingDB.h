@@ -444,6 +444,10 @@ private:
 	// the same an ActiveFAM entry.
 	static CMutex ms_mutexPingDBLock;
 
+	// Used to coordinate revertTimedOutProcessingFAMs calls so that it is not over-executed within
+	// a given process.
+	static CMutex ms_mutexAutoRevertLock;
+
 	// Used to synchronize logging that should occur only once per process.
 	static CMutex ms_mutexSpecialLoggingLock;
 
@@ -626,6 +630,9 @@ private:
 
 	// The tick count from the last time the ping time was updated.
 	volatile DWORD m_dwLastPingTime;
+	
+	// Time since last revertTimedOutProcessingFAMs call was executed this process.
+	static DWORD ms_dwLastRevertTime;
 
 	// Indicates whether the DB schema is currently being validated or upgraded.
 	volatile bool m_bValidatingOrUpdatingSchema;
@@ -684,8 +691,11 @@ private:
 	// Used in initOutputFileMetadataFieldValue()
 	UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr m_ipFAMTagManager;
 
-	// Wether current session is a web session. If true, no maintenance threads will be started
+	// Whether current session is a web session. If true, no maintenance threads will be started
 	bool m_bCurrentSessionIsWebSession;
+
+	// After establishing connection, cache DBInfo settings to avoid unnecessary hits on the database.
+	IStrToStrMapPtr m_ipDBInfoSettings;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods

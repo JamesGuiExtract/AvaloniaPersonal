@@ -1430,6 +1430,7 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 
 				// Set the status of the connection to not connected
 				m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
+				m_ipDBInfoSettings = __nullptr;
 
 				// Create the connection string with the current server and database
 				strConnectionString = createConnectionString(m_strDatabaseServer, 
@@ -3715,264 +3716,188 @@ long CFileProcessingDB::addOrUpdateFAMUser(_ConnectionPtr ipConnection)
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 {
-	INIT_EXCEPTION_AND_TRACING("MLI00019");
-
 	try
 	{
-		// Initialize settings to default values
-		m_iDBSchemaVersion = 0;
-		m_iCommandTimeout = glDEFAULT_COMMAND_TIMEOUT;
-		m_bUpdateQueueEventTable = true;
-		m_bUpdateFASTTable = true;
-		m_iNumberOfRetries = m_bNumberOfRetriesOverridden ? m_iNumberOfRetries : giDEFAULT_RETRY_COUNT;
-		m_dRetryTimeout = m_bRetryTimeoutOverridden ? m_dRetryTimeout : gdDEFAULT_RETRY_TIMEOUT;
-		m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
-		m_bAllowRestartableProcessing = false;
-
-		// Only load the settings if the table exists
-		if (doesTableExist(ipConnection, "DBInfo"))
+		if (m_ipDBInfoSettings == __nullptr || m_iDBSchemaVersion == 0)
 		{
-			// Create a pointer to a recordset
-			_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI18171", ipDBInfoSet != __nullptr);
+			// Initialize settings to default values
+			m_ipDBInfoSettings = __nullptr;
+			m_iDBSchemaVersion = 0;
+			m_iCommandTimeout = glDEFAULT_COMMAND_TIMEOUT;
+			m_bUpdateQueueEventTable = true;
+			m_bUpdateFASTTable = true;
+			m_iNumberOfRetries = m_bNumberOfRetriesOverridden ? m_iNumberOfRetries : giDEFAULT_RETRY_COUNT;
+			m_dRetryTimeout = m_bRetryTimeoutOverridden ? m_dRetryTimeout : gdDEFAULT_RETRY_TIMEOUT;
+			m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
+			m_bAllowRestartableProcessing = false;
 
-			_lastCodePos = "10";
-
-			ipDBInfoSet->Open("DBInfo", _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
-				adLockReadOnly, adCmdTable);
-
-			_lastCodePos = "20";
-
-			// Loop through all of the records in the DBInfo table
-			while (!asCppBool(ipDBInfoSet->adoEOF))
+			// Only load the settings if the table exists
+			if (doesTableExist(ipConnection, "DBInfo"))
 			{
-				FieldsPtr ipFields = ipDBInfoSet->Fields;
-				ASSERT_RESOURCE_ALLOCATION("ELI18172", ipFields != __nullptr);
+				// Create a pointer to a recordset
+				_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
+				ASSERT_RESOURCE_ALLOCATION("ELI31897", ipDBInfoSet != __nullptr);
 
-				_lastCodePos = "30";
+				// Open the record set using the Setting Query		
+				ipDBInfoSet->Open(gstrDBINFO_GET_SETTINGS_QUERY.c_str(),
+					_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
+					adLockReadOnly, adCmdText);
 
-				// Check all of the fields
-				int nFields = ipFields->Count;
-				for (long l = 0; l < nFields; l++)
+				IStrToStrMapPtr ipDBInfoSettings(CLSID_StrToStrMap);
+				ASSERT_RESOURCE_ALLOCATION("ELI31896", ipDBInfoSettings != __nullptr);
+
+				while (ipDBInfoSet->adoEOF == VARIANT_FALSE)
 				{
-					// Setup the variant with the current loop count
-					variant_t vt = l;
+					FieldsPtr ipFields = ipDBInfoSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI31898", ipFields != __nullptr);
 
-					_lastCodePos = "40";
+					string strKey = getStringField(ipFields, "Name");
+					string strValue = getStringField(ipFields, "Value");
+					ipDBInfoSettings->Set(strKey.c_str(), strValue.c_str());
 
-					// Get field with that index
-					FieldPtr ipField = ipFields->Item[vt];
-
-					_lastCodePos = "50";
-
-					// If the "Name" field exist
-					if (ipField->Name == _bstr_t("Name"))
+					if (strKey == gstrFAMDB_SCHEMA_VERSION)
 					{
-						_lastCodePos = "60";
-
-						// Get the Setting name
-						string strValue = getStringField(ipFields, "Name");
-						if (strValue == gstrFAMDB_SCHEMA_VERSION)
-						{
-							_lastCodePos = "70";
-
-							// Get the schema version
-							m_iDBSchemaVersion = asLong(getStringField(ipFields, "Value"));
-						}
-						else if (strValue == gstrCOMMAND_TIMEOUT)
-						{
-							_lastCodePos = "80";
-
-							// Get the command timeout
-							m_iCommandTimeout = asLong(getStringField(ipFields, "Value"));
-						}
-						else if (strValue == gstrUPDATE_QUEUE_EVENT_TABLE)
-						{
-							_lastCodePos = "90";
-
-							// Get the Update Queue flag
-							m_bUpdateQueueEventTable = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrUPDATE_FAST_TABLE)
-						{
-							_lastCodePos = "100";
-
-							// get the Update FAST flag
-							m_bUpdateFASTTable = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrNUMBER_CONNECTION_RETRIES)
-						{
-							_lastCodePos = "150";
-
-							if (!m_bNumberOfRetriesOverridden)
-							{
-								// Get the Connection retry count
-								m_iNumberOfRetries = asLong(getStringField(ipFields, "Value"));
-							}
-						}
-						else if (strValue == gstrCONNECTION_RETRY_TIMEOUT)
-						{
-							_lastCodePos = "160";
-
-							if (!m_bRetryTimeoutOverridden)
-							{
-								// Get the connection retry timeout
-								m_dRetryTimeout = asDouble(getStringField(ipFields, "Value"));
-							}
-						}
-						else if (strValue == gstrAUTO_DELETE_FILE_ACTION_COMMENT)
-						{
-							_lastCodePos = "170";
-
-							m_bAutoDeleteFileActionComment = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrAUTO_REVERT_TIME_OUT_IN_MINUTES)
-						{
-							_lastCodePos = "190";
-
-							m_nAutoRevertTimeOutInMinutes = asLong(getStringField(ipFields, "Value"));
-
-// [LegacyRCAndUtils:6172]
-// Don't enforce gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES in debug mode; having a low value is useful in development.
-#ifndef _DEBUG
-							// if less that a minimum value this should be reset to the minimum value
-							if (m_nAutoRevertTimeOutInMinutes < gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES)
-							{
-								try
-								{
-									string strNewValue = asString(gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
-									// Log application trace exception 
-									UCLIDException ue("ELI29826", "Application trace: AutoRevertTimeOutInMinutes changed to " +
-										strNewValue + " minutes.");
-									ue.addDebugInfo("Old value", m_nAutoRevertTimeOutInMinutes);
-									ue.addDebugInfo("New value", gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
-									ue.log();
-
-									// Change the setting in the DBInfo table
-									executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
-										"' WHERE DBInfo.Name = '" + strValue + "'");
-								}
-								CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
-
-								m_nAutoRevertTimeOutInMinutes = gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES;
-							}
-#endif
-						}
-						else if (strValue == gstrAUTO_REVERT_NOTIFY_EMAIL_LIST)
-						{
-							_lastCodePos = "200";
-
-							m_strAutoRevertNotifyEmailList = getStringField(ipFields, "Value");
-						}
-						else if (strValue == gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS)
-						{
-							_lastCodePos = "210";
-
-							m_nActionStatisticsUpdateFreqInSeconds = asLong(getStringField(ipFields, "Value"));
-						}
-						else if (strValue == gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT)
-						{
-							_lastCodePos = "220";
-
-							m_dGetFilesToProcessTransactionTimeout =
-								asDouble(getStringField(ipFields, "Value"));
-
-							_lastCodePos = "230";
-
-							// Need to make sure the value is above the minimum
-							if (m_dGetFilesToProcessTransactionTimeout < gdMINIMUM_TRANSACTION_TIMEOUT)
-							{
-								try
-								{
-									string strNewValue = asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0);
-									// Log application trace exception 
-									UCLIDException ue("ELI31146", "Application trace: DBInfo setting changed.");
-									ue.addDebugInfo("Setting", gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT);
-									ue.addDebugInfo("Old value", m_dGetFilesToProcessTransactionTimeout);
-									ue.addDebugInfo("New value", gdMINIMUM_TRANSACTION_TIMEOUT);
-									ue.log();
-
-									_lastCodePos = "240";
-
-									// Change the setting in the DBInfo table 
-									executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
-										"' WHERE DBInfo.Name = '" + strValue + "'");
-								}
-								CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31520");
-
-								_lastCodePos = "250";
-
-								m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
-							}
-						}
-						else if (strValue == gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY)
-						{
-							_lastCodePos = "260";
-
-							m_bStoreSourceDocChangeHistory = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrALLOW_DYNAMIC_TAG_CREATION)
-						{
-							_lastCodePos = "270";
-
-							m_bAllowDynamicTagCreation = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrSTORE_DOC_TAG_HISTORY)
-						{
-							_lastCodePos = "280";
-
-							m_bStoreDocTagHistory = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrSTORE_FTP_EVENT_HISTORY)
-						{
-							_lastCodePos = "290";
-
-							m_bStoreFTPEventHistory = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrALLOW_RESTARTABLE_PROCESSING)
-						{
-							_lastCodePos = "300";
-							m_bAllowRestartableProcessing = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrDATABASEID)
-						{
-							_lastCodePos = "310";
-							m_strEncryptedDatabaseID = getStringField(ipFields, "Value");
-							m_bDatabaseIDValuesValidated = false;
-						}
-						else if (strValue == gstrSTORE_DB_INFO_HISTORY)
-						{
-							_lastCodePos = "320";
-							m_bStoreDBInfoChangeHistory = getStringField(ipFields, "Value") == "1";
-						}
-						else if (strValue == gstrENABLE_LOAD_BALANCING)
-						{
-							_lastCodePos = "330";
-							m_bLoadBalance = getStringField(ipFields, "Value") == "1";
-						}
+						m_iDBSchemaVersion = asLong(strValue);
 					}
-					else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
+					else if (strKey == "FPMDBSchemaVersion")
 					{
-						_lastCodePos = "110";
-
-						// Get the schema version for the previous Database version
-						m_iDBSchemaVersion = getLongField(ipFields, "FAMDBSchemaVersion");
-					}
-					else if (ipField->Name == _bstr_t("FPMDBSchemaVersion"))
-					{
-						_lastCodePos = "120";
-
 						// This is for an even older schema version
-						m_iDBSchemaVersion = getLongField(ipFields, "FPMDBSchemaVersion");
+						m_iDBSchemaVersion = asLong(strValue);
 					}
+					else if (strKey == gstrCOMMAND_TIMEOUT)
+					{
+						m_iCommandTimeout = asLong(strValue);
+					}
+					else if (strKey == gstrUPDATE_QUEUE_EVENT_TABLE)
+					{
+						m_bUpdateQueueEventTable = strValue == "1";
+					}
+					else if (strKey == gstrUPDATE_FAST_TABLE)
+					{
+						m_bUpdateFASTTable = strValue == "1";
+					}
+					else if (strKey == gstrNUMBER_CONNECTION_RETRIES)
+					{
+						if (!m_bNumberOfRetriesOverridden)
+						{
+							// Get the Connection retry count
+							m_iNumberOfRetries = asLong(strValue);
+						}
+					}
+					else if (strKey == gstrCONNECTION_RETRY_TIMEOUT)
+					{
+						if (!m_bRetryTimeoutOverridden)
+						{
+							// Get the connection retry timeout
+							m_dRetryTimeout = asDouble(strValue);
+						}
+					}
+					else if (strKey == gstrAUTO_DELETE_FILE_ACTION_COMMENT)
+					{
+						m_bAutoDeleteFileActionComment = strValue == "1";
+					}
+					else if (strKey == gstrAUTO_REVERT_TIME_OUT_IN_MINUTES)
+					{
+						m_nAutoRevertTimeOutInMinutes = asLong(strValue);
+
+						// [LegacyRCAndUtils:6172]
+						// Don't enforce gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES in debug mode; having a low value is useful in development.
+#ifndef _DEBUG
+						// if less that a minimum value this should be reset to the minimum value
+						if (m_nAutoRevertTimeOutInMinutes < gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES)
+						{
+							try
+							{
+								string strNewValue = asString(gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
+								// Log application trace exception 
+								UCLIDException ue("ELI29826", "Application trace: AutoRevertTimeOutInMinutes changed to " +
+									strNewValue + " minutes.");
+								ue.addDebugInfo("Old value", m_nAutoRevertTimeOutInMinutes);
+								ue.addDebugInfo("New value", gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
+								ue.log();
+
+								// Change the setting in the DBInfo table
+								executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
+									"' WHERE DBInfo.Name = '" + strValue + "'");
+							}
+							CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
+
+							m_nAutoRevertTimeOutInMinutes = gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES;
+						}
+#endif
+					}
+					else if (strKey == gstrAUTO_REVERT_NOTIFY_EMAIL_LIST)
+					{
+						m_strAutoRevertNotifyEmailList = strValue;
+					}
+					else if (strKey == gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS)
+					{
+						m_nActionStatisticsUpdateFreqInSeconds = asLong(strValue);
+					}
+					else if (strKey == gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT)
+					{
+						m_dGetFilesToProcessTransactionTimeout = asDouble(strValue);
+
+						// Need to make sure the value is above the minimum
+						if (m_dGetFilesToProcessTransactionTimeout < gdMINIMUM_TRANSACTION_TIMEOUT)
+						{
+							try
+							{
+								string strNewValue = asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0);
+								// Log application trace exception 
+								UCLIDException ue("ELI31146", "Application trace: DBInfo setting changed.");
+								ue.addDebugInfo("Setting", gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT);
+								ue.addDebugInfo("Old value", m_dGetFilesToProcessTransactionTimeout);
+								ue.addDebugInfo("New value", gdMINIMUM_TRANSACTION_TIMEOUT);
+								ue.log();
+
+								// Change the setting in the DBInfo table 
+								executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
+									"' WHERE DBInfo.Name = '" + strValue + "'");
+							}
+							CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31520");
+
+							m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
+						}
+					}
+					else if (strKey == gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY)
+					{
+						m_bStoreSourceDocChangeHistory = strValue == "1";
+					}
+					else if (strKey == gstrALLOW_DYNAMIC_TAG_CREATION)
+					{
+						m_bAllowDynamicTagCreation = strValue == "1";
+					}
+					else if (strKey == gstrSTORE_DOC_TAG_HISTORY)
+					{
+						m_bStoreDocTagHistory = strValue == "1";
+					}
+					else if (strKey == gstrSTORE_FTP_EVENT_HISTORY)
+					{
+						m_bStoreFTPEventHistory = strValue == "1";
+					}
+					else if (strKey == gstrALLOW_RESTARTABLE_PROCESSING)
+					{
+						m_bAllowRestartableProcessing = strValue == "1";
+					}
+					else if (strKey == gstrDATABASEID)
+					{
+						m_strEncryptedDatabaseID = strValue;
+						m_bDatabaseIDValuesValidated = false;
+					}
+					else if (strKey == gstrSTORE_DB_INFO_HISTORY)
+					{
+						m_bStoreDBInfoChangeHistory = strValue == "1";
+					}
+					else if (strKey == gstrENABLE_LOAD_BALANCING)
+					{
+						m_bLoadBalance = strValue == "1";
+					}
+
+					ipDBInfoSet->MoveNext();
 				}
 
-				_lastCodePos = "130";
-
-				// Move the next record
-				ipDBInfoSet->MoveNext();
-
-				_lastCodePos = "140";
+				m_ipDBInfoSettings = ipDBInfoSettings;
 			}
 		}
 	}
@@ -4394,6 +4319,7 @@ void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 
 		// Reset the Current connection status to not connected
 		m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
+		m_ipDBInfoSettings = __nullptr;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29885");
 }
@@ -4765,23 +4691,12 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 {
 	try
 	{
-		// Create a pointer to a recordset
-		_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI19793", ipDBInfoSet != __nullptr);
+		loadDBInfoSettings(ipConnection);
 
-		// Setup Setting Query
-		string strSQL = gstrDBINFO_SETTING_QUERY;
-		replaceVariable(strSQL, gstrSETTING_NAME, strSettingName);
-		
-		// Open the record set using the Setting Query		
-		ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenForwardOnly, adLockReadOnly, adCmdText); 
-
-		// Check if any data returned
-		if (ipDBInfoSet->adoEOF == VARIANT_FALSE)
+		if (m_ipDBInfoSettings->Contains(strSettingName.c_str()) == VARIANT_TRUE)
 		{
 			// Return the setting value
-			return getStringField(ipDBInfoSet->Fields, "Value");
+			return asString(m_ipDBInfoSettings->GetValue(strSettingName.c_str()));
 		}
 		else if (bThrowIfMissing)
 		{
@@ -4825,33 +4740,38 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI27737", ipFileSet != __nullptr);
 
-		ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
+		ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Map to track the number of files for each action that are being reset
 		map<string, map<string, int>> map_StatusCounts;
 		map_StatusCounts.clear();
 
-		// Step through all of the file records in the LockedFile table for the dead ActiveFAMID
-		while (ipFileSet->adoEOF == VARIANT_FALSE)
+		if (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
-			FieldsPtr ipFields = ipFileSet->Fields;
+			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
-			// Get the action name and previous status
-			string strActionName = getStringField(ipFields, "ActionName");
-			string strRevertToStatus = getStringField(ipFields, "StatusBeforeLock");
+			// Step through all of the file records in the LockedFile table for the dead ActiveFAMID
+			while (ipFileSet->adoEOF == VARIANT_FALSE)
+			{
+				FieldsPtr ipFields = ipFileSet->Fields;
 
-			// Add to the count
-			map_StatusCounts[strActionName][strRevertToStatus] =
-				map_StatusCounts[strActionName][strRevertToStatus] + 1;
+				// Get the action name and previous status
+				string strActionName = getStringField(ipFields, "ActionName");
+				string strRevertToStatus = getStringField(ipFields, "StatusBeforeLock");
 
-			// Pass bAllowQueuedStatusOverride so that any queued changes for files that were
-			// processing when the FAM crashed are applied now.
-			setFileActionState(ipConnection, getLongField(ipFields, "FileID"),
-				strActionName, -1, strRevertToStatus,
-				"", false, true, getLongField(ipFields, "ActionID"), false, strFASTComment, true);
+				// Add to the count
+				map_StatusCounts[strActionName][strRevertToStatus] =
+					map_StatusCounts[strActionName][strRevertToStatus] + 1;
 
-			ipFileSet->MoveNext();
+				// Pass bAllowQueuedStatusOverride so that any queued changes for files that were
+				// processing when the FAM crashed are applied now.
+				setFileActionState(ipConnection, getLongField(ipFields, "FileID"),
+					strActionName, -1, strRevertToStatus,
+					"", false, true, getLongField(ipFields, "ActionID"), false, strFASTComment, true);
+
+				ipFileSet->MoveNext();
+			}
 		}
 
 		// Delete the record from the ActiveFAM table
@@ -4866,10 +4786,10 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			bool bAtLeastOneReset = false;
 			string strEmailMessage = "";
 
-			map<string, map<string,int>>::iterator itMap = map_StatusCounts.begin();
-			for(; itMap != map_StatusCounts.end(); itMap++)
+			map<string, map<string, int>>::iterator itMap = map_StatusCounts.begin();
+			for (; itMap != map_StatusCounts.end(); itMap++)
 			{
-				map<string,int>::iterator itCounts = itMap->second.begin();
+				map<string, int>::iterator itCounts = itMap->second.begin();
 				for (; itCounts != itMap->second.end(); itCounts++)
 				{
 					string strAction = itMap->first;
@@ -4884,12 +4804,12 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 					bAtLeastOneReset = true;
 				}
 			}
-			
+
 			// Only log the reset exception if one or more files were reset
 			if (bAtLeastOneReset)
 			{
 				pUE->log();
-				
+
 				// Send the email message if list is setup and message to send
 				if (!m_strAutoRevertNotifyEmailList.empty() && !strEmailMessage.empty())
 				{
@@ -5193,10 +5113,30 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 		return;
 	}
 
+	if (ms_dwLastRevertTime > 0
+		&& (GetTickCount() - ms_dwLastRevertTime) < gnPING_TIMEOUT)
+	{ 
+		return;
+	}
+
+	CSingleLock lock(&ms_mutexAutoRevertLock);
+	if (!asCppBool(lock.Lock(0)))
+	{
+		return;
+	}
+
+	if (ms_dwLastRevertTime > 0
+		&& (GetTickCount() - ms_dwLastRevertTime) < gnPING_TIMEOUT)
+	{
+		return;
+	}
+
 	try
 	{
 		// Set the revert in progress flag so only one thread executes this per process
 		m_bRevertInProgress = true;
+
+		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 		// Make sure the LastPingTime is up to date before reverting so that the
 		// current session doesn't get auto reverted
@@ -5253,6 +5193,9 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 			ipFileSet->MoveNext();
 		}
 
+		tgRevert.CommitTrans();
+
+		ms_dwLastRevertTime = GetTickCount();
 		m_bRevertInProgress = false;
 	}
 	catch(...)
@@ -5644,18 +5587,8 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI30401", ipFiles != __nullptr);
 
-			// Revert files before attempting to get the files to process
-			if (!m_bRevertInProgress)
-			{
-				// Begin a transaction
-				TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
-				// Revert files
-				revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-				// Commit the reverted files
-				tgRevert.CommitTrans();
-			}
+			// Revert files
+			revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
 			bool bTransactionSuccessful = false;
 
@@ -5867,15 +5800,7 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 		return;
 	}
 
-	// Run the revert method before checking for in processing file
-	{
-		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
-		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-		tgRevert.CommitTrans();
-	}
+	revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
 	// Check for active processing for the action
 	_RecordsetPtr ipProcessingSet(__uuidof(Recordset));
@@ -5916,15 +5841,7 @@ bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 		return false;
 	}
 
-	// Run the revert method before checking for in processing file
-	{
-		// Begin a transaction for the revert 
-		TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
-
-		revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
-
-		tgRevert.CommitTrans();
-	}
+	revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 
 	// Check for active processing 
 	long nActiveFAMCount = 0;

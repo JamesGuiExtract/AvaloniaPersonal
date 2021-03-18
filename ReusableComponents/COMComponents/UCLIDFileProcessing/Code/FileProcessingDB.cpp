@@ -41,9 +41,12 @@ std::string CFileProcessingDB::ms_strCurrDBName = "";
 std::string CFileProcessingDB::ms_strCurrAdvConnProperties = "";
 std::string CFileProcessingDB::ms_strLastUsedAdvConnStr = "";
 std::string CFileProcessingDB::ms_strLastWorkflow = "";
+DWORD CFileProcessingDB::ms_dwLastRevertTime;
 
 CMutex CFileProcessingDB::ms_mutexPingDBLock;
+CMutex CFileProcessingDB::ms_mutexAutoRevertLock;
 CMutex CFileProcessingDB::ms_mutexSpecialLoggingLock;
+
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB

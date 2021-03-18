@@ -353,7 +353,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 // Turn on auto-create actions.
                 fileProcessingDb.RecordFAMSessionStop();
-                fileProcessingDb.ExecuteCommandQuery("UPDATE [DBInfo] SET [Value] = '1' WHERE [Name] = 'AutoCreateActions'");
+                fileProcessingDb.SetDBInfoSetting("AutoCreateActions", "1", true, true);
                 fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION1, true, false);
 
                 fileProcessingDb.AutoCreateAction(_ACTION2);
@@ -409,7 +409,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 // Turn on auto-create actions.
                 fileProcessingDb.RecordFAMSessionStop();
-                fileProcessingDb.ExecuteCommandQuery("UPDATE [DBInfo] SET [Value] = '1' WHERE [Name] = 'AutoCreateActions'");
+                fileProcessingDb.SetDBInfoSetting("AutoCreateActions", "1", true, true);
                 fileProcessingDb.RecordFAMSessionStart("Test.fps", _ACTION1, true, false);
 
                 // Test creating an using an action that already exists in a different workflow.
@@ -494,7 +494,7 @@ namespace Extract.FileActionManager.Database.Test
                 fileId = fileRecord.FileID;
                 fileProcessingDb.SetStatusForFile(fileId, _LABDE_ACTION3, workflow2ID, EActionStatus.kActionSkipped, false, false, out previousStatus);
 
-                fileProcessingDb.ExecuteCommandQuery("UPDATE [DBInfo] SET [Value] = '1' WHERE [Name] = 'AutoCreateActions'");
+                fileProcessingDb.SetDBInfoSetting("AutoCreateActions", "1", true, true);
                 int newAction2 = fileProcessingDb.AutoCreateAction("NewAction");
                 fileProcessingDb.SetStatusForFile(fileId, "NewAction", workflow2ID, EActionStatus.kActionFailed, true, false, out previousStatus);
 
