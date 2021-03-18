@@ -1679,17 +1679,27 @@ void CUEXViewerDlg::addExceptions(string strUEXFile, bool bReplaceMode)
 	}
 
 	// Open the file and read each line from it
+	// Try a few times if unsuccessful
+	// (for some reason there are often sharing violations on the first attempt to open a file copied from a remote drive)
 	vector<string> vecLines;
-	if (file.Open( strFileToOpen.c_str(), CFile::modeRead ))
-	{
-		// Read each line of text
-		while (file.ReadString( zLine ) == TRUE)
+	Util::retry(5, "open uex file", [&]() -> bool
 		{
-			vecLines.push_back((LPCTSTR)zLine);
-		}
+			if (file.Open(strFileToOpen.c_str(), CFile::modeRead))
+			{
+				// Read each line of text
+				while (file.ReadString(zLine) == TRUE)
+				{
+					vecLines.push_back((LPCTSTR)zLine);
+				}
 
-		file.Close();
-	}
+				file.Close();
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}, /*eliCodeForRetry =*/ "ELI51606", /*eliCodeForFailure =*/ "ELI51607");
 
 	// Parse each line from the UEX file
 	for (size_t ulLineNum = 0; ulLineNum < vecLines.size(); ulLineNum++)
