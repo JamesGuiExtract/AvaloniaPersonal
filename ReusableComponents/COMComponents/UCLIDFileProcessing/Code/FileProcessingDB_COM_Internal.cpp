@@ -4118,10 +4118,10 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction, long nMaxFiles, 
-												  VARIANT_BOOL bGetSkippedFiles,
-												  BSTR bstrSkippedForUserName,
-												  IIUnknownVector * * pvecFileRecords)
+bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction, long nMaxFiles,
+	VARIANT_BOOL bGetSkippedFiles,
+	BSTR bstrSkippedForUserName,
+	IIUnknownVector** pvecFileRecords)
 {
 	try
 	{
@@ -4133,36 +4133,17 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			// If the FAM has lost its registration, re-register before continuing with processing.
 			ensureFAMRegistration();
 
-			static const string strActionIDPlaceHolder = "<ActionIDPlaceHolder>";
-
-			string strWhere = "";
-			if (bGetSkippedFiles == VARIANT_TRUE)
+			// Currently when running all workflows use legacy
+			// and if requested
+			//if (m_bUseGetFilesLegacy)
+			//{
+			//	*pvecFileRecords = getFilesToProcessLegacy(bDBLocked, strActionName, nMaxFiles, asCppBool(bGetSkippedFiles), asString(bstrSkippedForUserName)).Detach();
+			//}
+			//else
 			{
-				strWhere = "INNER JOIN SkippedFile ON FileActionStatus.FileID = SkippedFile.FileID "
-					"AND SkippedFile.ActionID IN (<ActionIDPlaceHolder>) WHERE (ActionStatus = 'S'";
 
-				string strUserName = asString(bstrSkippedForUserName);
-				if(!strUserName.empty())
-				{
-					replaceVariable(strUserName, "'", "''");
-					string strUserAnd = " AND SkippedFile.UserName = '" + strUserName + "'";
-					strWhere += strUserAnd;
-				}
-
-				// Only get files that have not been skipped by the current session.
-				strWhere += " AND COALESCE(SkippedFile.FAMSessionID, 0) <> " + asString(m_nFAMSessionID);
-			}
-			else
-			{
-				strWhere = "WHERE (ActionStatus = 'P'";
-			}
-
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
-			string strActionIDs;
-
-			{
+				// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+				ADODB::_ConnectionPtr ipConnection = __nullptr;
 				BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
@@ -4171,90 +4152,30 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
-				// Get the action IDs
-				strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strActionName);
-
-				// [LegacyRCAndUtils:6233]
-				// Since the query run by setFilesToProcessing is expensive (even when there are no
-				// pending records available), before calling setFilesToProcessing do a quick and
-				// simple check to see if there are any files available.
-				string strGateKeeperQuery =
-					"IF EXISTS ("
-					"	SELECT TOP 1 [FileActionStatus].[FileID] FROM [FileActionStatus] WITH (NOLOCK) " + strWhere +
-					"		AND [FileActionStatus].[ActionID] IN (<ActionIDPlaceHolder>))"
-					"		OR ([ActionStatus] = 'R' "
-					"		AND [FileActionStatus].[ActionID] IN (<ActionIDPlaceHolder>))"
-					") SELECT 1 AS ID ELSE SELECT 0 AS ID";
-
-				// For the gate keeper query if Skippled file is joined add NOLOCK query hint
-				replaceVariable(strGateKeeperQuery, "INNER JOIN SkippedFile", "INNER JOIN SkippedFile WITH (NOLOCK) ");
-
-				// Update the select statement with the action ID
-				replaceVariable(strGateKeeperQuery, strActionIDPlaceHolder, strActionIDs);
-
-				// The "ID" column for executeCmdQuery will actually be 1 if there are potential
-				// files to process of 0 if there are not.
-				long nFilesToProcess = 0;
-				executeCmdQuery(ipConnection, strGateKeeperQuery, false, &nFilesToProcess);
-
-				// If there are no files available, don't bother calling setFilesToProcessing.
-				if (nFilesToProcess == 0)
+				if (bGetSkippedFiles == VARIANT_TRUE)
 				{
-					IIUnknownVectorPtr ipFiles(CLSID_IUnknownVector);
-					ASSERT_RESOURCE_ALLOCATION("ELI34145", ipFiles != __nullptr);
+					string strUserName = asString(bstrSkippedForUserName);
 
+					IIUnknownVectorPtr ipFiles = setFilesToProcessing(
+						bDBLocked, ipConnection, strActionName, strUserName.empty() ? "" : strUserName, "S", nMaxFiles);
 					*pvecFileRecords = ipFiles.Detach();
-					
-					return true;
+				}
+				else
+				{
+					// Perform all processing related to setting a file as processing.
+					// The previous status of the files to process is expected to be either pending or
+					// skipped.
+					IIUnknownVectorPtr ipFiles = setFilesToProcessing(
+						bDBLocked, ipConnection, strActionName, "", "P", nMaxFiles);
+					*pvecFileRecords = ipFiles.Detach();
 				}
 
-				END_CONNECTION_RETRY(ipConnection, "ELI34143");
+				END_CONNECTION_RETRY(ipConnection, "ELI51471");
 			}
-
-			// If current session is a web session then deleted files should not be returned
-			// https://extract.atlassian.net/browse/ISSUE-15990
-			string strWorkflowJoin = "";
-			if (m_bCurrentSessionIsWebSession)
-			{
-				long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
-				ASSERT_RUNTIME_CONDITION("ELI46688", nWorkflowID > 0, "Internal logic error: No active workflow for web session");
-
-				strWorkflowJoin = "INNER JOIN WorkflowFile ON WorkflowFile.FileID = FAMFile.ID ";
-				strWhere += " AND WorkflowFile.WorkflowID = " + asString(nWorkflowID) + " AND WorkflowFile.Deleted = 0 ";
-			}
-
-			// Build the from clause
-			string strFrom = "FROM FAMFile INNER JOIN FileActionStatus WITH (ROWLOCK, UPDLOCK, READPAST ) "
-				"ON FileActionStatus.FileID = FAMFile.ID AND FileActionStatus.ActionID IN (<ActionIDPlaceHolder>) "
-				+ strWorkflowJoin
-				+ strWhere + ")";
-
-			// create query to select top records;
-			string strSelectSQL =
-				"SELECT FAMFile.ID, FileName, Pages, FileSize, FileActionStatus.Priority, ActionStatus, FileActionStatus.ActionID " + strFrom;
-
-			BEGIN_CONNECTION_RETRY();
-
-				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
-
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
-
-				// Update the select statement with the action ID
-				replaceVariable(strSelectSQL, strActionIDPlaceHolder, strActionIDs);
-
-				// Perform all processing related to setting a file as processing.
-				// The previous status of the files to process is expected to be either pending or
-				// skipped.
-				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-					bDBLocked, ipConnection, strSelectSQL, strActionName, nMaxFiles, "PS");
-				*pvecFileRecords = ipFiles.Detach();
-			END_CONNECTION_RETRY(ipConnection, "ELI30377");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30644");
 	}
-	catch(UCLIDException &ue)
+	catch (UCLIDException& ue)
 	{
 		if (!bDBLocked)
 		{
@@ -8498,40 +8419,40 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 
 			BEGIN_CONNECTION_RETRY();
 
-				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
 
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
 
-				// Create a pointer to a recordset
-				_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI31897", ipDBInfoSet != __nullptr);
+			// Create a pointer to a recordset
+			_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI31897", ipDBInfoSet != __nullptr);
 
-				// Open the record set using the Setting Query		
-				ipDBInfoSet->Open(gstrDBINFO_GET_SETTINGS_QUERY.c_str(),
-					_variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly,
-					adLockReadOnly, adCmdText); 
+			// Open the record set using the Setting Query		
+			ipDBInfoSet->Open(gstrDBINFO_GET_SETTINGS_QUERY.c_str(),
+				_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
+				adLockReadOnly, adCmdText);
 
-				while (ipDBInfoSet->adoEOF == VARIANT_FALSE)
-				{
-					FieldsPtr ipFields = ipDBInfoSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI31898", ipFields != __nullptr);
+			while (ipDBInfoSet->adoEOF == VARIANT_FALSE)
+			{
+				FieldsPtr ipFields = ipDBInfoSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI31898", ipFields != __nullptr);
 
-					string strKey = getStringField(ipFields, "Name");
-					string strValue = getStringField(ipFields, "Value");
-					ipSettings->Set(strKey.c_str(), strValue.c_str());
+				string strKey = getStringField(ipFields, "Name");
+				string strValue = getStringField(ipFields, "Value");
+				ipSettings->Set(strKey.c_str(), strValue.c_str());
 
-					ipDBInfoSet->MoveNext();
-				}
+				ipDBInfoSet->MoveNext();
+			}
 
-				*ppSettings = ipSettings.Detach();
+			*ppSettings = ipSettings.Detach();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI31899");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI31900");
 	}
-	catch(UCLIDException &ue)
+	catch (UCLIDException& ue)
 	{
 		if (!bDBLocked)
 		{
