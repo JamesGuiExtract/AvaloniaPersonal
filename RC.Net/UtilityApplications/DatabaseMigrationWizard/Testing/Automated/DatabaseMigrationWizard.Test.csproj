@@ -156,117 +156,43 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DatabaseExportNoLABDE\Action.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\AttributeName.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\AttributeSetName.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\Dashboard.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\DatabaseService.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\DataEntryCounterDefinition.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\DBInfo.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\FAMUser.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\FieldSearch.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\FileHandler.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\Login.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\MetadataField.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\MLModel.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\Tag.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\UserCreatedCounter.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\WebAppConfig.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportNoLABDE\Workflow.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\Action.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\AttributeSetName.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\Dashboard.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\DatabaseService.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\DataEntryCounterDefinition.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\DBInfo.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\FAMUser.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\FieldSearch.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\FileHandler.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\LabDEEncounter.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\LabDEOrder.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\LabDEPatient.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\LabDEProvider.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\Login.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\MetadataField.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\MLModel.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\Tag.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\UserCreatedCounter.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\WebAppConfig.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="DatabaseExportWithLABDE\Workflow.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="DatabaseExportNoLABDE\Action.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\AttributeName.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\AttributeSetName.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\Dashboard.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\DatabaseService.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\DataEntryCounterDefinition.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\DBInfo.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\FAMUser.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\FieldSearch.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\FileHandler.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\Login.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\MetadataField.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\MLModel.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\Tag.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\UserCreatedCounter.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\WebAppConfig.json" />
+    <EmbeddedResource Include="DatabaseExportNoLABDE\Workflow.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\Action.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\AttributeSetName.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\Dashboard.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\DatabaseService.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\DataEntryCounterDefinition.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\DBInfo.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\FAMUser.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\FieldSearch.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\FileHandler.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\LabDEEncounter.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\LabDEOrder.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\LabDEPatient.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\LabDEProvider.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\Login.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\MetadataField.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\MLModel.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\Tag.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\UserCreatedCounter.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\WebAppConfig.json" />
+    <EmbeddedResource Include="DatabaseExportWithLABDE\Workflow.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
