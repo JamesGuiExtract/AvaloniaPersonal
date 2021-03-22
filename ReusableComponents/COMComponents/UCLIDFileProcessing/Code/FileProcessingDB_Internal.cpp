@@ -134,6 +134,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		// Get the ActionID
 		long nActionID = getActionID(ipConnection, strAction);
 		string strActionID = asString(nActionID);
+		long nWorkflowID = getWorkflowID(ipConnection, nActionID);
 		string strFAMUser = asString(getFAMUserID(ipConnection));
 		string strMachine = asString(getMachineID(ipConnection));
 		EActionStatus eaTo = asEActionStatus(strState);
@@ -205,9 +206,14 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				}
 				strFileIdList += asString(data.FileID);
 
+				bool bIsDeleted =
+					nWorkflowID <= 0
+					? false
+					: isFileInWorkflow(ipConnection, data.FileID, nWorkflowID) == 0; // 0 = deleted
+
 				// Update the stats				
 				updateStats(ipConnection, nActionID, data.FromStatus, eaTo, data.FileRecord,
-					data.FileRecord, false);
+					data.FileRecord, bIsDeleted);
 			}
 			strFileIdList += ")";
 			
@@ -511,8 +517,15 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 						"AND [ActiveFAMID] = " + asString(m_nActiveFAMID));
 				}
 				_lastCodePos = "250";
+
+				long nWorkflowID = getWorkflowID(ipConnection, nActionID);
+				bool bIsDeleted =
+					nWorkflowID <= 0
+					? false
+					: isFileInWorkflow(ipConnection, nFileID, nWorkflowID) == 0; // 0 = deleted
+
 				updateStats(ipConnection, nActionID, easStatsFrom, asEActionStatus(strNewState),
-					ipCurrRecord, ipCurrRecord);
+					ipCurrRecord, ipCurrRecord, bIsDeleted);
 
 				_lastCodePos = "260";
 				// Only update FileActionStateTransition table if required
@@ -2381,7 +2394,7 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 									EActionStatus eFromStatus, EActionStatus eToStatus, 
 									UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewRecord, 
 									UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord,
-									bool bUpdateAndSaveStats)
+									bool bIsDeleted)
 {
 	// Only time a ipOldRecord can be NULL is if the from status is kActionUnattempted
 	if (eFromStatus != kActionUnattempted && ipOldRecord == __nullptr)
@@ -2541,11 +2554,12 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 
 	// need to add the delta record with to ActionStatisticsDelta table
 	string strAddDeltaSQL;
-	strAddDeltaSQL = "INSERT INTO ActionStatisticsDelta (ActionID, NumDocuments, " 
+	strAddDeltaSQL = "INSERT INTO ActionStatisticsDelta (ActionID, Deleted, NumDocuments, " 
 		"NumDocumentsPending, NumDocumentsComplete, NumDocumentsFailed, NumDocumentsSkipped, " 
 		"NumPages, NumPagesPending, NumPagesComplete, NumPagesFailed, NumPagesSkipped, " 
 		"NumBytes, NumBytesPending, NumBytesComplete, NumBytesFailed, NumBytesSkipped ) "
-		"VALUES (" + asString(nActionID) + ", " + asString(lNumDocsTotal) + ", " + 
+		"VALUES (" + asString(nActionID) + ", " + (bIsDeleted ? "1, " : "0, ") +
+		asString(lNumDocsTotal) + ", " + 
 		asString(lNumDocsPending) + ", " + asString(lNumDocsComplete) + ", " + 
 		asString(lNumDocsFailed) + ", " + asString(lNumDocsSkipped) + ", " + 
 		asString(lNumPagesTotal) + ", " + asString(lNumPagesPending) + ", " + 
@@ -2558,14 +2572,15 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 }
 //--------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, 
-	long nActionID, bool bForceUpdate, bool bDBLocked)
+	long nActionID, bool bDeletedFiles, bool bForceUpdate, bool bDBLocked)
 {
 	// Create a pointer to a recordset
 	_RecordsetPtr ipActionStatSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI14099", ipActionStatSet != __nullptr);
 
 	// Select the existing Statistics record if it exists
-	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID);
+	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID)
+		+ " AND Deleted = " + (bDeletedFiles ? "1" : "0");
 
 	// Open the recordset for the statistics with the record for ActionID if it exists
 	ipActionStatSet->Open(strSelectStat.c_str(), 
@@ -2633,6 +2648,7 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 
 		string strCalcStat = gstrCALCULATE_ACTION_STATISTICS_FOR_ACTION;
 		replaceVariable(strCalcStat, "<ActionIDWhereClause>", asString(nActionID));
+		replaceVariable(strCalcStat, "<DeletedFilesWhereClause>", bDeletedFiles ? "1" : "0");
 
 		ipActionStatSet->Open(strCalcStat.c_str(), 
 			_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockOptimistic, adCmdText);
@@ -5491,9 +5507,14 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 								"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + asString(ipFileRecord->ActionID) +
 								" AND [FileID] = " + strFileID);
 
+							bool bIsDeleted =
+								ipFileRecord->WorkflowID <= 0
+								? false
+								: isFileInWorkflow(ipConnection, ipFileRecord->FileID, ipFileRecord->WorkflowID) == 0; // 0 = deleted
+
 							// Update the Statistics
 							updateStats(ipConnection, ipFileRecord->ActionID, asEActionStatus(strFileFromState),
-								kActionProcessing, ipFileRecord, ipFileRecord);
+								kActionProcessing, ipFileRecord, ipFileRecord, bIsDeleted);
 
 							// move to the next record in the recordset
 							ipFileSet->MoveNext();

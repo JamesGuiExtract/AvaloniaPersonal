@@ -295,19 +295,24 @@ namespace Extract.FileActionManager.Database.Test
 
                 fileProcessingDb.SetFileStatusToPending(fileId, _LABDE_ACTION1, false);
 
+                fileProcessingDb.RecordFAMSessionStop();
+
+                // File was added to workflow automatically
+                Assert.IsTrue(fileProcessingDb.IsFileInWorkflow(fileId, workflowId2));
+
                 // The actionID associated with the workflow should have a file queued, but not the "NULL" workflow action.
-                Assert.That(fileProcessingDb.GetStats(actionId, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStats(actionIdWorkflow1, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStats(actionIdWorkflow2, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 2); // The file will be counted separately in each workflow
+                Assert.AreEqual(0, fileProcessingDb.GetStats(actionId, false).NumDocumentsPending);
+                Assert.AreEqual(1, fileProcessingDb.GetStats(actionIdWorkflow1, false).NumDocumentsPending);
+                Assert.AreEqual(1, fileProcessingDb.GetStats(actionIdWorkflow2, false).NumDocumentsPending);
+                Assert.AreEqual(2, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending); // The file will be counted separately in each workflow
 
                 // Test that after removing the file there are no longer any files pending on the workflow's action.
                 fileProcessingDb.RemoveFile(testFileName, _LABDE_ACTION1);
 
-                Assert.That(fileProcessingDb.GetStats(actionId, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStats(actionIdWorkflow1, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStats(actionIdWorkflow2, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 1);
+                Assert.AreEqual(0, fileProcessingDb.GetStats(actionId, false).NumDocumentsPending);
+                Assert.AreEqual(1, fileProcessingDb.GetStats(actionIdWorkflow1, false).NumDocumentsPending);
+                Assert.AreEqual(0, fileProcessingDb.GetStats(actionIdWorkflow2, false).NumDocumentsPending);
+                Assert.AreEqual(1, fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending);
             }
             finally
             {

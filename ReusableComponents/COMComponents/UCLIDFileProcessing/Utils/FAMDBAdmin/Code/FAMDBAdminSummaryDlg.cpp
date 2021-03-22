@@ -79,7 +79,8 @@ m_ipFAMDB(__nullptr),
 m_ipContextMenuFileSelector(CLSID_FAMFileSelector),
 m_ipFAMFileInspector(__nullptr),
 m_bInitialized(false),
-m_bUseOracleSyntax(false)
+m_bUseOracleSyntax(false),
+m_bShowDeletedFileStats(false)
 {
 	try
 	{
@@ -106,6 +107,9 @@ void CFAMDBAdminSummaryDlg::DoDataExchange(CDataExchange *pDX)
 	DDX_Control(pDX, IDC_BUTTON_REFRESH_SUMMARY, m_btnRefreshSummary);
 	DDX_Control(pDX, IDC_STATIC_TOTAL_LABEL, m_lblTotals);
 	DDX_Control(pDX, IDC_STATIC_UPDATED, m_staticLastUpdated);
+	DDX_Control(pDX, IDC_SHOW_STATS_TYPE, m_staticStatisticsType);
+	DDX_Control(pDX, IDC_RADIO_SHOW_NONDELETED_STATS, m_btnShowNonDeletedFileStats);
+	DDX_Control(pDX, IDC_RADIO_SHOW_DELETED_STATS, m_btnShowDeletedFileStats);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -113,6 +117,8 @@ void CFAMDBAdminSummaryDlg::DoDataExchange(CDataExchange *pDX)
 //--------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CFAMDBAdminSummaryDlg, CPropertyPage)
 	ON_BN_CLICKED(IDC_BUTTON_REFRESH_SUMMARY, &OnBnClickedRefreshSummary)
+	ON_BN_CLICKED(IDC_RADIO_SHOW_NONDELETED_STATS, &OnBnClickedShowDeletedFileStats)
+	ON_BN_CLICKED(IDC_RADIO_SHOW_DELETED_STATS, &OnBnClickedShowDeletedFileStats)
 	ON_WM_SIZE()
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_ACTIONS, &CFAMDBAdminSummaryDlg::OnNMRClickListActions)
 	ON_COMMAND(ID_SUMMARY_MENU_EXPORT_LIST, &OnContextExportFileList)
@@ -137,6 +143,9 @@ BOOL CFAMDBAdminSummaryDlg::OnInitDialog()
 		// set the wait cursor
 		CWaitCursor wait;
 
+		m_btnShowDeletedFileStats.SetCheck(asBSTChecked(m_bShowDeletedFileStats));
+		m_btnShowNonDeletedFileStats.SetCheck(asBSTChecked(!m_bShowDeletedFileStats));
+
 		prepareListControl();
 		resizeListColumns();
 		populatePage();
@@ -160,7 +169,11 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 			return;
 		}
 
-		CRect recDlg, recListCtrl, recRefresh, recTotalText, recLabel, recLastUpdated;
+		CRect recDlg, recListCtrl, recRefresh, recTotalText, recLabel, recLastUpdated,
+			recStatisticsType, recShowNonDeletedFiles, recShowDeletedFiles;
+
+		// Get current positions of the controls and then move them.
+		// Start at the bottom and work up so that the controls stick to the bottom of the dialog
 
 		// get the summary page rectangle
 		GetClientRect(&recDlg);
@@ -185,24 +198,44 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 		m_staticLastUpdated.GetWindowRect(&recLastUpdated);
 		ScreenToClient(&recLastUpdated);
 
+		// get the statistics type groupbox rectangle
+		m_staticStatisticsType.GetWindowRect(&recStatisticsType);
+		ScreenToClient(&recStatisticsType);
+
+		// get the show NonDeleted file stats button rectangle
+		m_btnShowNonDeletedFileStats.GetWindowRect(&recShowNonDeletedFiles);
+		ScreenToClient(&recShowNonDeletedFiles);
+
+		// get the show NonDeleted file stats button rectangle
+		m_btnShowDeletedFileStats.GetWindowRect(&recShowDeletedFiles);
+		ScreenToClient(&recShowDeletedFiles);
+
 		// compute margin
 		int iMargin = recListCtrl.left - recDlg.left;
 
-		// compute the new refresh button position
-		int iHeight = recRefresh.Height();
-		recRefresh.bottom = recDlg.bottom - iMargin;
-		recRefresh.top = recRefresh.bottom - iHeight;
+		// compute the new statistics type group box position so that it fills the width
+		int iHeight = recStatisticsType.Height();
+		recStatisticsType.bottom = recDlg.bottom - iMargin;
+		recStatisticsType.top = recStatisticsType.bottom - iHeight;
+		recStatisticsType.left = recDlg.left + iMargin;
+		recStatisticsType.right = recDlg.right - iMargin;
 
-		// compute the new file totals edit box position
-		recTotalText.MoveToY(recRefresh.top+2);
+		// compute radio button positions
+		recShowNonDeletedFiles.MoveToXY(recStatisticsType.left + iMargin, recStatisticsType.top + 20);
+		recShowDeletedFiles.MoveToXY(recShowNonDeletedFiles.right + iMargin, recStatisticsType.top + 20);
 
 		// compute the new file totals label position
 		iHeight = recLabel.Height();
-		recLabel.top = recRefresh.top + 5;
-		recLabel.bottom = recLabel.top + iHeight;
+		recLabel.MoveToY(recStatisticsType.top - iHeight - iMargin + 5);
+
+		// compute the new file totals edit box position
+		recTotalText.MoveToXY(recLabel.right + iMargin, recLabel.top - 3);
+
+		// compute the new refresh button position
+		recRefresh.MoveToXY(recTotalText.right + iMargin, recLabel.top - 5);
 
 		// compute the last updated text position
-		recLastUpdated.MoveToY(recLabel.top);
+		recLastUpdated.MoveToXY(recRefresh.right + iMargin, recLabel.top);
 
 		// compute the new list position
 		recListCtrl.right = recDlg.right - iMargin;
@@ -214,9 +247,14 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 		m_btnRefreshSummary.MoveWindow(&recRefresh);
 		m_listActions.MoveWindow(&recListCtrl);
 		m_staticLastUpdated.MoveWindow(&recLastUpdated);
+		m_staticStatisticsType.MoveWindow(&recStatisticsType);
+		m_btnShowNonDeletedFileStats.MoveWindow(&recShowNonDeletedFiles);
+		m_btnShowDeletedFileStats.MoveWindow(&recShowDeletedFiles);
 
 		// resize the columns in the list control
 		resizeListColumns();
+		
+		Invalidate();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19796");
 }
@@ -274,6 +312,22 @@ void CFAMDBAdminSummaryDlg::OnBnClickedRefreshSummary()
 		populatePage();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19797");
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::OnBnClickedShowDeletedFileStats()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		bool showDeleted = m_btnShowDeletedFileStats.GetCheck() == BST_CHECKED;
+		if (m_bShowDeletedFileStats != showDeleted)
+		{
+			m_bShowDeletedFileStats = showDeleted;
+			populatePage();
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI51617");
 }
 //--------------------------------------------------------------------------------------------------
 void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResult)
@@ -417,12 +471,26 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 		string currentWorkflow = m_ipFAMDB->ActiveWorkflow;
 		if (currentWorkflow.empty())
 		{
-			ipActionStats = m_ipFAMDB->GetStatsAllWorkflows(m_strContextMenuAction.c_str(), VARIANT_TRUE);
+			if (m_bShowDeletedFileStats)
+			{
+				ipActionStats = m_ipFAMDB->GetDeletedFileStatsAllWorkflows(m_strContextMenuAction.c_str(), VARIANT_TRUE);
+			}
+			else
+			{
+				ipActionStats = m_ipFAMDB->GetStatsAllWorkflows(m_strContextMenuAction.c_str(), VARIANT_TRUE);
+			}
 		}
 		else
 		{
 			long nActionID = m_ipFAMDB->GetActionID(m_strContextMenuAction.c_str());
-			ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
+			if (m_bShowDeletedFileStats)
+			{
+				ipActionStats = m_ipFAMDB->GetDeletedFileStats(nActionID, VARIANT_TRUE);
+			}
+			else
+			{
+				ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
+			}
 		}
 
 		long nFailedCount = ipActionStats->GetNumDocumentsFailed();
@@ -683,11 +751,25 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			string currentWorkflow = m_ipFAMDB->ActiveWorkflow;
 			if (currentWorkflow.empty())
 			{
-				ipActionStats = m_ipFAMDB->GetStatsAllWorkflows(strActionName.c_str(), VARIANT_TRUE);
+				if (m_bShowDeletedFileStats)
+				{
+					ipActionStats = m_ipFAMDB->GetDeletedFileStatsAllWorkflows(strActionName.c_str(), VARIANT_TRUE);
+				}
+				else
+				{
+					ipActionStats = m_ipFAMDB->GetStatsAllWorkflows(strActionName.c_str(), VARIANT_TRUE);
+				}
 			}
 			else
 			{
-				ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
+				if (m_bShowDeletedFileStats)
+				{
+					ipActionStats = m_ipFAMDB->GetDeletedFileStats(nActionID, VARIANT_TRUE);
+				}
+				else
+				{
+					ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
+				}
 			}
 
 			long lPending, lCompleted, lSkipped, lFailed, lTotal;

@@ -42,6 +42,7 @@ protected:
 	// Message Handlers
 	//---------------------------------------------------------------------------------------------
 	afx_msg void OnBnClickedRefreshSummary();
+	afx_msg void OnBnClickedShowDeletedFileStats();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnContextExportFileList();
@@ -61,6 +62,9 @@ private:
 	CButton m_btnRefreshSummary;
 	CStatic m_lblTotals;
 	CStatic m_staticLastUpdated;
+	CStatic m_staticStatisticsType;
+	CButton m_btnShowNonDeletedFileStats;
+	CButton m_btnShowDeletedFileStats;
 
 	bool m_bInitialized;
 
@@ -80,6 +84,9 @@ private:
 
 	// Indicates if the queries used should use OracleSyntax
 	bool m_bUseOracleSyntax;
+
+	// Indicates if the stats shown are for deleted files
+	bool m_bShowDeletedFileStats;
 
 	//---------------------------------------------------------------------------------------------
 	// Helper methods

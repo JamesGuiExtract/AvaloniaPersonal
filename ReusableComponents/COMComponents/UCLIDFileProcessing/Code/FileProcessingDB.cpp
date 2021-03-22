@@ -596,16 +596,40 @@ STDMETHODIMP CFileProcessingDB::GetStats(long nActionID, VARIANT_BOOL vbForceUpd
 	{
 		validateLicense();
 
-		if (!GetStats_Internal(false, nActionID, vbForceUpdate, vbRevertTimedOutFAMs, pStats))
+		bool getDeletedFileStats = false;
+		if (!GetStats_Internal(false, nActionID, vbForceUpdate, vbRevertTimedOutFAMs, getDeletedFileStats, pStats))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			GetStats_Internal(true, nActionID, vbForceUpdate, vbRevertTimedOutFAMs, pStats);
+			GetStats_Internal(true, nActionID, vbForceUpdate, vbRevertTimedOutFAMs, getDeletedFileStats, pStats);
 		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14045")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetDeletedFileStats(long nActionID, VARIANT_BOOL vbForceUpdate,
+	IActionStatistics* *pStats)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		VARIANT_BOOL revertTimedOutFAMs = VARIANT_FALSE;
+		bool getDeletedFileStats = true;
+		if (!GetStats_Internal(false, nActionID, vbForceUpdate, revertTimedOutFAMs, getDeletedFileStats, pStats))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			GetStats_Internal(true, nActionID, vbForceUpdate, revertTimedOutFAMs, getDeletedFileStats, pStats);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI51616")
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::CopyActionStatusFromAction(long  nFromAction, long nToAction)
@@ -4194,17 +4218,41 @@ STDMETHODIMP CFileProcessingDB::GetStatsAllWorkflows(BSTR bstrActionName, VARIAN
 	{
 		validateLicense();
 
-		if (!GetStatsAllWorkflows_Internal(false, bstrActionName, vbForceUpdate, pStats))
+		bool getDeletedFileStats = false;
+		if (!GetStatsAllWorkflows_Internal(false, bstrActionName, vbForceUpdate, getDeletedFileStats, pStats))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
 				gstrMAIN_DB_LOCK);
 
-			GetStatsAllWorkflows_Internal(true, bstrActionName, vbForceUpdate, pStats);
+			GetStatsAllWorkflows_Internal(true, bstrActionName, vbForceUpdate, getDeletedFileStats, pStats);
 		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI42085");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetDeletedFileStatsAllWorkflows(BSTR bstrActionName,
+	VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		bool getDeletedFileStats = true;
+		if (!GetStatsAllWorkflows_Internal(false, bstrActionName, vbForceUpdate, getDeletedFileStats, pStats))
+		{
+			// Lock the database
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+				gstrMAIN_DB_LOCK);
+
+			GetStatsAllWorkflows_Internal(true, bstrActionName, vbForceUpdate, getDeletedFileStats, pStats);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI51618");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetAllActions(IStrToStrMap** pmapActionNameToID)

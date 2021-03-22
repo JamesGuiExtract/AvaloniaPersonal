@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 191;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 192;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -203,14 +203,14 @@ int UpdateToSchemaVersion102(_ConnectionPtr ipConnection, long* pnNumSteps,
 		// Drop ActionStatistics table so it can be re-created with the proper columns.
 		// No need to transfer data; instead, regenerate the stats afterward.
 		vecQueries.push_back("DROP Table [ActionStatistics]");
-		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_TABLE);
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_TABLE_102);
 
 		// https://extract.atlassian.net/browse/ISSUE-12916
 		// Was added in 10.1 should have been added at the time the table was changed.
 		vecQueries.push_back(gstrADD_STATISTICS_ACTION_FK);
 
 		// Add new ActionStatisticsDelta table.
-		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_TABLE);
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_TABLE_102);
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
 		vecQueries.push_back(gstrADD_ACTION_STATISTICS_DELTA_ACTION_FK);
 
@@ -2995,6 +2995,49 @@ int UpdateToSchemaVersion191(_ConnectionPtr ipConnection,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51559");
 }
 //-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion192(_ConnectionPtr ipConnection, long* pnNumSteps, 
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 192;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 3;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// Drop ActionStatistics and ActionStatisticsDelta tables so they can be re-created with the proper columns.
+		// No need to transfer data; instead, regenerate the stats afterward.
+		vecQueries.push_back("DROP Table [ActionStatistics]");
+		vecQueries.push_back("DROP Table [ActionStatisticsDelta]");
+
+		// Add ActionStatistics table.
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_TABLE);
+		vecQueries.push_back(gstrADD_STATISTICS_ACTION_FK);
+
+		// Add ActionStatisticsDelta table.
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_TABLE);
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
+		vecQueries.push_back(gstrADD_ACTION_STATISTICS_DELTA_ACTION_FK);
+
+		// Regenerate the action statistics for all actions (empty "where" clause)
+		string strCreateActionStatsSQL = gstrRECREATE_ACTION_STATISTICS_FOR_ACTION;
+		replaceVariable(strCreateActionStatsSQL, "<ActionIDWhereClause>", "");
+		vecQueries.push_back(strCreateActionStatsSQL);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51615");
+}
+//-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::DefineNewAction_Internal(bool bDBLocked, BSTR strAction, long* pnID)
@@ -3442,7 +3485,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					_lastCodePos = "87";
 
 					// update the statistics
-					updateStats(ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, NULL);
+					updateStats(ipConnection, nActionID, *pPrevStatus, eNewStatus, ipNewFileRecord, NULL, false);
 					_lastCodePos = "90";
 				}
 				else
@@ -3610,8 +3653,14 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 								addFileActionStateTransition(ipConnection, nFileID, nActionID, strActionState, "U", "", "Removed");
 							}
 
+							bool bIsDeleted = false;
+							long nWorkflowID = getWorkflowID(ipConnection, nActionID);
+							if (nWorkflowID > 0)
+							{
+								bIsDeleted = isFileInWorkflow(ipConnection, nFileID, nWorkflowID) == 0; // 0 = deleted
+							}
 							// update the statistics
-							updateStats(ipConnection, nActionID, asEActionStatus(strActionState), kActionUnattempted, NULL, ipOldRecord); 
+							updateStats(ipConnection, nActionID, asEActionStatus(strActionState), kActionUnattempted, NULL, ipOldRecord, bIsDeleted); 
 						}
 
 						// Update QueueEvent table if enabled
@@ -3659,6 +3708,9 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
+				// Ensure file gets added to current workflow if it is missing (setFileActionState)
+				nWorkflowID = nWorkflowID == -1 ? getWorkflowID(ipConnection, getActiveWorkflow()) : nWorkflowID;
+
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
@@ -3704,6 +3756,9 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked, long nFileID, 
 
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
+
+				// Ensure file gets added to current workflow if it is missing (setFileActionState)
+				nWorkflowID = nWorkflowID == -1 ? getWorkflowID(ipConnection, getActiveWorkflow()) : nWorkflowID;
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -3752,11 +3807,14 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 				
+				// Ensure file gets added to current workflow if it is missing (setFileActionState)
+				long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
+
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 				
 				// change the given files state to Pending
-				setFileActionState(ipConnection, nFileID, asString(strAction), -1, "P", "", 
+				setFileActionState(ipConnection, nFileID, asString(strAction), nWorkflowID, "P", "", 
 					false, asCppBool(vbAllowQueuedStatusOverride));
 
 				tg.CommitTrans();
@@ -3834,11 +3892,14 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 			// Get the connection for the thread and save it locally.
 			ipConnection = getDBConnection();
 
+			// Ensure file gets added to current workflow if it is missing (setFileActionState)
+			long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
+
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 			// Change the given files state to Skipped
-			setFileActionState(ipConnection, nFileID, asString(strAction), -1, "S", "",
+			setFileActionState(ipConnection, nFileID, asString(strAction), nWorkflowID, "S", "",
 				false, asCppBool(vbAllowQueuedStatusOverride), -1, asCppBool(bRemovePreviousSkipped));
 
 			tg.CommitTrans();
@@ -4029,6 +4090,9 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 
 			// Get the connection for the thread and save it locally.
 			ipConnection = getDBConnection();
+
+			// Ensure file gets added to current workflow if it is missing (setFileActionState)
+			nWorkflowID = nWorkflowID == -1 ? getWorkflowID(ipConnection, getActiveWorkflow()) : nWorkflowID;
 
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -4400,7 +4464,7 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrActionName,
-	VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats)
+	VARIANT_BOOL vbForceUpdate, bool bGetDeletedFileStats, IActionStatistics* *pStats)
 {
 	try
 	{
@@ -4448,7 +4512,7 @@ bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrA
 				int nActionID = getLongField(ipFields, "ID");
 
 				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =
-					loadStats(ipConnection, nActionID, asCppBool(vbForceUpdate), bDBLocked);
+					loadStats(ipConnection, nActionID, bGetDeletedFileStats, asCppBool(vbForceUpdate), bDBLocked);
 				ASSERT_RESOURCE_ALLOCATION("ELI42089", ipActionStats != __nullptr);
 
 				ipAggregateStats->AddStatistics(ipActionStats);
@@ -4476,7 +4540,8 @@ bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrA
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
-	VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics* *pStats)
+	VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, bool bGetDeletedFileStats,
+	IActionStatistics* *pStats)
 {
 	try
 	{
@@ -4508,7 +4573,7 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 
 				// return a new object with the statistics
 				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =  
-					loadStats(ipConnection, nActionID, asCppBool(vbForceUpdate), bDBLocked);
+					loadStats(ipConnection, nActionID, bGetDeletedFileStats, asCppBool(vbForceUpdate), bDBLocked);
 				ASSERT_RESOURCE_ALLOCATION("ELI14107", ipActionStats != __nullptr);
 
 				// Commit any changes (could have recreated the stats)
@@ -5065,6 +5130,9 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 			BEGIN_CONNECTION_RETRY();
 
 				ipConnection = getDBConnection();
+
+				// Ensure file gets added to current workflow if it is missing (setFileActionState)
+				nWorkflowID = nWorkflowID == -1 ? getWorkflowID(ipConnection, getActiveWorkflow()) : nWorkflowID;
 
 				// Get the action name
 				string strActionName = asString(bstrAction);
@@ -8167,7 +8235,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 188:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion189);
 				case 189:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion190);
 				case 190:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion191);
-				case 191:
+				case 191:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion192);
+				case 192:
 					break;
 
 				default:
@@ -12831,40 +12900,90 @@ bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, l
 
 			ipConnection = getDBConnection();
 
-			// Get all the Main sequence actions for the given workflow
-			string strMainSequenceActionQuery = "SELECT ID, ASCName FROM Action WHERE MainSequence = 1 AND WorkflowID =  " +
-				asString(nWorkflowID);
-
-			_RecordsetPtr ipMainSequenceSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI46706", ipMainSequenceSet != __nullptr);
-
-			ipMainSequenceSet->Open(strMainSequenceActionQuery.c_str(),
-				_variant_t((IDispatch*)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
-
-			map<long, string> mapMainSequenceActions;
-			while (ipMainSequenceSet->adoEOF == VARIANT_FALSE)
-			{
-				FieldsPtr ipFields = ipMainSequenceSet->Fields;
-				mapMainSequenceActions[getLongField(ipFields, "ID")] = getStringField(ipFields, "ASCName");
-				ipMainSequenceSet->MoveNext();
-			}
-			ipMainSequenceSet->Close();
-
 			TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
 
-			string strMarkDeletedQuery = "UPDATE [WorkflowFile] SET [Deleted] = 1 "
-				"WHERE [FileID] = " + asString(nFileID) + " AND [WorkflowID] = " + asString(nWorkflowID);
+			string strMarkDeletedQuery = Util::Format(
+				"UPDATE WorkflowFile SET Deleted = 1 WHERE Deleted = 0 AND FileID = %d AND WorkflowID = %d",
+				nFileID, nWorkflowID);
 
 			long nAffected = executeCmdQuery(ipConnection, strMarkDeletedQuery.c_str(), false);
 
-			for (auto action = mapMainSequenceActions.begin(); action != mapMainSequenceActions.end(); action++)
+			// Update the action statistics for this file
+			// AppBackendAPI - Number of pending documents/pages should take into account deleted documents/pages
+			// https://extract.atlassian.net/browse/ISSUE-16044
+			if (nAffected == 1)
 			{
-				setFileActionState(ipConnection, nFileID, action->second, nWorkflowID, "U", "", true, false, action->first);
+				// Get a FileRecord for this file
+				UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
+				ASSERT_RESOURCE_ALLOCATION("ELI51613", ipFileRecord != __nullptr);
+				{
+					_RecordsetPtr ipFileSet(__uuidof(Recordset));
+					ASSERT_RESOURCE_ALLOCATION("ELI51611", ipFileSet != __nullptr);
+
+					string strFileSQL = Util::Format("SELECT * FROM FAMFile WHERE ID = %d", nFileID);
+					ipFileSet->Open(strFileSQL.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
+						adLockOptimistic, adCmdText);
+
+					FieldsPtr ipFields = ipFileSet->Fields;
+					ASSERT_RESOURCE_ALLOCATION("ELI51612", ipFields != __nullptr);
+
+					// Set pages and file size from the results
+					// (none of the other data is used by updateStats)
+					ipFileRecord->SetFileData(
+						0, 0, "",
+						getLongLongField(ipFields, "FileSize"),
+						getLongField(ipFields, "Pages"),
+						UCLID_FILEPROCESSINGLib::kPriorityNormal, 0);
+					ipFileSet->Close();
+				}
+
+				// Get all the actions for the specified workflow
+				vector<long> actions;
+				{
+					string strActionQuery = Util::Format("SELECT ID FROM Action WHERE WorkflowID = %d", nWorkflowID);
+
+					_RecordsetPtr ipActionSet(__uuidof(Recordset));
+					ASSERT_RESOURCE_ALLOCATION("ELI46706", ipActionSet != __nullptr);
+
+					ipActionSet->Open(strActionQuery.c_str(),
+						_variant_t((IDispatch*)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
+
+					while (ipActionSet->adoEOF == VARIANT_FALSE)
+					{
+						FieldsPtr ipFields = ipActionSet->Fields;
+						actions.push_back(getLongField(ipFields, "ID"));
+						ipActionSet->MoveNext();
+					}
+					ipActionSet->Close();
+				}
+
+				// Update statistics for each action
+				for (auto it = actions.begin(); it != actions.end(); ++it)
+				{
+					long nActionID = *it;
+
+					_RecordsetPtr ipFileActionStatusSet = getFileActionStatusSet(ipConnection, nFileID, nActionID);
+					EActionStatus status = ipFileActionStatusSet->adoEOF
+						? kActionUnattempted
+						: asEActionStatus(getStringField(ipFileActionStatusSet->Fields, "ActionStatus"));
+					ipFileActionStatusSet->Close();
+
+					if (status != kActionUnattempted)
+					{
+						// Subtract stats for non-deleted state
+						updateStats(ipConnection, nActionID, status, kActionUnattempted, __nullptr, ipFileRecord, false);
+
+						// Add stats for deleted state
+						updateStats(ipConnection, nActionID, kActionUnattempted, status, ipFileRecord, __nullptr, true);
+					}
+				}
+
+				tg.CommitTrans();
 			}
-
-			ASSERT_RUNTIME_CONDITION("ELI46299", nAffected == 1, "Failed to mark file deleted.");
-
-			tg.CommitTrans();
+			else
+			{
+				throw UCLIDException("ELI46299", "Failed to mark file deleted.");
+			}
 			
 			END_CONNECTION_RETRY(ipConnection, "ELI46300");
 		}

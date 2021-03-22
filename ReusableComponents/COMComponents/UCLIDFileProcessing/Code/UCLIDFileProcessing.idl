@@ -2073,6 +2073,7 @@ library UCLID_FILEPROCESSINGLib
 		[id(195), helpstring("method AbortFAMSession")] HRESULT AbortFAMSession([in] long nFAMSessionID);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Marks a file as deleted in the specified workflow;
+		//			Updates statistics (via ActionStatisticsDelta)
 		[id(196), helpstring("method MarkFileDeleted")] HRESULT MarkFileDeleted([in] long nFileID, [in] long nWorkflowID);
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: Returns the status of all files in the workflow via a delimited string where each file
@@ -2182,6 +2183,15 @@ library UCLID_FILEPROCESSINGLib
 		// FileSize: The size of the file
 		// PageCount: The number of pages the document has.
 		[id(212), helpstring("method SetFileInformationForFile")] HRESULT SetFileInformationForFile([in] int fileID, [in] long long fileSize, [in] int pageCount);
+
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To return a IActionStatistics pointer that contains the current stats for the specified action ID
+		[id(213), helpstring("method GetDeletedFileStats")] HRESULT GetDeletedFileStats(
+			[in] long nActionID, [in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To return a IActionStatistics pointer that contains the current stats for the specified action name across all workflows
+		[id(214), helpstring("method GetDeletedFileStatsAllWorkflows")] HRESULT GetDeletedFileStatsAllWorkflows(
+			[in] BSTR bstrActionName, [in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
 	};
 
 	[

@@ -162,6 +162,7 @@ public:
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
 	STDMETHOD(GetStats)(long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics** pStats);
+	STDMETHOD(GetDeletedFileStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(Clear)(VARIANT_BOOL vbRetainUserValues);
 	STDMETHOD(CopyActionStatusFromAction)(long  nFromAction, long nToAction);
 	STDMETHOD(RenameAction)(BSTR bstrOldActionName, BSTR bstrNewActionNam);
@@ -337,6 +338,7 @@ public:
 	STDMETHOD(put_ActiveWorkflow)(BSTR bstrWorkflowName);
 	STDMETHOD(get_ActiveActionID)(long* pnActionID);
 	STDMETHOD(GetStatsAllWorkflows)(BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
+	STDMETHOD(GetDeletedFileStatsAllWorkflows)(BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(GetAllActions)(IStrToStrMap** pmapActionNameToID);
 	STDMETHOD(GetWorkflowStatus)(long nFileID, EActionStatus* peaStatus);
 	STDMETHOD(GetAggregateWorkflowStatus)(long *pnUnattempted, long *pnProcessing, long *pnCompleted, long *pnFailed);
@@ -925,7 +927,7 @@ private:
 	//			Only time a ipOldRecord can be NULL is if the from status is kActionUnattempted
 	void updateStats(_ConnectionPtr ipConnection, long nActionID, EActionStatus eFromStatus, 
 		EActionStatus eToStatus, UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewRecord, 
-		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord, bool bUpdateAndSaveStats = true);
+		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord, bool bFileIsDeleted);
 					
 	// PROMISE: To load the stats record from the db from ActionStatistics table using the
 	//			connection provided.
@@ -935,7 +937,7 @@ private:
 	//			if the bDBLocked is false and no record exists or stats are out of date an exception
 	//			will be thrown.
 	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr loadStats(_ConnectionPtr ipConnection, 
-		long nActionID, bool bForceUpdate, bool bDBLocked);
+		long nActionID, bool bDeletedFiles, bool bForceUpdate, bool bDBLocked);
 
 	// Returns the DBSchemaVersion
 	int getDBSchemaVersion();
@@ -1368,7 +1370,8 @@ private:
 		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
 	bool GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction, BSTR bstrFromState, IFileRecord** ppFileRecord);
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);
-	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics* *pStats);
+	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs,
+		bool bGetDeletedFileStats, IActionStatistics* *pStats);
 	bool CopyActionStatusFromAction_Internal(bool bDBLocked, long  nFromAction, long nToAction);
 	bool RenameAction_Internal(bool bDBLocked, BSTR bstrOldActionName, BSTR bstrNewActionNam);
 	bool Clear_Internal(bool bDBLocked, VARIANT_BOOL vbRetainUserValues);
@@ -1495,7 +1498,8 @@ private:
 	bool GetWorkflows_Internal(bool bDBLocked, IStrToStrMap ** pmapWorkFlowNameToID);
 	bool GetWorkflowActions_Internal(bool bDBLocked, long nID, IIUnknownVector ** pvecActions);
 	bool SetWorkflowActions_Internal(bool bDBLocked, long nID, IIUnknownVector* pActionList);
-	bool GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, IActionStatistics* *pStats);
+	bool GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrActionName, VARIANT_BOOL vbForceUpdate, bool bGetDeletedFileStats,
+		IActionStatistics* *pStats);
 	bool GetAllActions_Internal(bool bDBLocked, IStrToStrMap** pmapActionNameToID);
 	bool GetWorkflowStatus_Internal(bool bDBLocked, long nFileID, EActionStatus* peaStatus);
 	bool GetAggregateWorkflowStatus_Internal(bool bDBLocked, long *pnUnattempted, long *pnProcessing,
