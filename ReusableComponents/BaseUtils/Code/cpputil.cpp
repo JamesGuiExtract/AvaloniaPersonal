@@ -34,6 +34,7 @@
 #include <algorithm>
 #include <iterator>
 #include <afxmt.h>
+#include <cstdarg>
 
 // FIXTHIS: confirm that it is OK to comment these lines
 // #include <d3dtypes.h>
@@ -1404,8 +1405,6 @@ namespace Util
 {
 	namespace Internal
 	{
-		const size_t Size = 1024 * 8;
-
 		//Lookup table for encoding
 		//If you want to use an alternate alphabet, change the characters here
 		const static TCHAR encodeLookup[] = TEXT("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
@@ -1415,25 +1414,37 @@ namespace Util
 	// Utility function that provides string formatting. This function takes a format specifier
 	// string constant (exactly like printf or sprintf does), and a set of 1..N arguments for
 	// the specifier string. Standard printf-style format specifiers are used in the format string.
-	std::string Format( const char* formatString, ... )
+	// Modified to loop if needed instead of always using two calls to printf
+	// (modified using code from https://codereview.stackexchange.com/a/115794)
+	std::string Format(const char* const formatString, ...)
 	{
 		try
 		{
 			ASSERT_ARGUMENT("ELI39182", formatString != nullptr);
 
-			va_list args;
-			va_start( args, formatString );
-		
-			int size = _vscprintf(formatString ,args) + 1;
-			std::vector<char> buffer( size, '\0' );
+			auto temp = std::vector<char>{};
+			auto length = std::size_t{ 63 };
+			std::va_list args;
+			while (temp.size() <= length)
+			{
+				temp.resize(length + 1); // Length + null terminating character
+				va_start(args, formatString);
+				const auto status = std::vsnprintf(temp.data(), temp.size(), formatString, args);
+				va_end(args);
 
-			int ret = ::vsnprintf_s( &buffer[0], size, _TRUNCATE, formatString, args );
-			ASSERT_RUNTIME_CONDITION( "ELI38885", ret > 0, "Format caused string truncation" );
+				// Status is negative if there was an error
+				ASSERT_RUNTIME_CONDITION("ELI38885", status >= 0, "Format string failure");
 
-			return std::string( &buffer[0] );
+				// vsnprintf returns the total number of characters excluding the terminating null character which
+				// were written or would have been written if the buffer were large enough
+				length = static_cast<std::size_t>(status);
+			}
+
+			return std::string{ temp.data(), length };
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI39183")
 	}
+	
 	//-------------------------------------------------------------------------------------------------
 	std::basic_string<TCHAR> base64Encode(std::stringstream& inputBuffer)
 	{
