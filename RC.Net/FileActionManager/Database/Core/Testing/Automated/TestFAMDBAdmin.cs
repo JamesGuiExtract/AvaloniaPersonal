@@ -2,8 +2,10 @@
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
 using UCLID_FILEPROCESSINGLib;
 
@@ -254,11 +256,18 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
+
         /// <summary>
         /// Tests the ModifyActionStatusForSelection method in a database with workflows
         /// </summary>
-        [Test, Category("Automated")]
-        public static void ModifyActionStatusForSelectionWithWorkflows()
+        [Category("Automated")]
+        [TestCase(false)]
+        [TestCase(true, 1, 1)]
+        [TestCase(true, 1, 2)]
+        [TestCase(true, 2, 1)]
+        [TestCase(true, 2, 2)]
+        [TestCase(true, 2, 3)]
+        public static void ModifyActionStatusForSelectionWithWorkflows(bool deleteFilesFromWorkflow, int workflowToDeleteFrom = 0, int fileToDelete = 0)
         {
             GeneralMethods.TestSetup();
 
@@ -283,44 +292,81 @@ namespace Extract.FileActionManager.Database.Test
                 //   Action 1                     1,2           
                 //   Action 2   1                  2
                 //   Action 3   3                        2
+                var expectedWorkflowStatuses = new ActionStatus[][]
+                {
+                    new ActionStatus[]
+                    {
+                        new ActionStatus{P = new[] { 1 }, C = new[] { 2 } },
+                        new ActionStatus{P = new[] { 2 } },
+                        new ActionStatus(),
+                    },
+                    new ActionStatus[]
+                    {
+                        new ActionStatus{C = new[] { 1, 2 } },
+                        new ActionStatus{P = new[] { 1 }, C = new[] { 2 } },
+                        new ActionStatus{P = new[] { 3 }, F = new[] { 2 } },
+                    }
+                };
+                ActionStatusCounts[] expectedCountsByAction = expectedWorkflowStatuses.ComputeCountsFromIDsByAction();
 
                 int workflowID1 = fileProcessingDb.AddWorkflow(
                     "Workflow1", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2);
-
                 fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionPending, false, out bool alreadyExists, out EActionStatus previousStatus);
+                    true, false, EActionStatus.kActionPending, false, out _, out _);
                 fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, workflowID1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionCompleted, false, out alreadyExists, out previousStatus);
+                    true, false, EActionStatus.kActionCompleted, false, out _, out _);
                 fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION2, workflowID1, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+                    true, false, EActionStatus.kActionPending, false, out _, out _);
 
                 int workflowID2 = fileProcessingDb.AddWorkflow(
                     "Workflow2", EWorkflowType.kUndefined, _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3);
 
                 fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION1, workflowID2, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionCompleted, false, out alreadyExists, out previousStatus);
+                    true, false, EActionStatus.kActionCompleted, false, out _, out _);
                 fileProcessingDb.AddFile(testFileName1, _LABDE_ACTION2, workflowID2, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
+                    true, false, EActionStatus.kActionPending, false, out _, out _);
                 fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION1, workflowID2, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionCompleted, false, out alreadyExists, out previousStatus);
+                    true, false, EActionStatus.kActionCompleted, false, out _, out _);
                 fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION2, workflowID2, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionCompleted, false, out alreadyExists, out previousStatus);
+                    true, false, EActionStatus.kActionCompleted, false, out _, out _);
                 fileProcessingDb.AddFile(testFileName2, _LABDE_ACTION3, workflowID2, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionFailed, false, out alreadyExists, out previousStatus);
+                    true, false, EActionStatus.kActionFailed, false, out _, out _);
                 fileProcessingDb.AddFile(testFileName3, _LABDE_ACTION3, workflowID2, EFilePriority.kPriorityNormal,
-                    true, false, EActionStatus.kActionPending, false, out alreadyExists, out previousStatus);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete == 3);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 2);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsComplete == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsFailed == 1);
+                    true, false, EActionStatus.kActionPending, false, out _, out _);
 
+                string[] actions = { _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3 };
+                var actualCountsByAction = actions.Select(a => fileProcessingDb.GetStatsAllWorkflows(a, false)).ComputeCountsFromActionStatisticsByAction();
+                CollectionAssert.AreEquivalent(expectedCountsByAction, actualCountsByAction);
+
+                // Separate the expected data. If not deleting then these will be the same as total and empty, respectively
+                ActionStatus[][] expectedNonDeletedStatus = expectedWorkflowStatuses;
+                ActionStatus[][] expectedDeletedStatus = expectedWorkflowStatuses.KeepOnlySpecifiedFile(0, 0);
+
+                if (deleteFilesFromWorkflow)
+                {
+                    fileProcessingDb.MarkFileDeleted(fileToDelete, workflowToDeleteFrom);
+
+                    expectedNonDeletedStatus = expectedWorkflowStatuses.RemoveFileFromWorkflow(workflowToDeleteFrom, fileToDelete);
+                    var expectedNonDeletedCountsByAction = expectedNonDeletedStatus.ComputeCountsFromIDsByAction();
+
+                    var actualNonDeletedCountsByAction = actions
+                        .Select(action => fileProcessingDb.GetStatsAllWorkflows(action, false))
+                        .ComputeCountsFromActionStatisticsByAction();
+                    CollectionAssert.AreEquivalent(expectedNonDeletedCountsByAction, actualNonDeletedCountsByAction);
+
+                    expectedDeletedStatus = expectedWorkflowStatuses.KeepOnlySpecifiedFile(workflowToDeleteFrom, fileToDelete);
+                    var expectedDeletedCountsByAction = expectedDeletedStatus.ComputeCountsFromIDsByAction();
+
+                    var actualDeletedCountsByAction = actions.Select(a => fileProcessingDb.GetDeletedFileStatsAllWorkflows(a, false)).ComputeCountsFromActionStatisticsByAction();
+                    CollectionAssert.AreEquivalent(expectedDeletedCountsByAction, actualDeletedCountsByAction);
+                }
+
+                // Make workflow 1 active
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 int actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
                 int actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
-                Assert.That(fileProcessingDb.GetFileCount(false) == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 2);
+                Assert.AreEqual(2, fileProcessingDb.GetFileCount(false));
+                Assert.AreEqual(2, fileProcessingDb.GetStats(actionId1, false).NumDocuments + fileProcessingDb.GetDeletedFileStats(actionId1, false).NumDocuments);
 
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
@@ -337,27 +383,90 @@ namespace Extract.FileActionManager.Database.Test
                 //   Action 2   1                  2
                 //   Action 3   3                        2
 
-                Assert.That(fileProcessingDb.GetFileCount(false) == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 0);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsComplete == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete == 2);
+                expectedWorkflowStatuses = new ActionStatus[][]
+                {
+                    new ActionStatus[]
+                    {
+                        new ActionStatus(),
+                        new ActionStatus{P = new[] { 2 } },
+                        new ActionStatus(),
+                    },
+                    new ActionStatus[]
+                    {
+                        new ActionStatus{C = new[] { 1, 2 } },
+                        new ActionStatus{P = new[] { 1 }, C = new[] { 2 } },
+                        new ActionStatus{P = new[] { 3 }, F = new[] { 2 } },
+                    }
+                };
 
+                if (deleteFilesFromWorkflow)
+                {
+                    expectedNonDeletedStatus = expectedWorkflowStatuses.RemoveFileFromWorkflow(workflowToDeleteFrom, fileToDelete);
+                    expectedDeletedStatus = expectedWorkflowStatuses.KeepOnlySpecifiedFile(workflowToDeleteFrom, fileToDelete);
+                }
+                else
+                {
+                    expectedNonDeletedStatus = expectedWorkflowStatuses;
+                    expectedDeletedStatus = expectedWorkflowStatuses.KeepOnlySpecifiedFile(0, 0);
+                }
+
+                Assert.That(fileProcessingDb.GetFileCount(false) == 2);
+
+                // Compute the expected stats for workflow 1
+                var expectedNonDeletedStats = expectedNonDeletedStatus[0].ComputeCountsFromIDsByAction();
+                var expectedDeletedStats = expectedDeletedStatus[0].ComputeCountsFromIDsByAction();
+
+                var actionIDs = new[] { actionId1, actionId2, 0 };
+                var actualNonDeletedStats = actionIDs
+                    .Select(actionID => actionID == 0 ? new ActionStatisticsClass() : fileProcessingDb.GetStats(actionID, false))
+                    .ToArray()
+                    .ComputeCountsFromActionStatisticsByAction();
+
+                var actualDeletedStats = actionIDs
+                    .Select(actionID => actionID == 0 ? new ActionStatisticsClass() : fileProcessingDb.GetDeletedFileStats(actionID, false))
+                    .ToArray()
+                    .ComputeCountsFromActionStatisticsByAction();
+
+                CollectionAssert.AreEquivalent(expectedNonDeletedStats, actualNonDeletedStats);
+                CollectionAssert.AreEquivalent(expectedDeletedStats, actualDeletedStats);
+
+                // Compute expected numbers for action 1, all workflows
+                var expectedNonDeletedAction1Stats = expectedNonDeletedStatus.ComputeCountsFromIDsByAction()[0];
+                var expectedDeletedAction1Stats = expectedDeletedStatus.ComputeCountsFromIDsByAction()[0];
+                var expectedCombinedStats = expectedNonDeletedAction1Stats + expectedDeletedAction1Stats;
+
+                // Sanity check, combined numbers match previous expected data for action 1
+                Assert.AreEqual(new ActionStatusCounts { C = 2 }, expectedCombinedStats);
+
+                var actualNonDeletedAction1Stats = fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).ComputeCountsFromActionStatistics();
+                Assert.AreEqual(expectedNonDeletedAction1Stats, actualNonDeletedAction1Stats);
+
+                var actualDeletedAction1Stats = fileProcessingDb.GetDeletedFileStatsAllWorkflows(_LABDE_ACTION1, false).ComputeCountsFromActionStatistics();
+                Assert.AreEqual(expectedDeletedAction1Stats, actualDeletedAction1Stats);
+
+                // Make workflow 2 active
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
                 actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
                 actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
                 int actionId3 = fileProcessingDb.GetActionID(_LABDE_ACTION3);
 
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsPending == 0);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsComplete == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsComplete == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsFailed == 1);
+                // Compute the expected stats for workflow 2
+                expectedNonDeletedStats = expectedNonDeletedStatus[1].ComputeCountsFromIDsByAction();
+                expectedDeletedStats = expectedDeletedStatus[1].ComputeCountsFromIDsByAction();
+
+                actionIDs = new[] { actionId1, actionId2, actionId3 };
+                actualNonDeletedStats = actionIDs
+                    .Select(actionID => fileProcessingDb.GetStats(actionID, false))
+                    .ToArray()
+                    .ComputeCountsFromActionStatisticsByAction();
+
+                actualDeletedStats = actionIDs
+                    .Select(actionID => fileProcessingDb.GetDeletedFileStats(actionID, false))
+                    .ToArray()
+                    .ComputeCountsFromActionStatisticsByAction();
+
+                CollectionAssert.AreEquivalent(expectedNonDeletedStats, actualNonDeletedStats);
+                CollectionAssert.AreEquivalent(expectedDeletedStats, actualDeletedStats);
 
                 Assert.That(fileProcessingDb.GetFileCount(false) == 3);
 
@@ -377,10 +486,53 @@ namespace Extract.FileActionManager.Database.Test
                 //   Action 2   1                  2
                 //   Action 3  2,3                
 
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsFailed == 0);
+                expectedWorkflowStatuses = new ActionStatus[][]
+                {
+                    new ActionStatus[]
+                    {
+                        new ActionStatus(),
+                        new ActionStatus{P = new[] { 2 } },
+                        new ActionStatus(),
+                    },
+                    new ActionStatus[]
+                    {
+                        new ActionStatus{C = new[] { 1, 2 } },
+                        new ActionStatus{P = new[] { 1 }, C = new[] { 2 } },
+                        new ActionStatus{P = new[] { 2, 3 } },
+                    }
+                };
 
+                if (deleteFilesFromWorkflow)
+                {
+                    expectedNonDeletedStatus = expectedWorkflowStatuses.RemoveFileFromWorkflow(workflowToDeleteFrom, fileToDelete);
+                    expectedDeletedStatus = expectedWorkflowStatuses.KeepOnlySpecifiedFile(workflowToDeleteFrom, fileToDelete);
+                }
+                else
+                {
+                    expectedNonDeletedStatus = expectedWorkflowStatuses;
+                    expectedDeletedStatus = expectedWorkflowStatuses.KeepOnlySpecifiedFile(0, 0);
+                }
+
+                // Compute the expected stats for workflow 2
+                expectedNonDeletedStats = expectedNonDeletedStatus[1].ComputeCountsFromIDsByAction();
+                expectedDeletedStats = expectedDeletedStatus[1].ComputeCountsFromIDsByAction();
+
+                actionIDs = new[] { actionId1, actionId2, actionId3 };
+                actualNonDeletedStats = actionIDs
+                    .Select(actionID => fileProcessingDb.GetStats(actionID, false))
+                    .ToArray()
+                    .ComputeCountsFromActionStatisticsByAction();
+
+                actualDeletedStats = actionIDs
+                    .Select(actionID => fileProcessingDb.GetDeletedFileStats(actionID, false))
+                    .ToArray()
+                    .ComputeCountsFromActionStatisticsByAction();
+
+                CollectionAssert.AreEquivalent(expectedNonDeletedStats, actualNonDeletedStats);
+                CollectionAssert.AreEquivalent(expectedDeletedStats, actualDeletedStats);
+
+
+                // Make all workflows active
                 fileProcessingDb.ActiveWorkflow = "";
 
                 fileSelector.Reset();
@@ -398,34 +550,94 @@ namespace Extract.FileActionManager.Database.Test
                 //   Action 2   1           2,3       
                 //   Action 3  2,3      
 
-                Assert.That(fileProcessingDb.GetFileCount(false) == 3);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION1, false).NumDocumentsComplete == 2);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocuments == 4);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION2, false).NumDocumentsSkipped == 3);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsPending == 2);
+                expectedWorkflowStatuses = new ActionStatus[][]
+                {
+                    new ActionStatus[]
+                    {
+                        new ActionStatus(),
+                        new ActionStatus{S = new[] { 2 } },
+                        new ActionStatus(),
+                    },
+                    new ActionStatus[]
+                    {
+                        new ActionStatus{C = new[] { 1, 2 } },
+                        new ActionStatus{P = new[] { 1 }, S = new[] { 2, 3 } },
+                        new ActionStatus{P = new[] { 2, 3 } },
+                    }
+                };
 
+                if (deleteFilesFromWorkflow)
+                {
+                    expectedNonDeletedStatus = expectedWorkflowStatuses.RemoveFileFromWorkflow(workflowToDeleteFrom, fileToDelete);
+                    expectedDeletedStatus = expectedWorkflowStatuses.KeepOnlySpecifiedFile(workflowToDeleteFrom, fileToDelete);
+                }
+                else
+                {
+                    expectedNonDeletedStatus = expectedWorkflowStatuses;
+                    expectedDeletedStatus = expectedWorkflowStatuses.KeepOnlySpecifiedFile(0, 0);
+                }
+
+                Assert.AreEqual(3, fileProcessingDb.GetFileCount(false));
+
+                // Compute the expected stats for all workflows
+                expectedNonDeletedStats = expectedNonDeletedStatus.ComputeCountsFromIDsByAction();
+                expectedDeletedStats = expectedDeletedStatus.ComputeCountsFromIDsByAction();
+
+                actualNonDeletedStats = actions.Select(a => fileProcessingDb.GetStatsAllWorkflows(a, false)).ComputeCountsFromActionStatisticsByAction();
+                CollectionAssert.AreEquivalent(expectedNonDeletedStats, actualNonDeletedStats);
+
+                actualDeletedStats = actions.Select(a => fileProcessingDb.GetDeletedFileStatsAllWorkflows(a, false)).ComputeCountsFromActionStatisticsByAction();
+                CollectionAssert.AreEquivalent(expectedDeletedStats, actualDeletedStats);
+
+                // Make workflow 1 active
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
                 actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
                 actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
-                Assert.That(fileProcessingDb.GetFileCount(false) == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 0);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocuments == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsSkipped == 1);
 
+                // Compute the expected stats for workflow 1
+                expectedNonDeletedStats = expectedNonDeletedStatus[0].ComputeCountsFromIDsByAction();
+                expectedDeletedStats = expectedDeletedStatus[0].ComputeCountsFromIDsByAction();
+
+                actionIDs = new[] { actionId1, actionId2, 0 };
+                actualNonDeletedStats = actionIDs
+                    .Select(actionID => actionID == 0 ? new ActionStatisticsClass() : fileProcessingDb.GetStats(actionID, false))
+                    .ToArray()
+                    .ComputeCountsFromActionStatisticsByAction();
+
+                actualDeletedStats = actionIDs
+                    .Select(actionID => actionID == 0 ? new ActionStatisticsClass() : fileProcessingDb.GetDeletedFileStats(actionID, false))
+                    .ToArray()
+                    .ComputeCountsFromActionStatisticsByAction();
+
+                CollectionAssert.AreEquivalent(expectedNonDeletedStats, actualNonDeletedStats);
+                CollectionAssert.AreEquivalent(expectedDeletedStats, actualDeletedStats);
+
+                Assert.AreEqual(2, fileProcessingDb.GetFileCount(false));
+
+                // Make workflow 2 active
                 fileProcessingDb.ActiveWorkflow = "Workflow2";
                 actionId1 = fileProcessingDb.GetActionID(_LABDE_ACTION1);
                 actionId2 = fileProcessingDb.GetActionID(_LABDE_ACTION2);
-                Assert.That(fileProcessingDb.GetFileCount(false) == 3);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId1, false).NumDocumentsComplete == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocuments == 3);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsPending == 1);
-                Assert.That(fileProcessingDb.GetStats(actionId2, false).NumDocumentsSkipped == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocuments == 2);
-                Assert.That(fileProcessingDb.GetStats(actionId3, false).NumDocumentsPending == 2);
+
+                // Compute the expected stats for workflow 2
+                expectedNonDeletedStats = expectedNonDeletedStatus[1].ComputeCountsFromIDsByAction();
+                expectedDeletedStats = expectedDeletedStatus[1].ComputeCountsFromIDsByAction();
+
+                actionIDs = new[] { actionId1, actionId2, actionId3 };
+                actualNonDeletedStats = actionIDs
+                    .Select(actionID => fileProcessingDb.GetStats(actionID, false))
+                    .ToArray()
+                    .ComputeCountsFromActionStatisticsByAction();
+
+                actualDeletedStats = actionIDs
+                    .Select(actionID => fileProcessingDb.GetDeletedFileStats(actionID, false))
+                    .ToArray()
+                    .ComputeCountsFromActionStatisticsByAction();
+
+                CollectionAssert.AreEquivalent(expectedNonDeletedStats, actualNonDeletedStats);
+                CollectionAssert.AreEquivalent(expectedDeletedStats, actualDeletedStats);
+
+                Assert.AreEqual(3, fileProcessingDb.GetFileCount(false));
             }
             finally
             {
@@ -825,5 +1037,167 @@ namespace Extract.FileActionManager.Database.Test
         }
 
         #endregion Test Methods
+
     }
+
+    #region Helper Classes
+
+    // FileIDs for each status
+    class ActionStatus
+    {
+        public int[] P = Array.Empty<int>();
+        public int[] R = Array.Empty<int>();
+        public int[] S = Array.Empty<int>();
+        public int[] C = Array.Empty<int>();
+        public int[] F = Array.Empty<int>();
+
+        public ActionStatus() { }
+
+        ActionStatus(int[][] statuses)
+        {
+            P = statuses[0];
+            R = statuses[1];
+            S = statuses[2];
+            C = statuses[3];
+            F = statuses[4];
+        }
+
+        int[][] statuses => new int[][] { P, R, S, C, F };
+
+        // Create a copy that has specific file IDs filtered out
+        public ActionStatus CopyWithFileFilter(Func<int, bool> fileFilter)
+        {
+            return new ActionStatus(statuses.Select(status => status.Where(fileFilter).ToArray()).ToArray());
+        }
+    }
+
+    // Total counts for each status
+    class ActionStatusCounts : IEquatable<ActionStatusCounts>
+    {
+        public int P;
+        public int R;
+        public int S;
+        public int C;
+        public int F;
+
+        public ActionStatusCounts() { }
+
+        ActionStatusCounts(int[] counts)
+        {
+            P = counts[0];
+            R = counts[1];
+            S = counts[2];
+            C = counts[3];
+            F = counts[4];
+        }
+
+        int[] counts => new int[] { P, R, S, C, F };
+
+        public bool Equals(ActionStatusCounts other)
+        {
+            return
+                P == other.P &&
+                R == other.R &&
+                S == other.S &&
+                C == other.C &&
+                F == other.F;
+        }
+
+        public static ActionStatusCounts operator +(ActionStatusCounts a, ActionStatusCounts b)
+        {
+            return new ActionStatusCounts(a.counts.Zip(b.counts, (a, b) => a + b).ToArray());
+        }
+
+        public override string ToString()
+        {
+            return UtilityMethods.FormatInvariant($"P={P},R={R},S={S},C={C},F={F}");
+        }
+    }
+
+    static class ActionStatusExtensions
+    {
+        static ActionStatus[][] FilterFileFromWorkflow(ActionStatus[][] statuses, int workflowToDeleteFrom, bool keepFilesInOtherWorkflows, Func<int, bool> fileFilter)
+        {
+            return statuses
+                .Select((workflow, i) => (i + 1) == workflowToDeleteFrom
+                    ? workflow.Select(a => a.CopyWithFileFilter(fileFilter)).ToArray()
+                    : keepFilesInOtherWorkflows
+                        ? workflow
+                        : workflow.Select(a => new ActionStatus()).ToArray())
+                .ToArray();
+        }
+
+        public static ActionStatus[][] RemoveFileFromWorkflow(this ActionStatus[][] statuses, int workflowToDeleteFrom, int fileToDelete)
+        {
+            return FilterFileFromWorkflow(statuses, workflowToDeleteFrom, true, fileID => fileID != fileToDelete);
+        }
+
+        public static ActionStatus[][] KeepOnlySpecifiedFile(this ActionStatus[][] statuses, int workflowToDeleteFrom, int fileToKeep)
+        {
+            return FilterFileFromWorkflow(statuses, workflowToDeleteFrom, false, fileID => fileID == fileToKeep);
+        }
+
+        public static ActionStatusCounts ComputeCountsFromIDs(this ActionStatus action)
+        {
+            return new ActionStatusCounts
+            {
+                P = action.P.Length,
+                R = action.R.Length,
+                S = action.S.Length,
+                C = action.C.Length,
+                F = action.F.Length
+            };
+        }
+
+        public static ActionStatusCounts ComputeCountsFromIDs(this ActionStatus[] workflows)
+        {
+            return workflows.Select(ComputeCountsFromIDs).Aggregate((acc, x) => acc + x);
+        }
+
+        public static ActionStatusCounts[] ComputeCountsFromIDsByAction(this ActionStatus[] actions)
+        {
+            return actions.Select(ComputeCountsFromIDs).ToArray();
+        }
+
+        // Require each array to have the same length (each 'workflow' has every action represented)
+        public static ActionStatusCounts[] ComputeCountsFromIDsByAction(this ActionStatus[][] workflows)
+        {
+            int numWorkflows = workflows.Length;
+            int numActions = workflows[0].Length;
+
+            foreach (var workflow in workflows)
+            {
+                Assert.AreEqual(numActions, workflow.Length);
+            }
+
+            // Transpose the matrix to sum by action
+            ActionStatus[][] actions = new ActionStatus[numActions][];
+            for (int i = 0; i < numActions; i++)
+            {
+                actions[i] = new ActionStatus[numWorkflows];
+                for (int j = 0; j < numWorkflows; j++)
+                {
+                    actions[i][j] = workflows[j][i];
+                }
+            }
+            return actions.Select(ComputeCountsFromIDs).ToArray();
+        }
+
+        public static ActionStatusCounts ComputeCountsFromActionStatistics(this ActionStatistics stats)
+        {
+            var p = stats.NumDocumentsPending;
+            var s = stats.NumDocumentsSkipped;
+            var c = stats.NumDocumentsComplete;
+            var f = stats.NumDocumentsFailed;
+            var r = stats.NumDocuments - p - s - c - f;
+            return new ActionStatusCounts { P = p, R = r, S = s, C = c, F = f };
+        }
+
+        public static ActionStatusCounts[] ComputeCountsFromActionStatisticsByAction(this IEnumerable<ActionStatistics> actions)
+        {
+            return actions.Select(ComputeCountsFromActionStatistics).ToArray();
+        }
+    }
+
+    #endregion
 }

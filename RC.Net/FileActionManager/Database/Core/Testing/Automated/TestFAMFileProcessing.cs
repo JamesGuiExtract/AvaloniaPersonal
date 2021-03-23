@@ -580,13 +580,14 @@ namespace Extract.FileActionManager.Database.Test
         public static void GetFilesToProcessAndNotify()
         {
             string testDbName = "Test_GetFilesToProcessAndNotify";
+            FileProcessingDB fileProcessingDb = null;
 
             try
             {
                 string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
                 string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
                 string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
-                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
 
                 // Start processing
                 int extractAction = fileProcessingDb.GetActionID(_LABDE_ACTION1);
@@ -648,6 +649,7 @@ namespace Extract.FileActionManager.Database.Test
             }
             finally
             {
+                fileProcessingDb?.UnregisterActiveFAM();
                 _testFiles.RemoveFile(_LABDE_TEST_FILE1);
                 _testFiles.RemoveFile(_LABDE_TEST_FILE2);
                 _testFiles.RemoveFile(_LABDE_TEST_FILE3);
@@ -659,12 +661,13 @@ namespace Extract.FileActionManager.Database.Test
         public static void GetFilesToProcessAndNotifyWithWorkflows()
         {
             string testDbName = "Test_GetFilesToProcessAndNotifyWithWorkflows";
+            FileProcessingDB fileProcessingDb = null;
 
             try
             {
                 string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
                 string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
-                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
                 fileProcessingDb.SetDBInfoSetting("EnableLoadBalancing", "0", true, false);
 
                 int workflowID1 = fileProcessingDb.AddWorkflow(
@@ -760,6 +763,7 @@ namespace Extract.FileActionManager.Database.Test
             }
             finally
             {
+                fileProcessingDb?.UnregisterActiveFAM();
                 _testFiles.RemoveFile(_LABDE_TEST_FILE1);
                 _testFiles.RemoveFile(_LABDE_TEST_FILE2);
                 _testDbManager.RemoveDatabase(testDbName);
@@ -773,13 +777,14 @@ namespace Extract.FileActionManager.Database.Test
         public static void GetWorkflowStatus()
         {
             string testDbName = "Test_GetWorkflowStatus";
+            FileProcessingDB fileProcessingDb = null;
 
             try
             {
                 string testFileName1 = _testFiles.GetFile(_LABDE_TEST_FILE1);
                 string testFileName2 = _testFiles.GetFile(_LABDE_TEST_FILE2);
                 string testFileName3 = _testFiles.GetFile(_LABDE_TEST_FILE3);
-                var fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
+                fileProcessingDb = _testDbManager.GetDatabase(_LABDE_EMPTY_DB, testDbName);
                 fileProcessingDb.DefineNewAction(_LABDE_ACTION4);
                 fileProcessingDb.DefineNewAction(_CLEANUP_ACTION);
 
@@ -885,6 +890,7 @@ namespace Extract.FileActionManager.Database.Test
             }
             finally
             {
+                fileProcessingDb?.UnregisterActiveFAM();
                 _testFiles.RemoveFile(_LABDE_TEST_FILE1);
                 _testFiles.RemoveFile(_LABDE_TEST_FILE2);
                 _testFiles.RemoveFile(_LABDE_TEST_FILE3);
