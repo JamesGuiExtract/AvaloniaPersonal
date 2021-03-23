@@ -790,7 +790,7 @@ EOrientation CScansoftOCR2::getOrientation(int nRotationInDegrees, IMG_ROTATE &r
 		{
 			UCLIDException ue("ELI16660", "Invalid setting for rotation angle!");
 			ue.addDebugInfo( "Desired Rotation", nRotationInDegrees );
-			throw;
+			throw ue;
 		}
 	}
 
@@ -813,7 +813,7 @@ EOrientation CScansoftOCR2::getOrientation(int nRotationInDegrees, IMG_ROTATE &r
 		// Other orientations are not supported
 		UCLIDException ue("ELI16662", "Invalid orientation for SpatialPageInfo!");
 		ue.addDebugInfo( "Orientation", rimgRotate );
-		throw;
+		throw ue;
 	}
 }
 //-------------------------------------------------------------------------------------------------
