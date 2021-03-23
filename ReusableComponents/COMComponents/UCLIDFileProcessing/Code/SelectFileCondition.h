@@ -10,6 +10,10 @@ class SelectFileCondition abstract
 {
 public:
 
+	// Defining a virtual destructor ensures that destructors for derived classes will be called
+	// when deleting pointers to the base class (see SelectFileSettings.clearConditions)
+	virtual ~SelectFileCondition(void) {};
+
 	// Allows configuration of this instance.
 	virtual bool configure(const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipFAMDB,
 		const string& strQueryHeader) abstract;
