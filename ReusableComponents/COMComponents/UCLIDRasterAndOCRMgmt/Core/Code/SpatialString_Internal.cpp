@@ -4728,22 +4728,24 @@ void CSpatialString::savePagesToArchive(const string& strOutputFile, IIUnknownVe
 		string baseName(pszTemp);
 		string internalPath = baseName + "." + asString(page->OCREngineVersion) + ".uss";
 
-        int retries = 0;
-        while (!z.AddFileToPathInZip(bstrtTmpPagePath, internalPath.c_str()))
-        {
-            if (retries >= 50)
-            {
-                UCLIDException ue("ELI49657", "Unable to save pages to uss file.");
-                ue.addDebugInfo("OutputFile", strOutputFile);
-                ue.addDebugInfo("NumberOfRetries", retries);
-                throw ue;
-            }
-            retries++;
-            Sleep(100);
-            // Always reopen with bAppend = true when retrying or else the recently added pages will be lost
-			// https://extract.atlassian.net/browse/ISSUE-17435
-            z.OpenZip(strOutputFile.c_str(), NULL, true);
-        }
+		Util::retry(50, "save page to uss file",
+			[&]() -> bool {
+                return z.AddFileToPathInZip(bstrtTmpPagePath, internalPath.c_str());
+			},
+			[&](int tries) -> void {
+				UCLIDException ue("ELI51628", "Application trace: Unable to save page to uss file. Retrying...");
+				ue.addDebugInfo("Attempt", tries);
+				ue.addDebugInfo("Output File", strOutputFile);
+				ue.addDebugInfo("Page Number", pageNumber);
+				ue.log();
+				Sleep(max(1000, 100 * tries));
+
+				// Always reopen with bAppend = true when retrying or else the recently added pages will be lost
+				// https://extract.atlassian.net/browse/ISSUE-17435
+				z.OpenZip(strOutputFile.c_str(), NULL, true);
+			},
+			"ELI49657"
+		);
 	}
 }
 //-------------------------------------------------------------------------------------------------
