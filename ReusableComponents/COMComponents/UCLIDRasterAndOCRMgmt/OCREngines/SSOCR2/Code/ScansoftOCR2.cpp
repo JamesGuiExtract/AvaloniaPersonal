@@ -905,9 +905,17 @@ void CScansoftOCR2::recognizeTextOnPages(const string& strFileName,
 	bool bDetectHandwriting, bool bReturnUnrecognized,
 	string& rstrText, vector<CPPLetter>* pvecLetters, ILongToObjectMapPtr ipPageInfos)
 {
+	// Set auto conversion mode (so that color images are converted to bitonal)
+	// This prevents strange behavior on certain mixed bitonal/color TIFs
+	// https://extract.atlassian.net/browse/ISSUE-17441
+	kRecSetImgConvMode(0, CNV_AUTO);
+
+	// Reset conversion mode after OCR is finished in case this instance is used for an image conversion task
+	shared_ptr<void> resetConvMode(__nullptr, [](void*){ kRecSetImgConvMode(0, CNV_NO); });
+
 	// load the specified image file
 	THROW_UE_ON_ERROR("ELI16639", "Unable to load specified image file in the OCR engine!",
-		kRecOpenImgFile(strFileName.c_str(), &m_hImageFile, IMGF_READ, FF_SIZE) );
+		kRecOpenImgFile(strFileName.c_str(), &m_hImageFile, IMGF_READ, FF_SIZE));
 
 	// ensure that the memory stored for the image file is released
 	RecMemoryReleaser<tagIMGFILEHANDLE> ImageFileMemoryReleaser(m_hImageFile);
@@ -931,7 +939,7 @@ void CScansoftOCR2::recognizeTextOnPages(const string& strFileName,
 		// create a vector to store the page letters if appropriate
 		vector<CPPLetter> vecPageLetters;
 		vector<CPPLetter>* pvecPageLetters = NULL;
-		if(pvecLetters != __nullptr)
+		if (pvecLetters != __nullptr)
 		{
 			pvecPageLetters = &vecPageLetters;
 		}
@@ -947,8 +955,8 @@ void CScansoftOCR2::recognizeTextOnPages(const string& strFileName,
 					setDecompositionMethodIndex(i);
 
 					// Recognize the text in the current page
-					rotateAndRecognizeTextInImagePage(strFileName, ms_lCurrentPageNumber, pZone, 
-						nRotationInDegrees, bDetectHandwriting, bReturnUnrecognized, strPageText, 
+					rotateAndRecognizeTextInImagePage(strFileName, ms_lCurrentPageNumber, pZone,
+						nRotationInDegrees, bDetectHandwriting, bReturnUnrecognized, strPageText,
 						pvecPageLetters, ipPageInfos);
 
 					break;
@@ -980,7 +988,7 @@ void CScansoftOCR2::recognizeTextOnPages(const string& strFileName,
 					}
 					else
 					{
-						apAggregateException.reset(new UCLIDException("ELI26801", message, 
+						apAggregateException.reset(new UCLIDException("ELI26801", message,
 							*apAggregateException));
 					}
 
@@ -990,17 +998,17 @@ void CScansoftOCR2::recognizeTextOnPages(const string& strFileName,
 					// Check if all pages failed
 					if (m_bRequireOnePageSuccess && m_vecFailedPages.size() == vecPageNumbers.size())
 					{
-						apAggregateException.reset(new UCLIDException("ELI46008", 
+						apAggregateException.reset(new UCLIDException("ELI46008",
 							"Failure to OCR image. All pages failed.", *apAggregateException));
 
-						throw *apAggregateException;
+						throw* apAggregateException;
 					}
 
 					// Check if max failures reached
-					if (m_vecFailedPages.size() > m_uiMaxOcrPageFailureNumber || 
+					if (m_vecFailedPages.size() > m_uiMaxOcrPageFailureNumber ||
 						m_vecFailedPages.size() * 100.0 / uiCount > (double)m_uiMaxOcrPageFailurePercentage)
 					{
-						apAggregateException.reset(new UCLIDException("ELI26802", 
+						apAggregateException.reset(new UCLIDException("ELI26802",
 							"Failure to OCR image. Max page failures reached.", *apAggregateException));
 
 						string strFailedPages = asString(m_vecFailedPages[0]);
@@ -1010,7 +1018,7 @@ void CScansoftOCR2::recognizeTextOnPages(const string& strFileName,
 						}
 						apAggregateException->addDebugInfo("Failed page numbers", strFailedPages, false);
 
-						throw *apAggregateException;
+						throw* apAggregateException;
 					}
 				}
 			}
@@ -1049,7 +1057,7 @@ void CScansoftOCR2::recognizeTextOnPages(const string& strFileName,
 	// If any pages failed, log an exception.
 	if (m_vecFailedPages.size() > 0)
 	{
-		apAggregateException.reset(new UCLIDException("ELI26826", 
+		apAggregateException.reset(new UCLIDException("ELI26826",
 			"Application trace: At least one page of document failed to OCR.", *apAggregateException));
 
 		string strFailedPages = asString(m_vecFailedPages[0]);
@@ -1903,12 +1911,6 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	LPRECT pZone, long nRotationInDegrees, bool bDetectHandwriting, bool bReturnUnrecognized,
 	string& rstrText, vector<CPPLetter>* pvecLetters, ILongToObjectMapPtr ipPageInfos)
 {
-	// If force despeckle is called, color/grayscale images need to be binarized on load or it will fail
-	if (m_eForceDespeckle == kAlwaysForce)
-	{
-		kRecSetImgConvMode(0, CNV_SET);
-	}
-
 	// load the specified page of the image file
 	// NOTE: RecAPI uses zero-based page number indexes
 	loadPageFromImageHandle(strImageFileName, m_hImageFile, nPageNum-1, &m_hPage);
@@ -1930,22 +1932,8 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	// Determine requirement for rotation and/or deskew
 	int slope = 0;
 	IMG_ROTATE imgRotate = ROT_NO;
-	if (kRecDetectImgSkew(0, m_hPage, &slope, &imgRotate) == IMG_BITSPERPIXEL_ERR)
-	{
-		// Trigger II_BW to be generated
-		// https://extract.atlassian.net/browse/ISSUE-17438
-		IMG_INFO info;
-		THROW_UE_ON_ERROR("ELI51593", "Unable to create bitonal image!",
-			kRecGetImgInfo(0, m_hPage, II_BW, &info));
-
-		// Retry skew detection
-		THROW_UE_ON_ERROR("ELI12719", "Unable to detect image skew in the OCR engine!",
-			kRecDetectImgSkew(0, m_hPage, &slope, &imgRotate));
-
-		// I am not sure if the bitonal image will be recreated after doing despeckling
-		// so just in case drop the version of II_BW that was created for deskewing
-		kRecDropImg(m_hPage, II_BW);
-	}
+	THROW_UE_ON_ERROR("ELI12719", "Unable to detect image skew in the OCR engine!",
+		kRecDetectImgSkew(0, m_hPage, &slope, &imgRotate));
 
 	// Get the orientation to use based on nRotationInDegrees.
 	EOrientation orientation = getOrientation(nRotationInDegrees, imgRotate);
