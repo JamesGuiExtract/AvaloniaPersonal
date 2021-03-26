@@ -3029,6 +3029,9 @@ int UpdateToSchemaVersion192(_ConnectionPtr ipConnection, long* pnNumSteps,
 		replaceVariable(strCreateActionStatsSQL, "<ActionIDWhereClause>", "");
 		vecQueries.push_back(strCreateActionStatsSQL);
 
+		// This procedure was updated to work with these stats changes.
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -4133,45 +4136,35 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			// If the FAM has lost its registration, re-register before continuing with processing.
 			ensureFAMRegistration();
 
-			// Currently when running all workflows use legacy
-			// and if requested
-			//if (m_bUseGetFilesLegacy)
-			//{
-			//	*pvecFileRecords = getFilesToProcessLegacy(bDBLocked, strActionName, nMaxFiles, asCppBool(bGetSkippedFiles), asString(bstrSkippedForUserName)).Detach();
-			//}
-			//else
+			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+			ADODB::_ConnectionPtr ipConnection = __nullptr;
+			BEGIN_CONNECTION_RETRY();
+
+			// Get the connection for the thread and save it locally.
+			ipConnection = getDBConnection();
+
+			// Make sure the DB Schema is the expected version
+			validateDBSchemaVersion();
+
+			if (bGetSkippedFiles == VARIANT_TRUE)
 			{
+				string strUserName = asString(bstrSkippedForUserName);
 
-				// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
-				ADODB::_ConnectionPtr ipConnection = __nullptr;
-				BEGIN_CONNECTION_RETRY();
-
-				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
-
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
-
-				if (bGetSkippedFiles == VARIANT_TRUE)
-				{
-					string strUserName = asString(bstrSkippedForUserName);
-
-					IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-						bDBLocked, ipConnection, strActionName, strUserName.empty() ? "" : strUserName, "S", nMaxFiles);
-					*pvecFileRecords = ipFiles.Detach();
-				}
-				else
-				{
-					// Perform all processing related to setting a file as processing.
-					// The previous status of the files to process is expected to be either pending or
-					// skipped.
-					IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-						bDBLocked, ipConnection, strActionName, "", "P", nMaxFiles);
-					*pvecFileRecords = ipFiles.Detach();
-				}
-
-				END_CONNECTION_RETRY(ipConnection, "ELI51471");
+				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
+					bDBLocked, ipConnection, strActionName, strUserName.empty() ? "" : strUserName, "S", nMaxFiles);
+				*pvecFileRecords = ipFiles.Detach();
 			}
+			else
+			{
+				// Perform all processing related to setting a file as processing.
+				// The previous status of the files to process is expected to be either pending or
+				// skipped.
+				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
+					bDBLocked, ipConnection, strActionName, "", "P", nMaxFiles);
+				*pvecFileRecords = ipFiles.Detach();
+			}
+
+			END_CONNECTION_RETRY(ipConnection, "ELI51471");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30644");
 	}

@@ -2252,7 +2252,6 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 
 	mapDefaultValues[gstrDASHBOARD_INCLUDE_FILTER] = "";
 	mapDefaultValues[gstrDASHBOARD_EXCLUDE_FILTER] = "";
-	mapDefaultValues[gstrUSE_GET_FILES_LEGACY] = "0";
 
 	// Create a new database ID  or use existing if it has been set
 	ByteStream bsDatabaseID;
@@ -3926,7 +3925,6 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 						else if (strValue == gstrENABLE_LOAD_BALANCING)
 						{
 							_lastCodePos = "330";
-
 							m_bLoadBalance = getStringField(ipFields, "Value") == "1";
 						}
 					}
@@ -4755,14 +4753,6 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 		// Open the record set using the Setting Query		
 		ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
 			adOpenForwardOnly, adLockReadOnly, adCmdText); 
-
-		// Setup Setting Query
-		string strSQL = gstrDBINFO_SETTING_QUERY;
-		replaceVariable(strSQL, gstrSETTING_NAME, strSettingName);
-
-		// Open the record set using the Setting Query		
-		ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
-			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Check if any data returned
 		if (ipDBInfoSet->adoEOF == VARIANT_FALSE)
@@ -6307,6 +6297,8 @@ void CFileProcessingDB::addOldDBInfoValues(map<string, string>& mapOldValues)
 	// Version 161 - Input event tracking is always enabled
 	mapOldValues["EnableInputEventTracking"] = "";
 	mapOldValues["InputEventHistorySize"] = "";
+	// Version 192 - UseGetFilesLegacy is no longer used
+	mapOldValues["UseGetFilesLegacy"] = "";
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addOldTables(vector<string>& vecTables)
