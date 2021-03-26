@@ -63,6 +63,7 @@ private:
 	CStatic m_lblTotals;
 	CStatic m_staticLastUpdated;
 	CStatic m_staticStatisticsType;
+	CButton m_btnShowAllStats;
 	CButton m_btnShowNonDeletedFileStats;
 	CButton m_btnShowDeletedFileStats;
 
@@ -85,8 +86,8 @@ private:
 	// Indicates if the queries used should use OracleSyntax
 	bool m_bUseOracleSyntax;
 
-	// Indicates if the stats shown are for deleted files
-	bool m_bShowDeletedFileStats;
+	// Indicates if the stats shown are for all files or only Visible/Invisible files
+	enum class EWorkflowVisibility { All, Visible, Invisible } m_eWorkflowVisibilityMode;
 
 	//---------------------------------------------------------------------------------------------
 	// Helper methods

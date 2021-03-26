@@ -80,7 +80,7 @@ m_ipContextMenuFileSelector(CLSID_FAMFileSelector),
 m_ipFAMFileInspector(__nullptr),
 m_bInitialized(false),
 m_bUseOracleSyntax(false),
-m_bShowDeletedFileStats(false)
+m_eWorkflowVisibilityMode(EWorkflowVisibility::All)
 {
 	try
 	{
@@ -108,8 +108,9 @@ void CFAMDBAdminSummaryDlg::DoDataExchange(CDataExchange *pDX)
 	DDX_Control(pDX, IDC_STATIC_TOTAL_LABEL, m_lblTotals);
 	DDX_Control(pDX, IDC_STATIC_UPDATED, m_staticLastUpdated);
 	DDX_Control(pDX, IDC_SHOW_STATS_TYPE, m_staticStatisticsType);
-	DDX_Control(pDX, IDC_RADIO_SHOW_NONDELETED_STATS, m_btnShowNonDeletedFileStats);
-	DDX_Control(pDX, IDC_RADIO_SHOW_DELETED_STATS, m_btnShowDeletedFileStats);
+	DDX_Control(pDX, IDC_RADIO_SHOW_VISIBLE_STATS, m_btnShowNonDeletedFileStats);
+	DDX_Control(pDX, IDC_RADIO_SHOW_INVISIBLE_STATS, m_btnShowDeletedFileStats);
+	DDX_Control(pDX, IDC_RADIO_SHOW_ALL_STATS, m_btnShowAllStats);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -117,8 +118,9 @@ void CFAMDBAdminSummaryDlg::DoDataExchange(CDataExchange *pDX)
 //--------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CFAMDBAdminSummaryDlg, CPropertyPage)
 	ON_BN_CLICKED(IDC_BUTTON_REFRESH_SUMMARY, &OnBnClickedRefreshSummary)
-	ON_BN_CLICKED(IDC_RADIO_SHOW_NONDELETED_STATS, &OnBnClickedShowDeletedFileStats)
-	ON_BN_CLICKED(IDC_RADIO_SHOW_DELETED_STATS, &OnBnClickedShowDeletedFileStats)
+	ON_BN_CLICKED(IDC_RADIO_SHOW_VISIBLE_STATS, &OnBnClickedShowDeletedFileStats)
+	ON_BN_CLICKED(IDC_RADIO_SHOW_INVISIBLE_STATS, &OnBnClickedShowDeletedFileStats)
+	ON_BN_CLICKED(IDC_RADIO_SHOW_ALL_STATS, &OnBnClickedShowDeletedFileStats)
 	ON_WM_SIZE()
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_ACTIONS, &CFAMDBAdminSummaryDlg::OnNMRClickListActions)
 	ON_COMMAND(ID_SUMMARY_MENU_EXPORT_LIST, &OnContextExportFileList)
@@ -143,8 +145,9 @@ BOOL CFAMDBAdminSummaryDlg::OnInitDialog()
 		// set the wait cursor
 		CWaitCursor wait;
 
-		m_btnShowDeletedFileStats.SetCheck(asBSTChecked(m_bShowDeletedFileStats));
-		m_btnShowNonDeletedFileStats.SetCheck(asBSTChecked(!m_bShowDeletedFileStats));
+		m_btnShowDeletedFileStats.SetCheck(asBSTChecked(m_eWorkflowVisibilityMode == EWorkflowVisibility::Invisible));
+		m_btnShowNonDeletedFileStats.SetCheck(asBSTChecked(m_eWorkflowVisibilityMode == EWorkflowVisibility::Visible));
+		m_btnShowAllStats.SetCheck(asBSTChecked(m_eWorkflowVisibilityMode == EWorkflowVisibility::All));
 
 		prepareListControl();
 		resizeListColumns();
@@ -170,7 +173,7 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 		}
 
 		CRect recDlg, recListCtrl, recRefresh, recTotalText, recLabel, recLastUpdated,
-			recStatisticsType, recShowNonDeletedFiles, recShowDeletedFiles;
+			recStatisticsType, recShowNonDeletedFiles, recShowDeletedFiles, recShowAll;
 
 		// Get current positions of the controls and then move them.
 		// Start at the bottom and work up so that the controls stick to the bottom of the dialog
@@ -210,6 +213,10 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 		m_btnShowDeletedFileStats.GetWindowRect(&recShowDeletedFiles);
 		ScreenToClient(&recShowDeletedFiles);
 
+		// get the show All stats button rectangle
+		m_btnShowAllStats.GetWindowRect(&recShowAll);
+		ScreenToClient(&recShowAll);
+
 		// compute margin
 		int iMargin = recListCtrl.left - recDlg.left;
 
@@ -221,8 +228,9 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 		recStatisticsType.right = recDlg.right - iMargin;
 
 		// compute radio button positions
-		recShowNonDeletedFiles.MoveToXY(recStatisticsType.left + iMargin, recStatisticsType.top + 20);
-		recShowDeletedFiles.MoveToXY(recShowNonDeletedFiles.right + iMargin, recStatisticsType.top + 20);
+		recShowAll.MoveToXY(recStatisticsType.left + iMargin, recStatisticsType.top + 20);
+		recShowNonDeletedFiles.MoveToXY(recShowAll.right + iMargin, recShowAll.top);
+		recShowDeletedFiles.MoveToXY(recShowNonDeletedFiles.right + iMargin, recShowAll.top);
 
 		// compute the new file totals label position
 		iHeight = recLabel.Height();
@@ -248,6 +256,7 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 		m_listActions.MoveWindow(&recListCtrl);
 		m_staticLastUpdated.MoveWindow(&recLastUpdated);
 		m_staticStatisticsType.MoveWindow(&recStatisticsType);
+		m_btnShowAllStats.MoveWindow(&recShowAll);
 		m_btnShowNonDeletedFileStats.MoveWindow(&recShowNonDeletedFiles);
 		m_btnShowDeletedFileStats.MoveWindow(&recShowDeletedFiles);
 
@@ -320,10 +329,18 @@ void CFAMDBAdminSummaryDlg::OnBnClickedShowDeletedFileStats()
 
 	try
 	{
-		bool showDeleted = m_btnShowDeletedFileStats.GetCheck() == BST_CHECKED;
-		if (m_bShowDeletedFileStats != showDeleted)
+		EWorkflowVisibility eVis = EWorkflowVisibility::All;
+		if (m_btnShowDeletedFileStats.GetCheck() == BST_CHECKED)
 		{
-			m_bShowDeletedFileStats = showDeleted;
+			eVis = EWorkflowVisibility::Invisible;
+		}
+		else if (m_btnShowNonDeletedFileStats.GetCheck() == BST_CHECKED)
+		{
+			eVis = EWorkflowVisibility::Visible;
+		}
+		if (m_eWorkflowVisibilityMode != eVis)
+		{
+			m_eWorkflowVisibilityMode = eVis;
 			populatePage();
 		}
 	}
@@ -471,25 +488,33 @@ void CFAMDBAdminSummaryDlg::OnContextViewFailed()
 		string currentWorkflow = m_ipFAMDB->ActiveWorkflow;
 		if (currentWorkflow.empty())
 		{
-			if (m_bShowDeletedFileStats)
+			switch (m_eWorkflowVisibilityMode)
 			{
-				ipActionStats = m_ipFAMDB->GetDeletedFileStatsAllWorkflows(m_strContextMenuAction.c_str(), VARIANT_TRUE);
-			}
-			else
-			{
+			case EWorkflowVisibility::All:
 				ipActionStats = m_ipFAMDB->GetStatsAllWorkflows(m_strContextMenuAction.c_str(), VARIANT_TRUE);
+				break;
+			case EWorkflowVisibility::Visible:
+				ipActionStats = m_ipFAMDB->GetVisibleFileStatsAllWorkflows(m_strContextMenuAction.c_str(), VARIANT_TRUE);
+				break;
+			case EWorkflowVisibility::Invisible:
+				ipActionStats = m_ipFAMDB->GetInvisibleFileStatsAllWorkflows(m_strContextMenuAction.c_str(), VARIANT_TRUE);
+				break;
 			}
 		}
 		else
 		{
 			long nActionID = m_ipFAMDB->GetActionID(m_strContextMenuAction.c_str());
-			if (m_bShowDeletedFileStats)
+			switch (m_eWorkflowVisibilityMode)
 			{
-				ipActionStats = m_ipFAMDB->GetDeletedFileStats(nActionID, VARIANT_TRUE);
-			}
-			else
-			{
-				ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
+			case EWorkflowVisibility::All:
+				ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE);
+				break;
+			case EWorkflowVisibility::Visible:
+				ipActionStats = m_ipFAMDB->GetVisibleFileStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
+				break;
+			case EWorkflowVisibility::Invisible:
+				ipActionStats = m_ipFAMDB->GetInvisibleFileStats(nActionID, VARIANT_TRUE);
+				break;
 			}
 		}
 
@@ -751,24 +776,32 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 			string currentWorkflow = m_ipFAMDB->ActiveWorkflow;
 			if (currentWorkflow.empty())
 			{
-				if (m_bShowDeletedFileStats)
+				switch (m_eWorkflowVisibilityMode)
 				{
-					ipActionStats = m_ipFAMDB->GetDeletedFileStatsAllWorkflows(strActionName.c_str(), VARIANT_TRUE);
-				}
-				else
-				{
+				case EWorkflowVisibility::All:
 					ipActionStats = m_ipFAMDB->GetStatsAllWorkflows(strActionName.c_str(), VARIANT_TRUE);
+					break;
+				case EWorkflowVisibility::Visible:
+					ipActionStats = m_ipFAMDB->GetVisibleFileStatsAllWorkflows(strActionName.c_str(), VARIANT_TRUE);
+					break;
+				case EWorkflowVisibility::Invisible:
+					ipActionStats = m_ipFAMDB->GetInvisibleFileStatsAllWorkflows(strActionName.c_str(), VARIANT_TRUE);
+					break;
 				}
 			}
 			else
 			{
-				if (m_bShowDeletedFileStats)
+				switch (m_eWorkflowVisibilityMode)
 				{
-					ipActionStats = m_ipFAMDB->GetDeletedFileStats(nActionID, VARIANT_TRUE);
-				}
-				else
-				{
-					ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
+				case EWorkflowVisibility::All:
+					ipActionStats = m_ipFAMDB->GetStats(nActionID, VARIANT_TRUE);
+					break;
+				case EWorkflowVisibility::Visible:
+					ipActionStats = m_ipFAMDB->GetVisibleFileStats(nActionID, VARIANT_TRUE, VARIANT_FALSE);
+					break;
+				case EWorkflowVisibility::Invisible:
+					ipActionStats = m_ipFAMDB->GetInvisibleFileStats(nActionID, VARIANT_TRUE);
+					break;
 				}
 			}
 

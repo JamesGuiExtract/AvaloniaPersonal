@@ -988,10 +988,10 @@ int CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, long nFileI
 		}
 
 		string strQuery = (nWorkflowID > 0)
-			// Use ~ operator to invert deleted flag as we want 1 to indicate a file in the workflow
-			// and 0 for a file that has been deleted.
+			// Use ~ operator to invert invisible flag as we want 1 to indicate a file in the workflow
+			// and 0 for a file that has been marked deleted (invisible).
 			// Add + 0 to convert to int since bit fields are not allowed in aggregate functions
-			? Util::Format("SELECT COALESCE(MAX(~[DELETED]+0), -1) AS [ID] FROM [WorkflowFile] "
+			? Util::Format("SELECT COALESCE(MAX(~[Invisible]+0), -1) AS [ID] FROM [WorkflowFile] "
 				"WHERE [FileID] = %d AND [WorkflowID] = %d", nFileID, nWorkflowID)
 			: Util::Format(
 				"SELECT COALESCE(MAX(1), -1) AS [ID] FROM [FAMFile] WHERE [ID] = %d",
@@ -1019,9 +1019,9 @@ int CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, string strF
 
 		string strQuery = (nWorkflowID > 0)
 			// Use ~ operator to invert deleted flag as we want 1 to indicate a file in the workflow
-			// and 0 for a file that has been deleted.
+			// and 0 for a file that has been marked deleted (invisible).
 			// Add + 0 to convert to int since bit fields are not allowed in aggregate functions
-			? Util::Format("SELECT COALESCE(MAX(~[DELETED]+0), -1) AS [ID] FROM [WorkflowFile] "
+			? Util::Format("SELECT COALESCE(MAX(~[Invisible]+0), -1) AS [ID] FROM [WorkflowFile] "
 				"INNER JOIN [FAMFile] ON [FileID] = [FAMFile].[ID] "
 				"WHERE [FileName] = '%s' AND [WorkflowID] = %d", strFileName.c_str(), nWorkflowID)
 			: Util::Format(
@@ -1663,7 +1663,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_PAGINATION_SOURCEFILE_INDEX);
 		vecQueries.push_back(gstrCREATE_FAMSESSION_ID_FAMUSERID_INDEX);
 		vecQueries.push_back(gstrCREATE_FILETASKSESSION_DATETIMESTAMP_WITH_INCLUDES_INDEX);
-		vecQueries.push_back(gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_DELETED_INDEX);
+		vecQueries.push_back(gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_INVISIBLE_INDEX);
 
 		// Add user-table specific indices if necessary.
 		if (bAddUserTables)
@@ -2393,7 +2393,7 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 									EActionStatus eFromStatus, EActionStatus eToStatus, 
 									UCLID_FILEPROCESSINGLib::IFileRecordPtr ipNewRecord, 
 									UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord,
-									bool bIsDeleted)
+									bool bIsInvisible)
 {
 	// Only time a ipOldRecord can be NULL is if the from status is kActionUnattempted
 	if (eFromStatus != kActionUnattempted && ipOldRecord == __nullptr)
@@ -2553,11 +2553,11 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 
 	// need to add the delta record with to ActionStatisticsDelta table
 	string strAddDeltaSQL;
-	strAddDeltaSQL = "INSERT INTO ActionStatisticsDelta (ActionID, Deleted, NumDocuments, " 
+	strAddDeltaSQL = "INSERT INTO ActionStatisticsDelta (ActionID, Invisible, NumDocuments, " 
 		"NumDocumentsPending, NumDocumentsComplete, NumDocumentsFailed, NumDocumentsSkipped, " 
 		"NumPages, NumPagesPending, NumPagesComplete, NumPagesFailed, NumPagesSkipped, " 
 		"NumBytes, NumBytesPending, NumBytesComplete, NumBytesFailed, NumBytesSkipped ) "
-		"VALUES (" + asString(nActionID) + ", " + (bIsDeleted ? "1, " : "0, ") +
+		"VALUES (" + asString(nActionID) + ", " + (bIsInvisible ? "1, " : "0, ") +
 		asString(lNumDocsTotal) + ", " + 
 		asString(lNumDocsPending) + ", " + asString(lNumDocsComplete) + ", " + 
 		asString(lNumDocsFailed) + ", " + asString(lNumDocsSkipped) + ", " + 
@@ -2571,19 +2571,31 @@ void CFileProcessingDB::updateStats(_ConnectionPtr ipConnection, long nActionID,
 }
 //--------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_ConnectionPtr ipConnection, 
-	long nActionID, bool bDeletedFiles, bool bForceUpdate, bool bDBLocked)
+	long nActionID, EWorkflowVisibility eWorkflowVisibility, bool bForceUpdate, bool bDBLocked)
 {
 	// Create a pointer to a recordset
 	_RecordsetPtr ipActionStatSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI14099", ipActionStatSet != __nullptr);
 
-	// Select the existing Statistics record if it exists
-	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID)
-		+ " AND Deleted = " + (bDeletedFiles ? "1" : "0");
+	// Select the existing Statistics records if they exist
+	string strSelectStat = gstrGET_ACTION_STATISTICS_FOR_ACTION;
+	replaceVariable(strSelectStat, "<ActionIDWhereClause>", asString(nActionID));
+	if (eWorkflowVisibility == EWorkflowVisibility::Invisible)
+	{
+		replaceVariable(strSelectStat, "<VisibilityWhereClause>", "AND [ActionStatistics].[Invisible] = 1");
+	}
+	else if (eWorkflowVisibility == EWorkflowVisibility::Visible)
+	{
+		replaceVariable(strSelectStat, "<VisibilityWhereClause>", "AND [ActionStatistics].[Invisible] = 0");
+	}
+	else
+	{
+		replaceVariable(strSelectStat, "<VisibilityWhereClause>", "");
+	}
 
-	// Open the recordset for the statistics with the record for ActionID if it exists
-	ipActionStatSet->Open(strSelectStat.c_str(), 
-		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+	// Open the recordset for the statistics with the records for ActionID if they exists
+	ipActionStatSet->Open(strSelectStat.c_str(),
+		_variant_t((IDispatch *)ipConnection, true), adOpenStatic,
 		adLockOptimistic, adCmdText);
 
 	if (asCppBool(ipActionStatSet->adoEOF))
@@ -2647,7 +2659,18 @@ UCLID_FILEPROCESSINGLib::IActionStatisticsPtr CFileProcessingDB::loadStats(_Conn
 
 		string strCalcStat = gstrCALCULATE_ACTION_STATISTICS_FOR_ACTION;
 		replaceVariable(strCalcStat, "<ActionIDWhereClause>", asString(nActionID));
-		replaceVariable(strCalcStat, "<DeletedFilesWhereClause>", bDeletedFiles ? "1" : "0");
+		if (eWorkflowVisibility == EWorkflowVisibility::Invisible)
+		{
+			replaceVariable(strCalcStat, "<VisibilityWhereClause>", "AND [ActionStatistics].[Invisible] = 1");
+		}
+		else if (eWorkflowVisibility == EWorkflowVisibility::Visible)
+		{
+			replaceVariable(strCalcStat, "<VisibilityWhereClause>", "AND [ActionStatistics].[Invisible] = 0");
+		}
+		else
+		{
+			replaceVariable(strCalcStat, "<VisibilityWhereClause>", "");
+		}
 
 		ipActionStatSet->Open(strCalcStat.c_str(), 
 			_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockOptimistic, adCmdText);

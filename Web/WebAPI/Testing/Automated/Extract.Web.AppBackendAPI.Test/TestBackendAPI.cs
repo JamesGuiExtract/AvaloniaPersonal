@@ -1584,7 +1584,7 @@ namespace Extract.Web.WebAPI.Test
                 result.AssertGoodResult<NoContentResult>();
 
                 var actionId = fileProcessingDb.GetActionID(_VERIFY_ACTION);
-                var stats = fileProcessingDb.GetStats(actionId, true, true);
+                var stats = fileProcessingDb.GetVisibleFileStats(actionId, true, true);
                 Assert.AreEqual(1, stats.NumDocumentsSkipped, "There should be 1 skipped document.");
 
                 string comment = fileProcessingDb.GetFileActionComment(openDocumentResult.Id, actionId);
@@ -1616,7 +1616,7 @@ namespace Extract.Web.WebAPI.Test
                 result.AssertGoodResult<NoContentResult>();
 
                 var actionId = fileProcessingDb.GetActionID(_VERIFY_ACTION);
-                var stats = fileProcessingDb.GetStats(actionId, true, true);
+                var stats = fileProcessingDb.GetVisibleFileStats(actionId, true, true);
                 Assert.AreEqual(1, stats.NumDocumentsFailed, "There should be 1 failed document.");
 
                 controller.CloseDocument(openDocumentResult.Id, true);

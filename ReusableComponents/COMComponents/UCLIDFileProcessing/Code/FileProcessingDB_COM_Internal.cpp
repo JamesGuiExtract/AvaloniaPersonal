@@ -3010,7 +3010,12 @@ int UpdateToSchemaVersion192(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		vector<string> vecQueries;
 
-		// Drop ActionStatistics and ActionStatisticsDelta tables so they can be re-created with the proper columns.
+		// Change WorkflowFile.Deleted to Invisible
+		vecQueries.push_back("DROP INDEX [IX_Workflowfile_FileID_WorkflowID_Deleted] ON [dbo].[WorkflowFile]");
+		vecQueries.push_back("EXEC sp_rename '[dbo].[WorkflowFile].[Deleted]', 'Invisible', 'COLUMN';");
+		vecQueries.push_back(gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_INVISIBLE_INDEX);
+
+		// Drop ActionStatistics and ActionStatisticsDelta tables so they can be re-created with added Invisible column
 		// No need to transfer data; instead, regenerate the stats afterward.
 		vecQueries.push_back("DROP Table [ActionStatistics]");
 		vecQueries.push_back("DROP Table [ActionStatisticsDelta]");
@@ -3324,7 +3329,7 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 					{
 						// NOTE: If the workflow/file pair is not yet in [WorkflowFile], it will be
 						// added as part of setStatusForFile below.
-						// -1 = not in WorkflowFile, 0 = marked deleted in WorkflowFile
+						// -1 = not in WorkflowFile, 0 = marked Invisible in WorkflowFile
 						bAlreadyExistsInWorkflow = isFileInWorkflow(ipConnection, nID, nWorkflowID) >= 0;
 					}
 				}
@@ -3656,14 +3661,14 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 								addFileActionStateTransition(ipConnection, nFileID, nActionID, strActionState, "U", "", "Removed");
 							}
 
-							bool bIsDeleted = false;
+							bool bIsInvisible = false;
 							long nWorkflowID = getWorkflowID(ipConnection, nActionID);
 							if (nWorkflowID > 0)
 							{
-								bIsDeleted = isFileInWorkflow(ipConnection, nFileID, nWorkflowID) == 0; // 0 = deleted
+								bIsInvisible = isFileInWorkflow(ipConnection, nFileID, nWorkflowID) == 0; // 0 = Invisible
 							}
 							// update the statistics
-							updateStats(ipConnection, nActionID, asEActionStatus(strActionState), kActionUnattempted, NULL, ipOldRecord, bIsDeleted); 
+							updateStats(ipConnection, nActionID, asEActionStatus(strActionState), kActionUnattempted, NULL, ipOldRecord, bIsInvisible); 
 						}
 
 						// Update QueueEvent table if enabled
@@ -4378,7 +4383,7 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrActionName,
-	VARIANT_BOOL vbForceUpdate, bool bGetDeletedFileStats, IActionStatistics* *pStats)
+	VARIANT_BOOL vbForceUpdate, EWorkflowVisibility eWorkflowVisibility, IActionStatistics* *pStats)
 {
 	try
 	{
@@ -4426,7 +4431,7 @@ bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrA
 				int nActionID = getLongField(ipFields, "ID");
 
 				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =
-					loadStats(ipConnection, nActionID, bGetDeletedFileStats, asCppBool(vbForceUpdate), bDBLocked);
+					loadStats(ipConnection, nActionID, eWorkflowVisibility, asCppBool(vbForceUpdate), bDBLocked);
 				ASSERT_RESOURCE_ALLOCATION("ELI42089", ipActionStats != __nullptr);
 
 				ipAggregateStats->AddStatistics(ipActionStats);
@@ -4454,7 +4459,7 @@ bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrA
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
-	VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, bool bGetDeletedFileStats,
+	VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, EWorkflowVisibility eWorkflowVisibility,
 	IActionStatistics* *pStats)
 {
 	try
@@ -4487,7 +4492,7 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 
 				// return a new object with the statistics
 				UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats =  
-					loadStats(ipConnection, nActionID, bGetDeletedFileStats, asCppBool(vbForceUpdate), bDBLocked);
+					loadStats(ipConnection, nActionID, eWorkflowVisibility, asCppBool(vbForceUpdate), bDBLocked);
 				ASSERT_RESOURCE_ALLOCATION("ELI14107", ipActionStats != __nullptr);
 
 				// Commit any changes (could have recreated the stats)
@@ -11073,7 +11078,7 @@ bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, l
 					addQueueEventRecord(ipConnection, nID, -1, asString(bstrFile), "P", llFileSize);
 				}
 
-				// -1 = not in WorkflowFile, 0 = marked deleted in WorkflowFile
+				// -1 = not in WorkflowFile, 0 = marked Invisible in WorkflowFile
 				if (nWorkflowID > 0 && isFileInWorkflow(ipConnection, nID, nWorkflowID) == -1)
 				{
 					// In the case that the file did exist in the DB, but not the workflow, the
@@ -11944,7 +11949,7 @@ bool CFileProcessingDB::IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, 
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			// -1 = not in WorkflowFile, 0 = marked deleted in WorkflowFile, 1 = in workflow, not marked deleted
+			// -1 = not in WorkflowFile, 0 = marked Invisible in WorkflowFile, 1 = in workflow, not marked Invisible
 			*pbIsInWorkflow = asVariantBool(isFileInWorkflow(ipConnection, nFileID, nWorkflowID) == 1);
 
 			END_CONNECTION_RETRY(ipConnection, "ELI43221");
@@ -12388,7 +12393,7 @@ bool CFileProcessingDB::IsFileNameInWorkflow_Internal(bool bDBLocked, BSTR bstrF
 			ipConnection = getDBConnection();
 			validateDBSchemaVersion();
 
-			// -1 = not in WorkflowFile, 0 = marked deleted in WorkflowFile, 1 = in workflow, not marked deleted
+			// -1 = not in WorkflowFile, 0 = marked Invisible in WorkflowFile, 1 = in workflow, not marked Invisible
 			*pbIsInWorkflow = asVariantBool(
 				isFileInWorkflow(ipConnection, asString(bstrFileName), nWorkflowID) == 1);
 
@@ -12817,7 +12822,7 @@ bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, l
 			TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
 
 			string strMarkDeletedQuery = Util::Format(
-				"UPDATE WorkflowFile SET Deleted = 1 WHERE Deleted = 0 AND FileID = %d AND WorkflowID = %d",
+				"UPDATE WorkflowFile SET Invisible = 1 WHERE Invisible = 0 AND FileID = %d AND WorkflowID = %d",
 				nFileID, nWorkflowID);
 
 			long nAffected = executeCmdQuery(ipConnection, strMarkDeletedQuery.c_str(), false);
@@ -12884,10 +12889,10 @@ bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, l
 
 					if (status != kActionUnattempted)
 					{
-						// Subtract stats for non-deleted state
+						// Subtract stats for visible state
 						updateStats(ipConnection, nActionID, status, kActionUnattempted, __nullptr, ipFileRecord, false);
 
-						// Add stats for deleted state
+						// Add stats for invisible state
 						updateStats(ipConnection, nActionID, kActionUnattempted, status, ipFileRecord, __nullptr, true);
 					}
 				}

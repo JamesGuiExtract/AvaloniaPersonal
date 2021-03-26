@@ -1082,7 +1082,7 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To return a IActionStistics pointer that contains the current stats for the given action
 		[id(19), helpstring("method GetStats")] HRESULT GetStats([in] long nActionID,
-			[in] VARIANT_BOOL vbForceUpdate, [in, optional] VARIANT_BOOL vbRevertTimedOutFAMs, [out, retval] IActionStatistics** pStats);
+			[in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
 
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To Clear the database
@@ -2185,12 +2185,20 @@ library UCLID_FILEPROCESSINGLib
 		[id(212), helpstring("method SetFileInformationForFile")] HRESULT SetFileInformationForFile([in] int fileID, [in] long long fileSize, [in] int pageCount);
 
 		// -----------------------------------------------------------------------------------------------
-		// PROMISE: To return a IActionStatistics pointer that contains the current stats for the specified action ID
-		[id(213), helpstring("method GetDeletedFileStats")] HRESULT GetDeletedFileStats(
+		// PROMISE: To return a IActionStatistics pointer that contains the current stats where WorkflowFile.Invisible is false for the specified action ID
+		[id(213), helpstring("method GetVisibleFileStats")] HRESULT GetVisibleFileStats(
+			[in] long nActionID, [in] VARIANT_BOOL vbForceUpdate, [in] VARIANT_BOOL vbRevertTimedOutFAMs, [out, retval] IActionStatistics** pStats);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To return a IActionStatistics pointer that contains the current stats where WorkflowFile.Invisible is false for the specified action name across all workflows
+		[id(214), helpstring("method GetVisibleFileStatsAllWorkflows")] HRESULT GetVisibleFileStatsAllWorkflows(
+			[in] BSTR bstrActionName, [in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To return a IActionStatistics pointer that contains the current stats where WorkflowFile.Invisible is true for the specified action ID
+		[id(215), helpstring("method GetInvisibleFileStats")] HRESULT GetInvisibleFileStats(
 			[in] long nActionID, [in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
 		// -----------------------------------------------------------------------------------------------
-		// PROMISE: To return a IActionStatistics pointer that contains the current stats for the specified action name across all workflows
-		[id(214), helpstring("method GetDeletedFileStatsAllWorkflows")] HRESULT GetDeletedFileStatsAllWorkflows(
+		// PROMISE: To return a IActionStatistics pointer that contains the current stats where WorkflowFile.Invisible is true for the specified action name across all workflows
+		[id(216), helpstring("method GetInvisibleFileStatsAllWorkflows")] HRESULT GetInvisibleFileStatsAllWorkflows(
 			[in] BSTR bstrActionName, [in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
 	};
 

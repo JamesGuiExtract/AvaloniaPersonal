@@ -185,14 +185,16 @@ CAPTION "Summary"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_LIST_ACTIONS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,7,7,419,163
-    LTEXT           "Total number of files referenced in the database:",IDC_STATIC_TOTAL_LABEL,7,179,168,10
+    LTEXT           "Total number of files referenced in the database:",IDC_STATIC_TOTAL_LABEL,7,179,159,10
     EDITTEXT        IDC_EDIT_FILE_TOTAL,172,178,62,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     PUSHBUTTON      "Refresh",IDC_BUTTON_REFRESH_SUMMARY,241,177,37,14
     LTEXT           "Last updated: ",IDC_STATIC_UPDATED,283,180,137,10
     GROUPBOX        "Show statistics for:",IDC_SHOW_STATS_TYPE,13,194,406,32
-    CONTROL         "Non-deleted files",IDC_RADIO_SHOW_NONDELETED_STATS,
-                    "Button",BS_AUTORADIOBUTTON,21,206,70,10
-    CONTROL         "Deleted files",IDC_RADIO_SHOW_DELETED_STATS,"Button",BS_AUTORADIOBUTTON,123,206,55,10
+    CONTROL         "All files",IDC_RADIO_SHOW_ALL_STATS,"Button",BS_AUTORADIOBUTTON,21,206,43,10
+    CONTROL         "Files visible to web APIs",IDC_RADIO_SHOW_VISIBLE_STATS,
+                    "Button",BS_AUTORADIOBUTTON,81,206,89,10
+    CONTROL         "Files invisible to web APIs",IDC_RADIO_SHOW_INVISIBLE_STATS,
+                    "Button",BS_AUTORADIOBUTTON,196,206,95,10
 END
 
 IDD_DIALOG_SELECT_REPORT DIALOGEX 0, 0, 310, 184

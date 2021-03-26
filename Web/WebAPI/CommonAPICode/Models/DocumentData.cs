@@ -245,7 +245,7 @@ namespace WebAPI.Models
                     !string.IsNullOrWhiteSpace(FileApi.Workflow.EditAction));
 
                 int actionId = FileApi.FileProcessingDB.GetActionID(FileApi.Workflow.EditAction);
-                var stats = FileApi.FileProcessingDB.GetStats(actionId, false, true);
+                var stats = FileApi.FileProcessingDB.GetVisibleFileStats(actionId, false, true);
                 var users = FileApi.FileProcessingDB.GetActiveUsers(FileApi.Workflow.EditAction);
 
                 var result = new QueueStatusResult();

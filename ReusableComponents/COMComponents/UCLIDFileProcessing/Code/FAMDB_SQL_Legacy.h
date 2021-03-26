@@ -308,6 +308,16 @@ static const string gstrCREATE_WORKFLOWFILE_V145 =
 "	[FileID] INT NOT NULL, "
 "	CONSTRAINT [PK_WorkflowFile] PRIMARY KEY CLUSTERED ([WorkflowID], [FileID]));";
 
+// used for schema version 169 to 191
+static const string gstrCREATE_WORKFLOWFILE_169 =
+	"CREATE TABLE dbo.[WorkflowFile]( "
+	"	[WorkflowID] INT NOT NULL, "
+	"	[FileID] INT NOT NULL, "
+	"	[Deleted] BIT NOT NULL DEFAULT(0), "
+	"	[AddedDateTime] [datetime] NOT NULL CONSTRAINT [DF_WorkflowFile_AddedDateTime] DEFAULT(GETDATE()), "
+	"	CONSTRAINT [PK_WorkflowFile] PRIMARY KEY CLUSTERED ([WorkflowID], [FileID]));";
+
+
 static const std::string gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW_LEGACY_166 =
 "IF OBJECT_ID('[dbo].[vFAMUserInputEventsTimeLegacy]', 'V') IS NULL "
 "	EXECUTE('CREATE VIEW[dbo].[vFAMUserInputEventsTimeLegacy] "
@@ -391,3 +401,15 @@ static const string gstrCREATE_ACTION_STATISTICS_DELTA_TABLE_102 = "CREATE TABLE
 	"[NumBytesFailed] [bigint] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumBytesFailed]  DEFAULT ((0)),"
 	"[NumBytesSkipped] [bigint] NOT NULL CONSTRAINT [DF_ActionStatisticsDelta_NumBytesSkipped]  DEFAULT ((0)))";
 
+// used for schema versions 190 to 191
+static const string gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_DELETED_INDEX =
+"IF EXISTS(SELECT * FROM sys.indexes WHERE name = 'IX_Workflowfile_FileID_WorkflowID_Deleted' AND object_id = OBJECT_ID('WorkflowFile')) \r\n"
+"BEGIN \r\n"
+"	DROP INDEX [IX_Workflowfile_FileID_WorkflowID_Deleted] ON [dbo].[WorkflowFile] \r\n"
+"END \r\n"
+"CREATE NONCLUSTERED INDEX [IX_Workflowfile_FileID_WorkflowID_Deleted] ON[dbo].[WorkflowFile]\r\n"
+"(																							\r\n"
+"	[FileID] ASC,																			\r\n"
+"	[WorkflowID] ASC,																		\r\n"
+"	[Deleted] ASC																			\r\n"
+")";
