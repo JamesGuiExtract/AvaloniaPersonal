@@ -21,7 +21,7 @@ namespace DatabaseMigrationWizard
         /// Provides a centralized place to provide feedback to the user.
         /// </summary>
         /// <param name="message">The message to give to the user</param>
-        internal void LogMessageToUser(string message)
+        internal static void LogMessageToUser(string message)
         {
             Console.WriteLine(message);
         }
@@ -68,14 +68,14 @@ namespace DatabaseMigrationWizard
                 }
                 else
                 {
-                    throw ex;
+                    throw;
                 }
             }
 
             return false;
         }
 
-        private void CreateDatabase(ConnectionInformation connectionInformation, string filePath)
+        private static void CreateDatabase(ConnectionInformation connectionInformation, string filePath)
         {
             var fileProcessingDb = new FileProcessingDB()
             {
@@ -101,7 +101,7 @@ namespace DatabaseMigrationWizard
         /// </summary>
         /// <param name="directory">The directory to check.</param>
         /// <returns></returns>
-        private bool DirectoryContainsLabDEJsonFiles(string directory)
+        private static bool DirectoryContainsLabDEJsonFiles(string directory)
         {
             bool labDEFound = false;
             foreach (var file in Directory.GetFiles(directory))
@@ -115,7 +115,7 @@ namespace DatabaseMigrationWizard
             return labDEFound;
         }
 
-        private void ValidateNextArgument(string[] arguments, int index)
+        private static void ValidateNextArgument(string[] arguments, int index)
         {
             if (index + 1 >= arguments.Length)
             {

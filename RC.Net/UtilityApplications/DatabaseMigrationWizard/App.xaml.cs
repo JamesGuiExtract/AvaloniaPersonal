@@ -36,8 +36,8 @@ namespace DatabaseMigrationWizard
             }
             catch(Exception ex)
             {
-                startupConfigurator.LogMessageToUser(ex.Message);
-                startupConfigurator.LogMessageToUser("Please check your exception file for the error details");
+                StartupConfigurator.LogMessageToUser(ex.Message);
+                StartupConfigurator.LogMessageToUser("Please check your exception file for the error details");
                 ex.ExtractLog("ELI51605");
                 System.Environment.Exit(1);
             }

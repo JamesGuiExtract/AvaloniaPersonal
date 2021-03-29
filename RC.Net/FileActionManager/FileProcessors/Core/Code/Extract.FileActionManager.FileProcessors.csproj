@@ -87,6 +87,8 @@
     <Reference Include="Leadtools.WinForms, Version=20.0.4.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <HintPath>..\..\..\..\..\ReusableComponents\APIs\Leadtools_20\DotNet\Leadtools.WinForms.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
     </Reference>
@@ -119,6 +121,7 @@
     <Compile Include="CloudOCRTaskSettingsDialog.Designer.cs">
       <DependentUpon>CloudOCRTaskSettingsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConverterFileProcessor.cs" />
     <Compile Include="CreateFileTaskSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -296,6 +299,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\UtilityApplications\Extract.FileConverter\Extract.FileConverter.csproj">
+      <Project>{e1f701d9-7822-42ab-9510-9fcafb718e0d}</Project>
+      <Name>Extract.FileConverter</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
       <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
       <Name>Extract.AttributeFinder</Name>
