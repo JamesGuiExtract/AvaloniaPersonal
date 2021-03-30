@@ -8398,12 +8398,6 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 		{
 			ASSERT_ARGUMENT("ELI31895", ppSettings != __nullptr);
 
-			// Create new cached settings instance.
-			m_ipDBInfoSettings.CreateInstance(CLSID_StrToStrMap);
-			ASSERT_RESOURCE_ALLOCATION("ELI31896", m_ipDBInfoSettings != __nullptr);
-
-			m_ipDBInfoSettings->CaseSensitive = VARIANT_FALSE;
-
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
@@ -8417,7 +8411,11 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 
 			loadDBInfoSettings(ipConnection);
 
-			*ppSettings = m_ipDBInfoSettings;
+			ASSERT_RUNTIME_CONDITION("ELI51656", m_ipDBInfoSettings != __nullptr, "Unable to load DBInfo");
+
+			// AddRef before returning a pointer
+			IStrToStrMapPtr ipCopy(m_ipDBInfoSettings);
+			*ppSettings = ipCopy.Detach();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI31899");
 		}
@@ -8425,8 +8423,6 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 	}
 	catch (UCLIDException& ue)
 	{
-		m_ipDBInfoSettings = __nullptr;
-
 		if (!bDBLocked)
 		{
 			return false;

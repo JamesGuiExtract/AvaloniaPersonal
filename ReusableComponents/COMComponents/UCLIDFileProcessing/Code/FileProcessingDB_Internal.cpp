@@ -3718,187 +3718,192 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 {
 	try
 	{
-		if (m_ipDBInfoSettings == __nullptr || m_iDBSchemaVersion == 0)
+		if (m_ipDBInfoSettings != __nullptr && m_iDBSchemaVersion != 0)
 		{
-			// Initialize settings to default values
-			m_ipDBInfoSettings = __nullptr;
-			m_iDBSchemaVersion = 0;
-			m_iCommandTimeout = glDEFAULT_COMMAND_TIMEOUT;
-			m_bUpdateQueueEventTable = true;
-			m_bUpdateFASTTable = true;
-			m_iNumberOfRetries = m_bNumberOfRetriesOverridden ? m_iNumberOfRetries : giDEFAULT_RETRY_COUNT;
-			m_dRetryTimeout = m_bRetryTimeoutOverridden ? m_dRetryTimeout : gdDEFAULT_RETRY_TIMEOUT;
-			m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
-			m_bAllowRestartableProcessing = false;
+			return;
+		}
 
-			// Only load the settings if the table exists
-			if (doesTableExist(ipConnection, "DBInfo"))
+		// Initialize settings to default values
+		m_ipDBInfoSettings = __nullptr;
+		m_iDBSchemaVersion = 0;
+		m_iCommandTimeout = glDEFAULT_COMMAND_TIMEOUT;
+		m_bUpdateQueueEventTable = true;
+		m_bUpdateFASTTable = true;
+		m_iNumberOfRetries = m_bNumberOfRetriesOverridden ? m_iNumberOfRetries : giDEFAULT_RETRY_COUNT;
+		m_dRetryTimeout = m_bRetryTimeoutOverridden ? m_dRetryTimeout : gdDEFAULT_RETRY_TIMEOUT;
+		m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
+		m_bAllowRestartableProcessing = false;
+
+		// Only load the settings if the table exists
+		if (doesTableExist(ipConnection, "DBInfo"))
+		{
+			// Create a pointer to a recordset
+			_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI31897", ipDBInfoSet != __nullptr);
+
+			// Open the record set using the Setting Query		
+			ipDBInfoSet->Open(gstrDBINFO_GET_SETTINGS_QUERY.c_str(),
+				_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
+				adLockReadOnly, adCmdText);
+
+			IStrToStrMapPtr ipDBInfoSettings(CLSID_StrToStrMap);
+			ASSERT_RESOURCE_ALLOCATION("ELI31896", ipDBInfoSettings != __nullptr);
+
+			ipDBInfoSettings->CaseSensitive = VARIANT_FALSE;
+
+
+			while (ipDBInfoSet->adoEOF == VARIANT_FALSE)
 			{
-				// Create a pointer to a recordset
-				_RecordsetPtr ipDBInfoSet(__uuidof(Recordset));
-				ASSERT_RESOURCE_ALLOCATION("ELI31897", ipDBInfoSet != __nullptr);
+				FieldsPtr ipFields = ipDBInfoSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI31898", ipFields != __nullptr);
 
-				// Open the record set using the Setting Query		
-				ipDBInfoSet->Open(gstrDBINFO_GET_SETTINGS_QUERY.c_str(),
-					_variant_t((IDispatch*)ipConnection, true), adOpenForwardOnly,
-					adLockReadOnly, adCmdText);
+				string strKey = getStringField(ipFields, "Name");
+				string strValue = getStringField(ipFields, "Value");
+				ipDBInfoSettings->Set(strKey.c_str(), strValue.c_str());
 
-				IStrToStrMapPtr ipDBInfoSettings(CLSID_StrToStrMap);
-				ASSERT_RESOURCE_ALLOCATION("ELI31896", ipDBInfoSettings != __nullptr);
-
-				while (ipDBInfoSet->adoEOF == VARIANT_FALSE)
+				if (strKey == gstrFAMDB_SCHEMA_VERSION)
 				{
-					FieldsPtr ipFields = ipDBInfoSet->Fields;
-					ASSERT_RESOURCE_ALLOCATION("ELI31898", ipFields != __nullptr);
+					m_iDBSchemaVersion = asLong(strValue);
+				}
+				else if (strKey == "FPMDBSchemaVersion")
+				{
+					// This is for an even older schema version
+					m_iDBSchemaVersion = asLong(strValue);
+				}
+				else if (strKey == gstrCOMMAND_TIMEOUT)
+				{
+					m_iCommandTimeout = asLong(strValue);
+				}
+				else if (strKey == gstrUPDATE_QUEUE_EVENT_TABLE)
+				{
+					m_bUpdateQueueEventTable = strValue == "1";
+				}
+				else if (strKey == gstrUPDATE_FAST_TABLE)
+				{
+					m_bUpdateFASTTable = strValue == "1";
+				}
+				else if (strKey == gstrNUMBER_CONNECTION_RETRIES)
+				{
+					if (!m_bNumberOfRetriesOverridden)
+					{
+						// Get the Connection retry count
+						m_iNumberOfRetries = asLong(strValue);
+					}
+				}
+				else if (strKey == gstrCONNECTION_RETRY_TIMEOUT)
+				{
+					if (!m_bRetryTimeoutOverridden)
+					{
+						// Get the connection retry timeout
+						m_dRetryTimeout = asDouble(strValue);
+					}
+				}
+				else if (strKey == gstrAUTO_DELETE_FILE_ACTION_COMMENT)
+				{
+					m_bAutoDeleteFileActionComment = strValue == "1";
+				}
+				else if (strKey == gstrAUTO_REVERT_TIME_OUT_IN_MINUTES)
+				{
+					m_nAutoRevertTimeOutInMinutes = asLong(strValue);
 
-					string strKey = getStringField(ipFields, "Name");
-					string strValue = getStringField(ipFields, "Value");
-					ipDBInfoSettings->Set(strKey.c_str(), strValue.c_str());
-
-					if (strKey == gstrFAMDB_SCHEMA_VERSION)
-					{
-						m_iDBSchemaVersion = asLong(strValue);
-					}
-					else if (strKey == "FPMDBSchemaVersion")
-					{
-						// This is for an even older schema version
-						m_iDBSchemaVersion = asLong(strValue);
-					}
-					else if (strKey == gstrCOMMAND_TIMEOUT)
-					{
-						m_iCommandTimeout = asLong(strValue);
-					}
-					else if (strKey == gstrUPDATE_QUEUE_EVENT_TABLE)
-					{
-						m_bUpdateQueueEventTable = strValue == "1";
-					}
-					else if (strKey == gstrUPDATE_FAST_TABLE)
-					{
-						m_bUpdateFASTTable = strValue == "1";
-					}
-					else if (strKey == gstrNUMBER_CONNECTION_RETRIES)
-					{
-						if (!m_bNumberOfRetriesOverridden)
-						{
-							// Get the Connection retry count
-							m_iNumberOfRetries = asLong(strValue);
-						}
-					}
-					else if (strKey == gstrCONNECTION_RETRY_TIMEOUT)
-					{
-						if (!m_bRetryTimeoutOverridden)
-						{
-							// Get the connection retry timeout
-							m_dRetryTimeout = asDouble(strValue);
-						}
-					}
-					else if (strKey == gstrAUTO_DELETE_FILE_ACTION_COMMENT)
-					{
-						m_bAutoDeleteFileActionComment = strValue == "1";
-					}
-					else if (strKey == gstrAUTO_REVERT_TIME_OUT_IN_MINUTES)
-					{
-						m_nAutoRevertTimeOutInMinutes = asLong(strValue);
-
-						// [LegacyRCAndUtils:6172]
-						// Don't enforce gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES in debug mode; having a low value is useful in development.
+					// [LegacyRCAndUtils:6172]
+					// Don't enforce gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES in debug mode; having a low value is useful in development.
 #ifndef _DEBUG
-						// if less that a minimum value this should be reset to the minimum value
-						if (m_nAutoRevertTimeOutInMinutes < gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES)
+					// if less that a minimum value this should be reset to the minimum value
+					if (m_nAutoRevertTimeOutInMinutes < gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES)
+					{
+						try
 						{
-							try
-							{
-								string strNewValue = asString(gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
-								// Log application trace exception 
-								UCLIDException ue("ELI29826", "Application trace: AutoRevertTimeOutInMinutes changed to " +
-									strNewValue + " minutes.");
-								ue.addDebugInfo("Old value", m_nAutoRevertTimeOutInMinutes);
-								ue.addDebugInfo("New value", gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
-								ue.log();
+							string strNewValue = asString(gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
+							// Log application trace exception 
+							UCLIDException ue("ELI29826", "Application trace: AutoRevertTimeOutInMinutes changed to " +
+								strNewValue + " minutes.");
+							ue.addDebugInfo("Old value", m_nAutoRevertTimeOutInMinutes);
+							ue.addDebugInfo("New value", gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES);
+							ue.log();
 
-								// Change the setting in the DBInfo table
-								executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
-									"' WHERE DBInfo.Name = '" + strValue + "'");
-							}
-							CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
-
-							m_nAutoRevertTimeOutInMinutes = gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES;
+							// Change the setting in the DBInfo table
+							executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
+								"' WHERE DBInfo.Name = '" + strValue + "'");
 						}
+						CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
+
+						m_nAutoRevertTimeOutInMinutes = gnMINIMUM_AUTO_REVERT_TIME_OUT_IN_MINUTES;
+					}
 #endif
-					}
-					else if (strKey == gstrAUTO_REVERT_NOTIFY_EMAIL_LIST)
-					{
-						m_strAutoRevertNotifyEmailList = strValue;
-					}
-					else if (strKey == gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS)
-					{
-						m_nActionStatisticsUpdateFreqInSeconds = asLong(strValue);
-					}
-					else if (strKey == gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT)
-					{
-						m_dGetFilesToProcessTransactionTimeout = asDouble(strValue);
+				}
+				else if (strKey == gstrAUTO_REVERT_NOTIFY_EMAIL_LIST)
+				{
+					m_strAutoRevertNotifyEmailList = strValue;
+				}
+				else if (strKey == gstrACTION_STATISTICS_UPDATE_FREQ_IN_SECONDS)
+				{
+					m_nActionStatisticsUpdateFreqInSeconds = asLong(strValue);
+				}
+				else if (strKey == gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT)
+				{
+					m_dGetFilesToProcessTransactionTimeout = asDouble(strValue);
 
-						// Need to make sure the value is above the minimum
-						if (m_dGetFilesToProcessTransactionTimeout < gdMINIMUM_TRANSACTION_TIMEOUT)
+					// Need to make sure the value is above the minimum
+					if (m_dGetFilesToProcessTransactionTimeout < gdMINIMUM_TRANSACTION_TIMEOUT)
+					{
+						try
 						{
-							try
-							{
-								string strNewValue = asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0);
-								// Log application trace exception 
-								UCLIDException ue("ELI31146", "Application trace: DBInfo setting changed.");
-								ue.addDebugInfo("Setting", gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT);
-								ue.addDebugInfo("Old value", m_dGetFilesToProcessTransactionTimeout);
-								ue.addDebugInfo("New value", gdMINIMUM_TRANSACTION_TIMEOUT);
-								ue.log();
+							string strNewValue = asString(gdMINIMUM_TRANSACTION_TIMEOUT, 0);
+							// Log application trace exception 
+							UCLIDException ue("ELI31146", "Application trace: DBInfo setting changed.");
+							ue.addDebugInfo("Setting", gstrGET_FILES_TO_PROCESS_TRANSACTION_TIMEOUT);
+							ue.addDebugInfo("Old value", m_dGetFilesToProcessTransactionTimeout);
+							ue.addDebugInfo("New value", gdMINIMUM_TRANSACTION_TIMEOUT);
+							ue.log();
 
-								// Change the setting in the DBInfo table 
-								executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
-									"' WHERE DBInfo.Name = '" + strValue + "'");
-							}
-							CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31520");
-
-							m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
+							// Change the setting in the DBInfo table 
+							executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
+								"' WHERE DBInfo.Name = '" + strValue + "'");
 						}
-					}
-					else if (strKey == gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY)
-					{
-						m_bStoreSourceDocChangeHistory = strValue == "1";
-					}
-					else if (strKey == gstrALLOW_DYNAMIC_TAG_CREATION)
-					{
-						m_bAllowDynamicTagCreation = strValue == "1";
-					}
-					else if (strKey == gstrSTORE_DOC_TAG_HISTORY)
-					{
-						m_bStoreDocTagHistory = strValue == "1";
-					}
-					else if (strKey == gstrSTORE_FTP_EVENT_HISTORY)
-					{
-						m_bStoreFTPEventHistory = strValue == "1";
-					}
-					else if (strKey == gstrALLOW_RESTARTABLE_PROCESSING)
-					{
-						m_bAllowRestartableProcessing = strValue == "1";
-					}
-					else if (strKey == gstrDATABASEID)
-					{
-						m_strEncryptedDatabaseID = strValue;
-						m_bDatabaseIDValuesValidated = false;
-					}
-					else if (strKey == gstrSTORE_DB_INFO_HISTORY)
-					{
-						m_bStoreDBInfoChangeHistory = strValue == "1";
-					}
-					else if (strKey == gstrENABLE_LOAD_BALANCING)
-					{
-						m_bLoadBalance = strValue == "1";
-					}
+						CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31520");
 
-					ipDBInfoSet->MoveNext();
+						m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
+					}
+				}
+				else if (strKey == gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY)
+				{
+					m_bStoreSourceDocChangeHistory = strValue == "1";
+				}
+				else if (strKey == gstrALLOW_DYNAMIC_TAG_CREATION)
+				{
+					m_bAllowDynamicTagCreation = strValue == "1";
+				}
+				else if (strKey == gstrSTORE_DOC_TAG_HISTORY)
+				{
+					m_bStoreDocTagHistory = strValue == "1";
+				}
+				else if (strKey == gstrSTORE_FTP_EVENT_HISTORY)
+				{
+					m_bStoreFTPEventHistory = strValue == "1";
+				}
+				else if (strKey == gstrALLOW_RESTARTABLE_PROCESSING)
+				{
+					m_bAllowRestartableProcessing = strValue == "1";
+				}
+				else if (strKey == gstrDATABASEID)
+				{
+					m_strEncryptedDatabaseID = strValue;
+					m_bDatabaseIDValuesValidated = false;
+				}
+				else if (strKey == gstrSTORE_DB_INFO_HISTORY)
+				{
+					m_bStoreDBInfoChangeHistory = strValue == "1";
+				}
+				else if (strKey == gstrENABLE_LOAD_BALANCING)
+				{
+					m_bLoadBalance = strValue == "1";
 				}
 
-				m_ipDBInfoSettings = ipDBInfoSettings;
+				ipDBInfoSet->MoveNext();
 			}
+
+			m_ipDBInfoSettings = ipDBInfoSettings;
 		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI18146");
@@ -4692,6 +4697,8 @@ string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
 	try
 	{
 		loadDBInfoSettings(ipConnection);
+
+		ASSERT_RUNTIME_CONDITION("ELI51657", m_ipDBInfoSettings != __nullptr, "Unable to load DBInfo");
 
 		if (m_ipDBInfoSettings->Contains(strSettingName.c_str()) == VARIANT_TRUE)
 		{

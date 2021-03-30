@@ -41,6 +41,9 @@ std::string CFileProcessingDB::ms_strCurrDBName = "";
 std::string CFileProcessingDB::ms_strCurrAdvConnProperties = "";
 std::string CFileProcessingDB::ms_strLastUsedAdvConnStr = "";
 std::string CFileProcessingDB::ms_strLastWorkflow = "";
+
+// TODO: Seems like this should be tracked per database
+// (since this is a static and there could be more than one DB in use for process)
 DWORD CFileProcessingDB::ms_dwLastRevertTime;
 
 CMutex CFileProcessingDB::ms_mutexPingDBLock;
@@ -96,7 +99,8 @@ m_nLastFAMFileID(0),
 m_bDeniedFastCountPermission(false),
 m_ipFAMTagManager(__nullptr),
 m_bCurrentSessionIsWebSession(false),
-m_dwLastPingTime(0)
+m_dwLastPingTime(0),
+m_ipDBInfoSettings(__nullptr)
 {
 	try
 	{
