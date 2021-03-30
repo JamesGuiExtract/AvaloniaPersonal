@@ -155,7 +155,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				+ "' WHERE ActionID = " + strActionID + " AND FileID IN (";
 			strInsertIntoFAS = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority) "
 				"SELECT FAMFile.ID, " + strActionID + " AS ActionID, '" + strState + "' AS ActionStatus, " +
-				"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority FROM FAMFile " +
+				"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority FROM FAMFile WITH (NOLOCK) " +
 				"LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID "
 				"AND ActionID = " + strActionID + " WHERE ActionID IS NULL AND FAMFile.ID IN (";
 		}
@@ -173,7 +173,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			+ ") SELECT FAMFile.ID, " + strActionID + " AS ActionID, "
 			+ "COALESCE(ActionStatus, 'U') AS ASC_From, '" + strState + "' AS ASC_To, "
 			+ "GETDATE() AS DateTimeStamp, " + strFAMUser + " AS FAMUserID, " + strMachine
-			+ " AS MachineID FROM FAMFile "
+			+ " AS MachineID FROM FAMFile WITH (NOLOCK) "
 			+ "LEFT JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID  AND "
 			+ "FileActionStatus.ActionID = " + strActionID + " "
 			+ "WHERE FAMFile.ID IN (";
@@ -183,7 +183,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		string strAddSkipRecord = strState == "S" ?
 			"INSERT INTO SkippedFile (UserName, FileID, ActionID) SELECT '"
 			+ ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName) + "' AS UserName, FAMFile.ID, "
-			+ strActionID + " AS ActionID FROM FAMFile WHERE FAMFile.ID IN (" : "";
+			+ strActionID + " AS ActionID FROM FAMFile WITH (NOLOCK) WHERE FAMFile.ID IN (" : "";
 
 		// This is used when processing state changes to "U", "C", "F" and if restartable processing
 		// is turned off "P"
@@ -306,7 +306,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			"COALESCE(ActionStatus, 'U') AS ActionStatus, "
 			"COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID, "
 			"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID "
-			"FROM FAMFile WITH (ROWLOCK, UPDLOCK)"
+			"FROM FAMFile  "
 			"LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID " 
 			"	AND SkippedFile.ActionID = " + strActionId + 
 			" LEFT OUTER JOIN FileActionStatus ON FileActionStatus.FileID = FAMFile.ID " + 
@@ -938,7 +938,7 @@ long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, string strWor
 			return getActiveWorkflowID(ipConnection);
 		}
 
-		string strQuery = "SELECT [ID] FROM [Workflow] WHERE [Workflow].[Name] = '" +
+		string strQuery = "SELECT [ID] FROM [Workflow] WITH (NOLOCK) WHERE [Workflow].[Name] = '" +
 			strWorkflowName + "'";
 
 		long nWorkflowID = 0;
@@ -1341,7 +1341,7 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 		}
 
 		// Create the from string
-		string strFrom = " FROM FAMFile LEFT JOIN FileActionStatus "
+		string strFrom = " FROM FAMFile WITH (NOLOCK) LEFT JOIN FileActionStatus WITH (NOLOCK) "
 			" ON FAMFile.ID = FileActionStatus.FileID AND FileActionStatus.ActionID = " +
 			asString(nActionID) + " " + strWhereClause;
 		
@@ -2326,10 +2326,10 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 				"COALESCE(fasTo.ActionStatus, 'U') as ASC_To, "
 				"GETDATE() AS TS_Trans, 'Copy status from " + 
 				strFrom +" to " + strTo + "' AS Comment, " + asString(getFAMUserID(ipConnection)) + 
-				", " + asString(getMachineID(ipConnection)) + " FROM FAMFile "
-				" LEFT JOIN FileActionStatus as fasFrom ON FAMFile.ID = fasFrom.FileID AND fasFrom.ActionID = " +
+				", " + asString(getMachineID(ipConnection)) + " FROM FAMFile WITH (NOLOCK) "
+				" LEFT JOIN FileActionStatus as fasFrom WITH (NOLOCK) ON FAMFile.ID = fasFrom.FileID AND fasFrom.ActionID = " +
 				strFromActionID + 
-				" LEFT JOIN FileActionStatus as fasTo ON FAMFile.ID = fasTo.FileID AND fasTo.ActionID = " +
+				" LEFT JOIN FileActionStatus as fasTo WITH (NOLOCK) ON FAMFile.ID = fasTo.FileID AND fasTo.ActionID = " +
 				strToActionID;
 
 			executeCmdQuery(ipConnection, strTransition);
@@ -2346,8 +2346,8 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 				" FAMFile.ID, " + strToActionID + " AS NewActionID, '" 
 				+ ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName)
 				+ "' AS NewUserName, " + ((m_nFAMSessionID == 0) ? "NULL" : asString(m_nFAMSessionID)) + 
-				" AS FAMSessionID FROM FAMFile "
-				"INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID AND "
+				" AS FAMSessionID FROM FAMFile WITH (NOLOCK) "
+				"INNER JOIN FileActionStatus WITH (NOLOCK) ON FAMFile.ID = FileActionStatus.FileID AND "
 				"FileActionStatus.ActionID = " + strFromActionID + " WHERE ActionStatus = 'S'";
 
 			// Delete the existing skipped records for this action and insert any new ones
@@ -4669,7 +4669,7 @@ void CFileProcessingDB::validateFileID(const _ConnectionPtr& ipConnection, long 
 {
 	try
 	{
-		string strQuery = "SELECT [FileName] FROM [" + gstrFAM_FILE + "] WHERE [ID] = "
+		string strQuery = "SELECT [FileName] FROM [" + gstrFAM_FILE + "] WITH (NOLOCK) WHERE [ID] = "
 			+ asString(nFileID);
 
 		_RecordsetPtr ipRecord(__uuidof(Recordset));
@@ -4856,7 +4856,7 @@ void CFileProcessingDB::pingDB()
 			long nFAMSessionID = 0;
 			// Return FAMSessionID as ID so it will populate nFAMSessionID.
 			executeCmdQuery(getDBConnection(),
-				"SELECT [FAMSessionID] AS [ID] FROM [ActiveFAM] WHERE [ID] = " + asString(m_nActiveFAMID),
+				"SELECT [FAMSessionID] AS [ID] FROM [ActiveFAM] WITH (NOLOCK) WHERE [ID] = " + asString(m_nActiveFAMID),
 				false, &nFAMSessionID);
 			if (nFAMSessionID != m_nFAMSessionID)
 			{
@@ -5159,7 +5159,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs(bool bDBLocked, const _Conn
 		// Query to show the elapsed time since last ping for all ActiveFAM records
 		string strElapsedSQL = "SELECT [ID], "
 			"DATEDIFF(minute,[LastPingTime],GetUTCDate()) as Elapsed "
-			"FROM [ActiveFAM]";
+			"FROM [ActiveFAM] WITH (NOLOCK)";
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI27813", ipFileSet != __nullptr);
@@ -5787,7 +5787,7 @@ _RecordsetPtr CFileProcessingDB::getFileActionStatusSet(_ConnectionPtr& ipConnec
 
 		EActionStatus eCurrentStatus = kActionUnattempted;
 
-		string strSQL = "SELECT ActionStatus From FileActionStatus WHERE ActionID = " + 
+		string strSQL = "SELECT ActionStatus From FileActionStatus WITH (NOLOCK) WHERE ActionID = " + 
 			asString(nActionID) + " AND FileID = " + asString(nFileID);
 
 		ipFileActionStatus->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
@@ -5814,8 +5814,8 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	ASSERT_RESOURCE_ALLOCATION("ELI31589", ipProcessingSet != __nullptr);
 
 	// Open recordset with ActiveFAM records that show processing on the action
-	string strSQL = "SELECT [UPI] FROM [FAMSession] "
-		"INNER JOIN [ActiveFAM] ON [FAMSessionID] = [FAMSession].[ID] "
+	string strSQL = "SELECT [UPI] FROM [FAMSession] WITH (NOLOCK) "
+		"INNER JOIN [ActiveFAM] WITH (NOLOCK) ON [FAMSessionID] = [FAMSession].[ID] "
 		"INNER JOIN [Action] ON [ActionID] = [Action].[ID] "
 		"WHERE [ASCName] = '" + strActionName + "'";
 
@@ -5853,7 +5853,7 @@ bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 	// Check for active processing 
 	long nActiveFAMCount = 0;
 	executeCmdQuery(ipConnection,
-		"SELECT Count([ID]) AS [ID] FROM [ActiveFAM]", false, &nActiveFAMCount);
+		"SELECT Count([ID]) AS [ID] FROM [ActiveFAM] WITH (NOLOCK)", false, &nActiveFAMCount);
 
 	return (nActiveFAMCount > 0);
 }
@@ -5898,7 +5898,7 @@ void CFileProcessingDB::assertNotActiveBeforeSchemaUpdate()
 		_RecordsetPtr ipProcessingFAMCount(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI33960", ipProcessingFAMCount != __nullptr);
 
-		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [dbo].[ActiveFAM]",
+		ipProcessingFAMCount->Open("SELECT COUNT(*) AS FAMCOUNT FROM [dbo].[ActiveFAM] WITH (NOLOCK)",
 			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
 
 		ipProcessingFAMCount->MoveFirst();
@@ -5917,7 +5917,7 @@ void CFileProcessingDB::assertNotActiveBeforeSchemaUpdate()
 		_RecordsetPtr ipPendingWorkItems(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI39229", ipPendingWorkItems != __nullptr);
 
-		ipPendingWorkItems->Open("SELECT * FROM [dbo].[WorkItem]",
+		ipPendingWorkItems->Open("SELECT * FROM [dbo].[WorkItem] WITH (NOLOCK) ",
 			_variant_t((IDispatch *)ipConnection, true), adOpenDynamic, adLockOptimistic, adCmdText);
 
 		if (!asCppBool(ipPendingWorkItems->adoEOF))
@@ -7396,7 +7396,7 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 		string strSQL = "INSERT INTO [SkippedFile] ([FileID], [ActionID], [UserName]) ";
 		strSQL += (nWorkflowId > 0)
 			? Util::Format(
-				"(SELECT [FileID] AS ID, %d AS ActionID, '%s' AS UserName FROM [WorkflowFile] WHERE [WorkflowID] = %d)",
+				"(SELECT [FileID] AS ID, %d AS ActionID, '%s' AS UserName FROM [WorkflowFile] WITH (NOLOCK) WHERE [WorkflowID] = %d)",
 				nActionID, strUserName.c_str(), nWorkflowId)
 			: Util::Format(
 				"(SELECT [ID], %d AS ActionID, '%s' AS UserName FROM [FAMFile])",
@@ -7425,7 +7425,7 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 		if (nWorkflowId > 0)
 		{
 			strUpdateStatus +=
-				" INNER JOIN [WorkflowFile] ON [FileActionStatus].[FileID] = [WorkflowFile].[FileID]" +
+				" INNER JOIN [WorkflowFile] WITH (NOLOCK) ON [FileActionStatus].[FileID] = [WorkflowFile].[FileID]" +
 				Util::Format(" AND [WorkflowID] = %d", nWorkflowId);
 		}
 		executeCmdQuery(ipConnection, strUpdateStatus);
@@ -7441,7 +7441,7 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 		{
 			strInsertStatus +=
 				Util::Format(
-					"INNER JOIN [WorkflowFile] ON [FAMFile].[ID] = [WorkflowFile].[FileID] AND [WorkflowID] = %d ",
+					"INNER JOIN [WorkflowFile] WITH (NOLOCK) ON [FAMFile].[ID] = [WorkflowFile].[FileID] AND [WorkflowID] = %d ",
 					nWorkflowId);
 		}
 		strInsertStatus += Util::Format(
@@ -7527,7 +7527,7 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 			"COALESCE(FromFAS.ActionStatus, 'U') AS FromActionStatus "
 			"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
 			"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID +
-			" LEFT JOIN FileActionStatus as FromFAS ON FAMFile.ID = FromFAS.FileID AND "
+			" LEFT JOIN FileActionStatus as FromFAS WITH (NOLOCK) ON FAMFile.ID = FromFAS.FileID AND "
 			"FromFAS.ActionID = " + asString(nFromActionID);
 	}
 

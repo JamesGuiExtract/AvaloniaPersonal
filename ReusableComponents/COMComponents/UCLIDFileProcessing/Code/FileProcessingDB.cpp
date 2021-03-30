@@ -5165,7 +5165,7 @@ STDMETHODIMP CFileProcessingDB::GetCachedPageNumbers(long nFileTaskSessionID, EC
 			"SELECT\r\n"
 			"(\r\n"
 			"	SELECT(CAST([Page] AS NVARCHAR) + ',')\r\n"
-			"		FROM [FileTaskSessionCache]\r\n"
+			"		FROM [FileTaskSessionCache] WITH (NOLOCK) \r\n"
 			"		WHERE [FileTaskSessionID] = <FileTaskSessionID>\r\n"
 			"		AND <TargetFields>\r\n"
 			"		FOR XML PATH('')\r\n"

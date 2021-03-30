@@ -9580,7 +9580,7 @@ bool CFileProcessingDB::GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFi
 			long nCount = vecFileIDs.size();
 			for (long i = 0; i < nCount;)
 			{
-				string strQuery = "SELECT [FileName] FROM [FAMFile] WHERE [ID] IN (";
+				string strQuery = "SELECT [FileName] FROM [FAMFile] WITH (NOLOCK) WHERE [ID] IN (";
 			
 				// Query in batches of 1000 to avoid any one query taking too much time in the DB
 				// for very large file sets.
@@ -9926,8 +9926,8 @@ bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			string strQuery =
-				"SELECT [Value] FROM [FileMetadataFieldValue] "
-					"INNER JOIN [MetadataField] ON [MetadataField].[ID] = [FileMetadataFieldValue].[MetadataFieldID] "
+				"SELECT [Value] FROM [FileMetadataFieldValue] WITH (NOLOCK) "
+					"INNER JOIN [MetadataField] WITH (NOLOCK) ON [MetadataField].[ID] = [FileMetadataFieldValue].[MetadataFieldID] "
 					"WHERE [FileID] = <FileID> AND [Name] = '<MetadataFieldName>'";
 
 			replaceVariable(strQuery, "<FileID>", asString(nFileID));
@@ -12667,8 +12667,8 @@ bool CFileProcessingDB::GetActiveUsers_Internal(bool bDBLocked, BSTR bstrAction,
 			ipConnection = getDBConnection();
 
 			string strQuery = "SELECT DISTINCT [UserName] "
-				"FROM [ActiveFAM] "
-				"INNER JOIN [FAMSession] ON [FAMSessionID] = [FAMSession].[ID] "
+				"FROM [ActiveFAM] WITH (NOLOCK) "
+				"INNER JOIN [FAMSession] WITH (NOLOCK) ON [FAMSessionID] = [FAMSession].[ID] "
 				"INNER JOIN [FAMUser] ON [FAMUserID] = [FAMUser].[ID] "
 				"WHERE [ActionID] = <ActionID> AND [Processing] = 1";
 
