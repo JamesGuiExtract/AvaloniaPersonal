@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{E1F701D9-7822-42AB-9510-9FCAFB718E0D}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>Extract.FileConverter</RootNamespace>
     <AssemblyName>Extract.FileConverter</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
@@ -29,8 +29,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>true</Prefer32Bit>
     <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisRuleSet>
-    </CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,13 +43,15 @@
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Office.Interop.Word, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-      <HintPath>..\..\..\Binaries\Debug\Microsoft.Office.Interop.Word.dll</HintPath>
+    <Reference Include="office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.ValueTuple" />
@@ -73,7 +74,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="MainWindow.xaml">
+    <Compile Include="Converters\FileFormat.cs" />
+    <Compile Include="Pages\OfficeConverter.xaml.cs">
+      <DependentUpon>OfficeConverter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ReordableListBox.cs" />
+    <Page Include="ConverterSettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -81,12 +87,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Converters\WordToPdfConverter.cs" />
+    <Compile Include="Converters\OfficeConverter.cs" />
     <Compile Include="Converters\IConverter.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="Converters\PerformConversion.cs" />
+    <Compile Include="ConverterSettingsWindow.xaml.cs">
+      <DependentUpon>ConverterSettingsWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Pages\OfficeConverter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -106,14 +117,41 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ModernUI.WPF">
-      <Version>1.0.9</Version>
+    <PackageReference Include="MahApps.Metro">
+      <Version>2.4.4</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Office.Interop.Excel">
+      <Version>15.0.4795.1000</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Office.Interop.PowerPoint">
+      <Version>15.0.4420.1017</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Office.Interop.Word">
+      <Version>15.0.4797.1003</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Code\Extract.csproj">
       <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Imaging\Core\Code\Extract.Imaging.csproj">
+      <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
+      <Name>Extract.Imaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
+      <Project>{212e31d9-5f02-43aa-8625-bcb86b15cf8f}</Project>
+      <Name>Extract.Licensing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Office\Core\Code\Extract.Office.csproj">
+      <Project>{1eab4e8f-1be0-460b-b35d-99994bd1245d}</Project>
+      <Name>Extract.Office</Name>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
+      <Name>Extract.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,0 +1,70 @@
+﻿<mah:MetroWindow
+        x:Class="Extract.FileConverter.ConverterSettingsWindow"
+        xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:content="clr-namespace:Extract.FileConverter.Pages" 
+        xmlns:local="clr-namespace:Extract.FileConverter"
+        mc:Ignorable="d"
+        Title="Core: Convert document Settings" 
+        Height="450" 
+        Width="800" 
+        MinWidth="600" 
+        MinHeight="450">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- MahApps.Metro resource dictionaries. Make sure that all file names are Case Sensitive! -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <!-- Theme setting -->
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Border BorderThickness="1" BorderBrush="Black" Grid.Column="0" Padding="4,4,4,4" Grid.Row="0">
+            <StackPanel>
+                <Label Content="Destination Format"></Label>
+                <ComboBox x:Name="DestinationFormat" ItemsSource="{Binding SupportedDestinationFormats}" SelectedItem="{Binding DestinationFileFormat}" DisplayMemberPath="">
+                </ComboBox>
+
+                <local:ItemDragAndDropListBox x:Name="ConverterListBox" ItemsSource="{Binding}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" MouseDown="StackPanel_MouseDown" Tag="{Binding}">
+                                <CheckBox IsChecked="{Binding IsEnabled}"></CheckBox>
+                                <TextBlock Text="{Binding ConverterName}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </local:ItemDragAndDropListBox>
+
+            </StackPanel>
+        </Border>
+        
+        <Border BorderThickness="1" BorderBrush="Black" Grid.Column="1" Padding="4,4,4,4" Margin="10,0,0,0" Grid.Row="0">
+            <DockPanel >
+                <StackPanel DockPanel.Dock="Top">
+                    <content:OfficeConverter Visibility="Visible" x:Name="ShowExtractOfficeConverter"></content:OfficeConverter>
+                </StackPanel>
+
+                
+            </DockPanel>
+        </Border>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,0">
+            <Button  Content="Save" Click="Button_Save_Click" VerticalAlignment="Bottom" MaxHeight="30" Margin="0,0,0,10"></Button>
+            <Button Content="Cancel" Click="Button_Cancel_Click" VerticalAlignment="Bottom" MaxHeight="30" Margin="5,0,0,10"></Button>
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>

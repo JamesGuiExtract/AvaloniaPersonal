@@ -1,0 +1,580 @@
+Customer_Name                                                                      Reseller                           VersionMachine_Name      Issued_OnIssued_By               Permanent ActiveProduction
+Amador County CA                                                                   Granicus                           11.1.0 CAC-SVR-W20        3/8/2021EXTRACT\lori_owens      Yes       No    No
+Amador County CA                                                                   Granicus                           11.1.0 CAC-SVR-W20       1/12/2021EXTRACT\lori_owens      Yes       No    No
+Amador County CA                                                                   Granicus                           11.1.0 CAC-SVR-W20        3/8/2021EXTRACT\cody_Auter      Yes       Yes   No
+Bartholomew County IN                                                              Computer Systems Inc. (CSI)        10.5.0 BARTH03796        2/23/2021EXTRACT\lori_owens      No        Yes   Yes
+Blackford County IN                                                                Computer Systems Inc. (CSI)        10.5.0 BCC-REC2          1/27/2021EXTRACT\lori_owens      No        Yes   Yes
+Blackford County IN                                                                Computer Systems Inc. (CSI)        10.5.0 BCC-REC01         1/19/2021EXTRACT\lori_owens      No        Yes   Yes
+Brown County IN                                                                    Computer Systems Inc. (CSI)        10.5.0 COURT3234          2/8/2021EXTRACT\lori_owens      No        Yes   Yes
+Canton Municipal Court                                                                                                10.2.0 CIVIL-EREED       1/26/2021EXTRACT\lori_owens      No        Yes   Yes
+Cass County MN                                                                     Tyler (Formerly CSA)               11.5.0 DOCPROAIS         2/25/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+Cass County MN                                                                     Tyler (Formerly CSA)               11.5.0 DOCPROAIS         2/25/2021EXTRACT\Branden_Bryan   No        No    Yes
+Community Behavioral Health (CBH) - City of Philadelphia                                                              11.3.1 BC14317_X64        3/3/2021EXTRACT\lori_owens      No        Yes   Yes
+Community Behavioral Health (CBH) - City of Philadelphia                                                              11.3.1 BC111036_X64      3/24/2021EXTRACT\lori_owens      No        Yes   Yes
+Community Behavioral Health (CBH) - City of Philadelphia                                                              11.3.1 BC14329_X64        3/9/2021EXTRACT\lori_owens      No        Yes   Yes
+Community Behavioral Health (CBH) - City of Philadelphia                                                              10.3.1 BC14317_X64        3/3/2021EXTRACT\lori_owens      No        No    Yes
+Contra Costa County CA                                                             Granicus                           11.3.1 226098-29         1/12/2021EXTRACT\lori_owens      Yes       Yes   No
+Dallas County, TX District Attorney                                                                                   10.0.0 D16DC1OCRED2       2/3/2021EXTRACT\cody_Auter      No        Yes   Yes
+Dallas County, TX District Attorney                                                                                   10.0.0 D16DC1OCRED3       2/3/2021EXTRACT\cody_Auter      No        Yes   Yes
+Dallas County, TX District Attorney                                                                                   10.0.0 D16DC1OCRED1       2/3/2021EXTRACT\cody_Auter      No        Yes   Yes
+Davidson County Circuit Court Clerk                                                                                   11.5.0 CCC0282           2/17/2021EXTRACT\lori_owens      No        Yes   Yes
+Extract Systems                                                                                                       11.6.0 HUWINSRV2K12       2/9/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 WP-VM-WIN2012R2   1/25/2021EXTRACT\william_parr    No        Yes   No
+Extract Systems                                                                                                       11.5.0 HUZWIN102019       1/8/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.6.0 VOYAGER           2/24/2021EXTRACT\William_Parr    No        Yes   No
+Extract Systems                                                                                                       10.0.0 VM-JENNY           2/8/2021EXTRACT\Jenny_Reschke   Yes       Yes   No
+Extract Systems                                                                                                       11.6.0 NATWINSRV16        2/8/2021EXTRACT\nathaniel_heyer No        Yes   No
+Extract Systems                                                                                                       11.6.0 TestMachine       2/26/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 BRANDEN            2/2/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+Extract Systems                                                                                                       11.5.0 NATVM10           1/12/2021EXTRACT\nathaniel_heyer No        Yes   No
+Extract Systems                                                                                                       11.5.0 HUWINSRV2K12      1/27/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.6.0 AzureTest         3/10/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 PerformanceTest   2/16/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 WIN-G61LT892CK8   1/29/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.6.0 11-6-Test-SVR16    2/7/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.6.0 WIN-G61LT892CK8   3/11/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.6.0 HUZWIN102019      2/11/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 OLDG               3/4/2021EXTRACT\william_parr    No        Yes   No
+Extract Systems                                                                                                       11.1.0 VM-JENNY          3/17/2021EXTRACT\Jenny_Reschke   No        Yes   No
+Extract Systems                                                                                                       11.5.0 HUSIWINSRV16      1/26/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.6.0 DevTest           2/11/2021EXTRACT\steve_kurth     No        Yes   No
+Extract Systems                                                                                                       11.6.0 JIGGERY-POKERY    3/26/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       10.0.0 VM-JENNY           2/5/2021EXTRACT\Jenny_Reschke   Yes       Yes   No
+Extract Systems                                                                                                       11.3.0 VM-JENNY           3/1/2021EXTRACT\Jenny_Reschke   Yes       Yes   No
+Extract Systems                                                                                                       11.3.0 11-3-Patch-Test    2/4/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.6.0 TestMachine       2/23/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 WIN-7T9AVCUJV7Q    2/2/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+Extract Systems                                                                                                       11.6.0 TestMachine       2/24/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.3.0 VM-JENNY           3/1/2021EXTRACT\Jenny_Reschke   No        Yes   No
+Extract Systems                                                                                                       11.6.0 WIN-G61LT892CK8   3/23/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.6.0 HUZ-WSRV12        2/10/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.6.0 11-6-InstallTes   2/10/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.6.0 SNK-SVR19          2/5/2021EXTRACT\steve_kurth     No        Yes   No
+Extract Systems                                                                                                       11.6.0 11-6-SVR-2016      2/9/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.5.0 11-6-WebInstall    2/4/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.6.0 MCCABE            3/26/2021EXTRACT\cody_Auter      Yes       Yes   No
+Extract Systems                                                                                                       11.5.0 HUWINSRV2K12      1/27/2021EXTRACT\huzaifa_sohail  Yes       Yes   No
+Extract Systems                                                                                                       11.5.0 WP-2012-VM         2/1/2021EXTRACT\william_parr    No        Yes   No
+Extract Systems                                                                                                       11.6.0 11-6-0-29         3/12/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.5.0 11-6-Perf-Test    1/22/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.6.0 BRANDEN           2/15/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+Extract Systems                                                                                                       11.6.0 VOYAGER           3/15/2021EXTRACT\William_Parr    No        Yes   No
+Extract Systems                                                                                                       11.5.0 WIN-7T9AVCUJV7Q    2/2/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+Extract Systems                                                                                                       11.6.0 JIGGERY-POKERY    3/23/2021EXTRACT\huzaifa_sohail  Yes       Yes   No
+Extract Systems                                                                                                       11.5.0 WP-WIN2016         2/2/2021EXTRACT\william_parr    No        Yes   No
+Extract Systems                                                                                                       11.5.0 WIN-GHNG3G74CO4   1/24/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 PerformanceTest    3/8/2021EXTRACT\William_Parr    No        Yes   No
+Extract Systems                                                                                                       11.6.0 HUWINSRV2K12       2/8/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.6.0 WIN-G61LT892CK8    3/8/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 SNK-SVR19          2/3/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.3.0 HUZWINSRV2K19     1/11/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 WIN-G61LT892CK8   1/28/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 DESKTOP-DEOCSAL    3/1/2021EXTRACT\ben_alberico    No        Yes   Yes
+Extract Systems                                                                                                       11.3.0 HUZWINSRV2K19      2/1/2021EXTRACT\steve_kurth     No        Yes   No
+Extract Systems                                                                                                       10.0.0 VM-JENNY           2/8/2021EXTRACT\Jenny_Reschke   No        Yes   No
+Extract Systems                                                                                                       11.6.0 11-6-WebInstall    2/5/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.5.0 11-6-Perf-Test    1/22/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.5.0 DELL-PS-D1         3/2/2021EXTRACT\ben_alberico    No        Yes   Yes
+Extract Systems                                                                                                       11.6.0 VOYAGER           2/24/2021EXTRACT\William_Parr    No        Yes   No
+Extract Systems                                                                                                       11.1.0 DESKTOP-DEOCSAL   3/29/2021EXTRACT\Ben_Alberico    No        Yes   No
+Extract Systems                                                                                                       11.6.0 HAWKEYE            3/1/2021EXTRACT\steve_kurth     No        Yes   No
+Extract Systems                                                                                                       11.6.0 WPSQL2017Win201   3/12/2021EXTRACT\William_Parr    No        Yes   No
+Extract Systems                                                                                                       11.6.0 PROVOLONE         2/22/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+Extract Systems                                                                                                       11.3.1 VM-JENNY          3/23/2021EXTRACT\Jenny_Reschke   No        Yes   No
+Extract Systems                                                                                                       11.5.0 WIN-G61LT892CK8    2/2/2021EXTRACT\huzaifa_sohail  Yes       Yes   No
+Extract Systems                                                                                                       11.3.0 HUZWIN102019       3/1/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.3.0 VM-JENNY           3/9/2021EXTRACT\Jenny_Reschke   No        Yes   No
+Extract Systems                                                                                                       11.6.0 HUWINSRV2K12       2/9/2021EXTRACT\huzaifa_sohail  No        Yes   No
+Extract Systems                                                                                                       11.5.0 VM-TG-WIN2012     1/22/2021EXTRACT\Trever_Gannon   Yes       No    No
+Extract Systems                                                                                                       11.6.0 11-6-0-29         3/12/2021EXTRACT\steve_kurth     Yes       Yes   No
+Extract Systems                                                                                                       11.3.1 VM-JENNY          3/24/2021EXTRACT\Jenny_Reschke   No        Yes   No
+Extract Systems                                                                                                       11.6.0 JIGGERY-POKERY    3/26/2021EXTRACT\huzaifa_sohail  Yes       Yes   No
+Extract Systems                                                                                                       11.3.0 VM-JENNY           3/1/2021EXTRACT\Jenny_Reschke   No        Yes   No
+Extract Systems                                                                                                       11.1.0 DESKTOP-DEOCSAL   3/26/2021EXTRACT\Ben_Alberico    No        Yes   No
+Franklin County IN                                                                 Computer Systems Inc. (CSI)        10.5.0 RECORDER-R2       1/26/2021EXTRACT\lori_owens      No        Yes   Yes
+Hamilton County IN                                                                 Computer Systems Inc. (CSI)        10.5.0 REC-CHAYLT-20     1/25/2021EXTRACT\lori_owens      No        Yes   Yes
+Harris Recording Solutions                                                                                            11.3.0 MAI-QUA-QA-P01    1/28/2021EXTRACT\Andrew_Loeffler No        Yes   No
+Harris Recording Solutions                                                                                            11.3.0 D1ZRTN2           3/22/2021EXTRACT\Andrew_Loeffler Yes       Yes   No
+Hendricks County IN                                                                Computer Systems Inc. (CSI)        10.5.0 HREC-CSISVR2      1/28/2021EXTRACT\lori_owens      No        Yes   Yes
+Hurley Medical Center                                                                                                 11.5.0 HMCEXTRACT-PRD    1/19/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+Hurley Medical Center                                                                                                 11.5.0 HMC-EXTRACTTST    1/12/2021EXTRACT\Rob_Fea         No        Yes   No
+Hurley Medical Center                                                                                                 11.5.0 ROBDELL2          3/25/2021EXTRACT\Rob_Fea         No        Yes   Yes
+Jefferson County IN                                                                Computer Systems Inc. (CSI)        10.5.0 JCG-APP-01        3/11/2021EXTRACT\lori_owens      No        Yes   Yes
+Kenosha County                                                                                                        11.1.0 KC-TRIMIN01DEV     3/3/2021EXTRACT\Rob_Fea         Yes       Yes   No
+Kenosha County                                                                                                        11.1.0 KC-TRIMIN01DEV     3/3/2021EXTRACT\Rob_Fea         Yes       Yes   No
+Kenosha County                                                                                                        11.1.0 KC-TRIMIN01DEV     3/3/2021EXTRACT\Rob_Fea         No        Yes   No
+Kenosha County                                                                                                        11.1.0 KC-TRIMIN01DEV     3/3/2021EXTRACT\Rob_Fea         Yes       Yes   No
+Laramie County WY                                                                  Tyler (Formerly CSA)               10.0.0 CLKDPIND          3/16/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+Lucas County OH - court and recorder                                                                                  11.1.0 IMGREDACT-18       2/2/2021EXTRACT\lori_owens      No        Yes   Yes
+Merced County CA                                                                   Granicus                           11.1.0 MCSTAPPTST-01     3/24/2021EXTRACT\lori_owens      Yes       Yes   No
+Monroe County IN                                                                   Computer Systems Inc. (CSI)        10.5.0 CH-RECORDER-G     1/13/2021EXTRACT\lori_owens      No        Yes   Yes
+Monroe County IN                                                                   Computer Systems Inc. (CSI)        10.5.0 CH-REC-A          3/23/2021EXTRACT\lori_owens      No        Yes   Yes
+Newton County IN                                                                   Computer Systems Inc. (CSI)        10.5.0 NEWTONDB1          1/5/2021EXTRACT\Andrew_Loeffler No        Yes   Yes
+Newton County IN                                                                   Computer Systems Inc. (CSI)        10.5.0 CH-REC-02          1/6/2021EXTRACT\lori_owens      No        Yes   Yes
+Newton County IN                                                                   Computer Systems Inc. (CSI)        10.5.0 CH-REC-001         1/6/2021EXTRACT\lori_owens      No        Yes   Yes
+Newton County IN                                                                   Computer Systems Inc. (CSI)        10.5.0 CH-REC-01          2/8/2021EXTRACT\lori_owens      No        Yes   Yes
+Northwestern Medicine - Lab Billing                                                Northwestern Medicine (Parent)     11.3.1 ROBDELL2          1/21/2021EXTRACT\Rob_Fea         No        Yes   Yes
+Rutgers Cancer Institute of New Jersey                                                                                10.2.0 CINJASBT301       1/15/2021EXTRACT\cody_Auter      No        Yes   No
+Rutgers Cancer Institute of New Jersey                                                                                10.2.0 CINJASBT301       1/15/2021EXTRACT\cody_Auter      No        Yes   Yes
+Rutgers Cancer Institute of New Jersey                                                                                10.2.0 CINJASBT301       1/15/2021EXTRACT\cody_Auter      No        No    No
+San Francisco County CA                                                            Avenu (Conduent/Xerox/ACS)         11.3.0 UATAFRMAPP1113     1/6/2021EXTRACT\Andrew_Loeffler Yes       No    No
+San Francisco County CA                                                            Avenu (Conduent/Xerox/ACS)         11.3.0 UATAFRMAPP1113     1/6/2021EXTRACT\Andrew_Loeffler Yes       No    No
+San Francisco County CA                                                            Avenu (Conduent/Xerox/ACS)         11.3.0 UATAFRMAPP1113     1/5/2021EXTRACT\Andrew_Loeffler Yes       No    No
+San Francisco County CA                                                            Avenu (Conduent/Xerox/ACS)         11.3.0 UATAFRMAPP1113     1/6/2021EXTRACT\Andrew_Loeffler Yes       No    No
+San Francisco County CA                                                            Avenu (Conduent/Xerox/ACS)         11.3.0 UATAFRMAPP1113     3/3/2021EXTRACT\Andrew_Loeffler No        Yes   No
+Somerset County NJ                                                                 Harris Recording Solutions         11.5.0 CLRKT083          2/26/2021EXTRACT\Andrew_Loeffler No        No    Yes
+Somerset County NJ                                                                 Harris Recording Solutions         11.5.0 CCAPPTEST         1/26/2021EXTRACT\Andrew_Loeffler No        Yes   No
+Somerset County NJ                                                                 Harris Recording Solutions         11.5.0 CLRKT096          2/26/2021EXTRACT\Andrew_Loeffler No        Yes   Yes
+Somerset County NJ                                                                 Harris Recording Solutions         11.5.0 CLRKT097          2/26/2021EXTRACT\Andrew_Loeffler No        Yes   Yes
+Somerset County NJ                                                                 Harris Recording Solutions         11.5.0 CLRKT083          1/28/2021EXTRACT\Andrew_Loeffler No        Yes   Yes
+Stanislaus County CA                                                               Granicus                           11.1.0 226098-33          3/8/2021EXTRACT\cody_Auter      Yes       Yes   No
+Stanislaus County CA                                                               Granicus                           11.1.0 CLERKDOCS          3/8/2021EXTRACT\lori_owens      Yes       No    No
+Stanislaus County CA                                                               Granicus                           11.1.0 CLERKDOCS         3/17/2021EXTRACT\lori_owens      Yes       Yes   No
+Stanislaus County CA                                                               Granicus                           11.1.0 226098-33          3/3/2021EXTRACT\lori_owens      Yes       No    No
+Sullivan County IN                                                                 Computer Systems Inc. (CSI)        10.5.0 DESKTOP-88FGH66    2/2/2021EXTRACT\lori_owens      No        Yes   Yes
+Surefire Data Solutions, LLC                                                       Provana                            11.3.1 SUREFIRE-TERMIN   1/26/2021EXTRACT\Rob_Fea         No        Yes   Yes
+Surefire Data Solutions, LLC                                                       Provana                            11.3.1 SUREFIRE12         1/4/2021EXTRACT\Rob_Fea         No        Yes   Yes
+Sweetwater County WY                                                               Tyler (Formerly CSA)               11.5.0 ITTYLERSCN        2/26/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+The University of Kansas Health System (KUHS) - The Center for Transplantation (TraThe University of Kansas Health Sys11.5.0 UKH-LABDE-PROD    1/22/2021EXTRACT\Andrew_Loeffler No        Yes   Yes
+Travis County, TX-County Clerk                                                     ImageSoft, Inc.                    10.0.0 TCC186381L        3/12/2021EXTRACT\Ben_Alberico    No        Yes   Yes
+University of Nebraska - Nebraska Medical Center - Transplant                                                         11.3.0 GPEXTAPP01        1/18/2021EXTRACT\Rob_Fea         No        Yes   Yes
+Vigo County Recorders Office                                                       Computer Systems Inc. (CSI)        10.5.0 REC1               2/5/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+Vigo County Recorders Office                                                       Computer Systems Inc. (CSI)        10.5.0 REC12              2/5/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+Washington County AR - Circuit Clerk                                               Cott Systems                       10.3.0 CIRC-LX16         2/24/2021EXTRACT\lori_owens      No        Yes   Yes
+Washington County MN                                                               West Central Indexing              11.5.0 TIOCR              2/9/2021EXTRACT\Branden_Bryan   No        Yes   Yes
+West Central Indexing                                                                                                 11.5.0 TIOCR              2/3/2021EXTRACT\Branden_Bryan   No        No    Yes
+Comments
+temp license for testing
+extending expired test license for testing
+temp license for testing - Updated W/ No Counters and PDF; per previous testing licenses
+transfer from RECORDERG_-1
+transfer from BCC-REC210
+transfer from BCC RECWIN7
+NULL
+transfer from CIVILCLERK2
+License for 11.5 upgrade; previous license was unlimited and for version 8 minus file inspector
+License for 11.5 upgrade; previous license was unlimited and for version 8
+transfer from LMARRER01_W7
+transfer from TMACFARLAND_W7
+transfer from CLEARY_W7
+wrong version
+extending test license one more month for Amador testing
+Transferred from D08SC1OCRED2
+Transferred from D08SC1OCRED3
+Transferred from D08SC1OCRED1
+NULL
+NULL
+NULL
+NULL
+NULL
+9.7.3.5
+NULL
+NULL
+for Washington WCI web api internal practice
+NULL
+NULL
+NULL
+NULL
+NULL
+11.6 Release Testing
+NULL
+NULL
+NULL
+NULL
+NULL
+Host for web API documentation
+NULL
+9.7.3.5
+NULL
+11.3 patch test for Essentia
+NULL
+WCI web api practice
+NULL
+
+NULL
+NULL
+11.6 Install testing
+11.6 Release Testing
+11.6 Testing
+NULL
+Cody 11.6 Internal License
+NULL
+NULL
+Steve 11.6 Testing RDT
+NULL
+Total license for Zeus
+NULL
+WCI web api practice
+NULL
+
+NULL
+NULL
+NULL
+NULL
+11.6 Testing
+NULL
+NULL
+NULL
+Test env for special 11.3 compatible build of web app for pfizer
+9.7.3.5
+11.6 Release Testing
+NULL
+NULL
+NULL
+Build for Fairfax County
+SNK Server Test License
+NULL
+Full license for Provolone
+NULL
+NULL
+NULL
+
+NULL
+NULL
+Steve 11.6 Testing
+NULL
+NULL
+NULL
+Build for Fairfax County
+transfer from RECORDERSCAN
+
+Updating MAI-QUA-QA-P01 (QA server) to a permanent license per Troy
+Harris demo machine
+transfer from HREC-CSISVR
+Prod upgrade from 11.2 to 11.5
+Server HMCEXTRACT-TST blew up during upgrade and they had to build a new one. This is the new one. Other one is gone.
+Only need to remove image pages. No cost, no royalties.
+transfer from JCG-V6
+Temp license for Kenosha's DEV server
+Temp license for Kenosha's DEV server
+Temp license for Kenosha's DEV server - temp was getting corrupt. Trying this out and will have them remove after testing.
+Temp license for Kenosha's DEV server
+Laramie is actually on version 9.7.3.5 ; version 10 licenses are compatible with 9.X Extract versions. Transferred from machine CLK6
+Sean created in 02/19 to upgrade to v10.6, then again in 10/19 to upgrade to v11.1, upgrade from 7.0, transfer from IMGREDACT-09
+NULL
+NULL
+new user
+Upgrade from v9 to 10.5.0
+transfer from CH-TRES-02, upgrade from v9.9
+transfer from CH-JALENDUFF, upgrade from v9.9
+upgrade from v9.9, transfer from CH-CIR-02-OLD
+Dashboard viewer and search only, no royalties
+
+
+Missing PDF R/W component
+Temp license for UAT environment, approved by Troy
+Created in error
+Created in error
+Created in error
+Permanent UAT environment
+Client license for Somerset
+Test environment license for Somerset/Harris
+Client license for Somerset
+Client license for Somerset
+Client license for Somerset
+test license for hosting environment - updated to include Disable Rule Counters utility
+temp license for testing
+NULL
+test license for hosting environment
+new user
+Client machine used by all users. Transfer from Surefire07 to Surefire-Common-Terminal. See transfer form here: \\extract.local\PS\Deliveries\Surefire\Licensing\Extract License Transfer Surefire07 to Surefire-Com
+PRA-FlexIndex-DashboardsOnly-NoCharge
+For 8 to 11.5 upgrade
+upgrade from 10.3
+Transferred from: TCC184478L
+Disable counters due to corruption issue, no royalties
+Transfer from REC1, new user on old PC
+Transfer from REC12, new user on old PC
+transfer from CIRC-LX15
+recreated license after initial license incorrectly created under WCI
+License for Washington Web API install
+License_Name                                                                                                PayRoyaltieExpires_OnUpgraded from license name                    Upgraded from Version
+Granicus_CA_Amador County CA_IDShield_Server_CAC-SVR-W20_2021-04-01                                         No           4/1/2021NULL                                          NULL
+Granicus_CA_Amador County CA_FlexIndex_IDShield_Server_CAC-SVR-W20_2021-02-11                               No          2/11/2021NULL                                          NULL
+Granicus_CA_Amador_IDShield_CAC-SVR-W20_Server_UpdatedTemp2021-04-01                                        No           4/1/2021NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Bartholomew County IN_IDShield_Client_BARTH03796_Full                        No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Blackford County IN_IDShield_Client_BCC-REC2_Full                            No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Blackford County IN_IDShield_Client_BCC-REC01_Full                           No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Brown County IN_IDShield_Client_COURT3234_Full                               Yes        NULL      NULL                                          NULL
+OH_Canton Municipal Court_IDShield_Client_CIVIL-EREED_Full                                                  No         NULL      NULL                                          NULL
+NoFileInspector_Tyler (Formerly CSA)_MN_Cass County MN_FlexIndex_Server_DOCPROAIS_Full                      Yes        NULL      NULL                                          NULL
+Tyler (Formerly CSA)_MN_Cass County MN_FlexIndex_Server_DOCPROAIS_Full                                      Yes        NULL      NULL                                          NULL
+PA_Community Behavioral Health (CBH) - City of Philadelphia_IDShield_Client_BC14317_X64_Full                No         NULL      NULL                                          NULL
+PA_Community Behavioral Health (CBH) - City of Philadelphia_IDShield_Client_BC111036_X64_Full               No         NULL      NULL                                          NULL
+PA_Community Behavioral Health (CBH) - City of Philadelphia_IDShield_Client_BC14329_X64_Full                No         NULL      NULL                                          NULL
+PA_Community Behavioral Health (CBH) - City of Philadelphia_IDShield_Client_BC14317_X64_Full                No         NULL      NULL                                          NULL
+Granicus_CA_Contra Costa County CA_FlexIndex_IDShield_Server_226098-29_2021-02-11                           No          2/11/2021NULL                                          NULL
+TX_DallasCountyDA_D16DC1OCRED2_IDShield_Server_Full                                                         No         NULL      NULL                                          NULL
+TX_DallasCountyDA_D16DC1OCRED3_IDShield_Server_Full                                                         No         NULL      NULL                                          NULL
+TX_DallasCountyDA_D16DC1OCRED1_IDShield_Server_Full                                                         No         NULL      NULL                                          NULL
+TN_Davidson County Circuit Court Clerk_IDShield_Client_CCC0282_Full                                         Yes        NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_HUWINSRV2K12_Full                                        No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_WP-VM-WIN2012R2_Full                                     No         NULL      NULL                                          NULL
+WI_Extract Systems_HUZWIN102019_2021-02-07                                                                  No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_VOYAGER_Full                                             No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_Server_VM-JENNY_2021-03-10                                            No          3/10/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_NATWINSRV16_Full                                         No         NULL      NULL                                          NULL
+WI_116_PerformanceTest_Counter_TestMachine_Full                                                             No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_Server_BRANDEN_Full                                                            No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_NATVM10_Full                                             No         NULL      NULL                                          NULL
+WI_Test_116_HUWINSRV2K12_Full                                                                               No         NULL      NULL                                          NULL
+WI_116_Build_27_LabDE_Server_AzureTest_Full                                                                 No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_PerformanceTest_Full                                     No         NULL      NULL                                          NULL
+WI_WinSrv19_SqlSrv19_Server_WIN-G61LT892CK8_Full                                                            No         NULL      NULL                                          NULL
+WI_Extract Systems_Server_11-6-Test-SVR16_2021-03-09                                                        No           3/9/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_WIN-G61LT892CK8_Full                                     No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_HUZWIN102019_Full                                        No         NULL      NULL                                          NULL
+WI_Extract Systems_Client_OLDG_Full_disableRuleCounter                                                      No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_Server_VM-JENNY_Full                                                  No         NULL      NULL                                          NULL
+WI_Extract Systems_SQL19_Server_HUSIWINSRV16_Full                                                           No         NULL      NULL                                          NULL
+WI_Extract Systems_API_Doc_Server_Full                                                                      No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_JIGGERY-POKERY_Full                                      No         NULL      NULL                                          NULL
+WI_Extract Systems_Client__2021-03-07                                                                       No           3/7/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_VM-JENNY_2021-03-31                                      No          3/31/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_11-3-Patch-Test_2021-03-06                               No           3/6/2021NULL                                          NULL
+WI_Extract Systems_Azure_116_TestMachine_Full                                                               No         NULL      NULL                                          NULL
+WI_WebAPI_FlexIndex_Server_WIN-7T9AVCUJV7Q_Full                                                             No         NULL      NULL                                          NULL
+WI_Extract Systems_RuleCounterDisbaled_Server_TestMachine_Full                                              No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_VM-JENNY_Full                                            No         NULL      WI_Extract Systems_LabDE_Server_VM-JENNY_Full 11.3.0
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_WIN-G61LT892CK8_Full                                     No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_HUZ-WSRV12_Full                                          No         NULL      NULL                                          NULL
+WI_Extract Systems_Server_11-6-InstallTes_2021-03-12                                                        No          3/12/2021NULL                                          NULL
+WI_Extract Systems_Server_SNK-SVR19_Full                                                                    No         NULL      NULL                                          NULL
+WI_Extract Systems_Server_11-6-SVR-2016_2021-03-11                                                          No          3/11/2021NULL                                          NULL
+WI_Extract Systems_Server_11-6-WebInstall_2021-03-06                                                        No           3/6/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_MCCABE_2021-04-25                                        No          4/25/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_HUWINSRV2K12_2021-02-26                                  No          2/26/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_WP-2012-VM_Full                                          No         NULL      NULL                                          NULL
+WI_Extract Systems_11_6_Testing_RDT_2021-04-11                                                              No          4/11/2021NULL                                          NULL
+WI_Extract Systems_Steve_11-6-Perf-Test_2021-02-21                                                          No          2/21/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_BRANDEN_Full                                             No         NULL      NULL                                          NULL
+WI_Extract Systems_Client_VOYAGER_Full_NO_COUNTS                                                            No         NULL      NULL                                          NULL
+WI_Extract Systems_Client_WIN-7T9AVCUJV7Q_Full                                                              No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_JIGGERY-POKERY_2021-04-22                                No          4/22/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_WP-WIN2016_Full                                          No         NULL      NULL                                          NULL
+Extract_Test_Server2k16_sql2k17_Server_WIN-GHNG3G74CO4_Full                                                 No         NULL      NULL                                          NULL
+WI_Extract Systems_Client_PerformanceTest_FullCounter                                                       No         NULL      NULL                                          NULL
+WI_Test116_Server_HUWINSRV2K12_Full                                                                         No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_WIN-G61LT892CK8_Full                                     No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_SNK-SVR19_2021-03-05                                     No           3/5/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_HUZWINSRV2K19_Full                                       No         NULL      NULL                                          NULL
+WI_Test_WinServ2k19_11.6.0.9_WIN-G61LT892CK8_Full                                                           No         NULL      NULL                                          NULL
+WI_Extract Systems_Client_DESKTOP-DEOCSAL_Full                                                              No         NULL      NULL                                          NULL
+WI_Extract Systems_IDShield_Server_HUZWINSRV2K19_Full                                                       No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_Server_VM-JENNY_Full                                                  No         NULL      NULL                                          NULL
+WI_Extract Systems_Server_11-6-WebInstall_2021-03-07                                                        No           3/7/2021NULL                                          NULL
+WI_Extract Systems_Client_11-6-Perf-Test_RDT_2021-02-21                                                     No          2/21/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_DELL-PS-D1_Full                                          No         NULL      NULL                                          NULL
+WI_Extract Systems_Client_VOYAGER_Full_RDT                                                                  No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_Server_DESKTOP-DEOCSAL_Full                                           No         NULL      NULL                                          NULL
+WI_Extract Systems_SNK__Server_Test_Full                                                                    No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_WPSQL2017Win201_Full                                     No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_PROVOLONE_Full                                           No         NULL      NULL                                          NULL
+WI_Extract Systems_IDShield_Server_VM-JENNY_Full                                                            No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_WIN-G61LT892CK8_2021-03-04                               No           3/4/2021NULL                                          NULL
+WI_113076Test_Essentia_HUZWIN102019_Full                                                                    No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_VM-JENNY_Full                                            No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_LabDE_Server_HUWINSRV2K12_Full                                        No         NULL      NULL                                          NULL
+VM-TG-WIN2012-Testing                                                                                       No          2/21/2021NULL                                          NULL
+WI_Extract Systems_Steve_11_6_Test_11-6-0-29_2021-04-11                                                     No          4/11/2021NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_Server_VM-JENNY_2021-04-23                                            No         NULL      NULL                                          NULL
+WI_JIGGERY-POKERY_2021-04-25                                                                                No          4/25/2021NULL                                          NULL
+WI_Extract Systems_LabDE_Server_VM-JENNY_Full                                                               No         NULL      NULL                                          NULL
+WI_Extract Systems_FlexIndex_IDShield_Server_DESKTOP-DEOCSAL_2021-04-25                                     No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Franklin County IN_IDShield_Client_RECORDER-R2_Full                          No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Hamilton County IN_IDShield_Client_REC-CHAYLT-20_Full                        Yes        NULL      NULL                                          NULL
+Harris_FlexIndex_IDShield_Server_MAI-QUA-QA-P01_Full                                                        Yes        NULL      NULL                                          NULL
+FL_Harris Recording Solutions_FlexIndex_IDShield_Server_D1ZRTN2_2021-09-22                                  No          9/22/2021NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Hendricks County IN_FlexIndex_IDShield_Server_HREC-CSISVR2_Full              No         NULL      NULL                                          NULL
+MI_Hurley Medical Center_LabDE_Server_HMCEXTRACT-PRD_Full                                                   Yes        NULL      NULL                                          NULL
+MI_Hurley Medical Center_LabDE_Server_HMC-EXTRACTTST_Full                                                   No         NULL      NULL                                          NULL
+MI_Hurley Medical Center_Client_Universal_RemoveImagePagesOnly                                              No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Jefferson County IN_IDShield_Server_JCG-APP-01_Full                          No         NULL      NULL                                          NULL
+WI_Kenosha County_FlexIndex_IDShield_Server_KC-TRIMIN01DEV_2021-04-02                                       No           4/2/2021NULL                                          NULL
+WI_Kenosha County_FlexIndex_IDShield_Server_KC-TRIMIN01DEV_Exp2021-04-02                                    No           4/2/2021NULL                                          NULL
+WI_Kenosha County_FlexIndex_IDShield_Server_KC-TRIMIN01DEV_Full                                             No         NULL      NULL                                          NULL
+WI_Kenosha County_FlexIndex_IDShield_Server_KC-TRIMIN01DEV_2021-04-02                                       No           4/2/2021NULL                                          NULL
+Tyler (Formerly CSA)_WY_Laramie County WY_FlexIndex_Server_CLKDPIND_Full                                    No         NULL      NULL                                          NULL
+OH_Lucas County OH - court and recorder_IDShield_Server_IMGREDACT-18_Full                                   No         NULL      NULL                                          NULL
+Granicus_CA_Merced County CA_FlexIndex_IDShield_Server_MCSTAPPTST-01_2021-06-23                             No          6/23/2021NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Monroe County IN_IDShield_Client_CH-RECORDER-G_Full                          No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Monroe County IN_IDShield_Client_CH-REC-A_Full                               Yes        NULL      NULL                                          NULL
+CSI_IN_Newton County IN_IDShield_Server_NEWTONDB1_Full                                                      No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Newton County IN_IDShield_Client_CH-REC-02_Full                              No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Newton County IN_IDShield_Client_CH-REC-001_Full                             No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Newton County IN_IDShield_Client_CH-REC-01_Full                              No         NULL      NULL                                          NULL
+IL_Northwestern Medicine - Lab Billing_Client_Search+DashboardViewer_Universal_Full                         No         NULL      NULL                                          NULL
+NJ_Rutgers_CINJASBT301_FlexIndex_TestServer_PDFReadWrite_NoCounter_Full                                     No         NULL      NULL                                          NULL
+NJ_Rutgers_CINJASBT301_FlexIndex_Server_PDFReadWrite_Full                                                   No         NULL      NULL                                          NULL
+NJ_Rutgers_FlexIndex_Server_CINJASBT301_Full                                                                No         NULL      NULL                                          NULL
+Avenu_CA_San Francisco County CA_FlexIndex_IDShield_Server_UATAFRMAPP1113_2021-04-06                        No           4/6/2021NULL                                          NULL
+Avenu (Conduent/Xerox/ACS)_CA_San Francisco County CA_FlexIndex_IDShield_Server_UATAFRMAPP1113_2021-04-06   No           4/6/2021NULL                                          NULL
+Avenu_CA_San Francisco County CA_FlexIndex_IDShield_Server_UATAFRMAPP1113_2021-04-06                        No           4/6/2021NULL                                          NULL
+Avenu_CA_San Francisco County CA_FlexIndex_IDShield_Server_UATAFRMAPP1113_2021-04-06v2                      No           4/6/2021NULL                                          NULL
+Avenu_CA_San Francisco County CA_FlexIndex_IDShield_Server_UATAFRMAPP1113_Full                              Yes        NULL      NULL                                          NULL
+Harris Recording Solutions_NJ_Somerset County NJ_IDShield_Client_CLRKT083_Full                              No         NULL      NULL                                          NULL
+Harris Recording Solutions_NJ_Somerset County NJ_IDShield_Server_CCAPPTEST_Full                             No         NULL      NULL                                          NULL
+Harris_NJ_Somerset County NJ_IDShield_Client_CLRKT096_Full                                                  No         NULL      NULL                                          NULL
+Harris_NJ_Somerset County NJ_IDShield_Client_CLRKT097_Full                                                  Yes        NULL      NULL                                          NULL
+Harris_NJ_Somerset County NJ_IDShield_Client_CLRKT083_Full                                                  Yes        NULL      NULL                                          NULL
+Granicus_CA_Stanislaus_FlexIndex_IDShield_226098-33_ServerTempUpdated_2021-05-02                            No           5/2/2021NULL                                          NULL
+Granicus_CA_Stanislaus County CA_FlexIndex_IDShield_Server_CLERKDOCS_2021-05-07                             No           5/7/2021NULL                                          NULL
+Granicus_CA_Stanislaus County CA_FlexIndex_IDShield_Server_CLERKDOCS_2021-05-17                             No          5/17/2021NULL                                          NULL
+Granicus_CA_Stanislaus County CA_FlexIndex_IDShield_Server_226098-33_2021-05-02                             No           5/2/2021NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Sullivan County IN_IDShield_Client_DESKTOP-88FGH66_Full                      Yes        NULL      NULL                                          NULL
+Provana_WI_Surefire_FlexIndex_IDShield_Client_SUREFIRE-TERMIN_Full                                          Yes        NULL      NULL                                          NULL
+Provana_WI_Surefire_Server_SUREFIRE12_DashboardsOnly_Full                                                   No         NULL      NULL                                          NULL
+Tyler (Formerly CSA)_WY_Sweetwater County WY_FlexIndex_Server_ITTYLERSCN_Full                               Yes        NULL      NULL                                          NULL
+KS_The University of Kansas Health System (KUHS)_LabDE_Server_UKH-LABDE-PROD_Full                           Yes        NULL      NULL                                          NULL
+TX_Travis County, TX-County Clerk_IDShield_Client_TCC186381L_Full                                           No         NULL      NULL                                          NULL
+NE-NebraskaMed_Server_GPEXTAPP01_NoCounterOnly_Full                                                         No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Vigo County Recorders Office_FlexIndex_IDShield_Client_REC1_Full             No         NULL      NULL                                          NULL
+Computer Systems Inc. (CSI)_IN_Vigo County Recorders Office_FlexIndex_IDShield_Client_REC12_Full            No         NULL      NULL                                          NULL
+Cott Systems_AR_Washington County AR - Circuit Clerk_IDShield_Client_CIRC-LX16_Full                         No         NULL      NULL                                          NULL
+West Central Indexing_MN_Washington County MN_FlexIndex_Server_BRANDEN_Full                                 Yes        NULL      NULL                                          NULL
+MN_West Central Indexing_FlexIndex_Server_TIOCR_Full                                                        Yes        NULL      NULL                                          NULL
+Transfered from license name                               License.Signed_Transfer_Form
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       No
+MI_Hurley Medical Center_LabDE_Server_HMCEXTRACT-TST_Full  No
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       No
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       Yes
+NULL                                                       No
+NULL                                                       No

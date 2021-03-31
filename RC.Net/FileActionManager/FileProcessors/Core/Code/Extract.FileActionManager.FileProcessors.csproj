@@ -96,6 +96,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -121,7 +122,7 @@
     <Compile Include="CloudOCRTaskSettingsDialog.Designer.cs">
       <DependentUpon>CloudOCRTaskSettingsDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConverterFileProcessor.cs" />
+    <Compile Include="ConvertDocumentTask.cs" />
     <Compile Include="CreateFileTaskSettingsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
