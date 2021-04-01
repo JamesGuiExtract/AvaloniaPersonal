@@ -20,22 +20,12 @@ del "OnBase export\*.*" /s /q
 
 copy "Solution\Database Files\Original\OrderMappingDB.sdf" "Solution\Database Files\OrderMappingDB.sdf"
 
-rem Setup batch file to detach the DB
-echo sp_detach_db Demo_LabDE >"%~dp0SQL.sql"
-rem Detach the Demo_LabDE database
+rem Setup batch file to drop the DB
+echo DROP DATABASE  Demo_LabDE >"%~dp0SQL.sql"
 sqlcmd -i "%~dp0SQL.sql"
 
-rem Delete the files for the database
-del "%~dp0DemoFiles\DB\Demo_LabDE*.*"
-
-if NOT EXIST "%~dp0DemoFiles\DB" MKDIR "%~dp0DemoFiles\DB"
-
-rem Copy a blank database to the db location
-copy "%~dp0DemoFiles\BlankDB\Demo_LabDE*.*" "%~dp0DemoFiles\DB\*.*"
-
-rem Create batch file that attaches the blank db
-echo CREATE DATABASE Demo_LabDE ON (FILENAME = "%~dp0DemoFiles\DB\Demo_LabDE.mdf"), (FILENAME = "%~dp0DemoFiles\DB\Demo_LabDE_Log.ldf") FOR ATTACH >"%~dp0SQL.sql"
-sqlcmd -i "%~dp0SQL.sql" 
+rem Create and import database
+"C:\Program Files (x86)\Extract Systems\CommonComponents\DatabaseMigrationWizard.exe" /databaseserver "(local)" /databasename Demo_LabDE /path "%~dp0DemoFiles\BlankDB\DatabaseExport" /import /createdatabase
 
 rem temporary SQL file
 del sql.sql
