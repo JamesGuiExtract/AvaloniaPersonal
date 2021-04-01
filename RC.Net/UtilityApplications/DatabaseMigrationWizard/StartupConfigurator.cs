@@ -36,6 +36,7 @@ namespace DatabaseMigrationWizard
                 if (createDatabase)
                 {
                     CreateDatabase(connectionInformation, filePath);
+                    Environment.Exit(0);
                 }
                 else
                 {
