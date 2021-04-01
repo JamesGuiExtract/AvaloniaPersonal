@@ -6957,10 +6957,6 @@ void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(_Connect
 {
 	try
 	{
-		// To prevent against this being called outside of a schema udpate that includes version 183.
-		ASSERT_RUNTIME_CONDITION("ELI46481", m_iDBSchemaVersion > 0 && m_iDBSchemaVersion < 183,
-			"Invalid counter operation");
-
 		TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 		m_strEncryptedDatabaseID = "";
 		createAndStoreNewDatabaseID(ipConnection);
