@@ -197,7 +197,6 @@ namespace DatabaseMigrationWizard.Test
             DBInfos.Add(new DBInfo() { Name = "UpdateQueueEventTable", Value = "1" });
             DBInfos.Add(new DBInfo() { Name = "MaxMillisecondsBetweenCheckForFilesToProcess", Value = "2000" });
             DBInfos.Add(new DBInfo() { Name = "MinMillisecondsBetweenCheckForFilesToProcess", Value = "2000" });
-            DBInfos.Add(new DBInfo() { Name = "UseGetFilesLegacy", Value = "0" });
 
             FAMUsers.Add(new FAMUser() { UserName = "Trever_Gannon", FullUserName = "DataMaster"});
             FAMUsers.Add(new FAMUser() { UserName = "Reassign", FullUserName = "ToReassign" });
