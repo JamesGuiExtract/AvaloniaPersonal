@@ -9,7 +9,7 @@ open Extract.Utilities.FSharp
 [<EntryPoint>]
 let main argv =
   try
-    let parser = ArgumentParser.Create<MLNetQueueArgs>(programName = "LearnOrPredictPagination.exe")
+    let parser = ArgumentParser.Create<MLNetQueueArgs>(programName = "MLNetQueue.exe")
     let results = parser.ParseCommandLine(inputs = argv, raiseOnUsage = true)
 
     match results.GetSubCommand() with
