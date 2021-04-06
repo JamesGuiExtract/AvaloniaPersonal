@@ -1149,9 +1149,10 @@ namespace Extract.FileActionManager.Utilities
                         // https://extract.atlassian.net/browse/ISSUE-16675
                         new Thread(() =>
                         {
-                            try
+
+                            do
                             {
-                                do
+                                try
                                 {
                                     // Check the FAM still active
                                     if (_etlFAMDB.ActiveFAMID == 0 && _etlFAMDB.IsConnected)
@@ -1162,15 +1163,24 @@ namespace Extract.FileActionManager.Utilities
                                         ExtractException restroredActiveFAM = new ExtractException("ELI46692", "Application Trace: ETL Polling ActiveFAM was restored.");
                                         restroredActiveFAM.Log();
                                     }
+                                    using var connection = GetSQLConneciton();
+                                    connection.Open();
+                                    
+                                    using var cmd = connection.CreateCommand();
+                                    cmd.CommandText = "SELECT Value FROM DBInfo WHERE Name = 'ETLRestart'";
+                                    string restartSetting = cmd.ExecuteScalar() as string;
 
-                                    string restartSetting = _etlFAMDB.GetDBInfoSetting("ETLRestart", false);
                                     DateTime restartTime;
                                     if (!DateTime.TryParse(restartSetting, out restartTime))
                                     {
                                         ExtractException restartInvalid = new ExtractException("ELI46424",
-                                            "ETLRestart value in DBInfo should be a date time string");
+                                            "ETLRestart value in DBInfo should be a date time string. Updated to last valid ETL start time.");
                                         restartInvalid.AddDebugData("ETLRestart", restartSetting, false);
-                                        throw restartInvalid;
+                                        restartInvalid.AddDebugData("LastETL start", _lastETLStart, false);
+                                        
+                                        // Fix the problem
+                                        _etlFAMDB.SetDBInfoSetting("ETLRestart", _lastETLStart.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"), true, false);
+                                        restartInvalid.Log();
                                     }
 
                                     if (restartTime > _lastETLStart)
@@ -1178,14 +1188,13 @@ namespace Extract.FileActionManager.Utilities
                                         StopAndRestartETL();
                                         break;
                                     }
-
                                 }
-                                while (!_stopProcessing.WaitOne(30000));
+                                catch (Exception ex)
+                                {
+                                    ex.ExtractLog("ELI46302");
+                                }
                             }
-                            catch (Exception ex)
-                            {
-                                ex.ExtractLog("ELI46302");
-                            }
+                            while (!_stopProcessing.WaitOne(30000));
                         }).Start();
                         _etlFAMDB.RecordFAMSessionStart("ETL Polling", string.Empty, false, false);
                         _etlFAMDB.RegisterActiveFAM();
@@ -1267,15 +1276,7 @@ namespace Extract.FileActionManager.Utilities
                 return new List<string>();
             }
 
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = _etlDatabaseServer;
-            sqlConnectionBuild.InitialCatalog = _etlDatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-
-            using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+            using (var connection = GetSQLConneciton())
             {
                 connection.Open();
                 using (var cmd = connection.CreateCommand())
@@ -1287,6 +1288,19 @@ namespace Extract.FileActionManager.Utilities
                     return result;
                 }
             }
+        }
+
+        private SqlConnection  GetSQLConneciton()
+        {
+
+            // Build the connection string from the settings
+            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
+            sqlConnectionBuild.DataSource = _etlDatabaseServer;
+            sqlConnectionBuild.InitialCatalog = _etlDatabaseName;
+            sqlConnectionBuild.IntegratedSecurity = true;
+            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
+            sqlConnectionBuild.MultipleActiveResultSets = true;
+            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         /// <summary>
