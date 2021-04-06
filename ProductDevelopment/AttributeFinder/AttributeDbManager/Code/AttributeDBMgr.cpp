@@ -1551,15 +1551,7 @@ void CAttributeDBMgr::SaveVoaDataInASFF( _ConnectionPtr ipConnection, IIUnknownV
 		ipASFF->Update();
 #endif
 	}
-	catch (...)
-	{
-		UCLIDException ue;
-		std::string message(
-			Util::Format("ADO exception while saving VOA to AttributeSetForFile, "
-						 "ID: %lld", llRootASFF_ID ) );
-		ue.asString( message );
-		throw ue;
-	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51661")
 }
 //-------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::storeAttributeData( _ConnectionPtr ipConnection,

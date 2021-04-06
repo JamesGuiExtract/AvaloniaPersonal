@@ -64,10 +64,7 @@ std::vector<unsigned char> Deflater::GetCompressedData()
 		std::vector<unsigned char> result( m_compressed.begin(), m_compressed.begin() + compressedSize );
 		return std::move( result );
 	}
-	CATCH_UNEXPECTED_EXCEPTION( "ELI38952" );
-
-	std::vector<unsigned char> empty;
-	return empty;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38952")
 }
 
 
@@ -82,82 +79,66 @@ m_buffer( inflateBufferSize, '\0' )
 {
 	try
 	{
-		try
-		{
-			m_strm.opaque = Z_NULL;
-			m_strm.zalloc = Z_NULL;
-			m_strm.zfree = Z_NULL;
-		
-			m_strm.next_in = compressedData.data();		// start of input bytes
-			m_strm.avail_in = compressedData.size();	// number of input bytes
-		
-			auto ret = inflateInit( &m_strm );
-			ASSERT_RUNTIME_CONDITION( "ELI38855", 
-									  ret == Z_OK,
-									  Util::Format("In: %s, inflateInit() returned error code: %d", 
-												   __FUNCTION__, 
-												   ret).c_str() );
-		}
-		CATCH_UCLID_EXCEPTION( "ELI38953" );
+		m_strm.opaque = Z_NULL;
+		m_strm.zalloc = Z_NULL;
+		m_strm.zfree = Z_NULL;
+	
+		m_strm.next_in = compressedData.data();		// start of input bytes
+		m_strm.avail_in = compressedData.size();	// number of input bytes
+	
+		auto ret = inflateInit( &m_strm );
+		ASSERT_RUNTIME_CONDITION( "ELI38855", 
+								  ret == Z_OK,
+								  Util::Format("In: %s, inflateInit() returned error code: %d", 
+											   __FUNCTION__, 
+											   ret).c_str() );
 	}
-	CATCH_UNEXPECTED_EXCEPTION( "ELI38954" );
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38953")
 }
 
 Inflater::~Inflater()
 {
 	try
 	{
-		try
-		{
-			auto ret = inflateEnd( &m_strm );
-			ASSERT_RUNTIME_CONDITION( "ELI38884", 
-									  ret == Z_OK, 
-									  Util::Format("In: %s, inflateEnd() returned error code: %d", 
-												   __FUNCTION__, 
-												   ret).c_str() );
-		}
-		CATCH_UCLID_EXCEPTION( "ELI38955" );
+		auto ret = inflateEnd( &m_strm );
+		ASSERT_RUNTIME_CONDITION( "ELI38884", 
+								  ret == Z_OK, 
+								  Util::Format("In: %s, inflateEnd() returned error code: %d", 
+											   __FUNCTION__, 
+											   ret).c_str() );
 	}
-	CATCH_UNEXPECTED_EXCEPTION( "ELI38956" );
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38955")
 }
 
 void Inflater::Inflate()
 {
 	try
 	{
-		try
+		while ( true )
 		{
-			while ( true )
-			{
-				m_strm.next_out = m_buffer.data();			// m_buffer is temp buffer to inflate each chunk into
-				m_strm.avail_out = m_buffer.size();			// max size to inflate into m_buffer
+			m_strm.next_out = m_buffer.data();			// m_buffer is temp buffer to inflate each chunk into
+			m_strm.avail_out = m_buffer.size();			// max size to inflate into m_buffer
 
-				auto ret = inflate( &m_strm, Z_NO_FLUSH );
-				ASSERT_RUNTIME_CONDITION( "ELI38883", 
-										  ret == Z_OK || ret == Z_STREAM_END,
-										  Util::Format("In: %s, inflate() returned error code: %d", 
-													   __FUNCTION__, 
-													   ret).c_str() );
+			auto ret = inflate( &m_strm, Z_NO_FLUSH );
+			ASSERT_RUNTIME_CONDITION( "ELI38883", 
+									  ret == Z_OK || ret == Z_STREAM_END,
+									  Util::Format("In: %s, inflate() returned error code: %d", 
+												   __FUNCTION__, 
+												   ret).c_str() );
 
-				size_t numberOfBytesProcessed = m_buffer.size() - m_strm.avail_out;
-				unsigned char* pStart = m_buffer.data();
-				unsigned char* pEnd= pStart + numberOfBytesProcessed;
-				m_result.insert( std::end(m_result), pStart, pEnd );	// accumulate inflated bytes into result, adding to end
+			size_t numberOfBytesProcessed = m_buffer.size() - m_strm.avail_out;
+			unsigned char* pStart = m_buffer.data();
+			unsigned char* pEnd= pStart + numberOfBytesProcessed;
+			m_result.insert( std::end(m_result), pStart, pEnd );	// accumulate inflated bytes into result, adding to end
 
-				if ( Z_STREAM_END == ret )
-					return;
-			}
+			if ( Z_STREAM_END == ret )
+				return;
 		}
-		CATCH_UCLID_EXCEPTION( "ELI38957" );
 	}
-	CATCH_UNEXPECTED_EXCEPTION( "ELI38958" );
-
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38957")
 }
 
 std::vector<unsigned char> Inflater::GetDecompressedData()
 {
 	return std::move( m_result );
 }
-
-
-
