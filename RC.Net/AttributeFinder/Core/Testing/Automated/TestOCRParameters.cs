@@ -412,7 +412,9 @@ namespace Extract.AttributeFinder.Test
                 uss.LoadFrom(ussPath, false);
                 var forceWhenBitonalString = uss.String;
 
-                Assert.AreEqual(defaultString, forceWhenBitonalString);
+                // The fix for ISSUE-17441 has made the behavior of kForceWhenBitonal the same as kAlwaysForce
+                Assert.AreNotEqual(defaultString, forceWhenBitonalString);
+                Assert.That(!string.IsNullOrWhiteSpace(forceWhenBitonalString), "USS was empty!");
 
                 // Set force mode to always-force
                 ocrParams.RemoveAll(u => u.Match(kv => (EOCRParameter)kv.key == EOCRParameter.kForceDespeckleMode, _ => false, _ => false, _ => false, _ => false));

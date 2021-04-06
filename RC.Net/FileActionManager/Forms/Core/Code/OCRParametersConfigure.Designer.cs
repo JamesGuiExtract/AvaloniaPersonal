@@ -79,9 +79,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this._forceDespeckleLevelNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this._forceDespeckleMethodComboBox = new System.Windows.Forms.ComboBox();
-            this._forceDespeckleWhenBitonalRadioButton = new System.Windows.Forms.RadioButton();
-            this._neverForceDespeckleRadioButton = new System.Windows.Forms.RadioButton();
-            this._alwaysForceDespeckleRadioButton = new System.Windows.Forms.RadioButton();
+            this._forceDespeckleCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -633,12 +631,10 @@
             this._forceDespeckleGroupBox.Controls.Add(this.label1);
             this._forceDespeckleGroupBox.Controls.Add(this._forceDespeckleLevelNumericUpDown);
             this._forceDespeckleGroupBox.Controls.Add(this._forceDespeckleMethodComboBox);
-            this._forceDespeckleGroupBox.Controls.Add(this._forceDespeckleWhenBitonalRadioButton);
-            this._forceDespeckleGroupBox.Controls.Add(this._neverForceDespeckleRadioButton);
-            this._forceDespeckleGroupBox.Controls.Add(this._alwaysForceDespeckleRadioButton);
+            this._forceDespeckleGroupBox.Controls.Add(this._forceDespeckleCheckBox);
             this._forceDespeckleGroupBox.Location = new System.Drawing.Point(6, 91);
             this._forceDespeckleGroupBox.Name = "_forceDespeckleGroupBox";
-            this._forceDespeckleGroupBox.Size = new System.Drawing.Size(433, 224);
+            this._forceDespeckleGroupBox.Size = new System.Drawing.Size(433, 150);
             this._forceDespeckleGroupBox.TabIndex = 1;
             this._forceDespeckleGroupBox.TabStop = false;
             this._forceDespeckleGroupBox.Text = "Despeckle";
@@ -658,7 +654,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 131);
+            this.label2.Location = new System.Drawing.Point(10, 67);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(124, 13);
             this.label2.TabIndex = 4;
@@ -667,7 +663,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 184);
+            this.label1.Location = new System.Drawing.Point(10, 120);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(111, 13);
             this.label1.TabIndex = 6;
@@ -675,7 +671,7 @@
             // 
             // _forceDespeckleLevelNumericUpDown
             // 
-            this._forceDespeckleLevelNumericUpDown.Location = new System.Drawing.Point(155, 182);
+            this._forceDespeckleLevelNumericUpDown.Location = new System.Drawing.Point(155, 118);
             this._forceDespeckleLevelNumericUpDown.Maximum = new decimal(new int[] {
             256,
             0,
@@ -689,46 +685,22 @@
             // 
             this._forceDespeckleMethodComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._forceDespeckleMethodComboBox.FormattingEnabled = true;
-            this._forceDespeckleMethodComboBox.Location = new System.Drawing.Point(13, 153);
+            this._forceDespeckleMethodComboBox.Location = new System.Drawing.Point(13, 89);
             this._forceDespeckleMethodComboBox.Name = "_forceDespeckleMethodComboBox";
             this._forceDespeckleMethodComboBox.Size = new System.Drawing.Size(196, 21);
             this._forceDespeckleMethodComboBox.TabIndex = 5;
             this._forceDespeckleMethodComboBox.SelectedIndexChanged += new System.EventHandler(this.Handle_ValueChanged);
             // 
-            // _forceDespeckleWhenBitonalRadioButton
+            // _forceDespeckleCheckBox
             // 
-            this._forceDespeckleWhenBitonalRadioButton.AutoSize = true;
-            this._forceDespeckleWhenBitonalRadioButton.Location = new System.Drawing.Point(13, 75);
-            this._forceDespeckleWhenBitonalRadioButton.Name = "_forceDespeckleWhenBitonalRadioButton";
-            this._forceDespeckleWhenBitonalRadioButton.Size = new System.Drawing.Size(156, 17);
-            this._forceDespeckleWhenBitonalRadioButton.TabIndex = 2;
-            this._forceDespeckleWhenBitonalRadioButton.Text = "Force when image is bitonal";
-            this._forceDespeckleWhenBitonalRadioButton.UseVisualStyleBackColor = true;
-            this._forceDespeckleWhenBitonalRadioButton.CheckedChanged += new System.EventHandler(this.Handle_ValueChanged);
-            // 
-            // _neverForceDespeckleRadioButton
-            // 
-            this._neverForceDespeckleRadioButton.AutoSize = true;
-            this._neverForceDespeckleRadioButton.Checked = true;
-            this._neverForceDespeckleRadioButton.Location = new System.Drawing.Point(13, 52);
-            this._neverForceDespeckleRadioButton.Name = "_neverForceDespeckleRadioButton";
-            this._neverForceDespeckleRadioButton.Size = new System.Drawing.Size(81, 17);
-            this._neverForceDespeckleRadioButton.TabIndex = 1;
-            this._neverForceDespeckleRadioButton.TabStop = true;
-            this._neverForceDespeckleRadioButton.Text = "Never force";
-            this._neverForceDespeckleRadioButton.UseVisualStyleBackColor = true;
-            this._neverForceDespeckleRadioButton.CheckedChanged += new System.EventHandler(this.Handle_ValueChanged);
-            // 
-            // _alwaysForceDespeckleRadioButton
-            // 
-            this._alwaysForceDespeckleRadioButton.AutoSize = true;
-            this._alwaysForceDespeckleRadioButton.Location = new System.Drawing.Point(13, 98);
-            this._alwaysForceDespeckleRadioButton.Name = "_alwaysForceDespeckleRadioButton";
-            this._alwaysForceDespeckleRadioButton.Size = new System.Drawing.Size(223, 17);
-            this._alwaysForceDespeckleRadioButton.TabIndex = 3;
-            this._alwaysForceDespeckleRadioButton.Text = "Always force (convert to bitonal if needed)";
-            this._alwaysForceDespeckleRadioButton.UseVisualStyleBackColor = true;
-            this._alwaysForceDespeckleRadioButton.CheckedChanged += new System.EventHandler(this.Handle_ValueChanged);
+            this._forceDespeckleCheckBox.AutoSize = true;
+            this._forceDespeckleCheckBox.Location = new System.Drawing.Point(13, 42);
+            this._forceDespeckleCheckBox.Name = "_forceDespeckleCheckBox";
+            this._forceDespeckleCheckBox.Size = new System.Drawing.Size(105, 17);
+            this._forceDespeckleCheckBox.TabIndex = 1;
+            this._forceDespeckleCheckBox.Text = "Force despeckle";
+            this._forceDespeckleCheckBox.UseVisualStyleBackColor = true;
+            this._forceDespeckleCheckBox.CheckedChanged += new System.EventHandler(this.Handle_ValueChanged);
             // 
             // groupBox1
             // 
@@ -983,9 +955,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown _forceDespeckleLevelNumericUpDown;
         private System.Windows.Forms.ComboBox _forceDespeckleMethodComboBox;
-        private System.Windows.Forms.RadioButton _forceDespeckleWhenBitonalRadioButton;
-        private System.Windows.Forms.RadioButton _neverForceDespeckleRadioButton;
-        private System.Windows.Forms.RadioButton _alwaysForceDespeckleRadioButton;
+        private System.Windows.Forms.CheckBox _forceDespeckleCheckBox;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;

@@ -492,7 +492,7 @@ namespace Extract.FileActionManager.Forms
         /// </summary>
         void SetControlStates()
         {
-            if (_neverForceDespeckleRadioButton.Checked)
+            if (!_forceDespeckleCheckBox.Checked)
             {
                 _forceDespeckleMethodComboBox.Enabled = false;
                 _forceDespeckleLevelNumericUpDown.Enabled = false;
@@ -588,18 +588,9 @@ namespace Extract.FileActionManager.Forms
                         switch ((EOCRParameter)key)
                         {
                             case EOCRParameter.kForceDespeckleMode:
-                                switch ((EForceDespeckleMode)value)
-                                {
-                                    case EForceDespeckleMode.kNeverForce:
-                                        _neverForceDespeckleRadioButton.Checked = true;
-                                        break;
-                                    case EForceDespeckleMode.kForceWhenBitonal:
-                                        _forceDespeckleWhenBitonalRadioButton.Checked = true;
-                                        break;
-                                    case EForceDespeckleMode.kAlwaysForce:
-                                        _alwaysForceDespeckleRadioButton.Checked = true;
-                                        break;
-                                }
+                                // Because of the fix for ISSUE-17441, kForceWhenBitonal has the same behavior as kAlwaysForce
+                                // so represent them both as if they were the same setting
+                                _forceDespeckleCheckBox.Checked = (EForceDespeckleMode)value != EForceDespeckleMode.kNeverForce;
                                 break;
                             case EOCRParameter.kForceDespeckleMethod:
                                 _forceDespeckleMethodComboBox.SelectEnumValue((DESPECKLE_METHOD)value);
@@ -753,20 +744,13 @@ namespace Extract.FileActionManager.Forms
             _parameterMap.Clear();
 
             // Image options
-            if (_neverForceDespeckleRadioButton.Checked)
+            if (!_forceDespeckleCheckBox.Checked)
             {
                 _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kForceDespeckleMode, VariantValue = EForceDespeckleMode.kNeverForce });
             }
             else
             {
-                if (_alwaysForceDespeckleRadioButton.Checked)
-                {
-                    _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kForceDespeckleMode, VariantValue = EForceDespeckleMode.kAlwaysForce });
-                }
-                else
-                {
-                    _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kForceDespeckleMode, VariantValue = EForceDespeckleMode.kForceWhenBitonal });
-                }
+                _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kForceDespeckleMode, VariantValue = EForceDespeckleMode.kAlwaysForce });
 
                 var method = _forceDespeckleMethodComboBox.ToEnumValue<DESPECKLE_METHOD>();
                 _parameterMap.PushBack(new VariantPair { VariantKey = EOCRParameter.kForceDespeckleMethod, VariantValue = method });

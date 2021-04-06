@@ -149,7 +149,7 @@ library UCLID_RASTERANDOCRMGMTLib
 	enum
 	{
 		kNeverForce = 0,
-		kForceWhenBitonal = 1,
+		kForceWhenBitonal = 1, // NOTE: This value has the same behavior as kAlwaysForce because of the fix for ISSUE-17441
 		kAlwaysForce = 2
 	} EForceDespeckleMode;
 

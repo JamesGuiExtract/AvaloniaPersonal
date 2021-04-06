@@ -2012,8 +2012,9 @@ void CScansoftOCR2::rotateAndRecognizeTextInImagePage(const string& strImageFile
 	ipPageInfo->Initialize(info.Size.cx, info.Size.cy, orientation, dDeskew);
 
 	// Despeckle before rotation (this matters if pZone is non-null, see https://extract.atlassian.net/browse/ISSUE-16940)
-	if (m_eForceDespeckle == kAlwaysForce
-		|| m_eForceDespeckle == kForceWhenBitonal && info.BitsPerPixel == 1)
+	// NOTE: The kForceWhenBitonal check for info.BitsPerPixel == 1 that was not necessary because of the fix for ISSUE-17441
+	// (info.BitsPerPixel is always 1 now)
+	if (m_eForceDespeckle == kAlwaysForce || m_eForceDespeckle == kForceWhenBitonal)
 	{
 		THROW_UE_ON_ERROR("ELI36823", "Unable to despeckle image.",
 			kRecForceDespeckleImg(0, m_hPage, pZone, m_eForceDespeckleMethod, m_nForceDespeckleLevel));
