@@ -5403,7 +5403,7 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 
 					// WARNING: This ELI code is referenced by CSetActionStatusDlg.applyActionStatusChanges. Do not change.
 					UCLIDException uexMissingActions("ELI51515",
-						Util::Format("Files could be moved because action \"%s\" did not exist in target workflows.",
+						Util::Format("The status of some files could not be set because action \"%s\" did not exist in target workflows.",
 							strToAction.c_str()), *upuexMissingActions.get());
 					uexMissingActions.addDebugInfo("Number able to set", nNumRecordsModified, false);
 

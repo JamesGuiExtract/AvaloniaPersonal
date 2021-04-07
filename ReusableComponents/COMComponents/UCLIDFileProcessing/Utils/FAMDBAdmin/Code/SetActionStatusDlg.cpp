@@ -88,7 +88,7 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 			if (IDYES != MessageBox(
 				"Setting action status under <All workflows> may cause \r\n"
 				"unexpected results. This will result in the same operation \r\n"
-				"being executed separately for all workflows in the database.\r\n\r\n"
+				"being executed separately for each workflow in the database.\r\n\r\n"
 				"Be sure you are clear on the effect this will have on each \r\n"
 				"workflow before proceeding.\r\n\r\n"
 				"Proceed?", "Warning", MB_YESNO | MB_ICONWARNING))
@@ -354,10 +354,12 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			{
 				if (ueModifyError.getTopELI() == "ELI51515")
 				{
-					if (!handleCantMoveFilesForAllWorkflows(ueModifyError, zToActionName, eNewStatus, zFromAction)
-						&& bCloseDialog)
+					if (!handleCantSetActionStatusForAllWorkflows(ueModifyError, zToActionName, eNewStatus, zFromAction))
 					{
-						OnOK();
+						if (bCloseDialog)
+						{
+							OnCancel();
+						}
 						return;
 					}
 				}
@@ -397,7 +399,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14903")
 }
 //-------------------------------------------------------------------------------------------------
-bool CSetActionStatusDlg::handleCantMoveFilesForAllWorkflows(UCLIDException& ueModifyError,
+bool CSetActionStatusDlg::handleCantSetActionStatusForAllWorkflows(UCLIDException& ueModifyError,
 	CString& zToActionName, EActionStatus eNewStatus, CString& zFromAction)
 {
 	long nCount = 0;
