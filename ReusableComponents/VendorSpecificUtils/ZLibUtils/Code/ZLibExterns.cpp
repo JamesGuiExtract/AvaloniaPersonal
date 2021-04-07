@@ -107,7 +107,7 @@ Inflater::~Inflater()
 											   __FUNCTION__, 
 											   ret).c_str() );
 	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI38955")
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI38955")
 }
 
 void Inflater::Inflate()
