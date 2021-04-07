@@ -68,15 +68,16 @@
             this._checkDataEntryEnableCounters = new System.Windows.Forms.CheckBox();
             this._tabEmail = new System.Windows.Forms.TabPage();
             this._emailSettingsControl = new Extract.Utilities.Email.EmailSettingsControl();
+            this.tabDashboard = new System.Windows.Forms.TabPage();
+            this.textBoxDashboardExcludeFilter = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.textBoxDashboardIncludeFilter = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
             this._emailTestButton = new System.Windows.Forms.Button();
-            this.tabDashboard = new System.Windows.Forms.TabPage();
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBoxDashboardIncludeFilter = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
-            this.textBoxDashboardExcludeFilter = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -173,7 +174,7 @@
             this._tabControlSettings.Location = new System.Drawing.Point(13, 13);
             this._tabControlSettings.Name = "_tabControlSettings";
             this._tabControlSettings.SelectedIndex = 0;
-            this._tabControlSettings.Size = new System.Drawing.Size(466, 351);
+            this._tabControlSettings.Size = new System.Drawing.Size(466, 337);
             this._tabControlSettings.TabIndex = 0;
             this._tabControlSettings.SelectedIndexChanged += new System.EventHandler(this.HandleTabControl_SelectedIndexChanged);
             // 
@@ -199,7 +200,7 @@
             this._tabGeneral.Location = new System.Drawing.Point(4, 22);
             this._tabGeneral.Name = "_tabGeneral";
             this._tabGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this._tabGeneral.Size = new System.Drawing.Size(458, 325);
+            this._tabGeneral.Size = new System.Drawing.Size(458, 311);
             this._tabGeneral.TabIndex = 0;
             this._tabGeneral.Text = "General";
             this._tabGeneral.ToolTipText = "General FAM database settings";
@@ -551,51 +552,6 @@
             this._emailSettingsControl.TabIndex = 0;
             this._emailSettingsControl.SettingsChanged += new System.EventHandler<System.EventArgs>(this.HandleEmailSettingsControl_SettingsChanged);
             // 
-            // _buttonCancel
-            // 
-            this._buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._buttonCancel.Location = new System.Drawing.Point(404, 370);
-            this._buttonCancel.Name = "_buttonCancel";
-            this._buttonCancel.Size = new System.Drawing.Size(75, 23);
-            this._buttonCancel.TabIndex = 3;
-            this._buttonCancel.Text = "Cancel";
-            this._buttonCancel.UseVisualStyleBackColor = true;
-            // 
-            // _buttonOK
-            // 
-            this._buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonOK.Location = new System.Drawing.Point(323, 370);
-            this._buttonOK.Name = "_buttonOK";
-            this._buttonOK.Size = new System.Drawing.Size(75, 23);
-            this._buttonOK.TabIndex = 2;
-            this._buttonOK.Text = "OK";
-            this._buttonOK.UseVisualStyleBackColor = true;
-            this._buttonOK.Click += new System.EventHandler(this.HandleOkClicked);
-            // 
-            // _buttonRefresh
-            // 
-            this._buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonRefresh.Location = new System.Drawing.Point(242, 370);
-            this._buttonRefresh.Name = "_buttonRefresh";
-            this._buttonRefresh.Size = new System.Drawing.Size(75, 23);
-            this._buttonRefresh.TabIndex = 1;
-            this._buttonRefresh.Text = "Refresh";
-            this._buttonRefresh.UseVisualStyleBackColor = true;
-            this._buttonRefresh.Click += new System.EventHandler(this.HandleRefreshDialog);
-            // 
-            // _emailTestButton
-            // 
-            this._emailTestButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._emailTestButton.Location = new System.Drawing.Point(132, 370);
-            this._emailTestButton.Name = "_emailTestButton";
-            this._emailTestButton.Size = new System.Drawing.Size(104, 23);
-            this._emailTestButton.TabIndex = 4;
-            this._emailTestButton.Text = "Send test email";
-            this._emailTestButton.UseVisualStyleBackColor = true;
-            this._emailTestButton.Visible = false;
-            this._emailTestButton.Click += new System.EventHandler(this.HandleEmailTestButton_Click);
-            // 
             // tabDashboard
             // 
             this.tabDashboard.Controls.Add(this.textBoxDashboardExcludeFilter);
@@ -610,14 +566,24 @@
             this.tabDashboard.Text = "Dashboard";
             this.tabDashboard.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // textBoxDashboardExcludeFilter
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 7);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(122, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Dashboard Include Filter";
+            this.textBoxDashboardExcludeFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxDashboardExcludeFilter.Location = new System.Drawing.Point(10, 170);
+            this.textBoxDashboardExcludeFilter.Multiline = true;
+            this.textBoxDashboardExcludeFilter.Name = "textBoxDashboardExcludeFilter";
+            this.textBoxDashboardExcludeFilter.Size = new System.Drawing.Size(442, 121);
+            this.textBoxDashboardExcludeFilter.TabIndex = 1;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(7, 153);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(125, 13);
+            this.label9.TabIndex = 0;
+            this.label9.Text = "Dashboard Exclude Filter";
             // 
             // textBoxDashboardIncludeFilter
             // 
@@ -629,30 +595,75 @@
             this.textBoxDashboardIncludeFilter.Size = new System.Drawing.Size(442, 121);
             this.textBoxDashboardIncludeFilter.TabIndex = 1;
             // 
-            // label9
+            // label1
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(7, 153);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(125, 13);
-            this.label9.TabIndex = 0;
-            this.label9.Text = "Dashboard Exclude Filter";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 7);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(122, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Dashboard Include Filter";
             // 
-            // textBoxDashboardExcludeFilter
+            // _buttonCancel
             // 
-            this.textBoxDashboardExcludeFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxDashboardExcludeFilter.Location = new System.Drawing.Point(10, 170);
-            this.textBoxDashboardExcludeFilter.Multiline = true;
-            this.textBoxDashboardExcludeFilter.Name = "textBoxDashboardExcludeFilter";
-            this.textBoxDashboardExcludeFilter.Size = new System.Drawing.Size(442, 121);
-            this.textBoxDashboardExcludeFilter.TabIndex = 1;
+            this._buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this._buttonCancel.Location = new System.Drawing.Point(404, 383);
+            this._buttonCancel.Name = "_buttonCancel";
+            this._buttonCancel.Size = new System.Drawing.Size(75, 23);
+            this._buttonCancel.TabIndex = 3;
+            this._buttonCancel.Text = "Cancel";
+            this._buttonCancel.UseVisualStyleBackColor = true;
+            // 
+            // _buttonOK
+            // 
+            this._buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._buttonOK.Location = new System.Drawing.Point(323, 383);
+            this._buttonOK.Name = "_buttonOK";
+            this._buttonOK.Size = new System.Drawing.Size(75, 23);
+            this._buttonOK.TabIndex = 2;
+            this._buttonOK.Text = "OK";
+            this._buttonOK.UseVisualStyleBackColor = true;
+            this._buttonOK.Click += new System.EventHandler(this.HandleOkClicked);
+            // 
+            // _buttonRefresh
+            // 
+            this._buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._buttonRefresh.Location = new System.Drawing.Point(242, 383);
+            this._buttonRefresh.Name = "_buttonRefresh";
+            this._buttonRefresh.Size = new System.Drawing.Size(75, 23);
+            this._buttonRefresh.TabIndex = 1;
+            this._buttonRefresh.Text = "Refresh";
+            this._buttonRefresh.UseVisualStyleBackColor = true;
+            this._buttonRefresh.Click += new System.EventHandler(this.HandleRefreshDialog);
+            // 
+            // _emailTestButton
+            // 
+            this._emailTestButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this._emailTestButton.Location = new System.Drawing.Point(132, 383);
+            this._emailTestButton.Name = "_emailTestButton";
+            this._emailTestButton.Size = new System.Drawing.Size(104, 23);
+            this._emailTestButton.TabIndex = 4;
+            this._emailTestButton.Text = "Send test email";
+            this._emailTestButton.UseVisualStyleBackColor = true;
+            this._emailTestButton.Visible = false;
+            this._emailTestButton.Click += new System.EventHandler(this.HandleEmailTestButton_Click);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.ForeColor = System.Drawing.Color.Red;
+            this.label10.Location = new System.Drawing.Point(14, 353);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(367, 13);
+            this.label10.TabIndex = 5;
+            this.label10.Text = "Services and APIs need to be restarted for settings changes to go into effect";
             // 
             // FAMDatabaseOptionsDialog
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(491, 405);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.ClientSize = new System.Drawing.Size(491, 418);
+            this.Controls.Add(this.label10);
             this.Controls.Add(this._emailTestButton);
             this.Controls.Add(this._buttonRefresh);
             this.Controls.Add(this._buttonOK);
@@ -682,6 +693,7 @@
             this.tabDashboard.ResumeLayout(false);
             this.tabDashboard.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -729,6 +741,7 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textBoxDashboardIncludeFilter;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label10;
     }
 }
 
