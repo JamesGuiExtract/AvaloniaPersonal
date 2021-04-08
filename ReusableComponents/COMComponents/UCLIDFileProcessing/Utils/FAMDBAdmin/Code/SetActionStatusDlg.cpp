@@ -424,7 +424,7 @@ bool CSetActionStatusDlg::handleCantSetActionStatusForAllWorkflows(UCLIDExceptio
 			zPrompt += CString(uexInner->getTopText().c_str()) + "\r\n";
 		}
 
-		zPrompt += Util::Format("\r\nDo you want to set the action for the %d "
+		zPrompt += Util::Format("\r\nDo you want to set the status for the %d "
 			"files from workflows in which the action '%s' exists?",
 			nCount, (LPCTSTR)zToActionName).c_str();
 
