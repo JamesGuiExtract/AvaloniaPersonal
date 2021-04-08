@@ -316,11 +316,11 @@ namespace Extract.AttributeFinder.Test
         /// Checks that ImageUtils.GetSpatialPageInfos works correctly on an image with a blank page (page missing from USS file) 
         /// </summary>
         [Test, Category("SpatialPageInfo")]
-        public static void GetPageInfoBlankPage()
+        public static void GetSpatialPageInfosBlankPage()
         {
             string imagePath = _testFiles.GetFile(_BLANKPAGE_TIF_FILE);
 
-            // add USS file to the file dictionary. This is required.
+            // Get the USS file so that it exists next to the image
             _testFiles.GetFile(_BLANKPAGE_USS_FILE);
 
             // USS file only has two pages in it
@@ -331,6 +331,33 @@ namespace Extract.AttributeFinder.Test
             var imageUtils = new ImageUtilsClass();
             var infosFromImageUtils = imageUtils.GetSpatialPageInfos(imagePath);
             Assert.AreEqual(3, infosFromImageUtils.Size());
+        }
+
+        /// <summary>
+        /// Checks that ImageUtils.GetSpatialPageInfo works correctly on a blank page (page missing from USS file) 
+        /// https://extract.atlassian.net/browse/ISSUE-17439
+        /// </summary>
+        [Test, Category("SpatialPageInfo")]
+        public static void GetSpatialPageInfoBlankPage()
+        {
+            string imagePath = _testFiles.GetFile(_BLANKPAGE_TIF_FILE);
+
+            // Get the USS file so that it exists next to the image
+            string ussPath = _testFiles.GetFile(_BLANKPAGE_USS_FILE);
+            Assert.AreEqual(imagePath + ".uss", ussPath);
+
+            // USS file is missing page 2
+            var spatialString = new SpatialStringClass();
+            spatialString.LoadFrom(ussPath, false);
+            var pageTwo = spatialString.GetSpecifiedPages(2, 2);
+            Assert.IsFalse(pageTwo.HasSpatialInfo());
+
+            // ImageUtils::GetSpatialPageInfo() returns info for blank page
+            var imageUtils = new ImageUtilsClass();
+            var pageTwoInfo = imageUtils.GetSpatialPageInfo(imagePath, 2);
+            pageTwoInfo.GetWidthAndHeight(out int width, out int height);
+            Assert.AreEqual(2539, width);
+            Assert.AreEqual(3297, height);
         }
 
         #endregion Public Test Functions

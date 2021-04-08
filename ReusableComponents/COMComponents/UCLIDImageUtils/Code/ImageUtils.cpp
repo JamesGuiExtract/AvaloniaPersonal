@@ -378,7 +378,7 @@ STDMETHODIMP CImageUtils::GetSpatialPageInfo(BSTR fileName, long pageNumber, ISp
 			ASSERT_RESOURCE_ALLOCATION("ELI49589", ipUssData != __nullptr);
 
 			ipUssData->LoadPageFromFile(strUssFileName.c_str(), pageNumber);
-			if (ipUssData->SpatialPageInfos->Contains(pageNumber))
+			if (ipUssData->HasSpatialInfo() && ipUssData->SpatialPageInfos->Contains(pageNumber))
 			{
 				ISpatialPageInfoPtr ipSpatialPageInfo = ipUssData->SpatialPageInfos->GetValue(pageNumber);
 				*spatialPageInfo = ipSpatialPageInfo.Detach();
