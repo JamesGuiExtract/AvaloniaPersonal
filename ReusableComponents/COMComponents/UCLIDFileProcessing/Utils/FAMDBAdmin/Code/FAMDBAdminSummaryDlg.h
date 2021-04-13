@@ -89,6 +89,8 @@ private:
 	// Indicates if the stats shown are for all files or only Visible/Invisible files
 	enum class EWorkflowVisibility { All, Visible, Invisible } m_eWorkflowVisibilityMode;
 
+	bool m_bDBHasInvisibleFiles;
+
 	//---------------------------------------------------------------------------------------------
 	// Helper methods
 	//---------------------------------------------------------------------------------------------
@@ -97,6 +99,12 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To resize the list control columns based on the size of the list control
 	void resizeListColumns();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To check the DB for invisible files and hide the stats type controls if there are none
+	void checkForInvisibleFiles();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To set the positions of the controls
+	void repositionControls();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To build a query to gather the statistics for each action
 	inline std::string buildStatsQueryFromActionColumn(const std::string& strActionColumn)

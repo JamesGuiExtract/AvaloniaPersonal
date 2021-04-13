@@ -80,7 +80,8 @@ m_ipContextMenuFileSelector(CLSID_FAMFileSelector),
 m_ipFAMFileInspector(__nullptr),
 m_bInitialized(false),
 m_bUseOracleSyntax(false),
-m_eWorkflowVisibilityMode(EWorkflowVisibility::All)
+m_eWorkflowVisibilityMode(EWorkflowVisibility::All),
+m_bDBHasInvisibleFiles(false)
 {
 	try
 	{
@@ -145,10 +146,7 @@ BOOL CFAMDBAdminSummaryDlg::OnInitDialog()
 		// set the wait cursor
 		CWaitCursor wait;
 
-		m_btnShowDeletedFileStats.SetCheck(asBSTChecked(m_eWorkflowVisibilityMode == EWorkflowVisibility::Invisible));
-		m_btnShowNonDeletedFileStats.SetCheck(asBSTChecked(m_eWorkflowVisibilityMode == EWorkflowVisibility::Visible));
-		m_btnShowAllStats.SetCheck(asBSTChecked(m_eWorkflowVisibilityMode == EWorkflowVisibility::All));
-
+		checkForInvisibleFiles();
 		prepareListControl();
 		resizeListColumns();
 		populatePage();
@@ -163,7 +161,6 @@ BOOL CFAMDBAdminSummaryDlg::OnInitDialog()
 void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
-
 	try
 	{
 		// dialog has not been initialized, return
@@ -172,93 +169,7 @@ void CFAMDBAdminSummaryDlg::OnSize(UINT nType, int cx, int cy)
 			return;
 		}
 
-		CRect recDlg, recListCtrl, recRefresh, recTotalText, recLabel, recLastUpdated,
-			recStatisticsType, recShowNonDeletedFiles, recShowDeletedFiles, recShowAll;
-
-		// Get current positions of the controls and then move them.
-		// Start at the bottom and work up so that the controls stick to the bottom of the dialog
-
-		// get the summary page rectangle
-		GetClientRect(&recDlg);
-
-		// get the list control rectangle
-		m_listActions.GetWindowRect(&recListCtrl);
-		ScreenToClient(&recListCtrl);
-
-		// get the total label rectangle
-		m_lblTotals.GetWindowRect(&recLabel);
-		ScreenToClient(&recLabel);
-
-		// get the total text box
-		m_editFileTotal.GetWindowRect(&recTotalText);
-		ScreenToClient(&recTotalText);
-
-		// get the refresh button rectangle
-		m_btnRefreshSummary.GetWindowRect(&recRefresh);
-		ScreenToClient(&recRefresh);
-
-		// get the last updated label rectangle
-		m_staticLastUpdated.GetWindowRect(&recLastUpdated);
-		ScreenToClient(&recLastUpdated);
-
-		// get the statistics type groupbox rectangle
-		m_staticStatisticsType.GetWindowRect(&recStatisticsType);
-		ScreenToClient(&recStatisticsType);
-
-		// get the show NonDeleted file stats button rectangle
-		m_btnShowNonDeletedFileStats.GetWindowRect(&recShowNonDeletedFiles);
-		ScreenToClient(&recShowNonDeletedFiles);
-
-		// get the show NonDeleted file stats button rectangle
-		m_btnShowDeletedFileStats.GetWindowRect(&recShowDeletedFiles);
-		ScreenToClient(&recShowDeletedFiles);
-
-		// get the show All stats button rectangle
-		m_btnShowAllStats.GetWindowRect(&recShowAll);
-		ScreenToClient(&recShowAll);
-
-		// compute margin
-		int iMargin = recListCtrl.left - recDlg.left;
-
-		// compute the new statistics type group box position so that it fills the width
-		int iHeight = recStatisticsType.Height();
-		recStatisticsType.bottom = recDlg.bottom - iMargin;
-		recStatisticsType.top = recStatisticsType.bottom - iHeight;
-		recStatisticsType.left = recDlg.left + iMargin;
-		recStatisticsType.right = recDlg.right - iMargin;
-
-		// compute radio button positions
-		recShowAll.MoveToXY(recStatisticsType.left + iMargin, recStatisticsType.top + 20);
-		recShowNonDeletedFiles.MoveToXY(recShowAll.right + iMargin, recShowAll.top);
-		recShowDeletedFiles.MoveToXY(recShowNonDeletedFiles.right + iMargin, recShowAll.top);
-
-		// compute the new file totals label position
-		iHeight = recLabel.Height();
-		recLabel.MoveToY(recStatisticsType.top - iHeight - iMargin + 5);
-
-		// compute the new file totals edit box position
-		recTotalText.MoveToXY(recLabel.right + iMargin, recLabel.top - 3);
-
-		// compute the new refresh button position
-		recRefresh.MoveToXY(recTotalText.right + iMargin, recLabel.top - 5);
-
-		// compute the last updated text position
-		recLastUpdated.MoveToXY(recRefresh.right + iMargin, recLabel.top);
-
-		// compute the new list position
-		recListCtrl.right = recDlg.right - iMargin;
-		recListCtrl.bottom = recRefresh.top - iMargin;
-
-		// move the controls
-		m_lblTotals.MoveWindow(&recLabel);
-		m_editFileTotal.MoveWindow(&recTotalText);
-		m_btnRefreshSummary.MoveWindow(&recRefresh);
-		m_listActions.MoveWindow(&recListCtrl);
-		m_staticLastUpdated.MoveWindow(&recLastUpdated);
-		m_staticStatisticsType.MoveWindow(&recStatisticsType);
-		m_btnShowAllStats.MoveWindow(&recShowAll);
-		m_btnShowNonDeletedFileStats.MoveWindow(&recShowNonDeletedFiles);
-		m_btnShowDeletedFileStats.MoveWindow(&recShowDeletedFiles);
+		repositionControls();
 
 		// resize the columns in the list control
 		resizeListColumns();
@@ -281,6 +192,10 @@ BOOL CFAMDBAdminSummaryDlg::PreTranslateMessage(MSG* pMsg)
 			// If the key is the F5 key then refresh the summary grid
 			if (pMsg->wParam == VK_F5)
 			{
+				// Show/hide the invisible file stats radio buttons when refreshing
+				// in case the status has changed
+				checkForInvisibleFiles();
+
 				// Refresh the grid
 				populatePage();
 
@@ -318,6 +233,8 @@ void CFAMDBAdminSummaryDlg::OnBnClickedRefreshSummary()
 
 	try
 	{
+		// Show/hide the invisible file stats radio buttons when refreshing in case the status has changed
+		checkForInvisibleFiles();
 		populatePage();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI19797");
@@ -893,3 +810,165 @@ void CFAMDBAdminSummaryDlg::populatePage(long nActionIDToRefresh /*= -1*/)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI30527");
 }
 //--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::checkForInvisibleFiles()
+{
+	try
+	{
+		bool hadInvisibleFiles = m_bDBHasInvisibleFiles;
+
+		_RecordsetPtr ipRecordSet =
+			m_ipFAMDB->GetResultsForQuery("SELECT TOP(1) Invisible FROM dbo.WorkflowFile WHERE Invisible = 1");
+		ASSERT_RESOURCE_ALLOCATION("ELI51673", ipRecordSet != __nullptr);
+
+		m_bDBHasInvisibleFiles = ipRecordSet->adoEOF == VARIANT_FALSE;
+
+		// If the status has changed or if this dialog is initializing
+		// set the visibility of the radio buttons
+		if (hadInvisibleFiles != m_bDBHasInvisibleFiles || !m_bInitialized)
+		{
+			if (m_bDBHasInvisibleFiles)
+			{
+				m_staticStatisticsType.ShowWindow(SW_SHOW);
+				m_btnShowDeletedFileStats.ShowWindow(SW_SHOW);
+				m_btnShowNonDeletedFileStats.ShowWindow(SW_SHOW);
+				m_btnShowAllStats.ShowWindow(SW_SHOW);
+				m_btnShowDeletedFileStats.SetCheck(asBSTChecked(m_eWorkflowVisibilityMode == EWorkflowVisibility::Invisible));
+				m_btnShowNonDeletedFileStats.SetCheck(asBSTChecked(m_eWorkflowVisibilityMode == EWorkflowVisibility::Visible));
+				m_btnShowAllStats.SetCheck(asBSTChecked(m_eWorkflowVisibilityMode == EWorkflowVisibility::All));
+			}
+			else
+			{
+				m_staticStatisticsType.ShowWindow(SW_HIDE);
+				m_btnShowDeletedFileStats.ShowWindow(SW_HIDE);
+				m_btnShowNonDeletedFileStats.ShowWindow(SW_HIDE);
+				m_btnShowAllStats.ShowWindow(SW_HIDE);
+			}
+		}
+
+		if (hadInvisibleFiles != m_bDBHasInvisibleFiles && m_bInitialized)
+		{
+			repositionControls();
+
+			Invalidate();
+
+			// Let dialog refresh
+	        emptyWindowsMessageQueue();
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI51674");
+}
+//--------------------------------------------------------------------------------------------------
+void CFAMDBAdminSummaryDlg::repositionControls()
+{
+	try
+	{
+		// dialog has not been initialized, return
+		if (!m_bInitialized)
+		{
+			return;
+		}
+
+		CRect recDlg, recListCtrl, recRefresh, recTotalText, recLabel, recLastUpdated,
+			recStatisticsType, recShowNonDeletedFiles, recShowDeletedFiles, recShowAll;
+
+		// Get current positions of the controls and then move them.
+		// Start at the bottom and work up so that the controls stick to the bottom of the dialog
+
+		// get the summary page rectangle
+		GetClientRect(&recDlg);
+
+		// get the list control rectangle
+		m_listActions.GetWindowRect(&recListCtrl);
+		ScreenToClient(&recListCtrl);
+
+		// get the total label rectangle
+		m_lblTotals.GetWindowRect(&recLabel);
+		ScreenToClient(&recLabel);
+
+		// get the total text box
+		m_editFileTotal.GetWindowRect(&recTotalText);
+		ScreenToClient(&recTotalText);
+
+		// get the refresh button rectangle
+		m_btnRefreshSummary.GetWindowRect(&recRefresh);
+		ScreenToClient(&recRefresh);
+
+		// get the last updated label rectangle
+		m_staticLastUpdated.GetWindowRect(&recLastUpdated);
+		ScreenToClient(&recLastUpdated);
+
+		if (m_bDBHasInvisibleFiles)
+		{
+			// get the statistics type groupbox rectangle
+			m_staticStatisticsType.GetWindowRect(&recStatisticsType);
+			ScreenToClient(&recStatisticsType);
+
+			// get the show NonDeleted file stats button rectangle
+			m_btnShowNonDeletedFileStats.GetWindowRect(&recShowNonDeletedFiles);
+			ScreenToClient(&recShowNonDeletedFiles);
+
+			// get the show NonDeleted file stats button rectangle
+			m_btnShowDeletedFileStats.GetWindowRect(&recShowDeletedFiles);
+			ScreenToClient(&recShowDeletedFiles);
+
+			// get the show All stats button rectangle
+			m_btnShowAllStats.GetWindowRect(&recShowAll);
+			ScreenToClient(&recShowAll);
+		}
+
+		// compute margin
+		int iMargin = recListCtrl.left - recDlg.left;
+
+		int relativeBottom = recDlg.bottom;
+
+		if (m_bDBHasInvisibleFiles)
+		{
+			// compute the new statistics type group box position so that it fills the width
+			int iHeight = recStatisticsType.Height();
+			recStatisticsType.bottom = relativeBottom - iMargin;
+			recStatisticsType.top = recStatisticsType.bottom - iHeight;
+			recStatisticsType.left = recDlg.left + iMargin;
+			recStatisticsType.right = recDlg.right - iMargin;
+
+			// compute radio button positions
+			recShowAll.MoveToXY(recStatisticsType.left + iMargin, recStatisticsType.top + 20);
+			recShowNonDeletedFiles.MoveToXY(recShowAll.right + iMargin, recShowAll.top);
+			recShowDeletedFiles.MoveToXY(recShowNonDeletedFiles.right + iMargin, recShowAll.top);
+
+			relativeBottom = recStatisticsType.top;
+		}
+
+		// compute the new file totals label position
+		int iHeight = recLabel.Height();
+		recLabel.MoveToY(relativeBottom - iHeight - iMargin + 5);
+
+		// compute the new file totals edit box position
+		recTotalText.MoveToXY(recLabel.right + iMargin, recLabel.top - 3);
+
+		// compute the new refresh button position
+		recRefresh.MoveToXY(recTotalText.right + iMargin, recLabel.top - 5);
+
+		// compute the last updated text position
+		recLastUpdated.MoveToXY(recRefresh.right + iMargin, recLabel.top);
+
+		// compute the new list position
+		recListCtrl.right = recDlg.right - iMargin;
+		recListCtrl.bottom = recRefresh.top - iMargin;
+
+		// move the controls
+		m_lblTotals.MoveWindow(&recLabel);
+		m_editFileTotal.MoveWindow(&recTotalText);
+		m_btnRefreshSummary.MoveWindow(&recRefresh);
+		m_listActions.MoveWindow(&recListCtrl);
+		m_staticLastUpdated.MoveWindow(&recLastUpdated);
+
+		if (m_bDBHasInvisibleFiles)
+		{
+			m_staticStatisticsType.MoveWindow(&recStatisticsType);
+			m_btnShowAllStats.MoveWindow(&recShowAll);
+			m_btnShowNonDeletedFileStats.MoveWindow(&recShowNonDeletedFiles);
+			m_btnShowDeletedFileStats.MoveWindow(&recShowDeletedFiles);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI51675");
+}
