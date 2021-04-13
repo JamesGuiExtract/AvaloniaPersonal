@@ -679,6 +679,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
+                if (_committingChanges)
+                {
+                    return false;
+                }
+
                 if (CommitOnlySelection)
                 {
                     if (PendingDocuments.Any(doc => doc.Selected))
@@ -1286,9 +1291,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             TemporaryWaitCursor waitCursor = new TemporaryWaitCursor();
 
+            if (_committingChanges)
+            {
+                return false;
+            }
+
             try
             {
                 _committingChanges = true;
+                UpdateCommandStates();
 
                 if (!CanSelectedDocumentsBeCommitted())
                 {
@@ -2546,6 +2557,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                if (_raisingCommittingChanges || _committingChanges)
+                {
+                    return;
+                }
+
                 // Allow ability of external event handler to handle the apply action.
                 var committingChangesArgs = new CommittingChangesEventArgs();
                 OnCommittingChanges(committingChangesArgs);
