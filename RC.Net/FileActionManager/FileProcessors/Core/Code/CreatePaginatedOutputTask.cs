@@ -291,20 +291,23 @@ namespace Extract.FileActionManager.FileProcessors
 
                     var request = new PaginationRequest(requestAttribute);
                     var nonDeletedImagePages = request.ImagePages.Where(p => !p.Deleted).ToList();
+                    var fileName = pFileRecord.Name;
 
-                    if (File.Exists(pFileRecord.Name))
+                    if (File.Exists(fileName))
                     {
                         var ee = new ExtractException("ELI46872", "File already exists.");
-                        ee.AddDebugData("Filename", pFileRecord.Name, false);
+                        ee.AddDebugData("Filename", fileName, false);
                         throw ee;
                     }
 
-                    ImageMethods.StaplePagesAsNewDocument(nonDeletedImagePages, pFileRecord.Name);
+                    ImageMethods.StaplePagesAsNewDocument(nonDeletedImagePages, fileName);
+
+                    pDB.SetFileInformationForFile(pFileRecord.FileID, new FileInfo(fileName).Length, -1);
 
                     var documentData = AttributeMethods.GetSingleAttributeByName(
                         documentAttribute.SubAttributes, "DocumentData");
                     AttributeMethods.CreateUssAndVoaForPaginatedDocument(
-                        pFileRecord.Name, documentData.SubAttributes, nonDeletedImagePages);
+                        fileName, documentData.SubAttributes, nonDeletedImagePages);
                 }
 
                 return EFileProcessingResult.kProcessingSuccessful;
