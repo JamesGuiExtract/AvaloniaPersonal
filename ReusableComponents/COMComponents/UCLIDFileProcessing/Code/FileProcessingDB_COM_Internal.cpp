@@ -12897,6 +12897,9 @@ bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, l
 
 						// Add stats for invisible state
 						updateStats(ipConnection, nActionID, kActionUnattempted, status, ipFileRecord, __nullptr, true);
+
+						// Remove skipped record so that the skipped stats used by the IDShield web app stop counting this file
+						removeSkipFileRecord(ipConnection, nFileID, nActionID);
 					}
 				}
 

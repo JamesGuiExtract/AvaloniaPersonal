@@ -1572,6 +1572,7 @@ namespace Extract.Web.WebAPI.Test
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
 
                 LogInToWebApp(controller, user);
+
                 var openDocumentResult = OpenDocument(controller, 1);
 
                 SkipDocumentData skipDocumentData = new SkipDocumentData()
@@ -1587,10 +1588,25 @@ namespace Extract.Web.WebAPI.Test
                 var stats = fileProcessingDb.GetVisibleFileStats(actionId, true, true);
                 Assert.AreEqual(1, stats.NumDocumentsSkipped, "There should be 1 skipped document.");
 
+                var skippedForThisUser = fileProcessingDb.GetNumberSkippedForUser(user.Username, actionId, false);
+                Assert.AreEqual(1, skippedForThisUser, "There should be 1 skipped document for user");
+
                 string comment = fileProcessingDb.GetFileActionComment(openDocumentResult.Id, actionId);
                 Assert.AreEqual(skipDocumentData.Comment, comment, "Retrieved Comment should equal the saved comment.");
 
                 controller.CloseDocument(openDocumentResult.Id, true);
+
+                // Mark the file as deleted and confirm that it doesn't show up in the stats anymore
+                var workflowID = fileProcessingDb.GetWorkflowID(fileProcessingDb.ActiveWorkflow);
+                var fileID = openDocumentResult.Id;
+                fileProcessingDb.MarkFileDeleted(fileID, workflowID);
+
+                stats = fileProcessingDb.GetVisibleFileStats(actionId, true, true);
+                Assert.AreEqual(0, stats.NumDocumentsSkipped, "There should be no skipped documents visible");
+
+                skippedForThisUser = fileProcessingDb.GetNumberSkippedForUser(user.Username, actionId, false);
+                Assert.AreEqual(0, skippedForThisUser, "There should be no skipped document for user");
+
                 controller.Logout();
             }
             finally
