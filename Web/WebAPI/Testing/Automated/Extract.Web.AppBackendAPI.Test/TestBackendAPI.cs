@@ -2418,6 +2418,35 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
+        [Test]
+        [Category("Automated")]
+        [Category("WebAPIBackend")]
+        public static void GetQueuedFiles()
+        {
+            string dbName = "AppBackendAPI_Test_GetQueuedFiles";
+
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+
+                var result = controller.Login(user);
+                var token = result.AssertGoodResult<JwtSecurityToken>();
+                controller.ApplyTokenClaimPrincipalToContext(token);
+
+                result = controller.GetQueuedFiles("");
+                var queuedFilesResult = result.AssertGoodResult<QueuedFilesResult>();
+
+                Assert.Greater(queuedFilesResult.QueuedFiles.Count(), 0);
+
+                controller.Logout()
+                    .AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
         #endregion Public Test Functions
 
         #region Private Members

@@ -348,7 +348,7 @@ namespace WebAPI.Models
                       LEFT JOIN FileMetadataFieldValue ON FileMetadataFieldValue.FileID = FAMFile.ID
                       LEFT JOIN MetadataField ON MetadataField.ID = FileMetadataFieldValue.MetaDataFieldID
                       WHERE WorkflowFile.WorkflowID = {wfID}
-				      AND WorkflowFile.Deleted = 0
+				      AND WorkflowFile.Invisible = 0
                       AND {skippedOrPendingClause}
                     ) AS SourceTable PIVOT(MIN(MetadataValue) FOR MetadataName IN ([OriginalFileName], [SubmittedByUser], [DocumentType])) AS PivotTable
                     {filterClause}
