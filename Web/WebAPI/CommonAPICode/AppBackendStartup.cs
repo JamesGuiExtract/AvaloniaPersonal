@@ -121,15 +121,17 @@ namespace WebAPI
 
                     config.IncludeXmlComments(xmlPath);
 
-                    // config.DescribeAllEnumsAsStrings() is obsolete in Swagger v5+; it is supposed to use
-                    // System.Text.Json for serialization and that serialization includes specification for enum
-                    // translation. However, this functionality appears to depend on Asp.Net Core 3.0, so it
-                    // appears for now a filter is necessary.
-                    config.SchemaFilter<EnumsAsStringFilter>();
+                    // This still works when using AddSwaggerGenNewtonsoftSupport (see below)
+                    // This might change to Deprecated but then we can probably get it working in a different way.
+#pragma warning disable CS0618 // Type or member is obsolete
+                    config.DescribeAllEnumsAsStrings();
+#pragma warning restore CS0618 // Type or member is obsolete
 
                     config.EnableAuthorization();
                 });
 
+                // Enable DescribeAllEnumsAsStrings (see above)
+                services.AddSwaggerGenNewtonsoftSupport();
                 services.Configure<ServerOptions>(Configuration);
             }
             catch (Exception ex)
