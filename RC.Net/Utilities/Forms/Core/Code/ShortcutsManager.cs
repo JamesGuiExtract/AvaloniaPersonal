@@ -1,11 +1,9 @@
-using Extract;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
-using System.Windows.Forms;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Extract.Utilities.Forms
 {
@@ -55,7 +53,7 @@ namespace Extract.Utilities.Forms
         /// Raised when a registered shortcut key or key combo is entered, before calling the registered
         /// ShortcutHandler.
         /// </summary>
-        public event EventHandler<EventArgs> ProcessingShortcut;
+        public event EventHandler<CancelEventArgs> ProcessingShortcut;
 
         #endregion
 
@@ -234,10 +232,16 @@ namespace Extract.Utilities.Forms
                 ShortcutHandler shortcutHandler;
                 if (_shortcuts.TryGetValue(key, out shortcutHandler))
                 {
-                    ProcessingShortcut?.Invoke(this, new EventArgs());
+                    var args = new CancelEventArgs();
+                    ProcessingShortcut?.Invoke(this, args);
 
-                    // Run the shortcut handler and return true
-                    shortcutHandler();
+                    if (!args.Cancel)
+                    {
+                        // Run the shortcut handler and return true
+                        shortcutHandler();
+                    }
+                    
+                    // Return true even if canceled to prevent base control handler from executing.
                     return true;
                 }
 

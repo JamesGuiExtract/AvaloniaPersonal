@@ -770,9 +770,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     return false;
                 }
 
-                if (_documentStatusUpdateErrors != null)
+                var statusUpdateErrors = _documentStatusUpdateErrors;
+                if (statusUpdateErrors != null)
                 {
-                    throw _documentStatusUpdateErrors;
+                    throw statusUpdateErrors;
                 }
 
                 return true;
@@ -1818,44 +1819,55 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
-        /// If <see paramref="documentData"/> is the last pending document status update, any
-        /// exceptions from those updates are gathered and <see cref="_documentStatusesUpdated"/>
-        /// is signaled.
+        /// If there are no known document status updates pending or <see paramref="documentData"/> is the
+        /// last such instance being updated, any exceptions from those updates are gathered and
+        /// <see cref="_documentStatusesUpdated"/> is signaled.
         /// </summary>
         /// <param name="documentData">The <see cref="DataEntryPaginationDocumentData"/> that was just updated.</param>
         /// <param name="displayErrors"><c>true</c> to display the errors via the errors; otherwise, <c>false</c>.</param>
         void SignalIfLastDocumentStatusUpdate(DataEntryPaginationDocumentData documentData, bool displayErrors)
         {
-            if (_pendingDocumentStatusUpdate.TryRemove(documentData, out int _)
-                && _pendingDocumentStatusUpdate.Count == 0)
+            _pendingDocumentStatusUpdate.TryRemove(documentData, out int _);
+
+            // To help prevent the possibility of getting stuck waiting on document updates,
+            // signal status completion when _pendingDocumentStatusUpdate is empty even if
+            // documentData was not found (_pendingDocumentStatusUpdate could have been cleared
+            // by another event).
+            if (_pendingDocumentStatusUpdate.Count == 0)
             {
-                // Create a single aggregate exception to ecapsulate all exceptions encountered updating
-                // document statuses
-                ExtractException aggregateException = null;
-                if (_newDocumentStatusUpdateErrors.Count > 0)
+                try
                 {
-                    aggregateException =
-                        new ExtractException("ELI48295", "Error updating the status of one or more documents.",
-                        _newDocumentStatusUpdateErrors.AsAggregateException());
-
-                    if (displayErrors && _imageViewer != null)
+                    // Create a single aggregate exception to ecapsulate all exceptions encountered updating
+                    // document statuses
+                    ExtractException aggregateException = null;
+                    var newStatusUpdateErrors = _newDocumentStatusUpdateErrors.ToArray();
+                    if (newStatusUpdateErrors.Length > 0)
                     {
-                        _imageViewer.SafeBeginInvoke("ELI48294", () => aggregateException.Display());
+                        aggregateException =
+                            new ExtractException("ELI48295", "Error updating the status of one or more documents.",
+                            newStatusUpdateErrors.AsAggregateException());
+
+                        if (displayErrors && _imageViewer != null)
+                        {
+                            _imageViewer.SafeBeginInvoke("ELI48294", () => aggregateException.Display());
+                        }
                     }
+
+                    // Now that the status updates are complete, set _documentStatusUpdateErrors as the
+                    // errors to be reported by WaitForDocumentStatusUpdates and reset
+                    // _newDocumentStatusUpdateErrors in anticipation of new document status updates.
+                    Interlocked.Exchange(
+                        ref _documentStatusUpdateErrors, aggregateException);
+                    Interlocked.Exchange(
+                        ref _newDocumentStatusUpdateErrors, new ConcurrentBag<ExtractException>());
+
+                    // Once any active batch of status updates is complete, clear shared cache data.
+                    AttributeStatusInfo.ClearProcessWideCache();
                 }
-
-                // Now that the status updates are complete, set _documentStatusUpdateErrors as the
-                // errors to be reported by WaitForDocumentStatusUpdates and reset
-                // _newDocumentStatusUpdateErrors in anticipation of new document status updates.
-                Interlocked.Exchange(
-                    ref _documentStatusUpdateErrors, aggregateException);
-                Interlocked.Exchange(
-                    ref _newDocumentStatusUpdateErrors, new ConcurrentBag<ExtractException>());
-
-                // Once any active batch of status updates is complete, clear shared cache data.
-                AttributeStatusInfo.ClearProcessWideCache();
-
-                _documentStatusesUpdated.Set();
+                finally
+                {
+                    _documentStatusesUpdated.Set();
+                }
             }
         }
 

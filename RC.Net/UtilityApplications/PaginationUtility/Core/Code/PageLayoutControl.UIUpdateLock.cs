@@ -35,6 +35,12 @@ namespace Extract.UtilityApplications.PaginationUtility
             static TemporaryWaitCursor _waitCursor;
 
             /// <summary>
+            /// Indicates if a lock is being interrupted to refresh the UI via RefreshUI()
+            /// </summary>
+            [ThreadStatic]
+            static bool _refreshing;
+
+            /// <summary>
             /// Indicates whether a full layout should be performed when this instance is disposed.
             /// </summary>
             [ThreadStatic]
@@ -109,6 +115,18 @@ namespace Extract.UtilityApplications.PaginationUtility
             }
 
             /// <summary>
+            /// <c>true</c> if temporarily unlocked in order to allow a refresh of the UI via 
+            /// <see cref="RefreshUI"/>.
+            /// </summary>
+            public static bool IsRefreshing
+            {
+                get
+                {
+                    return _refreshing;
+                }
+            }
+
+            /// <summary>
             /// Refreshes the UI on demand without removing any existing lock instances.
             /// </summary>
             public static void RefreshUI()
@@ -117,13 +135,18 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     if (_references.Value.Count > 0)
                     {
-                        UnlockUI(temporary: true);
+                        _refreshing = true;
+                        UnlockUI(refreshing: true);
                         LockUI();
                     }
                 }
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI50197");
+                }
+                finally
+                {
+                    _refreshing = false;
                 }
             }
             
@@ -137,7 +160,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     _references.Value.Clear();
 
-                    UnlockUI(temporary: false);
+                    UnlockUI(refreshing: false);
                 }
                 catch (Exception ex)
                 {
@@ -173,7 +196,7 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                         if (_references.Value.Count == 0)
                         {
-                            UnlockUI(temporary: false);
+                            UnlockUI(refreshing: false);
                         }
                     }
                     catch { }
@@ -188,7 +211,10 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 if (!_pageLayoutControl.IsDisposed && _controlUpdateLock == null)
                 {
-                    _pageLayoutControl.SuspendingUIUpdates?.Invoke(_pageLayoutControl, new EventArgs());
+                    if (!_refreshing)
+                    {
+                        _pageLayoutControl.SuspendingUIUpdates?.Invoke(_pageLayoutControl, new EventArgs());
+                    }
 
                     _controlUpdateLock =
                         new LockControlUpdates(_pageLayoutControl._flowLayoutPanel, true, true);
@@ -212,9 +238,9 @@ namespace Extract.UtilityApplications.PaginationUtility
             /// <summary>
             /// Unlocks the <see cref="_pageLayoutControl"/> UI.
             /// </summary>
-            /// <param name="temporary"><c>true</c> if the UI is only being temporarily unlocked to refresh the UI
+            /// <param name="refreshing"><c>true</c> if the UI is only being temporarily unlocked to refresh the UI
             /// or <c>false</c> if the UI is intented to be usable at this point.</param>
-            static void UnlockUI(bool temporary)
+            static void UnlockUI(bool refreshing)
             {
                 if (_pageLayoutControl?.IsDisposed == false && _controlUpdateLock != null)
                 {
@@ -226,7 +252,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _controlUpdateLock.Dispose();
                     _controlUpdateLock = null;
 
-                    if (!temporary)
+                    if (!refreshing)
                     {
                         _waitCursor.Dispose();
                         _waitCursor = null;
@@ -244,7 +270,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     _pageLayoutControl.ResumeLayout(true);
                     _pageLayoutControl.UpdateCommandStates();
 
-                    _pageLayoutControl.ResumingUIUpdates?.Invoke(_pageLayoutControl, new EventArgs());
+                    if (!refreshing)
+                    {
+                        _pageLayoutControl.ResumingUIUpdates?.Invoke(_pageLayoutControl, new EventArgs());
+                    }
                 }
             }
         }

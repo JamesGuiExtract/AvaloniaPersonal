@@ -2557,7 +2557,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (_raisingCommittingChanges || _committingChanges)
+                if (ProcessingOperation)
                 {
                     return;
                 }
@@ -2585,6 +2585,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                if (ProcessingOperation)
+                {
+                    return;
+                }
+
                 Save();
             }
             catch (Exception ex)
@@ -2604,6 +2609,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                if (ProcessingOperation)
+                {
+                    return;
+                }
+
                 var response = MessageBox.Show(this,
                     "Restore all pages and extracted data to the state at which they existed when " +
                     "first displayed (except for any documents that have already been processed). " +
@@ -2633,6 +2643,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                if (ProcessingOperation)
+                {
+                    return;
+                }
+
                 var response = MessageBox.Show(this,
                     "Discarding all changes will display all source documents as they were before " +
                     "being processed by the software and will discard all data extracted from " +
@@ -2681,6 +2696,11 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
+                if (ProcessingOperation)
+                {
+                    return;
+                }
+
                 OnLoadNextDocument();
             }
             catch (Exception ex)
@@ -2770,6 +2790,25 @@ namespace Extract.UtilityApplications.PaginationUtility
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI50202");
+            }
+        }
+
+        /// <summary>
+        /// Handles <see cref="PageLayoutControl.ProcessingShortcut"/> in order to block hotkeys
+        /// from being handled in the midst of an ongoing operation.
+        /// </summary>
+        void HandlePageLayoutControl_ProcessingShortcut(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                if (ProcessingOperation)
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI51676");
             }
         }
 
@@ -3152,6 +3191,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         }
 
         /// <summary>
+        /// <c>true</c> indicates the UI is in the midst of processing a significant operation
+        /// (loading, saving, opening DEP, etc);
+        /// New operations should not be launched at this time.
+        /// </summary>
+        public bool ProcessingOperation
+        {
+            get
+            {
+                return UIUpdatesSuspended
+                    || _raisingCommittingChanges
+                    || _committingChanges;
+
+            }
+        }
+
+        /// <summary>
         /// Selects or un-selects all documents for committal.
         /// </summary>
         /// <param name="select"><see langword="true"/> to select all documents for committal or
@@ -3214,6 +3269,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             _primaryPageLayoutControl.TabNavigationEnd += HandlePrimaryPageLayoutControl_TabNavigationEnd;
             _primaryPageLayoutControl.SuspendingUIUpdates += HandlePageLayoutControl_SuspendingUpdates;
             _primaryPageLayoutControl.ResumingUIUpdates += HandlePageLayoutControl_ResumingUpdates;
+            _primaryPageLayoutControl.ProcessingShortcut += HandlePageLayoutControl_ProcessingShortcut;
 
             _tableLayoutPanel.Controls.Add(_primaryPageLayoutControl, 0, 1);
             _primaryPageLayoutControl.Focus();

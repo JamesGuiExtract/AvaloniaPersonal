@@ -404,6 +404,12 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         public event EventHandler<EventArgs> ResumingUIUpdates;
 
+        /// <summary>
+        /// Raised when a registered shortcut key or key combo is entered, before calling the registered
+        /// ShortcutHandler.
+        /// </summary>
+        public event EventHandler<CancelEventArgs> ProcessingShortcut;
+
         #endregion Events
 
         #region Properties
@@ -755,7 +761,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             get
             {
-                return UIUpdateLock.IsLocked;
+                return UIUpdateLock.IsLocked || UIUpdateLock.IsRefreshing;
             }
         }
 
@@ -1823,7 +1829,7 @@ namespace Extract.UtilityApplications.PaginationUtility
         {
             try
             {
-                if (DocumentInDataEdit.PaginationSeparator != null)
+                if (DocumentInDataEdit?.PaginationSeparator != null)
                 {
                     DocumentInDataEdit.PaginationSeparator.Collapsed = false;
 
@@ -2715,7 +2721,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     {
                         _panelLoadUpdateLock?.Dispose();
                         _panelLoadUpdateLock = null;
-                        DocumentDataPanel.UpdateEnded -= endPanelUpdateLock;
+                        if (DocumentDataPanel != null)
+                        {
+                            DocumentDataPanel.UpdateEnded -= endPanelUpdateLock;
+                        }
                     };
 
                     var activePage = PrimarySelection as PageThumbnailControl;
@@ -2861,10 +2870,22 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Handles the <see cref="ShortcutsManager.ProcessingShortcut"/> event of <see cref="Shortcuts"/>.
         /// </summary>
-        void HandleShortcuts_ProcessingShortcut(object sender, EventArgs e)
+        void HandleShortcuts_ProcessingShortcut(object sender, CancelEventArgs e)
         {
             try
             {
+                if (UIUpdatesSuspended)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                ProcessingShortcut?.Invoke(this, e);
+                if (e.Cancel)
+                {
+                    return;
+                }
+
                 // Not all ScrollToControl requests should be honored by default. As an example, if a document
                 // separator is at the bottom the panel, an attempted double-click may be interrupted, by a scroll
                 // to position the first page in view before the 2nd click is registered. Therefore, only enable
