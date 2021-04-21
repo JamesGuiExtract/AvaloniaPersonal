@@ -3743,8 +3743,8 @@ namespace Extract.UtilityApplications.PaginationUtility
                 if (control == null)
                 {
                     control = forward
-                        ? PageControls.First()
-                        : PageControls.Last();
+                        ? PageControls.FirstOrDefault()
+                        : PageControls.LastOrDefault();
                 }
                 else
                 {
