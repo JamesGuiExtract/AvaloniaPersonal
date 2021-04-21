@@ -85,7 +85,7 @@
             this._credentialsJSONFileBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this._credentialsJSONFileBrowseButton.EnsureFileExists = false;
             this._credentialsJSONFileBrowseButton.EnsurePathExists = false;
-            this._credentialsJSONFileBrowseButton.FileFilter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            this._credentialsJSONFileBrowseButton.FileFilter = "JSON Files (*.json;*.etf)|*.json;*.etf|All files (*.*)|*.*";
             this._credentialsJSONFileBrowseButton.Location = new System.Drawing.Point(444, 24);
             this._credentialsJSONFileBrowseButton.Name = "_credentialsJSONFileBrowseButton";
             this._credentialsJSONFileBrowseButton.Size = new System.Drawing.Size(40, 22);

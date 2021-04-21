@@ -41,7 +41,6 @@
             this._StoreRadioButton = new System.Windows.Forms.RadioButton();
             this._doNotSaveEmptyCheckBox = new System.Windows.Forms.CheckBox();
             this._voaFileNameBrowseButton = new Extract.Utilities.Forms.BrowseButton();
-            this._attributeSetNamePathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._voaFileNamePathTagButton = new Extract.FileActionManager.Forms.FileActionManagerPathTagButton();
             this._storeDiscreteDataCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
@@ -172,26 +171,16 @@
             // _voaFileNameBrowseButton
             // 
             this._voaFileNameBrowseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._voaFileNameBrowseButton.FileFilter = "XSD Files (*.xsd)|*.xsd|All files (*.*)|*.*";
-            this._voaFileNameBrowseButton.Location = new System.Drawing.Point(410, 24);
+            this._voaFileNameBrowseButton.EnsureFileExists = false;
+            this._voaFileNameBrowseButton.EnsurePathExists = false;
+            this._voaFileNameBrowseButton.FileFilter = "VOA Files (*.voa;*.evoa;*.eav)|*.voa;*.evoa;*.eav|All files (*.*)|*.*";
+            this._voaFileNameBrowseButton.Location = new System.Drawing.Point(410, 25);
             this._voaFileNameBrowseButton.Name = "_voaFileNameBrowseButton";
             this._voaFileNameBrowseButton.Size = new System.Drawing.Size(26, 21);
             this._voaFileNameBrowseButton.TabIndex = 2;
             this._voaFileNameBrowseButton.Text = "...";
+            this._voaFileNameBrowseButton.TextControl = this._voaFileNameTextBox;
             this._voaFileNameBrowseButton.UseVisualStyleBackColor = true;
-            // 
-            // _attributeSetNamePathTagButton
-            // 
-            this._attributeSetNamePathTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._attributeSetNamePathTagButton.Enabled = false;
-            this._attributeSetNamePathTagButton.Image = ((System.Drawing.Image)(resources.GetObject("_attributeSetNamePathTagButton.Image")));
-            this._attributeSetNamePathTagButton.Location = new System.Drawing.Point(386, 64);
-            this._attributeSetNamePathTagButton.Name = "_attributeSetNamePathTagButton";
-            this._attributeSetNamePathTagButton.PathTags = new Extract.FileActionManager.Forms.FileActionManagerPathTags();
-            this._attributeSetNamePathTagButton.Size = new System.Drawing.Size(18, 21);
-            this._attributeSetNamePathTagButton.TabIndex = 4;
-            this._attributeSetNamePathTagButton.UseVisualStyleBackColor = true;
-            this._attributeSetNamePathTagButton.Visible = false;
             // 
             // _voaFileNamePathTagButton
             // 
@@ -229,7 +218,6 @@
             this.Controls.Add(this._storeRasterZonesCheckBox);
             this.Controls.Add(label2);
             this.Controls.Add(this._voaFileNameBrowseButton);
-            this.Controls.Add(this._attributeSetNamePathTagButton);
             this.Controls.Add(this._voaFileNameTextBox);
             this.Controls.Add(this._voaFileNamePathTagButton);
             this.Controls.Add(label1);
@@ -258,7 +246,6 @@
         private System.Windows.Forms.Button _okButton;
         private System.Windows.Forms.TextBox _voaFileNameTextBox;
         private Forms.FileActionManagerPathTagButton _voaFileNamePathTagButton;
-        private Forms.FileActionManagerPathTagButton _attributeSetNamePathTagButton;
         private Utilities.Forms.BrowseButton _voaFileNameBrowseButton;
         private System.Windows.Forms.CheckBox _storeRasterZonesCheckBox;
         private System.Windows.Forms.ComboBox _attributeSetNameComboBox;
