@@ -667,10 +667,6 @@ namespace Extract.Utilities.Forms
                             browser.Filters.Add(filter);
                         }
                     }
-                    if (browser.Filters.Any())
-                    {
-                        browser.DefaultExtension = browser.Filters[0].Extensions.FirstOrDefault();
-                    }
 
                     // Show the dialog
                     var result = browser.ShowDialog();
