@@ -3746,7 +3746,7 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 				ipConnection = getDBConnection();
 
 				// Ensure file gets added to current workflow if it is missing (setFileActionState)
-				nWorkflowID = nWorkflowID == -1 ? getWorkflowID(ipConnection, getActiveWorkflow()) : nWorkflowID;
+				nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -3795,7 +3795,7 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked, long nFileID, 
 				ipConnection = getDBConnection();
 
 				// Ensure file gets added to current workflow if it is missing (setFileActionState)
-				nWorkflowID = nWorkflowID == -1 ? getWorkflowID(ipConnection, getActiveWorkflow()) : nWorkflowID;
+				nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -3845,7 +3845,7 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 				ipConnection = getDBConnection();
 				
 				// Ensure file gets added to current workflow if it is missing (setFileActionState)
-				long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
+				long nWorkflowID = getActiveWorkflowID(ipConnection);
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -3930,7 +3930,7 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 			ipConnection = getDBConnection();
 
 			// Ensure file gets added to current workflow if it is missing (setFileActionState)
-			long nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
+			long nWorkflowID = getActiveWorkflowID(ipConnection);
 
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -4123,7 +4123,7 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 			ipConnection = getDBConnection();
 
 			// Ensure file gets added to current workflow if it is missing (setFileActionState)
-			nWorkflowID = nWorkflowID == -1 ? getWorkflowID(ipConnection, getActiveWorkflow()) : nWorkflowID;
+			nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
 
 			// Begin a transaction
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -5071,7 +5071,7 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 				ipConnection = getDBConnection();
 
 				// Ensure file gets added to current workflow if it is missing (setFileActionState)
-				nWorkflowID = nWorkflowID == -1 ? getWorkflowID(ipConnection, getActiveWorkflow()) : nWorkflowID;
+				nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
 
 				// Get the action name
 				string strActionName = asString(bstrAction);

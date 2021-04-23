@@ -284,6 +284,12 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		_lastCodePos = "10";
 		EActionStatus easRtn = kActionUnattempted;
 
+		// If the Action ID was specified but the Workflow ID wasn't then get the WorkflowID from the Action ID
+		if (nWorkflowID <= 0 && nActionID > 0)
+		{
+			nWorkflowID = getWorkflowID(ipConnection, nActionID);
+		}
+
 		// Update action ID/Action name
 		if (!strAction.empty() && nActionID == -1)
 		{	
@@ -477,7 +483,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					" VALUES (" + asString(nFileID) + ", " + asString(nActionID) + ", '" + strNewState + "', " +
 					asString(ipCurrRecord->Priority) + ")");
 
-				// If a workflow was specified, record the file as having been active in this workflow.
+				// If the workflow is known then record the file as having been active in this workflow.
 				if (nWorkflowID > 0)
 				{
 					executeCmdQuery(ipConnection, Util::Format(
@@ -518,7 +524,6 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				}
 				_lastCodePos = "250";
 
-				long nWorkflowID = getWorkflowID(ipConnection, nActionID);
 				bool bIsDeleted =
 					nWorkflowID <= 0
 					? false
