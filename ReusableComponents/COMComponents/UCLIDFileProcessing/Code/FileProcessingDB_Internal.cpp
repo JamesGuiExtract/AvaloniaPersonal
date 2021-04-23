@@ -311,7 +311,8 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		string strFileSQL = "SELECT FAMFile.ID as ID, FileName, FileSize, Pages, [FAMFile].Priority, " 
 			"COALESCE(ActionStatus, 'U') AS ActionStatus, "
 			"COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID, "
-			"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID "
+			"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID, "
+			"COALESCE(WorkflowFile.Invisible, 0) AS Invisible "
 			"FROM FAMFile  "
 			"LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID " 
 			"	AND SkippedFile.ActionID = " + strActionId + 
@@ -320,6 +321,8 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			" LEFT OUTER JOIN QueuedActionStatusChange ON QueuedActionStatusChange.ChangeStatus = 'P' "
 			"	AND QueuedActionStatusChange.FileID = FAMFile.ID "
 			"	AND QueuedActionStatusChange.ActionID = " + strActionId +
+			" LEFT OUTER JOIN WorkflowFile ON WorkflowFile.FileID = FAMFile.ID AND WorkflowFile.WorkflowID = " 
+				+ asString(nWorkflowID) + 
 			" WHERE FAMFile.ID = " + strFileId;
 		
 		_lastCodePos = "60";
@@ -524,10 +527,7 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				}
 				_lastCodePos = "250";
 
-				bool bIsDeleted =
-					nWorkflowID <= 0
-					? false
-					: isFileInWorkflow(ipConnection, nFileID, nWorkflowID) == 0; // 0 = deleted
+				bool bIsDeleted = getLongField(ipFileSetFields, "Invisible") != 0;
 
 				updateStats(ipConnection, nActionID, easStatsFrom, asEActionStatus(strNewState),
 					ipCurrRecord, ipCurrRecord, bIsDeleted);
