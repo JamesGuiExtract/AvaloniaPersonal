@@ -156,6 +156,31 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Return all the classes that implement the Interface <typeparamref name="T"/>
+        /// </summary>
+        /// <typeparam name="T">The interface implemented</typeparam>
+        /// <returns>Returns Ienum containing all the interfaces.</returns>
+        public static IEnumerable<T> GetClassesThatImplementInterface<T>(Assembly executingAssembly)
+        {
+            try
+            {
+                return executingAssembly
+                    .GetTypes()
+                    .Where(type => typeof(T).IsAssignableFrom(type))
+                    .Where(type =>
+                        !type.IsAbstract &&
+                        !type.IsGenericType &&
+                        type.GetConstructor(new Type[0]) != null)
+                    .Select(type => (T)Activator.CreateInstance(type))
+                    .ToList();
+            }
+            catch (Exception e)
+            {
+                throw e.AsExtract("ELI51670");
+            }
+        }
+
+        /// <summary>
         /// Creates the type from type name.
         /// </summary>
         /// <param name="typeName">Name of the type.</param>

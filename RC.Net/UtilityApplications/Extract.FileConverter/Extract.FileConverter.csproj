@@ -75,9 +75,15 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\FileFormat.cs" />
+    <Compile Include="Converters\LeadtoolsConverter.cs" />
+    <Compile Include="Converters\Models\LeadtoolsModel.cs" />
+    <Compile Include="Pages\LeadtoolsConverter.xaml.cs">
+      <DependentUpon>LeadtoolsConverter.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\OfficeConverter.xaml.cs">
       <DependentUpon>OfficeConverter.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Utility\NotifyPropertyChangedObject.cs" />
     <Compile Include="ReordableListBox.cs" />
     <Page Include="ConverterSettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -94,6 +100,10 @@
       <DependentUpon>ConverterSettingsWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Pages\LeadtoolsConverter.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Pages\OfficeConverter.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -152,6 +162,10 @@
     <ProjectReference Include="..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
       <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781de2-21d2-470c-b41d-598dc0c2640b}</Project>
+      <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

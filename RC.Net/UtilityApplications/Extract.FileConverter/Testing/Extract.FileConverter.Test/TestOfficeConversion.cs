@@ -1,4 +1,5 @@
 ﻿using Extract.FileConverter.Converters;
+using Extract.Licensing;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,15 @@ namespace Extract.FileConverter.Test
     [Category("TestLaunchArguments")]
     public class TestOfficeConversion
     {
+        /// <summary>
+        /// Setup method to initialize the testing environment.
+        /// </summary>
+        [OneTimeSetUp]
+        public static void Setup()
+        {
+            LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+        }
+
         [Test, Category("Automated")]
         [Parallelizable(ParallelScope.All)]
         [TestCase("Extract.FileConverter.Test.TestWordDocuments.VPNInstructions.docx", TestName = "Convert docx to pdf")]
@@ -36,7 +46,7 @@ namespace Extract.FileConverter.Test
             try
             {
                 WriteResourceToFile(testItem, fileName);
-                IConverter[] converters = { new OfficeConverter() };
+                IConverter[] converters = { new OfficeConverter() { IsEnabled = true } };
                 PerformConversion.Convert(converters, fileName, FileFormat.Pdf);
                 Assert.IsTrue(File.Exists(Path.ChangeExtension(fileName, ".pdf")));
             }
@@ -70,7 +80,7 @@ namespace Extract.FileConverter.Test
             try
             {
                 WriteResourceToFile(testItem, fileName);
-                IConverter[] converters = { new OfficeConverter() };
+                IConverter[] converters = { new OfficeConverter() { IsEnabled = true } };
                 PerformConversion.Convert(converters, fileName, FileFormat.Tiff);
                 Assert.IsTrue(File.Exists(Path.ChangeExtension(fileName, ".tiff")));
             }
@@ -88,7 +98,7 @@ namespace Extract.FileConverter.Test
             try
             {
                 WriteResourceToFile("Extract.FileConverter.Test.TestNonExistantFormat.VPNInstructions2003.lol", fileName);
-                IConverter[] converters = { new OfficeConverter() };
+                IConverter[] converters = { new OfficeConverter() { IsEnabled = true } };
                 Assert.Throws<ExtractException>(() => PerformConversion.Convert(converters, fileName, FileFormat.Tiff));
             }
             finally

@@ -11,12 +11,12 @@ using System.Collections.ObjectModel;
 
 namespace Extract.FileConverter.Converters
 {
-    public class OfficeConverter : IConverter
+    sealed public class OfficeConverter : IConverter
     {
         /// <summary>
         /// Sets the supported destination file formats for this converter.
         /// </summary>
-        public Collection<FileFormat> SupportedFormats => new Collection<FileFormat>() { FileFormat.Pdf, FileFormat.Tiff };
+        public Collection<FileFormat> SupportedDestinationFormats => new Collection<FileFormat>() { FileFormat.Pdf, FileFormat.Tiff };
 
         /// <summary>
         /// Gets or sets the enabled flag for this converter. If the converter is disabled, it will not be run.
@@ -175,6 +175,11 @@ namespace Extract.FileConverter.Converters
             {
                 return OfficeApplication.Unknown;
             }
+        }
+
+        public IConverter Clone()
+        {
+            return new OfficeConverter() { IsEnabled = this.IsEnabled };
         }
     }
 }

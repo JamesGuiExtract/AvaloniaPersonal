@@ -156,6 +156,7 @@
     <Compile Include="ConfigurableObjectControl.Designer.cs">
       <DependentUpon>ConfigurableObjectControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="DragAndDropListBox.cs" />
     <Compile Include="InvisibleForm.cs">
       <SubType>Form</SubType>
     </Compile>

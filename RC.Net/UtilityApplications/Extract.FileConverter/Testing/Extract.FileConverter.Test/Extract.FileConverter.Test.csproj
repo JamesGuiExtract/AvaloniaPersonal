@@ -63,11 +63,16 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Extract.Licensing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564" />
+    <Reference Include="Extract.Utilities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.ValueTuple" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -91,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestLeadToolsConversion.cs" />
     <Compile Include="TestOfficeConversion.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -126,9 +132,15 @@
   <ItemGroup>
     <EmbeddedResource Include="TestWordDocuments\VPNInstructions2003.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="TestPDFDocuments\0003.pdf" />
+    <EmbeddedResource Include="TestPDFDocuments\004.pdf" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestNonExistantFormat\VPNInstructions2003.lol" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestTiffDocuments\0275pages.tif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="Extract.FileConverter.Pages.LeadtoolsConverter"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" >
+    <UserControl.Resources>
+        <!-- ValidatingControl Style -->
+        <Style TargetType="{x:Type FrameworkElement}" x:Key="ValidatingControl">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip" Value="{Binding 
+                Path=(Validation.Errors)[0].ErrorContent, 
+                RelativeSource={x:Static RelativeSource.Self}}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <StackPanel x:Name="SettingsPannel">
+        <TextBlock TextWrapping="Wrap">This converter has two supported destinations: PDF and Tiff</TextBlock>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <Border CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+                <Border.ToolTip>
+                    <TextBlock>
+                        Retain will cause any redaction annotations to be burned into the resulting image (if the source is a TIF, and the destination is a PDF or JPEG).
+                        <LineBreak></LineBreak>
+                        If the source and destination are TIFs, then all annotations are retained, if the source is a PDF then there are no annotations to retain.
+                        </TextBlock>
+                </Border.ToolTip>
+                <TextBlock Text="?" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            </Border>
+            <Label Content="Retain" MinWidth="90"></Label>
+            <CheckBox IsChecked="{Binding LeadtoolsModel.Retain}" IsEnabled="{Binding IsEnabled}"></CheckBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Border CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+                <Border.ToolTip>
+                    <TextBlock>
+                        Remove pages will exclude the specified pages from the output. The valid inputs are defined as:
+                        <LineBreak></LineBreak>
+                        A comma separated list. EX: 1,2,3
+                        <LineBreak></LineBreak>
+                        A range of pages denoted with a hyphen. EX: 5-7
+                        <LineBreak></LineBreak>
+                        A dash followed by number (will remove last X pages). EX: -2 (will remove last two pages)
+                    </TextBlock>
+                </Border.ToolTip>
+                <TextBlock Text="?" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            </Border>
+            <Label Content="Remove Pages" MinWidth="90"></Label>
+            <TextBox Text="{Binding LeadtoolsModel.RemovePages, ValidatesOnDataErrors=True}" Width="200px" IsEnabled="{Binding IsEnabled}"></TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Border CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+                <Border.ToolTip>
+                    <TextBlock>
+                        Perspective ID will be used with the /vp argument. This sets the view perspective of the output to a specified value.
+                        <LineBreak></LineBreak>
+                        The valid values are 1-8 (or -1, if not used)
+                    </TextBlock>
+                </Border.ToolTip>
+                <TextBlock Text="?" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            </Border>
+            <Label Content="Perspective ID" MinWidth="90"></Label>
+            <TextBox Text="{Binding LeadtoolsModel.PerspectiveID, ValidatesOnDataErrors=True}" Width="200px" IsEnabled="{Binding IsEnabled}"></TextBox>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

@@ -12,8 +12,12 @@ using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Windows.Forms;
+using Extract.FileConverter;
+using System.Collections.ObjectModel;
+using System.Windows;
+using Application = System.Windows.Forms.Application;
 
-namespace Extract.FileConverter
+namespace Extract.FileActionManager.FileProcessors
 {
     /// <summary>
     /// Interface definition for the <see cref="ConverterFileProcessor"/>.
@@ -30,7 +34,7 @@ namespace Extract.FileConverter
         ILicensedComponent,
         IPersistStream
     {
-        public IList<IConverter> Converters { get; set; }
+        public IList<IConverter> Converters { get; }
 
         public FileFormat DestinationFileFormat { get; set; }
     }
@@ -60,7 +64,7 @@ namespace Extract.FileConverter
         /// </summary>
         const LicenseIdName _LICENSE_ID = LicenseIdName.FileActionManagerObjects;
 
-        public IList<IConverter> Converters { get; set; }
+        public IList<IConverter> Converters { get; } = new Collection<IConverter>();
 
         public FileFormat DestinationFileFormat { get; set; }
 
@@ -136,25 +140,21 @@ namespace Extract.FileConverter
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI51642", _COMPONENT_DESCRIPTION);
                 ConverterSettingsWindow converterSettingsWindow;
 
-                if (this.Converters != null)
-                {
-                    converterSettingsWindow = new ConverterSettingsWindow(this.Converters, this.DestinationFileFormat);
-                }
-                else
-                {
-                    converterSettingsWindow = new ConverterSettingsWindow();
-                }
+                IList<IConverter> clonedConverters = this.Converters.Select(m => m.Clone()).ToList();
+                converterSettingsWindow = new ConverterSettingsWindow(clonedConverters, this.DestinationFileFormat);
 
-                WindowInteropHelper wih = new WindowInteropHelper(converterSettingsWindow)
+                new WindowInteropHelper(converterSettingsWindow)
                 {
                     Owner = Process.GetCurrentProcess().MainWindowHandle
                 };
+                converterSettingsWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
 
                 converterSettingsWindow.ShowDialog();
                 if (converterSettingsWindow.SaveSettings)
                 {
-                    this.Converters = converterSettingsWindow.Converters;
+                    PopulateAndClearConverters(converterSettingsWindow.Converters);
                     this.DestinationFileFormat = converterSettingsWindow.DestinationFileFormat;
+                    this._dirty = true;
                     return true;
                 }
 
@@ -436,7 +436,7 @@ namespace Extract.FileConverter
                         TypeNameHandling = TypeNameHandling.Objects
                     };
 
-                    this.Converters = JsonConvert.DeserializeObject<IList<IConverter>>(reader.ReadString(), settings);
+                    PopulateAndClearConverters(JsonConvert.DeserializeObject<IList<IConverter>>(reader.ReadString(), settings));
 
                     this.DestinationFileFormat = JsonConvert.DeserializeObject<FileFormat>(reader.ReadString(), settings);
                 }
@@ -503,6 +503,15 @@ namespace Extract.FileConverter
 
         #region Private Members
 
+        private void PopulateAndClearConverters(IList<IConverter> converters)
+        {
+            this.Converters.Clear();
+            foreach(var converter in converters)
+            {
+                this.Converters.Add(converter);
+            }
+        }
+
         /// <summary>
         /// Code to be executed upon registration in order to add this class to the
         /// <see cref="ExtractCategories.FileProcessorsGuid"/> COM category.
@@ -533,7 +542,7 @@ namespace Extract.FileConverter
         /// <param name="task">The <see cref="ConverterFileProcessor"/> from which to copy.</param>
         void CopyFrom(ConvertDocumentTask task)
         {
-            this.Converters = task.Converters;
+            PopulateAndClearConverters(task.Converters);
             this.DestinationFileFormat = task.DestinationFileFormat;
             _dirty = true;
         }

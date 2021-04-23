@@ -17,7 +17,7 @@ namespace Extract.FileConverter.Converters
             bool conversionSuccessful = false;
             try
             {
-                foreach(var converter in converters)
+                foreach(var converter in converters.Where(m => m.IsEnabled))
                 {
                     try
                     {
