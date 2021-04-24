@@ -308,11 +308,12 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 
 		// Set up the select query to select the file to change and include and skipped file data
 		// If there is no skipped file record the SkippedActionID will be -1
+		// Use ~ operator to invert the Invisible flag to match isFileInWorkflow(); 1 = in the workflow, 0 = marked deleted
 		string strFileSQL = "SELECT FAMFile.ID as ID, FileName, FileSize, Pages, [FAMFile].Priority, " 
 			"COALESCE(ActionStatus, 'U') AS ActionStatus, "
 			"COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID, "
 			"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID, "
-			"COALESCE(WorkflowFile.Invisible, 0) AS Invisible "
+			"COALESCE(~WorkflowFile.Invisible, -1) AS IsFileInWorkflow "
 			"FROM FAMFile  "
 			"LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID " 
 			"	AND SkippedFile.ActionID = " + strActionId + 
@@ -461,6 +462,9 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			long nSkippedActionID = getLongField(ipFileSetFields, "SkippedActionID");
 			_lastCodePos = "170";
 
+			// Get whether the file is in the workflow and if it is invisible (deleted via the Document Web API)
+			long nIsFileInWorkflow = getLongField(ipFileSetFields, "IsFileInWorkflow");
+
 			// Update the FileActionStatus table appropriately
 			if (easRtn != kActionUnattempted && strNewState != "U")
 			{
@@ -486,15 +490,13 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 					" VALUES (" + asString(nFileID) + ", " + asString(nActionID) + ", '" + strNewState + "', " +
 					asString(ipCurrRecord->Priority) + ")");
 
-				// If the workflow is known then record the file as having been active in this workflow.
-				if (nWorkflowID > 0)
+				// If the workflow is known but the file is not registered in the workflow table
+				// then record the file as having been active in this workflow.
+				if (nWorkflowID > 0 && nIsFileInWorkflow == -1)
 				{
 					executeCmdQuery(ipConnection, Util::Format(
-						"IF NOT EXISTS ( \r\n"
-						"	SELECT * FROM [WorkflowFile] WHERE [WorkflowID] = %d AND [FileID] = %d) \r\n"
-						"BEGIN \r\n"
-						"	INSERT INTO [WorkflowFile] ([WorkflowID], [FileID]) VALUES (%d,%d) \r\n"
-						"END", nWorkflowID, nFileID, nWorkflowID, nFileID));
+						"INSERT INTO [WorkflowFile] ([WorkflowID], [FileID]) VALUES (%d,%d)",
+						nWorkflowID, nFileID));
 				}
 			}
 
@@ -527,10 +529,8 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				}
 				_lastCodePos = "250";
 
-				bool bIsDeleted = getLongField(ipFileSetFields, "Invisible") != 0;
-
 				updateStats(ipConnection, nActionID, easStatsFrom, asEActionStatus(strNewState),
-					ipCurrRecord, ipCurrRecord, bIsDeleted);
+					ipCurrRecord, ipCurrRecord, nIsFileInWorkflow == 0); // 0 = Deleted/Invisible
 
 				_lastCodePos = "260";
 				// Only update FileActionStateTransition table if required
