@@ -1,14 +1,11 @@
 ﻿using Extract.Database;
-using Extract.Utilities;
 using Extract.Testing.Utilities;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
-using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-using System.Collections.Concurrent;
 
 namespace Extract.FileActionManager.Database.Test
 {

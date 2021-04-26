@@ -1,8 +1,5 @@
 ﻿using Extract.Testing.Utilities;
-using Extract.Utilities;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -336,7 +333,7 @@ namespace Extract.FileActionManager.Database.Test
 
                 string[] actions = { _LABDE_ACTION1, _LABDE_ACTION2, _LABDE_ACTION3 };
                 var actualCountsByAction = actions.Select(a => fileProcessingDb.GetStatsAllWorkflows(a, false)).ComputeCountsFromActionStatisticsByAction();
-                CollectionAssert.AreEquivalent(expectedCountsByAction, actualCountsByAction);
+                CollectionAssert.AreEqual(expectedCountsByAction, actualCountsByAction);
 
                 // Separate the expected data. If not deleting then these will be the same as total and empty, respectively
                 ActionStatus[][] expectedVisibleStatus = expectedWorkflowStatuses;
@@ -352,13 +349,13 @@ namespace Extract.FileActionManager.Database.Test
                     var actualVisibleCountsByAction = actions
                         .Select(action => fileProcessingDb.GetVisibleFileStatsAllWorkflows(action, false))
                         .ComputeCountsFromActionStatisticsByAction();
-                    CollectionAssert.AreEquivalent(expectedVisibleCountsByAction, actualVisibleCountsByAction);
+                    CollectionAssert.AreEqual(expectedVisibleCountsByAction, actualVisibleCountsByAction);
 
                     expectedInvisibleStatus = expectedWorkflowStatuses.KeepOnlySpecifiedFile(workflowToDeleteFrom, fileToDelete);
                     var expectedInvisibleCountsByAction = expectedInvisibleStatus.ComputeCountsFromIDsByAction();
 
                     var actualInvisibleCountsByAction = actions.Select(a => fileProcessingDb.GetInvisibleFileStatsAllWorkflows(a, false)).ComputeCountsFromActionStatisticsByAction();
-                    CollectionAssert.AreEquivalent(expectedInvisibleCountsByAction, actualInvisibleCountsByAction);
+                    CollectionAssert.AreEqual(expectedInvisibleCountsByAction, actualInvisibleCountsByAction);
                 }
 
                 // Make workflow 1 active
@@ -429,8 +426,8 @@ namespace Extract.FileActionManager.Database.Test
                     .ToArray()
                     .ComputeCountsFromActionStatisticsByAction();
 
-                CollectionAssert.AreEquivalent(expectedVisibleStats, actualVisibleStats);
-                CollectionAssert.AreEquivalent(expectedInvisibleStats, actualInvisibleStats);
+                CollectionAssert.AreEqual(expectedVisibleStats, actualVisibleStats);
+                CollectionAssert.AreEqual(expectedInvisibleStats, actualInvisibleStats);
 
                 // Compute expected numbers for action 1, all workflows
                 var expectedVisibleAction1Stats = expectedVisibleStatus.ComputeCountsFromIDsByAction()[0];
@@ -467,8 +464,8 @@ namespace Extract.FileActionManager.Database.Test
                     .ToArray()
                     .ComputeCountsFromActionStatisticsByAction();
 
-                CollectionAssert.AreEquivalent(expectedVisibleStats, actualVisibleStats);
-                CollectionAssert.AreEquivalent(expectedInvisibleStats, actualInvisibleStats);
+                CollectionAssert.AreEqual(expectedVisibleStats, actualVisibleStats);
+                CollectionAssert.AreEqual(expectedInvisibleStats, actualInvisibleStats);
 
                 Assert.That(fileProcessingDb.GetFileCount(false) == 3);
 
@@ -530,8 +527,8 @@ namespace Extract.FileActionManager.Database.Test
                     .ToArray()
                     .ComputeCountsFromActionStatisticsByAction();
 
-                CollectionAssert.AreEquivalent(expectedVisibleStats, actualVisibleStats);
-                CollectionAssert.AreEquivalent(expectedInvisibleStats, actualInvisibleStats);
+                CollectionAssert.AreEqual(expectedVisibleStats, actualVisibleStats);
+                CollectionAssert.AreEqual(expectedInvisibleStats, actualInvisibleStats);
 
 
                 // Make all workflows active
@@ -586,10 +583,10 @@ namespace Extract.FileActionManager.Database.Test
                 expectedInvisibleStats = expectedInvisibleStatus.ComputeCountsFromIDsByAction();
 
                 actualVisibleStats = actions.Select(a => fileProcessingDb.GetVisibleFileStatsAllWorkflows(a, false)).ComputeCountsFromActionStatisticsByAction();
-                CollectionAssert.AreEquivalent(expectedVisibleStats, actualVisibleStats);
+                CollectionAssert.AreEqual(expectedVisibleStats, actualVisibleStats);
 
                 actualInvisibleStats = actions.Select(a => fileProcessingDb.GetInvisibleFileStatsAllWorkflows(a, false)).ComputeCountsFromActionStatisticsByAction();
-                CollectionAssert.AreEquivalent(expectedInvisibleStats, actualInvisibleStats);
+                CollectionAssert.AreEqual(expectedInvisibleStats, actualInvisibleStats);
 
                 // Make workflow 1 active
                 fileProcessingDb.ActiveWorkflow = "Workflow1";
@@ -611,8 +608,8 @@ namespace Extract.FileActionManager.Database.Test
                     .ToArray()
                     .ComputeCountsFromActionStatisticsByAction();
 
-                CollectionAssert.AreEquivalent(expectedVisibleStats, actualVisibleStats);
-                CollectionAssert.AreEquivalent(expectedInvisibleStats, actualInvisibleStats);
+                CollectionAssert.AreEqual(expectedVisibleStats, actualVisibleStats);
+                CollectionAssert.AreEqual(expectedInvisibleStats, actualInvisibleStats);
 
                 Assert.AreEqual(2, fileProcessingDb.GetFileCount(false));
 
@@ -636,8 +633,8 @@ namespace Extract.FileActionManager.Database.Test
                     .ToArray()
                     .ComputeCountsFromActionStatisticsByAction();
 
-                CollectionAssert.AreEquivalent(expectedVisibleStats, actualVisibleStats);
-                CollectionAssert.AreEquivalent(expectedInvisibleStats, actualInvisibleStats);
+                CollectionAssert.AreEqual(expectedVisibleStats, actualVisibleStats);
+                CollectionAssert.AreEqual(expectedInvisibleStats, actualInvisibleStats);
 
                 Assert.AreEqual(3, fileProcessingDb.GetFileCount(false));
             }
@@ -1039,167 +1036,5 @@ namespace Extract.FileActionManager.Database.Test
         }
 
         #endregion Test Methods
-
     }
-
-    #region Helper Classes
-
-    // FileIDs for each status
-    class ActionStatus
-    {
-        public int[] P = Array.Empty<int>();
-        public int[] R = Array.Empty<int>();
-        public int[] S = Array.Empty<int>();
-        public int[] C = Array.Empty<int>();
-        public int[] F = Array.Empty<int>();
-
-        public ActionStatus() { }
-
-        ActionStatus(int[][] statuses)
-        {
-            P = statuses[0];
-            R = statuses[1];
-            S = statuses[2];
-            C = statuses[3];
-            F = statuses[4];
-        }
-
-        int[][] statuses => new int[][] { P, R, S, C, F };
-
-        // Create a copy that has specific file IDs filtered out
-        public ActionStatus CopyWithFileFilter(Func<int, bool> fileFilter)
-        {
-            return new ActionStatus(statuses.Select(status => status.Where(fileFilter).ToArray()).ToArray());
-        }
-    }
-
-    // Total counts for each status
-    class ActionStatusCounts : IEquatable<ActionStatusCounts>
-    {
-        public int P;
-        public int R;
-        public int S;
-        public int C;
-        public int F;
-
-        public ActionStatusCounts() { }
-
-        ActionStatusCounts(int[] counts)
-        {
-            P = counts[0];
-            R = counts[1];
-            S = counts[2];
-            C = counts[3];
-            F = counts[4];
-        }
-
-        int[] counts => new int[] { P, R, S, C, F };
-
-        public bool Equals(ActionStatusCounts other)
-        {
-            return
-                P == other.P &&
-                R == other.R &&
-                S == other.S &&
-                C == other.C &&
-                F == other.F;
-        }
-
-        public static ActionStatusCounts operator +(ActionStatusCounts a, ActionStatusCounts b)
-        {
-            return new ActionStatusCounts(a.counts.Zip(b.counts, (a, b) => a + b).ToArray());
-        }
-
-        public override string ToString()
-        {
-            return UtilityMethods.FormatInvariant($"P={P},R={R},S={S},C={C},F={F}");
-        }
-    }
-
-    static class ActionStatusExtensions
-    {
-        static ActionStatus[][] FilterFileFromWorkflow(ActionStatus[][] statuses, int workflowToDeleteFrom, bool keepFilesInOtherWorkflows, Func<int, bool> fileFilter)
-        {
-            return statuses
-                .Select((workflow, i) => (i + 1) == workflowToDeleteFrom
-                    ? workflow.Select(a => a.CopyWithFileFilter(fileFilter)).ToArray()
-                    : keepFilesInOtherWorkflows
-                        ? workflow
-                        : workflow.Select(a => new ActionStatus()).ToArray())
-                .ToArray();
-        }
-
-        public static ActionStatus[][] RemoveFileFromWorkflow(this ActionStatus[][] statuses, int workflowToDeleteFrom, int fileToDelete)
-        {
-            return FilterFileFromWorkflow(statuses, workflowToDeleteFrom, true, fileID => fileID != fileToDelete);
-        }
-
-        public static ActionStatus[][] KeepOnlySpecifiedFile(this ActionStatus[][] statuses, int workflowToDeleteFrom, int fileToKeep)
-        {
-            return FilterFileFromWorkflow(statuses, workflowToDeleteFrom, false, fileID => fileID == fileToKeep);
-        }
-
-        public static ActionStatusCounts ComputeCountsFromIDs(this ActionStatus action)
-        {
-            return new ActionStatusCounts
-            {
-                P = action.P.Length,
-                R = action.R.Length,
-                S = action.S.Length,
-                C = action.C.Length,
-                F = action.F.Length
-            };
-        }
-
-        public static ActionStatusCounts ComputeCountsFromIDs(this ActionStatus[] workflows)
-        {
-            return workflows.Select(ComputeCountsFromIDs).Aggregate((acc, x) => acc + x);
-        }
-
-        public static ActionStatusCounts[] ComputeCountsFromIDsByAction(this ActionStatus[] actions)
-        {
-            return actions.Select(ComputeCountsFromIDs).ToArray();
-        }
-
-        // Require each array to have the same length (each 'workflow' has every action represented)
-        public static ActionStatusCounts[] ComputeCountsFromIDsByAction(this ActionStatus[][] workflows)
-        {
-            int numWorkflows = workflows.Length;
-            int numActions = workflows[0].Length;
-
-            foreach (var workflow in workflows)
-            {
-                Assert.AreEqual(numActions, workflow.Length);
-            }
-
-            // Transpose the matrix to sum by action
-            ActionStatus[][] actions = new ActionStatus[numActions][];
-            for (int i = 0; i < numActions; i++)
-            {
-                actions[i] = new ActionStatus[numWorkflows];
-                for (int j = 0; j < numWorkflows; j++)
-                {
-                    actions[i][j] = workflows[j][i];
-                }
-            }
-            return actions.Select(ComputeCountsFromIDs).ToArray();
-        }
-
-        public static ActionStatusCounts ComputeCountsFromActionStatistics(this ActionStatistics stats)
-        {
-            var p = stats.NumDocumentsPending;
-            var s = stats.NumDocumentsSkipped;
-            var c = stats.NumDocumentsComplete;
-            var f = stats.NumDocumentsFailed;
-            var r = stats.NumDocuments - p - s - c - f;
-            return new ActionStatusCounts { P = p, R = r, S = s, C = c, F = f };
-        }
-
-        public static ActionStatusCounts[] ComputeCountsFromActionStatisticsByAction(this IEnumerable<ActionStatistics> actions)
-        {
-            return actions.Select(ComputeCountsFromActionStatistics).ToArray();
-        }
-    }
-
-    #endregion
 }
