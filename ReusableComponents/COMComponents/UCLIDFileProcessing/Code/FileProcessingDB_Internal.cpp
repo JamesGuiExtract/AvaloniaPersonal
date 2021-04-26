@@ -284,6 +284,11 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 		{
 			nWorkflowID = getWorkflowID(ipConnection, nActionID);
 		}
+		// Else get the active Workflow ID if there is one so that the join to the workflow file table will work correctly
+		else if (nWorkflowID <= 0)
+		{
+			nWorkflowID = getActiveWorkflowID(ipConnection);
+		}
 
 		// Update action ID/Action name
 		if (!strAction.empty() && nActionID == -1)
