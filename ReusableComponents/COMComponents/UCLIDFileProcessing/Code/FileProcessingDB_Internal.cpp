@@ -206,14 +206,9 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				}
 				strFileIdList += asString(data.FileID);
 
-				bool bIsDeleted =
-					nWorkflowID <= 0
-					? false
-					: isFileInWorkflow(ipConnection, data.FileID, nWorkflowID) == 0; // 0 = deleted
-
 				// Update the stats				
 				updateStats(ipConnection, nActionID, data.FromStatus, eaTo, data.FileRecord,
-					data.FileRecord, bIsDeleted);
+					data.FileRecord, data.IsFileDeleted);
 			}
 			strFileIdList += ")";
 			
@@ -7484,12 +7479,12 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 	ipFileRecord->Name = "";
 	ipFileRecord->FileID = 0;
 
-	string strWorkflow = getActiveWorkflow();
+	long nWorkflowID = getActiveWorkflowID(ipConnection);
 	bool bFromSpecified = !strFromAction.empty();
 	long nToActionID = 
-		strWorkflow.empty() 
+		nWorkflowID <= 0
 		? getActionID(ipConnection, strToAction)
-		: getActionIDNoThrow(ipConnection, strToAction, strWorkflow);
+		: getActionIDNoThrow(ipConnection, strToAction, nWorkflowID);
 	long nFromActionID = bFromSpecified
 		? getActionID(ipConnection, strFromAction)
 		: 0;
@@ -7508,28 +7503,34 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 	// Action id to change
 	string strToActionID = asString(nToActionID);
 
+	string strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, \r\n";
+
+	if (nWorkflowID > 0)
+	{
+		strSelectQuery += "[FAMFile].[ID], COALESCE(~[WorkflowFile].[Invisible], -1) AS IsFileInWorkflow, \r\n";
+	}
+
 	// Loop through the file Ids to change in groups of 10000 populating the SetFileActionData
 	size_t count = vecFileIds.size();
 	size_t i = 0;
-	string strSelectQuery;
 	if (!bFromSpecified)
 	{
-		strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
-			"COALESCE (ToFAS.Priority, FAMFile.Priority) AS Priority, "
-			"COALESCE (ToFAS.ActionStatus, 'U') AS ToActionStatus "
-			"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
-			"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID;
+		strSelectQuery += "COALESCE (ToFAS.Priority, FAMFile.Priority) AS Priority, \r\n"
+			"COALESCE (ToFAS.ActionStatus, 'U') AS ToActionStatus \r\n"
+			"FROM FAMFile \r\n"
+			"LEFT JOIN FileActionStatus as ToFAS ON FAMFile.ID = ToFAS.FileID \r\n"
+			"	AND ToFAS.ActionID = " + strToActionID + "\r\n";
 	}
 	else
 	{
-		strSelectQuery = "SELECT FAMFile.ID, FileName, FileSize, Pages, "
-			"COALESCE(ToFAS.Priority, FAMFile.Priority) AS Priority, "
-			"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus, "
-			"COALESCE(FromFAS.ActionStatus, 'U') AS FromActionStatus "
-			"FROM FAMFile LEFT JOIN FileActionStatus as ToFAS "
-			"ON FAMFile.ID = ToFAS.FileID AND ToFAS.ActionID = " + strToActionID +
-			" LEFT JOIN FileActionStatus as FromFAS WITH (NOLOCK) ON FAMFile.ID = FromFAS.FileID AND "
-			"FromFAS.ActionID = " + asString(nFromActionID);
+		strSelectQuery += "COALESCE(ToFAS.Priority, FAMFile.Priority) AS Priority, \r\n"
+			"COALESCE(ToFAS.ActionStatus, 'U') AS ToActionStatus, \r\n"
+			"COALESCE(FromFAS.ActionStatus, 'U') AS FromActionStatus \r\n"
+			"FROM FAMFile \r\n"
+			"LEFT JOIN FileActionStatus as ToFAS ON FAMFile.ID = ToFAS.FileID \r\n"
+			"	AND ToFAS.ActionID = " + strToActionID + "\r\n"
+			"LEFT JOIN FileActionStatus as FromFAS WITH (NOLOCK) ON FAMFile.ID = FromFAS.FileID \r\n"
+			"	AND FromFAS.ActionID = " + asString(nFromActionID) + "\r\n";
 	}
 
 	if (count > 0 && nToActionID == -1)
@@ -7537,15 +7538,21 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 		// WARNING: This ELI code is referenced by ModifyActionStatusForSelection_Internal. Do not change.
 		UCLIDException ue("ELI51514", Util::Format(
 			"Cannot set %d file(s) in workflow \"%s\"; action \"%s\" does not exist.",
-			count, strWorkflow.c_str(), strToAction.c_str()));
+			count, getActiveWorkflow().c_str(), strToAction.c_str()));
 		throw ue;
+	}
+
+	if (nWorkflowID > 0)
+	{
+		strSelectQuery += "\r\nLEFT JOIN [WorkflowFile] ON [FAMFile].[ID] = [WorkflowFile].[FileID] "
+			"AND [WorkflowID] = " + asString(nWorkflowID) + "\r\n";
 	}
 
 	while (i < count)
 	{
 		map<string, vector<SetFileActionData>> mapFromStatusToId;
 
-		string strQuery = strSelectQuery + " WHERE FAMFile.ID IN (";
+		string strQuery = strSelectQuery + "WHERE FAMFile.ID IN (";
 		string strFileIds = asString(vecFileIds[i++]);
 		for (int j = 1; i < count && j < 10000; j++)
 		{
@@ -7553,6 +7560,7 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 		}
 		strQuery += strFileIds;
 		strQuery += ")";
+
 		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
@@ -7571,8 +7579,12 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 				strNewStatus = getStringField(ipFields, "FromActionStatus");
 			}
 
+			bool isFileDeleted = (nWorkflowID > 0)
+				? (getLongField(ipFields, "IsFileInWorkflow") == 0) // 0 = deleted
+				: false;
+
 			mapFromStatusToId[strNewStatus].push_back(SetFileActionData(nFileID,
-				getFileRecordFromFields(ipFields, false), oldStatus));
+				getFileRecordFromFields(ipFields, false), oldStatus, isFileDeleted));
 
 			ipFileSet->MoveNext();
 		}

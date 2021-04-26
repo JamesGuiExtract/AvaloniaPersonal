@@ -402,10 +402,11 @@ private:
 	{
 	public:
 		SetFileActionData(long fileId, UCLID_FILEPROCESSINGLib::IFileRecordPtr ipRecord,
-			EActionStatus eaFromStatus)
+			EActionStatus eaFromStatus, bool isFileDeleted)
 			: FileID(fileId),
 			FileRecord(ipRecord),
-			FromStatus(eaFromStatus)
+			FromStatus(eaFromStatus),
+			IsFileDeleted(isFileDeleted)
 		{
 		}
 		~SetFileActionData()
@@ -419,6 +420,7 @@ private:
 
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr FileRecord;
 		long FileID;
+		bool IsFileDeleted; // Indicates whether the file has been marked invisible in the active workflow
 		EActionStatus FromStatus;
 	};
 
