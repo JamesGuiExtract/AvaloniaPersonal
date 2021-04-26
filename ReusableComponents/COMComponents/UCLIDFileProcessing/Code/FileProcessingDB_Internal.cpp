@@ -1649,7 +1649,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_FAMUSER_WITH_TIMESTAMP_INDEX);
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_STATUS_ALL_INDEX);
-		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX);
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_INDEX);
 		vecQueries.push_back(gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX);
 		vecQueries.push_back(gstrCREATE_WORK_ITEM_GROUP_FAM_SESSION_INDEX);
 		vecQueries.push_back(gstrCREATE_WORK_ITEM_STATUS_INDEX);

@@ -565,10 +565,11 @@ static const string gstrCREATE_ACTIONSTATUS_PRIORITY_FILE_ACTIONID_INDEX =
 	"	[ActionID] ASC"
 	")";
 
-static const string gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX =
-	"CREATE UNIQUE NONCLUSTERED INDEX "
-	"[IX_ActionStatisticsDeltaActionID_ID] ON [dbo].[ActionStatisticsDelta] "
-	"([ActionID] ASC, [ID] ASC)";
+static const string gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_INDEX =
+	"CREATE NONCLUSTERED INDEX "
+	"[IX_ActionStatisticsDeltaActionID] ON [dbo].[ActionStatisticsDelta] "
+	"([ActionID] ASC) "
+	"INCLUDE ([ID], [Invisible], [NumDocuments], [NumDocumentsPending], [NumDocumentsComplete], [NumDocumentsFailed], [NumDocumentsSkipped], [NumPages], [NumPagesPending], [NumPagesComplete], [NumPagesFailed], [NumPagesSkipped], [NumBytes], [NumBytesPending], [NumBytesComplete], [NumBytesFailed], [NumBytesSkipped])";
 
 static const string gstrCREATE_QUEUED_ACTION_STATUS_CHANGE_INDEX =
 	"CREATE NONCLUSTERED INDEX "

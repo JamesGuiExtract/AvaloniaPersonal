@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 193;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 194;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3072,6 +3072,37 @@ int UpdateToSchemaVersion193(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51660");
+}
+// -------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion194(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 194;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// IX_ActionStatisticsDeltaActionID_ID has been updated to account for the Invisible column
+		// and, thus, limit potential performance regressions related to:
+		// https://extract.atlassian.net/browse/ISSUE-15744
+		// https://extract.atlassian.net/browse/ISSUE-16044
+		vecQueries.push_back("DROP INDEX [ActionStatisticsDelta].[IX_ActionStatisticsDeltaActionID_ID]");
+		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_INDEX);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51681");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -8176,7 +8207,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 190:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion191);
 				case 191:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion192);
 				case 192:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion193);
-				case 193:
+				case 193:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion194);
+				case 194:
 					break;
 
 				default:

@@ -362,6 +362,11 @@ static const string gstrCREATE_ACTIONSTATUS_ACTIONID_PRIORITY_FILE_INDEX_188 =
 "	[FileID] ASC "
 ")";
 
+static const string gstrCREATE_ACTION_STATISTICS_DELTA_ACTIONID_ID_INDEX =
+"CREATE UNIQUE NONCLUSTERED INDEX "
+"[IX_ActionStatisticsDeltaActionID_ID] ON [dbo].[ActionStatisticsDelta] "
+"([ActionID] ASC, [ID] ASC)";
+
 // used for schema version 102 to 191
 static const string gstrCREATE_ACTION_STATISTICS_TABLE_102 = "CREATE TABLE [dbo].[ActionStatistics]("
 	"[ActionID] [int] NOT NULL CONSTRAINT [PK_Statistics] PRIMARY KEY CLUSTERED,"
