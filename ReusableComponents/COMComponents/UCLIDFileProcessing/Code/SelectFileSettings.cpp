@@ -13,7 +13,8 @@ m_bLimitToSubset(false),
 m_bSubsetIsRandom(true),
 m_bTopSubset(true),
 m_bSubsetUsePercentage(true),
-m_nSubsetSize(0)
+m_nSubsetSize(0),
+m_nOffset(-1)
 {
 }
 //--------------------------------------------------------------------------------------------------
@@ -42,6 +43,7 @@ SelectFileSettings& SelectFileSettings::operator =(const SelectFileSettings &sou
 	m_bTopSubset = source.m_bTopSubset;
 	m_bSubsetUsePercentage = source.m_bSubsetUsePercentage;
 	m_nSubsetSize = source.m_nSubsetSize;
+	m_nOffset = source.m_nOffset;
 
 	// Delete any existing conditions.
 	clearConditions();
