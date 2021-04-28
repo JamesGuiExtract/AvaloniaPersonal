@@ -211,8 +211,9 @@ namespace Extract.FileActionManager.Database.Test
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
-                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                int numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
                     _LABDE_ACTION3, EActionStatus.kActionPending, "", false);
+                Assert.AreEqual(1, numModified);
 
                 // Updated statuses
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -227,8 +228,9 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.Reset();
                 fileSelector.AddQueryCondition(
                     "SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
-                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
                     _LABDE_ACTION2, EActionStatus.kActionSkipped, "", false);
+                Assert.AreEqual(2, numModified);
 
                 // Updated statuses
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -369,8 +371,9 @@ namespace Extract.FileActionManager.Database.Test
 
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
-                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                int numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
                     _LABDE_ACTION1, EActionStatus.kActionUnattempted, "", false);
+                Assert.AreEqual(2, numModified);
 
                 // Statuses after ModifyActionStatusForSelection in Workflow 1
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -472,8 +475,9 @@ namespace Extract.FileActionManager.Database.Test
                 fileSelector.Reset();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] " +
                     "   INNER JOIN [FileActionStatus] ON [FileID] = [FAMFile].[ID] AND [ActionStatus] = 'F'");
-                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
                     _LABDE_ACTION3, EActionStatus.kActionPending, "", false);
+                Assert.AreEqual(1, numModified);
 
                 // Statuses after ModifyActionStatusForSelection in Workflow 2
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -536,8 +540,9 @@ namespace Extract.FileActionManager.Database.Test
 
                 fileSelector.Reset();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile] WHERE [ID] = 2 OR [ID] = 3");
-                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
                     _LABDE_ACTION2, EActionStatus.kActionSkipped, "", false);
+                Assert.AreEqual(3, numModified);
 
                 // Statuses after ModifyActionStatusForSelection for all workflows
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -705,8 +710,9 @@ namespace Extract.FileActionManager.Database.Test
                 var fileSelector = new FAMFileSelector();
                 fileSelector.AddQueryCondition("SELECT [FAMFile].[ID] FROM [FAMFile]");
 
-                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                int numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
                     _LABDE_ACTION2, EActionStatus.kActionPending, "", vbModifyWhenTargetActionMissingForSomeFiles: false);
+                Assert.AreEqual(3, numModified);
 
                 // After setting Action 2 to pending for all workflows
                 //            |  P  |  R  |  S  |  C  |  F 
@@ -729,8 +735,9 @@ namespace Extract.FileActionManager.Database.Test
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsPending == 0);
 
                 // Retry, but allow Action 3 to be set for Workflow 2
-                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
                     _LABDE_ACTION3, EActionStatus.kActionPending, "", vbModifyWhenTargetActionMissingForSomeFiles: true);
+                Assert.AreEqual(1, numModified);
 
 
                 // After setting Action 3 to pending for all workflows
@@ -757,8 +764,9 @@ namespace Extract.FileActionManager.Database.Test
 
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 0);
 
-                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
                     _LABDE_ACTION3, EActionStatus.kActionSkipped, "", vbModifyWhenTargetActionMissingForSomeFiles: true);
+                Assert.AreEqual(0, numModified);
 
                 Assert.That(fileProcessingDb.GetStatsAllWorkflows(_LABDE_ACTION3, false).NumDocumentsSkipped == 0);
 
@@ -768,8 +776,9 @@ namespace Extract.FileActionManager.Database.Test
                     "WHERE [WorkflowID] = " + workflowID2.ToString(CultureInfo.InvariantCulture));
 
                 // No error even though Action 3 doesn't exist in Workflow 1 because no selected files from Workflow 1
-                fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
+                numModified = fileProcessingDb.ModifyActionStatusForSelection(fileSelector,
                     _LABDE_ACTION3, EActionStatus.kActionSkipped, "", vbModifyWhenTargetActionMissingForSomeFiles: false);
+                Assert.AreEqual(1, numModified);
 
                 // After setting Action 3 to skipped for all files in Workflow 2
                 //            |  P  |  R  |  S  |  C  |  F 

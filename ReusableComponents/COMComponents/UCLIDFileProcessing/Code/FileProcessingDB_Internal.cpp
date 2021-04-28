@@ -7600,9 +7600,8 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 			it != mapFromStatusToId.end(); it++)
 		{
 			setFileActionState(ipConnection, it->second, strToAction, it->first);
+			nNumRecordsModified += it->second.size();
 		}
-
-		nNumRecordsModified += mapFromStatusToId.size();
 	}
 }
 //-------------------------------------------------------------------------------------------------
