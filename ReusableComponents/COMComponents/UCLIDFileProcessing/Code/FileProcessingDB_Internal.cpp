@@ -7512,7 +7512,7 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 
 	if (nWorkflowID > 0)
 	{
-		strSelectQuery += "[FAMFile].[ID], COALESCE(~[WorkflowFile].[Invisible], -1) AS IsFileInWorkflow, \r\n";
+		strSelectQuery += "COALESCE(~[WorkflowFile].[Invisible], -1) AS IsFileInWorkflow, \r\n";
 	}
 
 	// Loop through the file Ids to change in groups of 10000 populating the SetFileActionData

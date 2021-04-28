@@ -174,7 +174,7 @@
             this._tabControlSettings.Location = new System.Drawing.Point(13, 13);
             this._tabControlSettings.Name = "_tabControlSettings";
             this._tabControlSettings.SelectedIndex = 0;
-            this._tabControlSettings.Size = new System.Drawing.Size(466, 337);
+            this._tabControlSettings.Size = new System.Drawing.Size(466, 357);
             this._tabControlSettings.TabIndex = 0;
             this._tabControlSettings.SelectedIndexChanged += new System.EventHandler(this.HandleTabControl_SelectedIndexChanged);
             // 
@@ -200,7 +200,7 @@
             this._tabGeneral.Location = new System.Drawing.Point(4, 22);
             this._tabGeneral.Name = "_tabGeneral";
             this._tabGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this._tabGeneral.Size = new System.Drawing.Size(458, 311);
+            this._tabGeneral.Size = new System.Drawing.Size(458, 331);
             this._tabGeneral.TabIndex = 0;
             this._tabGeneral.Text = "General";
             this._tabGeneral.ToolTipText = "General FAM database settings";
@@ -343,7 +343,7 @@
             this._tabHistory.Location = new System.Drawing.Point(4, 22);
             this._tabHistory.Name = "_tabHistory";
             this._tabHistory.Padding = new System.Windows.Forms.Padding(3);
-            this._tabHistory.Size = new System.Drawing.Size(458, 325);
+            this._tabHistory.Size = new System.Drawing.Size(458, 331);
             this._tabHistory.TabIndex = 4;
             this._tabHistory.Text = "History";
             this._tabHistory.ToolTipText = "FAM history settings";
@@ -421,7 +421,7 @@
             this._tabSecurity.Location = new System.Drawing.Point(4, 22);
             this._tabSecurity.Name = "_tabSecurity";
             this._tabSecurity.Padding = new System.Windows.Forms.Padding(3);
-            this._tabSecurity.Size = new System.Drawing.Size(458, 325);
+            this._tabSecurity.Size = new System.Drawing.Size(458, 331);
             this._tabSecurity.TabIndex = 1;
             this._tabSecurity.Text = "Security";
             this._tabSecurity.ToolTipText = "FAM security settings";
@@ -497,7 +497,7 @@
             this._tabProductSpecific.Controls.Add(this._productSpecificLayout);
             this._tabProductSpecific.Location = new System.Drawing.Point(4, 22);
             this._tabProductSpecific.Name = "_tabProductSpecific";
-            this._tabProductSpecific.Size = new System.Drawing.Size(458, 325);
+            this._tabProductSpecific.Size = new System.Drawing.Size(458, 331);
             this._tabProductSpecific.TabIndex = 5;
             this._tabProductSpecific.Text = "Product Specific";
             this._tabProductSpecific.ToolTipText = "Product specific settings";
@@ -510,7 +510,7 @@
             this._productSpecificLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this._productSpecificLayout.Location = new System.Drawing.Point(0, 0);
             this._productSpecificLayout.Name = "_productSpecificLayout";
-            this._productSpecificLayout.Size = new System.Drawing.Size(458, 325);
+            this._productSpecificLayout.Size = new System.Drawing.Size(458, 331);
             this._productSpecificLayout.TabIndex = 1;
             // 
             // _groupDataEntry
@@ -539,7 +539,7 @@
             this._tabEmail.Location = new System.Drawing.Point(4, 22);
             this._tabEmail.Name = "_tabEmail";
             this._tabEmail.Padding = new System.Windows.Forms.Padding(3);
-            this._tabEmail.Size = new System.Drawing.Size(458, 325);
+            this._tabEmail.Size = new System.Drawing.Size(458, 331);
             this._tabEmail.TabIndex = 6;
             this._tabEmail.Text = "Email";
             this._tabEmail.UseVisualStyleBackColor = true;
@@ -561,7 +561,7 @@
             this.tabDashboard.Location = new System.Drawing.Point(4, 22);
             this.tabDashboard.Name = "tabDashboard";
             this.tabDashboard.Padding = new System.Windows.Forms.Padding(3);
-            this.tabDashboard.Size = new System.Drawing.Size(458, 325);
+            this.tabDashboard.Size = new System.Drawing.Size(458, 331);
             this.tabDashboard.TabIndex = 7;
             this.tabDashboard.Text = "Dashboard";
             this.tabDashboard.UseVisualStyleBackColor = true;
@@ -608,7 +608,7 @@
             // 
             this._buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._buttonCancel.Location = new System.Drawing.Point(404, 383);
+            this._buttonCancel.Location = new System.Drawing.Point(404, 393);
             this._buttonCancel.Name = "_buttonCancel";
             this._buttonCancel.Size = new System.Drawing.Size(75, 23);
             this._buttonCancel.TabIndex = 3;
@@ -618,7 +618,7 @@
             // _buttonOK
             // 
             this._buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonOK.Location = new System.Drawing.Point(323, 383);
+            this._buttonOK.Location = new System.Drawing.Point(323, 393);
             this._buttonOK.Name = "_buttonOK";
             this._buttonOK.Size = new System.Drawing.Size(75, 23);
             this._buttonOK.TabIndex = 2;
@@ -629,7 +629,7 @@
             // _buttonRefresh
             // 
             this._buttonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonRefresh.Location = new System.Drawing.Point(242, 383);
+            this._buttonRefresh.Location = new System.Drawing.Point(242, 393);
             this._buttonRefresh.Name = "_buttonRefresh";
             this._buttonRefresh.Size = new System.Drawing.Size(75, 23);
             this._buttonRefresh.TabIndex = 1;
@@ -640,7 +640,7 @@
             // _emailTestButton
             // 
             this._emailTestButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this._emailTestButton.Location = new System.Drawing.Point(132, 383);
+            this._emailTestButton.Location = new System.Drawing.Point(132, 393);
             this._emailTestButton.Name = "_emailTestButton";
             this._emailTestButton.Size = new System.Drawing.Size(104, 23);
             this._emailTestButton.TabIndex = 4;
@@ -651,9 +651,10 @@
             // 
             // label10
             // 
+            this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label10.AutoSize = true;
             this.label10.ForeColor = System.Drawing.Color.Red;
-            this.label10.Location = new System.Drawing.Point(14, 353);
+            this.label10.Location = new System.Drawing.Point(14, 373);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(367, 13);
             this.label10.TabIndex = 5;
@@ -662,7 +663,7 @@
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(491, 418);
+            this.ClientSize = new System.Drawing.Size(491, 428);
             this.Controls.Add(this.label10);
             this.Controls.Add(this._emailTestButton);
             this.Controls.Add(this._buttonRefresh);
