@@ -1,0 +1,94 @@
+{
+  "Type": "RuleSet",
+  "Object": {
+    "SavedWithSoftwareVersion": "1.0.0.0",
+    "Comments": "",
+    "Counters": [],
+    "FKBVersion": "",
+    "ForInternalUseOnly": true,
+    "IsSwipingRule": false,
+    "OCRParameters": [],
+    "RunMode": "RunPerDocument",
+    "InsertAttributesUnderParent": false,
+    "InsertParentName": "",
+    "InsertParentValue": "",
+    "DeepCopyInput": false,
+    "GlobalDocPreprocessor": {
+      "Type": "FSharpPreprocessorV2",
+      "Description": "setStatusForFile_SingleFileVersion<FSharp preprocessor>",
+      "Enabled": true,
+      "Object": {
+        "ScriptPath": "<RSDFileDir>\\Preprocessor.fsx",
+        "FunctionName": "setStatusForFile_SingleFileVersion",
+        "Collectible": true
+      }
+    },
+    "IgnorePreprocessorErrors": false,
+    "AttributeNameToInfoMap": {
+      "_": {
+        "AttributeRules": [
+          {
+            "Enabled": true,
+            "Description": "Input finder",
+            "IgnorePreprocessorErrors": false,
+            "RuleSpecificDocPreprocessor": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "AttributeFindingRule": {
+              "Type": "InputFinder",
+              "Object": "InputFinder"
+            },
+            "IgnoreErrors": false,
+            "AttributeModifiers": {
+              "Enabled": false,
+              "ObjectsVector": []
+            },
+            "IgnoreModifierErrors": false,
+            "RuleSpecificOutputHandler": {
+              "Type": null,
+              "Description": "",
+              "Enabled": true,
+              "Object": null
+            },
+            "IgnoreOutputHandlerErrors": false
+          }
+        ],
+        "AttributeSplitter": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "IgnoreAttributeSplitterErrors": false,
+        "InputValidator": {
+          "Type": null,
+          "Description": "",
+          "Enabled": true,
+          "Object": null
+        },
+        "StopSearchingWhenValueFound": false
+      }
+    },
+    "GlobalOutputHandler": {
+      "Type": "MoveAndModifyAttributes",
+      "Description": "Promote subattributes<Move and modify attributes>",
+      "Enabled": true,
+      "Object": {
+        "AddAttributeNameToType": false,
+        "AddRootOrParentAttributeType": false,
+        "AddSpecifiedAttributeType": false,
+        "AttributeQuery": "*/*",
+        "DeleteRootOrParentIfAllChildrenMoved": true,
+        "MoveAttributeLevel": "MoveToRoot",
+        "OverwriteAttributeName": "DoNotOverwrite",
+        "RetainAttributeType": true,
+        "SpecifiedAttributeName": "",
+        "SpecifiedAttributeType": ""
+      }
+    },
+    "IgnoreOutputHandlerErrors": false
+  }
+}

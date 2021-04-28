@@ -15,11 +15,11 @@
     "DeepCopyInput": false,
     "GlobalDocPreprocessor": {
       "Type": "FSharpPreprocessorV2",
-      "Description": "<FSharp preprocessor>",
+      "Description": "setStatusForFile_MultipleFileVersion<FSharp preprocessor>",
       "Enabled": true,
       "Object": {
         "ScriptPath": "<RSDFileDir>\\Preprocessor.fsx",
-        "FunctionName": "runTest",
+        "FunctionName": "setStatusForFile_MultipleFileVersion",
         "Collectible": true
       }
     },
@@ -73,10 +73,21 @@
       }
     },
     "GlobalOutputHandler": {
-      "Type": null,
-      "Description": "",
+      "Type": "MoveAndModifyAttributes",
+      "Description": "Promote subattributes<Move and modify attributes>",
       "Enabled": true,
-      "Object": null
+      "Object": {
+        "AddAttributeNameToType": false,
+        "AddRootOrParentAttributeType": false,
+        "AddSpecifiedAttributeType": false,
+        "AttributeQuery": "*/*",
+        "DeleteRootOrParentIfAllChildrenMoved": true,
+        "MoveAttributeLevel": "MoveToRoot",
+        "OverwriteAttributeName": "DoNotOverwrite",
+        "RetainAttributeType": true,
+        "SpecifiedAttributeName": "",
+        "SpecifiedAttributeType": ""
+      }
     },
     "IgnoreOutputHandlerErrors": false
   }
