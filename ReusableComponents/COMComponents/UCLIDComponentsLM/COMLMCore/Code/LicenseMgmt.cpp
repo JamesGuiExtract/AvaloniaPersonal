@@ -55,9 +55,6 @@ bool LicenseManagement::m_bDoNotCheckTempLicenseYet = false;
 LMData LicenseManagement::m_LicenseData;
 map<unsigned long, int> LicenseManagement::m_mapIdToDayLicensed;
 map<unsigned long, bool> LicenseManagement::m_mapIdToLicensed;
-Win32Event LicenseManagement::m_licenseStateIsInvalidEvent;
-unique_ptr<CMutex> LicenseManagement::m_upTrpRunning(__nullptr);
-unique_ptr<CMutex> LicenseManagement::m_upValidState(getGlobalNamedMutex(gpszGoodStateMutex));
 volatile bool LicenseManagement::m_initializedHighMemoryMode = false;
 long LicenseManagement::m_nRegisteredObjectCount = 0;
 
@@ -218,10 +215,6 @@ void LicenseManagement::initializeLicenseFromFile(const std::string& strLicenseF
 		}
 		m_lOEMPassword = lOEMPassword;
 
-		if (!m_bDoNotCheckTempLicenseYet)
-		{
-			startOrCloseTrpBasedOnLicenseData();
-		}
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI10682");
 }
@@ -457,7 +450,6 @@ void LicenseManagement::loadLicenseFilesFromFolder(std::string strDirectory,
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI03904")
 	}
 	m_bDoNotCheckTempLicenseYet = false;
-	startOrCloseTrpBasedOnLicenseData();
 
 	// Set the files loaded from folder flag to true
 	m_bFilesLoadedFromFolder = true;
@@ -730,62 +722,6 @@ void LicenseManagement::registerObject(long objectCode)
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-void LicenseManagement::createTRPObject()
-{
-	try
-	{
-		// Check for TRP already running
-		if (m_upTrpRunning.get() == __nullptr)
-		{
-			// Lock around TRP initialization
-			CSingleLock guard(&m_lock, TRUE);
-
-			if (m_upTrpRunning.get() == __nullptr)
-			{
-				m_upTrpRunning.reset(getGlobalNamedMutex(gpszTrpRunning));
-				ASSERT_RESOURCE_ALLOCATION("ELI32536", m_upTrpRunning.get() != __nullptr);
-
-				// Compute the path to the EXE
-				string strEXEPath = getModuleDirectory(COMLMCoreDLL.hModule);
-				strEXEPath += "\\";
-				strEXEPath += gstrTRP_EXE_NAME.c_str();
-
-				// Launch the exe and sleep for a second to let it initialize
-				runEXE(strEXEPath);
-				Sleep(1000);
-			}
-		}
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32448");
-}
-//-------------------------------------------------------------------------------------------------
-void LicenseManagement::closeTRPObject()
-{
-	try
-	{
-		// Check for TRP already launched
-		if (m_upTrpRunning.get() != __nullptr)
-		{
-			// Lock around TRP initialization
-			CSingleLock guard(&m_lock, TRUE);
-
-			if (m_upTrpRunning.get() != __nullptr)
-			{
-				// Compute the path to the EXE
-				string strEXEPath = getModuleDirectory(COMLMCoreDLL.hModule);
-				strEXEPath += "\\";
-				strEXEPath += gstrTRP_EXE_NAME.c_str();
-
-				// Run the EXE with the exit flag
-				runEXE(strEXEPath, "/exit");
-
-				m_upTrpRunning.reset(__nullptr);
-			}
-		}
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32538");
-}
-//-------------------------------------------------------------------------------------------------
 void LicenseManagement::updateLicenseData( LMData& rData )
 {
 	// Check through each component ID in rData
@@ -851,28 +787,6 @@ void LicenseManagement::validateState()
 {
 	try
 	{
-		// If the time rollback preventer has been initialized, then check its state
-		if (m_upTrpRunning.get() != __nullptr)
-		{
-			CSingleLock (&m_lock, TRUE);
-
-			if (m_upTrpRunning.get() != __nullptr)
-			{
-				// Check that both TRP is running and the valid handle is set
-				CSingleLock lRunning(m_upTrpRunning.get(), FALSE);
-				CSingleLock lValid(m_upValidState.get(), FALSE);
-
-				if (lRunning.Lock(0) == TRUE)
-				{
-					throw UCLIDException("ELI13089", "Extract Systems license state has been corrupted!");
-				}
-				else if (lValid.Lock(0) == TRUE)
-				{
-					throw UCLIDException("ELI35323", "Extract Systems license state has been corrupted!");
-				}
-			}
-		}
-
 		if (m_nRegisteredObjectCount != getRegisteredObjectCount())
 		{
 			throw UCLIDException("ELI38726", "Registration corrupted");
@@ -952,21 +866,6 @@ vector<pair<string, CTime>> LicenseManagement::internalGetLicensedPackageNames()
 	// so go ahead and check the package names
 
 	return m_LicenseData.getLicensedPackageNames();
-}
-//-------------------------------------------------------------------------------------------------
-void LicenseManagement::startOrCloseTrpBasedOnLicenseData()
-{
-	// Now check if we have any expiring components and launch TRP if necessary
-	if (m_LicenseData.containsExpiringComponent())
-	{
-		// Create call does nothing if TRP is already running
-		createTRPObject();
-	}
-	// If no expiring components then close TRP if it is running
-	else if (m_upTrpRunning.get() != __nullptr)
-	{
-		closeTRPObject();
-	}
 }
 //-------------------------------------------------------------------------------------------------
 void LicenseManagement::validateAnnotationLicense()

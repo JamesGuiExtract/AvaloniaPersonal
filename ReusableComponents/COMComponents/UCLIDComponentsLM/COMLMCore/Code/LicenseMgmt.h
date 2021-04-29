@@ -285,9 +285,6 @@ private:
     // Methods
     //////////
 
-    // Create the TRP object.  Will throw exception if unsuccessful.
-    static void createTRPObject();
-	static void closeTRPObject();
 
 	static bool m_bDoNotCheckTempLicenseYet;
 
@@ -328,10 +325,6 @@ private:
     // packages expire or 0 for permanently licensed packages.
     static vector<pair<string, CTime>> internalGetLicensedPackageNames();
 
-	// Will either start or stop the TRP service based on whether the current license
-	// data contains an expiring component
-	static void startOrCloseTrpBasedOnLicenseData();
-
 	// Checks to see if high memory test mode should be activated for this processes if specified
 	// by HKLM\SOFTWARE\[Wow6432Node]\Extract Systems\ReusableComponents\BaseUtils\HighMemoryTestMode
 	static void initializeHighMemTestMode();
@@ -357,13 +350,6 @@ private:
 
     // Collected license information
     static LMData	m_LicenseData;
-
-	// Event that is signaled by the TRP if there is a license validation issue
-	static Win32Event m_licenseStateIsInvalidEvent;
-
-	// The TRP object initialized if there is a temporary license
-	static unique_ptr<CMutex> m_upTrpRunning;
-	static unique_ptr<CMutex> m_upValidState;
 
     // maps that are used by the validateLicense function to cache
     // the licensed state values for components that have already been validated
