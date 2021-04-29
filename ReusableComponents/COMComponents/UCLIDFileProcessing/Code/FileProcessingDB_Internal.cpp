@@ -6762,6 +6762,8 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 	// it will trigger a load from the DBInfo
 	m_strEncryptedDatabaseID = "";
 	m_bDatabaseIDValuesValidated = false;
+	m_ipDBInfoSettings = __nullptr;
+
 	return strReturnValue;
 }
 //-------------------------------------------------------------------------------------------------
@@ -6895,7 +6897,7 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 
 	m_strEncryptedDatabaseID = "";
 	m_bDatabaseIDValuesValidated = false;
-
+	m_ipDBInfoSettings = __nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
@@ -6922,6 +6924,7 @@ void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
 	replaceVariable(strUpdateQuery, gstrSETTING_VALUE, m_strEncryptedDatabaseID);
 	executeCmdQuery(ipConnection, strUpdateQuery);
 	m_bDatabaseIDValuesValidated = false;
+	m_ipDBInfoSettings = __nullptr;
 					
 	// The DatabaseID should be valid now so check it and throw exception if it isn't
 	checkDatabaseIDValid(ipConnection, true);
@@ -6984,6 +6987,7 @@ void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(_Connect
 		}
 		vecQueries.push_back(getDatabaseIDUpdateQuery(m_DatabaseIDValues));
 		executeVectorOfSQL(ipConnection, vecQueries);
+		m_ipDBInfoSettings = __nullptr;
 
 		ueLog.log();
 
