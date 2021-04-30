@@ -449,8 +449,9 @@ namespace ExtractLicenseUI.Database
 
             foreach (var id in uniqueComponentIDs)
             {
+                // A single day was added because there were reports that licenses were expring early.
                 this.LicenseInfo.ComponentIDToInfo[(uint) id] = license.ExpiresOn != null 
-                    ? new ComponentInfo((DateTime)license.ExpiresOn) 
+                    ? new ComponentInfo(((DateTime)license.ExpiresOn).AddDays(1)) 
                     : new ComponentInfo();
             }
 

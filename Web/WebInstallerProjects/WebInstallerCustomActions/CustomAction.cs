@@ -88,7 +88,7 @@ namespace WebInstallerCustomActions
                 angularJsonDeserial["WindowsAuthenticationUrl"] = "http://" + session["WINDOWSAUTHORIZATION_DNS_ENTRY"];
                 angularJsonDeserial["EnablePasswordLogin"] = !session["CREATE_WINDOWS_AUTHORIZATION_SITE"].Equals("1", StringComparison.OrdinalIgnoreCase);
                 angularJsonDeserial["UseWindowsAuthentication"] = session["CREATE_WINDOWS_AUTHORIZATION_SITE"].Equals("1", StringComparison.OrdinalIgnoreCase);
-                angularJsonDeserial["ForceRedactionTypeToBeSet"] = !session["FORCE_REDACTION_TYPE_TO_BE_SET"].Equals("1", StringComparison.OrdinalIgnoreCase);
+                angularJsonDeserial["ForceRedactionTypeToBeSet"] = session["FORCE_REDACTION_TYPE_TO_BE_SET"].Equals("1", StringComparison.OrdinalIgnoreCase);
 
                 string angularOutput = Newtonsoft.Json.JsonConvert.SerializeObject(angularJsonDeserial, Newtonsoft.Json.Formatting.Indented);
                 File.WriteAllText(@$"{session["INSTALLLOCATION"].ToString()}IDSVerify\json\settings.json", angularOutput);
