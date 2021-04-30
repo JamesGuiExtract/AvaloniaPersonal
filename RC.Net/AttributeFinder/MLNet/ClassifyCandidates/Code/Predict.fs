@@ -130,8 +130,8 @@ let private sendRequest (modelPath: string) (request: PredictionRequest) =
   with | _ -> None
 (************************************************************************************************************************)
 
-// Try up to 5 times to send the request without communication failures
-// If the request results in an Error message then fail immediately
+/// Try up to 5 times to send the request without communication failures
+/// If the request results in an Error message then fail immediately
 let predictWithMLNetQueue (modelPath: string) (request: PredictionRequest) =
   let rec loop tries =
     match tries with
@@ -147,7 +147,7 @@ let predictWithMLNetQueue (modelPath: string) (request: PredictionRequest) =
   loop 0
 (************************************************************************************************************************)
 
-// Classify candidate attributes for a document using an MLNetQueue server to do the work
+/// Classify candidate attributes for a document using an MLNetQueue server to do the work
 let predict (modelConfig: ModelConfig) (doc: AFDocument) =
   let afUtil = AFUtilityClass()
   let sdn = doc.Text.SourceDocName
