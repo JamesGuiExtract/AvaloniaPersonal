@@ -62,17 +62,14 @@ string ActionStatusCondition::buildQuery(const UCLID_FILEPROCESSINGLib::IFilePro
 
 	long nActionID = ipFAMDB->GetActionIDForWorkflow(m_strAction.c_str(), nWorkflowID);
 
-	// Check if comparing skipped status
-	if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionSkipped)
+	string strUser = m_strUser;
+
+	// Check if need to use skipped file table (selecting files skipped for a particular user)
+	if (m_nStatus == UCLID_FILEPROCESSINGLib::kActionSkipped && strUser != gstrANY_USER)
 	{
-		strQuery += "INNER JOIN SkippedFile WITH (NOLOCK) ON FAMFile.ID = SkippedFile.FileID WHERE "
-			"(SkippedFile.ActionID = " + asString(nActionID);
-		string strUser = m_strUser;
-		if (strUser != gstrANY_USER)
-		{
-			strQuery += " AND SkippedFile.UserName = '" + strUser + "'";
-		}
-		strQuery += ")";
+		strQuery +=
+			"INNER JOIN SkippedFile WITH (NOLOCK) ON FAMFile.ID = SkippedFile.FileID WHERE "
+			"(SkippedFile.ActionID = " + asString(nActionID) + " AND SkippedFile.UserName = '" + strUser + "')";
 	}
 	else
 	{
