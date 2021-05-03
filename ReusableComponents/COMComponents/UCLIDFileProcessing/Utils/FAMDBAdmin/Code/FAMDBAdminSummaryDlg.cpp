@@ -308,6 +308,14 @@ void CFAMDBAdminSummaryDlg::OnNMRClickListActions(NMHDR *pNMHDR, LRESULT *pResul
 			}
 			// If there is an associated action status code, the click corresponds to a specific
 			// action status.
+			else if (m_eWorkflowVisibilityMode != EWorkflowVisibility::All)
+			{
+				// https://extract.atlassian.net/browse/ISSUE-17496
+				// To avoid a situation where the context menu acts upon more files than expected,
+				// for the time being, prevent use of context menu options unless "All files" is selected.
+				menu.LoadMenu(IDR_MENU_SUMMARY_UNSUPPORTED_VISIBILITY);
+				pContextMenu = menu.GetSubMenu(0);
+			}
 			else 
 			{
 				m_strContextMenuCount =

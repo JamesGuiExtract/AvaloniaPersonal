@@ -612,6 +612,16 @@ BEGIN
     END
 END
 
+IDR_MENU_SUMMARY_UNSUPPORTED_VISIBILITY MENU
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "** Context menu options available only for ""All files"" radio selection at bottom **", ID_SUMMARY_MENU_UNSUPPORTED_VISIBILITY, INACTIVE
+        MENUITEM SEPARATOR
+        MENUITEM "Cancel",                      ID_SUMMARY_MENU_CANCEL
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
