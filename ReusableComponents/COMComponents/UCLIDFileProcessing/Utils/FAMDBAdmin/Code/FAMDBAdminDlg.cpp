@@ -39,6 +39,7 @@ using namespace System::Collections::Generic;
 using namespace Extract::FileActionManager::Forms;
 using namespace Extract::Utilities;
 using namespace Extract::Dashboard::Forms;
+using namespace System::Threading;
 
 //-------------------------------------------------------------------------------------------------
 // Constants
@@ -1190,11 +1191,10 @@ void CFAMDBAdminDlg::OnToolsDashboards()
 	{
 		String^ pathEXE = marshal_as<String^>( getCurrentProcessEXEDirectory() + "\\DashboardViewer.exe");
 
-		Form ^dashboardForm =  safe_cast<Form^>( UtilityMethods::CreateTypeFromTypeNameAndAssembly(
-			pathEXE,"Extract.DashboardViewer.DashboardViewerForm", 
-			marshal_as<String^>(m_ipFAMDB->DatabaseServer),
-			marshal_as<String^>(m_ipFAMDB->DatabaseName)));
-		dashboardForm->Show();
+		String^ parameters = String::Format(CultureInfo::InvariantCulture,
+			"/s \"{0}\" /d \"{1}\"", marshal_as<String^>(m_ipFAMDB->DatabaseServer), marshal_as<String^>(m_ipFAMDB->DatabaseName));
+		CancellationToken^ noCancel = gcnew CancellationToken(false);
+		SystemMethods::RunExecutable(pathEXE, parameters, 0, false, *noCancel, true);
 	}
 	// This is needed because .net exception causes crash if not handled
 	catch (Exception^ ex)
