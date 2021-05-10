@@ -2186,6 +2186,7 @@ library UCLID_FILEPROCESSINGLib
 
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE: To return a IActionStatistics pointer that contains the current stats where WorkflowFile.Invisible is false for the specified action ID
+		//			vbRevertTimedOutFAMs = VARIANT_TRUE means that a pingDB call will happen and a check for files that were abandoned in the processing status
 		[id(213), helpstring("method GetVisibleFileStats")] HRESULT GetVisibleFileStats(
 			[in] long nActionID, [in] VARIANT_BOOL vbForceUpdate, [in] VARIANT_BOOL vbRevertTimedOutFAMs, [out, retval] IActionStatistics** pStats);
 		// -----------------------------------------------------------------------------------------------

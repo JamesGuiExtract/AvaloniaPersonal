@@ -4531,8 +4531,15 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
+				// This flag is true when this method is called from the web app
 				if (asCppBool(vbRevertTimedOutFAMs))
 				{
+					// Ping the DB every time so that a document being verified is not closed by another user's session
+					// (Starting in 11.7, revertTimedOutProcessingFAMs can short-circuit before doing the ping)
+					if (m_dwLastPingTime == 0 || (GetTickCount() - m_dwLastPingTime) > gnPING_TIMEOUT)
+					{
+						pingDB();
+					}
 					revertTimedOutProcessingFAMs(bDBLocked, ipConnection);
 				}
 				
