@@ -140,7 +140,8 @@ CScansoftOCR2::CScansoftOCR2()
 	m_eOCRFindType(kFindStandardOCR),
 	m_bReturnUnrecognizedCharacters(false),
 	m_bLocateZonesInSpecifiedZone(false),
-	m_bIgnoreAreaOutsideSpecifiedZone(false)
+	m_bIgnoreAreaOutsideSpecifiedZone(false),
+	m_bPrimaryConversionModeSet(false)
 {
 	try
 	{
@@ -905,13 +906,45 @@ void CScansoftOCR2::recognizeTextOnPages(const string& strFileName,
 	bool bDetectHandwriting, bool bReturnUnrecognized,
 	string& rstrText, vector<CPPLetter>* pvecLetters, ILongToObjectMapPtr ipPageInfos)
 {
-	// Set auto conversion mode (so that color images are converted to bitonal)
-	// This prevents strange behavior on certain mixed bitonal/color TIFs
+	IMG_CONVERSION prevConversionMode;
+	THROW_UE_ON_ERROR("ELI51699", "Unable to get the primary conversion mode of the OCR engine!",
+		kRecGetImgConvMode(0, &prevConversionMode));
+
+	IMG_CONVERSION newConversionMode = prevConversionMode;
+
+	// Unless the primary conversion mode was set with an OCRParameter, set the primary
+	// conversion mode to CNV_GRAY so that color images are converted to grayscale.
+	// This prevents strange behavior on certain mixed, group-4, lzw, old-style-jpeg color TIFs
+	// https://extract.atlassian.net/browse/ISSUE-17438
 	// https://extract.atlassian.net/browse/ISSUE-17441
-	kRecSetImgConvMode(0, CNV_AUTO);
+	// while having less impact on OCR results than CNV_AUTO has.
+	if (!m_bPrimaryConversionModeSet)
+	{
+		newConversionMode = CNV_GRAY;
+	}
+
+	// Color/grayscale images need to be binarized on load if force despeckle is to be called
+	// NOTE: kForceWhenBitonal was made to equal kAlwaysForce as part of the fix for ISSUE-17441
+	if ((m_eForceDespeckle == kAlwaysForce || m_eForceDespeckle == kForceWhenBitonal)
+		&& (newConversionMode == CNV_GRAY || newConversionMode == CNV_NO))
+	{
+		newConversionMode = CNV_AUTO;
+	}
+
+	// Set the conversion mode if needed
+	if (newConversionMode != prevConversionMode)
+	{
+		THROW_UE_ON_ERROR("ELI51700", "Unable to set the primary conversion mode of the OCR engine!",
+			kRecSetImgConvMode(0, newConversionMode));
+	}
 
 	// Reset conversion mode after OCR is finished in case this instance is used for an image conversion task
-	shared_ptr<void> resetConvMode(__nullptr, [](void*){ kRecSetImgConvMode(0, CNV_NO); });
+	shared_ptr<void> resetConvMode(__nullptr, [&](void*) {
+		if (newConversionMode != prevConversionMode)
+		{
+			THROW_UE_ON_ERROR("ELI51701", "Unable to reset the primary conversion mode of the OCR engine!",
+				kRecSetImgConvMode(0, prevConversionMode));
+		}});
 
 	// load the specified image file
 	THROW_UE_ON_ERROR("ELI16639", "Unable to load specified image file in the OCR engine!",
@@ -1283,6 +1316,7 @@ void CScansoftOCR2::init()
 
 		// Get the RecAPI version number
 		m_strVersion = "Nuance " + asString(kRecGetVersion() / 100.0, 2);
+		m_strVersion += " Extract " + ::getFileVersion(getCurrentProcessEXEFullPath());
 
 		// Initialize our registry settings manager
 		m_apCfg = unique_ptr<ScansoftOCRCfg>(new ScansoftOCRCfg());
@@ -2849,11 +2883,12 @@ void CScansoftOCR2::applyCommonSettings()
 {
 	try
 	{
-		// NOTE: Turning on the CNV_NO mode makes OCR output sometimes very bad!
-		// keep color/greyscale images in memory as color/greyscale images
-		// NOTE: the RecAPI documentation recommends this step to improve accruacy
-		//THROW_UE_ON_ERROR("ELI03413", "Unable to set image conversion options in the OCR engine!",
-		//	RecSetImgConvMode(CNV_NO));
+		// NOTE: CNV_NO is the default conversion mode so this is just to reset a value specified by an OCR Parameter
+		THROW_UE_ON_ERROR("ELI03413", "Unable to set image conversion option in the OCR engine!",
+			kRecSetImgConvMode(0, CNV_NO));
+
+		// Keep track of whether the default conversion mode has been overridden
+		m_bPrimaryConversionModeSet = false;
 
 		// specify the default symbol for rejected chars
 		THROW_UE_ON_ERROR("ELI03766", "Unable to set default rejection symbol in the OCR engine!",
@@ -3107,6 +3142,13 @@ void CScansoftOCR2::applySettingsFromParameters(IOCRParametersPtr ipOCRParameter
 				string strKey = asString(vtKey.bstrVal);
 				THROW_UE_ON_ERROR("ELI50077", "Unable to get OCR setting.",
 					kRecSettingGetHandle(NULL, strKey.c_str(), &hSetting, NULL));
+
+				// Track whether conversion mode has been specified as a parameter
+				// so that we don't override the specified value
+				if (strKey == "Kernel.Img.Binarization.PrimaryMode")
+				{
+					m_bPrimaryConversionModeSet = true;
+				}
 
 				if (vtValue.vt == VT_I4)
 				{

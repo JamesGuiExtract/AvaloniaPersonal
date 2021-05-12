@@ -245,6 +245,7 @@ private:
 	bool m_bIgnoreParagraphFlag;
 	bool m_bTreatZonesAsParagraphs;
 	EOCRFindType m_eOCRFindType;
+	bool m_bPrimaryConversionModeSet;
 
 	/////////////
 	// Methods
