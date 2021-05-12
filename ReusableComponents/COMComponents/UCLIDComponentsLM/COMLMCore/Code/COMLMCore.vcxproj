@@ -188,7 +188,6 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TimeRollbackPreventer.cpp" />
     <ClCompile Include="UCLIDCOMPackages.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -210,13 +209,11 @@
     <ClInclude Include="COMLMCore.h" />
     <ClInclude Include="ComponentData.h" />
     <ClInclude Include="ComponentLicenseIDs.h" />
-    <ClInclude Include="ExtractTRP2Constants.h" />
     <ClInclude Include="LicenseMgmt.h" />
     <ClInclude Include="LMData.h" />
     <ClInclude Include="PdfSecurityValues.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />
-    <ClInclude Include="TimeRollbackPreventer.h" />
     <ClInclude Include="UCLIDCOMPackages.h" />
   </ItemGroup>
   <ItemGroup>

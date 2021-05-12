@@ -99,21 +99,7 @@ BOOL CUserLicenseApp::InitInstance()
 				// Compare file creation and system time
 				// and continue only if system time is newer than EXE time
 				CTime tmEXE( ftCreationTime );
-				if (tmCurrent > tmEXE)
-				{
-					// Create file and registry items only if neither are present
-					try
-					{
-						LicenseManagement::initTrpData(LICENSE_MGMT_PASSWORD);
-					}
-					catch(UCLIDException& ue)
-					{
-						UCLIDException uexOuter( "ELI07449", 
-							"Unable to initialize licensing scheme!", ue );
-						throw uexOuter;
-					}
-				}
-				else
+				if (tmCurrent < tmEXE)
 				{
 					// Create and throw exception
 					UCLIDException ue( "ELI07480", "Unable to initialize licensing scheme!" );

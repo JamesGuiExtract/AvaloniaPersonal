@@ -18,7 +18,6 @@
 #include "SpecialIcoMap.h"
 #include "SpecialSimpleRules.h"
 #include "ComponentLicenseIDs.h"
-#include "ExtractTRP2Constants.h"
 
 #include <UCLIDException.h>
 #include <EncryptionEngine.h>
@@ -600,23 +599,6 @@ void LicenseManagement::validateLicense(unsigned long ulLicenseID, const string&
 	ee.addDebugInfo("Component Name", strComponentName);
 	ee.addDebugInfo("Component ID", ulLicenseID, true);
 	throw ee;
-}
-//-------------------------------------------------------------------------------------------------
-void LicenseManagement::initTrpData(const string& strLicenseCode)
-{
-	try
-	{
-		if (!IS_VALID_PRIVATE_LICENSE(strLicenseCode))
-		{
-			throw UCLIDException("ELI32462", "Unable to initialize data.");
-		}
-
-		CSingleLock guard(&m_lock, TRUE);
-
-		TimeRollbackPreventer trp(false);
-		trp.checkDateTimeItems();
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32461");
 }
 //-------------------------------------------------------------------------------------------------
 string LicenseManagement::getUserLicense(const string& strLicenseCode)
