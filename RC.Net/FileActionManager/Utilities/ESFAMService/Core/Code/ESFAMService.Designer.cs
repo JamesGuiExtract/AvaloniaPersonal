@@ -64,6 +64,8 @@ namespace Extract.FileActionManager.Utilities
                     _startThreads.Close();
                     _startThreads = null;
                 }
+
+                _processingHasStopped.Dispose();
             }
 
             base.Dispose(disposing);

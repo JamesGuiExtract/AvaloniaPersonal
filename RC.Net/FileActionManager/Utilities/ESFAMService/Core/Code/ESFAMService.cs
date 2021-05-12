@@ -154,6 +154,11 @@ namespace Extract.FileActionManager.Utilities
         ManualResetEvent _stopProcessing = new ManualResetEvent(false);
 
         /// <summary>
+        /// Event to indicate processing has stopped.
+        /// </summary>
+        ManualResetEvent _processingHasStopped = new ManualResetEvent(false);
+
+        /// <summary>
         /// Event to indicate the threads may start (set to true by the sleep time thread)
         /// </summary>
         ManualResetEvent _startThreads = new ManualResetEvent(false);
@@ -329,9 +334,9 @@ namespace Extract.FileActionManager.Utilities
 
             }, null);
 
-            if (WaitHandle.WaitAny(new WaitHandle[] { connectedEvent, _stopProcessing}) == 1)
+            if (WaitHandle.WaitAny(new WaitHandle[] { connectedEvent, _processingHasStopped }) == 1)
             {
-                // Stop waiting if Stop has been called
+                // Stop waiting if processing has stopped
                 pipeStream.Close();
                 return false;
             }
@@ -1551,6 +1556,9 @@ namespace Extract.FileActionManager.Utilities
                 {
                     RequestAdditionalTime(1200);
                 }
+
+                // Signal that processing has stopped
+                _processingHasStopped.Set();
 
                 // [DNRCAU #357] - Log application trace when service has shutdown
                 ExtractException ee2 = new ExtractException("ELI28774", UtilityMethods.FormatInvariant(
