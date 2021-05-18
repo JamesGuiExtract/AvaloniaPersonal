@@ -9,5 +9,5 @@
   <String Id="Description">This is a description.</String>
   <String Id="Comments">This is a comment.</String>
   <String Id="Keywords">dotnet,core,application,installer</String>
-  <String Id="DowngradeErrorMessage">A newer version of LearningWix is already installed.</String>
+  <String Id="DowngradeErrorMessage">A newer version of Extract Web Services is already installed.</String>
 </WixLocalization>
