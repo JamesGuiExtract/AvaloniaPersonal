@@ -90,7 +90,11 @@ BuildFKDBIfRequired:
 	@CD $(EngineeringRootDirectory)\Rules\Build_FKB
 	@IF "$(FKBBuildNeeded)"=="True" @nmake /F FKBUpdate.mak CreateFKBInstall
 
-BuildAttributeFinderCore: BuildFKDBIfRequired
+SetWebPath:
+	@CD $(EXTRACT_WEB_APP_REPO)
+	@FOR /f "delims=" %%V in ('git describe --match v[0-9]*.[0-9]*.[0-9]* main') DO SET WebAppArchivePath=$(WEB_BUILD_BASE_DIR)\%%V\%%V.zip
+
+BuildAttributeFinderCore: BuildFKDBIfRequired SetWebPath
 	@Echo Building AttributeFinderCore...
 	@CD "$(AFRootDirectory)\Build"
     @nmake /F AttributeFinderCore.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(FlexIndexVersion)" $(AttributeCoreTarget)

@@ -18,6 +18,8 @@ SET BUILD_PRODUCT_RELEASE=\\extract.local\Eng\Builds
 SET NAS_BUILD_BASE=/volume8/Eng-Builds
 SET MSBUILDDISABLENODEREUSE=0
 SET GITPATH="C:\Program Files\Git\bin\git.exe"
+SET EXTRACT_WEB_APP_REPO=%BUILD_DRIVE%\ExtractWebApp
+SET WEB_BUILD_BASE_DIR=\\Extract.local\Eng\Builds\Web\Internal
 
 net use i: \\extract.local\All
 
