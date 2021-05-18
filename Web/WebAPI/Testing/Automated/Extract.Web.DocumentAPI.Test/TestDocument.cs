@@ -254,7 +254,7 @@ namespace Extract.Web.WebAPI.Test
         }
 
         /// <summary>
-        /// Tests corner cases related to documnet metadata fields:
+        /// Tests corner cases related to document metadata fields:
         /// - Missing metadata field in the in the database
         /// - Filename only specified (not path)
         /// - Invalid file paths specified
@@ -307,7 +307,7 @@ namespace Extract.Web.WebAPI.Test
                     result = controller.PostDocument(formFile);
                     var submitResult = result.AssertGoodResult<DocumentIdResult>();
 
-                    Assert.IsTrue(string.IsNullOrEmpty(fileProcessingDb.GetMetadataFieldValue(submitResult.Id, "OriginalFileName")));
+                    Assert.IsTrue(string.IsNullOrWhiteSpace(fileProcessingDb.GetMetadataFieldValue(submitResult.Id, "OriginalFileName")));
                 }
             }
             finally

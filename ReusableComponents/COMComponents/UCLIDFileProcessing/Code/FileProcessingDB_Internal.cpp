@@ -104,14 +104,14 @@ set<long> CFileProcessingDB::getSkippedFilesForAction(const _ConnectionPtr& ipCo
 {
 	try
 	{
-		string strQuery = "SELECT FileID FROM SkippedFile WHERE ActionID = " + asString(nActionId);
+		string strQuery = "SELECT FileID FROM SkippedFile WHERE ActionID = @ActionID";
+		auto cmd = buildCmd(ipConnection, strQuery, { {"@ActionID", nActionId} });
 
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI30293", ipFileSet != __nullptr);
 
 		// Open the file set
-		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
-			adOpenForwardOnly, adLockReadOnly, adCmdText);
+		ipFileSet->Open((IDispatch*)cmd, vtMissing, adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		set<long> setFileIds;
 		while (ipFileSet->adoEOF == VARIANT_FALSE)
@@ -164,7 +164,7 @@ void CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 			_CommandPtr cmdUpdateFAS;
 			_CommandPtr cmdDeleteFromFAS;
 			_CommandPtr cmdInsertIntoFAS;
-			vector<pair<string, _variant_t>> params =
+			map<string, _variant_t> params =
 			{
 				{"@ActionID", nActionID},
 				{"@State", strState.c_str()},
@@ -328,8 +328,9 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				"SELECT FAMFile.ID as ID, FileName, FileSize, Pages, [FAMFile].Priority, "
 				"COALESCE(ActionStatus, 'U') AS ActionStatus, "
 				"COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID, "
-				"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID "
-				"FROM FAMFile  "
+				"COALESCE(QueuedActionStatusChange.ID, -1) AS QueuedStatusChangeID, "
+				"COALESCE(~WorkflowFile.Invisible, -1) AS IsFileInWorkflow "
+			"FROM FAMFile  "
 				"LEFT OUTER JOIN SkippedFile ON SkippedFile.FileID = FAMFile.ID " 
 				"	AND SkippedFile.ActionID = @ActionID "
 				"LEFT OUTER JOIN FileActionStatus WITH (ROWLOCK, UPDLOCK) ON FileActionStatus.FileID = FAMFile.ID "
@@ -337,10 +338,12 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 				" LEFT OUTER JOIN QueuedActionStatusChange WITH (ROWLOCK, UPDLOCK) ON QueuedActionStatusChange.ChangeStatus = @ChangeStatus "
 				"	AND QueuedActionStatusChange.FileID = FAMFile.ID "
 				"	AND QueuedActionStatusChange.ActionID = @ActionID "
+				" LEFT OUTER JOIN WorkflowFile ON WorkflowFile.FileID = FAMFile.ID AND WorkflowFile.WorkflowID = @WorkflowID "
 				" WHERE FAMFile.ID = @FileID",
 			{
 				{"@ChangeStatus", "P"},
 				{"@ActionID", nActionID},
+				{"@WorkflowID", nWorkflowID},
 				{"@FileID", nFileID}
 			});
 		
@@ -639,9 +642,10 @@ EActionStatus CFileProcessingDB::setFileActionState(_ConnectionPtr ipConnection,
 						// [LRCAU #5853]
 						executeCmd(buildCmd(ipConnection,
 							"UPDATE SkippedFile "
-							"	SET FAMSessionID = @FAMSessionID, DateTimeStamp = GETDATE(), UserName = @UserName, "
+							"	SET FAMSessionID = @FAMSessionID, DateTimeStamp = GETDATE(), UserName = @UserName "
 							"	WHERE FileID = @FileID",
 							{
+								{ "@FAMSessionID", m_nFAMSessionID },
 								{ "@FileID", nFileID },
 								{ "@UserName", ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName).c_str() }
 							}));
@@ -826,7 +830,8 @@ void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nF
 			}
 			_lastCodePos = "10";
 
-			variant_t vtFileModifyTime = vtMissing;
+			variant_t vtFileModifyTime;
+			vtFileModifyTime.vt = VT_NULL;
 			long long llFileSize = 0;
 			// File should exist for these options
 			if (strQueueEventCode == "A" || strQueueEventCode == "M")
@@ -844,13 +849,18 @@ void CFileProcessingDB::addQueueEventRecord(_ConnectionPtr ipConnection, long nF
 				llFileSize = getSizeOfFile(strFileName);
 				_lastCodePos = "80_50";
 			}
+			variant_t vtAction;
+			if (nActionID < 0)
+				vtAction.vt = VT_NULL;
+			else
+				vtAction = nActionID;
 
 			executeCmd(buildCmd(ipConnection,
 				"INSERT INTO [QueueEvent] (FileID, ActionID, DateTimeStamp, QueueEventCode, FAMUserID, MachineID, FileModifyTime, FileSizeInBytes) "
 				" VALUES (@FileID, @ActionID, GETDATE(), @QueueEventCode, @FAMUserID, @MachineID, @FileModifyTime, @FileSizeInBytes)",
 				{
 					{ "@FileID", nFileID },
-					{ "@ActionID", nActionID },
+					{ "@ActionID", vtAction },
 					{ "@QueueEventCode", strQueueEventCode.c_str() },
 					{ "@FAMUserID", getFAMUserID(ipConnection) },
 					{ "@MachineID", getMachineID(ipConnection) },
@@ -980,13 +990,13 @@ long CFileProcessingDB::getWorkflowID(_ConnectionPtr ipConnection, long nActionI
 {
 	try
 	{
-		string strQuery = "SELECT [WorkflowID] FROM [Action] WHERE [ID] = '" +
-			asString(nActionID) + "'";
+		string strQuery = "SELECT [WorkflowID] FROM [Action] WHERE [ID] = @ActionID";
+		auto cmd = buildCmd(ipConnection, strQuery, { {"@ActionID", nActionID} });
 
 		_RecordsetPtr ipActionSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI42144", ipActionSet != __nullptr);
 		
-		ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+		ipActionSet->Open((IDispatch*) cmd, vtMissing,
 			adOpenStatic, adLockOptimistic, adCmdText);
 
 		if (ipActionSet->adoEOF == VARIANT_FALSE)
@@ -1043,21 +1053,28 @@ int CFileProcessingDB::isFileInWorkflow(_ConnectionPtr ipConnection, string strF
 			nWorkflowID = getWorkflowID(ipConnection, getActiveWorkflow());
 		}
 
-		replaceVariable(strFileName, "'", "''");
 
-		string strQuery = (nWorkflowID > 0)
+		string strQuery;
+		map<string, variant_t> vecParams;
+		vecParams["@FileName"] = strFileName.c_str();
+		if (nWorkflowID > 0)
+		{
+			vecParams["@WorkflowID"] = nWorkflowID;
 			// Use ~ operator to invert deleted flag as we want 1 to indicate a file in the workflow
 			// and 0 for a file that has been marked deleted (invisible).
 			// Add + 0 to convert to int since bit fields are not allowed in aggregate functions
-			? Util::Format("SELECT COALESCE(MAX(~[Invisible]+0), -1) AS [ID] FROM [WorkflowFile] "
+			strQuery = "SELECT COALESCE(MAX(~[Invisible]+0), -1) AS [ID] FROM [WorkflowFile] "
 				"INNER JOIN [FAMFile] ON [FileID] = [FAMFile].[ID] "
-				"WHERE [FileName] = '%s' AND [WorkflowID] = %d", strFileName.c_str(), nWorkflowID)
-			: Util::Format(
-				"SELECT COALESCE(MAX(1), -1) AS [ID] FROM [FAMFile] WHERE [FileName] = '%s'",
-				strFileName.c_str());
+				"WHERE [FileName] = @FileName AND [WorkflowID] = @WorkflowID";
+		}
+		else
+		{
+			strQuery = "SELECT COALESCE(MAX(1), -1) AS [ID] FROM [FAMFile] WHERE [FileName] = @FileName";
+		}
+
 
 		long nResult = -1;
-		executeCmdQuery(ipConnection, strQuery, false, &nResult);
+		getCmdId(buildCmd(ipConnection, strQuery, vecParams), &nResult);
 
 		return nResult;
 	}
@@ -1189,17 +1206,25 @@ long CFileProcessingDB::getActionIDNoThrow(_ConnectionPtr ipConnection, const st
 	try
 	{
 		// This query will always return a row-- it will return -1 when no matching action is present.
-		string strQuery = Util::Format(
+		string strQuery =
 			"SELECT COALESCE(MAX([Action].[ID]), -1) AS [ID] FROM [Action] "
 			"	LEFT JOIN [WorkFlow] ON [WorkflowID] = [Workflow].[ID]"
-			"	WHERE [ASCName] = '%s' AND [Workflow].[Name] %s",
-			strActionName.c_str(),
-			(strWorkflow.empty()
-				? "IS NULL"
-				: " = '" + strWorkflow + "'").c_str());
+			"	WHERE [ASCName] = @ActionName AND ISNULL([Workflow].[Name],'') = ISNULL(@WorkflowName,'')";
+
+		variant_t vtWorkflow;
+			
+		if (!strWorkflow.empty())
+			vtWorkflow = strWorkflow.c_str();
+		else
+			vtWorkflow.vt = VT_NULL;
 
 		long nActionID = -1;
-		executeCmdQuery(ipConnection, strQuery, false, &nActionID);
+
+		getCmdId(buildCmd(ipConnection, strQuery,
+			{
+				{"@ActionName", strActionName.c_str()},
+				{"@WorkflowName", vtWorkflow}
+			}), &nActionID);
 
 		return nActionID;
 	}
@@ -1217,12 +1242,15 @@ long CFileProcessingDB::getActionIDNoThrow(_ConnectionPtr ipConnection, const st
 		}
 		else
 		{
-			string strQuery = Util::Format(
-				"SELECT COALESCE(MAX([ID]), -1) AS [ID] FROM [Action] WHERE [ASCName] = '%s' AND [WorkflowID] = %d",
-				strActionName.c_str(), nWorkflowID);
+			string strQuery =
+				"SELECT COALESCE(MAX([ID]), -1) AS [ID] FROM [Action] WHERE [ASCName] = @ActionName AND [WorkflowID] = @WorkflowID";
 
 			long nActionID = -1;
-			executeCmdQuery(ipConnection, strQuery, false, &nActionID);
+			getCmdId(buildCmd(ipConnection, strQuery,
+				{
+					{"@ActionName", strActionName.c_str()},
+					{"@WorkflowID", nWorkflowID}
+				}), &nActionID);
 
 			return nActionID;
 		}
@@ -1256,13 +1284,13 @@ string CFileProcessingDB::getActionIDsForActiveWorkflow(_ConnectionPtr ipConnect
 			_RecordsetPtr ipActionSet(__uuidof(Recordset));
 			ASSERT_RESOURCE_ALLOCATION("ELI42080", ipActionSet != __nullptr);
 			
-			string strQuery = Util::Format(
+			_CommandPtr cmdActions  = buildCmd(ipConnection,
 				"SELECT [Action].[ID] AS [ID] FROM [Action]"
-				"	WHERE [ASCName] = '%s'", strActionName.c_str());
+				"	WHERE [ASCName] = @ActionName",
+				{ {"@ActionName", strActionName.c_str()} });
 
 			// Open the Action table in the database
-			ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-				adOpenDynamic, adLockOptimistic, adCmdText);
+			ipActionSet->Open((IDispatch*)cmdActions, vtMissing, adOpenDynamic, adLockOptimistic, adCmdText);
 
 			while (ipActionSet->adoEOF == VARIANT_FALSE)
 			{
@@ -1337,20 +1365,25 @@ long CFileProcessingDB::addAction(_ConnectionPtr ipConnection, const string &str
 		// If no workflow, add a workflow independent action
 		if (strWorkflow.empty())
 		{
-			string strQuery = "INSERT INTO [Action] ([ASCName]) "
+			getCmdId( buildCmd(ipConnection, "INSERT INTO [Action] ([ASCName]) "
 				"OUTPUT INSERTED.ID "
-				"VALUES ('" + strAction + "')";
-			executeCmdQuery(ipConnection, strQuery, false, &lActionId);
+				"VALUES (@ActionName)",
+				{ {"@ActionName", strAction.c_str()} }),
+				&lActionId);
+			//executeCmdQuery(ipConnection, strQuery, false, &lActionId);
 		}
 		// If a workflow is specified, add a workflow specific action. A separate call with
 		// strWorkflow == "" may be needed to create the base workflow-independent action.
 		else
 		{
 			long nWorkflowID = getWorkflowID(ipConnection, strWorkflow);
-			string strQuery = Util::Format("INSERT INTO [Action] ([ASCName], [WorkflowID]) "
+			getCmdId(buildCmd(ipConnection, "INSERT INTO [Action] ([ASCName], [WorkflowID]) "
 				"OUTPUT INSERTED.ID "
-				"VALUES ('%s', %d)", strAction.c_str(), nWorkflowID);
-			executeCmdQuery(ipConnection, strQuery, false, &lActionId);
+				"VALUES (@ActionName, @WorkflowId)",
+				{
+					{"@ActionName", strAction.c_str()},
+					{"@WorkflowId", nWorkflowID}
+				}), &lActionId);
 		}
 
 		return lActionId;
@@ -1359,6 +1392,7 @@ long CFileProcessingDB::addAction(_ConnectionPtr ipConnection, const string &str
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
+											  map<string,variant_t> &params,
 											  const string &strAction, long nActionID,
 											  const string &strToState, const string &strException,
 											  const string &strComment, const string &strWhereClause, 
@@ -1370,34 +1404,38 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 		{
 			return;
 		}
+		if (params.find("@ActionID") == params.end())
+		{
+			params["@ActionID"] = nActionID;
+		}
 
 		// Create the from string
 		string strFrom = " FROM FAMFile WITH (NOLOCK) LEFT JOIN FileActionStatus WITH (NOLOCK) "
-			" ON FAMFile.ID = FileActionStatus.FileID AND FileActionStatus.ActionID = " +
-			asString(nActionID) + " " + strWhereClause;
+			" ON FAMFile.ID = FileActionStatus.FileID AND FileActionStatus.ActionID = @ActionID " + strWhereClause;
 		
 		// if the strException string is empty NULL should be added to the db
-		string strNewException = (strException.empty()) ? "NULL": "'" + strException + "'";
+		variant_t vtNullValue;
+		vtNullValue.vt = VT_NULL;
+		
+		params["@Exception"] = (strException.empty()) ? vtNullValue : strException.c_str();
 
 		// if the strComment is empty the NULL should be added to the database
-		string strNewComment = (strComment.empty()) ? "NULL": "'" + strComment + "'";
+		params["@Comment"] = (strComment.empty()) ? vtNullValue : strComment.c_str();
+
+		params["@FAMUserID"] = getFAMUserID(ipConnection);
+		params["@MachineID"] = getMachineID(ipConnection);
+		params["@ToState"] = strToState.c_str();
 
 		// create the insert string
 		string strInsertTrans = "INSERT INTO FileActionStateTransition (FileID, ActionID, ASC_From, "
 			"ASC_To, DateTimeStamp, Exception, Comment, FAMUserID, MachineID) ";
-		strInsertTrans += "SELECT " + strTopClause + " FAMFile.ID, " + 
-			asString(nActionID) + 
-			" as ActionID, COALESCE(FileActionStatus.ActionStatus, 'U') as ActionStatus, '" + 
-			strToState + 
-			"' as ASC_To, GetDate() as DateTimeStamp, " + 
-			strNewException + ", " +
-			strNewComment + ", " +
-			asString(getFAMUserID(ipConnection)) + ", " +
-			asString(getMachineID(ipConnection)) + " " + 		
+		strInsertTrans += "SELECT " + strTopClause + " FAMFile.ID, @ActionID " + 
+			" as ActionID, COALESCE(FileActionStatus.ActionStatus, 'U') as ActionStatus, @ToState" + 
+			" as ASC_To, GetDate() as DateTimeStamp, @Exception, @Comment, @FAMUserID, @MachineID " + 
 			strFrom;
 
 		// Insert the records
-		executeCmdQuery(ipConnection, strInsertTrans);
+		executeCmd(buildCmd(ipConnection, strInsertTrans, params));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26937");
 }
@@ -1565,8 +1603,9 @@ void CFileProcessingDB::validateLicense()
 void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActionID)
 {
 	// Get the name of the action for the ID
-	string strActionName = getActionName(ipConnection, nActionID);	
-	string strWhere = "WHERE ActionID = " + asString(nActionID);
+	string strWhere = "WHERE ActionID = @ActionID";
+	map<string, variant_t> mapParams;
+	mapParams["@ActionID"] = nActionID;
 
 	// Ensure no other stats or action status change until recalculation is complete.
 	lockDBTableForTransaction(ipConnection, "FileActionStatus");
@@ -1576,17 +1615,17 @@ void CFileProcessingDB::reCalculateStats(_ConnectionPtr ipConnection, long nActi
 
 	// Delete existing stats for action
 	string strDeleteExistingStatsSQL = "DELETE FROM ActionStatistics " + strWhere;
-	executeCmdQuery(ipConnection, strDeleteExistingStatsSQL);
+	executeCmd(buildCmd(ipConnection, strDeleteExistingStatsSQL, mapParams));
 
 	// Set up the query to recreate the statistics
 	string strCreateActionStatsSQL = gstrRECREATE_ACTION_STATISTICS_FOR_ACTION;
 	replaceVariable(strCreateActionStatsSQL, "<ActionIDWhereClause>", strWhere);
 
 	// Recreate the statistics
-	executeCmdQuery(ipConnection, strCreateActionStatsSQL);
+	executeCmd(buildCmd(ipConnection, strCreateActionStatsSQL, mapParams));
 
 	// need to delete the records in the delta since they have been included in the total
-	executeCmdQuery(ipConnection, "DELETE FROM ActionStatisticsDelta " + strWhere);
+	executeCmd(buildCmd(ipConnection, "DELETE FROM ActionStatisticsDelta " + strWhere, mapParams));
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::dropTables(bool bRetainUserTables)
@@ -2343,65 +2382,80 @@ void CFileProcessingDB::copyActionStatus(const _ConnectionPtr& ipConnection, con
 		string strTmpFrom = strFrom;
 
 		// Get from action ID
-		string strFromActionID = asString(getActionID(ipConnection, strTmpFrom));
+		long nFromActionID = getActionID(ipConnection, strTmpFrom);
 
 		// Set string for the ToActionID
-		string strToActionID = asString(nToActionID == -1 ? getActionID(ipConnection, strTo) : nToActionID);
+		nToActionID = nToActionID == -1 ? getActionID(ipConnection, strTo) : nToActionID;
 		if (bAddTransRecords && m_bUpdateFASTTable)
 		{
 
 			string strTransition = "INSERT INTO FileActionStateTransition "
 				"(FileID, ActionID, ASC_From, ASC_To, DateTimeStamp, Comment, FAMUserID, MachineID) "
-				"SELECT ID, " + strToActionID + " AS ActionID, "
-				"COALESCE(fasFrom.ActionStatus, 'U') as ASC_From, " 
+				"SELECT ID, @ToActionID AS ActionID, "
+				"COALESCE(fasFrom.ActionStatus, 'U') as ASC_From, "
 				"COALESCE(fasTo.ActionStatus, 'U') as ASC_To, "
-				"GETDATE() AS TS_Trans, 'Copy status from " + 
-				strFrom +" to " + strTo + "' AS Comment, " + asString(getFAMUserID(ipConnection)) + 
-				", " + asString(getMachineID(ipConnection)) + " FROM FAMFile WITH (NOLOCK) "
-				" LEFT JOIN FileActionStatus as fasFrom WITH (NOLOCK) ON FAMFile.ID = fasFrom.FileID AND fasFrom.ActionID = " +
-				strFromActionID + 
-				" LEFT JOIN FileActionStatus as fasTo WITH (NOLOCK) ON FAMFile.ID = fasTo.FileID AND fasTo.ActionID = " +
-				strToActionID;
+				"GETDATE() AS TS_Trans, 'Copy status from ' + @FromAction + '"
+				" to ' + @ToAction + '''' AS Comment, @FAMUserID, @MachineID "
+				" FROM FAMFile WITH (NOLOCK) "
+				" LEFT JOIN FileActionStatus as fasFrom WITH (NOLOCK) ON FAMFile.ID = fasFrom.FileID AND fasFrom.ActionID = @FromActionID "
+				" LEFT JOIN FileActionStatus as fasTo WITH (NOLOCK) ON FAMFile.ID = fasTo.FileID AND fasTo.ActionID = @ToActionID";
 
-			executeCmdQuery(ipConnection, strTransition);
+			executeCmd(buildCmd(ipConnection, strTransition,
+				{
+					{"@FAMUserID", getFAMUserID(ipConnection)},
+					{"@MachineID", getMachineID(ipConnection)},
+					{"@ToActionID", nToActionID},
+					{"@FromAction", strFrom.c_str()},
+					{"@ToAction", strTo.c_str()},
+					{"@FromActionID", nFromActionID }
+				}));
 		}
 
 		// Check if the skipped table needs to be updated
 		if (nToActionID != -1)
 		{
 			// Delete any existing skipped records (files may be leaving skipped status)
-			string strDeleteSkipped = "DELETE FROM SkippedFile WHERE ActionID = " + strToActionID;
+			string strDeleteSkipped = "DELETE FROM SkippedFile WHERE ActionID = @ToActionID";
 
 			// Need to add any new skipped records (files may be entering skipped status)
 			string strAddSkipped = "INSERT INTO SkippedFile (FileID, ActionID, UserName, FAMSessionID) SELECT "
-				" FAMFile.ID, " + strToActionID + " AS NewActionID, '" 
-				+ ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName)
-				+ "' AS NewUserName, " + ((m_nFAMSessionID == 0) ? "NULL" : asString(m_nFAMSessionID)) + 
-				" AS FAMSessionID FROM FAMFile WITH (NOLOCK) "
+				" FAMFile.ID, @ToActionID AS NewActionID, @FAMUserName" 
+				" AS NewUserName, @FAMSessionID AS FAMSessionID FROM FAMFile WITH (NOLOCK) "
 				"INNER JOIN FileActionStatus WITH (NOLOCK) ON FAMFile.ID = FileActionStatus.FileID AND "
-				"FileActionStatus.ActionID = " + strFromActionID + " WHERE ActionStatus = 'S'";
+				"FileActionStatus.ActionID = @FromActionID WHERE ActionStatus = 'S'";
 
 			// Delete the existing skipped records for this action and insert any new ones
-			executeCmdQuery(ipConnection, strDeleteSkipped);
-			executeCmdQuery(ipConnection, strAddSkipped);
+			executeCmd(buildCmd(ipConnection, strDeleteSkipped, { {"@ToActionID", nToActionID } }));
+			executeCmd(buildCmd(ipConnection, strAddSkipped,
+				{
+					{"@ToActionID", nToActionID},
+					{"@FAMUserName", ((m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName).c_str()},
+					{"@FAMSessionID", m_nFAMSessionID == 0 ? vtMissing : m_nFAMSessionID},
+					{"@FromActionID", nFromActionID}
+				}));
 		}
 
 		// Delete all of the previous status for the to action
-		string strDeleteTo = "DELETE FROM FileActionStatus WHERE ActionID = " + strToActionID;
-		executeCmdQuery(ipConnection, strDeleteTo);
-
+		string strDeleteTo = "DELETE FROM FileActionStatus WHERE ActionID = @ToActionID";
+		executeCmd(buildCmd(ipConnection, strDeleteTo, { {"@ToActionID", nToActionID} }));
+		
 		// There are no cases where this method should not just ignore all pending entries in
 		// [QueuedActionStatusChange] for the selected files.
 		string strUpdateQueuedActionStatusChange =
 			"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
-			"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + strToActionID;
-		executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange);
+			"WHERE [ChangeStatus] = 'P' AND [ActionID] = @ToActionID";
+		executeCmd(buildCmd(ipConnection, strUpdateQueuedActionStatusChange, 
+			{ {"@ToActionID", nToActionID} }));
 
 		// Create new FileActionStatus records based on the value of the from action ID
 		string strCopy = "INSERT INTO FileActionStatus (FileID, ActionID, ActionStatus, Priority) "
-			"SELECT FileID, " + strToActionID + " as ActionID, ActionStatus, Priority "
-			"FROM FileActionStatus WHERE ActionID = " + strFromActionID;
-		executeCmdQuery(ipConnection, strCopy);
+			"SELECT FileID, @ToActionID as ActionID, ActionStatus, Priority "
+			"FROM FileActionStatus WHERE ActionID = @FromActionID";
+		executeCmd(buildCmd(ipConnection, strCopy,
+			{
+				{"@ToActionID", nToActionID},
+				{"@FromActionID", nFromActionID}
+			}));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27054");
 }
@@ -2872,11 +2926,12 @@ bool CFileProcessingDB::unaffiliatedWorkflowFilesExist()
 			strQuery =
 				"	SELECT COALESCE(MAX([ID]), -1) AS [ID] FROM [FAMFile] \r\n"
 				"	LEFT JOIN [WorkflowFile] ON [FAMFile].[ID] = [FileID] \r\n"
-				"	WHERE [ID] = " + asString(nUnaffiliatedFileId) + " \r\n"
+				"	WHERE [ID] = @UnaffiliatedFileID \r\n"
 				"	AND [WorkflowID] IS NULL";
 
 			long nDoubleCheckFileId = -1;
-			executeCmdQuery(ipConnection, strQuery, false, &nDoubleCheckFileId);
+			getCmdId(buildCmd(ipConnection, strQuery,
+				{ {"@UnaffiliatedFileID", nUnaffiliatedFileId} }), &nDoubleCheckFileId);
 
 			return (nUnaffiliatedFileId == nDoubleCheckFileId);
 		}
@@ -2896,10 +2951,11 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 			m_nActiveActionID = actionID;
 
 			long nWorkflowActionCount = 0;
-			string strWorkflowActionQuery = Util::Format(
-				"SELECT COUNT(*) AS [ID] FROM [Action] WHERE [ASCName] = '%s' AND [WorkflowID] IS NOT NULL",
-				strActionName.c_str());
-			executeCmdQuery(ipConnection, strWorkflowActionQuery, false, &nWorkflowActionCount);
+			string strWorkflowActionQuery =
+				"SELECT COUNT(*) AS [ID] FROM [Action] WHERE [ASCName] = @ActionName AND [WorkflowID] IS NOT NULL";
+			getCmdId(buildCmd(ipConnection, strWorkflowActionQuery, { {"@ActionName", strActionName.c_str()} }),
+				&nWorkflowActionCount);
+			
 			m_bUsingWorkflowsForCurrentAction = (nWorkflowActionCount > 0);
 			m_bRunningAllWorkflows = (m_bUsingWorkflowsForCurrentAction && strActiveWorkflow == "");
 			m_nProcessStart = 0;
@@ -2918,10 +2974,11 @@ void CFileProcessingDB::setActiveAction(_ConnectionPtr ipConnection, const strin
 			if (m_bUsingWorkflowsForCurrentAction)
 			{
 				long nExternalWorkflowFiles = 0;
-				string strExternalFilesQuery = Util::Format(
-					"SELECT COUNT(*) AS [ID] FROM [FileActionStatus] WHERE [ActionID] = '%d'",
-					getActionID(ipConnection, strActionName, ""));
-				executeCmdQuery(ipConnection, strExternalFilesQuery, false, &nExternalWorkflowFiles);
+				string strExternalFilesQuery =
+					"SELECT COUNT(*) AS [ID] FROM [FileActionStatus] WHERE [ActionID] = @ActionID";
+				getCmdId(buildCmd(ipConnection, strExternalFilesQuery, 
+					{ {"@ActionID", getActionID(ipConnection, strActionName, "")} })
+					, &nExternalWorkflowFiles);
 
 				if (nExternalWorkflowFiles > 0)
 				{
@@ -3035,9 +3092,18 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 				_RecordsetPtr ipLockTable(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI14550", ipLockTable != __nullptr);
 
-				// Open recordset with the locktime 
-				ipLockTable->Open((IDispatch *)cmdGetLock, vtMissing, adOpenStatic,
-					adLockReadOnly, adCmdText);
+				try
+				{
+					// Open recordset with the locktime 
+					ipLockTable->Open((IDispatch*)cmdGetLock, vtMissing, adOpenStatic,
+						adLockReadOnly, adCmdText);
+				}
+				catch (const std::exception& e)
+				{
+					UCLIDException ue("ELI51737", "Exception getting lock");
+					ue.addDebugInfo("ExceptionText", e.what());
+					throw ue;
+				}
 
 				// If we get to here the db connection should be valid
 				bConnectionGood = true;
@@ -3089,15 +3155,33 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 					throw UCLIDException("ELI34153", "Another process has the lock.");
 				}
 
-				// Add the lock
-				executeCmd(cmdAddLock);
+				try
+				{
+					// Add the lock
+					executeCmd(cmdAddLock);
 
-				// [LegacyRCAndUtils:6154]
-				// If this thread has the lock, but collides with another thread which is not locked
-				// over a database resource, the thread that is locked should win the deadlock
-				// (cause the unlocked thread to be chosen as the deadlock victim).
-				executeCmdQuery(ipConnection, "SET DEADLOCK_PRIORITY HIGH");
+				}
+				catch (const std::exception& e)
+				{
+					UCLIDException ue("ELI51738", "Exception adding lock.");
+					ue.addDebugInfo("ExceptionText", e.what());
+					throw ue;
+				}
+				try
+				{
+					// [LegacyRCAndUtils:6154]
+					// If this thread has the lock, but collides with another thread which is not locked
+					// over a database resource, the thread that is locked should win the deadlock
+					// (cause the unlocked thread to be chosen as the deadlock victim).
+					executeCmdQuery(ipConnection, "SET DEADLOCK_PRIORITY HIGH");
 
+				}
+				catch (const std::exception& e)
+				{
+					UCLIDException ue("ELI51739", "Exception Setting deadlock priority.");
+					ue.addDebugInfo("ExceptionText", e.what());
+					throw ue;
+				}
 				// Commit the changes
 				// If a DB lock is in the table for another process this will throw an exception
 				tg.CommitTrans();
@@ -3231,14 +3315,15 @@ bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseA
 
 		string username = m_strFAMUserName;
 		replaceVariable(username, "'", "''");
+		auto ipConnection = getDBConnection();
 
 		// setup the SQL Query to get the encrypted combo for admin or user
-		string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + 
-			((bUseAdmin) ? gstrADMIN_USER : username) + "'";
+		string strSQL = "SELECT * FROM LOGIN WHERE UserName = @UserName ";
+		auto cmd = buildCmd(ipConnection, strSQL, { {"@UserName",
+			((bUseAdmin) ? gstrADMIN_USER.c_str() : username.c_str())} });
 
 		// Open the set for the user being logged in
-		ipLoginSet->Open(strSQL.c_str(), _variant_t((IDispatch *)getDBConnection(), true), 
-			adOpenStatic, adLockReadOnly, adCmdText);
+		ipLoginSet->Open((IDispatch*)cmd, vtMissing, adOpenStatic, adLockReadOnly, adCmdText);
 
 		// user was in the DB if not at the end of file
 		if (ipLoginSet->adoEOF == VARIANT_FALSE)
@@ -3286,8 +3371,9 @@ void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strUser,
 	}
 
 	// Retrieve records from Login table for the admin or current user
-	string strSQL = "SELECT * FROM LOGIN WHERE UserName = '" + strUser + "'";
-	ipLoginSet->Open(strSQL.c_str(), _variant_t((IDispatch *)getDBConnection(), true), 
+	string strSQL = "SELECT * FROM LOGIN WHERE UserName = @UserName";
+	auto cmd = buildCmd(getDBConnection(), strSQL, { {"@UserName", strUser.c_str()} });
+	ipLoginSet->Open((IDispatch*)cmd, vtMissing,
 		adOpenDynamic, adLockPessimistic, adCmdText);
 
 	// User not in DB if at the end of file
@@ -3477,10 +3563,10 @@ void CFileProcessingDB::authenticateOneTimePassword(const string& strPassword)
 		" JOIN dbo.[FAMUser] ON [FAMUserID] = [FAMUser].[ID]"
 		" JOIN dbo.[FPSFile] ON [FPSFileID] = [FPSFile].[ID]"
 		" WHERE [StopTime] IS NULL"
-		"  AND [FPSFileName] = '" + gstrONE_TIME_ADMIN_USER + "'" +
-		"  AND [MachineName] = '" + m_strMachineName + "'" +
-		"  AND [UserName] = '" + getCurrentUserName() + "'" +
-		"  AND [StartTime] > DATEADD(minute, -1, GETDATE()) " +
+		"  AND [FPSFileName] = @FPSFileName "
+		"  AND [MachineName] = @MachineName "
+		"  AND [UserName] = @UserName "
+		"  AND [StartTime] > DATEADD(minute, -1, GETDATE()) "
 		" ORDER BY [FAMSession].[ID] DESC";
 	
 	try
@@ -3489,7 +3575,14 @@ void CFileProcessingDB::authenticateOneTimePassword(const string& strPassword)
 		{
 			_ConnectionPtr ipConnection = getDBConnection();
 			long nFAMSessionID = 0;
-			executeCmdQuery(ipConnection, strQueryForSession, false, &nFAMSessionID);
+
+			auto cmd = buildCmd(ipConnection, strQueryForSession,
+				{
+					{"@FPSFileName", gstrONE_TIME_ADMIN_USER.c_str()},
+					{"@MachineName", m_strMachineName.c_str()},
+					{"@UserName", getCurrentUserName().c_str()}
+				});
+			getCmdId(cmd, &nFAMSessionID);
 
 			// If an open session was found for a one-time password, initialize m_nFAMSessionID and
 			// m_bLoggedInAsAdmin, then validate the password is what it should be for the session.
@@ -3750,16 +3843,15 @@ long CFileProcessingDB::addOrUpdateFAMUser(_ConnectionPtr ipConnection)
 		long lFAMUserID = getKeyID(ipConnection, "FAMUser", "UserName", strUserName);
 
 		string strQuery =
-			"UPDATE FAMUser SET FullUserName = '<FullUserName>' "
-			" WHERE ID = <FAMUserID> "
-			"		AND(FullUserName IS NULL OR FullUserName <> '<FullUserName>')";
+			"UPDATE FAMUser SET FullUserName = @FullUserName "
+			" WHERE ID = @FAMUserID "
+			"		AND(FullUserName IS NULL OR FullUserName <> @FullUserName)";
+		executeCmd(buildCmd(ipConnection, strQuery,
+			{
+				{"@FullUserName", strFullUserName.c_str()},
+				{"@FAMUserID", lFAMUserID}
+			}));
 
-		replaceVariable(strFullUserName, "'", "''");
-		replaceVariable(strQuery, "<FAMUserID>", asString(lFAMUserID));
-		replaceVariable(strQuery, "<FullUserName>", strFullUserName);
-
-		executeCmdQuery(ipConnection, strQuery, false, __nullptr);
-		
 		return lFAMUserID;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI45997");
@@ -3772,6 +3864,11 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 		if (m_ipDBInfoSettings != __nullptr && m_iDBSchemaVersion != 0)
 		{
 			return;
+		}
+
+		if (ipConnection->State == adStateClosed)
+		{
+			throw UCLIDException("ELI51736", "Connection is Closed!");
 		}
 
 		// Initialize settings to default values
@@ -3874,8 +3971,12 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 							ue.log();
 
 							// Change the setting in the DBInfo table
-							executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
-								"' WHERE DBInfo.Name = '" + strValue + "'");
+							executeCmd(buildCmd(ipConnection,
+								"UPDATE DBInfo SET Value = @NewValue WHERE DBInfo.Name = @KeyName ",
+								{
+									{"@NewValue", strNewValue.c_str()},
+									{"@KeyName", strKey.c_str()}
+								}));
 						}
 						CATCH_AND_LOG_ALL_EXCEPTIONS("ELI29832");
 
@@ -3907,10 +4008,14 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 							ue.addDebugInfo("Old value", m_dGetFilesToProcessTransactionTimeout);
 							ue.addDebugInfo("New value", gdMINIMUM_TRANSACTION_TIMEOUT);
 							ue.log();
-
-							// Change the setting in the DBInfo table 
-							executeCmdQuery(ipConnection, "UPDATE DBInfo SET Value =  '" + strNewValue +
-								"' WHERE DBInfo.Name = '" + strValue + "'");
+							
+							// Change the setting in the DBInfo table
+							executeCmd(buildCmd(ipConnection,
+								"UPDATE DBInfo SET Value = @NewValue WHERE DBInfo.Name = @KeyName ",
+								{
+									{"@NewValue", strNewValue.c_str()},
+									{"@KeyName", strKey.c_str()}
+								}));
 						}
 						CATCH_AND_LOG_ALL_EXCEPTIONS("ELI31520");
 
@@ -4141,7 +4246,7 @@ bool CFileProcessingDB::isConnectionAlive(_ConnectionPtr ipConnection)
 	return false;
 }
 //--------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::reConnectDatabase()
+bool CFileProcessingDB::reConnectDatabase(string ELICodeOfCaller)
 {
 	StopWatch sw;
 	sw.start();
@@ -4159,6 +4264,7 @@ bool CFileProcessingDB::reConnectDatabase()
 				// Exception logged to indicate the retry was successful.
 				UCLIDException ueConnected("ELI23614",
 					"Application trace: Connection retry successful.");
+				ueConnected.addDebugInfo("CallerELICode", ELICodeOfCaller);
 				ueConnected.log();
 
 				return true;
@@ -4175,6 +4281,7 @@ bool CFileProcessingDB::reConnectDatabase()
 
 				// Create exception to indicate retry timed out
 				UCLIDException uex("ELI23612", "Database connection retry timed out!", ue);
+				uex.addDebugInfo("ELICodeOfCaller", ELICodeOfCaller);
 
 				// Log the caught exception.
 				uex.log();
@@ -4250,10 +4357,13 @@ void CFileProcessingDB::removeSkipFileRecord(const _ConnectionPtr &ipConnection,
 		string strSkippedSQL = "SELECT * FROM SkippedFile WHERE FileID = "
 			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
 
+		auto cmd = buildCmd(ipConnection, strSkippedSQL,
+			{ {"@FileID", nFileID}, {"@ActionID", nActionID} });
+
 		_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI26885", ipSkippedSet != __nullptr);
 
-		ipSkippedSet->Open(strSkippedSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
+		ipSkippedSet->Open((IDispatch*)cmd, vtMissing,
 			adOpenDynamic, adLockOptimistic, adCmdText);
 
 		// Only delete the record if it is found
@@ -4311,6 +4421,13 @@ void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = fa
 
 			// Validate the schema
 			validateDBSchemaVersion(bCheckForUnaffiliatedFiles);
+		}
+		else
+		{
+			UCLIDException ueNoDBSpecified("ELI51747", "No server or Database specified.");
+			ueNoDBSpecified.addDebugInfo("Server", m_strDatabaseServer);
+			ueNoDBSpecified.addDebugInfo("Database", m_strDatabaseName);
+			ueNoDBSpecified.log();
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");
@@ -4627,14 +4744,15 @@ void CFileProcessingDB::getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, 
 		// Clear the vector
 		rvecSkippedFileIDs.clear();
 
-		string strSQL = "SELECT [FileID] FROM [SkippedFile] WHERE [ActionID] = "
-			+ asString(nActionID);
+		string strSQL = "SELECT [FileID] FROM [SkippedFile] WHERE [ActionID] = @ActionID ";
+		map<string, variant_t> mapParam;
+		mapParam["@ActionID"] = nActionID;
 		if (!strUserName.empty())
 		{
-			// Escape any single quotes
-			replaceVariable(strUserName, "'", "''");
-			strSQL += " AND [UserName] = '" + strUserName + "'";
+			strSQL += " AND [UserName] = @UserName";
+			mapParam["@UserName"] = strUserName.c_str();
 		}
+		auto cmd = buildCmd(ipConnection, strSQL, mapParam);
 
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
@@ -4644,7 +4762,7 @@ void CFileProcessingDB::getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, 
 		ASSERT_RESOURCE_ALLOCATION("ELI26909", ipFileIDSet != __nullptr);
 
 		// get the recordset with skipped file ID's
-		ipFileIDSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
+		ipFileIDSet->Open((IDispatch*) cmd, vtMissing,
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Loop through the result set adding the file ID's to the vector
@@ -4666,12 +4784,15 @@ void CFileProcessingDB::clearFileActionComment(const _ConnectionPtr& ipConnectio
 {
 	try
 	{
+		map<string, variant_t> mapParams;
+		
 		// Query for deleting the comment
 		string strCommentSQL = "DELETE FROM FileActionComment ";
 		string strWhere = "";
 		if (nFileID != -1)
 		{
-			strWhere += "FileID = " + asString(nFileID);
+			mapParams["@FileID"] = nFileID;
+			strWhere += "FileID = @FileID";
 		}
 
 		// If nActionID == -1 then delete all comments for the FileID
@@ -4681,7 +4802,8 @@ void CFileProcessingDB::clearFileActionComment(const _ConnectionPtr& ipConnectio
 			{
 				strWhere += " AND ";
 			}
-			strWhere += "ActionID = " + asString(nActionID);
+			strWhere += "ActionID = @ActionID";
+			mapParams["@ActionID"] = nActionID;
 		}
 
 		if (!strWhere.empty())
@@ -4689,8 +4811,8 @@ void CFileProcessingDB::clearFileActionComment(const _ConnectionPtr& ipConnectio
 			strCommentSQL += "WHERE " + strWhere;
 		}
 
-		// Perform the deletion
-		executeCmdQuery(ipConnection, strCommentSQL);
+		// Perform deletion
+		executeCmd(buildCmd(ipConnection, strCommentSQL, mapParams));
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27109");
 }
@@ -4720,13 +4842,13 @@ void CFileProcessingDB::validateFileID(const _ConnectionPtr& ipConnection, long 
 {
 	try
 	{
-		string strQuery = "SELECT [FileName] FROM [" + gstrFAM_FILE + "] WITH (NOLOCK) WHERE [ID] = "
-			+ asString(nFileID);
+		string strQuery = "SELECT [FileName] FROM [" + gstrFAM_FILE + "] WITH (NOLOCK) WHERE [ID] = @FileID";
+		auto cmd = buildCmd(ipConnection, strQuery, { {"@FileID", nFileID} });
 
 		_RecordsetPtr ipRecord(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI27385", ipRecord != __nullptr);
 
-		ipRecord->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+		ipRecord->Open((IDispatch*) cmd, vtMissing, adOpenStatic,
 			adLockOptimistic, adCmdText);
 
 		if (ipRecord->adoEOF == VARIANT_TRUE)
@@ -4791,14 +4913,14 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			" FROM LockedFile "
 			" INNER JOIN [FileActionStatus] ON [LockedFile].[ActionID] = [FileActionStatus].[ActionID]"
 			"	AND [LockedFile].[FileID] = [FileActionStatus].[FileID]"
-			" WHERE [LockedFile].[ActiveFAMID] = " + asString(nActiveFAMID) +
+			" WHERE [LockedFile].[ActiveFAMID] = @ActionFAMID "
 			"	AND [FileActionStatus].[ActionStatus] = 'R'";
-
+		auto cmd = buildCmd(ipConnection, strSQL, { {"@ActionFAMID", nActiveFAMID} });
 		// Open a recordset that has the action names that need to have files reset
 		_RecordsetPtr ipFileSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI27737", ipFileSet != __nullptr);
 
-		ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
+		ipFileSet->Open((IDispatch*)cmd, vtMissing,
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Map to track the number of files for each action that are being reset
@@ -4835,8 +4957,8 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		// Delete the record from the ActiveFAM table
 		// By virtue of an FK with cascading deletes, this ensures files associated with the session
 		// can't be left behind in LockedFile or FileTaskSessionCache.
-		string strQuery = "DELETE FROM [ActiveFAM] WHERE [ID] = " + asString(nActiveFAMID);
-		executeCmdQuery(ipConnection, strQuery);
+		string strQuery = "DELETE FROM [ActiveFAM] WHERE [ID] = @ActiveFAMID";
+		executeCmd(buildCmd(ipConnection, strQuery, { {"@ActiveFAMID", nActiveFAMID} }));
 
 		// Set up the logged exception if it is not null
 		if (pUE != __nullptr)
@@ -4906,9 +5028,9 @@ void CFileProcessingDB::pingDB()
 			// Will throw an exception if m_nActiveFAMID does not exist in the ActiveFAM table.
 			long nFAMSessionID = 0;
 			// Return FAMSessionID as ID so it will populate nFAMSessionID.
-			executeCmdQuery(getDBConnection(),
-				"SELECT [FAMSessionID] AS [ID] FROM [ActiveFAM] WITH (NOLOCK) WHERE [ID] = " + asString(m_nActiveFAMID),
-				false, &nFAMSessionID);
+			getCmdId(buildCmd(getDBConnection(),
+				"SELECT [FAMSessionID] AS [ID] FROM [ActiveFAM] WITH (NOLOCK) WHERE [ID] = @ActiveFAMID ", { {"@ActiveFAMID", m_nActiveFAMID} }),
+				&nFAMSessionID);
 			if (nFAMSessionID != m_nFAMSessionID)
 			{
 				UCLIDException ue("ELI34118", "Unexpected FAMSessionID.");
@@ -4928,8 +5050,8 @@ void CFileProcessingDB::pingDB()
 	}
 
 	// Update the ping record. 
-	executeCmdQuery(getDBConnection(),
-		"UPDATE [ActiveFAM] SET [LastPingTime]=GETUTCDATE() WHERE [ID] = " + asString(m_nActiveFAMID));
+	executeCmd(buildCmd(getDBConnection(),
+		"UPDATE [ActiveFAM] SET [LastPingTime]=GETUTCDATE() WHERE [ID] = @ActiveFAMID", { {"@ActiveFAMID", m_nActiveFAMID} }));
 
 	m_dwLastPingTime = GetTickCount();
 }
@@ -5015,7 +5137,7 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 								// Unlike with END_CONNECTION_RETRY, failed reconnections here
 								// shouldn't be fatal. Just keep trying until processing is
 								// stopped or we finally get a connection.
-								pDB->reConnectDatabase();
+								pDB->reConnectDatabase("ELI51745");
 							}
 							catch (...) {}
 						}
@@ -5146,7 +5268,7 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 							// Unlike with END_CONNECTION_RETRY, failed reconnections here
 							// shouldn't be fatal. Just keep trying until processing is
 							// stopped or we finally get a connection.
-							pDB->reConnectDatabase();
+							pDB->reConnectDatabase("ELI51746");
 						}
 						catch (...) {}
 					}
@@ -5465,6 +5587,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 			// Start the stopwatch to use to check for transaction timeout
 			StopWatch swTransactionRetryTimeout;
 			swTransactionRetryTimeout.start();
+			long nTransactionRetryCount = 0;
 
 			// Retry the transaction until successful
 			while (!bTransactionSuccessful)
@@ -5533,6 +5656,11 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						throw ue;
 					}
 
+					if (nTransactionRetryCount == 0)
+					{
+						UCLIDException uex("ELI51731", "Start retry for set files to processing transaction.", ue);
+						uex.log();
+					}
 					// Check to see if the timeout value has been reached
 					if (swTransactionRetryTimeout.getElapsedTime() > m_dGetFilesToProcessTransactionTimeout)
 					{
@@ -5542,6 +5670,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						throw uex;
 					}
 
+					nTransactionRetryCount++;
 					// In the case that the exception is because the database has gotten into an
 					// inconsistent state (as with LegacyRCAndUtiles:6350), use a small sleep here to
 					// prevent thousands (or millions) of successive failures which may bog down the
@@ -5816,11 +5945,11 @@ bool CFileProcessingDB::doesLoginUserNameExist(const _ConnectionPtr& ipConnectio
 
 	// Sql query that should either be empty if the passed in users is not in the table
 	// or will return the record with the given username
-	string strLoginSelect = "Select Username From Login Where UserName = '" + strUserName + "'";
+	string strLoginSelect = "Select Username From Login Where UserName = @UserName";
+	auto cmd = buildCmd(ipConnection, strLoginSelect, { {"@UserName", strUserName.c_str()} });
 
 	// Open the sql query
-	ipLoginSet->Open(strLoginSelect.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-		adLockReadOnly, adCmdText);
+	ipLoginSet->Open((IDispatch*) cmd, vtMissing, adOpenStatic,	adLockReadOnly, adCmdText);
 
 	// if not at the end of file then there is a user by that name.
 	if (!asCppBool(ipLoginSet->adoEOF))
@@ -5875,9 +6004,10 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 	string strSQL = "SELECT [UPI] FROM [FAMSession] WITH (NOLOCK) "
 		"INNER JOIN [ActiveFAM] WITH (NOLOCK) ON [FAMSessionID] = [FAMSession].[ID] "
 		"INNER JOIN [Action] ON [ActionID] = [Action].[ID] "
-		"WHERE [ASCName] = '" + strActionName + "'";
+		"WHERE [ASCName] = @ActionName";
+	auto cmd = buildCmd(ipConnection, strSQL, { {"@ActionName", strActionName.c_str()} });
 
-	ipProcessingSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+	ipProcessingSet->Open((IDispatch*)cmd, vtMissing, adOpenStatic,
 		adLockReadOnly, adCmdText);
 
 	// if there are any records in ipProcessingSet there is active processing.
@@ -5993,11 +6123,11 @@ bool CFileProcessingDB::isStatisticsUpdateFromDeltaNeeded(const _ConnectionPtr& 
 	ASSERT_RESOURCE_ALLOCATION("ELI35130", ipActionStatSet != __nullptr);
 
 	// Select the existing Statistics record if it exists
-	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = " + asString(nActionID);
+	string strSelectStat = "SELECT * FROM ActionStatistics WHERE ActionID = @ActionID";
+	auto cmd = buildCmd(ipConnection, strSelectStat, { {"@ActionID", nActionID} });
 
 	// Open the recordset for the statistics with the record for ActionID if it exists
-	ipActionStatSet->Open(strSelectStat.c_str(), 
-		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+	ipActionStatSet->Open((IDispatch*)cmd, vtMissing, adOpenStatic,
 		adLockOptimistic, adCmdText);
 
 	if (!asCppBool(ipActionStatSet->adoEOF))
@@ -6022,15 +6152,15 @@ bool CFileProcessingDB::isStatisticsUpdateFromDeltaNeeded(const _ConnectionPtr& 
 void CFileProcessingDB::updateActionStatisticsFromDelta(const _ConnectionPtr& ipConnection, const long nActionID)
 {
 	// Get the current last record id from the ActionStatisticsDelta table for the ActionID
-	string strActionID = asString(nActionID);
-	string strActionStatisticsDeltaSQL = 
-		"SELECT COALESCE(MAX(ID),0) AS LastDeltaID FROM ActionStatisticsDelta where ActionID = " + strActionID;
+	string strActionStatisticsDeltaSQL =
+		"SELECT COALESCE(MAX(ID),0) AS LastDeltaID FROM ActionStatisticsDelta where ActionID = @ActionID";
+	auto cmd = buildCmd(ipConnection, strActionStatisticsDeltaSQL, { {"@ActionID", nActionID} });
+
 	_RecordsetPtr ipActionStatisticsDeltaSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI30749", ipActionStatisticsDeltaSet != __nullptr);
 
 	// Open the set that will give the last id in the delta table for the action
-	ipActionStatisticsDeltaSet->Open(strActionStatisticsDeltaSQL.c_str(),
-		_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly, adCmdText);
+	ipActionStatisticsDeltaSet->Open((IDispatch*) cmd, vtMissing, adOpenStatic, adLockReadOnly, adCmdText);
 
 	// Since the query for the set uses a Aggregate function (MAX) there should always
 	// be at least one record if there is not a problem
@@ -6053,25 +6183,21 @@ void CFileProcessingDB::updateActionStatisticsFromDelta(const _ConnectionPtr& ip
 	{
 		// No Delta records so just update the time stamp
 		string strUpdateTimeStamp = "UPDATE ActionStatistics SET [LastUpdateTimeStamp] = GetDate() "
-			"WHERE ActionID = " + strActionID;
-		executeCmdQuery (ipConnection, strUpdateTimeStamp);
+			"WHERE ActionID = @ActionID";
+		executeCmd(buildCmd(ipConnection, strUpdateTimeStamp, { {"@ActionID", nActionID} }));
 		return;
 	}
 
-	string strLastDeltaID = asString(llLastDeltaID);
 
 	// Build update query
 	string strUpdateActionStatistics = gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA;
-	replaceVariable(strUpdateActionStatistics, "<LastDeltaID>", strLastDeltaID);
-	replaceVariable(strUpdateActionStatistics, "<ActionIDToUpdate>", strActionID);
 
 	// Update the ActionStatistics table
-	executeCmdQuery(ipConnection, strUpdateActionStatistics);
+	executeCmd(buildCmd(ipConnection, strUpdateActionStatistics, { {"@LastDeltaID", llLastDeltaID}, {"@ActionIDToUpdate", nActionID} }));
 	
 	// Delete the ActionStatisticsDelta records that have just been updated
-	string strDeleteActionStatisticsDelta = "DELETE FROM ActionStatisticsDelta WHERE ActionID = " + 
-		strActionID + " AND ID <= " + strLastDeltaID;
-	executeCmdQuery(ipConnection, strDeleteActionStatisticsDelta);
+	string strDeleteActionStatisticsDelta = "DELETE FROM ActionStatisticsDelta WHERE ActionID = @ActionID AND ID <= @LastDeltaID";
+	executeCmd(buildCmd(ipConnection, strDeleteActionStatisticsDelta, { {"@ActionID", nActionID}, {"@LastDeltaID",llLastDeltaID} }));
 }
 //-------------------------------------------------------------------------------------------------
 set<string> getDBTableNames(const _ConnectionPtr& ipConnection)
@@ -6402,7 +6528,7 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, s
 	const _ConnectionPtr &ipConnection)
 {
 	// Declare query string so that if there is an exception the query can be added to debug info
-	string strQuery;
+	map<string, variant_t> params;
 	try
 	{
 		try
@@ -6416,22 +6542,24 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, s
 			StopWatch swTransactionRetryTimeout;
 			swTransactionRetryTimeout.start();
 
-			string strFAMSessionID = asString(m_nFAMSessionID);
-
 			// Set to the query to get workitems to process
-			strQuery = gstrGET_WORK_ITEM_TO_PROCESS;
 			string strActionIDs = getActionIDsForActiveWorkflow(ipConnection, strActionName);
-			replaceVariable(strQuery, "<ActionIDs>", strActionIDs);
-			replaceVariable(strQuery, "<FAMSessionID>", strFAMSessionID);
-			replaceVariable(strQuery, "<GroupFAMSessionID>",
-				(bRestrictToFAMSessionID) ? strFAMSessionID : "");
-			replaceVariable(strQuery, "<MaxWorkItems>", asString(nNumberToGet));
-			replaceVariable(strQuery, "<MinPriority>", asString(eMinPriority));
-			
+			params =
+			{
+				{"@|<VT_INT>ActionIDs", strActionIDs.c_str()},
+				{"@FAMSessionID", m_nFAMSessionID},
+				{"@GroupFAMSessionID", (bRestrictToFAMSessionID) ? m_nFAMSessionID : 0},
+				{"@MaxWorkItems", nNumberToGet},
+				{"@MinPriority", (int)eMinPriority}
+			};
+			auto cmd = buildCmd(ipConnection, gstrGET_WORK_ITEM_TO_PROCESS, params);
+
 			UCLID_FILEPROCESSINGLib::IWorkItemRecordPtr ipWorkItem = __nullptr;
 
 			IIUnknownVectorPtr ipWorkItems(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI37422", ipWorkItems != __nullptr);
+
+			long nTransactionRetryCount = 0;
 
 			// Retry the transaction until successful
 			while (!bTransactionSuccessful)
@@ -6443,8 +6571,8 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, s
 
 					try
 					{
-						variant_t vtRecordsAffected = 0L;
-						_RecordsetPtr ipWorkItemSet = ipConnection->Execute(strQuery.c_str(), &vtRecordsAffected,  adCmdText);
+                        variant_t vtRecordsAffected = 0L;
+						_RecordsetPtr ipWorkItemSet = cmd->Execute(&vtRecordsAffected, nullptr, adCmdText);
 						ASSERT_RESOURCE_ALLOCATION("ELI36887", ipWorkItemSet != __nullptr);
 
 						while (!asCppBool(ipWorkItemSet->adoEOF))
@@ -6474,6 +6602,12 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, s
 						throw ue;
 					}
 
+					if (nTransactionRetryCount == 0)
+					{
+						UCLIDException uex("ELI51732", "Start transaction retry to set work items to processing", ue);
+						uex.log();
+					}
+
 					// Check to see if the timeout value has been reached
 					if (swTransactionRetryTimeout.getElapsedTime() > m_dGetFilesToProcessTransactionTimeout)
 					{
@@ -6483,6 +6617,7 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, s
 						throw uex;
 					}
 
+					nTransactionRetryCount++;
 					// In the case that the exception is because the database has gotten into an
 					// inconsistent state (as with LegacyRCAndUtiles:6350), use a small sleep here to
 					// prevent thousands (or millions) of successive failures which may bog down the
@@ -6496,7 +6631,11 @@ IIUnknownVectorPtr CFileProcessingDB::setWorkItemsToProcessing(bool bDBLocked, s
 	}
 	catch (UCLIDException &ue)
 	{
-		ue.addDebugInfo("Record Query", strQuery, true);
+		ue.addDebugInfo("Record Query", gstrGET_WORK_ITEM_TO_PROCESS, true);
+		for each (auto p in params)
+		{
+			ue.addDebugInfo(p.first, p.second);
+		}
 		throw ue;
 	}
 }
@@ -6516,11 +6655,10 @@ void CFileProcessingDB::revertTimedOutWorkItems(bool bDBLocked, const _Connectio
 		{
 			// Begin a transaction
 			TransactionGuard tgRevert(ipConnection, adXactRepeatableRead, &m_criticalSection);
-			string strQuery = gstrRESET_TIMEDOUT_WORK_ITEM_QUERY;
-			replaceVariable(strQuery, "<TimeOutInSeconds>", asString(m_nAutoRevertTimeOutInMinutes * 60));
 
 			// Reset any work items that have a status of processing but the FAM is no longer active.
-			long nNumberWorkItemsReset = executeCmdQuery(ipConnection, strQuery);
+			long nNumberWorkItemsReset = executeCmd(buildCmd(ipConnection, gstrRESET_TIMEDOUT_WORK_ITEM_QUERY,
+				{ {"@TimeOutInSeconds",m_nAutoRevertTimeOutInMinutes * 60} }));
 
 			// Commit the reverted files
 			tgRevert.CommitTrans();
@@ -6792,13 +6930,16 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 	// list of queries to run
 	vector<string> vecUpdateQueries;
 
-	string strUpdateDBInfoQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
-	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_NAME, gstrDATABASEID);
-	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_VALUE, strNewEncryptedDBID);
-	
-	// Add Query to update to new DatabaseId
-	vecUpdateQueries.push_back(strUpdateDBInfoQuery);
-	
+	auto cmd = buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
+		{
+			{gstrSETTING_NAME.c_str(), gstrDATABASEID.c_str()}
+			,{gstrSETTING_VALUE.c_str(), strNewEncryptedDBID.c_str()}
+			,{"@UserID", 0}
+			,{"@MachineID",0}
+			,{gstrSAVE_HISTORY.c_str(), 0 }
+		});
+	executeCmd(cmd);
+
 	// Add the queries to update the counter records
 	createCounterUpdateQueries(newDatabaseIDValues, vecUpdateQueries, mapCounters);
 
@@ -6945,7 +7086,8 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 		vecUpdateQueries.push_back(getQueryToResetCounterCorruption(existingCounter,
 			newDatabaseID, ueLog));
 	}
-	vecUpdateQueries.push_back(getDatabaseIDUpdateQuery(newDatabaseID));
+	executeCmd(getDatabaseIDUpdateQuery(ipConnection, newDatabaseID));
+	
 	executeVectorOfSQL(ipConnection, vecUpdateQueries);
 
 	m_strEncryptedDatabaseID = "";
@@ -6963,19 +7105,16 @@ void CFileProcessingDB::createAndStoreNewDatabaseID(_ConnectionPtr ipConnection)
 	getFAMPassword(bsPW);
 	m_strEncryptedDatabaseID = MapLabel::setMapLabelWithS(bsDatabaseID,bsPW);
 
-	// Insert a blank entry if it is missing
-	string strUpdateQuery = gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY;
-	replaceVariable(strUpdateQuery, gstrSETTING_NAME, gstrDATABASEID);
-	replaceVariable(strUpdateQuery, gstrSETTING_VALUE, "");
-	executeCmdQuery(ipConnection, strUpdateQuery);
+	executeCmd(buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
+		{
+			{gstrSETTING_NAME.c_str(), gstrDATABASEID.c_str()}
+			,{gstrSETTING_VALUE.c_str(), ""}
+			,{"@UserID", getFAMUserID(ipConnection)}
+			,{"@MachineID", getMachineID(ipConnection)}
+			,{gstrSAVE_HISTORY.c_str(), (m_bStoreDBInfoChangeHistory) ? 1 : 0 }
+		}));
+
 	
-	// Update the value and store the old value in history
-	strUpdateQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY_STORE_HISTORY;
-	replaceVariable(strUpdateQuery, gstrUSER_ID_VAR, asString(getFAMUserID(ipConnection)));
-	replaceVariable(strUpdateQuery,	gstrMACHINE_ID_VAR, asString(getMachineID(ipConnection)));
-	replaceVariable(strUpdateQuery, gstrSETTING_NAME, gstrDATABASEID);
-	replaceVariable(strUpdateQuery, gstrSETTING_VALUE, m_strEncryptedDatabaseID);
-	executeCmdQuery(ipConnection, strUpdateQuery);
 	m_bDatabaseIDValuesValidated = false;
 	m_ipDBInfoSettings = __nullptr;
 					
@@ -7031,7 +7170,8 @@ void CFileProcessingDB::updateDatabaseIDAndSecureCounterTablesSchema183(_Connect
 			vecQueries.push_back(getQueryToResetCounterCorruption(existingCounter,
 				m_DatabaseIDValues, ueLog, "Schema Update"));
 		}
-		vecQueries.push_back(getDatabaseIDUpdateQuery(m_DatabaseIDValues));
+		executeCmd(getDatabaseIDUpdateQuery(ipConnection, m_DatabaseIDValues));
+
 		executeVectorOfSQL(ipConnection, vecQueries);
 		m_ipDBInfoSettings = __nullptr;
 
@@ -7068,7 +7208,7 @@ string CFileProcessingDB::getQueryToResetCounterCorruption(CounterOperation coun
 	return counterChange.GetInsertQuery();
 }
 //-------------------------------------------------------------------------------------------------
-string  CFileProcessingDB::getDatabaseIDUpdateQuery(DatabaseIDValues databaseID)
+_CommandPtr  CFileProcessingDB::getDatabaseIDUpdateQuery(_ConnectionPtr ipConnection, DatabaseIDValues databaseID)
 {
 	// Need to updated the DatabaseID record
 	ByteStream bsNewDBID;
@@ -7081,11 +7221,14 @@ string  CFileProcessingDB::getDatabaseIDUpdateQuery(DatabaseIDValues databaseID)
 
 	string strNewEncryptedDBID = MapLabel::setMapLabelWithS(bsNewDBID, bsFAMPassword);
 
-	string strUpdateDBInfoQuery = gstrDBINFO_UPDATE_SETTINGS_QUERY;
-	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_NAME, gstrDATABASEID);
-	replaceVariable(strUpdateDBInfoQuery, gstrSETTING_VALUE, strNewEncryptedDBID);
-
-	return strUpdateDBInfoQuery;
+	return buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
+		{
+			{gstrSETTING_NAME.c_str(), gstrDATABASEID.c_str()}
+			,{gstrSETTING_VALUE.c_str(), strNewEncryptedDBID.c_str()}
+			,{"@UserID", 0}
+			,{"@MachineID",0}
+			,{gstrSAVE_HISTORY.c_str(), 0 }
+		});
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDefinition(
@@ -7095,7 +7238,6 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 	ASSERT_RESOURCE_ALLOCATION("ELI41893", ipWorkflowSet != __nullptr);
 
 	string strQuery =
-		Util::Format(
 			"SELECT [ID] "
 			", [Name] "
 			", [WorkflowTypeCode] "
@@ -7111,10 +7253,10 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 			", [OutputFilePathInitializationFunction] "
 			", [LoadBalanceWeight] "
 			"	FROM [Workflow]"
-			"	WHERE [ID] = %i", nID);
+			"	WHERE [ID] = @WorkflowID";
+	auto cmd = buildCmd(ipConnection, strQuery, { {"@WorkflowID", nID} });
 
-	ipWorkflowSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-		adOpenStatic, adLockReadOnly, adCmdText);
+	ipWorkflowSet->Open((IDispatch*)cmd, vtMissing, adOpenStatic, adLockReadOnly, adCmdText);
 
 	if (asCppBool(ipWorkflowSet->adoEOF))
 	{
@@ -7166,14 +7308,14 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 	{
 		long long llAttributeSetID = getLongLongField(ipFields, "OutputAttributeSetID");
 
-		string strAttributeSetQuery = "SELECT [Description] FROM [dbo].[AttributeSetName] WHERE [ID]="
-			+ asString(llAttributeSetID);
+		string strAttributeSetQuery = "SELECT [Description] FROM [dbo].[AttributeSetName] WHERE [ID]= @AttributeSetID";
+
+		auto cmd = buildCmd(ipConnection, strAttributeSetQuery, { {"@AttributeSetID", llAttributeSetID} });
 
 		_RecordsetPtr ipAttributeSetResult(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI41919", ipAttributeSetResult != __nullptr);
 
-		ipAttributeSetResult->Open(strAttributeSetQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenStatic, adLockReadOnly, adCmdText);
+		ipAttributeSetResult->Open((IDispatch*)cmd, vtMissing, adOpenStatic, adLockReadOnly, adCmdText);
 
 		ASSERT_RUNTIME_CONDITION("ELI41920", !asCppBool(ipAttributeSetResult->adoEOF),
 			"Unknown attribute set ID");
@@ -7193,13 +7335,12 @@ UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr CFileProcessingDB::getWorkflowDe
 	{
 		long lMetadataFieldID = getLongField(ipFields, "OutputFileMetadataFieldID");
 
-		string strMetadataFieldQuery = "SELECT [Name] FROM [dbo].[MetadataField] WHERE [ID] = "
-			+ asString(lMetadataFieldID);
-
+		string strMetadataFieldQuery = "SELECT [Name] FROM [dbo].[MetadataField] WHERE [ID] = @MetadataFieldID";
+		auto cmd = buildCmd(ipConnection, strMetadataFieldQuery, { {"@MetadataFieldID", lMetadataFieldID} });
 		_RecordsetPtr ipMetadataFieldResult(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI42049", ipMetadataFieldResult != __nullptr);
 
-		ipMetadataFieldResult->Open(strMetadataFieldQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+		ipMetadataFieldResult->Open((IDispatch*)cmd, vtMissing,
 			adOpenStatic, adLockReadOnly, adCmdText);
 
 		ASSERT_RUNTIME_CONDITION("ELI42050", !asCppBool(ipMetadataFieldResult->adoEOF),
@@ -7253,13 +7394,13 @@ vector<tuple<long, string, bool>> CFileProcessingDB::getWorkflowActions(_Connect
 	_RecordsetPtr ipActionSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI41992", ipActionSet != __nullptr);
 
-	string strQuery =
-		Util::Format("SELECT [ID], [ASCName], [MainSequence] "
+	string strQuery = "SELECT [ID], [ASCName], [MainSequence] "
 			"FROM dbo.[Action] "
-			"WHERE [WorkflowID] = %i", nWorkflowID);
+			"WHERE [WorkflowID] = @WorkflowID";
 
-	ipActionSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
-		adOpenStatic, adLockReadOnly, adCmdText);
+	auto cmd = buildCmd(ipConnection, strQuery, { {"@WorkflowID", nWorkflowID} });
+
+	ipActionSet->Open((IDispatch*) cmd, vtMissing, adOpenStatic, adLockReadOnly, adCmdText);
 
 	while (!asCppBool(ipActionSet->adoEOF))
 	{
@@ -7352,17 +7493,19 @@ vector<tuple<long, string>> CFileProcessingDB::getWorkflowStatus(long nFileID,
 			"Workflow has not been properly configured; EndAction not defined.");
 		long nEndActionID = getActionID(ipConnection, strEndAction);
 
-		string strQuery = gstrGET_WORKFLOW_STATUS;
-		replaceVariable(strQuery, "<FileID>", asString(nFileID));
-		replaceVariable(strQuery, "<WorkflowID>", asString(nWorkflowID));
-		replaceVariable(strQuery, "<ActionIDs>", strActionIDs);
-		replaceVariable(strQuery, "<EndActionID>", asString(nEndActionID));
-		replaceVariable(strQuery, "<ReturnFileStatuses>", bReturnFileStatuses ? "1" : "0");
+        auto cmd = buildCmd(ipConnection, gstrGET_WORKFLOW_STATUS,
+        {
+            {"@FileID", nFileID},
+            {"@WorkflowID", nWorkflowID},
+            {"@|<VT_INT>ActionIDs", strActionIDs.c_str()},
+            {"@EndActionID", nEndActionID},
+            {"@ReturnFileStatuses", bReturnFileStatuses ? 1: 0}
+        });
 
 		_RecordsetPtr ipWorkflowStatus(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI42138", ipWorkflowStatus);
 
-		ipWorkflowStatus->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+		ipWorkflowStatus->Open((IDispatch *)cmd, vtMissing,
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		while (ipWorkflowStatus->adoEOF == VARIANT_FALSE)
@@ -7416,90 +7559,101 @@ void CFileProcessingDB::setStatusForAllFiles(_ConnectionPtr ipConnection, const 
 
 	string strActionStatus = asStatusString(eStatus);
 
-	// Only want to change the status that is different from status that is being changed to
-	string strWhere = " WHERE ActionStatus  <> '" + strActionStatus + "'";
+	map<string, variant_t> mapParams;
+	mapParams["@ActionID"] = nActionID;
 
 	// Get the action ID as a string
 	string strActionID = asString(nActionID);
 
 	// Remove any records from the skipped file table that where skipped for this action
-	string strDeleteSkippedSQL = "DELETE FROM [SkippedFile] WHERE ActionID = " + strActionID;
-	executeCmdQuery(ipConnection, strDeleteSkippedSQL);
+	string strDeleteSkippedSQL = "DELETE FROM [SkippedFile] WHERE ActionID = @ActionID";
+	executeCmd(buildCmd(ipConnection, strDeleteSkippedSQL, mapParams));
 
 	// Remove any records in the LockedFile table for status changing from Processing to pending
-	string strDeleteLockedFiles = "DELETE FROM [LockedFile] WHERE ActionID = " + strActionID;
-	executeCmdQuery(ipConnection, strDeleteLockedFiles);
+	string strDeleteLockedFiles = "DELETE FROM [LockedFile] WHERE ActionID = @ActionID";
+	executeCmd(buildCmd(ipConnection, strDeleteLockedFiles, mapParams));
 
 	// There are no cases where this method should not just ignore all pending entries in
 	// [QueuedActionStatusChange] for the selected files.
 	string strUpdateQueuedActionStatusChange =
 		"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
-		"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + strActionID;
-	executeCmdQuery(ipConnection, strUpdateQueuedActionStatusChange);
+		"WHERE [ChangeStatus] = 'P' AND [ActionID] = @ActionID";
+	executeCmd(buildCmd(ipConnection, strUpdateQueuedActionStatusChange, mapParams));
 
 	// If setting files to skipped, need to add skipped record for each file
 	if (eStatus == kActionSkipped)
 	{
 		// Get the current user name
 		string strUserName = (m_strFAMUserName.empty()) ? getCurrentUserName() : m_strFAMUserName;
+		mapParams["@UserName"] = strUserName.c_str();
 
 		// Add all files to the skipped table for this action
 		string strSQL = "INSERT INTO [SkippedFile] ([FileID], [ActionID], [UserName]) ";
-		strSQL += (nWorkflowId > 0)
-			? Util::Format(
-				"(SELECT [FileID] AS ID, %d AS ActionID, '%s' AS UserName FROM [WorkflowFile] WITH (NOLOCK) WHERE [WorkflowID] = %d)",
-				nActionID, strUserName.c_str(), nWorkflowId)
-			: Util::Format(
-				"(SELECT [ID], %d AS ActionID, '%s' AS UserName FROM [FAMFile])",
-				nActionID, strUserName.c_str());
-		executeCmdQuery(ipConnection, strSQL);
+		if (nWorkflowId > 0)
+		{
+			mapParams["@WorkflowID"] = nWorkflowId;
+			strSQL +=
+				"(SELECT [FileID] AS ID, @ActionID AS ActionID, @UserName AS UserName FROM [WorkflowFile] WITH (NOLOCK) WHERE [WorkflowID] = @WorkflowID)";
+		}
+		else
+		{
+			strSQL +=
+				"(SELECT [ID], @ActionID AS ActionID, @UserName AS UserName FROM [FAMFile])";
+		}
+		executeCmd(buildCmd(ipConnection, strSQL, mapParams));
 	}
 
+	map<string, variant_t> params;
+
+	params["@ActionID"] = nActionID;
+	params["@ActionStatus"] = strActionStatus.c_str();
+
+	// Only want to change the status that is different from status that is being changed to
+	string strWhere = " WHERE ActionStatus  <> @ActionStatus ";
+
 	// Add the transition records
-	addASTransFromSelect(ipConnection, strAction, nActionID, strActionStatus,
+	addASTransFromSelect(ipConnection, params, strAction, nActionID, strActionStatus,
 		"", "", strWhere, "");
 
 	// if the new status is Unattempted
 	if (eStatus == kActionUnattempted)
 	{
 		string strDeleteStatus = "DELETE FROM FileActionStatus "
-			" WHERE ActionID = " + strActionID;
-		executeCmdQuery(ipConnection, strDeleteStatus);
+			" WHERE ActionID = @ActionID";
+		executeCmd(buildCmd(ipConnection, strDeleteStatus, { {"@ActionID", nActionID } }));
 	}
 	else
 	{
 		// Update status of existing records
-		string strUpdateStatus = "UPDATE FileActionStatus SET ActionStatus = '" +
-			strActionStatus + "' "
+		string strUpdateStatus = "UPDATE FileActionStatus SET ActionStatus = @ActionStatus "
 			"FROM FileActionStatus INNER JOIN FAMFile ON FileActionStatus.FileID = FAMFile.ID AND "
-			"FileActionStatus.ActionID = " + strActionID;
+			"FileActionStatus.ActionID = @ActionID ";
 		if (nWorkflowId > 0)
 		{
 			strUpdateStatus +=
-				" INNER JOIN [WorkflowFile] WITH (NOLOCK) ON [FileActionStatus].[FileID] = [WorkflowFile].[FileID]" +
-				Util::Format(" AND [WorkflowID] = %d", nWorkflowId);
+				" INNER JOIN [WorkflowFile] WITH (NOLOCK) ON [FileActionStatus].[FileID] = [WorkflowFile].[FileID]" 
+				" AND [WorkflowID] = @WorkflowID";
+			params["@WorkflowID"] = nWorkflowId;
 		}
-		executeCmdQuery(ipConnection, strUpdateStatus);
+		executeCmd(buildCmd(ipConnection, strUpdateStatus, params));
 
 		// Insert new records where previous status was 'U'
 		string strInsertStatus = "INSERT INTO FileActionStatus "
 			"(FileID, ActionID, ActionStatus, Priority) "
-			" SELECT FAMFile.ID, " + strActionID + " as ActionID, '" +
-			strActionStatus + "' AS ActionStatus, "
+			" SELECT FAMFile.ID, @ActionID as ActionID, @ActionStatus"
+			" AS ActionStatus, "
 			"COALESCE(FileActionStatus.Priority, FAMFile.Priority) AS Priority "
 			"FROM FAMFile ";
 		if (nWorkflowId > 0)
 		{
 			strInsertStatus +=
-				Util::Format(
-					"INNER JOIN [WorkflowFile] WITH (NOLOCK) ON [FAMFile].[ID] = [WorkflowFile].[FileID] AND [WorkflowID] = %d ",
-					nWorkflowId);
+				"INNER JOIN [WorkflowFile] WITH (NOLOCK) ON [FAMFile].[ID] = [WorkflowFile].[FileID] AND [WorkflowID] = @WorkflowID ";
 		}
-		strInsertStatus += Util::Format(
-			"LEFT JOIN FileActionStatus ON [FAMFile].[ID] = FileActionStatus.FileID"
-			"	AND FileActionStatus.ActionID = %d "
-			"WHERE FileActionStatus.ActionID IS NULL", nActionID);
-		executeCmdQuery(ipConnection, strInsertStatus);
+		strInsertStatus +=
+			"LEFT JOIN FileActionStatus ON [FAMFile].[ID] = FileActionStatus.FileID "
+			"	AND FileActionStatus.ActionID = @ActionID "
+			"WHERE FileActionStatus.ActionID IS NULL";
+		executeCmd(buildCmd(ipConnection, strInsertStatus, params));
 	}
 
 	// If going to complete status and AutoDeleteFileActionComments == true then
@@ -7743,19 +7897,17 @@ void CFileProcessingDB::createTempTableOfSelectedFiles(ADODB::_ConnectionPtr &ip
 //--------------------------------------------------------------------------------------------------
 string CFileProcessingDB::getWebAppSettings(_ConnectionPtr ipConnection, long nWorkflowId, string strType)
 {
-	replaceVariable(strType, "'", "''");
-
-	string strQuery = Util::Format(
-		"SELECT [Settings] "
+	string strQuery = "SELECT [Settings] "
 		"	FROM dbo.[WebAppConfig] "
-		"	WHERE[Type] = '%s' AND[WorkflowID] = %d",
-		strType.c_str(), nWorkflowId);
+		"	WHERE[Type] =  @Type AND [WorkflowID] = @WorkflowID";
+
+	auto cmd = buildCmd(ipConnection, strQuery, { {"@Type", strType.c_str()}, {"@WorkflowID", nWorkflowId} });
 
 	// Create a pointer to a recordset
 	_RecordsetPtr ipWebAppSettings(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI45071", ipWebAppSettings != __nullptr);
 
-	ipWebAppSettings->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic,
+	ipWebAppSettings->Open((IDispatch*)cmd, vtMissing, adOpenStatic,
 		adLockOptimistic, adCmdText);
 
 	if (ipWebAppSettings->adoEOF == VARIANT_TRUE)

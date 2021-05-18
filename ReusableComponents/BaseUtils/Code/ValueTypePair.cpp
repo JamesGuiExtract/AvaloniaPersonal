@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ValueTypePair.h"
 #include "UCLIDException.h"
+#include "COMUtils.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -175,6 +176,60 @@ ValueTypePair::ValueTypePair(double _dValue)
 	ValueTypePair::ValueTypePair();
 
 	setValue(_dValue);
+}
+//--------------------------------------------------------------------------------------------------
+ValueTypePair::ValueTypePair(const variant_t vtVariant)
+{
+	try
+	{
+		switch (vtVariant.vt)
+		{
+		case VT_EMPTY:
+			setValue("<Empty>");
+			break;
+		case VT_NULL:
+			setValue("<NULL>");
+			break;
+		case VT_I1:
+		case VT_I2:
+		case VT_I4:
+		case VT_INT:
+			setValue((long)vtVariant);
+			break;
+		case VT_I8:
+			setValue((long long)vtVariant);
+			break;
+		case VT_UI1:
+		case VT_UI2:
+		case VT_UI4:
+		case VT_UINT:
+			setValue((unsigned long)vtVariant);
+			break;
+		case VT_R4:
+		case VT_R8:
+		case VT_DECIMAL:
+			setValue((double)vtVariant);
+			break;
+		case VT_BOOL:
+			setValue(asCppBool((VARIANT_BOOL)vtVariant));
+			break;
+		case VT_DATE:
+			setValue(vtVariant.date);
+			break;
+		case VT_BSTR:
+			setValue(asString(vtVariant.bstrVal));
+			break;
+		default:
+			THROW_LOGIC_ERROR_EXCEPTION("ELI51734");
+		}
+	}
+	catch (UCLIDException &ue)
+	{
+		ue.addDebugInfo("VariantType", vtVariant.vt);
+		UCLIDException logExecption("ELI51735", "Unable to convert variant value", ue);
+		logExecption.log();
+		setValue("Unable to convert variant_t of type " + asString(vtVariant.vt));
+	}
 }
 //--------------------------------------------------------------------------------------------------
 ValueTypePair::~ValueTypePair()

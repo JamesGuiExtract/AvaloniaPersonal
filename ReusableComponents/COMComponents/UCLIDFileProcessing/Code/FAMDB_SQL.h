@@ -1351,7 +1351,7 @@ static const string gstrSHRINK_DATABASE = "DBCC SHRINKDATABASE (0)";
 static const string gstrSETTING_NAME = "@SettingName";
 
 // Query for looking for a specific setting
-// To use run replaceVariable to replace <SettingName>
+// This query uses the parameter specified in gstrSETTING_NAME
 // https://extract.atlassian.net/browse/ISSUE-13910
 // To allow for the ability to query settings on old DB's where the schema may have changed,
 // get all columns rather than a hard-coded list.
@@ -1364,37 +1364,75 @@ static const string gstrDBINFO_GET_SETTINGS_QUERY =
 
 // Constant to be replaced in the DBInfo Setting query
 static const string gstrSETTING_VALUE = "@SettingValue";
-
-// Query for updating the DB info settings
-static const string gstrDBINFO_UPDATE_SETTINGS_QUERY =
-	"UPDATE DBInfo SET [Value] = '" + gstrSETTING_VALUE + "' WHERE [Name] = "
-	+ gstrSETTING_NAME + " AND [Value] <> " + gstrSETTING_VALUE;
-
-// Query for inserting a DBInfo setting if it doesn't exist 
-static const string gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY =
-	"DECLARE @CurrentValue as NVARCHAR(MAX) "
-	"SELECT @CurrentValue = Value FROM DBInfo WHERE Name = " + gstrSETTING_NAME +
-	" IF (@CurrentValue IS NULL) BEGIN "
-	"	INSERT INTO DBINFO ([Name], [Value]) "
-	"	VALUES (" + gstrSETTING_NAME + ", " + gstrSETTING_VALUE + ") "
-	"END "; 
-
-// Query for updating the DB info settings and storing the change history
-static const string gstrDBINFO_UPDATE_SETTINGS_QUERY_STORE_HISTORY =
-	"DECLARE @ChangeHistory TABLE (UserID INT, MachineID INT, DBInfoID INT, "
-	"OldValue NVARCHAR(MAX), NewValue NVARCHAR(MAX)); UPDATE [DBInfo] SET [Value] = '"
-	+ gstrSETTING_VALUE + "' OUTPUT " + gstrUSER_ID_VAR + ", "
-	+ gstrMACHINE_ID_VAR + ", INSERTED.[ID] AS DBInfoID, "
-	"DELETED.[Value] AS OldValue, INSERTED.[Value] AS NewValue INTO "
-	"@ChangeHistory (UserID, MachineID, DBInfoID, OldValue, NewValue) "
-	"WHERE [Name] = " + gstrSETTING_NAME + " AND [Value] <> " + gstrSETTING_VALUE
-	+ "; INSERT INTO [DBInfoChangeHistory] ([FAMUserID], [MachineID], [DBInfoID], "
-	"[OldValue], [NewValue]) SELECT * FROM @ChangeHistory;";
+static const string gstrSAVE_HISTORY = "@SaveHistory";
 
 // Query to set the last DB info changed time
 static const string gstrUPDATE_DB_INFO_LAST_CHANGE_TIME =
-	"UPDATE [DBInfo] SET [Value] = CONVERT(NVARCHAR(MAX), GETDATE(), 21) WHERE [Name] = '"
-	+ gstrLAST_DB_INFO_CHANGE + "'";
+"UPDATE [DBInfo] SET [Value] = CONVERT(NVARCHAR(MAX), GETDATE(), 21) WHERE [Name] = '"
++ gstrLAST_DB_INFO_CHANGE + "'";
+
+static const string gstADD_UPDATE_DBINFO_SETTING =
+"	DECLARE @HistoryChanges TABLE(																			   \r\n"
+"		[FAMUserID][int] NOT NULL																			   \r\n"
+"		, [MachineID][int] NOT NULL																			   \r\n"
+"		, [DBInfoID][int] NOT NULL																			   \r\n"
+"		, [OldValue][nvarchar](max) NULL																	   \r\n"
+"		, [NewValue][nvarchar](max) NULL																	   \r\n"
+"		, [TimeStamp][datetime] NOT NULL																	   \r\n"
+"	)																										   \r\n"
+"																											   \r\n"
+"	MERGE INTO dbo.DBInfo AS Target																			   \r\n"
+"	USING(																									   \r\n"
+"		VALUES(																								   \r\n"
+"			@SettingName																					   \r\n"
+"			, @SettingValue																					   \r\n"
+"		)																									   \r\n"
+"	) AS Source(Name, Value)																				   \r\n"
+"	ON(Target.Name = Source.Name)																			   \r\n"
+"	WHEN MATCHED																							   \r\n"
+"	AND Target.Value != Source.Value																		   \r\n"
+"	THEN																									   \r\n"
+"	UPDATE																									   \r\n"
+"	SET Value = Source.Value																				   \r\n"
+"	WHEN NOT MATCHED																						   \r\n"
+"	THEN																									   \r\n"
+"	INSERT(																									   \r\n"
+"		NAME																								   \r\n"
+"		, VALUE																								   \r\n"
+"	)																										   \r\n"
+"	VALUES(																									   \r\n"
+"		Name																								   \r\n"
+"		, Value																								   \r\n"
+"	)																										   \r\n"
+"	OUTPUT @UserID FAMUserID																				   \r\n"
+"	, @MachineID MachineID																					   \r\n"
+"	, Inserted.ID																							   \r\n"
+"	, ISNULL(Deleted.Value, '[N/A]') OldValue																	   \r\n"
+"	, Inserted.Value NewValue																				   \r\n"
+"	, GetDate() TIMESTAMP																					   \r\n"
+"	INTO @HistoryChanges;																					   \r\n"
+"																											   \r\n"
+"	IF EXISTS(Select Top 1 FAMUserID FROM @HistoryChanges)													   \r\n"
+"	UPDATE[DBInfo] SET[Value] = CONVERT(NVARCHAR(MAX), GETDATE(), 21) WHERE[Name] = 'LastDBInfoChange'		   \r\n"
+"																											   \r\n"
+"	IF(@SaveHistory = 1)																					   \r\n"
+"	INSERT INTO DBInfoChangeHistory(																		   \r\n"
+"		FAMUserID																							   \r\n"
+"		, MachineID																							   \r\n"
+"		, DBInfoID																							   \r\n"
+"		, OldValue																							   \r\n"
+"		, NewValue																							   \r\n"
+"		, TIMESTAMP																							   \r\n"
+"	)																										   \r\n"
+"	SELECT FAMUserID																						   \r\n"
+"	, MachineID																								   \r\n"
+"	, DBInfoID																								   \r\n"
+"	, OldValue																								   \r\n"
+"	, NewValue																								   \r\n"
+"	, TIMESTAMP																								   \r\n"
+"	FROM @HistoryChanges																					   \r\n";
+
+
 
 // Insert that adds Enable email Settings to DBInfo, and sets the value
 // to true iff email settings are already establised, false if not.
@@ -1590,9 +1628,9 @@ static const string gstrCALCULATE_ACTION_STATISTICS_FOR_ACTION =
 
 // Query to use to update the ActionStatistics table from the ActionStatisticsDelta table
 // There are to variables that need to be replaced:
-//		<LastDeltaID>	Should be replaced with the last record in the ActionStatisticsDelta table 
+//		@LastDeltaID	Set this parameter to the last record in the ActionStatisticsDelta table 
 //						that will be included in the update to the ActionStatistics
-//		<ActionIDToUpdate> Should be replaced with the ActionID that is being updated
+//		@ActionIDToUpdate Set to the ActionID that is being updated
 static const string gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA =
 	"UPDATE ActionStatistics\r\n"
 	"SET LastUpdateTimeStamp = GETDATE(),\r\n"
@@ -1630,7 +1668,7 @@ static const string gstrUPDATE_ACTION_STATISTICS_FOR_ACTION_FROM_DELTA =
 	"		,SUM([NumBytesFailed]) AS [NumBytesFailed]\r\n"
 	"		,SUM([NumBytesSkipped]) AS [NumBytesSkipped]\r\n"
 	"	FROM [ActionStatisticsDelta]\r\n"
-	"	WHERE ID <= <LastDeltaID> AND ActionStatisticsDelta.ActionID = <ActionIDToUpdate>\r\n"
+	"	WHERE ID <= @LastDeltaID AND ActionStatisticsDelta.ActionID = @ActionIDToUpdate\r\n"
 	"	GROUP BY ActionID, Invisible\r\n"
 	") AS Changes\r\n"
 	"ON ActionStatistics.ActionID = Changes.ActionID AND ActionStatistics.Invisible = Changes.Invisible";
@@ -1888,7 +1926,7 @@ const string gstrFAST_TOTAL_FAMFILE_QUERY = "SELECT SUM (row_count) AS " + gstrT
 const string gstrSTANDARD_TOTAL_FAMFILE_QUERY = "SELECT COUNT(*) AS " + gstrTOTAL_FILECOUNT_FIELD +
 " FROM [FAMFile]";
 const string gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY = "SELECT COUNT(*) AS " + gstrTOTAL_FILECOUNT_FIELD +
-	" FROM [WorkflowFile] WHERE [WorkflowID] = <WorkflowID>";
+	" FROM [WorkflowFile] WHERE [WorkflowID] = @WorkflowID";
 const string gstrSTANDARD_TOTAL_FAMFILE_QUERY_ORACLE = "SELECT COUNT(*) AS \"" + 
 	gstrTOTAL_FILECOUNT_FIELD + "\" FROM \"FAMFile\"";
 // Queries for all currently enabled features.
@@ -1916,7 +1954,7 @@ const string gstrGET_WORK_ITEM_TO_PROCESS =
 "	);\r\n"
 "	SET NOCOUNT ON\r\n"
 "	BEGIN TRY\r\n"
-"		UPDATE [dbo].WorkItem Set Status = 'R', FAMSessionID = <FAMSessionID>\r\n"
+"		UPDATE [dbo].WorkItem Set Status = 'R', FAMSessionID = @FAMSessionID\r\n"
 "		OUTPUT DELETED.ID, DELETED.WorkItemGroupID, WorkItemGroup.ActionID, INSERTED.Status, DELETED.[Input],\r\n"
 "			DELETED.[Output], INSERTED.FAMSessionID, FAMFile.FileName, DELETED.StringizedException, NULL,\r\n"
 "			DELETED.BinaryInput, FAMFile.ID, WorkItemGroup.FAMSessionID, FileActionStatus.Priority,\r\n"
@@ -1924,20 +1962,20 @@ const string gstrGET_WORK_ITEM_TO_PROCESS =
 "		FROM WorkItem INNER JOIN WorkItemGroup ON WorkItemGroup.ID = WorkItem.WorkItemGroupID\r\n"
 "		INNER JOIN FAMFile ON FAMFile.ID = WorkItemGroup.FileID\r\n"
 "		INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID\r\n"
-"		WHERE FileActionStatus.ActionID IN (<ActionIDs>)\r\n"
+"		WHERE FileActionStatus.ActionID IN (@|<VT_INT>ActionIDs)\r\n"
 "	    AND WorkItem.ID IN (\r\n"
-"			SELECT TOP(<MaxWorkItems>) WorkItem.ID\r\n"
+"			SELECT TOP(@MaxWorkItems) WorkItem.ID\r\n"
 "			FROM WorkItem WITH (ROWLOCK, UPDLOCK, READPAST) \r\n"
 "			INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID\r\n"
 "			INNER JOIN FAMFile ON FAMFile.ID = WorkItemGroup.FileID\r\n"
 "			INNER JOIN FileActionStatus ON FAMFile.ID = FileActionStatus.FileID\r\n"
 "			INNER JOIN ActiveFAM ON ActiveFAM.FAMSessionID = WorkItemGroup.FAMSessionID\r\n"
 "			WHERE [Status] = 'P'\r\n"
-"				AND FileActionStatus.ActionID IN (<ActionIDs>)\r\n"
-"				AND WorkItemGroup.ActionID IN (<ActionIDs>)\r\n"
-"				AND ('<GroupFAMSessionID>' = '' OR WorkItemGroup.FAMSessionID = '<GroupFAMSessionID>')\r\n"
+"				AND FileActionStatus.ActionID IN (@|<VT_INT>ActionIDs)\r\n"
+"				AND WorkItemGroup.ActionID IN (@|<VT_INT>ActionIDs)\r\n"
+"				AND (@GroupFAMSessionID = 0 OR WorkItemGroup.FAMSessionID = @GroupFAMSessionID)\r\n"
 "				AND ActiveFAM.LastPingTime >= DATEADD(SECOND, -90, GetUTCDate())\r\n"
-"				AND FileActionStatus.Priority >= <MinPriority>\r\n"
+"				AND FileActionStatus.Priority >= @MinPriority\r\n"
 "			ORDER BY FileActionStatus.Priority DESC, FAMFile.ID ASC\r\n"
 "		)\r\n"
 "		SET NOCOUNT OFF\r\n"
@@ -1983,7 +2021,7 @@ const string gstrRESET_TIMEDOUT_WORK_ITEM_QUERY =
 	"FROM dbo.WorkItem wi LEFT JOIN dbo.ActiveFAM af "
 	"ON wi.FAMSessionID = af.FAMSessionID "
 	"WHERE [Status] = 'R' AND "
-	"	 (af.FAMSessionID IS NULL OR af.LastPingTime < DATEADD(SECOND, -<TimeOutInSeconds>,GetUTCDate()))";
+	"	 (af.FAMSessionID IS NULL OR af.LastPingTime < DATEADD(SECOND, -@TimeOutInSeconds ,GetUTCDate()))";
 
 const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE = 
 	"SELECT [WorkItem].ID "
@@ -2003,8 +2041,8 @@ const string gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE =
 	"  ,[RunningTaskDescription] "
 	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
 	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
-	"WHERE WorkItemGroupID = <WorkItemGroupID> "
-	"AND [Sequence] >= <StartSequence> AND [Sequence] < <EndSequence>";
+	"WHERE WorkItemGroupID = @WorkItemGroupID "
+	"AND [Sequence] >= @StartSequence AND [Sequence] < @EndSequence";
 
 const string gstrGET_FAILED_WORK_ITEM_FOR_GROUP =
 	"SELECT [WorkItem].ID "
@@ -2024,7 +2062,7 @@ const string gstrGET_FAILED_WORK_ITEM_FOR_GROUP =
 	"  ,[RunningTaskDescription] "
 	"FROM [WorkItem] INNER JOIN WorkItemGroup ON WorkItem.WorkItemGroupID = WorkItemGroup.ID "
 	"INNER JOIN FAMFile ON WorkItemGroup.FileID = FAMFile.ID "
-	"WHERE WorkItemGroupID = <WorkItemGroupID> "
+	"WHERE WorkItemGroupID = @WorkItemGroupID "
 	"AND [WorkItem].[Status] = 'F' ";
 
 const string gstrGET_WORK_ITEM_GROUP_ID =
@@ -2035,10 +2073,10 @@ const string gstrGET_WORK_ITEM_GROUP_ID =
 	"		,NumberOfWorkItems "
 	"	FROM WorkItemGroup "
 	"	INNER JOIN WorkItem ON WorkItemGroup.ID = WorkItem.WorkItemGroupID "
-	"	WHERE FileID = <FileID> "
-	"		AND ActionID = <ActionID> "
-	"		AND StringizedSettings = '<StringizedSettings>' "
-	"		AND NumberOfWorkItems = <NumberOfWorkItems> "
+	"	WHERE FileID = @FileID "
+	"		AND ActionID = @ActionID "
+	"		AND StringizedSettings = @StringizedSettings "
+	"		AND NumberOfWorkItems = @NumberOfWorkItems "
 	"	GROUP BY WorkItemGroupID "
 	"		,NumberOfWorkItems "
 	"	) "
@@ -2058,10 +2096,10 @@ static const string gstrSTART_FILETASKSESSION_DATA =
 static const string gstrUPDATE_FILETASKSESSION_DATA = 
 	"UPDATE [dbo].[FileTaskSession] SET "
 	"		[DateTimeStamp] = GETDATE(), "
-	"		[Duration] = <Duration>, "
-	"		[OverheadTime] = <OverheadTime>, "
-	"       [ActivityTime] = <ActivityTime> "
-	"	WHERE [ID] = <FileTaskSessionID>";
+	"		[Duration] = @Duration, "
+	"		[OverheadTime] = @OverheadTime, "
+	"       [ActivityTime] = @ActivityTime "
+	"	WHERE [ID] = @FileTaskSessionID";
 
 static const string gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES = 
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
@@ -2176,30 +2214,30 @@ static const string gstrGET_WORKFLOW_STATUS =
 "INSERT INTO @workflowFileIDs (FileID) \r\n"
 "	SELECT DISTINCT [FileID] \r\n"
 "		FROM [WorkflowFile] \r\n"
-"			WHERE [WorkflowID] = <WorkflowID> \r\n"
+"			WHERE [WorkflowID] = @WorkflowID \r\n"
 "			AND [Invisible] = 0 \r\n"
-"			AND (<FileID> < 1 OR <FileID> = [FileID]) \r\n"
+"			AND (@FileID < 1 OR @FileID = [FileID]) \r\n"
 
-"DECLARE @fileID INT \r\n"
+"DECLARE @CurrentFileID INT \r\n"
 "DECLARE @endStatus NVARCHAR(1) \r\n"
 "DECLARE fileCursor CURSOR FOR SELECT [FileID] FROM @workflowFileIDs \r\n"
 "OPEN fileCursor \r\n"
 
 // For each file, populate status counts (P, R, S, F, C) + end action status into @workflowStatuses
-"FETCH NEXT FROM fileCursor INTO @fileID \r\n"
+"FETCH NEXT FROM fileCursor INTO @CurrentFileID \r\n"
 "WHILE @@FETCH_STATUS = 0 \r\n"
 "BEGIN \r\n"
 // https://extract.atlassian.net/browse/ISSUE-15647
 // Ensure that @endStatus is updated even if the file does not have a status in the end action.
 "	SELECT @endStatus = COALESCE(MAX([ActionStatus]), 'U') \r\n" 
 "		FROM [FileActionStatus] \r\n"
-"		WHERE [FileID] = @fileID AND [ActionID] = <EndActionID>; \r\n"
+"		WHERE [FileID] = @CurrentFileID AND [ActionID] = @EndActionID; \r\n"
 
 "	INSERT INTO @workflowStatuses (FileID, P, R, S, F, C, EndStatus) \r\n"
-"	SELECT @fileID, *, @endStatus FROM \r\n"
+"	SELECT @CurrentFileID, *, @endStatus FROM \r\n"
 "	( \r\n"
 "		SELECT [FileID], [ActionStatus] FROM [FileActionStatus] \r\n"
-"			WHERE [FileID] = @fileID AND [ActionID] IN (<ActionIDs>) \r\n"
+"			WHERE [FileID] = @CurrentFileID AND [ActionID] IN (@|<VT_INT>ActionIDs) \r\n"
 "	) AS T \r\n"
 "	PIVOT \r\n"
 "	( \r\n"
@@ -2207,7 +2245,7 @@ static const string gstrGET_WORKFLOW_STATUS =
 "		FOR [ActionStatus] IN(P, R, S, F, C) \r\n"
 "	) AS PVT \r\n"
 
-"FETCH NEXT FROM fileCursor INTO @fileID \r\n"
+"FETCH NEXT FROM fileCursor INTO @CurrentFileID \r\n"
 "END \r\n"
 
 "CLOSE fileCursor \r\n"
@@ -2232,7 +2270,7 @@ static const string gstrGET_WORKFLOW_STATUS =
 "WHERE [WorkflowStatus] IS NULL \r\n"
 "AND [F] > 0 \r\n"
 
-" IF 1 = <ReturnFileStatuses> BEGIN \r\n"
+" IF 1 = @ReturnFileStatuses BEGIN \r\n"
 " SELECT \r\n"
 "		[FileID], \r\n"
 "		COALESCE([WorkflowStatus], 'U') AS [Status] \r\n"
@@ -2285,15 +2323,15 @@ static const string gstrGET_ATTRIBUTE_VALUE =
 	"	INNER JOIN [FileTaskSession] WITH (NOLOCK) ON [FileTaskSessionID] = [FileTaskSession].[ID] \r\n"
 	"	INNER JOIN [AttributeSetName] ON [AttributeSetNameID] = [AttributeSetName].[ID] \r\n"
 	"	INNER JOIN [FAMFile] WITH (NOLOCK) ON [FileID] = [FAMFile].[ID] \r\n"
-	"	WHERE [AttributeSetName].[Description] = '<AttributeSetName>' \r\n"
-	"	AND [FileName] = '<SourceDocName>' \r\n"
+	"	WHERE [AttributeSetName].[Description] = @AttributeSetName \r\n"
+	"	AND [FileName] = @SourceDocName \r\n"
 	"), \r\n"
 	"AttributeHierarchy AS \r\n" 
 	"(\r\n"
 	"	SELECT \r\n"
 	"		CAST(NULL AS BIGINT) AS [ID], \r\n"
 	"		CAST(NULL AS NVARCHAR(MAX)) AS [Value], \r\n"
-	"		'<AttributePath>' AS [RemainingPath] \r\n"
+	"		@AttributePath AS [RemainingPath] \r\n"
 	"	UNION ALL \r\n"
 	"	SELECT [Attribute].[ID] AS [ID], [Attribute].[Value], \r\n"
 	"		CASE WHEN(CHARINDEX('/', [RemainingPath]) = 0) \r\n"
@@ -3509,3 +3547,5 @@ static string gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE =
 "  \r\n"
 " \r\n')";
 
+static const string gstrUPDATE_SCHEMA_VERSION_QUERY = 
+"UPDATE [DBInfo] SET [Value] = @SchemaVersion WHERE [Name] = '" + gstrFAMDB_SCHEMA_VERSION + "'";

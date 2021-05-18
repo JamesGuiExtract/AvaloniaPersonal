@@ -1347,23 +1347,34 @@ int UpdateToSchemaVersion136(_ConnectionPtr ipConnection, long* pnNumSteps,
 			return nNewSchemaVersion;
 		}
 
-		vector<string> vecQueries;
+		vector<_CommandPtr> vecCmds;
+		map<string, variant_t> params;
 
-		vecQueries.push_back(gstrINSERT_EMAIL_ENABLE_SETTINGS_WITH_VALUE);
+		vecCmds.push_back(buildCmd(ipConnection, gstrINSERT_EMAIL_ENABLE_SETTINGS_WITH_VALUE, params));
 
-		string strEmailPossibleInvalidServer = gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY;
-		replaceVariable(strEmailPossibleInvalidServer, gstrSETTING_NAME, "EmailPossibleInvalidServer");	
-		replaceVariable(strEmailPossibleInvalidServer, gstrSETTING_VALUE, "0");
-		vecQueries.push_back(strEmailPossibleInvalidServer);
+		auto cmd = buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
+			{
+				{gstrSETTING_NAME.c_str(), "EmailPossibleInvalidServer"}
+				,{gstrSETTING_VALUE.c_str(), "0"}
+				,{"@UserID", 0}
+				,{"@MachineID", 0}
+				,{gstrSAVE_HISTORY.c_str(), 0 }
+			});
+		vecCmds.push_back(cmd);
 
-		string strEmailPossibleInvalidSenderAddress = gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY;
-		replaceVariable(strEmailPossibleInvalidSenderAddress, gstrSETTING_NAME, "EmailPossibleInvalidSenderAddress");	
-		replaceVariable(strEmailPossibleInvalidSenderAddress, gstrSETTING_VALUE, "0");
-		vecQueries.push_back(strEmailPossibleInvalidSenderAddress);
+		cmd = buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
+			{
+				{gstrSETTING_NAME.c_str(), "EmailPossibleInvalidSenderAddress"}
+				,{gstrSETTING_VALUE.c_str(), "0"}
+				,{"@UserID", 0}
+				,{"@MachineID", 0}
+				,{gstrSAVE_HISTORY.c_str(), 0 }
+			});
+		vecCmds.push_back(cmd);
 
-		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		vecCmds.push_back(buildCmd(ipConnection, gstrUPDATE_SCHEMA_VERSION_QUERY, { {"@SchemaVersion", asString(nNewSchemaVersion).c_str()} }));
 
-		executeVectorOfSQL(ipConnection, vecQueries);
+		executeVectorOfCmd(vecCmds);
 
 		return nNewSchemaVersion;
 	}
@@ -2090,24 +2101,30 @@ int UpdateToSchemaVersion161(_ConnectionPtr ipConnection,
 			return nNewSchemaVersion;
 		}
 
-		vector<string> vecQueries;
+		vector<_CommandPtr> vecCmds;
+		map<string, variant_t> params;
 		
-		vecQueries.push_back("ALTER TABLE dbo.[FileTaskSession] ADD [ActivityTime] [float] NULL");
+		vecCmds.push_back(buildCmd(ipConnection, "ALTER TABLE dbo.[FileTaskSession] ADD [ActivityTime] [float] NULL", params));
 
-		string strInputActivityTimeout = gstrDBINFO_INSERT_IF_MISSING_SETTINGS_QUERY;
-		replaceVariable(strInputActivityTimeout, gstrSETTING_NAME, "InputActivityTimeout");
-		replaceVariable(strInputActivityTimeout, gstrSETTING_VALUE, "30");
-		vecQueries.push_back(strInputActivityTimeout);
+		auto cmd = buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
+			{
+				{gstrSETTING_NAME.c_str(), "InputActivityTimeout"}
+				,{gstrSETTING_VALUE.c_str(), "30"}
+				,{"@UserID", 0}
+				,{"@MachineID", 0}
+				,{gstrSAVE_HISTORY.c_str(), 0 }
+			});
+		vecCmds.push_back(cmd);
 
 		// Remove EnableInputEventTracking
-		vecQueries.push_back("DELETE FROM [DBINFO] WHERE [Name] = 'EnableInputEventTracking'");
+		vecCmds.push_back(buildCmd(ipConnection, "DELETE FROM [DBINFO] WHERE [Name] = 'EnableInputEventTracking'", params));
 
 		// Remove InputEventHistorSize
-		vecQueries.push_back("DELETE FROM [DBINFO] WHERE [Name] = 'InputEventHistorySize'");
+		vecCmds.push_back(buildCmd(ipConnection, "DELETE FROM [DBINFO] WHERE [Name] = 'InputEventHistorySize'", params));
 
-		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+		vecCmds.push_back(buildCmd(ipConnection, gstrUPDATE_SCHEMA_VERSION_QUERY, { {"@SchemaVersion", asString(nNewSchemaVersion).c_str()} }));
 
-		executeVectorOfSQL(ipConnection, vecQueries);
+		executeVectorOfCmd(vecCmds);
 
 		return nNewSchemaVersion;
 	}
@@ -3214,8 +3231,9 @@ bool CFileProcessingDB::DeleteAction_Internal(bool bDBLocked, BSTR strAction)
 				m_mapActionIdsForActiveWorkflow.clear();
 
 				// Delete the action
-				string strDeleteActionQuery = "DELETE FROM [Action] WHERE [ASCName] = '" + strActionName + "'";
-				executeCmdQuery(ipConnection, strDeleteActionQuery);
+				string strDeleteActionQuery = "DELETE FROM [Action] WHERE [ASCName] = @ActionName";
+
+				executeCmd(buildCmd(ipConnection, strDeleteActionQuery, { { "@ActionName", strAction} }));
 
 				// Commit this transaction
 				tg.CommitTrans();
@@ -4373,6 +4391,8 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 	{
 		try
 		{
+			map<string, _variant_t> params;
+
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
@@ -4390,27 +4410,24 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 				// Get the action ID and update the strActionName to stored value
 				long nActionID = getActionID(ipConnection, strActionName);
 
-				// Replace any occurrences of ' with '' this is because SQL Server use the ' to
-				// indicate the beginning and end of a string
-				string strFolderName = asString(strFolder);
-				replaceVariable(strFolderName, "'", "''");
-
 				// set up the where clause to find the pending records that the filename begins with the folder name
-				string strWhere = "WHERE (ActionStatus = 'P') AND (FileName LIKE '" + strFolderName + "%')";
+				string strWhere = "WHERE (ActionStatus = 'P') AND (FileName LIKE @FolderName + '%')";
 				string strFrom = "FROM FAMFile " + strWhere;
+				params["@FolderName"] = strFolder;
 
 				// Set up the SQL to delete the records in the FileActionStatus table 
 				string strDeleteSQL = "DELETE FROM FileActionStatus"
-					" WHERE ActionID = " + asString(nActionID) + " AND FileID IN ("
+					" WHERE ActionID = @ActionID AND FileID IN ("
 					" SELECT FAMFile.ID FROM FileActionStatus RIGHT JOIN FAMFile "
 					" ON FileActionStatus.FileID = FAMFile.ID " + 
 					strWhere + ")";
+				params["@ActionID"] = nActionID;
 
 				// This method does not ever seem to get called, but in case it does, it seems reasonable
 				// to ignore and pending changes for files in the folder.
 				string strUpdateQueuedActionStatusChange =
 					"UPDATE [QueuedActionStatusChange] SET [ChangeStatus] = 'I'"
-					"WHERE [ChangeStatus] = 'P' AND [ActionID] = " + asString(nActionID) +
+					"WHERE [ChangeStatus] = 'P' AND [ActionID] = @ActionID "
 					" AND [FileID] IN"
 					"("
 					"	SELECT FAMFile.ID FROM FileActionStatus RIGHT JOIN FAMFile "
@@ -4421,7 +4438,7 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
 				// add transition records to the database
-				addASTransFromSelect(ipConnection, strActionName, nActionID, "U", "", "", strWhere, "");
+				addASTransFromSelect(ipConnection, params, strActionName, nActionID, "U", "", "", strWhere, "");
 
 				// Only update the QueueEvent table if update is enabled
 				if (m_bUpdateQueueEventTable)
@@ -4902,51 +4919,17 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 				// Continue if the setting is new or we are changing an existing setting
 				if (!bExists || vbSetIfExists == VARIANT_TRUE)
 				{
-					string strOldValue;
-
-					if (!bExists)
-					{
-						// Setting does not exist so add it
-						ipDBInfoSet->AddNew();
-
-						setStringField(ipDBInfoSet->Fields, "Name", strSettingName, true);
-
-						strOldValue = "[N/A]";
-					}
-					else if (m_bStoreDBInfoChangeHistory)
-					{
-						strOldValue = getStringField(ipDBInfoSet->Fields, "Value");
-					}
-
-					// Set the value field to the new value
-					setStringField(ipDBInfoSet->Fields, "Value", strSettingValue);
-
-					// Update the database
-					ipDBInfoSet->Update();
-
-					executeCmdQuery(ipConnection, gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
-
-					if (m_bStoreDBInfoChangeHistory && asCppBool(vbRecordHistory))
-					{
-						ipDBInfoSet->Requery(adOptionUnspecified);
-
-						// If updating history, need to get user and machine id
-						long nUserId = getFAMUserID(ipConnection);
-						long nMachineId = getMachineID(ipConnection);
-						long nDBInfoId = getLongField(ipDBInfoSet->Fields, "ID");
-
-						executeCmd(buildCmd(ipConnection,
-							"INSERT INTO [DBInfoChangeHistory] "
-								"([FAMUserID], [MachineID], [DBInfoID], [OldValue], [NewValue]) "
-								"VALUES (@UserId, @MachineId, @DBInfoId, @OldValue, @NewValue)",
-								{
-									{ "@UserId", nUserId},
-									{ "@MachineId", nMachineId},
-									{ "@DBInfoId", nDBInfoId},
-									{ "@OldValue", strOldValue.c_str()},
-									{ "@NewValue", strSettingValue.c_str()}
-								}));
-					}
+					long nUserId = getFAMUserID(ipConnection);
+					long nMachineId = getMachineID(ipConnection);
+					auto cmd = buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
+						{
+							{gstrSETTING_NAME.c_str(), bstrSettingName}
+							,{gstrSETTING_VALUE.c_str(), bstrSettingValue}
+							,{"@UserID", nUserId}
+							,{"@MachineID", nMachineId}
+							,{gstrSAVE_HISTORY.c_str(), (m_bStoreDBInfoChangeHistory) ? 1 : 0 }
+						});
+					executeCmd(cmd);
 				}
 
 				// Commit transaction
@@ -7436,9 +7419,6 @@ bool CFileProcessingDB::RecordFAMSessionStop_Internal(bool bDBLocked)
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
-
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
@@ -8428,8 +8408,7 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 			replaceVariable(strNewNameForQuery, "'", "''");
 			replaceVariable(strCurrFileName, "'", "''");
 
-			string strChangeNameQuery = "UPDATE [FAMFile]   SET [FileName] = '" + strNewNameForQuery + 
-				"' WHERE FileName = '" + strCurrFileName + "' AND ID = " + strFileID;
+			string strChangeNameQuery = "UPDATE[FAMFile] SET[FileName] = @NewFileName WHERE[FileName] = @CurrentFileName AND ID = @ID";
 
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
@@ -8439,13 +8418,18 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 				// Get the connection for the thread and save it locally.
 				ipConnection = getDBConnection();
 
+				auto cmd = buildCmd(ipConnection,
+					strChangeNameQuery,
+					{
+						{"@NewFileName", strNewName.c_str()},
+						{"@CurrentFileName", strCurrFileName.c_str()},
+						{"@ID", ipFileRecord->FileID}
+					});	
+
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
-				// Make sure the DB Schema is the expected version
-				validateDBSchemaVersion();
-
-				long lRecordsAffected = executeCmdQuery(ipConnection, strChangeNameQuery);
+				long lRecordsAffected = executeCmd(cmd);
 
 				// There should be one record affected if not an exception should be thrown
 				if (lRecordsAffected != 1)
@@ -8459,12 +8443,19 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 				// If storing history need to update the SourceDocChangeHistory table
 				if (m_bStoreSourceDocChangeHistory)
 				{
-					string strChangeHistoryQuery = "INSERT INTO [SourceDocChangeHistory]  ([FileID], [FromFileName], "
+					auto cmd = buildCmd(ipConnection,
+						"INSERT INTO [SourceDocChangeHistory]  ([FileID], [FromFileName], "
 						"[ToFileName], [TimeStamp], [FAMUserID], [MachineID]) VALUES "
-						"(" + strFileID + ", '" + strCurrFileName + "', '" + strNewNameForQuery + "', GetDate(), " 
-						+ asString(getFAMUserID(ipConnection)) + ", " + asString(getMachineID(ipConnection)) + ")";
+						"( @FileID, @CurrentFileName, @NewFileName, GetDate(), @FAMUserID, @MachineID) ",
+						{
+							{"@NewFileName", strNewName.c_str()},
+							{"@CurrentFileName", strCurrFileName.c_str()},
+							{"@FileID", ipFileRecord->FileID},
+							{"@FAMUserID", getFAMUserID(ipConnection)},
+							{"@MachineID", getMachineID(ipConnection)}
+						});
 
-					executeCmdQuery(ipConnection, strChangeHistoryQuery);
+					executeCmd(cmd);
 				}
 				
 				// Commit the transaction
@@ -8531,7 +8522,7 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, vector<string> vecQueries,
+bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, vector<_CommandPtr> vecCommands,
 	long& rnNumRowsUpdated)
 {
 	try
@@ -8552,28 +8543,12 @@ bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, vector<string
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
-				if (m_bStoreDBInfoChangeHistory)
+				for each(auto cmd in vecCommands)
 				{
-					// If updating history, need to get user and machine id
-					string strUserId = asString(getFAMUserID(ipConnection));
-					string strMachineId = asString(getMachineID(ipConnection));
+					_variant_t vtRecordsUpdated = 0;
 
-					// Update the queries with the user and machine id
-					for(vector<string>::iterator it = vecQueries.begin();
-						it != vecQueries.end(); it++)
-					{
-						replaceVariable(*it, gstrUSER_ID_VAR, strUserId, kReplaceAll);
-						replaceVariable(*it, gstrMACHINE_ID_VAR, strMachineId, kReplaceAll);
-					}
-				}
-
-				// Execute query and get count of updated rows
-				rnNumRowsUpdated = executeVectorOfSQL(ipConnection, vecQueries);
-
-				// If at least 1 row was updated, update the last DB info changed value
-				if (rnNumRowsUpdated > 0)
-				{
-					executeCmdQuery(ipConnection, gstrUPDATE_DB_INFO_LAST_CHANGE_TIME);
+					cmd->Execute(&vtRecordsUpdated.GetVARIANT(), __nullptr, adCmdText);
+					rnNumRowsUpdated += vtRecordsUpdated.lVal;
 				}
 
 				tg.CommitTrans();
@@ -8746,11 +8721,9 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 				// Can't use a fast count if workflows are involved; need to use the WorkflowFile table.
 				if (nWorkflowID > 0)
 				{
-					string strCountQuery = gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY;
-					replaceVariable(strCountQuery, "<WorkflowID>", asString(nWorkflowID));
+                    auto cmd = buildCmd(ipConnection, gstrSTANDARD_TOTAL_WORKFLOW_FILES_QUERY, {{"@WorkflowID", nWorkflowID}});
 
-					ipResultSet->Open(strCountQuery.c_str(),
-						_variant_t((IDispatch *)ipConnection, true), adOpenStatic, adLockReadOnly,
+					ipResultSet->Open((IDispatch*) cmd, vtMissing, adOpenStatic, adLockReadOnly,
 						adCmdText);
 				}
 				else if (!m_bDeniedFastCountPermission)
@@ -8887,17 +8860,7 @@ bool CFileProcessingDB::GetWorkItemsForGroup_Internal(bool bDBLocked, long nWork
 		{
 			ASSERT_ARGUMENT("ELI36869",  ppWorkItems != __nullptr);
 
-			// Convert the nWorkItemGroupID to a string
-			string strWorkItemGroupID = asString(nWorkItemGroupID);
-
-			// Setup query of workItems for the given work group id and sequence number in the range
-			// nStartPos to nStartPos + 1
-			string strWorkItemSQL = gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE;
-			replaceVariable(strWorkItemSQL, "<WorkItemGroupID>", strWorkItemGroupID);
-			replaceVariable(strWorkItemSQL, "<StartSequence>", asString(nStartPos));
-			replaceVariable(strWorkItemSQL, "<EndSequence>", asString(nStartPos + nCount));
-
-			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+    		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
@@ -8908,12 +8871,19 @@ bool CFileProcessingDB::GetWorkItemsForGroup_Internal(bool bDBLocked, long nWork
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
+                auto cmd = buildCmd(ipConnection, gstrGET_WORK_ITEM_FOR_GROUP_IN_RANGE,
+                {
+                    {"@WorkItemGroupID", nWorkItemGroupID},
+                    {"@StartSequence", nStartPos},
+                    {"@EndSequence", nStartPos + nCount}
+                });
+
 				// Create a pointer to a recordset
 				_RecordsetPtr ipWorkItemSet(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI36870", ipWorkItemSet != __nullptr);
 
 				// Execute the query get the set of WorkItems
-				ipWorkItemSet->Open(strWorkItemSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+				ipWorkItemSet->Open((IDispatch *)cmd, vtMissing, adOpenStatic, 
 					adLockReadOnly, adCmdText);
 
 				IIUnknownVectorPtr ipWorkItems(CLSID_IUnknownVector);
@@ -9097,13 +9067,6 @@ bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFile
 			string strNumberOfWorkItems = asString(nNumberOfWorkItems);
 			string strRunningTaskDescription = asString(bstrRunningTaskDescription);
 
-			// Create the query to get matching work item group id
-			string strGetExisting = gstrGET_WORK_ITEM_GROUP_ID;
-			replaceVariable(strGetExisting, "<FileID>", strFileID);
-			replaceVariable(strGetExisting, "<ActionID>", strActionID);
-			replaceVariable(strGetExisting, "<StringizedSettings>", strStringizedTask);
-			replaceVariable(strGetExisting, "<NumberOfWorkItems>", strNumberOfWorkItems);
-
 			// Escape the ' in the task description since it will be used in a query
 			replaceVariable(strRunningTaskDescription, "'", "''");
 
@@ -9125,13 +9088,20 @@ bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFile
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
+
+                auto cmd = buildCmd(ipConnection, gstrGET_WORK_ITEM_GROUP_ID,
+                {
+                    {"@FileID", nFileID},
+                    {"@ActionID", nActionID},
+                    {"@StringizedSettings", strStringizedTask.c_str()},
+                    {"@NumberOfWorkItems", nNumberOfWorkItems}
+                } );
 				
 				*pnWorkItemGroupID = -1;
 				try
 				{
 					// see if group already exists
-					executeCmdQuery(ipConnection, strGetExisting, false, pnWorkItemGroupID);
-
+                    getCmdId(cmd, pnWorkItemGroupID);
 				}
 				catch(...)
 				{
@@ -9905,13 +9875,6 @@ bool CFileProcessingDB::GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long
 		{
 			ASSERT_ARGUMENT("ELI37542",  ppWorkItems != __nullptr);
 
-			// Convert the nWorkItemGroupID to a string
-			string strWorkItemGroupID = asString(nWorkItemGroupID);
-
-			// Setup query of failed work items for the given work group id
-			string strWorkItemSQL = gstrGET_FAILED_WORK_ITEM_FOR_GROUP;
-			replaceVariable(strWorkItemSQL, "<WorkItemGroupID>", strWorkItemGroupID);
-
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
@@ -9923,12 +9886,17 @@ bool CFileProcessingDB::GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
+				auto cmd = buildCmd(ipConnection, gstrGET_FAILED_WORK_ITEM_FOR_GROUP,
+					{
+						{"@WorkItemGroupID", nWorkItemGroupID}
+					});
+
 				// Create a pointer to a recordset
 				_RecordsetPtr ipWorkItemSet(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI37543", ipWorkItemSet != __nullptr);
 
 				// Execute the query get the set of WorkItems
-				ipWorkItemSet->Open(strWorkItemSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+				ipWorkItemSet->Open((IDispatch *)cmd, vtMissing, adOpenStatic, 
 					adLockReadOnly, adCmdText);
 
 				IIUnknownVectorPtr ipWorkItems(CLSID_IUnknownVector);
@@ -10022,17 +9990,12 @@ bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 		{
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
-
+			
 			string strQuery =
 				"SELECT [Value] FROM [FileMetadataFieldValue] WITH (NOLOCK) "
 					"INNER JOIN [MetadataField] WITH (NOLOCK) ON [MetadataField].[ID] = [FileMetadataFieldValue].[MetadataFieldID] "
-					"WHERE [FileID] = <FileID> AND [Name] = '<MetadataFieldName>'";
+					"WHERE [FileID] = @FileID AND [Name] = @MetadataFieldName";
 
-			replaceVariable(strQuery, "<FileID>", asString(nFileID));
-
-			string name = asString(bstrMetadataFieldName);
-			replaceVariable(name, "'", "''");
-			replaceVariable(strQuery, "<MetadataFieldName>", name);
 
 			BEGIN_CONNECTION_RETRY();
 
@@ -10042,12 +10005,18 @@ bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
 
+				auto cmd = buildCmd(ipConnection, strQuery, 
+					{ 
+						{"@FileID", nFileID}, 
+						{"@MetadataFieldName", bstrMetadataFieldName} 
+					});
+
 				// Create a pointer to a recordset
 				_RecordsetPtr ipResult(__uuidof(Recordset));
 				ASSERT_RESOURCE_ALLOCATION("ELI37639", ipResult != __nullptr);
 
 				// Execute the query get the set of WorkItems
-				ipResult->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+				ipResult->Open((IDispatch*)cmd, vtMissing, adOpenStatic, 
 					adLockReadOnly, adCmdText);
 
 				if (!asCppBool(ipResult->adoEOF))
@@ -10417,17 +10386,23 @@ bool CFileProcessingDB::EndFileTaskSession_Internal(bool bDBLocked, long nFileTa
 
 			validateDBSchemaVersion();
 
-			string strUpdateSQL = gstrUPDATE_FILETASKSESSION_DATA;
-			replaceVariable(strUpdateSQL, "<FileTaskSessionID>", asString(nFileTaskSessionID));
-			replaceVariable(strUpdateSQL, "<Duration>", asString(dDuration));
-			replaceVariable(strUpdateSQL, "<OverheadTime>", asString(dOverheadTime));
-			replaceVariable(strUpdateSQL, "<ActivityTime>", asString(dActivityTime));
+            auto cmd = buildCmd(ipConnection, gstrUPDATE_FILETASKSESSION_DATA,
+            {
+                {"@FileTaskSessionID", nFileTaskSessionID},
+                {"@Duration", dDuration},
+                {"@OverheadTime", dOverheadTime},
+                {"@ActivityTime", dActivityTime}
+            });
 
-			executeCmdQuery(ipConnection, strUpdateSQL);
+			executeCmd(cmd);
 
-			string strDeleteCachedData = "DELETE FROM [FileTaskSessionCache] \r\n"
-				"WHERE [AutoDeleteWithActiveFAMID] IS NOT NULL AND [FileTaskSessionID] = "+ asString(nFileTaskSessionID);
-			executeCmdQuery(ipConnection, strDeleteCachedData);
+            cmd = buildCmd(ipConnection, 
+                "DELETE FROM [FileTaskSessionCache] \r\n"
+				"WHERE [AutoDeleteWithActiveFAMID] IS NOT NULL AND [FileTaskSessionID] = @FileTaskSessionID",
+                {
+                    {"@FileTaskSessionID", nFileTaskSessionID}
+                });
+			executeCmd(cmd);
 			
 			END_CONNECTION_RETRY(ipConnection, "ELI39694");
 		}
@@ -12411,18 +12386,14 @@ bool CFileProcessingDB::GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSour
 			_RecordsetPtr ipResult(__uuidof(Recordset));
 			ASSERT_RESOURCE_ALLOCATION("ELI43521", ipResult != __nullptr);
 
-			string strQuery = gstrGET_ATTRIBUTE_VALUE;
-			string sdn = asString(bstrSourceDocName);
-			string asn = asString(bstrAttributeSetName);
-			string pth = asString(bstrAttributePath);
-			replaceVariable(sdn, "'", "''");
-			replaceVariable(asn, "'", "''");
-			replaceVariable(pth, "'", "''");
-			replaceVariable(strQuery, "<SourceDocName>", sdn);
-			replaceVariable(strQuery, "<AttributeSetName>", asn);
-			replaceVariable(strQuery, "<AttributePath>", pth);
+            auto cmd = buildCmd(ipConnection, gstrGET_ATTRIBUTE_VALUE,
+            {
+                {"@SourceDocName", bstrSourceDocName},
+                {"@AttributeSetName", bstrAttributeSetName},
+                {"@AttributePath", bstrAttributePath}
+            });
 
-			ipResult->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenStatic,
+			ipResult->Open((IDispatch*)cmd, vtMissing, adOpenStatic,
 				adLockReadOnly, adCmdText);
 
 			if (!asCppBool(ipResult->adoEOF))

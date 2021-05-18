@@ -2663,16 +2663,17 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long*
 		ASSERT_ARGUMENT("ELI31909", ipSettings != __nullptr);
 		ASSERT_ARGUMENT("ELI32173", pnNumRowsUpdated != __nullptr);
 
-		string strBaseQuery = m_bStoreDBInfoChangeHistory ? gstrDBINFO_UPDATE_SETTINGS_QUERY_STORE_HISTORY
-			: gstrDBINFO_UPDATE_SETTINGS_QUERY;
-
 		IIUnknownVectorPtr ipPairs = ipSettings->GetAllKeyValuePairs();
 		ASSERT_RESOURCE_ALLOCATION("ELI31910", ipPairs != __nullptr);
 
 		// Get the key value pairs from the StrToStrMap and create the update queries
 		int nSize = ipPairs->Size();
-		vector<string> vecQueries;
-		vecQueries.reserve(nSize);
+		vector<_CommandPtr> vecCommands;
+		vecCommands.reserve(nSize);
+		auto ipConnection = getDBConnection();
+		int famUserID = getFAMUserID(ipConnection);
+		int machineID = getMachineID(ipConnection);
+
 		for(int i=0; i < nSize; i++)
 		{
 			IStringPairPtr ipPair = ipPairs->At(i);
@@ -2681,19 +2682,22 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long*
 			_bstr_t bstrKey;
 			_bstr_t bstrValue;
 			ipPair->GetKeyValuePair(bstrKey.GetAddress(), bstrValue.GetAddress());
-
-			string strQuery = strBaseQuery;
-			replaceVariable(strQuery, gstrSETTING_NAME, asString(bstrKey), kReplaceAll);
-			replaceVariable(strQuery, gstrSETTING_VALUE, asString(bstrValue), kReplaceAll);
-			vecQueries.push_back(strQuery);
+			vecCommands.push_back(buildCmd(ipConnection, gstADD_UPDATE_DBINFO_SETTING,
+				{
+					{gstrSETTING_NAME.c_str(), bstrKey}
+					,{gstrSETTING_VALUE.c_str(), bstrValue}
+					,{"@UserID", famUserID}
+					,{"@MachineID",machineID}
+					,{gstrSAVE_HISTORY.c_str(), (m_bStoreDBInfoChangeHistory) ? 1 : 0 }
+				}));
 		}
 
 		long nNumRowsUpdated = 0;
-		if (!SetDBInfoSettings_Internal(false, vecQueries, nNumRowsUpdated))
+		if (!SetDBInfoSettings_Internal(false, vecCommands, nNumRowsUpdated))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-			SetDBInfoSettings_Internal(true, vecQueries, nNumRowsUpdated);
+			SetDBInfoSettings_Internal(true, vecCommands, nNumRowsUpdated);
 		}
 
 		*pnNumRowsUpdated = nNumRowsUpdated;

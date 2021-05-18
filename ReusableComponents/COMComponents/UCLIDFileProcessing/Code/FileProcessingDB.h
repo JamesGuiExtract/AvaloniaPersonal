@@ -791,7 +791,8 @@ private:
 	//							  be used so that only one current action state is selected
 	//			strTopClause	- Top clause to specify the number of records that meet the where clause condition that should
 	//							  have records added to the ActionStateTransition table
-	void addASTransFromSelect (_ConnectionPtr ipConnection, const string &strAction,
+	//			params			- map of parameters that will be passed to the query
+	void addASTransFromSelect (_ConnectionPtr ipConnection, map<string, variant_t> &params, const string &strAction,
 		long nActionID, const string &strToState, const string &strException, const string &strComment, 
 		const string &strWhereClause, const string &strTopClause);
 
@@ -1107,7 +1108,7 @@ private:
 	// the connection object fails it will be reattempted for gdRETRY_TIMEOUT (120sec) If after the
 	// timeout it was still not possible to create the connection object false will be returned,
 	// otherwise true will be returned.
-	bool reConnectDatabase();
+	bool reConnectDatabase(string ELICodeOfCaller );
 
 	// Adds a record to the skipped file table
 	void addSkipFileRecord(const _ConnectionPtr& ipConnection, long nFileID, long nActionID);
@@ -1309,7 +1310,7 @@ private:
 	string getQueryToResetCounterCorruption(CounterOperation counter, DatabaseIDValues databaseID, 
 		UCLIDException &ueLog, string strComment = "Unlock");
 
-	string getDatabaseIDUpdateQuery(DatabaseIDValues databaseID);
+	_CommandPtr  getDatabaseIDUpdateQuery(_ConnectionPtr ipConnection, DatabaseIDValues databaseID);
 
 	// Returns a map with all the existing counters as CounterOperation records. All of the records
 	// returned will have the m_eOperation set to kNone. As the changes are processed they will be 
@@ -1489,7 +1490,7 @@ private:
 	bool UpgradeToCurrentSchema_Internal(bool bDBLocked, IProgressStatusPtr ipProgressStatus);
 	bool RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRecord, BSTR bstrNewName);
 	bool get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap** ppSettings);
-	bool SetDBInfoSettings_Internal(bool bDBLocked, vector<string> vecQueries, long& nNumRowsUpdated);
+	bool SetDBInfoSettings_Internal(bool bDBLocked, vector<_CommandPtr> vecCommands, long& nNumRowsUpdated);
 	bool RecordFTPEvent_Internal(bool bDBLocked, long nFileId, long nActionID,
 		VARIANT_BOOL vbQueueing, EFTPAction eFTPAction, BSTR bstrServerAddress,
 		BSTR bstrUserName, BSTR bstrArg1, BSTR bstrArg2, long nRetries, BSTR bstrException);
@@ -1647,7 +1648,7 @@ OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)
 				} \
 				if (!bConnectionAlive) \
 				{ \
-					reConnectDatabase(); \
+					reConnectDatabase(strELICode); \
 				} \
 				nRetryCount++; \
 			} \

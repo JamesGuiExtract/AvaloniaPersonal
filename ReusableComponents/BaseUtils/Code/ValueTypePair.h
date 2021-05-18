@@ -26,6 +26,7 @@ class EXPORT_BaseUtils ValueTypePair
 		ValueTypePair(double _dValue);
 		ValueTypePair(bool bValue);
 		ValueTypePair(const char *pszValue);
+		ValueTypePair(const variant_t vtVariant);
 
 		virtual ~ValueTypePair();
 		

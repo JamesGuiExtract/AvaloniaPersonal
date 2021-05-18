@@ -246,6 +246,10 @@ FAMUTILS_API long executeCmdQuery(const _ConnectionPtr& ipDBConnection,
 	bool bDisplayExceptions = false,
 	long* pnOutputID = nullptr);
 
+// Executes all the command objects in the vector
+// vecCmds: vector containing the command objects to execute
+FAMUTILS_API long executeVectorOfCmd(const vector<_CommandPtr>& vecCmds);
+
 // Builds a parameterized SQL command
 // strQuery: SQL query that should denote parameters prefixed with "@" symbol (e.g. @ActionID)
 // params:	 Maps each parameter name (including "@") to a _variant_t with the value to apply.
@@ -263,12 +267,12 @@ FAMUTILS_API long executeCmdQuery(const _ConnectionPtr& ipDBConnection,
 // NULL as a value will be handled the same as described above.
 FAMUTILS_API _CommandPtr buildCmd(const _ConnectionPtr& ipDBConnection,
 	const string &strQuery,
-	vector<pair<string, _variant_t>> params);
+	map<string, _variant_t> params);
 
 // Executes the provided _CommandPtr 
 // if bDisplayExceptions == false any exceptions will be thrown to caller
 // if bDisplayExceptions == true any exceptions will be displayed and 0 will be returned
-FAMUTILS_API void executeCmd(const _CommandPtr& ipCommand, bool bDisplayExceptions = false);
+FAMUTILS_API long executeCmd(const _CommandPtr& ipCommand, bool bDisplayExceptions = false);
 
 // Executes the provided _CommandPtr, returning the first row's column value corresponding to pvtValue
 // bAllowBlock: true if call should block if necessary read value; false to return false if record is locked

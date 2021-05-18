@@ -810,7 +810,7 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQ
 {
 	return executeCmdQuery(ipDBConnection, strSQLQuery, "ID", bDisplayExceptions, pnOutputID);
 }
-// ------------------------------------------------------------------------------------------------ -
+//-------------------------------------------------------------------------------------------------
 long executeCmdQuery(const _ConnectionPtr& ipDBConnection,
 	const std::string& strSQLQuery,
 	const std::string& resultColumnName,
@@ -872,14 +872,36 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection,
 	return vtRecordsAffected.lVal;
 }
 //-------------------------------------------------------------------------------------------------
+long executeVectorOfCmd( const vector<_CommandPtr>& vecCmds)
+{
+	long nNumRowsUpdated = 0;
+
+	// Execute all of the queries
+	for each (_CommandPtr cmd in vecCmds)
+	{
+		try
+		{
+			nNumRowsUpdated += executeCmd(cmd);
+		}
+		catch (UCLIDException& ue)
+		{
+			UCLIDException uexOuter("ELI51748", "Error executing sql cmd", ue);
+			uexOuter.addDebugInfo("Query", asString(cmd->CommandText));
+			throw uexOuter;
+		}
+	}
+
+	return nNumRowsUpdated;
+}
+//-------------------------------------------------------------------------------------------------
 // buildCmd helper funcs
 ADODB::DataTypeEnum parseCmdValueType(variant_t vtParamValue);
 ADODB::DataTypeEnum parseCmdListType(string strListDeclaration);
 vector<_variant_t> parseCmdListValues(ADODB::DataTypeEnum dataType, variant_t vtParamValue);
-vector<_ParameterPtr> getCmdParamters(_CommandPtr ipCommand, ADODB::DataTypeEnum dataType, vector<_variant_t> vecParamValues);
+vector<_ParameterPtr> getCmdParameters(_CommandPtr ipCommand, ADODB::DataTypeEnum dataType, vector<_variant_t> vecParamValues);
 //-------------------------------------------------------------------------------------------------
 _CommandPtr buildCmd(const _ConnectionPtr& ipDBConnection,
-	const string &strQuery, vector<pair<string, _variant_t>> params)
+	const string &strQuery, map<string, _variant_t> params)
 {
 	try
 	{
@@ -940,7 +962,7 @@ _CommandPtr buildCmd(const _ConnectionPtr& ipDBConnection,
 						 && !(nextChar >= 'A' && nextChar <= 'Z')
 						 && !(nextChar >= '0' && nextChar <= '9')))
 					{
-						vector<_ParameterPtr> paramValues = getCmdParamters(ipCommand, dataType, vecParamValues);
+						vector<_ParameterPtr> paramValues = getCmdParameters(ipCommand, dataType, vecParamValues);
 
 						orderedParams[index] = { strParamName, paramValues };
 					}
@@ -983,25 +1005,48 @@ _CommandPtr buildCmd(const _ConnectionPtr& ipDBConnection,
 	}
 	catch (UCLIDException& ue)
 	{
-		ue.display();
-		throw ue;
+		try
+		{
+			ue.addDebugInfo("ConnectionString", asString(ipDBConnection->ConnectionString));
+			ue.addDebugInfo("Database", asString(ipDBConnection->DefaultDatabase));
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI51749");
+		
+		ue.addDebugInfo("Query", strQuery);
+		string paramString = "";
+		for each (auto p in params)
+		{
+			ue.addDebugInfo(p.first, p.second);
+		}
+		throw;
 	}
 }
 //-------------------------------------------------------------------------------------------------
 ADODB::DataTypeEnum parseCmdValueType(variant_t vtParamValue)
 {
-	switch (vtParamValue.vt)
+	try
 	{
-	case VT_BOOL:	return adBoolean;
-	case VT_INT:
-	case VT_I4:		return adInteger;
-	case VT_I8:		return adBigInt;
-	case VT_BSTR:	return adChar;
-	case VT_VOID:
-	case VT_ERROR:  // vtMissing will have VT_ERROR type
-	case VT_NULL:	return adEmpty;
+		switch (vtParamValue.vt)
+		{
+		case VT_BOOL:	return adBoolean;
+		case VT_INT:
+		case VT_I4:		return adInteger;
+		case VT_I8:		return adBigInt;
+		case VT_BSTR:	return adBSTR;
+		case VT_R8:		return adDouble;
+		case VT_EMPTY:
+		case VT_VOID:
+		case VT_ERROR:  // vtMissing will have VT_ERROR type
+		case VT_NULL:	return adEmpty;
 
-	default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51595");
+		default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51595");
+		}
+	}
+	catch (UCLIDException &ue)
+	{
+		ue.addDebugInfo("variant_t type", vtParamValue.vt);
+		ue.addDebugInfo("Value", vtParamValue);
+		throw;
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -1012,104 +1057,137 @@ ADODB::DataTypeEnum parseCmdListType(string strListDeclaration)
 	nameTokenizer.parse(strListDeclaration, vecNameTokens);
 	string strType = vecNameTokens[3];
 
-	if (_strcmpi(strType.c_str(), "VT_BOOL") == 0)
+	try
 	{
-		return adBoolean;
+		if (_strcmpi(strType.c_str(), "VT_BOOL") == 0)
+		{
+			return adBoolean;
+		}
+		else if (_strcmpi(strType.c_str(), "VT_INT") == 0
+			|| _strcmpi(strType.c_str(), "VT_I4") == 0)
+		{
+			return adInteger;
+		}
+		else if (_strcmpi(strType.c_str(), "VT_I8") == 0)
+		{
+			return adBigInt;
+		}
+		else if (_strcmpi(strType.c_str(), "VT_BSTR") == 0)
+		{
+			return adBSTR;
+		}
+		else if (_strcmpi(strType.c_str(), "VT_R8") == 0)
+		{
+			return adDouble;
+		}
+		else
+		{
+			THROW_LOGIC_ERROR_EXCEPTION("ELI51620");
+		}
 	}
-	else if (_strcmpi(strType.c_str(), "VT_INT") == 0
-		|| _strcmpi(strType.c_str(), "VT_I4") == 0)
+	catch (UCLIDException &ue)
 	{
-		return adInteger;
-	}
-	else if (_strcmpi(strType.c_str(), "VT_I8") == 0)
-	{
-		return adBigInt;
-	}
-	else if (_strcmpi(strType.c_str(), "VT_INT") == 0)
-	{
-		return adChar;
-	}
-	else
-	{
-		THROW_LOGIC_ERROR_EXCEPTION("ELI51620");
+		ue.addDebugInfo("ListType", strType);
+		throw;
 	}
 }
 //-------------------------------------------------------------------------------------------------
 vector<_variant_t> parseCmdListValues(ADODB::DataTypeEnum dataType, variant_t vtParamValue)
 {
 	vector<_variant_t> vecParamValues;
-
-	if (vtParamValue == __nullptr || vtParamValue == vtMissing)
+	try
 	{
-		vecParamValues.push_back(vtMissing);
-	}
-	else
-	{
-		ASSERT_ARGUMENT("ELI51619", vtParamValue.vt == VT_BSTR);
 
-		string strList = asString(vtParamValue.bstrVal);
-		replaceVariable(strList, "\\,", "<<<COMMA>>>");
-
-		vector<string> vecValueTokens;
-		StringTokenizer valueTokenizer(',');
-		valueTokenizer.parse(asString(vtParamValue.bstrVal), vecValueTokens);
-		for each (string strValue in vecValueTokens)
+		if (vtParamValue == __nullptr || vtParamValue == vtMissing)
 		{
-			replaceVariable(strValue, "<<<COMMA>>>", ",");
-			trim(strValue, " ", " ");
+			vecParamValues.push_back(vtMissing);
+		}
+		else
+		{
+			ASSERT_ARGUMENT("ELI51619", vtParamValue.vt == VT_BSTR);
 
-			if (_strcmpi(strValue.c_str(), "NULL") == 0)
+			string strList = asString(vtParamValue.bstrVal);
+			replaceVariable(strList, "\\,", "<<<COMMA>>>");
+
+			vector<string> vecValueTokens;
+			StringTokenizer valueTokenizer(',');
+			valueTokenizer.parse(asString(vtParamValue.bstrVal), vecValueTokens);
+			for each (string strValue in vecValueTokens)
 			{
-				vecParamValues.push_back(vtMissing);
-			}
-			else
-			{
-				if (_strcmpi(strValue.c_str(), "\"NULL\""))
+				replaceVariable(strValue, "<<<COMMA>>>", ",");
+				trim(strValue, " ", " ");
+
+				if (_strcmpi(strValue.c_str(), "NULL") == 0)
 				{
-					trim(strValue, "\"", "\"");
+					vecParamValues.push_back(vtMissing);
 				}
-
-				switch (dataType)
+				else
 				{
-				case adBoolean: vecParamValues.push_back(_variant_t(asCppBool(strValue)));	break;
-				case adInteger: vecParamValues.push_back(_variant_t(asLong(strValue)));		break;
-				case adBigInt:  vecParamValues.push_back(_variant_t(asLongLong(strValue)));	break;
-				case adChar:	vecParamValues.push_back(_variant_t(strValue.c_str()));		break;
-				default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51594");					break;
+					if (_strcmpi(strValue.c_str(), "\"NULL\""))
+					{
+						trim(strValue, "\"", "\"");
+					}
+
+					switch (dataType)
+					{
+					case adBoolean: vecParamValues.push_back(_variant_t(asCppBool(strValue)));	break;
+					case adInteger: vecParamValues.push_back(_variant_t(asLong(strValue)));		break;
+					case adBigInt:  vecParamValues.push_back(_variant_t(asLongLong(strValue)));	break;
+					case adBSTR:	vecParamValues.push_back(_variant_t(strValue.c_str()));		break;
+					case adDouble:	vecParamValues.push_back(_variant_t(asDouble(strValue)));	break;
+					default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51594");					break;
+					}
 				}
 			}
 		}
+	}
+	catch (UCLIDException &ue)
+	{
+		ue.addDebugInfo("DataType", dataType);
+		throw;
 	}
 
 	return vecParamValues;
 }
 //-------------------------------------------------------------------------------------------------
-vector<_ParameterPtr> getCmdParamters(_CommandPtr ipCommand, ADODB::DataTypeEnum dataType, vector<_variant_t> vecParamValues)
+vector<_ParameterPtr> getCmdParameters(_CommandPtr ipCommand, ADODB::DataTypeEnum dataType, vector<_variant_t> vecParamValues)
 {
 	vector<_ParameterPtr> cmdParameters;
 
 	for each (_variant_t vtParamValue in vecParamValues)
 	{
-		if (vtParamValue == vtMissing || dataType == adEmpty)
+		try
 		{
-			cmdParameters.push_back(__nullptr);
-		}
-		else
-		{
-			long size;
-			switch (dataType)
+			if (vtParamValue == vtMissing || dataType == adEmpty)
 			{
+				cmdParameters.push_back(__nullptr);
+			}
+			else
+			{
+				long size;
+				switch (dataType)
+				{
 				case adBoolean: size = 1;									break;
 				case adInteger:	size = 4;									break;
 				case adBigInt:	size = 8;									break;
-				case adChar:	size = ((_bstr_t)vtParamValue).length();	break;
+				case adDouble: size = 8;									break;
+				case adChar:
+				case adBSTR:
+				case adVarChar: size = ((_bstr_t)vtParamValue).length();	break;
 				case adEmpty:	size = 0;									break;
 				default:		THROW_LOGIC_ERROR_EXCEPTION("ELI51592");
+				}
+
+				_ParameterPtr paramValue = ipCommand->CreateParameter(
+					_bstr_t(), (dataType == adChar) ? adVarChar : dataType, adParamInput, size, vtParamValue);
+				cmdParameters.push_back(paramValue);
 			}
-		
-			_ParameterPtr paramValue = ipCommand->CreateParameter(
-				_bstr_t(), dataType, adParamInput, size, vtParamValue);
-			cmdParameters.push_back(paramValue);
+		}
+		catch (UCLIDException& ue)
+		{
+			ue.addDebugInfo("DataType", dataType);
+			ue.addDebugInfo("vtData", vtParamValue);
+			throw;
 		}
 	}
 
@@ -1123,7 +1201,7 @@ bool getCmdId(const _CommandPtr& ipCommand, long* pnResult, bool bAllowBlock /*=
 	{
 		if (vtId.vt != VT_I4)
 		{
-			UCLIDException ue("ELI51598", "ID should be a long type");
+			UCLIDException ue("ELI51742", "ID should be a long type");
 			ue.addDebugInfo("Type", vtId.vt);
 			throw ue;
 		}
@@ -1161,15 +1239,16 @@ bool getCmdId(const _CommandPtr& ipCommand, long long* pllResult, bool bAllowBlo
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-void executeCmd(const _CommandPtr& ipCommand, bool bDisplayExceptions /*= false*/)
+long executeCmd(const _CommandPtr& ipCommand, bool bDisplayExceptions /*= false*/)
 {
 	ASSERT_ARGUMENT("ELI51626", ipCommand != nullptr);
+	variant_t vtRecordsAffected = 0;
 
 	try
 	{
 		try
 		{
-			ipCommand->Execute(NULL, NULL, adCmdText | adExecuteNoRecords);
+			ipCommand->Execute(&vtRecordsAffected, NULL, adCmdText | adExecuteNoRecords);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51627");
 	}
@@ -1180,12 +1259,13 @@ void executeCmd(const _CommandPtr& ipCommand, bool bDisplayExceptions /*= false*
 		if (!bDisplayExceptions)
 		{
 			// Rethrow the exception
-			throw ue;
+			throw;
 		}
 
 		// Display exception
 		ue.display();
 	}
+	return vtRecordsAffected.lVal;
 }
 //-------------------------------------------------------------------------------------------------
 bool executeCmd(const _CommandPtr& ipCommand,
@@ -1312,11 +1392,15 @@ long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, cons
 			executeCmd(cmdInsert, false, true, "ID", &vtId);
 		}
 	}
-
+	
 	if (vtId.vt != VT_I4)
 	{
-		UCLIDException ue("ELI51598", "ID shold be a long type");
+		UCLIDException ue("ELI51598", "ID should be a long type");
 		ue.addDebugInfo("Type", vtId.vt);
+		ue.addDebugInfo("AddKey", bAddKey);
+		ue.addDebugInfo("Table", strTable);
+		ue.addDebugInfo("Column", strKeyCol);
+		ue.addDebugInfo("Key", rstrKey);
 		throw ue;
 	}
 

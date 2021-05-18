@@ -154,3 +154,5 @@ ProductDevelopment/AttributeFinder/AFCore/AFCoreTest/Code/AFCoreTest.opensdf
 /binaries64/
 .vs/
 .ionide
+
+.fake
