@@ -70,16 +70,31 @@
   <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
     <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
   </Target>
-  <PropertyGroup Condition="'$(WebInstallPath)'==''">
-    <WebInstallPath>\\extract.local\Eng\Builds\Web\Internal\v1.0.57</WebInstallPath>
+  <PropertyGroup Condition="'$(WebAppArchivePath)'==''">
+    <WebAppArchivePath>\\extract.local\Eng\Builds\Web\Internal\v1.116.3\v1.116.3.zip</WebAppArchivePath>
   </PropertyGroup>
   <PropertyGroup>
-    <DefineConstants>BasePath=$(WebInstallPath)</DefineConstants>
+    <ExtractedWebAppDir>$(OutDir)ExtractedWebApp</ExtractedWebAppDir>
   </PropertyGroup>
-  <Target Name="BeforeBuild">
-    <Message Text="Harvesting: '$(WebInstallPath)'" Importance="high" />
+  <PropertyGroup>
+    <DefineConstants>BasePath=$(ExtractedWebAppDir)</DefineConstants>
+  </PropertyGroup>
+  <Target Name="RemoveExtractedWebAppDir" AfterTargets="BeforeBuild">
+    <Message Text="Removing '$(ExtractedWebAppDir)'" />
+    <RemoveDir Directories="$(ExtractedWebAppDir)" />
+  </Target>
+  <Target Name="UnzipWebApp" AfterTargets="RemoveExtractedWebAppDir">
+    <Message Text="Unzipping '$(WebAppArchivePath)' to '$(ExtractedWebAppDir)'" Importance="high" />
+    <Unzip
+      SourceFiles="$(WebAppArchivePath)"
+      DestinationFolder="$(ExtractedWebAppDir)"
+      OverwriteReadOnlyFiles="true"
+    />
+  </Target>
+  <Target Name="HarvestWebApp" AfterTargets="UnzipWebApp">
+    <Message Text="Harvesting: '$(ExtractedWebAppDir)'" Importance="high" />
     <ItemGroup>
-      <HarvestDirectory Include="$(WebInstallPath)">
+      <HarvestDirectory Include="$(ExtractedWebAppDir)">
         <DirectoryRefId>IDSVerify</DirectoryRefId>
         <SuppressRootDirectory>true</SuppressRootDirectory>
         <SuppressCom>true</SuppressCom>
