@@ -8,15 +8,17 @@ using MSPowerPoint = Microsoft.Office.Interop.PowerPoint;
 using MSTriState = Microsoft.Office.Core.MsoTriState;
 using Extract.Office;
 using System.Collections.ObjectModel;
+using Newtonsoft.Json;
 
-namespace Extract.FileConverter.Converters
+namespace Extract.FileConverter
 {
-    sealed public class OfficeConverter : IConverter
+    public sealed class OfficeConverter : IConverter
     {
         /// <summary>
         /// Sets the supported destination file formats for this converter.
         /// </summary>
-        public Collection<FileFormat> SupportedDestinationFormats => new Collection<FileFormat>() { FileFormat.Pdf, FileFormat.Tiff };
+        [JsonIgnore]
+        public Collection<DestinationFileFormat> SupportedDestinationFormats => new Collection<DestinationFileFormat>() { DestinationFileFormat.Pdf, DestinationFileFormat.Tif };
 
         /// <summary>
         /// Gets or sets the enabled flag for this converter. If the converter is disabled, it will not be run.
@@ -26,14 +28,18 @@ namespace Extract.FileConverter.Converters
         /// <summary>
         /// Gets the name of the converter.
         /// </summary>
-        public string ConverterName { get => "Extract Office Converter"; }
+        [JsonIgnore]
+        public string ConverterName => "Extract Office Converter";
+
+        [JsonIgnore]
+        public bool HasDataError => false;
 
         /// <summary>
         /// Executes the code to convert from one file type to another.
         /// </summary>
         /// <param name="inputFile">The fully qualified path to the file you wish to convert</param>
         /// <param name="destinationFileFormat">The destination file format</param>
-        public void Convert(string inputFile, FileFormat destinationFileFormat)
+        public void Convert(string inputFile, DestinationFileFormat destinationFileFormat)
         {
             TemporaryFile tempPdf = null;
             try
@@ -55,14 +61,14 @@ namespace Extract.FileConverter.Converters
                     default:
                         throw new ExtractException("ELI30264", "Unsupported office application.");
                 }
-                
-                if(destinationFileFormat == FileFormat.Tiff)
+
+                if (destinationFileFormat == DestinationFileFormat.Tif)
                 {
-                    ImageMethods.ConvertPdfToTif(tempPdf.FileName, Path.ChangeExtension(inputFile, ".tiff"));
+                    ImageMethods.ConvertPdfToTif(tempPdf.FileName, inputFile + ".tif");
                 }
                 else
                 {
-                    File.Copy(tempPdf.FileName, Path.ChangeExtension(inputFile, ".pdf"));
+                    File.Copy(tempPdf.FileName, inputFile + ".pdf");
                 }
             }
             catch (Exception ex)
@@ -92,11 +98,11 @@ namespace Extract.FileConverter.Converters
             MSPowerPoint._Presentation presentation = pp.Presentations.Open(
                 inputFile, MSTriState.msoTrue, MSTriState.msoTrue,
                 MSTriState.msoFalse);
-            
+
             // Save as PDF
             presentation.SaveAs(tempPdf.FileName,
                 MSPowerPoint.PpSaveAsFileType.ppSaveAsPDF, MSTriState.msoTrue);
-            
+
             // Close the presentation
             presentation.Close();
             pp.Quit();
@@ -117,7 +123,7 @@ namespace Extract.FileConverter.Converters
 
             // Save document into PDF Format
             doc.SaveAs(FileName: tempPdf.FileName, FileFormat: Microsoft.Office.Interop.Word.WdSaveFormat.wdFormatPDF);
-          
+
             doc.Close(SaveChanges: Microsoft.Office.Interop.Word.WdSaveOptions.wdDoNotSaveChanges);
             word.Quit();
         }
@@ -177,9 +183,10 @@ namespace Extract.FileConverter.Converters
             }
         }
 
+        ///<inheritdoc cref="IConverter"/>
         public IConverter Clone()
         {
-            return new OfficeConverter() { IsEnabled = this.IsEnabled };
+            return new OfficeConverter() { IsEnabled = IsEnabled };
         }
     }
 }

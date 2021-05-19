@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Extract.FileConverter.Pages.OfficeConverter"
+﻿<UserControl x:Class="Extract.FileConverter.OfficeConverterUserControl"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,7 +6,7 @@
       mc:Ignorable="d" >
 
     <StackPanel>
-        <TextBlock TextWrapping="Wrap">This converter has two supported destinations: PDF and Tiff</TextBlock>
+        <TextBlock TextWrapping="Wrap">The office converter has two supported destinations: PDF and TIF</TextBlock>
         <TextBlock TextWrapping="Wrap">The supported inputs are: csv, ods, prn, xls, xlsx, odp, pps, ppt, pptx, docx, doc, odt, rtf, txt, wps</TextBlock>
         <TextBlock TextWrapping="Wrap">There are no configuration options currently available for this converter.</TextBlock>
     </StackPanel>

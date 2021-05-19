@@ -1,18 +1,16 @@
-﻿using Extract.FileConverter.Converters;
-using Extract.Licensing;
+﻿using Extract.Licensing;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace Extract.FileConverter.Test
 {
     /// <summary>
-    /// Provides test cases for the <see cref="DataEntryQuery"/> class.
+    /// Provides test cases for the <see cref="LeadtoolsConverter"/> class.
     /// </summary>
     [TestFixture]
-    [Category("TestLaunchArguments")]
-    public class TestLeadToolsConversion
+    [Category("TestConverters")]
+    public class TestLeadtoolsConversion
     {
         /// <summary>
         /// Setup method to initialize the testing environment.
@@ -38,24 +36,24 @@ namespace Extract.FileConverter.Test
             string fileName = Path.GetTempFileName() + "." + testItem.Split('.').Last();
             try
             {
-                WriteResourceToFile(testItem, fileName);
-                IConverter[] converters = { new LeadtoolsConverter() 
-                { 
-                    IsEnabled = true, 
-                    LeadtoolsModel = new Converters.Models.LeadtoolsModel() 
-                        { 
-                            PerspectiveID = perspectiveID, 
-                            Retain = retain, 
-                            RemovePages = removePages 
-                        } 
+                Utility.WriteResourceToFile(testItem, fileName);
+                IConverter[] converters = { new LeadtoolsConverter()
+                {
+                    IsEnabled = true,
+                    LeadtoolsModel = new LeadtoolsModel()
+                        {
+                            PerspectiveID = perspectiveID,
+                            Retain = retain,
+                            RemovePages = removePages
+                        }
                 } };
-                PerformConversion.Convert(converters, fileName, FileFormat.Pdf);
-                Assert.IsTrue(File.Exists(Path.ChangeExtension(fileName, ".pdf")));
+                PerformConversion.Convert(converters, fileName, DestinationFileFormat.Pdf);
+                Assert.IsTrue(File.Exists(fileName + ".pdf"));
             }
             finally
             {
                 File.Delete(fileName);
-                File.Delete(Path.ChangeExtension(fileName, ".pdf"));
+                Assert.IsTrue(File.Exists(fileName + ".pdf"));
             }
         }
 
@@ -68,23 +66,16 @@ namespace Extract.FileConverter.Test
             string fileName = Path.GetTempFileName() + "." + testItem.Split('.').Last();
             try
             {
-                WriteResourceToFile(testItem, fileName);
+                Utility.WriteResourceToFile(testItem, fileName);
                 IConverter[] converters = { new LeadtoolsConverter() { IsEnabled = true } };
-                PerformConversion.Convert(converters, fileName, FileFormat.Tiff);
-                Assert.IsTrue(File.Exists(Path.ChangeExtension(fileName, ".tiff")));
+                PerformConversion.Convert(converters, fileName, DestinationFileFormat.Tif);
+                Assert.IsTrue(File.Exists(fileName + ".tif"));
             }
             finally
             {
                 File.Delete(fileName);
-                File.Delete(Path.ChangeExtension(fileName, ".tiff"));
+                Assert.IsTrue(File.Exists(fileName + ".tif"));
             }
-        }
-
-        public static void WriteResourceToFile(string resourceName, string fileName)
-        {
-            using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
-            using var file = new FileStream(fileName, FileMode.Create, FileAccess.Write);
-            resource.CopyTo(file);
         }
     }
 }

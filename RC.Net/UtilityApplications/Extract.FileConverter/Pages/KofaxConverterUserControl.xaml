@@ -1,0 +1,105 @@
+﻿<UserControl x:Class="Extract.FileConverter.KofaxConverterUserControl"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="clr-namespace:Extract.FileConverter"
+             mc:Ignorable="d" >
+    <UserControl.Resources>
+        <!-- ValidatingControl Style -->
+        <Style TargetType="{x:Type FrameworkElement}" x:Key="ValidatingControl">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="ToolTip" Value="{Binding 
+                Path=(Validation.Errors)[0].ErrorContent, 
+                RelativeSource={x:Static RelativeSource.Self}}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <local:EnumDescriptionConverter x:Key="descConverter"></local:EnumDescriptionConverter>
+    </UserControl.Resources>
+    <StackPanel x:Name="SettingsPannel">
+        <TextBlock TextWrapping="Wrap">The Kofax converter has two supported destinations: PDF and TIF</TextBlock>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <Border ToolTipService.ShowDuration="12000" CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+                <Border.ToolTip>
+                    <TextBlock>
+                        Color will preserve the color depth of the source image even if the output is a tif.
+                        <LineBreak></LineBreak>
+                        If this argument is not used, all tif output images will be bi-tonal regardless of source bit depth.
+                    </TextBlock>
+                </Border.ToolTip>
+                <TextBlock Text="?" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            </Border>
+            <Label Content="Preserve Color" MinWidth="120"></Label>
+            <CheckBox IsChecked="{Binding KofaxModel.Color}" IsEnabled="{Binding IsEnabled}"></CheckBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Border ToolTipService.ShowDuration="12000" CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+                <Border.ToolTip>
+                    <TextBlock>
+                        Remove pages will exclude the specified pages from the output. The valid inputs are defined as:
+                        <LineBreak></LineBreak>
+                        A comma separated list. EX: 1,2,3
+                        <LineBreak></LineBreak>
+                        A range of pages denoted with a hyphen. EX: 5-7
+                        <LineBreak></LineBreak>
+                        A dash followed by number (will remove last X pages). EX: -2 (will remove last two pages)
+                        <LineBreak></LineBreak>
+                        A number followed by a dash (will pages starting a x). EX: 2- (Will remove every page after 2)
+                    </TextBlock>
+                </Border.ToolTip>
+                <TextBlock Text="?" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            </Border>
+            <Label Content="Remove Pages" MinWidth="120"></Label>
+            <TextBox Text="{Binding KofaxModel.RemovePages, ValidatesOnDataErrors=True}" Width="200px" IsEnabled="{Binding IsEnabled}"></TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Border ToolTipService.ShowDuration="12000" CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+                <Border.ToolTip>
+                    <TextBlock>
+                        The optional argument page number will write a single converted page directly to the output file.
+                    </TextBlock>
+                </Border.ToolTip>
+                <TextBlock Text="?" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            </Border>
+            <Label Content="Page Number" MinWidth="120"></Label>
+            <TextBox Text="{Binding KofaxModel.PageNumber, ValidatesOnDataErrors=True}" Width="200px" IsEnabled="{Binding IsEnabled}"></TextBox>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+            <Border ToolTipService.ShowDuration="12000" CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+                <Border.ToolTip>
+                    <TextBlock>
+                        This argument allows you to specify the exact file format Kofax will use.
+                    </TextBlock>
+                </Border.ToolTip>
+                <TextBlock Text="?" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            </Border>
+            <Label Content="Format (Advanced)" MinWidth="120"></Label>
+            
+            <ComboBox x:Name="KofaxFormat" SelectedItem="{Binding KofaxModel.SpecifiedCompressionFormat, ValidatesOnDataErrors=True}" Width="200px" IsEnabled="{Binding IsEnabled}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource descConverter}}"></TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Border ToolTipService.ShowDuration="12000" CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+                <Border.ToolTip>
+                    <TextBlock>
+                        The argument compression allows for specification of the compression level for applicable Kofax file formats (pdf, pdf_mrc, jpg, jpg2k).
+                    </TextBlock>
+                </Border.ToolTip>
+                <TextBlock Text="?" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+            </Border>
+            <Label Content="Compression" MinWidth="90"></Label>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Less Compression"></Label>
+            <Slider x:Name="CompressionSlider" Width="200px" Maximum="5" Minimum="1" TickPlacement="BottomRight" TickFrequency="1" IsSnapToTickEnabled="True" IsEnabled="{Binding IsEnabled}" Value="{Binding KofaxModel.Compression}" />
+            <Label Content="More Compression"></Label>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

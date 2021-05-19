@@ -1,10 +1,10 @@
-﻿using Extract.FileConverter.Converters;
-using Extract.FileConverter.Pages.Utility;
-using MahApps.Metro.Controls;
+﻿using MahApps.Metro.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,46 +14,44 @@ namespace Extract.FileConverter
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    sealed public partial class ConverterSettingsWindow : MetroWindow
+    public sealed partial class ConverterSettingsWindow : MetroWindow
     {
-        /// <summary>
-        /// Used to indicate to the calling object if it should save the settings.
-        /// </summary>
-        private bool _SaveSettings = false;
-        private FileFormat _DestinationFileFormat = FileFormat.Tiff;
+        private DestinationFileFormat _DestinationFileFormat = DestinationFileFormat.Tif;
+
+        public ObservableCollection<KofaxFileFormat> KofaxFileFormats { get; } = new ObservableCollection<KofaxFileFormat>() { KofaxFileFormat.None };
 
         private bool isDirty;
 
-        public IList<IConverter> Converters { get; } = new ObservableCollection<IConverter>() { new OfficeConverter(), new LeadtoolsConverter() };
+        public IList<IConverter> Converters { get; } = new ObservableCollection<IConverter>();
 
         /// <summary>
         /// Gets or sets the destination file format.
         /// </summary>
-        public FileFormat DestinationFileFormat 
+        public DestinationFileFormat DestinationFileFormat
         {
-            get 
+            get => _DestinationFileFormat;
+            set
             {
-                return this._DestinationFileFormat;
-            }
-            set 
-            {
-                this._DestinationFileFormat = value;
-                this.isDirty = true;
+                _DestinationFileFormat = value;
+                isDirty = true;
+                ClearAndPopulateKofaxFileFormats();
+                UpdateCompressionSilder();
             }
         }
 
         /// <summary>
         /// Publicly accessible property for _SaveSettings
         /// </summary>
-        public bool SaveSettings { get { return _SaveSettings; } }
+        public bool SaveSettings { get; private set; } = false;
 
         /// <summary>
         /// Gets the supported destination file formats.
         /// </summary>
-        public Collection<FileFormat> SupportedDestinationFormats { get; } = new Collection<FileFormat> { FileFormat.Tiff, FileFormat.Pdf };
+        public Collection<DestinationFileFormat> SupportedDestinationFormats { get; } = new Collection<DestinationFileFormat> { DestinationFileFormat.Tif, DestinationFileFormat.Pdf };
 
-        private Pages.LeadtoolsConverter _leadtoolsConverter;
-        private Pages.OfficeConverter _officeConverter;
+        private LeadtoolsConverterUserControl _leadtoolsConverter;
+        private OfficeConverterUserControl _officeConverter;
+        private KofaxConverterUserControl _kofaxConverter;
 
         /// <summary>
         /// Default constructor that adds all of the supported converters.
@@ -68,16 +66,16 @@ namespace Extract.FileConverter
         /// </summary>
         /// <param name="converters">A collection of pre-configured converters</param>
         /// <param name="destinationFileFormat">The destination file format to set</param>
-        public ConverterSettingsWindow(IList<IConverter> converters, FileFormat destinationFileFormat)
+        public ConverterSettingsWindow(IList<IConverter> converters, DestinationFileFormat destinationFileFormat)
         {
-            this.Converters.Clear();
+            Converters.Clear();
             try
             {
-                foreach (var converter in converters)
+                foreach (IConverter converter in converters)
                 {
-                    this.Converters.Add(converter);
+                    Converters.Add(converter);
                 }
-                this.DestinationFileFormat = destinationFileFormat;
+                DestinationFileFormat = destinationFileFormat;
             }
             catch (Exception ex)
             {
@@ -88,7 +86,7 @@ namespace Extract.FileConverter
 
         private void ConverterSettingsWindow_Closing(object sender, CancelEventArgs e)
         {
-            if(this.isDirty)
+            if (isDirty)
             {
                 string msg = "Would you like to save your changes?";
                 MessageBoxResult result =
@@ -99,7 +97,7 @@ namespace Extract.FileConverter
                     MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Yes)
                 {
-                    this._SaveSettings = true;
+                    SaveSettings = true;
                 }
             }
         }
@@ -110,27 +108,61 @@ namespace Extract.FileConverter
         private void Setup()
         {
             InitializeComponent();
-            ConverterListBox.DataContext = this.Converters;
+            ClearAndPopulateKofaxFileFormats();
+            ConverterListBox.DataContext = Converters;
             DestinationFormat.DataContext = this;
             AddInMissingOrNewConverters();
-            this._officeConverter = new Pages.OfficeConverter();
-            var leadToolsConverter = ((LeadtoolsConverter)this.Converters.Where(m => m.ConverterName.Equals(new LeadtoolsConverter().ConverterName)).First());
-            this._leadtoolsConverter = new Pages.LeadtoolsConverter(leadToolsConverter);
-            leadToolsConverter.LeadtoolsModel.PropertyChanged += propertyChanged;
-            this.isDirty = false;
+            _officeConverter = new OfficeConverterUserControl();
+
+            LeadtoolsConverter leadToolsConverter = Converters.OfType<LeadtoolsConverter>().First();
+            _leadtoolsConverter = new LeadtoolsConverterUserControl(leadToolsConverter);
+            leadToolsConverter.LeadtoolsModel.PropertyChanged += ModelPropertyChange;
+
+            KofaxConverter kofaxConverter = Converters.OfType<KofaxConverter>().First();
+            _kofaxConverter = new KofaxConverterUserControl(this);
+            kofaxConverter.KofaxModel.PropertyChanged += ModelPropertyChange;
+
+            isDirty = false;
+            UpdateCompressionSilder();
+        }
+
+        private void ClearAndPopulateKofaxFileFormats()
+        {
+            if (_kofaxConverter != null)
+            {
+                _kofaxConverter.KofaxFormat.SelectedItem = KofaxFileFormat.None;
+            }
+
+            KofaxFileFormats.Where(m => !m.Equals(KofaxFileFormat.None)).ToList().ForEach(m => KofaxFileFormats.Remove(m));
+
+            //foreach(KofaxFileFormat value in toremove)
+            //{
+            //    KofaxFileFormats.Remove(value);
+            //}
+
+            foreach (object fileformat in Enum.GetValues(typeof(KofaxFileFormat)))
+            {
+                KofaxFileFormat format = (KofaxFileFormat)fileformat;
+                if (format.ToString().ToUpper(CultureInfo.InvariantCulture).Contains(DestinationFileFormat.ToString().ToUpper(CultureInfo.InvariantCulture)))
+                {
+                    KofaxFileFormats.Add(format);
+                }
+            }
         }
 
         private void AddInMissingOrNewConverters()
         {
-            var leadTools = new LeadtoolsConverter();
-            if (!this.Converters.Where(m => m.ConverterName.Equals(leadTools.ConverterName)).Any())
+            if (!Converters.OfType<LeadtoolsConverter>().Any())
             {
-                this.Converters.Add(leadTools);
+                Converters.Add(new LeadtoolsConverter());
             }
-            var officeConverter = new OfficeConverter();
-            if (!this.Converters.Where(m => m.ConverterName.Equals(officeConverter.ConverterName)).Any())
+            if (!Converters.OfType<OfficeConverter>().Any())
             {
-                this.Converters.Add(officeConverter);
+                Converters.Add(new OfficeConverter());
+            }
+            if (!Converters.OfType<KofaxConverter>().Any())
+            {
+                Converters.Add(new KofaxConverter());
             }
         }
 
@@ -141,9 +173,26 @@ namespace Extract.FileConverter
         /// <param name="e">Any routed arguments</param>
         private void Button_Save_Click(object sender, RoutedEventArgs e)
         {
-            isDirty = false;
-            this._SaveSettings = true;
-            this.Close();
+            IEnumerable<IConverter> convertersToValidate = Converters.Where(m => m.IsEnabled);
+            bool allowSave = true;
+            foreach (IConverter converter in convertersToValidate)
+            {
+                if (converter.HasDataError)
+                {
+                    allowSave = false;
+                    break;
+                }
+            }
+            if (allowSave)
+            {
+                isDirty = false;
+                SaveSettings = true;
+                Close();
+            }
+            else
+            {
+                MessageBox.Show("Please correct all validation errors before saving!", "File Conversion Utility");
+            }
         }
 
         /// <summary>
@@ -154,17 +203,18 @@ namespace Extract.FileConverter
         private void Button_Cancel_Click(object sender, RoutedEventArgs e)
         {
             isDirty = false;
-            this.Close();
+            Close();
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         private void ConverterListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UpdateDisplayedConverterSettings(((IConverter)((ItemDragAndDropListBox)sender).SelectedValue));
+            UpdateDisplayedConverterSettings((IConverter)((ItemDragAndDropListBox)sender).SelectedValue);
         }
 
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
-            this.isDirty = true;
+            isDirty = true;
             ConverterListBox.SelectedValue = ((CheckBox)sender).DataContext;
             UpdateDisplayedConverterSettings((IConverter)ConverterListBox.SelectedValue);
         }
@@ -175,20 +225,33 @@ namespace Extract.FileConverter
             {
                 ConverterSettings.Children.Clear();
 
-                if (converter.ConverterName == new OfficeConverter().ConverterName)
+                if (converter.GetType().Equals(typeof(OfficeConverter)))
                 {
-                    ConverterSettings.Children.Add(this._officeConverter);
+                    ConverterSettings.Children.Add(_officeConverter);
                 }
-                if (converter.ConverterName == new LeadtoolsConverter().ConverterName)
+                if (converter.GetType().Equals(typeof(LeadtoolsConverter)))
                 {
-                    ConverterSettings.Children.Add(this._leadtoolsConverter);
+                    ConverterSettings.Children.Add(_leadtoolsConverter);
                 }
+                if (converter.GetType().Equals(typeof(KofaxConverter)))
+                {
+                    ConverterSettings.Children.Add(_kofaxConverter);
+                }
+                UpdateCompressionSilder();
             }
         }
 
-        void propertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void ModelPropertyChange(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            this.isDirty = true;
+            isDirty = true;
+        }
+
+        private void UpdateCompressionSilder()
+        {
+            if (Converters.Count > 0 && _kofaxConverter != null)
+            {
+                _kofaxConverter.CompressionSlider.IsEnabled = _DestinationFileFormat.Equals(DestinationFileFormat.Pdf) && Converters.OfType<KofaxConverter>().First().IsEnabled;
+            }
         }
     }
 }

@@ -5,20 +5,20 @@ using System.Globalization;
 
 namespace Extract.FileConverter
 {
-    public sealed class LeadtoolsConverter : IConverter
+    public sealed class KofaxConverter : IConverter
     {
-        public LeadtoolsModel LeadtoolsModel { get; set; } = new LeadtoolsModel();
+        public KofaxModel KofaxModel { get; set; } = new KofaxModel();
 
         public bool IsEnabled { get; set; }
 
         [JsonIgnore]
-        public string ConverterName => "LeadTools";
+        public string ConverterName => "Kofax (Nuance)";
 
         [JsonIgnore]
         public Collection<DestinationFileFormat> SupportedDestinationFormats => new Collection<DestinationFileFormat>() { DestinationFileFormat.Pdf, DestinationFileFormat.Tif };
 
         [JsonIgnore]
-        public bool HasDataError => LeadtoolsModel.HasDataError;
+        public bool HasDataError => KofaxModel.HasDataError;
 
         /// <summary>
         /// Converts the input file to a PDF, and sets the name to the output file name.
@@ -30,35 +30,43 @@ namespace Extract.FileConverter
             {
                 string arguments = "\"" + inputFile + "\"" + " "
                                + "\"" + inputFile + "." + destinationFileFormat.EnumValue() + "\""
-                               + " /" + destinationFileFormat.EnumValue();
-                if (LeadtoolsModel.Retain.Equals(true))
+                               + " /" + destinationFileFormat.EnumValue() + " /am";
+                if (!string.IsNullOrEmpty(KofaxModel.RemovePages))
                 {
-                    arguments += " /retain";
+                    arguments += " /RemovePages " + KofaxModel.RemovePages;
                 }
-                if (LeadtoolsModel.PerspectiveID != -1)
+                if (KofaxModel.Color)
                 {
-                    arguments += " /vp " + LeadtoolsModel.PerspectiveID.ToString(CultureInfo.InvariantCulture);
+                    arguments += " /color";
                 }
-                if (!string.IsNullOrEmpty(LeadtoolsModel.RemovePages))
+                if (KofaxModel.SpecifiedCompressionFormat != KofaxFileFormat.None)
                 {
-                    arguments += " /RemovePages " + LeadtoolsModel.RemovePages;
+                    arguments += " /format " + MapKofaxFileFormats.ToImageFormatConverterFormat(KofaxModel.SpecifiedCompressionFormat);
+                }
+                if (destinationFileFormat.Equals(DestinationFileFormat.Pdf) && KofaxModel.Compression > 0 && KofaxModel.Compression < 6)
+                {
+                    arguments += " /compression " + KofaxModel.Compression.ToString(CultureInfo.InvariantCulture);
+                }
+                if (KofaxModel.PageNumber != -1)
+                {
+                    arguments += " /page " + KofaxModel.PageNumber.ToString(CultureInfo.InvariantCulture);
                 }
 
                 Utilities.SystemMethods.RunExtractExecutable(@$"{Utilities.FileSystemMethods.CommonComponentsPath}\ImageFormatConverter.exe", arguments);
             }
             catch (Exception ee)
             {
-                throw ee.AsExtract("ELI51718");
+                throw ee.AsExtract("ELI51717");
             }
         }
 
         ///<inheritdoc cref="IConverter"/>
         public IConverter Clone()
         {
-            return new LeadtoolsConverter()
+            return new KofaxConverter()
             {
                 IsEnabled = IsEnabled,
-                LeadtoolsModel = LeadtoolsModel.Clone()
+                KofaxModel = KofaxModel.Clone()
             };
         }
     }

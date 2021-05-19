@@ -5,15 +5,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:content="clr-namespace:Extract.FileConverter.Pages" 
         xmlns:local="clr-namespace:Extract.FileConverter"
         mc:Ignorable="d"
-        Title="Core: Convert document Settings" 
+        Title="Core: Convert document settings" 
         Height="450" 
         Width="800" 
         MinWidth="600" 
         MinHeight="450"
         Closing="ConverterSettingsWindow_Closing"
+        TitleCharacterCasing="Normal"
         x:Name="settingsWindow">
     <Window.Resources>
         <ResourceDictionary>
@@ -40,7 +40,20 @@
                 <Label Content="Destination Format"></Label>
                 <ComboBox x:Name="DestinationFormat" ItemsSource="{Binding SupportedDestinationFormats}" SelectedItem="{Binding DestinationFileFormat}" DisplayMemberPath="">
                 </ComboBox>
-                <Label Content="Converters (Drag to re-order)"></Label>
+                <StackPanel Orientation="Horizontal">
+                    <Border ToolTipService.ShowDuration="12000" CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+                        <Border.ToolTip>
+                            <TextBlock>
+                                The converters are executed from top to bottom. The checkbox next to the indicates if they are enabled.
+                                <LineBreak></LineBreak>
+                                An example would be having both the Leadtools and Kofax converters enabled. If the Leadtools converter was higher than the Kofax converter, then it would execute the LeadTools converter fist. If it failed, then it would try the Kofax converter.
+                            </TextBlock>
+                        </Border.ToolTip>
+                        <TextBlock Text="?" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                    </Border>
+
+                    <Label Content="Converters (Drag to re-order)"></Label>
+                </StackPanel>
                 <local:ItemDragAndDropListBox x:Name="ConverterListBox" ItemsSource="{Binding}" SelectionChanged="ConverterListBox_SelectionChanged">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -61,7 +74,7 @@
             </DockPanel>
         </Border>
         <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,10,0">
-            <Button  Content="Save" Click="Button_Save_Click" VerticalAlignment="Bottom" MaxHeight="30" Margin="0,0,0,10"></Button>
+            <Button Content="Save" Click="Button_Save_Click" VerticalAlignment="Bottom" MaxHeight="30" Margin="0,0,0,10"></Button>
             <Button Content="Cancel" Click="Button_Cancel_Click" VerticalAlignment="Bottom" MaxHeight="30" Margin="5,0,0,10"></Button>
         </StackPanel>
     </Grid>

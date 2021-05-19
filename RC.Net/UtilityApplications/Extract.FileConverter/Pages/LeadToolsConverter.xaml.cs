@@ -1,21 +1,16 @@
-﻿using Extract.FileConverter.Converters.Models;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
-namespace Extract.FileConverter.Pages
+namespace Extract.FileConverter
 {
     /// <summary>
     /// Interaction logic for ImageFormatConverter.xaml
     /// </summary>
-    sealed public partial class LeadtoolsConverter : UserControl
-    {        
-        public LeadtoolsConverter(Converters.LeadtoolsConverter leadtoolsConverterWindow)
+    public sealed partial class LeadtoolsConverterUserControl : UserControl
+    {
+        public LeadtoolsConverterUserControl(LeadtoolsConverter leadtoolsConverterWindow)
         {
             InitializeComponent();
-            this.SettingsPannel.DataContext = leadtoolsConverterWindow;
+            SettingsPannel.DataContext = leadtoolsConverterWindow;
         }
     }
 }

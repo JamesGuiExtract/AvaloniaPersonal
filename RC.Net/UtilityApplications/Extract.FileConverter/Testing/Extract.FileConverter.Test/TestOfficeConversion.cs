@@ -1,5 +1,4 @@
-﻿using Extract.FileConverter.Converters;
-using Extract.Licensing;
+﻿using Extract.Licensing;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
@@ -8,10 +7,10 @@ using System.Reflection;
 namespace Extract.FileConverter.Test
 {
     /// <summary>
-    /// Provides test cases for the <see cref="DataEntryQuery"/> class.
+    /// Provides test cases for the <see cref="OfficeConverter"/> class.
     /// </summary>
     [TestFixture]
-    [Category("TestLaunchArguments")]
+    [Category("TestConverters")]
     public class TestOfficeConversion
     {
         /// <summary>
@@ -23,7 +22,7 @@ namespace Extract.FileConverter.Test
             LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
         }
 
-        [Test, Category("Automated")]
+        [Test, Category("Automated"), Category("OfficeRequired")]
         [Parallelizable(ParallelScope.All)]
         [TestCase("Extract.FileConverter.Test.TestWordDocuments.VPNInstructions.docx", TestName = "Convert docx to pdf")]
         [TestCase("Extract.FileConverter.Test.TestWordDocuments.VPNInstructions2003.doc", TestName = "Convert doc to pdf.")]
@@ -40,24 +39,24 @@ namespace Extract.FileConverter.Test
         [TestCase("Extract.FileConverter.Test.TestExcelDocuments.Jan-March.prn", TestName = "Convert prn to pdf.")]
         [TestCase("Extract.FileConverter.Test.TestExcelDocuments.Jan-March.xls", TestName = "Convert xls to pdf.")]
         [TestCase("Extract.FileConverter.Test.TestExcelDocuments.Jan-March.xlsx", TestName = "Convert xlsx to pdf.")]
-        public static void ConvertDOCXToPdf(string testItem)
+        public static void ConvertFilesToPdf(string testItem)
         {
             string fileName = Path.GetTempFileName() + "." + testItem.Split('.').Last();
             try
             {
                 WriteResourceToFile(testItem, fileName);
                 IConverter[] converters = { new OfficeConverter() { IsEnabled = true } };
-                PerformConversion.Convert(converters, fileName, FileFormat.Pdf);
-                Assert.IsTrue(File.Exists(Path.ChangeExtension(fileName, ".pdf")));
+                PerformConversion.Convert(converters, fileName, DestinationFileFormat.Pdf);
+                Assert.IsTrue(File.Exists(fileName + ".pdf"));
             }
             finally
             {
                 File.Delete(fileName);
-                File.Delete(Path.ChangeExtension(fileName, ".pdf"));
+                Assert.IsTrue(File.Exists(fileName + ".pdf"));
             }
         }
 
-        [Test, Category("Automated")]
+        [Test, Category("Automated"), Category("OfficeRequired")]
         [Parallelizable(ParallelScope.All)]
         [TestCase("Extract.FileConverter.Test.TestWordDocuments.VPNInstructions.docx", TestName = "Convert docx to tiff")]
         [TestCase("Extract.FileConverter.Test.TestWordDocuments.VPNInstructions2003.doc", TestName = "Convert doc to tiff.")]
@@ -81,17 +80,17 @@ namespace Extract.FileConverter.Test
             {
                 WriteResourceToFile(testItem, fileName);
                 IConverter[] converters = { new OfficeConverter() { IsEnabled = true } };
-                PerformConversion.Convert(converters, fileName, FileFormat.Tiff);
-                Assert.IsTrue(File.Exists(Path.ChangeExtension(fileName, ".tiff")));
+                PerformConversion.Convert(converters, fileName, DestinationFileFormat.Tif);
+                Assert.IsTrue(File.Exists(fileName + ".tif"));
             }
             finally
             {
                 File.Delete(fileName);
-                File.Delete(Path.ChangeExtension(fileName, ".tiff"));
+                Assert.IsTrue(File.Exists(fileName + ".tif"));
             }
         }
 
-        [Test, Category("Automated")]
+        [Test, Category("Automated"), Category("OfficeRequired")]
         public static void EnsureErrorForNonSupportedFormat()
         {
             string fileName = Path.GetTempFileName() + ".lol";
@@ -99,7 +98,7 @@ namespace Extract.FileConverter.Test
             {
                 WriteResourceToFile("Extract.FileConverter.Test.TestNonExistantFormat.VPNInstructions2003.lol", fileName);
                 IConverter[] converters = { new OfficeConverter() { IsEnabled = true } };
-                Assert.Throws<ExtractException>(() => PerformConversion.Convert(converters, fileName, FileFormat.Tiff));
+                Assert.Throws<ExtractException>(() => PerformConversion.Convert(converters, fileName, DestinationFileFormat.Tif));
             }
             finally
             {
@@ -109,8 +108,8 @@ namespace Extract.FileConverter.Test
 
         public static void WriteResourceToFile(string resourceName, string fileName)
         {
-            using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
-            using var file = new FileStream(fileName, FileMode.Create, FileAccess.Write);
+            using Stream resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+            using FileStream file = new FileStream(fileName, FileMode.Create, FileAccess.Write);
             resource.CopyTo(file);
         }
     }

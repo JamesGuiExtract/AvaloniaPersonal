@@ -80,11 +80,11 @@ namespace Extract.Utilities.Forms
             if (sender is ListBoxItem _sender)
             {
                 T source = null;
-                var implemenations = UtilityMethods.GetClassesThatImplementInterface<T>(this.executingAssembly);
+                var implemenations = UtilityMethods.AllTypesThatImplementInterface(typeof(T), this.executingAssembly);
                 foreach (var implemenation in implemenations)
                 {
 
-                    source = e.Data.GetData(implemenation.GetType()) as T;
+                    source = e.Data.GetData(implemenation) as T;
                     if (source != null)
                     {
                         break;

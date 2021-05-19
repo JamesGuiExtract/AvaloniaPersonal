@@ -1,15 +1,15 @@
 ﻿using System.Windows.Controls;
 
-namespace Extract.FileConverter.Pages
+namespace Extract.FileConverter
 {
     /// <summary>
     /// Interaction logic for ImageFormatConverter.xaml
     /// </summary>
-    sealed public partial class OfficeConverter : UserControl
+    public sealed partial class OfficeConverterUserControl : UserControl
     {
-        public OfficeConverter()
+        public OfficeConverterUserControl()
         {
-            this.DataContext = this;
+            DataContext = this;
             InitializeComponent();
         }
     }

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Extract.FileConverter.Pages.LeadtoolsConverter"
+﻿<UserControl x:Class="Extract.FileConverter.LeadtoolsConverterUserControl"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -17,9 +17,9 @@
         </Style>
     </UserControl.Resources>
     <StackPanel x:Name="SettingsPannel">
-        <TextBlock TextWrapping="Wrap">This converter has two supported destinations: PDF and Tiff</TextBlock>
+        <TextBlock TextWrapping="Wrap">The Leadtools converter has two supported destinations: PDF and TIF</TextBlock>
         <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-            <Border CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+            <Border ToolTipService.ShowDuration="12000" CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
                 <Border.ToolTip>
                     <TextBlock>
                         Retain will cause any redaction annotations to be burned into the resulting image (if the source is a TIF, and the destination is a PDF or JPEG).
@@ -33,7 +33,7 @@
             <CheckBox IsChecked="{Binding LeadtoolsModel.Retain}" IsEnabled="{Binding IsEnabled}"></CheckBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <Border CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+            <Border ToolTipService.ShowDuration="12000" CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
                 <Border.ToolTip>
                     <TextBlock>
                         Remove pages will exclude the specified pages from the output. The valid inputs are defined as:
@@ -43,6 +43,8 @@
                         A range of pages denoted with a hyphen. EX: 5-7
                         <LineBreak></LineBreak>
                         A dash followed by number (will remove last X pages). EX: -2 (will remove last two pages)
+                        <LineBreak></LineBreak>
+                        A number followed by a dash (will pages starting a x). EX: 2- (Will remove every page after 2)
                     </TextBlock>
                 </Border.ToolTip>
                 <TextBlock Text="?" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
@@ -51,7 +53,7 @@
             <TextBox Text="{Binding LeadtoolsModel.RemovePages, ValidatesOnDataErrors=True}" Width="200px" IsEnabled="{Binding IsEnabled}"></TextBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <Border CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
+            <Border ToolTipService.ShowDuration="12000" CornerRadius="9" Width="15" Height="15" BorderBrush="blue" BorderThickness="1">
                 <Border.ToolTip>
                     <TextBlock>
                         Perspective ID will be used with the /vp argument. This sets the view perspective of the output to a specified value.

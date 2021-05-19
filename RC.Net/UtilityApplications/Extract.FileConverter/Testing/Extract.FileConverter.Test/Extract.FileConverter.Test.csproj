@@ -63,6 +63,9 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Interop.UCLID_FILEPROCESSINGLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
@@ -94,8 +97,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestConvertDocumentTask.cs" />
+    <Compile Include="TestKofaxConverter.cs" />
     <Compile Include="TestLeadToolsConversion.cs" />
     <Compile Include="TestOfficeConversion.cs" />
+    <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestWordDocuments\VPNInstructions.docx" />
@@ -147,6 +153,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestTiffDocuments\0275pages.tif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="UnitTestNoNamespaceChange.fps" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

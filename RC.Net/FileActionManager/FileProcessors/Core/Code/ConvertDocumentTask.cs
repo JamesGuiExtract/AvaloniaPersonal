@@ -5,17 +5,15 @@ using System.Runtime.InteropServices;
 using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-using Extract.FileConverter.Converters;
 using System.Windows.Interop;
 using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using System.Windows.Forms;
-using Extract.FileConverter;
 using System.Collections.ObjectModel;
 using System.Windows;
 using Application = System.Windows.Forms.Application;
+using Extract.FileConverter;
 
 namespace Extract.FileActionManager.FileProcessors
 {
@@ -34,9 +32,10 @@ namespace Extract.FileActionManager.FileProcessors
         ILicensedComponent,
         IPersistStream
     {
+        [ComVisible(false)]
         public IList<IConverter> Converters { get; }
-
-        public FileFormat DestinationFileFormat { get; set; }
+        [ComVisible(false)]
+        public DestinationFileFormat DestinationFileFormat { get; set; }
     }
 
     /// <summary>
@@ -45,6 +44,7 @@ namespace Extract.FileActionManager.FileProcessors
     [ComVisible(true)]
     [Guid("1377C71B-871A-4857-9E40-D7994792E8F0")]
     [ProgId("Extract.FileConverter.ConverterFileProcessor")]
+    [CLSCompliant(false)]
     public class ConvertDocumentTask : IConverterFileProcessor
     {
         #region Constants
@@ -66,7 +66,32 @@ namespace Extract.FileActionManager.FileProcessors
 
         public IList<IConverter> Converters { get; } = new Collection<IConverter>();
 
-        public FileFormat DestinationFileFormat { get; set; }
+        private DestinationFileFormat _DestinationFileFormat;
+        public DestinationFileFormat DestinationFileFormat { 
+            get 
+            { 
+                return _DestinationFileFormat; 
+            } 
+            set 
+            {
+                try
+                {
+                    List<DestinationFileFormat> enumValues = Enum.GetValues(typeof(DestinationFileFormat)).Cast<DestinationFileFormat>().ToList();
+                    if (enumValues.Where(m => m.Equals(value)).Any())
+                    {
+                        _DestinationFileFormat = value;
+                    }
+                    else
+                    {
+                        throw new ExtractException("ELI51713", $"Unknown destination format: {value.AsString()}");
+                    }
+                }
+                catch(Exception ex)
+                {
+                    throw ex.AsExtract("ELI51723");
+                }
+            } 
+        }
 
         #endregion Constants
 
@@ -140,8 +165,8 @@ namespace Extract.FileActionManager.FileProcessors
                 LicenseUtilities.ValidateLicense(_LICENSE_ID, "ELI51642", _COMPONENT_DESCRIPTION);
                 ConverterSettingsWindow converterSettingsWindow;
 
-                IList<IConverter> clonedConverters = this.Converters.Select(m => m.Clone()).ToList();
-                converterSettingsWindow = new ConverterSettingsWindow(clonedConverters, this.DestinationFileFormat);
+                IList<IConverter> clonedConverters = Converters.Select(m => m.Clone()).ToList();
+                converterSettingsWindow = new ConverterSettingsWindow(clonedConverters, DestinationFileFormat);
 
                 new WindowInteropHelper(converterSettingsWindow)
                 {
@@ -153,8 +178,8 @@ namespace Extract.FileActionManager.FileProcessors
                 if (converterSettingsWindow.SaveSettings)
                 {
                     PopulateAndClearConverters(converterSettingsWindow.Converters);
-                    this.DestinationFileFormat = converterSettingsWindow.DestinationFileFormat;
-                    this._dirty = true;
+                    DestinationFileFormat = converterSettingsWindow.DestinationFileFormat;
+                    _dirty = true;
                     return true;
                 }
 
@@ -350,7 +375,7 @@ namespace Extract.FileActionManager.FileProcessors
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI51648", _COMPONENT_DESCRIPTION);
 
-                PerformConversion.Convert(this.Converters.Where(m => m.IsEnabled).ToArray(), pFileRecord.Name, this.DestinationFileFormat);
+                PerformConversion.Convert(Converters.Where(m => m.IsEnabled).ToArray(), pFileRecord.Name, DestinationFileFormat);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }
@@ -431,14 +456,14 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    var settings = new JsonSerializerSettings
+                    JsonSerializerSettings settings = new JsonSerializerSettings
                     {
                         TypeNameHandling = TypeNameHandling.Objects
                     };
 
                     PopulateAndClearConverters(JsonConvert.DeserializeObject<IList<IConverter>>(reader.ReadString(), settings));
 
-                    this.DestinationFileFormat = JsonConvert.DeserializeObject<FileFormat>(reader.ReadString(), settings);
+                    DestinationFileFormat = JsonConvert.DeserializeObject<DestinationFileFormat>(reader.ReadString(), settings);
                 }
 
                 // Freshly loaded object is no longer dirty
@@ -466,13 +491,13 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    var settings = new JsonSerializerSettings
+                    JsonSerializerSettings settings = new JsonSerializerSettings
                     {
                         TypeNameHandling = TypeNameHandling.Objects
                     };
 
-                    writer.Write(JsonConvert.SerializeObject(this.Converters, Formatting.Indented, settings));
-                    writer.Write(JsonConvert.SerializeObject(this.DestinationFileFormat, Formatting.Indented, settings));
+                    writer.Write(JsonConvert.SerializeObject(Converters, Formatting.Indented, settings));
+                    writer.Write(JsonConvert.SerializeObject(DestinationFileFormat, Formatting.Indented, settings));
 
                     writer.WriteTo(stream);
                 }
@@ -505,10 +530,10 @@ namespace Extract.FileActionManager.FileProcessors
 
         private void PopulateAndClearConverters(IList<IConverter> converters)
         {
-            this.Converters.Clear();
-            foreach(var converter in converters)
+            Converters.Clear();
+            foreach(IConverter converter in converters)
             {
-                this.Converters.Add(converter);
+                Converters.Add(converter);
             }
         }
 
@@ -543,7 +568,7 @@ namespace Extract.FileActionManager.FileProcessors
         void CopyFrom(ConvertDocumentTask task)
         {
             PopulateAndClearConverters(task.Converters);
-            this.DestinationFileFormat = task.DestinationFileFormat;
+            DestinationFileFormat = task.DestinationFileFormat;
             _dirty = true;
         }
 
