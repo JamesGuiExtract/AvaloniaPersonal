@@ -28,7 +28,11 @@ namespace DatabaseMigrationWizard
             var startupConfigurator = new StartupConfigurator();
             try
             {
-                startupConfigurator.Start(e.Args);
+                var exit = startupConfigurator.Start(e.Args);
+                if (exit)
+                {
+                    Environment.Exit(0);
+                }
             }
             catch(Exception ex)
             {

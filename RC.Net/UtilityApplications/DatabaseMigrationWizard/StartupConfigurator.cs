@@ -26,7 +26,7 @@ namespace DatabaseMigrationWizard
             Console.WriteLine(message);
         }
 
-        internal void Start(string[] arguments)
+        internal bool Start(string[] arguments)
         {
             bool useUI = false;
             try
@@ -36,7 +36,7 @@ namespace DatabaseMigrationWizard
                 if (createDatabase)
                 {
                     CreateDatabase(connectionInformation, filePath);
-                    Environment.Exit(0);
+                    return true;
                 }
                 else
                 {
@@ -71,7 +71,8 @@ namespace DatabaseMigrationWizard
                     throw ex;
                 }
             }
-            
+
+            return false;
         }
 
         private void CreateDatabase(ConnectionInformation connectionInformation, string filePath)
