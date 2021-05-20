@@ -516,6 +516,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 AttributeStatusInfo.DisableValidationQueries =
                     _applicationConfig.Settings.DisableValidationQueries;
 
+                QueryNode.QueryCacheLimit = _applicationConfig.Settings.QueryCacheLimit;
+
                 // Since SpotIR compatibility is not required for data entry applications, avoid the
                 // performance hit it exacts.
                 Highlight.SpotIRCompatible = false;
@@ -2017,7 +2019,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 ExtractException.Assert("ELI29142", "Saving is disabled!",
                     ActiveDataEntryConfig == null ||
-                    !ActiveDataEntryConfig.Config.Settings.PreventSave);
+                    !_applicationConfig.Settings.PreventSave);
 
                 SaveData(false);
             }
@@ -2186,7 +2188,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // a data entry configuration is loaded, and PreventSave is not specified.
                     _saveMenuItem.Enabled = _imageViewer.IsImageAvailable &&
                         ActiveDataEntryConfig != null &&
-                        !ActiveDataEntryConfig.Config.Settings.PreventSave;
+                        !_applicationConfig.Settings.PreventSave;
 
                     if (_fileProcessingDb != null)
                     {
@@ -3685,7 +3687,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 if (ActiveDataEntryConfig == null ||
                         DataEntryControlHost == null ||
-                        ActiveDataEntryConfig.Config.Settings.PreventSave)
+                        _applicationConfig.Settings.PreventSave)
                 {
                     return false;
                 }
@@ -4096,7 +4098,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // if it did save correctly.
             if (ActiveDataEntryConfig == null ||
                 DataEntryControlHost == null ||
-                ActiveDataEntryConfig.Config.Settings.PreventSave)
+                _applicationConfig.Settings.PreventSave)
             {
                 return response;
             }
@@ -4368,7 +4370,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // Change the text on certain controls if not running in stand alone mode
             if (!_standAloneMode && IsHandleCreated)
             {
-                bool enableSave = config != null && !config.Config.Settings.PreventSave;
+                bool enableSave = !_applicationConfig.Settings.PreventSave;
 
                 if (enableSave)
                 {
@@ -4393,9 +4395,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                     _saveMenuItem.Enabled = enableSave;
                 }
-                else if (config != null)
+                else
                 {
-                    QueryNode.PerformanceTesting = config.Config.Settings.PerformanceTesting;
+                    AttributeStatusInfo.PerformanceTesting = _applicationConfig.Settings.PerformanceTesting;
                 }
 
                 _saveAndCommitFileCommand.Enabled = (config != null && _isLoaded);

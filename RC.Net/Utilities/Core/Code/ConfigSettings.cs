@@ -836,18 +836,23 @@ namespace Extract.Utilities
             {
                 // Retrieve the settings associated with the Setting's class's type.
                 string settingsType = typeof(T).ToString();
-                ClientSettingsSection configSection =
-                    (ClientSettingsSection)configSectionGroup.Sections[settingsType];
+                var configSection = configSectionGroup.Sections[settingsType];
 
                 if (configSection != null)
                 {
-                    ValidateSettings(configSection);
+                    if (configSection is not ClientSettingsSection clientConfigSection)
+                    {
+                        throw new ExtractException("ELI51709",
+                            UtilityMethods.FormatInvariant($"Missing client config section for {settingsType}"));
+                    }
+
+                    ValidateSettings(clientConfigSection);
 
                     // Loop through all SettingsProperty to load any specified values from disk.
                     foreach (SettingsProperty setting in Settings.Properties)
                     {
                         string settingName = setting.Name;
-                        SettingElement xmlSetting = configSection.Settings.Get(settingName);
+                        SettingElement xmlSetting = clientConfigSection.Settings.Get(settingName);
                         SettingsProperty property = Settings.Properties[settingName];
                         if (xmlSetting != null)
                         {
@@ -897,7 +902,8 @@ namespace Extract.Utilities
             if (invalidXmlSettings.Any())
             {
                 ExtractException ee = new ExtractException("ELI28826",
-                    "Invalid Application Setting(s)");
+                    "Invalid config file setting(s)");
+                ee.AddDebugData("Section", typeof(T).ToString());
                 foreach (SettingElement invalidXmlSetting in invalidXmlSettings)
                 {
                     ee.AddDebugData("Setting name", invalidXmlSetting.Name, false);

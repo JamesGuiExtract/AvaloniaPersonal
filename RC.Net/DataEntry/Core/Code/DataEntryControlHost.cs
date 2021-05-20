@@ -967,7 +967,7 @@ namespace Extract.DataEntry
         {
             get
             {
-                return Config.Settings.PerformanceTesting
+                return AttributeStatusInfo.PerformanceTesting
                     ? UnviewedDataSaveMode.Allow
                     : _unviewedDataSaveMode;
             }
@@ -999,7 +999,7 @@ namespace Extract.DataEntry
         {
             get
             {
-                return Config.Settings.PerformanceTesting
+                return AttributeStatusInfo.PerformanceTesting
                     ? InvalidDataSaveMode.Allow
                     : _invalidDataSaveMode;
             }
@@ -1854,17 +1854,10 @@ namespace Extract.DataEntry
         /// <param name="initialSelection">Indicates which field should be selected upon completion
         /// of the load (if any).</param>
         public void LoadData(IUnknownVector attributes, string sourceDocName, bool forEditing,
-            FieldSelection initialSelection)
+            FieldSelection initialSelection, Guid attributeSetID = new Guid())
         {
             try
             {
-                if (attributes != null && attributes.Size() > 0 &&
-                    AttributeStatusInfo.IsLoggingEnabled(LogCategories.DataLoad))
-                {
-                    AttributeStatusInfo.Logger.LogEvent(LogCategories.DataLoad, null,
-                        "Begin: ----------------------------------------------------");
-                }
-
                 _sourceDocName = sourceDocName;
                 _initialSelection = initialSelection;
                 HighlightDictionary preCreatedHighlights = null;
@@ -1915,7 +1908,15 @@ namespace Extract.DataEntry
 
                         // Notify AttributeStatusInfo of the new attribute hierarchy
                         AttributeStatusInfo.ResetData(_sourceDocName, _attributes,
-                            _dbConnections, pathTags: null, noUILoad: false);
+                            _dbConnections, pathTags: null, noUILoad: false, forEditing,
+                            attributeSetID);
+
+                        if (attributes.Size() > 0 &&
+                            AttributeStatusInfo.IsLoggingEnabled(LogCategories.DataLoad))
+                        {
+                            AttributeStatusInfo.Logger.LogEvent(LogCategories.DataLoad, null,
+                                "Begin: ----------------------------------------------------");
+                        }
 
                         // Enable or disable swiping as appropriate.
                         OnSwipingStateChanged(new SwipingStateChangedEventArgs(SwipingEnabled));
@@ -2019,7 +2020,7 @@ namespace Extract.DataEntry
                     }
 
                     // If testing performance, send the shortcut key to save as soon as each document is loaded.
-                    if (Config.Settings.PerformanceTesting)
+                    if (AttributeStatusInfo.PerformanceTesting)
                     {
                         ExecuteOnIdle("ELI36156", () => SendKeys.Send("^s"));
                     }
@@ -3168,7 +3169,7 @@ namespace Extract.DataEntry
                 if (!_inDesignMode)
                 {
                     // If testing performance, record the start time when the form is loaded.
-                    if (Config.Settings.PerformanceTesting && !_performanceTestingStartTime.HasValue)
+                    if (AttributeStatusInfo.PerformanceTesting && !_performanceTestingStartTime.HasValue)
                     {
                         _performanceTestingStartTime = DateTime.Now;
                     }

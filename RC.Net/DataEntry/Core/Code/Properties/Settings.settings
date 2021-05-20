@@ -26,9 +26,6 @@
     <Setting Name="SkipValidationIfDocTaggedAs" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="PreventSave" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="GCFrequency" Type="System.UInt32" Scope="Application">
       <Value Profile="(Default)">1</Value>
     </Setting>
@@ -40,12 +37,6 @@
     </Setting>
     <Setting Name="TooltipFontSize" Type="System.Single" Scope="Application">
       <Value Profile="(Default)">13</Value>
-    </Setting>
-    <Setting Name="PerformanceTesting" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="QueryCacheLimit" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">500</Value>
     </Setting>
     <Setting Name="SupportsNoUILoad" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>

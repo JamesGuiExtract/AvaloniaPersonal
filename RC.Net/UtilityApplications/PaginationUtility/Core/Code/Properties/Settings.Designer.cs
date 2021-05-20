@@ -12,7 +12,7 @@ namespace Extract.UtilityApplications.PaginationUtility.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -140,6 +140,72 @@ namespace Extract.UtilityApplications.PaginationUtility.Properties {
             }
             set {
                 this["AutoInsertDocumentBoundaries"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int QueryCacheLimit {
+            get {
+                return ((int)(this["QueryCacheLimit"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableLogging {
+            get {
+                return ((bool)(this["EnableLogging"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LogToFile {
+            get {
+                return ((bool)(this["LogToFile"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DataLoad,DataSave,AttributeInitialized,AttributeUpdated,AttributeDeleted,AutoUpda" +
+            "teResult,SwipedText,TooltipNotification,FormattingRuleResult,Undo,Redo,Focus,Inp" +
+            "utEvent")]
+        public string LogFilter {
+            get {
+                return ((string)(this["LogFilter"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("KeyDown,SystemKeyDown,LeftButtonDown,NonClientLeftButtonDown,MiddleButtonDown,Non" +
+            "ClientMiddleButtonDown,RightButtonDown,NonClientRightButtonDown")]
+        public string InputEventFilter {
+            get {
+                return ((string)(this["InputEventFilter"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisableAutoUpdateQueries {
+            get {
+                return ((bool)(this["DisableAutoUpdateQueries"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisableValidationQueries {
+            get {
+                return ((bool)(this["DisableValidationQueries"]));
             }
         }
     }

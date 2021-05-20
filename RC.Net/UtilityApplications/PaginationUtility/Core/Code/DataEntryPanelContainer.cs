@@ -217,6 +217,21 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 var configSettings = new ConfigSettings<Properties.Settings>(_expandedConfigFileName, false, false);
 
+                QueryNode.QueryCacheLimit = configSettings.Settings.QueryCacheLimit;
+                AttributeStatusInfo.DisableAutoUpdateQueries =
+                    !Editable || configSettings.Settings.DisableAutoUpdateQueries;
+                AttributeStatusInfo.DisableValidationQueries =
+                    !Editable || configSettings.Settings.DisableValidationQueries;
+
+                if (configSettings.Settings.EnableLogging)
+                {
+                    AttributeStatusInfo.Logger = Logger.CreateLogger(
+                        configSettings.Settings.LogToFile,
+                        configSettings.Settings.LogFilter,
+                        configSettings.Settings.InputEventFilter,
+                        this);
+                }
+
                 _configManager = new DataEntryConfigurationManager<Properties.Settings>(
                     dataEntryApp, tagUtility, configSettings, imageViewer, _documentTypeComboBox);
 
@@ -278,7 +293,6 @@ namespace Extract.UtilityApplications.PaginationUtility
                 _dataEntryApp = dataEntryApp;
                 _tagUtility = tagUtility;
                 _imageViewer = imageViewer;
-
                 _configManager = configManager;
                 _configManager.ConfigurationInitialized += HandleConfigManager_ConfigurationInitialized;
 
@@ -510,8 +524,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             ActiveDataEntryPanel.Active = Editable;
                             ActiveDataEntryPanel.ShowValidationIcons = Editable;
-                            AttributeStatusInfo.DisableAutoUpdateQueries = !Editable;
-                            AttributeStatusInfo.DisableValidationQueries = !Editable;
+                            AttributeStatusInfo.DisableAutoUpdateQueries =
+                                !Editable || _configManager.ApplicationConfig.Settings.DisableAutoUpdateQueries;
+                            AttributeStatusInfo.DisableValidationQueries =
+                                !Editable || _configManager.ApplicationConfig.Settings.DisableValidationQueries;
                         }
                     }
                 }
@@ -1716,6 +1732,11 @@ namespace Extract.UtilityApplications.PaginationUtility
                 // relative paths.
                 DataEntryMethods.SolutionRootDirectory = Path.GetDirectoryName(_expandedConfigFileName);
 
+                AttributeStatusInfo.DisableAutoUpdateQueries =
+                    !Editable || backgroundConfigManager.ApplicationConfig.Settings.DisableAutoUpdateQueries;
+                AttributeStatusInfo.DisableValidationQueries =
+                    !Editable || backgroundConfigManager.ApplicationConfig.Settings.DisableValidationQueries;
+
                 var miscUtils = new MiscUtils();
                 var deserializedAttributes = (IUnknownVector)miscUtils.GetObjectFromStringizedByteStream(serializedAttributes);
 
@@ -1890,7 +1911,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             var documentStatus = new DocumentStatus();
 
             IAttribute invalidAttribute = null;
-            if (!backgroundConfigManager.ActiveDataEntryConfiguration.Config.Settings.PerformanceTesting)
+            if (!AttributeStatusInfo.PerformanceTesting)
             {
                 documentStatus.DocumentTypeIsValid = backgroundConfigManager.DocumentTypeIsValid;
 
@@ -2034,7 +2055,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 tempPanel.LoadData(tempData, forEditing: false, initialSelection: FieldSelection.DoNotReset);
 
                 IAttribute invalidAttribute = null;
-                if (!tempPanel.ActiveDataEntryPanel.Config.Settings.PerformanceTesting)
+                if (!AttributeStatusInfo.PerformanceTesting)
                 {
                     documentStatus.DocumentTypeIsValid = configManager.DocumentTypeIsValid;
 

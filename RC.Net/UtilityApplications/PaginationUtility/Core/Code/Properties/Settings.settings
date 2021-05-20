@@ -32,5 +32,26 @@
     <Setting Name="AutoInsertDocumentBoundaries" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="QueryCacheLimit" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
+    <Setting Name="EnableLogging" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LogToFile" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LogFilter" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">DataLoad,DataSave,AttributeInitialized,AttributeUpdated,AttributeDeleted,AutoUpdateResult,SwipedText,TooltipNotification,FormattingRuleResult,Undo,Redo,Focus,InputEvent</Value>
+    </Setting>
+    <Setting Name="InputEventFilter" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">KeyDown,SystemKeyDown,LeftButtonDown,NonClientLeftButtonDown,MiddleButtonDown,NonClientMiddleButtonDown,RightButtonDown,NonClientRightButtonDown</Value>
+    </Setting>
+    <Setting Name="DisableAutoUpdateQueries" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DisableValidationQueries" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

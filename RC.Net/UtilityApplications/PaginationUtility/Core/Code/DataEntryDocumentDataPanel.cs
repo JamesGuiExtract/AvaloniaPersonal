@@ -271,14 +271,17 @@ namespace Extract.UtilityApplications.PaginationUtility
 
                 _documentData = (DataEntryPaginationDocumentData)data;
 
-                LoadData(_documentData.WorkingAttributes, _documentData.SourceDocName, forEditing, initialSelection);
+                IIdentifiableObject identifiable = (IIdentifiableObject)_documentData.DocumentDataAttribute;
+
+                LoadData(_documentData.WorkingAttributes, _documentData.SourceDocName, forEditing, initialSelection,
+                    identifiable.InstanceGUID);
 
                 if (_imageViewer != null && _imageViewer.Visible)
                 {
                     _documentData.SetSummary(SummaryDataEntryQuery?.Evaluate().ToString());
                     _documentData.SetSendForReprocessing(SendForReprocessingFunc(_documentData));
                     _documentData.SetModified(UndoOperationAvailable);
-                    if (!Config.Settings.PerformanceTesting)
+                    if (!AttributeStatusInfo.PerformanceTesting)
                     {
                         UpdateDataValidity(_documentData, DataValidity);
                     }
@@ -348,7 +351,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 attributes.ReportMemoryUsage();
 
                 var dataEntryData = (DataEntryPaginationDocumentData)data;
-                if (!Config.Settings.PerformanceTesting)
+                if (!AttributeStatusInfo.PerformanceTesting)
                 {
                     UpdateDataValidity(dataEntryData, DataValidity);
                 }
@@ -551,7 +554,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 {
                     // https://extract.atlassian.net/browse/ISSUE-14216
                     // AllowWithWarnings is currently the only supported mode in the pagination panel
-                    return Config.Settings.PerformanceTesting
+                    return AttributeStatusInfo.PerformanceTesting
                         ? InvalidDataSaveMode.Allow
                         : InvalidDataSaveMode.AllowWithWarnings;
                     
@@ -749,7 +752,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             {
                 base.OnDataValidityChanged();
 
-                if (_documentData != null && !Config.Settings.PerformanceTesting)
+                if (_documentData != null && !AttributeStatusInfo.PerformanceTesting)
                 {
                     UpdateDataValidity(_documentData, DataValidity);
                 }

@@ -112,10 +112,10 @@ namespace Extract.DataEntry
         #region Fields
 
         /// <summary>
-        /// <see langword="true"/> to store logged events to memory (to be saved later);
+        /// <see langword="true"/> to output logging to disk when the file is closed;
         /// <see langword="false"/> to generate trace output.
         /// </summary>
-        bool _logToMemory;
+        bool _logToFile;
 
         /// <summary>
         /// A <see cref="LogCategories"/> value indicating which events should be logged.
@@ -129,7 +129,7 @@ namespace Extract.DataEntry
         HashSet<int> _inputEventsToTrack;
 
         /// <summary>
-        /// The default buffer size to use store logged input when <see cref="LogToMemory"/> is
+        /// The default buffer size to use to store logged input when <see cref="LogToFile"/> is
         /// <see langword="true"/>.
         /// </summary>
         StringBuilder _loggedInput = new StringBuilder(0x10000); // 1MB
@@ -149,8 +149,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Creates a new instance of the <see cref="Logger"/> class.
         /// </summary>
-        /// <param name="logToMemory"><see langword="true"/> to store logged events to memory (to be
-        /// saved later); <see langword="false"/> to generate trace output.</param>
+        /// <param name="logToFile"><see langword="true"/> to output logging to disk
+        /// when the file is closed; <see langword="false"/> to generate trace output.</param>
         /// <param name="logCategories">A comma-delimited list representing the
         /// <see cref="LogCategories"/> to be logged or "*" to log all categories.</param>
         /// <param name="inputEventsToTrack">A comma-delimited list representing the
@@ -158,7 +158,7 @@ namespace Extract.DataEntry
         /// is enabled or "*" to log all <see cref="WindowsMessage"/> codes.</param>
         /// <param name="controls">The <see cref="Control"/>(s) for which InputEvents is to be
         /// tracked.</param>
-        public static Logger CreateLogger(bool logToMemory, string logCategories,
+        public static Logger CreateLogger(bool logToFile, string logCategories,
             string inputEventsToTrack, params Control[] controls)
         {
             try
@@ -201,7 +201,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                return new Logger(logToMemory, categoryFilter, inputFilter, controls);
+                return new Logger(logToFile, categoryFilter, inputFilter, controls);
             }
             catch (Exception ex)
             {
@@ -215,8 +215,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// Initializes a new instance of the <see cref="Logger"/> class.
         /// </summary>
-        /// <param name="logToMemory"><see langword="true"/> to store logged events to memory (to be
-        /// saved later); <see langword="false"/> to generate trace output.</param>
+        /// <param name="logToFile"><see langword="true"/> to output logging to disk
+        /// when the file is closed; <see langword="false"/> to generate trace output.</param>
         /// <param name="logCategories">A <see cref="LogCategories"/> value representing the event
         /// categories to be logged.</param>
         /// <param name="eventsToTrack">An <see cref="int"/> <see cref="IEnumerable{T}"/> of
@@ -224,7 +224,7 @@ namespace Extract.DataEntry
         /// LogCategories.InputEvent is enabled.</param>
         /// <param name="controls">The <see cref="Control"/>(s) for which InputEvents is to be
         /// tracked.</param>
-        public Logger(bool logToMemory, LogCategories logCategories,
+        public Logger(bool logToFile, LogCategories logCategories,
             IEnumerable<int> eventsToTrack, params Control[] controls)
             : base(
                 (logCategories.HasFlag(LogCategories.InputEvent) && eventsToTrack.Any()) 
@@ -233,7 +233,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                _logToMemory = logToMemory;
+                _logToFile = logToFile;
                 _logCategories = logCategories;
 
                 if (eventsToTrack == null)
@@ -253,22 +253,24 @@ namespace Extract.DataEntry
 
         #endregion Constructors
 
+        #region Properties
+
         /// <summary>
-        /// Gets or sets a value indicating whether to store logged events to memory or to generate
+        /// Gets or sets a value indicating whether to output logging to disk or to generate
         /// trace output.
         /// </summary>
-        /// <value><see langword="true"/> to store logged events to memory (to be saved later);
-        /// <see langword="false"/> to generate trace output.</value>
-        public bool LogToMemory
+        /// <value><see langword="true"/> to output logging to disk when the file
+        /// is closed; <see langword="false"/> to generate trace output.</value>
+        public bool LogToFile
         {
             get
             {
-                return _logToMemory;
+                return _logToFile;
             }
 
             set
             {
-                _logToMemory = value;
+                _logToFile = value;
             }
         }
 
@@ -289,6 +291,13 @@ namespace Extract.DataEntry
                 _logCategories = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets whether logging is currently enabled.
+        /// </summary>
+        public bool Enabled { get; set; }
+
+        #endregion Properties
 
         #region Methods
 
@@ -323,7 +332,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (LogCategories.HasFlag(category))
+                if (Enabled && LogCategories.HasFlag(category))
                 {
                     // If a control was now explicitly specified, use the attribute's owning control
                     // if there is one.
@@ -393,7 +402,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_loggedInput.Length > 0)
+                if (Enabled && _loggedInput.Length > 0)
                 {
                     File.WriteAllText(fileName, _loggedInput.ToString());
                 }
@@ -438,7 +447,7 @@ namespace Extract.DataEntry
             try
             {
                 // Only check the message if event tracking is on
-                if (_inputEventsToTrack.Contains(message.Msg))
+                if (Enabled && _inputEventsToTrack.Contains(message.Msg))
                 {
                     string line = ((WindowsMessageCode)message.Msg).ToString();
 
@@ -488,21 +497,24 @@ namespace Extract.DataEntry
         /// <param name="logline">The log line to log (may contain multiple lines of text).</param>
         void LogLine(string category, string logline)
         {
-            if (_logToMemory)
+            if (Enabled)
             {
-                // Output: [log line #]   [Time]    [Log lines]
-                _loggedEventCount++;
-                _loggedInput.Append(_loggedEventCount.ToString("D", CultureInfo.InvariantCulture));
-                _loggedInput.Append("\t");
-                _loggedInput.Append(
-                    new DateTime(DateTime.Now.Ticks, DateTimeKind.Unspecified).ToString(
-                        "o", CultureInfo.InvariantCulture));
-                _loggedInput.Append("\t");
-                _loggedInput.AppendLine(category + ": " + logline);
-            }
-            else
-            {
-                System.Diagnostics.Trace.WriteLine(logline, category);
+                if (_logToFile)
+                {
+                    // Output: [log line #]   [Time]    [Log lines]
+                    _loggedEventCount++;
+                    _loggedInput.Append(_loggedEventCount.ToString("D", CultureInfo.InvariantCulture));
+                    _loggedInput.Append("\t");
+                    _loggedInput.Append(
+                        new DateTime(DateTime.Now.Ticks, DateTimeKind.Unspecified).ToString(
+                            "o", CultureInfo.InvariantCulture));
+                    _loggedInput.Append("\t");
+                    _loggedInput.AppendLine(category + ": " + logline);
+                }
+                else
+                {
+                    System.Diagnostics.Trace.WriteLine(logline, category);
+                }
             }
         }
 

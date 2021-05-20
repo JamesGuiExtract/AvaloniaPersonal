@@ -187,6 +187,17 @@ namespace Extract.DataEntry
         #region Properties
 
         /// <summary>
+        /// Gets the application configuration
+        /// </summary>
+        public ConfigSettings<T> ApplicationConfig
+        {
+            get
+            {
+                return _applicationConfig;
+            }
+        }
+
+        /// <summary>
         /// Gets the default <see cref="DataEntryConfiguration"/> to use in the case that document
         /// type does not indicate the usage of another configuration.
         /// </summary>
@@ -623,7 +634,6 @@ namespace Extract.DataEntry
                 configuration.DataEntryControlHost.Config = config;
                 configuration.DataEntryControlHost.ImageViewer = _imageViewer;
 
-                QueryNode.QueryCacheLimit = config.Settings.QueryCacheLimit;
                 InitializePanel(configuration);
 
                 if (config.Settings.SupportsNoUILoad)

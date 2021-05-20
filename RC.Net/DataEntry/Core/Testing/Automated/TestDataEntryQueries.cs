@@ -1266,7 +1266,8 @@ namespace Extract.DataEntry.Test
             var dbConnections = new Dictionary<string, DbConnection>();
             dbConnections[""] = dbConnection;
 
-            AttributeStatusInfo.ResetData(fileName, attributes, dbConnections, pathTags: null, noUILoad: false);
+            AttributeStatusInfo.ResetData(fileName, attributes, dbConnections, pathTags: null, 
+                noUILoad: false, forEditing: false);
 
             InitializeAttributes(attributes);
 

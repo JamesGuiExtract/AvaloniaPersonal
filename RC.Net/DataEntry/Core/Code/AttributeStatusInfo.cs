@@ -277,6 +277,18 @@ namespace Extract.DataEntry
         static Logger _logger;
 
         /// <summary>
+        /// Whether performance testing of data entry verification is currently enabled.
+        /// </summary>
+        [ThreadStatic]
+        static bool _performanceTesting;
+
+        /// <summary>
+        /// The GUID ID of DocumentData attribute representing the data being edited.
+        /// </summary>
+        [ThreadStatic]
+        static Guid _attributesSetId;
+
+        /// <summary>
         /// Indicates whether the current thread is about to end; This can be used to prevent
         /// unnecessary operations from running.
         /// </summary>
@@ -827,6 +839,39 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether performance testing of data entry verification is currently enabled.
+        /// This setting is thread static.
+        /// </summary>
+        public static bool PerformanceTesting
+        {
+            get
+            {
+                return _performanceTesting;
+            }
+
+            set
+            {
+                _performanceTesting = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the GUID ID of DocumentData attribute representing the data being edited.
+        /// </summary>
+        public static Guid AttributeSetID
+        {
+            get
+            {
+                return _attributesSetId;
+            }
+
+            set
+            {
+                _attributesSetId = value;
+            }
+        }
+
+        /// <summary>
         /// Gets the filename of the currently open document.
         /// </summary>
         /// <returns>The filename of the currently open document.</returns>
@@ -1023,7 +1068,7 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         public static bool IsLoggingEnabled(LogCategories category)
         {
-            return (Logger != null && Logger.LogCategories.HasFlag(category));
+            return (Logger != null && Logger.Enabled && Logger.LogCategories.HasFlag(category));
         }
 
         /// <summary>
@@ -1080,7 +1125,7 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         public static void ResetData()
         {
-            ResetData(null, null, null, null, false);
+            ResetData(null, null, null, null, false, false);
         }
 
         /// <summary>
@@ -1099,9 +1144,13 @@ namespace Extract.DataEntry
         /// </param>
         /// <param name="noUILoad">Indicates whether this data is associated with a background load
         /// that is not using any Windows controls.</param>
+        /// <param name="forEditing"><c>true</c> if the loaded data is to be displayed for editing;
+        /// <c>false</c> if the data is to be displayed read-only, or if it is being used for
+        /// background formatting.</param>
         [ComVisible(false)]
         public static void ResetData(string sourceDocName, IUnknownVector attributes,
-            Dictionary<string, DbConnection> dbConnections, IPathTags pathTags, bool noUILoad)
+            Dictionary<string, DbConnection> dbConnections, IPathTags pathTags, bool noUILoad,
+            bool forEditing, Guid attributeSetID = new Guid())
         {
             try
             {
@@ -1114,30 +1163,39 @@ namespace Extract.DataEntry
                 string traceFileName = "";
                 try
                 {
-                    if (Logger != null && Logger.LogToMemory &&
-                        !string.IsNullOrWhiteSpace(_sourceDocName))
+                    if (Logger != null)
                     {
-                        // Generate the trace output filename.
-                        for (int i = 0; i < 8; i++)
+                        if (Logger.Enabled && Logger.LogToFile && 
+                            !string.IsNullOrWhiteSpace(_sourceDocName))
                         {
-                            string format = "yyyy-MM-dd HH-mm-ss";
-                            // If the previous name was taken, add more precision to the datetime
-                            // stamp.
-                            if (i > 0)
+                            // Generate the trace output filename.
+                            for (int i = 0; i < 8; i++)
                             {
-                                format += "." + new string('f', i);
+                                string format = "yyyy-MM-dd HH-mm-ss";
+                                // If the previous name was taken, add more precision to the datetime
+                                // stamp.
+                                if (i > 0)
+                                {
+                                    format += "." + new string('f', i);
+                                }
+                                traceFileName = _sourceDocName + "." +
+                                    (_attributesSetId == Guid.Empty 
+                                        ? "" : 
+                                        "{" + _attributesSetId.ToString().ToUpperInvariant() + "}.") +
+                                    DateTime.Now.ToString(format, CultureInfo.InvariantCulture) +
+                                    ".trace";
+                                if (!File.Exists(traceFileName))
+                                {
+                                    // This filename is unused; use it.
+                                    break;
+                                }
                             }
-                            traceFileName = _sourceDocName + "." +
-                                DateTime.Now.ToString(format, CultureInfo.InvariantCulture) + ".trace";
-                            if (!File.Exists(traceFileName))
-                            {
-                                // This filename is unused; use it.
-                                break;
-                            }
+
+                            Logger.SaveLoggedData(traceFileName);
+                            Logger.ClearLoggedData();
                         }
 
-                        Logger.SaveLoggedData(traceFileName);
-                        Logger.ClearLoggedData();
+                        Logger.Enabled = forEditing;
                     }
                 }
                 catch (Exception ex)
@@ -1201,6 +1259,7 @@ namespace Extract.DataEntry
                 }
 
                 _attributes = attributes;
+                _attributesSetId = attributeSetID;
                 _sourceDocName = sourceDocName;
                 _dbConnections = dbConnections;
                 _noUILoad = noUILoad;
@@ -1231,7 +1290,8 @@ namespace Extract.DataEntry
                 var dbConnections = new Dictionary<string, DbConnection>();
                 dbConnections[""] = dbConnection;
 
-                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags: null, noUILoad: true);
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags: null,
+                    noUILoad: true, forEditing: false);
                 Initialize(attributes);
             }
             catch (Exception ex)
@@ -1266,7 +1326,7 @@ namespace Extract.DataEntry
             try
             {
                 AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags,
-                    noUILoad: fieldModels != null);
+                    noUILoad: fieldModels != null, forEditing: false);
                 EnableValidationTriggers(false);
                 Initialize(attributes, fieldModels);
                 EnableValidationTriggers(true);
@@ -1297,7 +1357,8 @@ namespace Extract.DataEntry
                 var dbConnections = new Dictionary<string, DbConnection>();
                 dbConnections[""] = dbConnection;
 
-                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags, noUILoad: true);
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags,
+                    noUILoad: true, forEditing: false);
                 Initialize(attributes);
             }
             catch (Exception ex)
@@ -1323,7 +1384,8 @@ namespace Extract.DataEntry
         {
             try
             {
-                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags, noUILoad: true);
+                AttributeStatusInfo.ResetData(sourceDocName, attributes, dbConnections, pathTags,
+                    noUILoad: true, forEditing: false);
                 Initialize(attributes);
             }
             catch (Exception ex)
@@ -3987,6 +4049,7 @@ namespace Extract.DataEntry
                 _undoManager = new UndoManager();
                 _endEditReferenceCount = 0;
                 _endEditRecursionBlock = false;
+                _attributesSetId = new Guid();
             }
         }
 

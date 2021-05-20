@@ -65,7 +65,7 @@ namespace Extract.DataEntry
         #region Fields
 
         /// <summary>
-        /// When <see cref="QueryNode.PerformanceTesting"/> is <see langword="true"/> keeps track
+        /// When <see cref="AttributeStatusInfo.PerformanceTesting"/> is <see langword="true"/> keeps track
         /// of the top 25 most expensive queries will be output as debug values where the
         /// expensiveness is the initial query execution time multiplied by the number of executions.
         /// This resulting "score" will be shown just before the query itself in the exception debug.
@@ -602,7 +602,7 @@ namespace Extract.DataEntry
 
                 QueryResult result = base.Evaluate();
 
-                if (QueryNode.PerformanceTesting)
+                if (AttributeStatusInfo.PerformanceTesting)
                 {
                     double executionTime = (DateTime.Now - startTime).TotalMilliseconds;
                     CachedQueryData<string[]> cachedResults;
