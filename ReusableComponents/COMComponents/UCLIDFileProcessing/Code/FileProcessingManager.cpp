@@ -1893,22 +1893,28 @@ bool CFileProcessingManager::authenticateForProcessing()
 	{
 		VARIANT_BOOL vbCancelled;
 		
-		// Show the DB login prompt for the current user
-		if (!asCppBool(getFPMDB()->ShowLogin(VARIANT_FALSE, &vbCancelled)))
-		{
-			// Check if the user cancelled, only warn about invalid password
-			// if they didn't cancel [LRCAU #5419]
-			if (!asCppBool(vbCancelled))
-			{
-				HWND hParent = NULL;
-				CWnd *pWnd = AfxGetMainWnd();
-				if (pWnd)
-				{
-					hParent = pWnd->m_hWnd;
-				}
+		static IAuthenticationProviderPtr ipAuthenticationProvider(__nullptr);
+		SECURE_CREATE_OBJECT("ELI49621",
+			ipAuthenticationProvider, "Extract.Utilities.AuthenticationProvider");
 
-				MessageBox(hParent, "Incorrect password", "Invalid Login", MB_OK);
-			}
+		HWND hParent = NULL;
+		CWnd* pWnd = AfxGetMainWnd();
+		if (pWnd)
+		{
+			hParent = pWnd->m_hWnd;
+		}
+
+		try
+		{
+			auto fileProcessingDB = getFPMDB();
+
+			_bstr_t databaseName = fileProcessingDB->DatabaseName;
+			_bstr_t databaseServer = fileProcessingDB->DatabaseServer;
+			ipAuthenticationProvider->PromptForAndValidateWindowsCredentials(databaseName, databaseServer);
+		}
+		catch (...)
+		{
+			MessageBox(hParent, "Unable to validate your domain credentials.", "Invalid creditials", MB_OK);
 			return false;
 		}
 	}

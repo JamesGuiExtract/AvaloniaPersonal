@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label4;
             System.Windows.Forms.Label label3;
@@ -56,6 +57,12 @@
             this._checkStoreFASTHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreSourceDocChangeHistory = new System.Windows.Forms.CheckBox();
             this._tabSecurity = new System.Windows.Forms.TabPage();
+            this._azureInstance = new Extract.Utilities.Forms.BetterTextBox();
+            this._azureTenant = new Extract.Utilities.Forms.BetterTextBox();
+            this.betterLabel3 = new Extract.Utilities.Forms.BetterLabel();
+            this.betterLabel2 = new Extract.Utilities.Forms.BetterLabel();
+            this.betterLabel1 = new Extract.Utilities.Forms.BetterLabel();
+            this._azureClientID = new Extract.Utilities.Forms.BetterTextBox();
             this._buttonRemoveMachine = new System.Windows.Forms.Button();
             this._buttonModifyMachine = new System.Windows.Forms.Button();
             this._buttonAddMachine = new System.Windows.Forms.Button();
@@ -100,7 +107,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(6, 50);
+            label2.Location = new System.Drawing.Point(6, 156);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(353, 13);
             label2.TabIndex = 2;
@@ -411,6 +418,12 @@
             // 
             // _tabSecurity
             // 
+            this._tabSecurity.Controls.Add(this._azureInstance);
+            this._tabSecurity.Controls.Add(this._azureTenant);
+            this._tabSecurity.Controls.Add(this.betterLabel3);
+            this._tabSecurity.Controls.Add(this.betterLabel2);
+            this._tabSecurity.Controls.Add(this.betterLabel1);
+            this._tabSecurity.Controls.Add(this._azureClientID);
             this._tabSecurity.Controls.Add(this._buttonRemoveMachine);
             this._tabSecurity.Controls.Add(this._buttonModifyMachine);
             this._tabSecurity.Controls.Add(this._buttonAddMachine);
@@ -427,10 +440,58 @@
             this._tabSecurity.ToolTipText = "FAM security settings";
             this._tabSecurity.UseVisualStyleBackColor = true;
             // 
+            // _azureInstance
+            // 
+            this._azureInstance.Location = new System.Drawing.Point(88, 103);
+            this._azureInstance.Name = "_azureInstance";
+            this._azureInstance.Size = new System.Drawing.Size(364, 20);
+            this._azureInstance.TabIndex = 11;
+            // 
+            // _azureTenant
+            // 
+            this._azureTenant.Location = new System.Drawing.Point(88, 78);
+            this._azureTenant.Name = "_azureTenant";
+            this._azureTenant.Size = new System.Drawing.Size(364, 20);
+            this._azureTenant.TabIndex = 10;
+            // 
+            // betterLabel3
+            // 
+            this.betterLabel3.AutoSize = true;
+            this.betterLabel3.Location = new System.Drawing.Point(7, 106);
+            this.betterLabel3.Name = "betterLabel3";
+            this.betterLabel3.Size = new System.Drawing.Size(78, 13);
+            this.betterLabel3.TabIndex = 9;
+            this.betterLabel3.Text = "Azure Instance";
+            // 
+            // betterLabel2
+            // 
+            this.betterLabel2.AutoSize = true;
+            this.betterLabel2.Location = new System.Drawing.Point(7, 82);
+            this.betterLabel2.Name = "betterLabel2";
+            this.betterLabel2.Size = new System.Drawing.Size(71, 13);
+            this.betterLabel2.TabIndex = 8;
+            this.betterLabel2.Text = "Azure Tenant";
+            // 
+            // betterLabel1
+            // 
+            this.betterLabel1.AutoSize = true;
+            this.betterLabel1.Location = new System.Drawing.Point(7, 56);
+            this.betterLabel1.Name = "betterLabel1";
+            this.betterLabel1.Size = new System.Drawing.Size(77, 13);
+            this.betterLabel1.TabIndex = 7;
+            this.betterLabel1.Text = "Azure Client ID";
+            // 
+            // _azureClientID
+            // 
+            this._azureClientID.Location = new System.Drawing.Point(88, 53);
+            this._azureClientID.Name = "_azureClientID";
+            this._azureClientID.Size = new System.Drawing.Size(364, 20);
+            this._azureClientID.TabIndex = 6;
+            // 
             // _buttonRemoveMachine
             // 
             this._buttonRemoveMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonRemoveMachine.Location = new System.Drawing.Point(377, 124);
+            this._buttonRemoveMachine.Location = new System.Drawing.Point(377, 230);
             this._buttonRemoveMachine.Name = "_buttonRemoveMachine";
             this._buttonRemoveMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonRemoveMachine.TabIndex = 5;
@@ -441,7 +502,7 @@
             // _buttonModifyMachine
             // 
             this._buttonModifyMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonModifyMachine.Location = new System.Drawing.Point(377, 95);
+            this._buttonModifyMachine.Location = new System.Drawing.Point(377, 201);
             this._buttonModifyMachine.Name = "_buttonModifyMachine";
             this._buttonModifyMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonModifyMachine.TabIndex = 4;
@@ -452,7 +513,7 @@
             // _buttonAddMachine
             // 
             this._buttonAddMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonAddMachine.Location = new System.Drawing.Point(377, 66);
+            this._buttonAddMachine.Location = new System.Drawing.Point(377, 172);
             this._buttonAddMachine.Name = "_buttonAddMachine";
             this._buttonAddMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonAddMachine.TabIndex = 3;
@@ -465,7 +526,7 @@
             this._listMachinesToAuthenticate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._listMachinesToAuthenticate.FormattingEnabled = true;
-            this._listMachinesToAuthenticate.Location = new System.Drawing.Point(9, 66);
+            this._listMachinesToAuthenticate.Location = new System.Drawing.Point(9, 172);
             this._listMachinesToAuthenticate.Name = "_listMachinesToAuthenticate";
             this._listMachinesToAuthenticate.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this._listMachinesToAuthenticate.Size = new System.Drawing.Size(362, 95);
@@ -743,6 +804,12 @@
         private System.Windows.Forms.TextBox textBoxDashboardIncludeFilter;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label10;
+        private Utilities.Forms.BetterTextBox _azureInstance;
+        private Utilities.Forms.BetterTextBox _azureTenant;
+        private Utilities.Forms.BetterLabel betterLabel3;
+        private Utilities.Forms.BetterLabel betterLabel2;
+        private Utilities.Forms.BetterLabel betterLabel1;
+        private Utilities.Forms.BetterTextBox _azureClientID;
     }
 }
 

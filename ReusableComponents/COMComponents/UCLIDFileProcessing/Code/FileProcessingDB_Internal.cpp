@@ -2356,6 +2356,10 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrDASHBOARD_INCLUDE_FILTER] = "";
 	mapDefaultValues[gstrDASHBOARD_EXCLUDE_FILTER] = "";
 
+	mapDefaultValues[gstrAZURE_TENNANT] = "";
+	mapDefaultValues[gstrAZURE_CLIENT_ID] = "";
+	mapDefaultValues[gstrAZURE_INSTANCE] = "https://login.microsoftonline.com/";
+
 	// Create a new database ID  or use existing if it has been set
 	ByteStream bsDatabaseID;
 
@@ -6354,7 +6358,7 @@ vector<string> CFileProcessingDB::findUnrecognizedSchemaElements(const _Connecti
 	for (long i = 0; i < nFAMTableCount; i++)
 	{
 		string strTableName = vecFAMDBTableNames[i];
-		makeUpperCase(strTableName);
+		makeUpperCase(strTableName); 
 		setTableNames.erase(strTableName);
 	}
 

@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="FileFilter.cs" />
     <Compile Include="FileReceiver.cs" />
+    <Compile Include="IAuthentication.cs" />
     <Compile Include="IDashboardDataConverter.cs" />
     <Compile Include="IErrorEmailTask.cs" />
     <Compile Include="IFileBrowser.cs" />

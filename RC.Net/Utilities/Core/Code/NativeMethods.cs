@@ -1068,7 +1068,7 @@ namespace Extract.Utilities
         /// the domain or machine. If invalid credentials are entered, the prompt will be
         /// re-displayed to allow the user to try again.
         /// </summary>
-        /// <param name="parent">The prompting <see cref="Control"/> that, if specified, will cause
+        /// <param name="parent">The prompting <see cref="IntPtr"/> that, if specified, will cause
         /// the prompt to run modally; if <see langword="null"/> the prompt will be displayed
         /// non-modally.</param>
         /// <param name="caption">The caption to display in the prompt.</param>
@@ -1079,7 +1079,7 @@ namespace Extract.Utilities
         /// <returns>A <see cref="WindowsIdentity"/> representing the authenticated credentials if
         /// successful, or <see langword="null"/> if the user cancelled without having entered valid
         /// credentials.</returns>
-        public static WindowsIdentity PromptForAndValidateWindowsCredentials(Control parent,
+        public static WindowsIdentity PromptForAndValidateWindowsCredentials(IntPtr parent,
             string caption, string message, bool defaultToCurrentUser)
         {
             // Initialize the prompt settings
@@ -1088,7 +1088,7 @@ namespace Extract.Utilities
             creduiInfo.pszCaptionText = caption;
             creduiInfo.pszMessageText = message;
             creduiInfo.hbmBanner = IntPtr.Zero;
-            creduiInfo.hwndParent = (parent == null) ? IntPtr.Zero : parent.Handle;
+            creduiInfo.hwndParent = parent;
 
             // Initialize the buffer to receive the username. This will be persisted between
             // attempts so that the username does not need to be re-entered due to a bad password.
@@ -1200,7 +1200,7 @@ namespace Extract.Utilities
                 result = CredUIPromptForCredentials(ref creduiInfo, 
                     Environment.UserDomainName, IntPtr.Zero, (int)authenticationError,
                     userName, userNameSize, passwordBuffer, passwordBufferSize, ref save,
-                    CREDUI_FLAGS.DO_NOT_PERSIST);
+                    CREDUI_FLAGS.DO_NOT_PERSIST | CREDUI_FLAGS.KEEP_USERNAME);
             }
             // CredUIPromptForWindowsCredentials should be used for Vista or Server 2008 or later.
             else
@@ -1210,7 +1210,7 @@ namespace Extract.Utilities
                 IntPtr outCredBuffer = IntPtr.Zero;
                 uint outCredBufferSize = 0;
                 uint authenticationPackage = 0;
-
+                
                 try
                 {
                     // If a username is already pre-filled in, use it to initialize inCredBuffer for

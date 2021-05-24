@@ -70,6 +70,10 @@ static const string gstrETL_RESTART = "ETLRestart";
 static const string gstrDASHBOARD_INCLUDE_FILTER = "DashboardIncludeFilter";
 static const string gstrDASHBOARD_EXCLUDE_FILTER = "DashboardExcludeFilter";
 
+static const string gstrAZURE_TENNANT = "AzureTenant";
+static const string gstrAZURE_CLIENT_ID = "AzureClientId";
+static const string gstrAZURE_INSTANCE = "AzureInstance";
+
 // Feature names
 static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";
 static const string gstrFEATURE_FILE_HANDLER_COPY_FILES = "Files: Copy files";

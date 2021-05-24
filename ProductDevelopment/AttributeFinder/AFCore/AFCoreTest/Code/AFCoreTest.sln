@@ -1323,6 +1323,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.ContextTa
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DEPChecker", "..\..\..\..\..\RC.Net\UtilityApplications\DEPChecker\DEPChecker.fsproj", "{593864ED-C9FF-44D8-9E08-8F1FD923286A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Authentication", "..\..\..\..\..\RC.Net\Utilities\Authentication\Extract.Utilities.Authentication.csproj", "{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -6841,6 +6843,36 @@ Global
 		{593864ED-C9FF-44D8-9E08-8F1FD923286A}.Template|x64.Build.0 = Debug|Any CPU
 		{593864ED-C9FF-44D8-9E08-8F1FD923286A}.Template|x86.ActiveCfg = Debug|Any CPU
 		{593864ED-C9FF-44D8-9E08-8F1FD923286A}.Template|x86.Build.0 = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Debug|Win32.Build.0 = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Debug|x64.Build.0 = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Debug|x86.Build.0 = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Release|Win32.ActiveCfg = Release|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Release|Win32.Build.0 = Release|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Release|x64.ActiveCfg = Release|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Release|x64.Build.0 = Release|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Release|x86.ActiveCfg = Release|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Release|x86.Build.0 = Release|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Template|Win32.Build.0 = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Template|x64.ActiveCfg = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Template|x64.Build.0 = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Template|x86.ActiveCfg = Debug|Any CPU
+		{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}.Template|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -43,6 +43,9 @@ namespace Extract.FileActionManager.Database
         const string _REQUIRE_PASSWORD_TO_PROCESS_SKIPPED = "RequirePasswordToProcessAllSkippedFiles";
         const string _REQUIRE_AUTHENTICATION_BEFORE_RUN = "RequireAuthenticationBeforeRun";
         const string _SKIP_AUTHENTICATION_ON_MACHINES = "SkipAuthenticationForServiceOnMachines";
+        const string _AZURE_TENNANT = "AzureTenant";
+        const string _AZURE_CLIENT_ID = "AzureClientId";
+        const string _AZURE_INSTANCE = "AzureInstance";
 
         // Constants for Product Specific tab
         const string _ID_SHIELD_SCHEMA_VERSION_NAME = "IDShieldSchemaVersion";
@@ -219,6 +222,13 @@ namespace Extract.FileActionManager.Database
                     settings.GetValue(_MIN_TIME_BETWEEN_PROCESSING_DB_CHECK);
                 _numberMaxTimeBetweenChecks.Text =
                     settings.GetValue(_MAX_TIME_BETWEEN_PROCESSING_DB_CHECK);
+
+                _azureClientID.Text =
+                    settings.GetValue(_AZURE_CLIENT_ID);
+                _azureInstance.Text =
+                    settings.GetValue(_AZURE_INSTANCE);
+                _azureTenant.Text =
+                    settings.GetValue(_AZURE_TENNANT);
 
                 _alternateComponentDataDirectoryTextBox.Text =
                     settings.GetValue(_ALTERNATE_COMPONENT_DATA_DIR);
@@ -399,6 +409,7 @@ namespace Extract.FileActionManager.Database
             dictionary[_STORE_DOC_TAG_HISTORY] = _checkStoreDocTagHistory;
             dictionary[_REQUIRE_PASSWORD_TO_PROCESS_SKIPPED] = _checkRequirePasswordForSkipped;
             dictionary[_REQUIRE_AUTHENTICATION_BEFORE_RUN] = _checkRequireAuthenticationToRun;
+
             dictionary[_STORE_DB_INFO_HISTORY] = _checkStoreDBSettingsChangeHistory;
             dictionary[_STORE_FTP_EVENT_HISTORY] = _checkStoreFTPEventHistory;
 
@@ -541,6 +552,10 @@ namespace Extract.FileActionManager.Database
 
                 map.Set(_DASHBOARD_INCLUDE_FILTER, textBoxDashboardIncludeFilter.Text);
                 map.Set(_DASHBOARD_EXCLUDE_FILTER, textBoxDashboardExcludeFilter.Text);
+
+                map.Set(_AZURE_TENNANT, _azureTenant.Text);
+                map.Set(_AZURE_CLIENT_ID, _azureClientID.Text);
+                map.Set(_AZURE_INSTANCE, _azureInstance.Text);
 
                 // Add product specific data if the group boxes are visible
 

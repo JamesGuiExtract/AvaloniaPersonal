@@ -802,7 +802,7 @@ namespace Extract.Utilities
         /// the domain or machine. If invalid credentials are entered, the prompt will be
         /// re-displayed to allow the user to try again.
         /// </summary>
-        /// <param name="parent">The prompting <see cref="Control"/> that, if specified, will cause
+        /// <param name="parent">The prompting <see cref="IntPtr"/> that, if specified, will cause
         /// the prompt to run modally; if <see langword="null"/> the prompt will be displayed
         /// non-modally.</param>
         /// <param name="caption">The caption to display in the prompt.</param>
@@ -813,7 +813,7 @@ namespace Extract.Utilities
         /// <returns>A <see cref="WindowsIdentity"/> representing the authenticated credentials if
         /// successful, or <see langword="null"/> if the user cancelled without having entered valid
         /// credentials.</returns>
-        public static WindowsIdentity PromptForAndValidateWindowsCredentials(Control parent,
+        public static WindowsIdentity PromptForAndValidateWindowsCredentials(IntPtr parent,
             string caption, string message, bool defaultToCurrentUser)
         {
             try
