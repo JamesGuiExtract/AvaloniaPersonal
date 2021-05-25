@@ -63,8 +63,6 @@
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Extract.Licensing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564" />
-    <Reference Include="Extract.Utilities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
@@ -106,6 +104,14 @@
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
       <Project>{7c37b0fb-81b8-4aa2-bc14-b21028c7ab9f}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
+      <Project>{212e31d9-5f02-43aa-8625-bcb86b15cf8f}</Project>
+      <Name>Extract.Licensing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
+      <Name>Extract.Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Extract.FileConverter.csproj">
       <Project>{e1f701d9-7822-42ab-9510-9fcafb718e0d}</Project>
