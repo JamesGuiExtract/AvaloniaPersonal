@@ -92,7 +92,7 @@ BuildFKDBIfRequired:
 
 SetWebPath:
 	@CD $(EXTRACT_WEB_APP_REPO)
-	@FOR /f "delims=" %%V in ('git describe --match v[0-9]*.[0-9]*.[0-9]* main') DO SET WebAppArchivePath=$(WEB_BUILD_BASE_DIR)\%%V\%%V.zip
+	@FOR /f "delims=" %%V in ('$(GITPATH) describe --match v[0-9]*.[0-9]*.[0-9]* main') DO SET WebAppArchivePath=$(WEB_BUILD_BASE_DIR)\%%V\%%V.zip
 
 BuildAttributeFinderCore: BuildFKDBIfRequired SetWebPath
 	@Echo Building AttributeFinderCore...
