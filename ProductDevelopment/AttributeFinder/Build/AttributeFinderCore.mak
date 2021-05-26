@@ -201,8 +201,6 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\FAMNetworkManager.exe" /mapout:"$(BinariesFolder)\Map\mapFAMNetworkManager.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\FAMDBCounterManager.exe" /mapout:"$(BinaribesFolder)\Map\mapFAMDBCounterManager.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\FAMDBLockChecker.exe" /mapout:"$(BinaribesFolder)\Map\mapFAMDBLockChecker.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Office2007ToTif.exe" /mapout:"$(BinariesFolder)\Map\mapOffice2007ToTif.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\OfficeToTif.exe" /mapout:"$(BinaribesFolder)\Map\mapOfficeToTif.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Office.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Office.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.FileActionManager.Database.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileActionManager.Database.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.Redaction.CustomComponentsHelper.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Redaction.CustomComponentsHelper.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
@@ -438,7 +436,6 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(PDCommonDir)\UnRegisterShellExtension.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\ClearImage_7_0\Installer\*.*" "$(ClearImageInstallFilesDir)\" /v /s /e /y
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Reports\*.*" "$(AFCoreInstallFilesRootDir)\Reports" /Y/E
-	@COPY /V /Y "$(RCNETDir)\APIs\MSOffice\Office2007\installer\o2007pia.msi" "$(AFCoreInstallFilesRootDir)\OfficeRedist"
 	@COPY /V /Y "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Utils\ProcessFiles\Code\res\ProcessFiles.ico" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(ReusableComponentsRootDirectory)\APIs\Nuance_20\Bin\CAPI_PInvoke.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@XCOPY "$(RCNETDir)\APIs\IKVM\lib\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
@@ -566,7 +563,6 @@ CleanupPreviousBuildFolders: CleanUpMergeModulesFromPreviousBuilds
     @IF NOT EXIST "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\DotNetGAC" @MKDIR "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\Reports" @MKDIR "$(AFCoreInstallFilesRootDir)\Reports"
-	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\OfficeRedist" @MKDIR "$(AFCoreInstallFilesRootDir)\OfficeRedist"
 	@IF NOT EXIST "$(IDShieldInstallFilesRootDir)\NonSelfRegFiles" @MKDIR "$(IDShieldInstallFilesRootDir)\NonSelfRegFiles"
 	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles" @MKDIR "$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles"
 	@IF NOT EXIST "$(RequiredInstallsDir)\LogicNP" @MKDIR "$(RequiredInstallsDir)\LogicNP"
@@ -588,7 +584,6 @@ CleanupPreviousBuildFolders: CleanUpMergeModulesFromPreviousBuilds
 	@DeleteFiles "$(DataEntryCoreInstallFilesDir)\NonSelfRegFiles\*.*"
 	@Deletefiles "$(ExtractCommonInstallFilesRootDir)\NonSelfRegFiles\*.*"
 	@Deletefiles "$(ExtractCommonInstallFilesRootDir)\SelfRegFiles\*.*"	
-	@Deletefiles "$(AFCoreInstallFilesRootDir)\OfficeRedist\*.*"	
 	@Deletefiles "$(RequiredInstallsDir)\LogicNP\*.*"
 	@Deletefiles "$(AFCoreInstallFilesRootDir)\ProgramDataFiles\*.*"
 	@Deletefiles "$(MERGE_MODULE_DIR)\NuanceLicensing.msm"
