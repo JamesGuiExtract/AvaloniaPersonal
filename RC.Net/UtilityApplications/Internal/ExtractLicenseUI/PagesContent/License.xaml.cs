@@ -524,6 +524,7 @@ namespace ExtractLicenseUI
                     this.ClonedPackageSelector.Visibility = System.Windows.Visibility.Visible;
                     goto case LicenseNavigationOptions.NewLicense;
                 case LicenseNavigationOptions.NewLicense:
+                    this.PayRoyalties.IsEnabled = true;
                     this.RequestKey.IsEnabled = true;
                     this.IsPermanent.IsEnabled = true;
                     this.LicenseName.IsEnabled = true;

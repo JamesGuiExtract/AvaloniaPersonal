@@ -8,6 +8,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace ExtractLicenseUI
 {
@@ -71,6 +72,16 @@ namespace ExtractLicenseUI
             catch(Exception ex)
             {
                 MessageBox.Show("Failed to load organizations.\n" + ex.Message);
+            }
+        }
+
+        public void RefreshOrganizations()
+        {
+            this.PopulateOrganizations();
+            if(!this.SelectedOrganization.Guid.Equals(Guid.Empty))
+            {
+                IEnumerable<Database.Organization> updatedCustomers = this.Organizations.Where(m => m.Guid == this.SelectedOrganization.Guid);
+                this.SelectedOrganization = updatedCustomers.First();
             }
         }
 

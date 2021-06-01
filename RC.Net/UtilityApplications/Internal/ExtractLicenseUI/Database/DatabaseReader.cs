@@ -28,7 +28,7 @@ namespace ExtractLicenseUI.Database
         public Collection<Organization> ReadOrganizations()
         {
             Collection<Organization> organizations = new Collection<Organization>();
-            using(SqlCommand command = new SqlCommand("Select GUID, SalesForce_Hyperlink, Customer_Name, Reseller, State FROM Organization", this.SqlConnection))
+            using(SqlCommand command = new SqlCommand("Select GUID, SalesForce_Hyperlink, Customer_Name, Reseller, SalesForce_Account_ID, State FROM Organization", this.SqlConnection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -43,6 +43,7 @@ namespace ExtractLicenseUI.Database
                                 Guid = Guid.Parse(reader["Guid"].ToString()),
                                 SalesforceHyperlink = reader["Salesforce_Hyperlink"]?.ToString(),
                                 State = reader["State"].ToString(),
+                                SalesForceAccountID = reader["SalesForce_Account_ID"]?.ToString()
                             });
                         }
                     }

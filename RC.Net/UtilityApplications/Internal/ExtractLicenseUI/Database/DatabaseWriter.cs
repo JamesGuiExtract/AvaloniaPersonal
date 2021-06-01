@@ -49,6 +49,40 @@ VALUES
     , @LicenseGuid
 )";
 
+        private readonly string InsertUpdateOrganizationQuery = @"
+IF NOT EXISTS(SELECT GUID FROM dbo.Organization WHERE GUID like @GUID)
+BEGIN
+	INSERT INTO dbo.Organization
+	(
+		[Guid]
+		, [Customer_Name]
+		, [Reseller]
+		, [Salesforce_Hyperlink]
+		, [State]
+		, [SalesForce_Account_ID]
+	)
+	VALUES
+	(
+		@Guid
+		, @Customer_Name
+		, @Reseller
+		, @Salesforce_Hyperlink
+		, @State
+		, @SalesForce_Account_ID
+	)
+END
+
+UPDATE
+	dbo.Organization
+SET
+	Customer_Name = @Customer_Name
+		, Reseller = @Reseller
+		, Salesforce_Hyperlink = @Salesforce_Hyperlink
+		, State = @State
+		, SalesForce_Account_ID = @SalesForce_Account_ID
+WHERE
+	dbo.Organization.GUID = @GUID";
+
         private readonly string InsertUpdateLicenseQuery = @"
 IF NOT EXISTS(SELECT GUID FROM dbo.License WHERE GUID like @GUID)
 BEGIN
@@ -162,6 +196,31 @@ WHERE
             return true;
         }
 
+        /// <summary>
+        /// Writes the selected license to the database.
+        /// </summary>
+        /// <param name="organization">The organization with the selected license</param>
+        /// <returns>Returns true if successful</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "The query is using Microsoft parameters. Its safe.")]
+        public bool WriteOrganization(Organization organization)
+        {
+            if (organization == null)
+            {
+                throw new ArgumentNullException(nameof(organization));
+            }
+            using (SqlCommand command = new SqlCommand(InsertUpdateOrganizationQuery, SqlConnection))
+            {
+                command.Parameters.AddWithValue("@Guid", organization.Guid);
+                command.Parameters.AddWithValue("@Customer_Name", organization.CustomerName);
+                command.Parameters.AddWithValue("@Reseller", HandleNullTypes(organization.Reseller));
+                command.Parameters.AddWithValue("@Salesforce_Hyperlink", HandleNullTypes(organization.SalesforceHyperlink));
+                command.Parameters.AddWithValue("@State", HandleNullTypes(organization.State));
+                command.Parameters.AddWithValue("@SalesForce_Account_ID", HandleNullTypes(organization.SalesForceAccountID));
+                command.ExecuteNonQuery();
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Writes packages associated with a particular license to the database.

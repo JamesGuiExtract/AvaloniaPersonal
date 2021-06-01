@@ -36,7 +36,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\..\..\..\binaries\debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -87,6 +87,9 @@
     <Compile Include="DatFileUtility\LoadDatFilesIntoDatabase.cs" />
     <Compile Include="DatFileUtility\PackageModel.cs" />
     <Compile Include="DatFileUtility\PackageVariable.cs" />
+    <Compile Include="PagesContent\AddOrEditOrganization.xaml.cs">
+      <DependentUpon>AddOrEditOrganization.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PagesContent\CustomerSelector.xaml.cs">
       <DependentUpon>CustomerSelector.xaml</DependentUpon>
     </Compile>
@@ -98,6 +101,7 @@
     </Compile>
     <Compile Include="Utility\LicenseContainer.cs" />
     <Compile Include="Utility\LicenseNavigation.cs" />
+    <Compile Include="Utility\OrganizationContainer.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -121,6 +125,10 @@
       <DependentUpon>Contact.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Page Include="PagesContent\AddOrEditOrganization.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PagesContent\CustomerSelector.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

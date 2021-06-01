@@ -1,5 +1,7 @@
 ﻿using ExtractLicenseUI.Database;
 using ExtractLicenseUI.Utility;
+using FirstFloor.ModernUI.Windows.Controls;
+using FirstFloor.ModernUI.Windows.Navigation;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,6 +33,7 @@ namespace ExtractLicenseUI.PagesContent
             {
                 var selectedOrg = (Database.Organization)this.CustomerName.SelectedItem;
                 this.MainWindow.Organization.SelectedOrganization = selectedOrg;
+                this.EditCustomerButton.IsEnabled = true;
             }
             catch(Exception ex)
             {
@@ -53,6 +56,16 @@ namespace ExtractLicenseUI.PagesContent
             {
                 MessageBox.Show($@"Cannot open link to: {this.MainWindow.Organization.SelectedOrganization.SalesforceHyperlink}");
             }
+        }
+
+        private void NewCustomerButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.MainWindow.OrganizationContainer.NavigateToOrganization(new Database.Organization() { Guid = Guid.NewGuid() });
+        }
+
+        private void EditCustomerButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.MainWindow.OrganizationContainer.NavigateToOrganization((Database.Organization)this.CustomerName.SelectedItem);
         }
     }
 }

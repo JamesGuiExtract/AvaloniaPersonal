@@ -29,6 +29,8 @@ namespace ExtractLicenseUI
         public Organization Organization { get; set; }
         public LicenseContainer LicenseContainer { get; } = new LicenseContainer();
 
+        public OrganizationContainer OrganizationContainer { get; } = new OrganizationContainer();
+
         public MainWindow()
         {
             InitializeComponent();

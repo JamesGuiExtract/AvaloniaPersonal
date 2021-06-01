@@ -62,9 +62,9 @@
                         <Label Content="SalesforceHyperlink" Target="{Binding ElementName=SalesforceHyperlink}"></Label>
                         <TextBlock x:Name="SalesforceHyperlink"><Hyperlink NavigateUri="{Binding SelectedOrganization.SalesforceHyperlink}" ToolTip="{Binding SelectedOrganization.SalesforceHyperlink}" Click="Hyperlink_Click">SalesForce</Hyperlink></TextBlock>
                     </StackPanel>
+                    <Button x:Name="NewCustomerButton" Content="New Customer" Grid.Column="1" Grid.Row="1" Click="NewCustomerButton_Click"></Button>
+                    <Button x:Name="EditCustomerButton" Content="Edit Customer" Grid.Column="1" Grid.Row="2" Click="EditCustomerButton_Click" IsEnabled="False"></Button>
                 </Grid>
-
-                <TextBlock Grid.Column="1" Grid.Row="0" Text="To add a new customer, please go to the licensing database, open the Organization table, and add a new row there. The test server is ENGSVR, and prod will be PSSVR." TextWrapping="Wrap" Width="400px"></TextBlock>
             </Grid>
         </Border>
     </Grid>
