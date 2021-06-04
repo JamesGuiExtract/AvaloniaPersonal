@@ -45,9 +45,9 @@ namespace DatabaseMigrationWizard
                     
                     new MainWindow(connectionInformation)
                     {
-                        ShowDatabase = !importArgument && !exportArgument,
-                        ShowImport = importArgument,
-                        ShowExport = exportArgument,
+                        ShowDatabase = !importArgument && !exportArgument, // If not only importing or only exporting, show the database login page
+                        ShowImport = !exportArgument, // If not only exporting, show the import page option
+                        ShowExport = !importArgument, // If not only importing, show the export page option
                         DefaultPath = string.IsNullOrWhiteSpace(filePath)
                         ? Properties.Settings.Default.DefaultPath
                         : filePath
