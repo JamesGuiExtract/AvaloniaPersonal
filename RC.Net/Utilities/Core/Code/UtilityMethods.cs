@@ -1196,6 +1196,63 @@ namespace Extract.Utilities
                 throw ex.AsExtract("ELI50342");
             }
         }
+
+        /// <summary>
+        /// Attempt to read the XML encoding attribute
+        /// </summary>
+        /// <param name="input">The XML stream to read</param>
+        /// <returns>Whether an encoding was read successfully</returns>
+        static bool TryGetEncodingFromXmlAttribute(Stream input, out Encoding encoding)
+        {
+            var position = input.Position;
+            try
+            {
+                var settings = new System.Xml.XmlReaderSettings
+                {
+                    ConformanceLevel = System.Xml.ConformanceLevel.Fragment,
+                    CloseInput = false
+                };
+
+                using var reader = System.Xml.XmlReader.Create(input, settings);
+                if (reader.Read())
+                {
+                    var encodingName = reader.GetAttribute("encoding");
+                    if (!String.IsNullOrEmpty(encodingName))
+                    {
+                        encoding = Encoding.GetEncoding(encodingName);
+                        return true;
+                    }
+                }
+
+                encoding = Encoding.Default;
+                return false;
+            }
+            finally
+            {
+                input.Position = position;
+            }
+        }
+
+        /// <summary>
+        /// Create a reader after determining the input encoding
+        /// </summary>
+        /// <param name="input">The xml stream to be read</param>
+        /// <param name="defaultEncoding">Encoding to use if the encoding can't be detected from the input</param>
+        public static StreamReader GetXmlStreamReader(Stream input, Encoding defaultEncoding)
+        {
+            var inputEncoding = defaultEncoding;
+
+            if (TryGetEncodingFromXmlAttribute(input, out var encoding))
+            {
+                inputEncoding = encoding;
+            }
+
+            return new StreamReader(input,
+                encoding: inputEncoding,
+                detectEncodingFromByteOrderMarks: true,
+                bufferSize: 1024,
+                leaveOpen: true);
+        }
     }
 
     /// <summary>

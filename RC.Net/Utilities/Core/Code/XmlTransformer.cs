@@ -50,63 +50,6 @@ namespace Extract.Utilities
         }
 
         /// <summary>
-        /// Attempt to read the XML encoding attribute
-        /// </summary>
-        /// <param name="input">The XML stream to read</param>
-        /// <returns>Whether an encoding was read successfully</returns>
-        static bool TryGetEncodingFromXmlAttribute(Stream input, out Encoding encoding)
-        {
-            var position = input.Position;
-            try
-            {
-                var settings = new XmlReaderSettings
-                {
-                    ConformanceLevel = ConformanceLevel.Fragment,
-                    CloseInput = false
-                };
-
-                using var reader = XmlReader.Create(input, settings);
-                if (reader.Read())
-                {
-                    var encodingName = reader.GetAttribute("encoding");
-                    if (!String.IsNullOrEmpty(encodingName))
-                    {
-                        encoding = Encoding.GetEncoding(encodingName);
-                        return true;
-                    }
-                }
-
-                encoding = Encoding.Default;
-                return false;
-            }
-            finally
-            {
-                input.Position = position;
-            }
-        }
-
-        /// <summary>
-        /// Create a reader after determining the input encoding
-        /// </summary>
-        /// <param name="input">The xml stream to be read</param>
-        /// <param name="defaultEncoding">Encoding to use if the encoding can't be detected from the input</param>
-        static StreamReader GetStreamReader(Stream input, Encoding defaultEncoding)
-        {
-            var inputEncoding = defaultEncoding;
-
-            if (TryGetEncodingFromXmlAttribute(input, out var encoding))
-            {
-                inputEncoding = encoding;
-            }
-
-            return new StreamReader(input,
-                encoding: inputEncoding,
-                detectEncodingFromByteOrderMarks: true,
-                bufferSize: 1024,
-                leaveOpen: true);
-        }
-
-        /// <summary>
         /// Transform an XML document
         /// </summary>
         /// <param name="input">The stream containing the XML document to be transformed</param>
@@ -115,7 +58,7 @@ namespace Extract.Utilities
         {
             try
             {
-                using var reader = GetStreamReader(input, defaultEncoding: Encoding.GetEncoding("Windows-1252"));
+                using var reader = UtilityMethods.GetXmlStreamReader(input, defaultEncoding: Encoding.GetEncoding("Windows-1252"));
                 using var xmlReader = XmlReader.Create(reader);
                 transform.Transform(xmlReader, null, output);
             }

@@ -1,6 +1,7 @@
 ﻿using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -581,20 +582,19 @@ namespace Extract.FileActionManager.FileProcessors
                 xmlReaderSettings.ValidationEventHandler += (o, args) =>
                     validationErrorList.Add(args);
 
-                // Create the XmlReader object.
-                XmlReader reader = null;
                 try
                 {
-                    // Create the XmlReader object.
-                    reader = XmlReader.Create(xmlFileName, xmlReaderSettings);
+                    using var inputStream = new FileStream(xmlFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    using var reader = UtilityMethods.GetXmlStreamReader(inputStream, defaultEncoding: System.Text.Encoding.GetEncoding("Windows-1252"));
+                    using var xmlReader = XmlReader.Create(reader, xmlReaderSettings);
 
                     // Parse the file. 
-                    while (reader.Read());
+                    while (xmlReader.Read());
 
                     // Validate in-line schema exists if required, only after reading the XML;
                     // The in-line schema is not initialized until the file is read.
                     if (XmlSchemaValidation == XmlSchemaValidation.InlineSchema &&
-                        RequireInlineSchema && reader.Settings.Schemas.Count == 0)
+                        RequireInlineSchema && xmlReader.Settings.Schemas.Count == 0)
                     {
                         throw new ExtractException("ELI38399", "No in-line schema definition found.");
                     }
@@ -629,13 +629,6 @@ namespace Extract.FileActionManager.FileProcessors
                     var ee = new ExtractException("ELI38394", "XML file is invalid.", ex);
                     ee.AddDebugData("XML filename", xmlFileName, false);
                     throw ee;
-                }
-                finally
-                {
-                    if (reader != null)
-                    {
-                        reader.Close();
-                    }
                 }
 
                 return EFileProcessingResult.kProcessingSuccessful;
