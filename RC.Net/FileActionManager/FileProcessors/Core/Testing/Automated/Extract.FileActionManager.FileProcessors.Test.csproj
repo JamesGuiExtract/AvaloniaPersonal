@@ -223,6 +223,7 @@
     <EmbeddedResource Include="Resources\FlexIndex-BadSyntax.xml" />
     <EmbeddedResource Include="Resources\FlexIndex-Inline-WrongSchema.xml" />
     <EmbeddedResource Include="Resources\FlexIndex.xml" />
+    <EmbeddedResource Include="Resources\ExtendedASCII.xml" />
     <EmbeddedResource Include="Resources\TestSplitMultipageFile.bak" />
     <EmbeddedResource Include="Resources\C413.tif.uss" />
     <EmbeddedResource Include="Resources\C413.tif.voa" />

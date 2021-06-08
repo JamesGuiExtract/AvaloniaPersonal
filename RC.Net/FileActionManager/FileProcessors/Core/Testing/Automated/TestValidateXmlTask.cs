@@ -47,6 +47,12 @@ namespace Extract.FileActionManager.FileProcessors.Test
         /// </summary>
         static readonly string _FLEX_INDEX_INLINE_WRONG_SCHEMA = "Resources.FlexIndex-Inline-WrongSchema.xml";
 
+        /// <summary>
+        /// A file with a byte with decimal value of 149 in it
+        /// https://extract.atlassian.net/browse/ISSUE-17552
+        /// </summary>
+        static readonly string _EXTENDED_ASCII_XML = "Resources.ExtendedASCII.xml";
+
         #endregion Constants
 
         #region Fields
@@ -116,6 +122,22 @@ namespace Extract.FileActionManager.FileProcessors.Test
 
             Assert.That(TestTaskForFailure(validateXmlTask,
                 _testFiles.GetFile(_FLEX_INDEX_BAD_SYNTAX_XML), "ELI38394"));
+        }
+
+        /// <summary>
+        /// Tests that XML with non-ascii code point doesn't cause an error
+        /// https://extract.atlassian.net/browse/ISSUE-17552
+        /// </summary>
+        [Test, Category("XML Syntax")]
+        public static void TestExtendedASCIIInValue()
+        {
+            ValidateXmlTask validateXmlTask = new ValidateXmlTask();
+            validateXmlTask.XmlFileName = "<SourceDocName>";
+            validateXmlTask.TreatWarningsAsErrors = false;
+            validateXmlTask.XmlSchemaValidation = XmlSchemaValidation.None;
+
+            Assert.That(TestTaskForFailure(validateXmlTask,
+                _testFiles.GetFile(_EXTENDED_ASCII_XML), null));
         }
 
         /// <summary>
