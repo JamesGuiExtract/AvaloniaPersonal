@@ -382,7 +382,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\Google*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Microsoft.Office.Interop.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Microsoft.Vbe.Interop.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V /Y "$(BinariesFolder)\Microsoft.Vbe.Forms.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\Microsoft.Vbe.Interop.Forms.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Office.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\GalaSoft*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\FirstFloor*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
