@@ -2016,7 +2016,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             date = DateTime.Parse(dateResult.ToString(), CultureInfo.CurrentCulture);
                         }
-                        list.Add((result.ToString(), date));
+                        list.Add((result.FirstString, date));
                     }
                     recordCollection = list.AsReadOnly();
                 }
