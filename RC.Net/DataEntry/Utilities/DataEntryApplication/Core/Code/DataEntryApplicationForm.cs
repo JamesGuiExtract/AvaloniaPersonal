@@ -1406,6 +1406,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // control to be created and loaded.
                     _paginationTab.Show();
                     _dataTab.Show();
+
+                    // https://extract.atlassian.net/browse/ISSUE-17541
+                    // Default pagination tab to the parked state to prevent the panel from trying to
+                    // handle shortcut keys until it is activated.
+                    _paginationPanel.Park();
                 }
                 else
                 {

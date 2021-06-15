@@ -2364,6 +2364,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 if (HandleShortcutsInternally
+                    && !Parked
                     && !_primaryPageLayoutControl.IgnoreShortcutKey
                     && _shortcuts.ProcessKey(keyData))
                 {
@@ -3107,6 +3108,7 @@ namespace Extract.UtilityApplications.PaginationUtility
             try
             {
                 if (HandleShortcutsInternally
+                    && !Parked
                     && !_primaryPageLayoutControl.IgnoreShortcutKey
                     && !_dataPanelFocused)
                 {
