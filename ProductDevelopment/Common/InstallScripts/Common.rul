@@ -83,7 +83,6 @@
     prototype InstallDotNetService(STRING);
     prototype UninstallDotNetService(STRING);    
 	prototype BOOL AreOtherExtractProductsInstalled();
-	prototype InstallOfficeRedist();
 	prototype UnregisterLoginNPShellExtension(STRING);   
 	prototype InstallFKB();
 	prototype InstallNuanceLicense(); 
@@ -757,27 +756,6 @@ begin
 	return bReturnValue;    	
 end;
 
-
-///////////////////////////////////////////////////////////////////////////////
-//
-// Function: InstallOfficeRedist
-//
-//  Purpose: This function installs the Office redist.
-//	Returns 0 if no errors
-///////////////////////////////////////////////////////////////////////////////
-function InstallOfficeRedist()
-STRING szProgram, szCmdLine;
-int nResult, svServiceState;
-begin
-	SdShowMsg("Setup is Installing Microsoft Office Redistributable", TRUE);
-	
-	// Install Microsoft Office Redistributable
-	szProgram = "msiexec";
-	szCmdLine = " /qn /norestart /i " + SUPPORTDIR ^ "\\o2007pia.msi";
-	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
-	
-	SdShowMsg("Setup is Installing Microsoft Office Redistributable", FALSE);
-end;
 
 ///////////////////////////////////////////////////////////////////////////////
 //

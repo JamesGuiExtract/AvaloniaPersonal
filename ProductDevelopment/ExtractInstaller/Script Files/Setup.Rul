@@ -134,9 +134,7 @@ Dlg_SdStartCopy:
    	CopyLicFiles();
 	BackupESFAMServiceFile();
    	 	                      
-	// Install Office Redist
-   	InstallOfficeRedist();
-   	
+  	
    	gbInstalled = TRUE;
 
     return 0;
