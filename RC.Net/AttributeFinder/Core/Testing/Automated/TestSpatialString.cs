@@ -176,7 +176,7 @@ namespace Extract.AttributeFinder.Test
         /// CreateFromSpatialStrings creates bad spatial string when given an empty vector
         /// https://extract.atlassian.net/browse/ISSUE-17006
         /// </summary>
-        [Test, Category("SpatialString")]        
+        [Test, Category("SpatialString")]
         public static void CreateFromSpatialStringsWithEmptyVector()
         {
             var ss = new SpatialStringClass();
@@ -185,6 +185,25 @@ namespace Extract.AttributeFinder.Test
 
             // Confirm that the result is non-spatial
             Assert.AreEqual(ESpatialStringMode.kNonSpatialMode, ss.GetMode());
+        }
+
+        /// <summary>
+        /// CreateFromSpatialStrings creates bad spatial string when given an empty vector
+        /// https://extract.atlassian.net/browse/ISSUE-17558
+        /// </summary>
+        [Test, Category("SpatialString")]
+        public static void GetLinesWorksWithCarriageReturns()
+        {
+            var ss = new SpatialStringClass();
+            ss.CreateNonSpatialString("Line1\r\nLine2\rLine3", "placeholder");
+
+            // Confirm that all three lines are returned by GetLines
+            var expectedLines = new[] { "Line1", "Line2", "Line3" };
+            var lines = ss.GetLines()
+                .ToIEnumerable<SpatialString>()
+                .Select(line => line.String)
+                .ToArray();
+            CollectionAssert.AreEqual(expectedLines, lines);
         }
         #endregion Public Test Functions
     }
