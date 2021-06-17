@@ -1621,14 +1621,15 @@ bool CSpatialString::getIsEndOfLine(long nIndex)
             }
         }
 
-        // I am defining the end of a line as \r*\n
+        // Define the end of a line as [\r\n] because if this code requires a \n then
+        // getLines will behave badly (omit characters) for lines separated by \r
         char cNextLetter = m_strString[nNextPos];
 
         if (cNextLetter == '\r')
         {
-            nNextPos++;
+			return true;
         }
-        else if (cNextLetter == '\n' )
+        else if (cNextLetter == '\n')
         {
             return true;
         }
