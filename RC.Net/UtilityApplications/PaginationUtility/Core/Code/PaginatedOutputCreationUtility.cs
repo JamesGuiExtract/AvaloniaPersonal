@@ -153,10 +153,10 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <summary>
         /// Gets the priority to assign a paginated output file.
         /// </summary>
-        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance relating to
-        /// the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this call is
-        /// being made.</param>
-        EFilePriority GetPriorityForFile(IEnumerable<PageInfo> pageInfos)
+        /// <param name="pageInfos">The PageInfos for the pages to be in the document.</param>
+        /// <param name="minimumPriority">The <see cref="EFilePriority"/> that should be assigned for the
+        /// file except in the case that the source document(s) have a higher priority than specified here.</param>
+        EFilePriority GetPriorityForFile(IEnumerable<PageInfo> pageInfos, EFilePriority minimumPriority)
         {
             try
             {
@@ -173,7 +173,10 @@ namespace Extract.UtilityApplications.PaginationUtility
                     "   AND [FileName] IN ({1})", _actionID, sourceDocNames);
 
                 var recordset = _fileProcessingDB.GetResultsForQuery(query);
-                var priority = (EFilePriority)recordset.Fields["MaxPriority"].Value;
+                var priority = (EFilePriority)
+                    Math.Max(
+                        (int)minimumPriority,
+                        (int)(EFilePriority)recordset.Fields["MaxPriority"].Value);
                 recordset.Close();
 
                 return priority;
@@ -190,14 +193,15 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// <remarks>If the filename already exists on the file system or if the DB add fails because
         /// the file already exists in the DB, it will add 6 random chars before the extension and
         /// try to add that filename.</remarks>
-        /// <param name="e">The <see cref="CreatingOutputDocumentEventArgs"/> instance relating to
-        /// the <see cref="PaginationPanel.CreatingOutputDocument"/> event for which this call is
-        /// being made.</param>
-        /// <param name="priority">The <see cref="EFilePriority"/> that should be assigned for the
-        /// file.</param>
+        /// <param name="pageInfos">The PageInfos for the pages to be in the document.</param>
+        /// <param name="tagManager">The tag manager that should be used to expand the path tag expression.</param>
+        /// <param name="fileTaskSessionId">The file task session ID for the current pagination operation.</param>
+        /// <param name="minimumPriority">The <see cref="EFilePriority"/> that should be assigned for the
+        /// file except in the case that the source document(s) have a higher priority than specified here.</param>
         /// <returns>The ID of the newly added filename in the FAMFile table.</returns>
         public (int FileID, string FileName) AddFileWithNameConflictResolve(
-            IEnumerable<PageInfo> pageInfos, FAMTagManager tagManager, int fileTaskSessionId)
+            IEnumerable<PageInfo> pageInfos, FAMTagManager tagManager, int fileTaskSessionId, 
+            EFilePriority minimumPriority)
         {
             try
             {
@@ -205,7 +209,7 @@ namespace Extract.UtilityApplications.PaginationUtility
                 int pageCount = sourcePageInfo.Count;
 
                 string outputFileName = GetPaginatedDocumentFileName(pageInfos, tagManager);
-                var priority = GetPriorityForFile(pageInfos);
+                var priority = GetPriorityForFile(pageInfos, minimumPriority);
 
                 // Create directory if it doesn't exist
                 Directory.CreateDirectory(Path.GetDirectoryName(outputFileName));
@@ -267,8 +271,9 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// Records to the database the pagination that has occurred (which pages have been used in
         /// which output documents, which pages have been deleted).
         /// </summary>
-        /// <param name="outputDocument">The <see cref="OutputDocument"/> for which history should
-        /// be recorded.</param>
+        /// <param name="pageInfos">The PageInfos for the pages for which history should be recorded.</param>
+        /// <param name="outputDocument">The ID of the output document that has been produced.</param>
+        /// <param name="fileTaskSessionId">The file task session ID for the current pagination operation.</param>
         public void WritePaginationHistory(IEnumerable<PageInfo> pageInfos, int outputFileID, int fileTaskSessionId)
         {
             try

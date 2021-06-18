@@ -1274,7 +1274,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // it to outputPath to prevent a running file supplier from grabbing it and another
                 // process from getting it.
                 var newFileInfo =_paginatedOutputCreationUtility.AddFileWithNameConflictResolve(
-                    e.SourcePageInfo, (FAMTagManager)_tagUtility, sessionData.SessionID);
+                    e.SourcePageInfo, (FAMTagManager)_tagUtility, sessionData.SessionID, EFilePriority.kPriorityNormal);
 
                 e.FileID = newFileInfo.FileID;
                 e.OutputFileName = newFileInfo.FileName;

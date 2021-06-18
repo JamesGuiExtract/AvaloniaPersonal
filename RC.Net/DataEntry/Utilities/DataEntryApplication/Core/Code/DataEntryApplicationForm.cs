@@ -3211,7 +3211,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // it to outputPath to prevent a running file supplier from grabbing it and another
                 // process from getting it.
                 var newFileInfo = _paginatedOutputCreationUtility.AddFileWithNameConflictResolve(
-                    e.SourcePageInfo, (FAMTagManager)_tagUtility, _fileTaskSessionID.Value);
+                    e.SourcePageInfo, (FAMTagManager)_tagUtility, _fileTaskSessionID.Value,
+                    _settings.PaginationSettings.PaginatedOutputPriority);
                 e.FileID = newFileInfo.FileID;
                 e.OutputFileName = newFileInfo.FileName;
 

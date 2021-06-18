@@ -1310,7 +1310,7 @@ namespace Extract.FileActionManager.FileProcessors
             // it to outputPath to prevent a running file supplier from grabbing it and another
             // process from getting it.
             var newFileInfo = _paginatedOutputCreationUtility.AddFileWithNameConflictResolve(
-                sourcePageInfos, pFAMTM, fileTaskSessionID);
+                sourcePageInfos, pFAMTM, fileTaskSessionID, EFilePriority.kPriorityNormal);
 
             var nonDeletedPageInfos = sourcePageInfos.Where(pageInfo => !pageInfo.Deleted).ToList();
 
