@@ -4126,7 +4126,8 @@ namespace Extract.UtilityApplications.PaginationUtility
         /// </summary>
         /// <param name="copiedPages">The <see cref="Page"/>s to be inserted into this control.
         /// </param>
-        /// <param name="index">The index at which the pages should be inserted.</param>
+        /// <param name="index">The index at which the pages should be inserted; -1 indicates the page
+        /// should be added after all other pages currently loaded in the UI.</param>
         void InsertPages(IEnumerable<KeyValuePair<Page, bool>> copiedPages, int index)
         {
             bool duplicatePagesExist = false;
@@ -4134,27 +4135,25 @@ namespace Extract.UtilityApplications.PaginationUtility
 
             foreach (var page in copiedPages)
             {
-                // A null page represents a document boundary; insert a separator.
-                if (page.Key == null)
-                {
-                    var separator = new PaginationSeparator(this, CommitOnlySelection);
-                    insertedPaginationControls.Add(separator);
+                // Originally a null page represented a document seperator; when the pagination utility was converted
+                // to a task in July 2016, CopySelectionToClipboard was changed to only ever copy pages, not separators.
+                ExtractException.Assert("ELI51727", "Missing page data", page.Key != null);
 
-                    if (InitializePaginationControl(separator, ref index))
-                    {
-                        index++;
-                    }
-                }
                 // Insert a new page control that uses the specified page.
-                else
-                {
-                    var newPageControl = new PageThumbnailControl(this, null, page.Key);
-                    newPageControl.Deleted = page.Value;
-                    insertedPaginationControls.Add(newPageControl);
+                var newPageControl = new PageThumbnailControl(this, null, page.Key);
+                newPageControl.Deleted = page.Value;
+                insertedPaginationControls.Add(newPageControl);
 
-                    if (InitializePaginationControl(newPageControl, ref index))
+                if (InitializePaginationControl(newPageControl, ref index))
+                {
+                    duplicatePagesExist |= newPageControl.Page.MultipleCopiesExist;
+
+                    // https://extract.atlassian.net/browse/ISSUE-17559
+                    // Increment index only if inserting at a specified index rather that at the end (index = -1)
+                    // (otherwise all pages except the first will end up being inserted at the very top of the
+                    // pagination panel)
+                    if (index >= 0)
                     {
-                        duplicatePagesExist |= newPageControl.Page.MultipleCopiesExist;
                         index++;
                     }
                 }
@@ -4875,6 +4874,19 @@ namespace Extract.UtilityApplications.PaginationUtility
                         {
                             var nextDocument = GetNextDocument(forward: true, onlyUnprocessed: false, _commandTargetControl.Document);
                             index = _flowLayoutPanel.Controls.IndexOf(nextDocument?.PaginationSeparator);
+
+                            // InsertPaginationControl will add a separator (without associated document) to distinguish
+                            // the LoadNextDocument button from the last document. This separator also provides a target to
+                            // drop dragged pages into to create a new document. However, in the case that pages are being
+                            // pasted after the last existing page in the the panel (index = -1), the pasted pages should belong
+                            // to the last currently existing document as in this case the paste will correspond to the area to
+                            // the right of the last page but above this final document separator.
+                            // Temporarily remove this separator attached the pasted pages to the final document.
+                            if (index == -1 && LoadNextDocumentVisible
+                                && _flowLayoutPanel.Controls.OfType<Control>().Last() is PaginationSeparator finalSeparator)
+                            {
+                                RemovePaginationControl(finalSeparator, dispose: true);
+                            }
                         }
 
                         InsertPages(copiedPages, index);
