@@ -1,5 +1,6 @@
 ﻿using Extract.Testing.Utilities;
 using NUnit.Framework;
+using System.IO;
 
 namespace Extract.FileActionManager.FileProcessors.Test
 {
@@ -164,16 +165,26 @@ namespace Extract.FileActionManager.FileProcessors.Test
         [Test, Category("XML Schema")]
         public static void TestInvalidInlineSchema()
         {
-            ValidateXmlTask validateXmlTask = new ValidateXmlTask();
-            validateXmlTask.XmlFileName = "<SourceDocName>";
-            validateXmlTask.TreatWarningsAsErrors = false;
-            validateXmlTask.XmlSchemaValidation = XmlSchemaValidation.InlineSchema;
-            validateXmlTask.RequireInlineSchema = false;
+            // Use a subdir to put the xml files so that this tests that relative paths are resolved correctly
+            // https://extract.atlassian.net/browse/ISSUE-17562
+            var tempDir = Utilities.FileSystemMethods.GetTemporaryFolder();
+            try
+            {
+                ValidateXmlTask validateXmlTask = new ValidateXmlTask();
+                validateXmlTask.XmlFileName = "<SourceDocName>";
+                validateXmlTask.TreatWarningsAsErrors = false;
+                validateXmlTask.XmlSchemaValidation = XmlSchemaValidation.InlineSchema;
+                validateXmlTask.RequireInlineSchema = false;
 
-            _testFiles.GetFile(_LABDE_XSD);
+                _testFiles.GetFile(_LABDE_XSD, Path.Combine(tempDir.FullName, "LabDE.xsd"));
+                string xmlFile = _testFiles.GetFile(_LABDE_INLINE_BAD_SCHEMA, Path.Combine(tempDir.FullName, "SchemaViolation.xml"));
 
-            Assert.That(TestTaskForFailure(validateXmlTask,
-                _testFiles.GetFile(_LABDE_INLINE_BAD_SCHEMA), "ELI38394"));
+                Assert.That(TestTaskForFailure(validateXmlTask, xmlFile, "ELI38394"));
+            }
+            finally
+            {
+                tempDir.Delete(true);
+            }
         }
 
         /// <summary>
