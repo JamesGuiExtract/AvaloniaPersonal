@@ -573,7 +573,7 @@ namespace Extract.FileActionManager.FileProcessors
                 FileActionManagerPathTags pathTags = new FileActionManagerPathTags(
                     pFAMTM, pFileRecord.Name);
 
-                string xmlFileName = pathTags.Expand(XmlFileName);
+                string xmlFileName = Path.GetFullPath(pathTags.Expand(XmlFileName));
                 ExtractException.Assert("ELI38392", "XML file not found.", File.Exists(xmlFileName),
                     "XML filename", xmlFileName);
 
@@ -586,7 +586,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     using var inputStream = new FileStream(xmlFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
                     using var reader = UtilityMethods.GetXmlStreamReader(inputStream, defaultEncoding: System.Text.Encoding.GetEncoding("Windows-1252"));
-                    using var xmlReader = XmlReader.Create(reader, xmlReaderSettings);
+                    using var xmlReader = XmlReader.Create(reader, xmlReaderSettings, xmlFileName);
 
                     // Parse the file. 
                     while (xmlReader.Read());
