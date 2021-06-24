@@ -183,6 +183,9 @@ namespace Extract.FileActionManager.FileProcessors.Test
             }
             finally
             {
+                // Kill cached files to avoid polluting other tests
+                _testFiles.RemoveFile(_LABDE_XSD);
+                _testFiles.RemoveFile(_LABDE_INLINE_BAD_SCHEMA);
                 tempDir.Delete(true);
             }
         }
