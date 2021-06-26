@@ -88,35 +88,21 @@ namespace Extract.Testing.Utilities
                 ExtractException.Assert("ELI25567", "Resource name cannot be null or empty!",
                     !string.IsNullOrEmpty(resourceName));
 
-                TemporaryFile tempFile;
-                if (!_files.TryGetValue(resourceName, out tempFile))
+                // If this resource was already retrieved, remove the previous file
+                if (_files.TryGetValue(resourceName, out var previousFile))
                 {
-                    // Create the temporary image file
-                    tempFile = CreateTemporaryFile(resourceName, fileName);
-
-                    // I have run into at least one unit test where I periodically getting errors
-                    // stating the test file is missing or sharing violations.
-                    FileSystemMethods.WaitForFileToBeReadable(tempFile.FileName);
-
-                    // Add the temporary file to the dictionary
-                    _files.Add(resourceName, tempFile);
+                    previousFile.Dispose();
                 }
-                else if (!string.IsNullOrEmpty(fileName) &&
-                    !fileName.Equals(tempFile.FileName, StringComparison.OrdinalIgnoreCase))
-                {
-                    // Move the file to the new location
-                    FileSystemMethods.MoveFile(tempFile.FileName, fileName, false);
 
-                    // Remove the old file from the collection and dispose of the
-                    // temporary file
-                    _files.Remove(resourceName);
-                    tempFile.Dispose();
+                // Create the temporary image file
+                TemporaryFile tempFile = CreateTemporaryFile(resourceName, fileName);
 
-                    // Create a new temporary file with the specified name
-                    // and add it to the collection
-                    tempFile = new TemporaryFile(new FileInfo(fileName), false);
-                    _files.Add(resourceName, tempFile);
-                }
+                // I have run into at least one unit test where I periodically getting errors
+                // stating the test file is missing or sharing violations.
+                FileSystemMethods.WaitForFileToBeReadable(tempFile.FileName);
+
+                // Add the temporary file to the collection
+                _files[resourceName] = tempFile;
 
                 return tempFile.FileName;
             }

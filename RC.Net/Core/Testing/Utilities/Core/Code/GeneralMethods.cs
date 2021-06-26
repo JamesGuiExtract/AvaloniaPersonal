@@ -96,11 +96,14 @@ namespace Extract.Testing.Utilities
                 }
 
                 // Write the embedded resource to the stream
-                using (Stream stream =
-                    assembly.GetManifestResourceStream(type, resourceName))
+                using Stream stream = assembly.GetManifestResourceStream(type, resourceName);
+                var resourceBytes = stream.ToByteArray();
+                var fileInfo = new FileInfo(fileName);
+
+                // Write to the file if needed
+                if (FileContentDiffersFromByteArray(fileInfo, resourceBytes))
                 {
-                    File.WriteAllBytes(fileName,
-                        StreamMethods.ConvertStreamToByteArray(stream));
+                    File.WriteAllBytes(fileName, resourceBytes);
                 }
             }
             catch (Exception ex)
@@ -142,40 +145,39 @@ namespace Extract.Testing.Utilities
                 }
 
                 // Write the embedded resource to the stream
-                using (Stream stream =
-                    assembly.GetManifestResourceStream(type, resourceName))
+                using Stream stream = assembly.GetManifestResourceStream(type, resourceName);
+
+                // Remove any project-prefix to the resource name that is not related to the
+                // original filename.
+                string outputFileName = Regex.Replace(resourceName,
+                    @"^(Properties\.)?Resources\.", "", RegexOptions.IgnoreCase);
+
+                string path = Path.GetTempPath();
+
+                if (!string.IsNullOrWhiteSpace(subdirectoryName))
                 {
-                    // Remove any project-prefix to the resource name that is not related to the
-                    // original filename.
-                    string outputFileName = Regex.Replace(resourceName,
-                        @"^(Properties\.)?Resources\.", "", RegexOptions.IgnoreCase);
-
-                    string path = Path.GetTempPath();
-
-                    if (!string.IsNullOrWhiteSpace(subdirectoryName))
+                    path = Path.Combine(path, subdirectoryName);
+                    if (!Directory.Exists(path))
                     {
-                        path = Path.Combine(path, subdirectoryName);
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
+                        Directory.CreateDirectory(path);
                     }
-
-                    outputFileName = Path.Combine(path, outputFileName);
-
-                    // Since a static filename is being specified (and TemporaryFile will not be
-                    // able to guarantee uniqueness), delete any existing instance of the file so
-                    // that this operation acts as an overwrite.
-                    File.Delete(outputFileName);
-
-                    FileInfo fileInfo = new FileInfo(outputFileName);
-                    var temporaryFile = new TemporaryFile(fileInfo, false);
-                    
-                    File.WriteAllBytes(temporaryFile.FileName,
-                        StreamMethods.ConvertStreamToByteArray(stream));
-
-                    return temporaryFile;
                 }
+
+                outputFileName = Path.Combine(path, outputFileName);
+
+                var fileInfo = new FileInfo(outputFileName);
+                var temporaryFile = new TemporaryFile(fileInfo, false);
+
+                var resourceBytes = stream.ToByteArray();
+
+                // Write to the file if needed
+                if (FileContentDiffersFromByteArray(fileInfo, resourceBytes))
+                {
+                    // File.WriteAllBytes will overwrite an existing file so no need to delete the file first
+                    File.WriteAllBytes(temporaryFile.FileName, resourceBytes);
+                }
+
+                return temporaryFile;
             }
             catch (Exception ex)
             {
@@ -184,6 +186,14 @@ namespace Extract.Testing.Utilities
                 ee.AddDebugData("Resource Name", resourceName, false);
                 throw ee;
             }
+        }
+
+        // True if file doesn't exist or if its contents differ from the byte array
+        static bool FileContentDiffersFromByteArray(FileInfo fileInfo, byte[] bytes)
+        {
+            return !fileInfo.Exists
+                || fileInfo.Length != bytes.Length
+                || !bytes.SequenceEqual(File.ReadAllBytes(fileInfo.FullName));
         }
     }
 }
