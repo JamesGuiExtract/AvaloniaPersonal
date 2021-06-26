@@ -1419,86 +1419,54 @@ namespace Extract.Web.WebAPI.Test
             }
         }
 
-        [Test, Category("Automated"), Category("TryGetPage")]
+        [Test, Category("Automated"), Category("TryGetPage"), Parallelizable(ParallelScope.Self)]
         public static void Test_GetImagePageFromTIF()
         {
-            string tifPath = null;
-            try
-            {
-                tifPath = _testFiles.GetFile("Resources.TestImage003.tif");
+            using var testFiles = new TestFileManager<TestDocument>();
 
-                Assert.False(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out var _));
+            var tifPath = testFiles.GetFile("Resources.TestImage003.tif");
 
-                Assert.True(DocumentData.TryGetPageWithConversionToPdf(tifPath, 1, out byte[] imageDataFromConversion));
-                Assert.True(imageDataFromConversion.Length > 0);
-            }
-            finally
-            {
-                if (tifPath is string)
-                {
-                    _testFiles.RemoveFile("Resources.TestImage003.tif");
-                }
-            }
+            Assert.False(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out var _));
+
+            Assert.True(DocumentData.TryGetPageWithConversionToPdf(tifPath, 1, out byte[] imageDataFromConversion));
+            Assert.True(imageDataFromConversion.Length > 0);
         }
 
-        [Test, Category("Automated"), Category("TryGetPage")]
+        [Test, Category("Automated"), Category("TryGetPage"), Parallelizable(ParallelScope.Self)]
         public static void Test_GetImagePageFromPDF()
         {
-            string pdfPath = null;
-            try
-            {
-                pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf");
-                Assert.True(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, 1, out byte[] imageDataFromPDF));
-                Assert.True(imageDataFromPDF.Length > 0);
-                RemoveCachedPDF(pdfPath);
-            }
-            finally
-            {
-                if (pdfPath is string)
-                {
-                    _testFiles.RemoveFile("Resources.TestImage003.pdf");
-                }
-            }
+            using var testFiles = new TestFileManager<TestDocument>();
+
+            var pdfPath = testFiles.GetFile("Resources.TestImage003.pdf");
+            Assert.True(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, 1, out byte[] imageDataFromPDF));
+            Assert.True(imageDataFromPDF.Length > 0);
+            RemoveCachedPDF(pdfPath);
         }
 
-        [Test, Category("Automated"), Category("TryGetPage")]
+        [Test, Category("Automated"), Category("TryGetPage"), Parallelizable(ParallelScope.Self)]
         public static void Test_GetImagePageFromAssociatedPDF()
         {
-            string tifPath = null;
-            string pdfPath = null;
-            try
-            {
-                tifPath = _testFiles.GetFile("Resources.TestImage003.tif");
-                Assert.False(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out var _));
+            using var testFiles = new TestFileManager<TestDocument>();
 
-                pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf");
-                Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out byte[] imageDataFromPDF));
-                RemoveCachedPDF(pdfPath);
+            var tifPath = testFiles.GetFile("Resources.TestImage003.tif");
+            Assert.False(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out var _));
 
-                var pdfPathOld = pdfPath;
-                pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf", tifPath + ".PDF");
-                Assert.False(File.Exists(pdfPathOld));
-                Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out imageDataFromPDF));
-                RemoveCachedPDF(pdfPath);
+            var pdfPath = testFiles.GetFile("Resources.TestImage003.pdf");
+            Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out byte[] imageDataFromPDF));
+            RemoveCachedPDF(pdfPath);
 
-                tifPath = _testFiles.GetFile("Resources.TestImage003.tif", Path.ChangeExtension(tifPath, ".pdf.tif"));
-                pdfPathOld = pdfPath;
-                pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf", Path.ChangeExtension(tifPath, null));
-                Assert.False(File.Exists(pdfPathOld));
-                Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out imageDataFromPDF));
-                RemoveCachedPDF(pdfPath);
-            }
-            finally
-            {
-                if (tifPath is string)
-                {
-                    _testFiles.RemoveFile("Resources.TestImage003.tif");
-                }
-                if (pdfPath is string)
-                {
-                    _testFiles.RemoveFile("Resources.TestImage003.pdf");
-                }
-            }
+            var pdfPathOld = pdfPath;
+            pdfPath = testFiles.GetFile("Resources.TestImage003.pdf", tifPath + ".PDF");
+            Assert.False(File.Exists(pdfPathOld));
+            Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out imageDataFromPDF));
+            RemoveCachedPDF(pdfPath);
+
+            tifPath = testFiles.GetFile("Resources.TestImage003.tif", Path.ChangeExtension(tifPath, ".pdf.tif"));
+            pdfPathOld = pdfPath;
+            pdfPath = testFiles.GetFile("Resources.TestImage003.pdf", Path.ChangeExtension(tifPath, null));
+            Assert.False(File.Exists(pdfPathOld));
+            Assert.True(DocumentData.TryGetPageFromAssociatedPdf(tifPath, 1, out imageDataFromPDF));
+            RemoveCachedPDF(pdfPath);
         }
 
         // I used nuance to convert this TIF to PDF so the data is the same for both methods
@@ -1507,8 +1475,11 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(2, Description = "Page 2"), Category("Automated"), Category("TryGetPage")]
         [TestCase(3, Description = "Page 3"), Category("Automated"), Category("TryGetPage")]
         [TestCase(4, Description = "Page 4"), Category("Automated"), Category("TryGetPage")]
+        [Parallelizable(ParallelScope.All)]
         public static void Test_ComparePDFPages(int pageNumber)
         {
+            using var testFiles = new TestFileManager<TestDocument>();
+
             // Hack to pull out the image from the PDF by looking for null bytes to indicate beginning
             // and then searching for 'endstream' text
             byte[] getMainStream(byte[] pdfData)
@@ -1547,63 +1518,39 @@ namespace Extract.Web.WebAPI.Test
                 return pdfData.Skip(startStream).Take(endStream - startStream).ToArray();
             }
 
-            string tifPath = null;
-            string pdfPath = null;
-            try
-            {
-                pdfPath = _testFiles.GetFile("Resources.TestImage003.pdf");
-                Assert.True(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, pageNumber, out byte[] imageDataFromPDF));
-                RemoveCachedPDF(pdfPath);
+            string pdfPath = testFiles.GetFile("Resources.TestImage003.pdf");
+            Assert.True(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, pageNumber, out byte[] imageDataFromPDF));
+            RemoveCachedPDF(pdfPath);
 
-                tifPath = _testFiles.GetFile("Resources.TestImage003.tif");
-                Assert.True(DocumentData.TryGetPageWithConversionToPdf(tifPath, pageNumber, out byte[] imageDataFromConversion));
+            string tifPath = testFiles.GetFile("Resources.TestImage003.tif");
+            Assert.True(DocumentData.TryGetPageWithConversionToPdf(tifPath, pageNumber, out byte[] imageDataFromConversion));
 
-                // Sanity check--these should be a little different
-                CollectionAssert.AreNotEqual(imageDataFromPDF, imageDataFromConversion);
+            // Sanity check--these should be a little different
+            CollectionAssert.AreNotEqual(imageDataFromPDF, imageDataFromConversion);
 
-                byte[] middleNoConversion = getMainStream(imageDataFromPDF);
-                byte[] middleConverted = getMainStream(imageDataFromConversion);
+            byte[] middleNoConversion = getMainStream(imageDataFromPDF);
+            byte[] middleConverted = getMainStream(imageDataFromConversion);
 
-                // Sanity check--this is most of the data, right?
-                Assert.Greater(middleConverted.Length, 0.9 * imageDataFromConversion.Length);
+            // Sanity check--this is most of the data, right?
+            Assert.Greater(middleConverted.Length, 0.9 * imageDataFromConversion.Length);
 
-                CollectionAssert.AreEqual(middleConverted, middleNoConversion);
-            }
-            finally
-            {
-                if (tifPath is string)
-                {
-                    _testFiles.RemoveFile("Resources.TestImage003.tif");
-                }
-                if (pdfPath is string)
-                {
-                    _testFiles.RemoveFile("Resources.TestImage003.pdf");
-                }
-            }
+            CollectionAssert.AreEqual(middleConverted, middleNoConversion);
         }
 
         // Ensure the method fails gracefully (returns false) for a bad PDF file
-        [Test, Category("Automated"), Category("TryGetPage")]
+        [Test, Category("Automated"), Category("TryGetPage"), Parallelizable(ParallelScope.Self)]
         public static void Test_GetImagePageFromBadPDF()
         {
+            using var testFiles = new TestFileManager<TestDocument>();
+
             var resource = "Resources.TestImage003.tif";
-            string pdfPath = null;
-            try
-            {
-                var tifPath = _testFiles.GetFile(resource);
 
-                // Move to a path ending in .pdf
-                pdfPath = _testFiles.GetFile(resource, tifPath + ".not.a.pdf");
+            var tifPath = testFiles.GetFile(resource);
 
-                Assert.False(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, 1, out byte[] imageDataFromPDF));
-            }
-            finally
-            {
-                if (pdfPath is string)
-                {
-                    _testFiles.RemoveFile(resource);
-                }
-            }
+            // Move to a path ending in .pdf
+            var pdfPath = testFiles.GetFile(resource, tifPath + ".not.a.pdf");
+
+            Assert.False(DocumentData.TryGetPageFromAssociatedPdf(pdfPath, 1, out byte[] imageDataFromPDF));
         }
 
         #endregion Public Test Functions
