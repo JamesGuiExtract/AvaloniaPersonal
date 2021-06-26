@@ -47,6 +47,7 @@ STDMETHODIMP CCategoryManager::InterfaceSupportsErrorInfo(REFIID riid)
 //-------------------------------------------------------------------------------------------------
 CCategoryManager::CCategoryManager()
 	: m_strCacheFileRoot("")
+	, m_mutex(FALSE, "UCLIDCategoryManagerCacheMutex")
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -254,6 +255,9 @@ STDMETHODIMP CCategoryManager::GetDescriptionToProgIDMap2(BSTR strCategoryName,
 
 	try
 	{
+		// Protect the category file from being deleted
+		CSingleLock lock(&m_mutex, TRUE);
+
 		// validate license and enable the wait cursor as this method
 		// make take some time to execute
 		validateLicense();
@@ -351,6 +355,9 @@ STDMETHODIMP CCategoryManager::DeleteCache(BSTR strCategoryName)
 		// compute the cache file name for the specified category name
 		string stdstrCategoryName = asString( strCategoryName );
 		string strCacheFileName = getCacheFileName(stdstrCategoryName);
+
+		// Lock while deleting cache file since there may be another thread reading or writing it
+		CSingleLock lock(&m_mutex, TRUE);
 
 		// if the cache file exists, delete it
 		if (isValidFile(strCacheFileName))

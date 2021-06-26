@@ -48,6 +48,7 @@ public:
 
 private:
 	std::string m_strCacheFileRoot;
+	CMutex m_mutex;
 	void verifyCategoryName(const std::string& strCategoryName);
 	void verifyComponentDescription(const std::string& strDescription);
 
