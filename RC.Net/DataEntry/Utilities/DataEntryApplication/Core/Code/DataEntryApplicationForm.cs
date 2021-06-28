@@ -3216,31 +3216,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 e.FileID = newFileInfo.FileID;
                 e.OutputFileName = newFileInfo.FileName;
 
-                // Add pagination history before the image is created so that it does not
-                // get queued by a watching supplier
-                // https://extract.atlassian.net/browse/ISSUE-13760
-                // Format source page info into an IUnknownVector of StringPairs (filename, page).
-                var sourcePageInfo = e.SourcePageInfo
-                    .Where(info => !info.Deleted)
-                    .Select(info => new StringPairClass()
-                    {
-                        StringKey = info.DocumentName,
-                        StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
-                    })
-                    .ToIUnknownVector();
-
-                var deletedSourcePageInfo = e.SourcePageInfo
-                    .Where(info => info.Deleted)
-                    .Select(info => new StringPairClass()
-                    {
-                        StringKey = info.DocumentName,
-                        StringValue = info.Page.ToString(CultureInfo.InvariantCulture)
-                    })
-                    .ToIUnknownVector();
-
-                FileProcessingDB.AddPaginationHistory(
-                    e.FileID, sourcePageInfo, deletedSourcePageInfo, _fileTaskSessionID.Value);
-
                 var imagePages = e.SourcePageInfo
                     .Where(p => !p.Deleted)
                     .Select(p => new ImagePage(p.DocumentName, p.Page, p.Orientation));
