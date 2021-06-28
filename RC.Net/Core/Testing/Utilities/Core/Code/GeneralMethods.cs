@@ -97,14 +97,9 @@ namespace Extract.Testing.Utilities
 
                 // Write the embedded resource to the stream
                 using Stream stream = assembly.GetManifestResourceStream(type, resourceName);
-                var resourceBytes = stream.ToByteArray();
-                var fileInfo = new FileInfo(fileName);
 
-                // Write to the file if needed
-                if (FileContentDiffersFromByteArray(fileInfo, resourceBytes))
-                {
-                    File.WriteAllBytes(fileName, resourceBytes);
-                }
+                // Write to the file
+                File.WriteAllBytes(fileName, stream.ToByteArray());
             }
             catch (Exception ex)
             {
@@ -168,14 +163,8 @@ namespace Extract.Testing.Utilities
                 var fileInfo = new FileInfo(outputFileName);
                 var temporaryFile = new TemporaryFile(fileInfo, false);
 
-                var resourceBytes = stream.ToByteArray();
-
-                // Write to the file if needed
-                if (FileContentDiffersFromByteArray(fileInfo, resourceBytes))
-                {
-                    // File.WriteAllBytes will overwrite an existing file so no need to delete the file first
-                    File.WriteAllBytes(temporaryFile.FileName, resourceBytes);
-                }
+                // File.WriteAllBytes will overwrite an existing file so no need to delete the file first
+                File.WriteAllBytes(temporaryFile.FileName, stream.ToByteArray());
 
                 return temporaryFile;
             }
@@ -186,14 +175,6 @@ namespace Extract.Testing.Utilities
                 ee.AddDebugData("Resource Name", resourceName, false);
                 throw ee;
             }
-        }
-
-        // True if file doesn't exist or if its contents differ from the byte array
-        static bool FileContentDiffersFromByteArray(FileInfo fileInfo, byte[] bytes)
-        {
-            return !fileInfo.Exists
-                || fileInfo.Length != bytes.Length
-                || !bytes.SequenceEqual(File.ReadAllBytes(fileInfo.FullName));
         }
     }
 }

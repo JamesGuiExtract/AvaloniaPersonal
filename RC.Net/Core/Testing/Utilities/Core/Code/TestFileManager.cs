@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 
 namespace Extract.Testing.Utilities
 {
@@ -39,10 +40,17 @@ namespace Extract.Testing.Utilities
         /// </summary>
         /// <param name="subdirectoryName">The name of a subdirectory in the temp directory where
         /// any test files should be placed (when an explicit file path is not specified). If
-        /// <c>null</c>, files will be placed into the root of the user's temp directory.</param>
+        /// <c>null</c>, a subdirectory name will be generated.</param>
         public TestFileManager(string subdirectoryName = null)
         {
-            _subdirectoryName = subdirectoryName;
+            if (subdirectoryName == null)
+            {
+                _subdirectoryName = UtilityMethods.FormatInvariant($"{typeof(T).Name}_{Guid.NewGuid()}");
+            }
+            else
+            {
+                _subdirectoryName = subdirectoryName;
+            }
         }
 
         #endregion TestFileManager Constructors
@@ -236,9 +244,17 @@ namespace Extract.Testing.Utilities
             if (!string.IsNullOrWhiteSpace(_subdirectoryName))
             {
                 string directory = Path.Combine(Path.GetTempPath(), _subdirectoryName);
-                if (Directory.Exists(directory))
+                for (int tries = 1; Directory.Exists(directory); tries++)
                 {
-                    Directory.Delete(directory);
+                    try
+                    {
+                        Directory.Delete(directory, true);
+                    }
+                    catch (Exception e)
+                    when (tries < 5 && (e is IOException || e is UnauthorizedAccessException))
+                    {
+                        Thread.Sleep(500);
+                    }
                 }
             }
         }
