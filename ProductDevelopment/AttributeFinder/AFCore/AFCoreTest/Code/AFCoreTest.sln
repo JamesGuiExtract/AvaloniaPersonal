@@ -1304,6 +1304,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileConverter", "..\..\..\..\..\RC.Net\UtilityApplications\Extract.FileConverter\Extract.FileConverter.csproj", "{E1F701D9-7822-42AB-9510-9FCAFB718E0D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileConverter.Test", "..\..\..\..\..\RC.Net\UtilityApplications\Extract.FileConverter\Testing\Extract.FileConverter.Test\Extract.FileConverter.Test.csproj", "{83138869-3CCB-4F4A-AB09-CB2614B62988}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
