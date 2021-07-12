@@ -146,6 +146,7 @@
     <ClCompile Include="FAMHelperFunctions.cpp" />
     <ClCompile Include="FAMUtils.cpp" />
     <ClCompile Include="FileProcessingConfigMgr.cpp" />
+    <ClCompile Include="SqlApplicationRole.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -170,6 +171,7 @@
     <ClInclude Include="FileProcessingConfigMgr.h" />
     <ClInclude Include="LockGuard.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="SqlApplicationRole.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TransactionGuard.h" />
   </ItemGroup>

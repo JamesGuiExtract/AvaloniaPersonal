@@ -273,6 +273,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ReportDesigner.exe" /mapout:"$(BinariesFolder)\Map\mapReportDesigner.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\ReportDesigner.exe"
 	sn -Ra "$(BinariesFolder)\Obfuscated\ReportDesigner.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.SqlDatabase.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.SqlDatabase.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 
 
 	@ECHO.
@@ -366,6 +367,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\TrainingCoordinator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\LearningMachineTrainer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\MLModelTrainer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Extract.SqlDatabase.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\RedactionPredictor.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\PredictionEvaluator.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(RCNETDir)\APIs\Aspose\Aspose.Pdf for .Net 9.8\License\Aspose.Pdf.lic" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" 
