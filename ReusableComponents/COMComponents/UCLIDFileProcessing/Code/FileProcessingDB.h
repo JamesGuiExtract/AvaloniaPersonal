@@ -96,6 +96,14 @@ static const string gstrDATABASE_SERVICE = "DatabaseService";
 static const string gstrREPORTING_VERIFICATION_RATES = "ReportingVerificationRates";
 static const string gstrDASHBOARD = "Dashboard";
 static const string gstrREPORTING_DATABASE_MIGRATION_WIZARD = "ReportingDatabaseMigrationWizard";
+static const string gstrROLE = "Role";
+static const string gstrSECURITY_GROUP = "Group";
+static const string gstrLOGIN_GROUP_MEMBERSHIP = "LoginGroupMembership";
+static const string gstrSECURITY_GROUP_ACTION = "GroupAction";
+static const string gstrSECURITY_GROUP_DASHBOARD = "GroupDashboard";
+static const string gstrSECURITY_GROUP_REPORT = "GroupReport";
+static const string gstrSECURITY_GROUP_WORKFLOW = "GroupWorkflow";
+static const string gstrSECURITY_GROUP_Role = "GroupRole";
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB

@@ -33,6 +33,11 @@ vector<string> getTableNamesFromCreationQueries(vector<string> vecCreationQuerie
 				foundCreateStatement = true;
 				break;
 			}
+			if (vecTokensSize - j > 3 && ((vecTokens[j] == "'CREATE" && vecTokens[j+1] == "SCHEMA") || vecTokens[j] == "ALTER" && vecTokens[j + 1] == "TABLE"))
+			{
+				foundCreateStatement = true;
+				break;
+			}
 		}
 
 		if (!foundCreateStatement)

@@ -41,7 +41,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 195;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 196;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3148,6 +3148,54 @@ int UpdateToSchemaVersion195(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51741");
+}
+int UpdateToSchemaVersion196(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 196;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back(gstrDASHBOARD_CHANGEPK_TO_GUID);
+		vecQueries.push_back(gstrCREATE_SECURITY_SCHEMA);
+		vecQueries.push_back(gstrCREATE_ROLE_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUP_TABLE);
+		vecQueries.push_back(gstrCREATE_LOGINGROUPMEMBERSHIP_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUPACTION_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUPDASHBOARD_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUPREPORT_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUPWORKFLOW_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUPROLE_TABLE);
+		vecQueries.push_back(gstrLOGIN_ADD_COLUMN_ALTER_FAMUSER);
+		vecQueries.push_back(gstrADD_LOGINGROUPMEMBERSHIP_GROUP_ID_FK);
+		vecQueries.push_back(gstrADD_LOGINGROUPMEMBERSHIP_LOGIN_ID_FK);
+		vecQueries.push_back(gstrADD_GROUPACTION_GROUP_ID_FK);
+		vecQueries.push_back(gstrADD_GROUPACTION_Action_ID_FK);
+		vecQueries.push_back(gstrADD_GROUPDASHBOARD_GROUP_ID_FK);
+		vecQueries.push_back(gstrADD_GROUPDASHBOARD_DASHBOARD_GUID_FK);
+		vecQueries.push_back(gstrADD_GROUPREPORT_GROUP_ID_FK);
+		vecQueries.push_back(gstrADD_GROUPWORKFLOW_GROUP_ID_FK);
+		vecQueries.push_back(gstrADD_GROUPWORKFLOW_WORKFLOW_ID_FK);
+		vecQueries.push_back(gstrADD_GROUPROLE_ROLE_ID_FK);
+		vecQueries.push_back(gstrADD_GROUPROLE_GROUP_ID_FK);
+		vecQueries.push_back(gstrINSERT_ROLE_DEFAULT_ROLES);
+		vecQueries.push_back(gstrINSERT_SECURITYGROUP_DEFAULT_GROUPS);
+		vecQueries.push_back(gstrADD_FAMUSER_LOGIN_ID_FK);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51768");
 }
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -8224,7 +8272,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 192:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion193);
 				case 193:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion194);
 				case 194:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion195);
-				case 195:
+				case 195:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion196);
+				case 196:
 					break;
 
 				default:

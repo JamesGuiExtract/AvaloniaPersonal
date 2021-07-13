@@ -1407,12 +1407,12 @@ long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, cons
 	return vtId.lVal;
 }
 //-------------------------------------------------------------------------------------------------
-void dropConstraint(const _ConnectionPtr& ipDBConnection, const string& strTableName, const string& strConstraint)
+void dropConstraint(const _ConnectionPtr& ipDBConnection, const string& strTableName, const string& strConstraint, const string& strSchemaName)
 {
 	ASSERT_ARGUMENT("ELI18819", ipDBConnection != __nullptr);
 
 	// Build the drop SQL statement
-	string strDropSQL = "ALTER TABLE [" + strTableName + "] DROP CONSTRAINT [" + strConstraint + "]";
+	string strDropSQL = "ALTER TABLE [" + strSchemaName + "].[" + strTableName + "] DROP CONSTRAINT[" + strConstraint + "]";
 
 	// Drop the contraint
 	executeCmdQuery(ipDBConnection, strDropSQL, false);
@@ -1432,6 +1432,7 @@ void dropFKContraintsOnTables(const _ConnectionPtr& ipDBConnection, const vector
 		// Get the Name of the Foreign key table
 		string strFKTableName = getStringField(ipConstraints->Fields, "FK_TABLE_NAME");
 		string strPKTableName = getStringField(ipConstraints->Fields, "PK_TABLE_NAME");
+		string strPKTableSchema = getStringField(ipConstraints->Fields, "FK_TABLE_SCHEMA");
 		
 		// Check if it is our table
 		if (vectorContainsElement(vecTables, strFKTableName) || vectorContainsElement(vecTables, strPKTableName ))
@@ -1440,7 +1441,7 @@ void dropFKContraintsOnTables(const _ConnectionPtr& ipDBConnection, const vector
 			string strConstraintName = getStringField(ipConstraints->Fields, "FK_NAME");
 
 			// Drop the Foreign key
-			dropConstraint(ipDBConnection, strFKTableName, strConstraintName);
+			dropConstraint(ipDBConnection, strFKTableName, strConstraintName, strPKTableSchema);
 		}
 
 		// Move to next constraint
@@ -1474,12 +1475,13 @@ void dropTablesInVector(const _ConnectionPtr& ipDBConnection, const vector<strin
 			{
 				// Get the table name 
 				string strTableName = getStringField( ipTables->Fields, "TABLE_NAME" );
+				string strSchemaName = getStringField(ipTables->Fields, "TABLE_SCHEMA");
 
 				// Don't drop the Login table if it exists and only drop Extract systems tables
 				if (vectorContainsElement(vecTables, strTableName))
 				{
 					// Build the drop script
-					string strDropSQL = "DROP TABLE [" + strTableName + "]";
+					string strDropSQL = "DROP TABLE [" + strSchemaName + "].[" + strTableName + "]";
 
 					// Drop the table
 					executeCmdQuery(ipDBConnection, strDropSQL, false);

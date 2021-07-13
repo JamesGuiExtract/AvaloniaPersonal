@@ -55,7 +55,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_Login(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_Login";
+            string dbName = "Test_DocumentAPI_Login";
 
             try
             {

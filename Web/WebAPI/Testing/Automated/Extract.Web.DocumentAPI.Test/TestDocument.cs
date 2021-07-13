@@ -163,7 +163,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_PostDocument(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_PostDocument";
+            string dbName = "Test_DocumentAPI_PostDocument";
 
             try
             {
@@ -216,7 +216,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_PostDocumentMetadata(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_PostDocumentMetadata";
+            string dbName = "Test_DocumentAPI_PostDocumentMetadata";
 
             try
             {
@@ -265,7 +265,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_PostDocumentMetadataCornerCases(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_PostDocumentMetadataCornerCases";
+            string dbName = "Test_DocumentAPI_PostDocumentMetadataCornerCases";
 
             try
             {
@@ -325,7 +325,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_PostText(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_PostText";
+            string dbName = "Test_DocumentAPI_PostText";
 
             try
             {
@@ -350,7 +350,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_UTF8Text(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_UTF8Text";
+            string dbName = "Test_DocumentAPI_UTF8Text";
 
             try
             {
@@ -382,7 +382,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetStatus(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_GetStatus";
+            string dbName = "Test_DocumentAPI_GetStatus";
 
             try
             {
@@ -408,7 +408,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetOutputFile(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_GetOutputFile";
+            string dbName = "Test_DocumentAPI_GetOutputFile";
             var tempFiles = new List<string>();
 
             try
@@ -452,7 +452,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_PostGetDeleteFile(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_PostGetDeleteFile";
+            string dbName = "Test_DocumentAPI_PostGetDeleteFile";
 
             try
             {
@@ -494,7 +494,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetPageInfoAndText(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_GetPageInfoAndText";
+            string dbName = "Test_DocumentAPI_GetPageInfoAndText";
 
             try
             {
@@ -566,7 +566,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetDocumentWordZones(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_GetDocumentWordZones";
+            string dbName = "Test_DocumentAPI_GetDocumentWordZones";
 
             try
             {
@@ -632,7 +632,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetTextResult(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_GetTextResult";
+            string dbName = "Test_DocumentAPI_GetTextResult";
 
             try
             {   
@@ -660,7 +660,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetDocumentType(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_GetDocumentType";
+            string dbName = "Test_DocumentAPI_GetDocumentType";
 
             try
             {
@@ -703,7 +703,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void TestIDShield_GetDocumentData(string apiVersion)
         {
-            string dbName = "DocumentAPI_TestIDShield_GetDocumentData";
+            string dbName = "Test_DocumentAPI_IDShield_GetDocumentData";
 
             try
             {
@@ -736,7 +736,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_PutDocumentData(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_PutDocumentData";
+            string dbName = "Test_DocumentAPI_PutDocumentData";
 
             try
             {
@@ -870,7 +870,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_PutMinimalDocumentData(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_PutMinimalDocumentData";
+            string dbName = "Test_DocumentAPI_PutMinimalDocumentData";
 
             try
             {
@@ -912,7 +912,7 @@ namespace Extract.Web.WebAPI.Test
 
         public static void Test_PutPatchNonPendingFile(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_PutPatchNonPendingFile";
+            string dbName = "Test_DocumentAPI_PutPatchNonPendingFile";
 
             try
             {
@@ -1068,7 +1068,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_PatchDocumentData(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_PatchDocumentData";
+            string dbName = "Test_DocumentAPI_PatchDocumentData";
 
             try
             {
@@ -1195,7 +1195,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void TestLabDE_GetDocumentData(string apiVersion)
         {
-            string dbName = "DocumentAPI_TestLabDE_GetDocumentData";
+            string dbName = "Test_DocumentAPI_LabDE_GetDocumentData";
 
             try
             {
@@ -1230,7 +1230,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void TestFlexIndex_GetDocumentData(string apiVersion)
         {
-            string dbName = "DocumentAPI_TestFlexIndex_GetDocumentData";
+            string dbName = "Test_DocumentAPI_FlexIndex_GetDocumentData";
 
             try
             {
@@ -1280,7 +1280,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetMetadataField(string apiVersion)
         {
-            var dbName = "DocumentAPI_Test_GetMetadataField";
+            var dbName = "Test_DocumentAPI_GetMetadataField";
 
             try
             {
@@ -1304,7 +1304,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_SetMetadataField(string apiVersion)
         {
-            var dbName = "DocumentAPI_Test_SetMetadataField";
+            var dbName = "Test_DocumentAPI_SetMetadataField";
 
             try
             {
@@ -1334,7 +1334,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_ProperWorkflowActionNamesUsed(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_ProperWorkflowActionNamesUsed";
+            string dbName = "Test_DocumentAPI_ProperWorkflowActionNamesUsed";
 
             // This test will:
             // 1) Set the workflow start action and clear the verify/edit action

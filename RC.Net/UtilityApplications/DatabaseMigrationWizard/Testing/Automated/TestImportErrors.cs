@@ -47,7 +47,7 @@ namespace DatabaseMigrationWizard.Test
         [Test, Category("Automated")]
         public static void EnsureRollbackIfError()
         {
-            var database = FamTestDbManager.GetNewDatabase("EnsureRollback");
+            var database = FamTestDbManager.GetNewDatabase("Test_EnsureRollback");
             ImportOptions ImportOptions = new ImportOptions()
             {
                 ImportPath = Path.GetTempPath() + $"EnsureRollback\\",
@@ -87,7 +87,7 @@ namespace DatabaseMigrationWizard.Test
         [Test, Category("Automated")]
         public static void FAMUserBoundsCase()
         {
-            var database = FamTestDbManager.GetNewDatabase("FamUserBoundCase");
+            var database = FamTestDbManager.GetNewDatabase("Test_FamUserBoundCase");
 
             ImportOptions ImportOptions = new ImportOptions()
             {

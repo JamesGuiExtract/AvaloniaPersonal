@@ -1655,6 +1655,14 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 			eraseFromVector(vecTables, gstrMLMODEL);
 			eraseFromVector(vecTables, gstrDASHBOARD);
 			eraseFromVector(vecTables, gstrREPORTING_DATABASE_MIGRATION_WIZARD);
+			eraseFromVector(vecTables, gstrROLE);
+			eraseFromVector(vecTables, gstrSECURITY_GROUP);
+			eraseFromVector(vecTables, gstrLOGIN_GROUP_MEMBERSHIP);
+			eraseFromVector(vecTables, gstrSECURITY_GROUP_ACTION);
+			eraseFromVector(vecTables, gstrSECURITY_GROUP_DASHBOARD);
+			eraseFromVector(vecTables, gstrSECURITY_GROUP_REPORT);
+			eraseFromVector(vecTables, gstrSECURITY_GROUP_WORKFLOW);
+			eraseFromVector(vecTables, gstrSECURITY_GROUP_Role);
 		}
 
 		// Never drop these tables
@@ -1848,6 +1856,19 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			vecQueries.push_back(gstrADD_WEB_APP_CONFIG_WORKFLOW_FK);
 			vecQueries.push_back(gstrADD_MLDATA_MLMODEL_FK);
 			vecQueries.push_back(gstrADD_DASHBOARD_FAMUSER_FK);
+
+			vecQueries.push_back(gstrADD_LOGINGROUPMEMBERSHIP_GROUP_ID_FK);
+			vecQueries.push_back(gstrADD_LOGINGROUPMEMBERSHIP_LOGIN_ID_FK);
+			vecQueries.push_back(gstrADD_GROUPACTION_GROUP_ID_FK);
+			vecQueries.push_back(gstrADD_GROUPACTION_Action_ID_FK);
+			vecQueries.push_back(gstrADD_GROUPDASHBOARD_GROUP_ID_FK);
+			vecQueries.push_back(gstrADD_GROUPDASHBOARD_DASHBOARD_GUID_FK);
+			vecQueries.push_back(gstrADD_GROUPREPORT_GROUP_ID_FK);
+			vecQueries.push_back(gstrADD_GROUPWORKFLOW_GROUP_ID_FK);
+			vecQueries.push_back(gstrADD_GROUPWORKFLOW_WORKFLOW_ID_FK);
+			vecQueries.push_back(gstrADD_GROUPROLE_ROLE_ID_FK);
+			vecQueries.push_back(gstrADD_GROUPROLE_GROUP_ID_FK);
+			vecQueries.push_back(gstrADD_FAMUSER_LOGIN_ID_FK);
 			
 			// Add triggers
 			vecQueries.push_back(gstrCREATE_ACTION_ON_DELETE_TRIGGER);
@@ -1985,6 +2006,15 @@ vector<string> CFileProcessingDB::getTableCreationQueries(bool bIncludeUserTable
 		vecQueries.push_back(gstrCREATE_DATABASE_SERVICE_TABLE);
 		vecQueries.push_back(gstrCREATE_MLMODEL);
 		vecQueries.push_back(gstrCREATE_DASHBOARD_TABLE);
+		vecQueries.push_back(gstrCREATE_SECURITY_SCHEMA);
+		vecQueries.push_back(gstrCREATE_ROLE_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUP_TABLE);
+		vecQueries.push_back(gstrCREATE_LOGINGROUPMEMBERSHIP_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUPACTION_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUPDASHBOARD_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUPREPORT_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUPWORKFLOW_TABLE);
+		vecQueries.push_back(gstrCREATE_GROUPROLE_TABLE);
 	}
 
 	// Add queries to create tables to the vector
@@ -2083,6 +2113,8 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		vecQueries.push_back(gstrINSERT_AUTO_PAGINATE_TASK_CLASS);
 		vecQueries.push_back(gstrINSERT_RTF_DIVIDE_BATCHES_TASK_CLASS);
 		vecQueries.push_back(gstrINSERT_RTF_UPDATE_BATCHES_TASK_CLASS);
+		vecQueries.push_back(gstrINSERT_ROLE_DEFAULT_ROLES);
+		vecQueries.push_back(gstrINSERT_SECURITYGROUP_DEFAULT_GROUPS);
 
 		// Initialize the DB Info settings if necessary
 		if (bInitializeUserTables)
@@ -3791,6 +3823,14 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrREPORTING_VERIFICATION_RATES);
 	vecTables.push_back(gstrDASHBOARD);
 	vecTables.push_back(gstrREPORTING_DATABASE_MIGRATION_WIZARD);
+	vecTables.push_back(gstrROLE);
+	vecTables.push_back(gstrSECURITY_GROUP);
+	vecTables.push_back(gstrLOGIN_GROUP_MEMBERSHIP);
+	vecTables.push_back(gstrSECURITY_GROUP_ACTION);
+	vecTables.push_back(gstrSECURITY_GROUP_DASHBOARD);
+	vecTables.push_back(gstrSECURITY_GROUP_REPORT);
+	vecTables.push_back(gstrSECURITY_GROUP_WORKFLOW);
+	vecTables.push_back(gstrSECURITY_GROUP_Role);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

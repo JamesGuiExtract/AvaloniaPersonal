@@ -61,7 +61,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetDefaultWorkflow(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_GetDefaultWorkflow";
+            string dbName = "Test_DocumentAPI_GetDefaultWorkflow";
 
             try
             {
@@ -100,7 +100,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetWorkflowStatus(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_GetWorkflowStatus";
+            string dbName = "Test_DocumentAPI_GetWorkflowStatus";
 
             try
             {
@@ -152,7 +152,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetFileStatuses(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_GetFileStatuses";
+            string dbName = "Test_DocumentAPI_GetFileStatuses";
 
             try
             {
@@ -210,7 +210,7 @@ namespace Extract.Web.WebAPI.Test
         [TestCase(ApiContext.CURRENT_VERSION)]
         public static void Test_GetFileDeletion(string apiVersion)
         {
-            string dbName = "DocumentAPI_Test_GetFileDeletion";
+            string dbName = "Test_DocumentAPI_GetFileDeletion";
 
             try
             {

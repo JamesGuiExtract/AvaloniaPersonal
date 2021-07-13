@@ -41,7 +41,7 @@ namespace DatabaseMigrationWizard.Test
 
         private static readonly FAMTestDBManager<TestExports> FamTestDbManager = new FAMTestDBManager<TestExports>();
 
-        private static readonly string DatabaseName = "TestExport";
+        private static readonly string DatabaseName = "Test_Export";
 
         // In general I tried to keep these inserts in the order of the unit tests.
         private static readonly string[] BuildDummyDatabase =
@@ -53,7 +53,7 @@ namespace DatabaseMigrationWizard.Test
                 "INSERT INTO [dbo].[DatabaseService] ([Description], Settings, Enabled) VALUES('TestServiceDescription', '{\"SomeJsonSettings\":\"True\"}', 1)",
                 "INSERT INTO dbo.FAMUser (UserName, FullUsername) VALUES ('Bob', 'McBoberson')",
                 @"INSERT INTO [dbo].[Dashboard] (DashboardName, Definition, FAMUserID, LastImportedDate, UseExtractedData, ExtractedDataDefinition) 
-                                                VALUES('CoolDBName', '<SomeDefinition></SomeDefinition>', 1, '2020-3-11', 1, '<SomeDefinition2></SomeDefinition2>')",
+                                                VALUES('CoolDBName', '<SomeDefinition></SomeDefinition>', 2, '2020-3-11', 1, '<SomeDefinition2></SomeDefinition2>')",
                 "INSERT INTO [dbo].[AttributeSetName] ([Description]) VALUES('TestAttributeSetDescripton')",
                 "INSERT INTO [dbo].[AttributeName] ([Name]) VALUES('TestAttributeName')",
                 "INSERT INTO [dbo].[Action] ([ASCName], [Description], [WorkflowID], [MainSequence]) VALUES('TestAction', 'TestDescription', 1, '1')",
@@ -210,7 +210,7 @@ namespace DatabaseMigrationWizard.Test
         {
             var writer = BuildAndWriteTable(new SerializeFAMUser());
 
-            var famUser = JsonConvert.DeserializeObject<List<FAMUser>>(writer.ToString()).First();
+            var famUser = JsonConvert.DeserializeObject<List<FAMUser>>(writer.ToString())[1];
 
             Assert.AreEqual("Bob", famUser.UserName);
             Assert.AreEqual("McBoberson", famUser.FullUserName);

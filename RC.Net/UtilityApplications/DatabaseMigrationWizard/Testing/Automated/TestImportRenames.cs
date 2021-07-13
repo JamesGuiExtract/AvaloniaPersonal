@@ -30,7 +30,7 @@ namespace DatabaseMigrationWizard.Test
                                                         exec (@sql)";
         private static readonly FAMTestDBManager<TestExports> FamTestDbManager = new FAMTestDBManager<TestExports>();
 
-        private static readonly string DatabaseName = "TestImportRenames";
+        private static readonly string DatabaseName = "Test_ImportRenames";
 
         private static ImportOptions ImportOptions;
 

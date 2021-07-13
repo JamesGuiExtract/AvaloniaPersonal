@@ -67,7 +67,7 @@ namespace DatabaseMigrationWizard.Test
         {
             try
             {
-                var database = FamTestDbManager.GetNewDatabase("TestPasswordArgumentNoConnectionInformation");
+                var database = FamTestDbManager.GetNewDatabase("Test_PasswordArgumentNoConnectionInformation");
                 database.LoginUser("admin", "a");
                 List<string> arguments = new List<string>();
                 arguments.Add("/Password");
@@ -77,7 +77,7 @@ namespace DatabaseMigrationWizard.Test
             }
             finally
             {
-                FamTestDbManager.RemoveDatabase("TestPasswordArgumentNoConnectionInformation");
+                FamTestDbManager.RemoveDatabase("Test_PasswordArgumentNoConnectionInformation");
             }
         }
 
@@ -142,7 +142,7 @@ namespace DatabaseMigrationWizard.Test
         [Test, Category("Automated")]
         public static void CreateDatabaseArgumentNoLabDE()
         {
-            string databaseName = "CreateDatabaseArgumentNoLabDE";
+            string databaseName = "Test_CreateDatabaseArgumentNoLabDE";
             try
             {
                 List<string> arguments = new List<string>();
@@ -175,7 +175,7 @@ namespace DatabaseMigrationWizard.Test
         [Test, Category("Automated")]
         public static void CreateDatabaseArgumentWithLabDE()
         {
-            string databaseName = "CreateDatabaseArgumentWithLabDE";
+            string databaseName = "Test_CreateDatabaseArgumentWithLabDE";
             try
             {
                 List<string> arguments = new List<string>();

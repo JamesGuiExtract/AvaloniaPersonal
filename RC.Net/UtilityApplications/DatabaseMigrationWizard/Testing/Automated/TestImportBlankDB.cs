@@ -24,7 +24,7 @@ namespace DatabaseMigrationWizard.Test
     {
         private static readonly FAMTestDBManager<TestExports> FamTestDbManager = new FAMTestDBManager<TestExports>();
 
-        private static readonly string DatabaseName = "TestImportBlankDB";
+        private static readonly string DatabaseName = "Test_ImportBlankDB";
 
         private static ImportOptions ImportOptions;
 

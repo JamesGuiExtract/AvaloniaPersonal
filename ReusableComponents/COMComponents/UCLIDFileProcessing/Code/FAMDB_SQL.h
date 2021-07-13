@@ -20,6 +20,84 @@ static const string gstrCREATE_ACTION_TABLE = "CREATE TABLE [dbo].[Action] "
 	"[Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"CONSTRAINT [IX_Action] UNIQUE NONCLUSTERED ([ASCName], [WorkflowID]))";
 
+static const string gstrCREATE_SECURITY_SCHEMA =
+" IF NOT EXISTS ( SELECT * FROM sys.schemas WHERE  name = N'Security' )"
+" BEGIN "
+"	EXEC('CREATE SCHEMA [Security]');"
+" END;";
+
+static const string gstrCREATE_ROLE_TABLE = 
+" CREATE TABLE [Security].[Role]( "
+" [GUID][uniqueidentifier] NOT NULL DEFAULT NEWID(),"
+" [Name][nvarchar](64) NOT NULL,"
+" [Description][nvarchar](max) NULL,"
+" CONSTRAINT [PK_Role] PRIMARY KEY CLUSTERED ([GUID] ASC), "
+" );";
+
+static const string gstrCREATE_GROUP_TABLE = 
+" CREATE TABLE [Security].[Group]( "
+" [GUID][uniqueidentifier] NOT NULL DEFAULT NEWID(),"
+" [Name][nvarchar](255) NOT NULL,"
+" [Description][nvarchar](255) NULL,"
+" [IsAdmin][bit] NULL,"
+" [ActiveDirectorySID][nvarchar](256) NULL,"
+" CONSTRAINT [PK_Group] PRIMARY KEY CLUSTERED ([GUID] ASC), "
+" );";
+
+static const string gstrCREATE_LOGINGROUPMEMBERSHIP_TABLE = 
+" CREATE TABLE [Security].[LoginGroupMembership]( "
+" [GUID] [uniqueidentifier] NOT NULL DEFAULT NEWID(), "
+" [LoginID][INT] NOT NULL,"
+" [GroupGUID][uniqueidentifier] NOT NULL,"
+" [AddedDateTime][datetime] NOT NULL,"
+" CONSTRAINT [PK_LoginGroupMembership] PRIMARY KEY CLUSTERED ([GUID] ASC), "
+" );";
+
+static const string gstrCREATE_GROUPACTION_TABLE = 
+" CREATE TABLE [Security].[GroupAction]( "
+" [GUID] [uniqueidentifier] NOT NULL DEFAULT NEWID(), "
+" [GroupGUID][uniqueidentifier] NOT NULL,"
+" [ActionID][int] NOT NULL,"
+" [Allow][bit] NOT NULL,"
+" CONSTRAINT [PK_GroupAction] PRIMARY KEY CLUSTERED ([GUID] ASC), "
+" );";
+
+static const string gstrCREATE_GROUPDASHBOARD_TABLE = 
+" CREATE TABLE [Security].[GroupDashboard]( "
+" [GUID] [uniqueidentifier] NOT NULL DEFAULT NEWID(), "
+" [GroupGUID][uniqueidentifier] NOT NULL,"
+" [DashboardGUID][uniqueidentifier] NOT NULL,"
+" [Allow][bit] NOT NULL,"
+" CONSTRAINT [PK_GroupDashboard] PRIMARY KEY CLUSTERED ([GUID] ASC), "
+" );";
+
+static const string gstrCREATE_GROUPREPORT_TABLE = 
+" CREATE TABLE [Security].[GroupReport]( "
+" [GUID] [uniqueidentifier] NOT NULL DEFAULT NEWID(), "
+" [GroupGUID][uniqueidentifier] NOT NULL,"
+" [REPORTID][nvarchar](100) NOT NULL,"
+" [Allow][bit] NOT NULL,"
+" CONSTRAINT [PK_GroupReport] PRIMARY KEY CLUSTERED ([GUID] ASC), "
+" );";
+
+static const string gstrCREATE_GROUPWORKFLOW_TABLE = 
+" CREATE TABLE [Security].[GroupWorkflow]( "
+" [GUID] [uniqueidentifier] NOT NULL DEFAULT NEWID(), "
+" [GroupGUID][uniqueidentifier] NOT NULL,"
+" [WorkflowID][int] NOT NULL,"
+" [Allow][bit] NOT NULL,"
+" CONSTRAINT [PK_GroupWorkflow] PRIMARY KEY CLUSTERED ([GUID] ASC), "
+" );";
+
+static const string gstrCREATE_GROUPROLE_TABLE =
+" CREATE TABLE [Security].[GroupRole]( "
+" [GUID] [uniqueidentifier] NOT NULL DEFAULT NEWID(), "
+" [GroupGUID][uniqueidentifier] NOT NULL,"
+" [RoleGUID][uniqueidentifier] NOT NULL,"
+" [Allow][bit] NOT NULL,"
+" CONSTRAINT [PK_GroupRole] PRIMARY KEY CLUSTERED ([GUID] ASC), "
+" );";
+
 static const string gstrCREATE_LOCK_TABLE = 
 	"CREATE TABLE [dbo].[LockTable]([LockName] [nvarchar](50) NOT NULL CONSTRAINT [PK_LockTable] PRIMARY KEY CLUSTERED,"
 	"[UPI] [nvarchar](512), "
@@ -116,6 +194,7 @@ static const string gstrCREATE_LOGIN_TABLE = "CREATE TABLE [dbo].[Login]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NOT NULL, "
 	"[Password] [nvarchar](128) NOT NULL DEFAULT(''), "
+	"[ActiveDirectorySID] NVARCHAR(256),"
 	"[Guid] uniqueidentifier NOT NULL DEFAULT newid(),"
 	"CONSTRAINT [PK_LoginID] PRIMARY KEY CLUSTERED ( [ID] ASC ))";
 
@@ -129,6 +208,7 @@ static const string gstrCREATE_FAM_USER_TABLE = "CREATE TABLE [dbo].[FAMUser]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL, "
 	"[UserName] [nvarchar](50) NULL, "
 	"[FullUserName] [nvarchar](128) NULL,"
+	"[LoginID] INT,"
 	"CONSTRAINT [PK_FAMUser] PRIMARY KEY CLUSTERED ([ID] ASC), "
 	"CONSTRAINT [IX_UserName] UNIQUE NONCLUSTERED ([UserName] ASC))";
 
@@ -501,13 +581,14 @@ static const string gstrCREATE_WEB_APP_CONFIG =
 
 static const string gstrCREATE_DASHBOARD_TABLE =
 	"CREATE TABLE [dbo].[Dashboard]( "
-	"	[DashboardName] [nvarchar](100) NOT NULL CONSTRAINT [PK_Dashboard] PRIMARY KEY CLUSTERED, \r\n"
+	"	[DashboardName] [nvarchar](100) NOT NULL, \r\n"
 	"	[Definition] [xml] NOT NULL, \r\n"
 	"   [FAMUserID] INT NOT NULL, \r\n"
 	"   [LastImportedDate] DATETIME NOT NULL, \r\n "
 	"   [UseExtractedData] BIT DEFAULT 0, \r\n"
 	"   [ExtractedDataDefinition] [xml] NULL,"
 	"   [Guid] uniqueidentifier NOT NULL DEFAULT newid()"
+	" CONSTRAINT[PK_Dashboard] PRIMARY KEY CLUSTERED([GUID] ASC), "
 	")";
 
 static const string gstrADD_DASHBOARD_FAMUSER_FK =
@@ -678,6 +759,90 @@ static const string gstrCREATE_WORKFLOWFILE_FILEID_WORKFLOWID_INVISIBLE_INDEX =
 ")";
 
 // Add foreign keys SQL
+static const string gstrADD_FAMUSER_LOGIN_ID_FK =
+"ALTER TABLE [dbo].[FAMUser] "
+"WITH CHECK ADD CONSTRAINT [FK_FAMUSER_LOGIN_ID] FOREIGN KEY([LoginID]) "
+"REFERENCES [dbo].[Login]([ID]) "
+"ON UPDATE CASCADE "
+"ON DELETE CASCADE";
+
+static const string gstrADD_LOGINGROUPMEMBERSHIP_GROUP_ID_FK =
+	"ALTER TABLE [Security].[LoginGroupMembership] "
+	"WITH CHECK ADD CONSTRAINT [FK_LoginGroupMembership_Group_ID] FOREIGN KEY([GroupGUID]) "
+	"REFERENCES [Security].[Group]([GUID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_LOGINGROUPMEMBERSHIP_LOGIN_ID_FK =
+	"ALTER TABLE [Security].[LoginGroupMembership] "
+	"WITH CHECK ADD CONSTRAINT [FK_LoginGroupMembership_LOGIN_ID] FOREIGN KEY([LoginID]) "
+	"REFERENCES [Login]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_GROUPACTION_GROUP_ID_FK =
+	"ALTER TABLE [Security].[GroupAction] "
+	"WITH CHECK ADD CONSTRAINT [FK_GroupAction_Group_ID] FOREIGN KEY([GroupGUID]) "
+	"REFERENCES [Security].[Group]([GUID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_GROUPACTION_Action_ID_FK =
+	"ALTER TABLE [Security].[GroupAction] "
+	"WITH CHECK ADD CONSTRAINT [FK_GroupAction_Action_ID] FOREIGN KEY([ActionID]) "
+	"REFERENCES [Action]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_GROUPDASHBOARD_GROUP_ID_FK =
+	"ALTER TABLE [Security].[GroupDashboard] "
+	"WITH CHECK ADD CONSTRAINT [FK_GroupDashboard_Group_ID] FOREIGN KEY([GroupGUID]) "
+	"REFERENCES [Security].[Group]([GUID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_GROUPDASHBOARD_DASHBOARD_GUID_FK =
+	"ALTER TABLE [Security].[GroupDashboard] "
+	"WITH CHECK ADD CONSTRAINT [FK_GroupDashboard_Dashboard_Guid] FOREIGN KEY([DashboardGUID]) "
+	"REFERENCES [Dashboard]([GUID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_GROUPREPORT_GROUP_ID_FK =
+	"ALTER TABLE [Security].[GroupReport] "
+	"WITH CHECK ADD CONSTRAINT [FK_GroupReport_Group_ID] FOREIGN KEY([GroupGUID]) "
+	"REFERENCES [Security].[Group]([GUID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_GROUPWORKFLOW_GROUP_ID_FK =
+	"ALTER TABLE [Security].[GroupWorkflow] "
+	"WITH CHECK ADD CONSTRAINT [FK_GroupWorkflow_Group_ID] FOREIGN KEY([GroupGUID]) "
+	"REFERENCES [Security].[Group]([GUID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_GROUPWORKFLOW_WORKFLOW_ID_FK =
+	"ALTER TABLE [Security].[GroupWorkflow] "
+	"WITH CHECK ADD CONSTRAINT [FK_GroupWorkflow_WORKFLOW_ID] FOREIGN KEY([WorkflowID]) "
+	"REFERENCES [Workflow]([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_GROUPROLE_GROUP_ID_FK =
+"ALTER TABLE [Security].[GroupRole] "
+"WITH CHECK ADD CONSTRAINT [FK_GroupRole_Group_ID] FOREIGN KEY([GroupGUID]) "
+"REFERENCES [Security].[Group]([GUID]) "
+"ON UPDATE CASCADE "
+"ON DELETE CASCADE";
+
+static const string gstrADD_GROUPROLE_ROLE_ID_FK =
+"ALTER TABLE [Security].[GroupRole] "
+"WITH CHECK ADD CONSTRAINT [FK_GroupRole_Role_ID] FOREIGN KEY([RoleGUID]) "
+"REFERENCES [Security].[Role]([GUID]) "
+"ON UPDATE CASCADE "
+"ON DELETE CASCADE";
+
 static const string gstrADD_ACTION_WORKFLOW_FK =
 	"ALTER TABLE dbo.[Action] "
 	"WITH CHECK ADD CONSTRAINT [FK_Action_Workflow] FOREIGN KEY([WorkflowID]) "
@@ -2104,6 +2269,20 @@ static const string gstrUPDATE_FILETASKSESSION_DATA =
 static const string gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES = 
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
 	"	('B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006', 'Core: Store/Retrieve attributes in DB') \r\n";
+
+static const string gstrINSERT_ROLE_DEFAULT_ROLES =
+" DELETE FROM [Security].[Role]; "
+" INSERT INTO [Security].[Role] (GUID, Name, Description) VALUES ('54ee3028-e0e8-400c-bc9e-da5e731391ae', 'Operator','Grants ability to run File Action Manager configurations in the foreground.')"
+" INSERT INTO [Security].[Role] (GUID, Name, Description) VALUES('5e63026d-3317-41a4-932e-5bae9f53aa74', 'Service', 'Grants ability to process as service.')"
+" INSERT INTO [Security].[Role] (GUID, Name, Description) VALUES('301354d0-4fc5-4e6a-aead-186574352c07', 'Analytics Viewer', 'Grants ability to view dashboards and reports.')"
+" INSERT INTO [Security].[Role] (GUID, Name, Description) VALUES('aee8188a-6770-48b9-9c6e-5c6aee22b96c', 'Analytics Editor', 'Grants ability to edit dashboards and reports.')"
+" INSERT INTO [Security].[Role] (GUID, Name, Description) VALUES('8e1ea2f2-03e7-49fd-a1b4-deb297691964', 'File viewer', 'Exposes source document and data file locations.')";
+
+static const string gstrINSERT_SECURITYGROUP_DEFAULT_GROUPS =
+" DELETE FROM [Security].[Group]; "
+" INSERT INTO [Security].[Group] (GUID, Name, Description, IsAdmin) VALUES ('e02b52c6-f4b4-4823-a801-5212c9fd7505', 'Admin','The default administrator group.', 1) "
+" INSERT INTO [Security].[Group] (GUID, Name, Description, IsAdmin) VALUES ('67ad8290-2f0e-4b8b-b8a7-87fc420a3d96', 'Authenticated Default', 'The default group authenticated users are placed into.', 0)"
+" INSERT INTO [Security].[Group] (GUID, Name, Description, IsAdmin) VALUES ('ef8b932d-2ee5-4405-9557-18e42af02744', 'Non-Authenticated Default', 'The default group non-authenticated users are placed into.', 0)";
 
 static const string gstrINSERT_PAGINATION_TASK_CLASS =
 	"INSERT INTO [TaskClass] ([GUID], [Name]) VALUES \r\n"
@@ -3549,3 +3728,17 @@ static string gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE =
 
 static const string gstrUPDATE_SCHEMA_VERSION_QUERY = 
 "UPDATE [DBInfo] SET [Value] = @SchemaVersion WHERE [Name] = '" + gstrFAMDB_SCHEMA_VERSION + "'";
+
+static const string gstrLOGIN_ADD_COLUMN_ALTER_FAMUSER =
+" IF NOT EXISTS (SELECT * FROM   sys.columns WHERE  object_id = OBJECT_ID(N'[dbo].[FAMUser]') AND name = 'LoginID')"
+" BEGIN"
+" ALTER TABLE dbo.FAMUser ADD LoginID INT REFERENCES dbo.Login(ID);"
+" END"
+" IF NOT EXISTS (SELECT * FROM   sys.columns WHERE  object_id = OBJECT_ID(N'[dbo].[Login]') AND name = 'ActiveDirectorySID')"
+" BEGIN"
+" ALTER TABLE dbo.Login ADD ActiveDirectorySID NVARCHAR(256);"
+" END";
+
+static const string gstrDASHBOARD_CHANGEPK_TO_GUID =
+" ALTER TABLE dbo.Dashboard DROP CONSTRAINT PK_Dashboard;"
+" ALTER TABLE dbo.Dashboard ADD CONSTRAINT PK_Dashboard PRIMARY KEY(Guid); ";
