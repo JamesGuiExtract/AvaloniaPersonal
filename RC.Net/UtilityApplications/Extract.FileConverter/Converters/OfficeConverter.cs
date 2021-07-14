@@ -85,8 +85,6 @@ namespace Extract.FileConverter
                 // This is recommended by MSDN to ensure that the office applications exit
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
         }
 

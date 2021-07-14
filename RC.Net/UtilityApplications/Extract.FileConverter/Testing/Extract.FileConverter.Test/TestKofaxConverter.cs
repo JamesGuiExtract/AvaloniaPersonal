@@ -1,4 +1,5 @@
 ﻿using Extract.Licensing;
+using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
@@ -49,24 +50,15 @@ namespace Extract.FileConverter.Test
         [TestCaseSource(nameof(TestCasesPdf))]
         public static void ConvertTifToPdf(KofaxModel kofaxModel)
         {
-            string testItem = "Extract.FileConverter.Test.TestTiffDocuments.0275pages.tif";
-            string fileName = Path.GetTempFileName() + "." + testItem.Split('.').Last();
-            try
-            {
-                Utility.WriteResourceToFile(testItem, fileName);
-                IConverter[] converters = { new KofaxConverter()
+            using TestFileManager<TestKofaxConverter> testFiles = new();
+            string fileName = testFiles.GetFile("TestTiffDocuments.0275pages.tif");
+            IConverter[] converters = { new KofaxConverter()
                 {
                     IsEnabled = true,
                     KofaxModel = kofaxModel
                 } };
-                PerformConversion.Convert(converters, fileName, DestinationFileFormat.Pdf);
-                Assert.IsTrue(File.Exists(fileName + ".pdf"));
-            }
-            finally
-            {
-                File.Delete(fileName);
-                Assert.IsTrue(File.Exists(fileName + ".pdf"));
-            }
+            PerformConversion.Convert(converters, fileName, DestinationFileFormat.Pdf);
+            Assert.IsTrue(File.Exists(fileName + ".pdf"));
         }
 
         [Test, Category("Automated")]
@@ -74,24 +66,15 @@ namespace Extract.FileConverter.Test
         [TestCaseSource(nameof(TestCasesTiff))]
         public static void ConvertPdfToTif(KofaxModel kofaxModel)
         {
-            string testItem = "Extract.FileConverter.Test.TestPDFDocuments.0003.pdf";
-            string fileName = Path.GetTempFileName() + "." + testItem.Split('.').Last();
-            try
-            {
-                Utility.WriteResourceToFile(testItem, fileName);
-                IConverter[] converters = { new KofaxConverter()
+            using TestFileManager<TestKofaxConverter> testFiles = new();
+            string fileName = testFiles.GetFile("TestPDFDocuments.0003.pdf");
+            IConverter[] converters = { new KofaxConverter()
                 {
                     IsEnabled = true,
                     KofaxModel = kofaxModel
                 } };
-                PerformConversion.Convert(converters, fileName, DestinationFileFormat.Tif);
-                Assert.IsTrue(File.Exists(fileName + ".tif"));
-            }
-            finally
-            {
-                File.Delete(fileName);
-                Assert.IsTrue(File.Exists(fileName + ".tif"));
-            }
+            PerformConversion.Convert(converters, fileName, DestinationFileFormat.Tif);
+            Assert.IsTrue(File.Exists(fileName + ".tif"));
         }
     }
 }

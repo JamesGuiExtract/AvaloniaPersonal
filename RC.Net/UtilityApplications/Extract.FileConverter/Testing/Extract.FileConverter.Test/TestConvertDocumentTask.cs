@@ -1,4 +1,5 @@
 ﻿using Extract.Licensing;
+using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
@@ -24,19 +25,11 @@ namespace Extract.FileConverter.Test
                 [Test, Category("Automated")]
         public static void CheckForNamespaceChange()
         {
-            string testItem = "Extract.FileConverter.Test.UnitTestNoNamespaceChange.fps";
-            string fileName = Path.GetTempFileName() + "." + testItem.Split('.').Last();
-            try
-            {
-                Utility.WriteResourceToFile(testItem, fileName);
-                FileProcessingManagerClass fileProcessingManager = new();
-                fileProcessingManager.LoadFrom(fileName, false);
-                fileProcessingManager.SaveTo(fileName, true);
-            }
-            finally
-            {
-                File.Delete(fileName);
-            }
+            using TestFileManager<TestConvertDocumentTask> testFiles = new();
+            string fileName = testFiles.GetFile("UnitTestNoNamespaceChange.fps");
+            FileProcessingManagerClass fileProcessingManager = new();
+            fileProcessingManager.LoadFrom(fileName, false);
+            fileProcessingManager.SaveTo(fileName, true);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Extract.Licensing;
+using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
@@ -32,12 +33,9 @@ namespace Extract.FileConverter.Test
         [TestCase(-1, true, "-1", TestName = "Last two set")]
         public static void ConvertTifToPdf(int perspectiveID, bool retain, string removePages)
         {
-            string testItem = "Extract.FileConverter.Test.TestTiffDocuments.0275pages.tif";
-            string fileName = Path.GetTempFileName() + "." + testItem.Split('.').Last();
-            try
-            {
-                Utility.WriteResourceToFile(testItem, fileName);
-                IConverter[] converters = { new LeadtoolsConverter()
+            using TestFileManager<TestLeadtoolsConversion> testFiles = new();
+            string fileName = testFiles.GetFile("TestTiffDocuments.0275pages.tif");
+            IConverter[] converters = { new LeadtoolsConverter()
                 {
                     IsEnabled = true,
                     LeadtoolsModel = new LeadtoolsModel()
@@ -47,35 +45,21 @@ namespace Extract.FileConverter.Test
                             RemovePages = removePages
                         }
                 } };
-                PerformConversion.Convert(converters, fileName, DestinationFileFormat.Pdf);
-                Assert.IsTrue(File.Exists(fileName + ".pdf"));
-            }
-            finally
-            {
-                File.Delete(fileName);
-                Assert.IsTrue(File.Exists(fileName + ".pdf"));
-            }
+            PerformConversion.Convert(converters, fileName, DestinationFileFormat.Pdf);
+            Assert.IsTrue(File.Exists(fileName + ".pdf"));
         }
 
         [Test, Category("Automated")]
         [Parallelizable(ParallelScope.All)]
-        [TestCase("Extract.FileConverter.Test.TestPDFDocuments.0003.pdf", TestName = "Convert pdf to tif 003")]
-        [TestCase("Extract.FileConverter.Test.TestPDFDocuments.004.pdf", TestName = "Convert pdf to tif 004")]
-        public static void ConvertPdfToTiff(string testItem)
+        [TestCase("TestPDFDocuments.0003.pdf", TestName = "Convert pdf to tif 003")]
+        [TestCase("TestPDFDocuments.004.pdf", TestName = "Convert pdf to tif 004")]
+        public static void ConvertPdfToTiff(string resource)
         {
-            string fileName = Path.GetTempFileName() + "." + testItem.Split('.').Last();
-            try
-            {
-                Utility.WriteResourceToFile(testItem, fileName);
-                IConverter[] converters = { new LeadtoolsConverter() { IsEnabled = true } };
-                PerformConversion.Convert(converters, fileName, DestinationFileFormat.Tif);
-                Assert.IsTrue(File.Exists(fileName + ".tif"));
-            }
-            finally
-            {
-                File.Delete(fileName);
-                Assert.IsTrue(File.Exists(fileName + ".tif"));
-            }
+            using TestFileManager<TestLeadtoolsConversion> testFiles = new();
+            string fileName = testFiles.GetFile(resource);
+            IConverter[] converters = { new LeadtoolsConverter() { IsEnabled = true } };
+            PerformConversion.Convert(converters, fileName, DestinationFileFormat.Tif);
+            Assert.IsTrue(File.Exists(fileName + ".tif"));
         }
     }
 }
