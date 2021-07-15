@@ -58,6 +58,12 @@ namespace Extract.DataEntry
         int _minimumNumberOfRows;
 
         /// <summary>
+        /// Preserves the initially configured value for AllowUserToDeleteRows as that property may
+        /// change dynamically to enforce MinimumNumberOfRows.
+        /// </summary>
+        bool _allowUserToDeleteRowsInitialValue;
+
+        /// <summary>
         /// Specifies names of attributes that can be mapped into this control by renaming them.
         /// The purpose is to be able to copy data out of one control and paste it into another.
         /// </summary>
@@ -537,8 +543,13 @@ namespace Extract.DataEntry
                         base.ContextMenuStrip.Items.Add(_rowInsertMenuItem);
                     }
 
+                    // Preserve the initially configured value for AllowUserToDeleteRows as it may be dynamically
+                    // changed to enforce MinimumNumberOfRows.
+                    // https://extract.atlassian.net/browse/ISSUE-13088
+                    _allowUserToDeleteRowsInitialValue = AllowUserToDeleteRows;
+
                     // Delete row(s) menu option
-                    if (AllowUserToDeleteRows)
+                    if (_allowUserToDeleteRowsInitialValue)
                     {
                         _rowDeleteMenuItem.Enabled = false;
                         _rowDeleteMenuItem.Click += HandleDeleteMenuItemClick;
@@ -557,7 +568,7 @@ namespace Extract.DataEntry
                     base.ContextMenuStrip.Items.Add(_rowCopyMenuItem);
 
                     // Cut row(s) menu option
-                    if (AllowUserToDeleteRows)
+                    if (_allowUserToDeleteRowsInitialValue)
                     {
                         _rowCutMenuItem.Enabled = false;
                         _rowCutMenuItem.Click += HandleRowCutMenuItemClick;
@@ -701,6 +712,8 @@ namespace Extract.DataEntry
                     // backward from this point.
                     selectedAttributes.PushBack(TabOrderPlaceholderAttribute);
                 }
+
+                UpdateDeleteRowCommandAvailability(SelectedRows.OfType<DataGridViewRow>());
 
                 // Allow all selected cells to be viewed with tooltips only if exactly one row
                 // attribute is selected.
@@ -1669,6 +1682,8 @@ namespace Extract.DataEntry
                     _initializedRows.Remove(row);
                     _modifiedRows.Remove(row);
                 }
+
+                UpdateDeleteRowCommandAvailability();
             }
             catch (Exception ex)
             {
@@ -2485,9 +2500,9 @@ namespace Extract.DataEntry
 
                 // Enable/disable the context menu options as appropriate.
                 _rowInsertMenuItem.Enabled = enableRowOptions;
-                _rowDeleteMenuItem.Enabled = enableRowOptions;
+                _rowDeleteMenuItem.Enabled = enableRowOptions && AllowUserToDeleteRows;
                 _rowCopyMenuItem.Enabled = enableRowOptions;
-                _rowCutMenuItem.Enabled = enableRowOptions;
+                _rowCutMenuItem.Enabled = enableRowOptions && AllowUserToDeleteRows;
                 _rowPasteMenuItem.Enabled = enablePasteOptions;
                 _rowInsertCopiedMenuItem.Enabled = enablePasteOptions;
 
@@ -4222,6 +4237,28 @@ namespace Extract.DataEntry
         static DataGridViewCell GetFirstVisibleCellInRow(DataGridViewRow row)
         {
             return row.Cells.Cast<DataGridViewCell>().First(c => c.Visible == true);
+        }
+
+        /// <summary>
+        /// Updates the availability of delete/cut row commands to prevent the number
+        /// of rows from becoming less than MinimumNumberOfRows.
+        /// https://extract.atlassian.net/browse/ISSUE-13088
+        /// </summary>
+        /// <param name="impactedRows">The collection of rows being acted upon.</param>
+        void UpdateDeleteRowCommandAvailability(IEnumerable<DataGridViewRow> impactedRows = null)
+        {
+            if (MinimumNumberOfRows > 0 && _allowUserToDeleteRowsInitialValue)
+            {
+                var totalRowCount = Rows
+                    .OfType<DataGridViewRow>()
+                    .Count(row => !row.IsNewRow);
+
+                var impactedRowCount = (impactedRows == null)
+                    ? 0
+                    : impactedRows.Count(row => !row.IsNewRow);
+
+                AllowUserToDeleteRows = MinimumNumberOfRows <= (totalRowCount - impactedRowCount);
+            }
         }
 
         #endregion Private Members
