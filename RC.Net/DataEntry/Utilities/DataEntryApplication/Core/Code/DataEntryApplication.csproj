@@ -260,10 +260,6 @@
       <Project>{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}</Project>
       <Name>Microsoft.Data.ConnectionUI.Dialog</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj">
-      <Project>{139729CD-0F06-48E8-9F4A-08E78BB6575F}</Project>
-      <Name>Microsoft.Data.ConnectionUI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
       <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
       <Name>Extract.AttributeFinder</Name>

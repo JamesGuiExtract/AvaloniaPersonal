@@ -692,8 +692,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionAndQueryTester", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSDataConnectionDialog", "MSDataConnectionDialog", "{4CAFD9CC-640F-4836-B388-D370B6219488}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI", "..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj", "{139729CD-0F06-48E8-9F4A-08E78BB6575F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.Dialog", "..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj", "{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
@@ -1308,11 +1306,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileConverter.Test"
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.SqlDatabase", "..\..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj", "{A75275DE-A979-41E6-8E46-546270D51E55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase", "..\..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj", "{A75275DE-A979-41E6-8E46-546270D51E55}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.SqlDatabase.Tests", "..\..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase.Tests\Extract.SqlDatabase.Tests.csproj", "{7D30388F-6C42-4055-BBCB-3F4AEAD97382}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase.Tests", "..\..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase.Tests\Extract.SqlDatabase.Tests.csproj", "{7D30388F-6C42-4055-BBCB-3F4AEAD97382}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMUtils.Test", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\FAMUtils.Test\FAMUtils.Test.vcxproj", "{45AC2D3B-53FC-423D-AA85-5CDC0F2E6140}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -4676,30 +4676,6 @@ Global
 		{404C32F6-646B-4FC7-A1B6-6F49986EF3E0}.Template|x64.Build.0 = Release|x86
 		{404C32F6-646B-4FC7-A1B6-6F49986EF3E0}.Template|x86.ActiveCfg = Release|x86
 		{404C32F6-646B-4FC7-A1B6-6F49986EF3E0}.Template|x86.Build.0 = Release|x86
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|x64.Build.0 = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Win32.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|x64.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|x64.Build.0 = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|x86.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Template|Any CPU.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Template|Any CPU.Build.0 = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Template|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Template|Mixed Platforms.Build.0 = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Template|Win32.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Template|x64.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Template|x64.Build.0 = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Template|x86.ActiveCfg = Release|Any CPU
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -6736,6 +6712,36 @@ Global
 		{45AC2D3B-53FC-423D-AA85-5CDC0F2E6140}.Template|x64.Build.0 = Debug|x64
 		{45AC2D3B-53FC-423D-AA85-5CDC0F2E6140}.Template|x86.ActiveCfg = Debug|Win32
 		{45AC2D3B-53FC-423D-AA85-5CDC0F2E6140}.Template|x86.Build.0 = Debug|Win32
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Win32.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|x64.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|x86.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Win32.ActiveCfg = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Win32.Build.0 = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|x64.ActiveCfg = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|x64.Build.0 = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|x86.ActiveCfg = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|x86.Build.0 = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|Win32.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|x64.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|x64.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|x86.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -6743,9 +6749,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{BE903913-8853-4966-A333-93B29D64E7E4} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
 		{A24D4168-C496-4543-9C99-DE2E07FF71BF} = {AF300FAF-68E6-4DE1-9E38-8369E9E3298F}
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F} = {4CAFD9CC-640F-4836-B388-D370B6219488}
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA} = {4CAFD9CC-640F-4836-B388-D370B6219488}
 		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31} = {4CAFD9CC-640F-4836-B388-D370B6219488}
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8} = {4CAFD9CC-640F-4836-B388-D370B6219488}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27ED4FC5-E231-42D6-8D2B-3089F09BFA8D}

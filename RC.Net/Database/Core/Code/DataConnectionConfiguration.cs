@@ -95,6 +95,7 @@ namespace Microsoft.Data.ConnectionUI
                 dialog.DataSources.Add(DataSource.AccessDataSource);
                 dialog.DataSources.Add(DataSource.OdbcDataSource);
                 dialog.DataSources.Add(SqlCe.SqlCeDataSource);
+                dialog.DataSources.Add(SQLite.SQLiteDataSource);
 
                 dialog.UnspecifiedDataSource.Providers.Add(DataProvider.SqlDataProvider);
                 dialog.UnspecifiedDataSource.Providers.Add(DataProvider.OracleDataProvider);
@@ -350,6 +351,7 @@ namespace Microsoft.Data.ConnectionUI
                 this.dataSources.Add(DataSource.AccessDataSource.Name, DataSource.AccessDataSource);
                 this.dataSources.Add(DataSource.OdbcDataSource.Name, DataSource.OdbcDataSource);
                 this.dataSources.Add(SqlCe.SqlCeDataSource.Name, SqlCe.SqlCeDataSource);
+                this.dataSources.Add(SQLite.SQLiteDataSource.Name, SQLite.SQLiteDataSource);
 
                 this.dataProviders = new Dictionary<string, DataProvider>();
                 this.dataProviders.Add(DataProvider.SqlDataProvider.Name, DataProvider.SqlDataProvider);
@@ -357,6 +359,7 @@ namespace Microsoft.Data.ConnectionUI
                 this.dataProviders.Add(DataProvider.OleDBDataProvider.Name, DataProvider.OleDBDataProvider);
                 this.dataProviders.Add(DataProvider.OdbcDataProvider.Name, DataProvider.OdbcDataProvider);
                 this.dataProviders.Add(SqlCe.SqlCeDataProvider.Name, SqlCe.SqlCeDataProvider);
+                this.dataProviders.Add(SQLite.SQLiteDataProvider.Name, SQLite.SQLiteDataProvider);
             }
         }
 	}

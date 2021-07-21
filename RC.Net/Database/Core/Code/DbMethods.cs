@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
@@ -132,22 +133,30 @@ namespace Extract.Database
                     return _lastProvider.Value;
                 }
 
-                // Use GetProviderMatchScore to select the provider that has the closest version to
-                // dbConnection.ServerVersion from the providers that correspond with the connection
-                // type.
-                var providerRow = DbProviderFactories
-                    .GetFactoryClasses()
-                    .Rows.Cast<DataRow>()
-                    .Select(row => new Tuple<DataRow, int>(
-                        row, GetProviderMatchScore(row, dbConnection)))
-                    .Where(item => item.Item2 > 0)
-                    .OrderByDescending(item => item.Item2)
-                    .Select(item => item.Item1)
-                    .FirstOrDefault();
+                DbProviderFactory providerFactory = null;
+                if (dbConnection.GetType() == typeof(SQLiteConnection))
+                {
+                    providerFactory = new SQLiteFactory();
+                }
+                else
+                {
+                    // Use GetProviderMatchScore to select the provider that has the closest version to
+                    // dbConnection.ServerVersion from the providers that correspond with the connection
+                    // type.
+                    var providerRow = DbProviderFactories
+                        .GetFactoryClasses()
+                        .Rows.Cast<DataRow>()
+                        .Select(row => new Tuple<DataRow, int>(
+                            row, GetProviderMatchScore(row, dbConnection)))
+                        .Where(item => item.Item2 > 0)
+                        .OrderByDescending(item => item.Item2)
+                        .Select(item => item.Item1)
+                        .FirstOrDefault();
 
-                DbProviderFactory providerFactory = (providerRow == null)
-                    ? DbProviderFactories.GetFactory(_config.Settings.DefaultDBProviderFactoryName)
-                    : DbProviderFactories.GetFactory(providerRow);
+                    providerFactory = (providerRow == null)
+                        ? DbProviderFactories.GetFactory(_config.Settings.DefaultDBProviderFactoryName)
+                        : DbProviderFactories.GetFactory(providerRow);
+                }
 
                 // Cache the provider per-thread so that subsequent calls don't have to go through
                 // the full lookup process.

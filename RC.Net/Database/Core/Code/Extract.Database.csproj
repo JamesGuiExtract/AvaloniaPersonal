@@ -113,13 +113,13 @@
       <Project>{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}</Project>
       <Name>Microsoft.Data.ConnectionUI.Dialog</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj">
-      <Project>{139729CD-0F06-48E8-9F4A-08E78BB6575F}</Project>
-      <Name>Microsoft.Data.ConnectionUI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj">
       <Project>{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}</Project>
       <Name>Microsoft.Data.ConnectionUI.SqlCeDataProvider</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj">
+      <Project>{b97cac92-16d9-48c6-b177-322457dcc8e8}</Project>
+      <Name>Microsoft.Data.ConnectionUI.SQLiteDataProvider</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
@@ -198,6 +198,11 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.ConnectionUI">
+      <Version>16.10.31320.204</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

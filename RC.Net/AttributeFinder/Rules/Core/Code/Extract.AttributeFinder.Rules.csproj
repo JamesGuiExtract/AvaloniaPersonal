@@ -453,10 +453,6 @@
       <Project>{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}</Project>
       <Name>Microsoft.Data.ConnectionUI.Dialog</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj">
-      <Project>{139729CD-0F06-48E8-9F4A-08E78BB6575F}</Project>
-      <Name>Microsoft.Data.ConnectionUI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>

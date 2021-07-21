@@ -181,8 +181,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.SecureFil
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MSDataConnectionDialog", "MSDataConnectionDialog", "{8B38C2BB-D3E0-4948-92DA-0A0876B200DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUI\Microsoft.Data.ConnectionUI.csproj", "{139729CD-0F06-48E8-9F4A-08E78BB6575F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.Dialog", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj", "{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
@@ -260,6 +258,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.SqlCompactToSqliteConverter.Test", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SqlCompactToSqliteConverter\Test\Extract.Utilities.SqlCompactToSqliteConverter.Test.csproj", "{92118C08-EA0F-4E0E-ADEC-A1DF88A40A04}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Database", "..\..\..\..\RC.Net\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj", "{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1343,22 +1343,6 @@ Global
 		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|x64.ActiveCfg = Release|Any CPU
 		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|x64.Build.0 = Release|Any CPU
 		{4E71D915-E822-4620-8E86-EB8255A96F82}.Release|x86.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|x64.Build.0 = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|Win32.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|x64.ActiveCfg = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|x64.Build.0 = Release|Any CPU
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F}.Release|x86.ActiveCfg = Release|Any CPU
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -1901,14 +1885,34 @@ Global
 		{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}.Release|x64.Build.0 = Release|Any CPU
 		{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}.Release|x86.ActiveCfg = Release|Any CPU
 		{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}.Release|x86.Build.0 = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|Win32.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|x64.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Debug|x86.Build.0 = Debug|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Win32.ActiveCfg = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|Win32.Build.0 = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|x64.ActiveCfg = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|x64.Build.0 = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|x86.ActiveCfg = Release|Any CPU
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{139729CD-0F06-48E8-9F4A-08E78BB6575F} = {8B38C2BB-D3E0-4948-92DA-0A0876B200DB}
 		{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA} = {8B38C2BB-D3E0-4948-92DA-0A0876B200DB}
 		{1CC9D080-C06D-4202-A14B-14A9CC7F7F31} = {8B38C2BB-D3E0-4948-92DA-0A0876B200DB}
+		{B97CAC92-16D9-48C6-B177-322457DCC8E8} = {8B38C2BB-D3E0-4948-92DA-0A0876B200DB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FCC49C04-B732-4B64-BBD9-B482462C46B0}
