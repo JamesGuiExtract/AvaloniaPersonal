@@ -47,11 +47,12 @@ namespace DatabaseMigrationWizard.Test
         [Test, Category("Automated")]
         public static void EnsureRollbackIfError()
         {
-            var database = FamTestDbManager.GetNewDatabase("Test_EnsureRollback");
+            string databaseName = "Test_EnsureRollback";
+            var database = FamTestDbManager.GetNewDatabase(databaseName);
             ImportOptions ImportOptions = new ImportOptions()
             {
                 ImportPath = Path.GetTempPath() + $"EnsureRollback\\",
-                ConnectionInformation = new Database.ConnectionInformation() { DatabaseName = "EnsureRollback", DatabaseServer = "(local)" }
+                ConnectionInformation = new Database.ConnectionInformation() { DatabaseName = databaseName, DatabaseServer = "(local)" }
             };
 
             Directory.CreateDirectory(ImportOptions.ImportPath);
@@ -75,7 +76,7 @@ namespace DatabaseMigrationWizard.Test
             }
             finally
             {
-                FamTestDbManager.RemoveDatabase("EnsureRollback");
+                FamTestDbManager.RemoveDatabase(databaseName);
                 Directory.Delete(ImportOptions.ImportPath, true);
             }
         }
@@ -87,12 +88,13 @@ namespace DatabaseMigrationWizard.Test
         [Test, Category("Automated")]
         public static void FAMUserBoundsCase()
         {
-            var database = FamTestDbManager.GetNewDatabase("Test_FamUserBoundCase");
+            string databaseName = "Test_FamUserBoundCase";
+            var database = FamTestDbManager.GetNewDatabase(databaseName);
 
             ImportOptions ImportOptions = new ImportOptions()
             {
                 ImportPath = Path.GetTempPath() + $"FamUserBoundCase\\",
-                ConnectionInformation = new Database.ConnectionInformation() { DatabaseName = "FamUserBoundCase", DatabaseServer = "(local)" }
+                ConnectionInformation = new Database.ConnectionInformation() { DatabaseName = databaseName, DatabaseServer = "(local)" }
             };
 
             Directory.CreateDirectory(ImportOptions.ImportPath);
@@ -132,7 +134,7 @@ namespace DatabaseMigrationWizard.Test
             }
             finally
             {
-                FamTestDbManager.RemoveDatabase("FamUserBoundCase");
+                FamTestDbManager.RemoveDatabase(databaseName);
                 Directory.Delete(ImportOptions.ImportPath, true);
             }
         }
