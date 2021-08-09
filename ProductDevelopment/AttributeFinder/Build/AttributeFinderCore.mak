@@ -514,6 +514,14 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\libiomp5md.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\lightgbm.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@XCOPY "$(BinariesFolder)\Microsoft.ML.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /v /s /e /y
+	@COPY /V /Y "$(BinariesFolder)\Extract.Utilities.SqlCompactToSqliteConverter.dll" "$(AFCoreInstallFilesRootDir)NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\SqlCompactToSqliteConverter.exe" "$(AFCoreInstallFilesRootDir)NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\ISqlCeScripting.dll" "$(AFCoreInstallFilesRootDir)NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\SqlCeScripting.dll" "$(AFCoreInstallFilesRootDir)NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\linq2db.dll" "$(AFCoreInstallFilesRootDir)NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\System.Data.SQLite.dll" "$(AFCoreInstallFilesRootDir)NonSelfRegFiles"
+	@XCOPY /V /Y "$(BinariesFolder)\x64\SQLite.Interop.dll" "$(AFCoreInstallFilesRootDir)NonSelfRegFiles\x64\"
+	@XCOPY /V /Y "$(BinariesFolder)\x86\SQLite.Interop.dll" "$(AFCoreInstallFilesRootDir)NonSelfRegFiles\x86\"
 
 # Copy Web files
 	@XCOPY "$(WebAPI)\*.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y

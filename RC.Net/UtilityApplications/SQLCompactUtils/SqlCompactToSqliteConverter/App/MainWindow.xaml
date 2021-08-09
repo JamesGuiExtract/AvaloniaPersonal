@@ -1,0 +1,22 @@
+﻿<Window x:Class="Extract.Utilities.SqlCompactToSqliteConverter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModel="clr-namespace:Extract.Utilities.SqlCompactToSqliteConverter"
+        xmlns:view="clr-namespace:Extract.Utilities.SqlCompactToSqliteConverter"
+        mc:Ignorable="d"
+        Title="Convert SQL Compact to SQLite database"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="Height"
+        Width="800" MinWidth="600" MinHeight="125" >
+
+  <Window.Resources>
+    <DataTemplate DataType="{x:Type viewModel:DatabaseConverterViewModel}">
+      <view:DatabaseConverterView/>
+    </DataTemplate>
+  </Window.Resources>
+  <Grid>
+    <ContentPresenter Content="{Binding DatabaseConverterViewModel}" />
+  </Grid>
+</Window>
