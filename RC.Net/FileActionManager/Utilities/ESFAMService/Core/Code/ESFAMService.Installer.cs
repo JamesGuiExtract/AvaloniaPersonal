@@ -67,11 +67,19 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 string databaseFile = ESFAMService.GetDatabaseFileName(_serviceInstaller.ServiceName);
-                var manager = new FAMServiceDatabaseManager(databaseFile);
+
+                bool convertedFromSqlCompact = ESFAMService.ConvertDatabaseIfNeeded(databaseFile).GetAwaiter().GetResult();
+
+                var manager = new FAMServiceSqliteDatabaseManager(databaseFile);
 
                 if (!File.Exists(databaseFile))
                 {
-                    _installerCreatedDatabase = manager.CreateDatabase(true);
+                    manager.CreateDatabase();
+                    _installerCreatedDatabase = true;
+                }
+                else if (convertedFromSqlCompact)
+                {
+                    _installerCreatedDatabase = true;
                 }
                 else
                 {

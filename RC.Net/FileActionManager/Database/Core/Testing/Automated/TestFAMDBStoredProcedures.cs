@@ -60,7 +60,7 @@ namespace Extract.FileActionManager.Database.Test
         [TestCase("OneValue", TestName = "List with one value")]
         [TestCase("First,Second", TestName = "List with 2 values")]
         [TestCase("First,Second, Third", TestName ="List with 3 values with space")]
-        public void function_fn_TableFromCommaSeparatedList(string commaSeparatedList)
+        public static void Function_FN_TableFromCommaSeparatedList(string commaSeparatedList)
         {
             string testDBName = "Test_fn_TableFromCommaSeparatedList";
             FileProcessingDB famDB = null;

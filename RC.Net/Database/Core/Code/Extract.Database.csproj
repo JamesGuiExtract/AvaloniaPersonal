@@ -1,172 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D0465C3D-527B-4B21-8E07-79A6CB762CC9}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.Database</RootNamespace>
-    <AssemblyName>Extract.Database</AssemblyName>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Copyright>Copyright © Extract Systems, LLC 2021</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <SccProjectName>Extract.Database</SccProjectName>
-    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
-    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
-    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileUpgradeFlags />
-    <OldToolsVersion>2.0</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <TargetFrameworkProfile />
-    <IsWebBootstrapper>true</IsWebBootstrapper>
-    <PublishUrl>http://localhost/Extract.Database/</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Web</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\Binaries\Release\</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL" />
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.Linq" />
-    <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>True</SpecificVersion>
-    </Reference>
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="WindowsFormsIntegration" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="DbTableColumnInfo.cs" />
-    <Compile Include="DatabaseConnectionControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DatabaseConnectionControl.Designer.cs">
-      <DependentUpon>DatabaseConnectionControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="DatabaseConnectionInfo.cs" />
-    <Compile Include="DatabaseHelperMethods.cs" />
-    <Compile Include="DataConnectionConfiguration.cs" />
-    <Compile Include="DbMethods.cs" />
-    <Compile Include="ExportTable.cs" />
-    <Compile Include="IDatabaseSchemaManager.cs" />
-    <Compile Include="IDataConnectionConfiguration.cs" />
-    <Compile Include="ImportTable.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="SqlCompactMethods.cs" />
-    <Compile Include="SqlCompactTableMappings.cs" />
-    <Compile Include="SqlDatabaseMethods.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RegistryManager.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj">
-      <Project>{05C97F8D-B7CF-4CAB-B81C-0994A70D90CA}</Project>
-      <Name>Microsoft.Data.ConnectionUI.Dialog</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj">
-      <Project>{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}</Project>
-      <Name>Microsoft.Data.ConnectionUI.SqlCeDataProvider</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj">
-      <Project>{b97cac92-16d9-48c6-b177-322457dcc8e8}</Project>
-      <Name>Microsoft.Data.ConnectionUI.SQLiteDataProvider</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">
-      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
-      <Name>Extract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
-      <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
-      <Name>Extract.Drawing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj">
-      <Project>{8267221B-52C3-490B-A98F-7A51EBEB2A2B}</Project>
-      <Name>Extract.Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj">
-      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
-      <Name>Extract.Interop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
-      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
-      <Name>Extract.Licensing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
-      <Name>Extract.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
-      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
-      <Name>Extract.Utilities.Forms</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
+
   <ItemGroup>
     <COMReference Include="UCLID_COMLMLib">
       <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
@@ -187,32 +38,81 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="DatabaseConnectionControl.resx">
+
+    <PackageReference Include="linq2db.SQLite" />
+
+    <!--Include these linq2db dependencies explicitly in order to avoid downgrades -->
+    <PackageReference Include="System.Threading.Tasks.Extensions" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
+    <!--Done with linq2db dependencies -->
+
+    <PackageReference Include="Microsoft.Data.ConnectionUI" Version="16.10.31320.204" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\ConnectionUIDialog\Microsoft.Data.ConnectionUI.Dialog.csproj" />
+    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj" />
+    <ProjectReference Include="..\..\..\APIs\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj" />
+    <ProjectReference Include="..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\Drawing\Core\Code\Extract.Drawing.csproj" />
+    <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj" />
+    <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj" />
+    <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
+      <SpecificVersion>True</SpecificVersion>
+      <HintPath>..\..\..\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>True</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Microsoft SQL Server Compact Edition\v3.5\Desktop\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="DatabaseConnectionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="DatabaseConnectionControl.Designer.cs">
+      <DependentUpon>DatabaseConnectionControl.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="DatabaseConnectionControl.resx">
       <DependentUpon>DatabaseConnectionControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Data.ConnectionUI">
-      <Version>16.10.31320.204</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
-  </PropertyGroup>
+
 </Project>

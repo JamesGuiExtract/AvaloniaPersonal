@@ -1,0 +1,13 @@
+﻿<#@ template language="C#" debug="True" hostSpecific="True" #>
+<#@ output extension=".generated.cs"                        #>
+
+<#@ include file="$(LinqToDBT4SQLiteTemplatesPath)LinqToDB.SQLite.Tools.ttinclude" once="true" #>
+<#@ include file="$(LinqToDBT4SQLiteTemplatesPath)PluralizationService.ttinclude"  once="true" #>
+<#
+	NamespaceName = "Extract.FileActionManager.Database.SqliteModels.Version8";
+	DataContextName = "FAMServiceDB";
+
+	LoadSQLiteMetadata(Host.ResolveAssemblyReference("$(ProjectDir)SqliteModels\\Version8"), "ESFAMService.sqlite");
+
+	GenerateModel();
+#>

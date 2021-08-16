@@ -35,7 +35,9 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
                 DbProviderFactory providerFactory = DBMethods.GetDBProvider(connection);
                 using DbDataAdapter adapter = providerFactory.CreateDataAdapter();
                 using DataTable table = new();
-                adapter.SelectCommand = DBMethods.CreateDBCommand(connection, "SELECT * FROM Settings", null);
+                using DbCommand dbCommand = connection.CreateCommand();
+                dbCommand.CommandText = "SELECT * FROM Settings";
+                adapter.SelectCommand = dbCommand;
                 table.Locale = CultureInfo.CurrentCulture;
 
                 // Fill the table with the data from the dataAdapter

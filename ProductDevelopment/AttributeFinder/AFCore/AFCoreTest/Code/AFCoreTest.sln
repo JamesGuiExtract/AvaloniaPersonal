@@ -209,6 +209,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestEncryptFileMgr", "..\..\..\..\..\ReusableComponents\BaseUtils\TestApps\TestEncryptFileMgr\TestEncryptFileMgr.vcxproj", "{D3B7C216-C6F6-4BB7-A8B7-83D687A03F18}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMUtils", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\Code\FAMUtils.vcxproj", "{5A74ECB3-8B17-42B5-B77F-44C35D489A64}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D0465C3D-527B-4B21-8E07-79A6CB762CC9} = {D0465C3D-527B-4B21-8E07-79A6CB762CC9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDExceptionMgmt", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDExceptionMgmt\Code\UCLIDExceptionMgmt.vcxproj", "{E7889662-1B92-485D-AFF2-AC673DD433BC}"
 EndProject
@@ -497,7 +500,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESFAMService", "..\..\..\..
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Database", "..\..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj", "{D0465C3D-527B-4B21-8E07-79A6CB762CC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Database", "..\..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj", "{D0465C3D-527B-4B21-8E07-79A6CB762CC9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -538,7 +541,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLCDBEditor", "..\..\..\..
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Database", "..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj", "{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.Database", "..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj", "{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -568,7 +571,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.F
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.Database.Test", "..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj", "{6B284A4D-132C-4FE4-858F-06A9C476B19B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.Database.Test", "..\..\..\..\..\RC.Net\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj", "{6B284A4D-132C-4FE4-858F-06A9C476B19B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C} = {A2E13543-A708-49E3-BA6E-4FC6DFE31E7C}
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
@@ -1313,6 +1316,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMUtils.Test", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\FAMUtils.Test\FAMUtils.Test.vcxproj", "{45AC2D3B-53FC-423D-AA85-5CDC0F2E6140}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.SqlCompactToSqliteConverter", "..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SqlCompactToSqliteConverter\Lib\Extract.Utilities.SqlCompactToSqliteConverter.csproj", "{F3F0B503-593E-4356-A619-BA451134AF00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -6742,6 +6747,36 @@ Global
 		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|x64.Build.0 = Debug|Any CPU
 		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|x86.ActiveCfg = Debug|Any CPU
 		{B97CAC92-16D9-48C6-B177-322457DCC8E8}.Template|x86.Build.0 = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Debug|Win32.Build.0 = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Debug|x64.Build.0 = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Debug|x86.Build.0 = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Release|Win32.ActiveCfg = Release|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Release|Win32.Build.0 = Release|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Release|x64.ActiveCfg = Release|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Release|x64.Build.0 = Release|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Release|x86.ActiveCfg = Release|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Release|x86.Build.0 = Release|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|Win32.Build.0 = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|x64.ActiveCfg = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|x64.Build.0 = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|x86.ActiveCfg = Debug|Any CPU
+		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

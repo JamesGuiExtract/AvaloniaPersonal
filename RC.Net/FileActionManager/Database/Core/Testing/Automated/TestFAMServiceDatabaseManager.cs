@@ -12,6 +12,7 @@ using System.Threading;
 // Tuple used for the fps file name list - FileName, AutoStart, NumberOfFilesToProcess
 using FPSFileData = System.Tuple<string, bool, string>;
 using System.Data.SqlServerCe;
+using System.Threading.Tasks;
 
 namespace Extract.FileActionManager.Database.Test
 {
@@ -125,7 +126,7 @@ namespace Extract.FileActionManager.Database.Test
         }
 
         /// <summary>
-        /// Tests whether the db manager will create a new database and will not create
+        /// Tests whether the db manager will not create a new database and will not create
         /// a backup file.
         /// </summary>
         [Test, Category("Automated")]
@@ -195,12 +196,10 @@ namespace Extract.FileActionManager.Database.Test
         [Test, Category("Automated")]
         public static void CorrectlyIndicatesUpdateRequiredV2()
         {
-            using (var tempV2 = new TemporaryFile(".sdf", false))
-            {
-                CreateV2Database(tempV2.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV2.FileName);
-                Assert.That(manager.IsUpdateRequired);
-            }
+            using var tempV2 = new TemporaryFile(".sdf", false);
+            CreateV2Database(tempV2.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV2.FileName);
+            Assert.That(manager.IsUpdateRequired);
         }
 
         #region Schema Version 2 Tests
@@ -209,37 +208,23 @@ namespace Extract.FileActionManager.Database.Test
         /// Test whether a V2 service database is correctly updated to the current schema.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV2ToCurrent()
+        public static async Task UpdateFromV2ToCurrent()
         {
-            TemporaryFile tempV2 = null, tempBackup = null;
-            try
-            {
-                tempV2 = new TemporaryFile(".sdf", false);
-                CreateV2Database(tempV2.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV2.FileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile, false);
+            using var tempV2 = new TemporaryFile(".sdf", false);
+            CreateV2Database(tempV2.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV2.FileName);
+            var backupFile = await manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+            File.Delete(backupFile);
 
-                // Check that the database has been upgraded correctly
-                var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
-                Assert.That(fpsFileTable.Count == _fromV2FpsTable.Count);
-                foreach (var data in fpsFileTable)
-                {
-                    Assert.That(_fromV2FpsTable[data.FileName] == data.NumberOfInstances);
-                }
-            }
-            finally
+            // Check that the database has been upgraded correctly
+            var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
+            Assert.That(fpsFileTable.Count == _fromV2FpsTable.Count);
+            foreach (var data in fpsFileTable)
             {
-                if (tempV2 != null)
-                {
-                    tempV2.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
+                Assert.That(_fromV2FpsTable[data.FileName] == data.NumberOfInstances);
             }
+
+            AssertPostCurrentSchema(manager);
         }
 
         /// <summary>
@@ -247,33 +232,15 @@ namespace Extract.FileActionManager.Database.Test
         /// update is performed.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV2ToCurrentSchemaCorrect()
+        public static async Task UpdateFromV2ToCurrentSchemaCorrect()
         {
-            TemporaryFile tempV2 = null, tempBackup = null;
-            try
-            {
-                tempV2 = new TemporaryFile(".sdf", false);
-                CreateV2Database(tempV2.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV2.FileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile, false);
+            using var tempV2 = new TemporaryFile(".sdf", false);
+            CreateV2Database(tempV2.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV2.FileName);
+            var backupFile = await manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+            File.Delete(backupFile);
 
-                int schemaVersion = new FAMServiceDatabaseManager(tempV2.FileName).GetSchemaVersion();
-
-                Assert.That(schemaVersion == FAMServiceDatabaseManager.CurrentSchemaVersion);
-            }
-            finally
-            {
-                if (tempV2 != null)
-                {
-                    tempV2.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
-            }
+            AssertPostCurrentSchema(new FAMServiceDatabaseManager(tempV2.FileName));
         }
 
         /// <summary>
@@ -281,47 +248,30 @@ namespace Extract.FileActionManager.Database.Test
         /// when using the <see cref="IDatabaseSchemaManager"/> interface.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV2ToCurrentIDatabaseSchemaUpdater()
+        public static async Task UpdateFromV2ToCurrentIDatabaseSchemaUpdater()
         {
-            TemporaryFile tempV2 = null, tempBackup = null;
-            try
+            using var tempV2 = new TemporaryFile(".sdf", false);
+            CreateV2Database(tempV2.FileName);
+            var manager = new FAMServiceDatabaseManager();
+            IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
+            using (var connection = new SqlCeConnection(
+                SqlCompactMethods.BuildDBConnectionString(tempV2.FileName, false)))
             {
-                tempV2 = new TemporaryFile(".sdf", false);
-                CreateV2Database(tempV2.FileName);
-                var manager = new FAMServiceDatabaseManager();
-                IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
-                using (var connection = new SqlCeConnection(
-                    SqlCompactMethods.BuildDBConnectionString(tempV2.FileName, false)))
-                {
-                    updater.SetDatabaseConnection(connection);
-                    var task =
-                        updater.BeginUpdateToLatestSchema(null,
-                        new CancellationTokenSource());
-
-                    var backupFile = new FileInfo(task.Result);
-                    tempBackup = new TemporaryFile(backupFile, false);
-                }
-                manager = new FAMServiceDatabaseManager(tempV2.FileName);
-
-                // Check that the database has been upgraded correctly
-                var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
-                Assert.That(fpsFileTable.Count == _fromV2FpsTable.Count);
-                foreach (var data in fpsFileTable)
-                {
-                    Assert.That(_fromV2FpsTable[data.FileName] == data.NumberOfInstances);
-                }
+                updater.SetDatabaseConnection(connection);
+                var backupFile = await updater.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+                File.Delete(backupFile);
             }
-            finally
+            manager = new FAMServiceDatabaseManager(tempV2.FileName);
+
+            // Check that the database has been upgraded correctly
+            var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
+            Assert.That(fpsFileTable.Count == _fromV2FpsTable.Count);
+            foreach (var data in fpsFileTable)
             {
-                if (tempV2 != null)
-                {
-                    tempV2.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
+                Assert.That(_fromV2FpsTable[data.FileName] == data.NumberOfInstances);
             }
+
+            AssertPostCurrentSchema(manager);
         }
 
         #endregion Schema Version 2 tests
@@ -335,51 +285,35 @@ namespace Extract.FileActionManager.Database.Test
         [Test, Category("Automated")]
         public static void CorrectlyIndicatesUpdateRequiredV3()
         {
-            using (var tempV3 = new TemporaryFile(".sdf", false))
-            {
-                CreateV3Database(tempV3.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV3.FileName);
-                Assert.That(manager.IsUpdateRequired);
-            }
+            using var tempV3 = new TemporaryFile(".sdf", false);
+            CreateV3Database(tempV3.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV3.FileName);
+            Assert.That(manager.IsUpdateRequired);
         }
 
         /// <summary>
         /// Test whether a V3 service database is correctly updated to the current schema.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV3ToCurrent()
+        public static async Task UpdateFromV3ToCurrent()
         {
-            TemporaryFile tempV3 = null, tempBackup = null;
-            try
-            {
-                tempV3 = new TemporaryFile(".sdf", false);
-                CreateV3Database(tempV3.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV3.FileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile, false);
+            using var tempV3 = new TemporaryFile(".sdf", false);
+            CreateV3Database(tempV3.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV3.FileName);
+            var backupFile = await manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+            File.Delete(backupFile);
 
-                // Check that the database has been upgraded correctly
-                var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
-                Assert.That(fpsFileTable.Count == _fromV3ToV5FpsTable.Count);
-                foreach (var data in fpsFileTable)
-                {
-                    var expected = _fromV3ToV5FpsTable[data.FileName];
-                    Assert.That(expected.Item1 == data.NumberOfInstances
-                        && expected.Item2 == data.NumberOfFilesToProcess);
-                }
-            }
-            finally
+            // Check that the database has been upgraded correctly
+            var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
+            Assert.That(fpsFileTable.Count == _fromV3ToV5FpsTable.Count);
+            foreach (var data in fpsFileTable)
             {
-                if (tempV3 != null)
-                {
-                    tempV3.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
+                var expected = _fromV3ToV5FpsTable[data.FileName];
+                Assert.That(expected.Item1 == data.NumberOfInstances
+                    && expected.Item2 == data.NumberOfFilesToProcess);
             }
+
+            AssertPostCurrentSchema(manager);
         }
 
         /// <summary>
@@ -387,83 +321,48 @@ namespace Extract.FileActionManager.Database.Test
         /// update is performed.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV3ToCurrentSchemaCorrect()
+        public static async Task UpdateFromV3ToCurrentSchemaCorrect()
         {
-            TemporaryFile tempV3 = null, tempBackup = null;
-            try
-            {
-                tempV3 = new TemporaryFile(".sdf", false);
-                CreateV3Database(tempV3.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV3.FileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile, false);
+            using var tempV3 = new TemporaryFile(".sdf", false);
+            CreateV3Database(tempV3.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV3.FileName);
+            var backupFile = await manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+            File.Delete(backupFile);
 
-                int schemaVersion = new FAMServiceDatabaseManager(tempV3.FileName).GetSchemaVersion();
-
-                Assert.That(schemaVersion == FAMServiceDatabaseManager.CurrentSchemaVersion);
-            }
-            finally
-            {
-                if (tempV3 != null)
-                {
-                    tempV3.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
-            }
+            AssertPostCurrentSchema(new FAMServiceDatabaseManager(tempV3.FileName));
         }
-
+       
         /// <summary>
         /// Test whether a V3 service database is correctly updated to the current schema
         /// when using the <see cref="IDatabaseSchemaManager"/> interface.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV3ToCurrentIDatabaseSchemaUpdater()
+        public static async Task UpdateFromV3ToCurrentIDatabaseSchemaUpdater()
         {
-            TemporaryFile tempV3 = null, tempBackup = null;
-            try
+            using var tempV3 = new TemporaryFile(".sdf", false);
+            CreateV3Database(tempV3.FileName);
+            var manager = new FAMServiceDatabaseManager();
+            IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
+            using (var connection = new SqlCeConnection(
+                SqlCompactMethods.BuildDBConnectionString(tempV3.FileName, false)))
             {
-                tempV3 = new TemporaryFile(".sdf", false);
-                CreateV3Database(tempV3.FileName);
-                var manager = new FAMServiceDatabaseManager();
-                IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
-                using (var connection = new SqlCeConnection(
-                    SqlCompactMethods.BuildDBConnectionString(tempV3.FileName, false)))
-                {
-                    updater.SetDatabaseConnection(connection);
-                    var task =
-                        updater.BeginUpdateToLatestSchema(null,
-                        new CancellationTokenSource());
-
-                    var backupFile = new FileInfo(task.Result);
-                    tempBackup = new TemporaryFile(backupFile, false);
-                }
-                manager = new FAMServiceDatabaseManager(tempV3.FileName);
-
-                // Check that the database has been upgraded correctly
-                var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
-                Assert.That(fpsFileTable.Count == _fromV3ToV5FpsTable.Count);
-                foreach (var data in fpsFileTable)
-                {
-                    var expected = _fromV3ToV5FpsTable[data.FileName];
-                    Assert.That(expected.Item1 == data.NumberOfInstances
-                        && expected.Item2 == data.NumberOfFilesToProcess);
-                }
+                updater.SetDatabaseConnection(connection);
+                var backupFile = await updater.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+                File.Delete(backupFile);
             }
-            finally
+            manager = new FAMServiceDatabaseManager(tempV3.FileName);
+
+            // Check that the database has been upgraded correctly
+            var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
+            Assert.That(fpsFileTable.Count == _fromV3ToV5FpsTable.Count);
+            foreach (var data in fpsFileTable)
             {
-                if (tempV3 != null)
-                {
-                    tempV3.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
+                var expected = _fromV3ToV5FpsTable[data.FileName];
+                Assert.That(expected.Item1 == data.NumberOfInstances
+                    && expected.Item2 == data.NumberOfFilesToProcess);
             }
+
+            AssertPostCurrentSchema(manager);
         }
 
         #endregion Schema Version 3 tests
@@ -477,51 +376,35 @@ namespace Extract.FileActionManager.Database.Test
         [Test, Category("Automated")]
         public static void CorrectlyIndicatesUpdateRequiredV4()
         {
-            using (var tempV4 = new TemporaryFile(".sdf", false))
-            {
-                CreateV4Database(tempV4.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV4.FileName);
-                Assert.That(manager.IsUpdateRequired);
-            }
+            using var tempV4 = new TemporaryFile(".sdf", false);
+            CreateV4Database(tempV4.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV4.FileName);
+            Assert.That(manager.IsUpdateRequired);
         }
 
         /// <summary>
         /// Test whether a V4 service database is correctly updated to the current schema.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV4ToCurrent()
+        public static async Task UpdateFromV4ToCurrent()
         {
-            TemporaryFile tempV4 = null, tempBackup = null;
-            try
-            {
-                tempV4 = new TemporaryFile(".sdf", false);
-                CreateV4Database(tempV4.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV4.FileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile, false);
+            using var tempV4 = new TemporaryFile(".sdf", false);
+            CreateV4Database(tempV4.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV4.FileName);
+            var backupFile = await manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+            File.Delete(backupFile);
 
-                // Check that the database has been upgraded correctly
-                var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
-                Assert.That(fpsFileTable.Count == _fromV3ToV5FpsTable.Count);
-                foreach (var data in fpsFileTable)
-                {
-                    var expected = _fromV3ToV5FpsTable[data.FileName];
-                    Assert.That(expected.Item1 == data.NumberOfInstances
-                        && expected.Item2 == data.NumberOfFilesToProcess);
-                }
-            }
-            finally
+            // Check that the database has been upgraded correctly
+            var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
+            Assert.That(fpsFileTable.Count == _fromV3ToV5FpsTable.Count);
+            foreach (var data in fpsFileTable)
             {
-                if (tempV4 != null)
-                {
-                    tempV4.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
+                var expected = _fromV3ToV5FpsTable[data.FileName];
+                Assert.That(expected.Item1 == data.NumberOfInstances
+                    && expected.Item2 == data.NumberOfFilesToProcess);
             }
+
+            AssertPostCurrentSchema(manager);
         }
 
         /// <summary>
@@ -529,32 +412,15 @@ namespace Extract.FileActionManager.Database.Test
         /// update is performed.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV4ToCurrentSchemaCorrect()
+        public static async Task UpdateFromV4ToCurrentSchemaCorrect()
         {
-            TemporaryFile tempV4 = null, tempBackup = null;
-            try
-            {
-                tempV4 = new TemporaryFile(".sdf", false);
-                CreateV4Database(tempV4.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV4.FileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile, false);
-                int schemaVersion = new FAMServiceDatabaseManager(tempV4.FileName).GetSchemaVersion();
+            using var tempV4 = new TemporaryFile(".sdf", false);
+            CreateV4Database(tempV4.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV4.FileName);
+            var backupFile = await manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+            File.Delete(backupFile);
 
-                Assert.That(schemaVersion == FAMServiceDatabaseManager.CurrentSchemaVersion);
-            }
-            finally
-            {
-                if (tempV4 != null)
-                {
-                    tempV4.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
-            }
+            AssertPostCurrentSchema(new FAMServiceDatabaseManager(tempV4.FileName));
         }
 
         /// <summary>
@@ -562,52 +428,37 @@ namespace Extract.FileActionManager.Database.Test
         /// when using the <see cref="IDatabaseSchemaManager"/> interface.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV4ToCurrentIDatabaseSchemaUpdater()
+        public static async Task UpdateFromV4ToCurrentIDatabaseSchemaUpdater()
         {
-            TemporaryFile tempV4 = null, tempBackup = null;
-            try
+            using var tempV4 = new TemporaryFile(".sdf", false);
+            CreateV4Database(tempV4.FileName);
+            var manager = new FAMServiceDatabaseManager();
+            IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
+            using (var connection = new SqlCeConnection(
+                SqlCompactMethods.BuildDBConnectionString(tempV4.FileName, false)))
             {
-                tempV4 = new TemporaryFile(".sdf", false);
-                CreateV4Database(tempV4.FileName);
-                var manager = new FAMServiceDatabaseManager();
-                IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
-                using (var connection = new SqlCeConnection(
-                    SqlCompactMethods.BuildDBConnectionString(tempV4.FileName, false)))
-                {
-                    updater.SetDatabaseConnection(connection);
-                    var task =
-                        updater.BeginUpdateToLatestSchema(null,
-                        new CancellationTokenSource());
-
-                    var backupFile = new FileInfo(task.Result);
-                    tempBackup = new TemporaryFile(backupFile, false);
-                }
-                manager = new FAMServiceDatabaseManager(tempV4.FileName);
-
-                // Check that the database has been upgraded correctly
-                var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
-                Assert.That(fpsFileTable.Count == _fromV3ToV5FpsTable.Count);
-                foreach (var data in fpsFileTable)
-                {
-                    var expected = _fromV3ToV5FpsTable[data.FileName];
-                    Assert.That(expected.Item1 == data.NumberOfInstances
-                        && expected.Item2 == data.NumberOfFilesToProcess);
-                }
+                updater.SetDatabaseConnection(connection);
+                var backupFile = await updater.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+                File.Delete(backupFile);
             }
-            finally
+            manager = new FAMServiceDatabaseManager(tempV4.FileName);
+
+            // Check that the database has been upgraded correctly
+            var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
+            Assert.That(fpsFileTable.Count == _fromV3ToV5FpsTable.Count);
+            foreach (var data in fpsFileTable)
             {
-                if (tempV4 != null)
-                {
-                    tempV4.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
+                var expected = _fromV3ToV5FpsTable[data.FileName];
+                Assert.That(expected.Item1 == data.NumberOfInstances
+                    && expected.Item2 == data.NumberOfFilesToProcess);
             }
+
+            AssertPostCurrentSchema(manager);
         }
 
         #endregion Schema Version 4 tests
+
+        #region Schema Version 5 tests
 
         /// <summary>
         /// Tests whether opening a V5 service database correctly indicates that it
@@ -616,51 +467,35 @@ namespace Extract.FileActionManager.Database.Test
         [Test, Category("Automated")]
         public static void CorrectlyIndicatesUpdateRequiredV5()
         {
-            using (var tempV5 = new TemporaryFile(".sdf", false))
-            {
-                CreateV5Database(tempV5.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV5.FileName);
-                Assert.That(manager.IsUpdateRequired);
-            }
+            using var tempV5 = new TemporaryFile(".sdf", false);
+            CreateV5Database(tempV5.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV5.FileName);
+            Assert.That(manager.IsUpdateRequired);
         }
 
         /// <summary>
         /// Test whether a V5 service database is correctly updated to the current schema.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV5ToCurrent()
+        public static async Task UpdateFromV5ToCurrent()
         {
-            TemporaryFile tempV5 = null, tempBackup = null;
-            try
-            {
-                tempV5 = new TemporaryFile(".sdf", false);
-                CreateV5Database(tempV5.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV5.FileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile, false);
+            using var tempV5 = new TemporaryFile(".sdf", false);
+            CreateV5Database(tempV5.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV5.FileName);
+            var backupFile = await manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+            File.Delete(backupFile);
 
-                // Check that the database has been upgraded correctly
-                var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
-                Assert.That(fpsFileTable.Count == _fromV2FpsTable.Count);
-                foreach (var data in fpsFileTable)
-                {
-                    var expected = _fromV3ToV5FpsTable[data.FileName];
-                    Assert.That(expected.Item1 == data.NumberOfInstances
-                        && expected.Item2 == data.NumberOfFilesToProcess);
-                }
-            }
-            finally
+            // Check that the database has been upgraded correctly
+            var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
+            Assert.That(fpsFileTable.Count == _fromV2FpsTable.Count);
+            foreach (var data in fpsFileTable)
             {
-                if (tempV5 != null)
-                {
-                    tempV5.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
+                var expected = _fromV3ToV5FpsTable[data.FileName];
+                Assert.That(expected.Item1 == data.NumberOfInstances
+                    && expected.Item2 == data.NumberOfFilesToProcess);
             }
+
+            AssertPostCurrentSchema(manager);
         }
 
         /// <summary>
@@ -668,104 +503,15 @@ namespace Extract.FileActionManager.Database.Test
         /// update is performed.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV5ToCurrentSchemaCorrect()
+        public static async Task UpdateFromV5ToCurrentSchemaCorrect()
         {
-            TemporaryFile tempV5 = null, tempBackup = null;
-            try
-            {
-                tempV5 = new TemporaryFile(".sdf", false);
-                CreateV5Database(tempV5.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV5.FileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile, false);
-                int schemaVersion = new FAMServiceDatabaseManager(tempV5.FileName).GetSchemaVersion();
+            using var tempV5 = new TemporaryFile(".sdf", false);
+            CreateV5Database(tempV5.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV5.FileName);
+            var backupFile = await manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+            File.Delete(backupFile);
 
-                Assert.That(schemaVersion == FAMServiceDatabaseManager.CurrentSchemaVersion);
-            }
-            finally
-            {
-                if (tempV5 != null)
-                {
-                    tempV5.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Test whether a V5 service database is correctly updated to the current schema.
-        /// </summary>
-        [Test, Category("Automated")]
-        public static void UpdateFromV6ToCurrent()
-        {
-            TemporaryFile tempV6 = null, tempBackup = null;
-            try
-            {
-                tempV6 = new TemporaryFile(".sdf", false);
-                CreateV6Database(tempV6.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV6.FileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile, false);
-
-                // Check that the database has been upgraded correctly
-                var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
-                Assert.That(fpsFileTable.Count == _fromV2FpsTable.Count);
-                foreach (var data in fpsFileTable)
-                {
-                    var expected = _fromV3ToV5FpsTable[data.FileName];
-                    Assert.That(expected.Item1 == data.NumberOfInstances
-                        && expected.Item2 == data.NumberOfFilesToProcess);
-                }
-            }
-            finally
-            {
-                if (tempV6 != null)
-                {
-                    tempV6.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Checks whether the V5 database has been updated to the correct schema after an
-        /// update is performed.
-        /// </summary>
-        [Test, Category("Automated")]
-        public static void UpdateFromV6ToCurrentSchemaCorrect()
-        {
-            TemporaryFile tempV6 = null, tempBackup = null;
-            try
-            {
-                tempV6 = new TemporaryFile(".sdf", false);
-                CreateV6Database(tempV6.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV6.FileName);
-                var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                var backupFile = new FileInfo(task.Result);
-                tempBackup = new TemporaryFile(backupFile, false);
-                int schemaVersion = new FAMServiceDatabaseManager(tempV6.FileName).GetSchemaVersion();
-
-                Assert.That(schemaVersion == FAMServiceDatabaseManager.CurrentSchemaVersion);
-            }
-            finally
-            {
-                if (tempV6 != null)
-                {
-                    tempV6.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
-            }
+            AssertPostCurrentSchema(new FAMServiceDatabaseManager(tempV5.FileName));
         }
 
         /// <summary>
@@ -773,78 +519,138 @@ namespace Extract.FileActionManager.Database.Test
         /// when using the <see cref="IDatabaseSchemaManager"/> interface.
         /// </summary>
         [Test, Category("Automated")]
-        public static void UpdateFromV5ToCurrentIDatabaseSchemaUpdater()
+        public static async Task UpdateFromV5ToCurrentIDatabaseSchemaUpdater()
         {
-            TemporaryFile tempV5 = null, tempBackup = null;
-            try
-            {
-                tempV5 = new TemporaryFile(".sdf", false);
-                CreateV5Database(tempV5.FileName);
-                var manager = new FAMServiceDatabaseManager();
-                IDatabaseSchemaManager updater = (IDatabaseSchemaManager)manager;
-                using (var connection = new SqlCeConnection(
-                    SqlCompactMethods.BuildDBConnectionString(tempV5.FileName, false)))
-                {
-                    updater.SetDatabaseConnection(connection);
-                    var task =
-                        updater.BeginUpdateToLatestSchema(null,
-                        new CancellationTokenSource());
+            using var tempV5 = new TemporaryFile(".sdf", false);
+            CreateV5Database(tempV5.FileName);
+            IDatabaseSchemaManager updater = new FAMServiceDatabaseManager();
 
-                    var backupFile = new FileInfo(task.Result);
-                    tempBackup = new TemporaryFile(backupFile, false);
-                }
-                manager = new FAMServiceDatabaseManager(tempV5.FileName);
-
-                // Check that the database has been upgraded correctly
-                var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
-                Assert.That(fpsFileTable.Count == _fromV3ToV5FpsTable.Count);
-                foreach (var data in fpsFileTable)
-                {
-                    var expected = _fromV3ToV5FpsTable[data.FileName];
-                    Assert.That(expected.Item1 == data.NumberOfInstances
-                        && expected.Item2 == data.NumberOfFilesToProcess);
-                }
-            }
-            finally
+            using (var connection = new SqlCeConnection(
+                SqlCompactMethods.BuildDBConnectionString(tempV5.FileName, false)))
             {
-                if (tempV5 != null)
-                {
-                    tempV5.Dispose();
-                }
-                if (tempBackup != null)
-                {
-                    tempBackup.Dispose();
-                }
+                updater.SetDatabaseConnection(connection);
+                var backupFile = await updater.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+                File.Delete(backupFile);
             }
+            var manager = new FAMServiceDatabaseManager(tempV5.FileName);
+
+            // Check that the database has been upgraded correctly
+            var fpsFileTable = new List<FpsFileTableData>(manager.GetFpsFileData(true));
+            Assert.That(fpsFileTable.Count == _fromV3ToV5FpsTable.Count);
+            foreach (var data in fpsFileTable)
+            {
+                var expected = _fromV3ToV5FpsTable[data.FileName];
+                Assert.That(expected.Item1 == data.NumberOfInstances
+                    && expected.Item2 == data.NumberOfFilesToProcess);
+            }
+
+            AssertPostCurrentSchema(manager);
         }
-
-        #region Schema Version 5 tests
-
 
         #endregion Schema Version 5 tests
 
         #region Schema Version 6 tests
 
-        /// <summary>
-        /// Tests whether opening a version 6 database correctly indicates no
-        /// update needed
-        /// </summary>
+        /// Test whether a V6 service database is correctly updated to the current schema.
         [Test, Category("Automated")]
-        public static void CorrectlyIndicatesNoUpdateRequiredCurrentVersion()
+        public static async Task UpdateFromV6ToCurrentSchemaCorrect()
         {
-            using (var tempV7 = new TemporaryFile(".sdf", false))
-            {
-                CreateV7Database(tempV7.FileName);
-                var manager = new FAMServiceDatabaseManager(tempV7.FileName);
-                Assert.That(!manager.IsUpdateRequired);
-            }
+            using var tempV6 = new TemporaryFile(".sdf", false);
+            CreateV6Database(tempV6.FileName);
+
+            var manager = new FAMServiceDatabaseManager(tempV6.FileName);
+            var settings = manager.Settings;
+            Assert.IsFalse(settings.ContainsKey("DatabaseServer"));
+            Assert.IsFalse(settings.ContainsKey("DatabaseName"));
+
+            var backupFile = await manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+
+            File.Delete(backupFile);
+
+            // Check that the database has been upgraded correctly
+            AssertPostCurrentSchema(manager);
         }
 
         #endregion Schema Version 6 tests
 
+        #region Schema Version 7 tests
+
+        /// <summary>
+        /// Tests whether a version 7 database is created correctly
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void LastSchemaVersionIsCorrect()
+        {
+            using TemporaryFile tempV8 = new(".sdf", false);
+            File.Delete(tempV8.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV8.FileName);
+            manager.CreateDatabase(false);
+
+            AssertCurrentSchema(manager);
+        }
+
+        /// <summary>
+        /// Tests whether opening a newly-created database correctly indicates an update is needed
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void CorrectlyIndicatesUpdateRequiredForNewDatabase()
+        {
+            using TemporaryFile tempV7 = new(".sdf", false);
+            File.Delete(tempV7.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV7.FileName);
+            manager.CreateDatabase(false);
+
+            Assert.IsTrue(manager.IsUpdateRequired);
+        }
+
+        /// <summary>
+        /// Test whether a V7 service database is correctly updated to post-current schema
+        /// </summary>
+        [Test, Category("Automated")]
+        public static async Task UpdateFromV7ToPostCurrentSchema()
+        {
+            using var tempV7 = new TemporaryFile(".sdf", false);
+            CreateV7Database(tempV7.FileName);
+            var manager = new FAMServiceDatabaseManager(tempV7.FileName);
+            var backupFile = await manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
+            File.Delete(backupFile);
+
+            // Check that the database has been upgraded correctly
+            AssertPostCurrentSchema(manager);
+        }
+
+        #endregion Schema Version 7 tests
+
         #endregion Test Methods
 
         #region Helper Methods
+
+        private static void AssertCurrentSchema(FAMServiceDatabaseManager manager)
+        {
+            Assert.AreEqual(FAMServiceDatabaseManager.CurrentSchemaVersion, manager.GetSchemaVersion());
+
+            // Make sure the settings added in version 7 are present
+            var settings = manager.Settings;
+            Assert.IsTrue(settings.ContainsKey("DatabaseServer"));
+            Assert.IsTrue(settings.ContainsKey("DatabaseName"));
+
+            // The current schema still specifies FAMServiceDatabaseManager to facilitate conversion to sqlite
+            Assert.AreEqual("Extract.FileActionManager.Database.FAMServiceDatabaseManager", settings["DatabaseSchemaManager"]);
+        }
+
+        private static void AssertPostCurrentSchema(FAMServiceDatabaseManager manager)
+        {
+            // The last update should have set the schema version to current version + 1 in order to hand off management
+            // to FAMServiceSqliteDatabaseManager
+            Assert.AreEqual(FAMServiceDatabaseManager.CurrentSchemaVersion + 1, manager.GetSchemaVersion());
+
+            // Make sure the settings added in version 7 are present
+            var settings = manager.Settings;
+            Assert.IsTrue(settings.ContainsKey("DatabaseServer"));
+            Assert.IsTrue(settings.ContainsKey("DatabaseName"));
+
+            Assert.AreEqual("Extract.FileActionManager.Database.FAMServiceSqliteDatabaseManager", settings["DatabaseSchemaManager"]);
+        }
 
         /// <summary>
         /// Builds the default settings list for the specified version of the service database.

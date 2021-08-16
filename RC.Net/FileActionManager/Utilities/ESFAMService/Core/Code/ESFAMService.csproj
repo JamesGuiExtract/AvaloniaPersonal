@@ -127,6 +127,10 @@
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\UtilityApplications\SQLCompactUtils\SqlCompactToSqliteConverter\Lib\Extract.Utilities.SqlCompactToSqliteConverter.csproj">
+      <Project>{45F4E351-E61E-475E-9AEB-59ED88E0A83E}</Project>
+      <Name>Extract.Utilities.SqlCompactToSqliteConverter</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Database\Core\Code\Extract.FileActionManager.Database.csproj">
       <Project>{C15ABD31-ADA3-4EB1-91D5-3392D375FF12}</Project>
       <Name>Extract.FileActionManager.Database</Name>

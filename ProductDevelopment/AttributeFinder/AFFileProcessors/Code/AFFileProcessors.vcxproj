@@ -255,9 +255,6 @@
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\RC.Net\FileActionManager\Database\Core\Code\Extract.FileActionManager.Database.csproj">
-      <Project>{c15abd31-ada3-4eb1-91d5-3392d375ff12}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcxproj">
       <Project>{91b17d62-305c-4ea4-add2-72ac7fe8d0af}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

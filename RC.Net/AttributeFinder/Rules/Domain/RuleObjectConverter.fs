@@ -137,7 +137,7 @@ module RuleObjectConverter =
   /// <summary>
   /// Lookup the domain class type and return the corresponding data transfer object type
   /// </summary>
-  /// <param name="domainType">The type of the domain object</param>
+  /// <param name="typ">The type of the domain object</param>
   /// <param name="dtoType">The type of the data transfer object associated with the supplied domain type</param>
   let TryGetDtoTypeFromDomainType (typ, dtoType: outref<Type>) =
     domainTypeToDtoType.TryGetValue (typ, &dtoType)

@@ -156,3 +156,4 @@ ProductDevelopment/AttributeFinder/AFCore/AFCoreTest/Code/AFCoreTest.opensdf
 .ionide
 
 .fake
+*.generated.cs

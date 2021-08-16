@@ -4,6 +4,7 @@ module Extract.FileActionManager.Utilities.FAMServiceManager.FAMService
 open Extract.FileActionManager.Database
 open Extract.Utilities
 open Extract.Utilities.FSharp
+open Extract.Utilities.SqlCompactToSqliteConverter
 open System
 open System.IO
 open System.Management
@@ -104,14 +105,24 @@ module FAMService =
       Settings = Map.empty
       FPSData = List.empty }
 
-  let private getSdfPath serviceName = 
-    let programData = FileSystemMethods.CommonApplicationDataPath
-    Path.Combine(programData, "ESFAMService", serviceName + ".sdf")
+  let private getDatabasePath serviceName = 
+    async {
+      let programData = FileSystemMethods.CommonApplicationDataPath
+      let sqlitePath = Path.Combine(programData, "ESFAMService", serviceName + ".sqlite")
+      if not (File.Exists sqlitePath)
+      then
+        let sdfPath = Path.Combine(programData, "ESFAMService", serviceName + ".sdf")
+        if File.Exists sdfPath then
+          let converter = DatabaseConverter(DatabaseSchemaManagerProvider())
+          do! Async.AwaitTask (converter.Convert(sdfPath, sqlitePath))
+      return sqlitePath
+    }
+    |> Async.RunSynchronously
 
   let private getDetails serviceName =
     try
-      let sdfPath = getSdfPath serviceName
-      let mgr = FAMServiceDatabaseManager(sdfPath)
+      let databasePath = getDatabasePath serviceName
+      let mgr = FAMServiceSqliteDatabaseManager(databasePath)
       let fpsFiles =
         mgr.GetFpsFileData(false)
         |> Seq.mapi (fun i data ->
@@ -121,7 +132,7 @@ module FAMService =
             NumberOfFilesToProcess = data.NumberOfFilesToProcess })
         |> Seq.toList
 
-      let settings = mgr.Settings |> Seq.map (|KeyValue|) |> Map.ofSeq
+      let settings = mgr.GetSettings() |> Seq.map (|KeyValue|) |> Map.ofSeq
       settings, fpsFiles
     with | _ -> Map.empty, []
 
@@ -208,7 +219,7 @@ module FAMService =
     runCmdf "%s /u /ServiceName=\"%s\" \"%s\"" installUtilPath name servicePath |> ignore
 
   let edit name =
-    let dbPath = getSdfPath name
+    let dbPath = getDatabasePath name
     runCmdf "\"%s\" \"%s\"" editorPath dbPath |> ignore
 
   // Returned by ManagementObject.InvokeMethod

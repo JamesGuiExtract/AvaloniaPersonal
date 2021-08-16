@@ -30,8 +30,8 @@ let private removeServiceAndDB name =
     |> ignore
   with | _ -> ()
   try
-    let sdfName = sprintf """C:\ProgramData\Extract Systems\ESFAMService\%s.sdf""" name
-    File.Delete sdfName
+    let databaseName = sprintf """C:\ProgramData\Extract Systems\ESFAMService\%s.sqlite""" name
+    File.Delete databaseName
   with | _ -> ()
 
 type private TempService(name, displayName) =
@@ -52,16 +52,30 @@ let private installTempService () =
 
 let private retry = RetryBuilder (10, 500)
 
-let private waitForServiceState (targetState: string) (service: TempService) =
+let private waitForServiceState (targetState: string) (transitionState: string option) (service: TempService) =
   let mutable state = "Unknown"
+  let mutable transitionStateSeen = false
+
+  let transitioning state =
+    transitionState |> Option.map (fun s -> s = state) |> Option.defaultValue false
+
+  // Handle service starting, then stopped without seeing running state
+  let transitioned state =
+    transitionStateSeen && transitionState |> Option.map (fun s -> s <> state) |> Option.defaultValue false
+
   try
     retry {
       let mgmtObj = FAMService.getFamService service.Name
       state <- string mgmtObj.["State"]
-      if state <> targetState then
+      if state = targetState then
+        return ()
+      elif transitioned state then
+        return ()
+      elif transitioning state then
+        transitionStateSeen <- true
         failwith "Do retry"
       else
-        return ()
+        failwith "Do retry"
     }
   with | _ -> ()
   state
@@ -115,7 +129,7 @@ module Interactive =
     // Let the window open
     System.Threading.Thread.Sleep 1000
 
-    test <@ MessageBox.Show(sprintf "Was the SQLCDBEditor for %s.sdf opened?" service.Name,
+    test <@ MessageBox.Show(sprintf "Was the SQLCDBEditor for %s.sqlite opened?" service.Name,
               "Confirm editor",
               MessageBoxButton.YesNo,
               MessageBoxImage.Question,
@@ -330,7 +344,7 @@ module Automated =
   let ``StartService starts the service`` () =
     use service = installTempService ()
     startService service.Name |> Async.RunSynchronously |> ignore
-    test <@ service |> waitForServiceState "Running" = "Running" @>
+    test <@ service |> waitForServiceState "Running" (Some "Start Pending") = "Running" @>
 
 
   [<Test>]
@@ -339,11 +353,11 @@ module Automated =
 
     // Confirm running state
     startService service.Name |> Async.RunSynchronously |> ignore
-    test <@ service |> waitForServiceState "Running" = "Running" @>
+    test <@ service |> waitForServiceState "Running" (Some "Start Pending") = "Running" @>
 
     // Test stopping
     stopService service.Name |> Async.RunSynchronously |> ignore
-    test <@ service |> waitForServiceState "Stopped" = "Stopped" @>
+    test <@ service |> waitForServiceState "Stopped" None = "Stopped" @>
 
 
   [<Test>]
@@ -370,7 +384,7 @@ module Automated =
 
     // Start the service
     startService service.Name |> Async.RunSynchronously |> ignore
-    test <@ service |> waitForServiceState "Running" = "Running" @>
+    test <@ service |> waitForServiceState "Running" (Some "Start Pending") = "Running" @>
 
     let serviceModel =
       let mgmtObj = FAMService.getFamService service.Name
@@ -442,8 +456,8 @@ module Automated =
     use service2 = installTempService ()
 
     // Remove DB for one service
-    let sdfName = sprintf """C:\ProgramData\Extract Systems\ESFAMService\%s.sdf""" service1.Name
-    File.Delete sdfName
+    let databaseName = sprintf """C:\ProgramData\Extract Systems\ESFAMService\%s.sqlite""" service1.Name
+    File.Delete databaseName
     
     let installedServices = load () |> Async.RunSynchronously
     let service1Model = installedServices |> List.find (fun s -> s.Name = service1.Name)

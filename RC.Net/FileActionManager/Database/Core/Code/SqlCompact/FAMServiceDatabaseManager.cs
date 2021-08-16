@@ -28,11 +28,6 @@ namespace Extract.FileActionManager.Database
         #region Constants
 
         /// <summary>
-        /// The object name use in licensing calls.
-        /// </summary>
-        static readonly string _OBJECT_NAME = typeof(FAMServiceDatabaseManager).ToString();
-
-        /// <summary>
         /// The setting key for the current fam service database schema
         /// </summary>
         public static readonly string ServiceDBSchemaVersionKey = "ServiceDBSchemaVersion";
@@ -45,7 +40,7 @@ namespace Extract.FileActionManager.Database
         /// <summary>
         /// The class that manages this schema and can perform upgrades to the latest schema.
         /// </summary>
-        public static readonly string DBSchemaManager = _OBJECT_NAME;
+        public static readonly string DBSchemaManager = typeof(FAMServiceDatabaseManager).ToString();
 
         /// <summary>
         /// The setting key for the sleep time on startup
@@ -530,7 +525,8 @@ namespace Extract.FileActionManager.Database
             {
                 try
                 {
-                    return GetSchemaVersion() < CurrentSchemaVersion;
+                    // Update the schema past the current version to hand-off management to FAMServiceSqliteDatabaseManager
+                    return GetSchemaVersion() < 8;
                 }
                 catch (Exception ex)
                 {
@@ -622,34 +618,35 @@ namespace Extract.FileActionManager.Database
 
                 CancellationToken ct = cancelTokenSource.Token;
 
-                var task = Task.Factory.StartNew<string>(() =>
+                var task = Task.Run(() =>
                 {
                     // Check if the task has already been cancelled
                     ct.ThrowIfCancellationRequested();
 
                     string backUpFileName = BackupDatabase();
 
-                    while (version < CurrentSchemaVersion)
+                    // Update the schema past the current version to hand-off management to FAMServiceSqliteDatabaseManager
+                    while (version < 8)
                     {
                         switch (version)
                         {
                             case 2:
                                 UpdateFromVersion2SchemaTo6();
-                                UpdateToVersion7();
                                 break;
 
                             case 3:
                             case 4:
                                 UpdateFromVersion3Or4SchemaTo6(backUpFileName);
-                                UpdateToVersion7();
                                 break;
 
                             case 5:
                                 UpdateFromVersion5SchemaTo6();
-                                UpdateToVersion7();
                                 break;
                             case 6:
                                 UpdateToVersion7();
+                                break;
+                            case 7:
+                                UpdateToVersion8();
                                 break;
 
                             default:
@@ -995,6 +992,51 @@ namespace Extract.FileActionManager.Database
             {
                 throw ex.AsExtract("ELI46426");
             }
+        }
+
+        // Replace the schema manager with FAMServiceSqliteDatabaseManager
+        private void UpdateToVersion8()
+        {
+            using FAMServiceDatabaseV6 currentDb = new(_databaseFile);
+            if (currentDb.Connection.State != ConnectionState.Open)
+            {
+                currentDb.Connection.Open();
+            }
+            using DbTransaction trans = currentDb.Connection.BeginTransaction();
+            currentDb.Transaction = trans;
+
+            var schemaManager = currentDb.Settings
+                .Where(s => s.Name == DatabaseHelperMethods.DatabaseSchemaManagerKey)
+                .FirstOrDefault();
+
+            if (schemaManager is null)
+            {
+                currentDb.Settings.InsertOnSubmit(new Settings()
+                {
+                    Name = DatabaseHelperMethods.DatabaseSchemaManagerKey,
+                    Value = FAMServiceSqliteDatabaseManager.DBSchemaManager
+                });
+            }
+            else
+            {
+                schemaManager.Value = FAMServiceSqliteDatabaseManager.DBSchemaManager;
+            }
+
+            // Update the schema version to 8
+            var setting = currentDb.Settings
+                .Where(s => s.Name == ServiceDBSchemaVersionKey)
+                .FirstOrDefault();
+            if (setting.Value is null)
+            {
+                var ee = new ExtractException("ELI46429",
+                    "No Service db schema version key found.");
+                ee.AddDebugData("Database File", _databaseFile, false);
+                throw ee;
+            }
+            setting.Value = "8";
+
+            currentDb.SubmitChanges(ConflictMode.FailOnFirstConflict);
+            trans.Commit();
         }
 
         /// <summary>

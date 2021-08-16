@@ -2,6 +2,7 @@ using Extract.ETL;
 using Extract.FileActionManager.Database;
 using Extract.Licensing;
 using Extract.Utilities;
+using Extract.Utilities.SqlCompactToSqliteConverter;
 using FAMProcessLib;
 using Microsoft.Win32.SafeHandles;
 using Newtonsoft.Json;
@@ -20,6 +21,7 @@ using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Utilities
@@ -249,23 +251,24 @@ namespace Extract.FileActionManager.Utilities
                 if (TryGetServiceName(out _serviceName))
                 {
                     _databaseFile = GetDatabaseFileName(_serviceName);
+                    ConvertDatabaseIfNeeded(_databaseFile).GetAwaiter().GetResult();
                 }
                 else
                 {
                     throw new ExtractException("ELI50266", "Could not determine service name");
                 }
 
-                var dbManager = new FAMServiceDatabaseManager(_databaseFile);
+                var dbManager = new FAMServiceSqliteDatabaseManager(_databaseFile);
 
                 // Validate the service database schema
                 int schemaVersion = dbManager.GetSchemaVersion();
-                if (schemaVersion != FAMServiceDatabaseManager.CurrentSchemaVersion)
+                if (schemaVersion != FAMServiceSqliteDatabaseManager.CurrentSchemaVersion)
                 {
                     ExtractException ee = new ExtractException("ELI29802",
                         dbManager.IsUpdateRequired ? "Service database must be updated to current schema."
                         : "Invalid service database schema version.");
                     ee.AddDebugData("Current Supported Schema Version",
-                        FAMServiceDatabaseManager.CurrentSchemaVersion, false);
+                        FAMServiceSqliteDatabaseManager.CurrentSchemaVersion, false);
                     ee.AddDebugData("Database Schema Version", schemaVersion, false);
                     throw ee;
                 }
@@ -442,18 +445,18 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                var dbManager = serviceDBManager as FAMServiceDatabaseManager;
+                var dbManager = serviceDBManager as FAMServiceSqliteDatabaseManager;
                 if (dbManager == null)
                 {
                     throw new ArgumentException(
-                        "Specified db manager is either null or not a FAMServiceDatabaseManager.");
+                        "Specified db manager is either null or not a FAMServiceSqliteDatabaseManager.");
                 }
 
                 // [DotNetRCAndUtils:858]
                 // Only honor SleepTimeOnStartup during the first 15 minutes of machine up time.
                 if (SystemMethods.SystemUptime.TotalMinutes < 15)
                 {
-                    int sleepTime = int.Parse(dbManager.Settings[FAMServiceDatabaseManager.SleepTimeOnStartupKey],
+                    int sleepTime = int.Parse(dbManager.GetSettings()[FAMServiceSqliteDatabaseManager.SleepTimeOnStartupKey],
                         CultureInfo.InvariantCulture);
                     if (sleepTime <= 0)
                     {
@@ -1051,11 +1054,11 @@ namespace Extract.FileActionManager.Utilities
         #region Methods
 
         /// <summary>
-        /// Checks for ETL processes in the <see cref="FAMServiceDatabaseManager"/> and starts any that are configured.
+        /// Checks for ETL processes in the <see cref="FAMServiceSqliteDatabaseManager"/> and starts any that are configured.
         /// A polling thread will also be started that will check periodically if there are changes in the configured Database
         /// </summary>
         /// <param name="dbManager"></param>
-        void StartETL(FAMServiceDatabaseManager dbManager)
+        void StartETL(FAMServiceSqliteDatabaseManager dbManager)
         {
             try
             {
@@ -1067,8 +1070,9 @@ namespace Extract.FileActionManager.Utilities
                     .ToList();
 
                 // Get the ETL database and server if configured
-                dbManager.Settings.TryGetValue("DatabaseServer", out _etlDatabaseServer);
-                dbManager.Settings.TryGetValue("DatabaseName", out _etlDatabaseName);
+                var settings = dbManager.GetSettings();
+                settings.TryGetValue("DatabaseServer", out _etlDatabaseServer);
+                settings.TryGetValue("DatabaseName", out _etlDatabaseName);
 
                 // This is called here so that it will open the the database - if it fails it will throw an exception
                 // https://extract.atlassian.net/browse/ISSUE-16841
@@ -1184,7 +1188,7 @@ namespace Extract.FileActionManager.Utilities
                                         restartInvalid.AddDebugData("LastETL start", _lastETLStart, false);
                                         
                                         // Fix the problem
-                                        _etlFAMDB.SetDBInfoSetting("ETLRestart", _lastETLStart.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"), true, false);
+                                        _etlFAMDB.SetDBInfoSetting("ETLRestart", _lastETLStart.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz", CultureInfo.InvariantCulture), true, false);
                                         restartInvalid.Log();
                                     }
 
@@ -1265,7 +1269,7 @@ namespace Extract.FileActionManager.Utilities
             }
 
             // Get the Service config file
-            var dbManager = new FAMServiceDatabaseManager(_databaseFile);
+            var dbManager = new FAMServiceSqliteDatabaseManager(_databaseFile);
             StartETL(dbManager);
         }
 
@@ -1312,11 +1316,11 @@ namespace Extract.FileActionManager.Utilities
         /// Gets the list of dependent services from the service database.
         /// </summary>
         /// <returns>The list of dependent services from the service database.</returns>
-        static List<string> GetDependentServices(FAMServiceDatabaseManager dbManager)
+        static List<string> GetDependentServices(FAMServiceSqliteDatabaseManager dbManager)
         {
             try
             {
-                var names = dbManager.Settings[FAMServiceDatabaseManager.DependentServicesKey];
+                var names = dbManager.GetSettings()[FAMServiceSqliteDatabaseManager.DependentServicesKey];
                 var serviceNames = new HashSet<string>();
                 if (!string.IsNullOrWhiteSpace(names))
                 {
@@ -1345,7 +1349,7 @@ namespace Extract.FileActionManager.Utilities
         /// <returns>A collection of <see cref="ServiceController"/>s for the
         /// dependent services in the service database settings table.</returns>
         static List<ServiceController> GetDependentServiceControllers(
-            FAMServiceDatabaseManager dbManager)
+            FAMServiceSqliteDatabaseManager dbManager)
         {
             // Get the list of dependent service names 
             List<string> dependentServiceNames = GetDependentServices(dbManager);
@@ -1455,14 +1459,14 @@ namespace Extract.FileActionManager.Utilities
         /// FPS file that will be launched when the processing threads are started.
         /// </returns>
         static List<ProcessingThreadArguments> GetFpsFileProcessingArguments(
-            FAMServiceDatabaseManager dbManager)
+            FAMServiceSqliteDatabaseManager dbManager)
         {
             try
             {
                 // Get the global number of files to process
                 int globalNumberOfFilesToProcess = 0;
                 var numberToProcessString =
-                    dbManager.Settings[FAMServiceDatabaseManager.NumberOfFilesToProcessGlobalKey];
+                    dbManager.GetSettings()[FAMServiceSqliteDatabaseManager.NumberOfFilesToProcessGlobalKey];
                 if (string.IsNullOrWhiteSpace(numberToProcessString))
                 {
                     new ExtractException("ELI31140",
@@ -1616,8 +1620,6 @@ namespace Extract.FileActionManager.Utilities
 
         #endregion Methods
 
-        #region Properties
-
         /// <summary>
         /// Gets the name of the database file that is used by the service.
         /// </summary>
@@ -1626,9 +1628,26 @@ namespace Extract.FileActionManager.Utilities
         public static string GetDatabaseFileName(string serviceName)
         {
             return FileSystemMethods.PathCombine(
-                FileSystemMethods.CommonApplicationDataPath, "ESFAMService", serviceName + ".sdf");
+                FileSystemMethods.CommonApplicationDataPath, "ESFAMService", serviceName + ".sqlite");
         }
 
-        #endregion Properties
+        /// <summary>
+        /// Creates a sqlite database at the supplied path if the file doesn't already exist and there is
+        /// an existing sql compact database with the same name (the extension of the supplied path changed to .sdf)
+        /// </summary>
+        /// <param name="databaseFile">The path to a sqlite database that may or may not exist</param>
+        /// <returns>True if the file was created by this method and false if it was not</returns>
+        internal static async Task<bool> ConvertDatabaseIfNeeded(string databaseFile)
+        {
+            string legacyDatabaseFile = Path.ChangeExtension(databaseFile, ".sdf");
+            if (File.Exists(legacyDatabaseFile) && !File.Exists(databaseFile))
+            {
+                var converter = new DatabaseConverter(new DatabaseSchemaManagerProvider());
+                await converter.Convert(legacyDatabaseFile, databaseFile).ConfigureAwait(false);
+                return true;
+            }
+
+            return false;
+        }
     }
 }

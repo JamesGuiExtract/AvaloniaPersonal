@@ -179,10 +179,6 @@
     <ResourceCompile Include="FAMUtils.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\RC.Net\Database\Core\Code\Extract.Database.csproj">
-      <Project>{d0465c3d-527b-4b21-8e07-79a6cb762cc9}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\BaseUtils\Code\BaseUtils.vcxproj">
       <Project>{91b17d62-305c-4ea4-add2-72ac7fe8d0af}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

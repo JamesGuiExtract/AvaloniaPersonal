@@ -1,5 +1,4 @@
 ﻿using Extract.Database;
-using Extract.Licensing;
 using System.Data.Linq;
 using System.Data.Linq.Mapping;
 using System.Data.SqlServerCe;
