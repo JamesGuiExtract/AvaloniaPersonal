@@ -32,7 +32,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="linq2db.SQLite" Version="3.4.2" />
+    <PackageReference Include="linq2db.SQLite" />
+
+    <!--Include these linq2db dependencies explicitly in order to avoid downgrades -->
+    <PackageReference Include="System.Threading.Tasks.Extensions" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
   </ItemGroup>
 
   <ItemGroup>
