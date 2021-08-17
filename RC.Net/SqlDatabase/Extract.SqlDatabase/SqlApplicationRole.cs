@@ -16,11 +16,12 @@ namespace Extract.SqlDatabase
         public enum AppRoleAccess
         {
             NoAccess = 0,
-            SelectAccess = 1,
+            SelectExecuteAccess = 1,
             InsertAccess = 3,
             UpdateAccess = 5,
             DeleteAccess = 9,
-            AllAccess = SelectAccess | InsertAccess | UpdateAccess | DeleteAccess
+            AlterAccess = 17,
+            AllAccess = SelectExecuteAccess | InsertAccess | UpdateAccess | DeleteAccess | AlterAccess
         }
 
         #region IDisposable
@@ -131,16 +132,18 @@ namespace Extract.SqlDatabase
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine($"CREATE APPLICATION ROLE {applicationRoleName} WITH PASSWORD = '{password}', DEFAULT_SCHEMA = dbo;");
                 if (access > 0)
+                {
+                    sb.AppendLine($"GRANT EXECUTE TO {applicationRoleName};");
                     sb.AppendLine($"GRANT SELECT TO {applicationRoleName};");
-                if ((access & AppRoleAccess.InsertAccess) > 0)
+                }
+                if ((access & AppRoleAccess.InsertAccess & ~AppRoleAccess.SelectExecuteAccess) > 0)
                     sb.AppendLine($"GRANT INSERT TO {applicationRoleName};");
-                if ((access & AppRoleAccess.UpdateAccess) > 0)
+                if ((access & AppRoleAccess.UpdateAccess & ~AppRoleAccess.SelectExecuteAccess) > 0)
                     sb.AppendLine($"GRANT UPDATE TO {applicationRoleName};");
-                if ((access & AppRoleAccess.DeleteAccess) > 0)
+                if ((access & AppRoleAccess.DeleteAccess & ~AppRoleAccess.SelectExecuteAccess) > 0)
                     sb.AppendLine($"GRANT DELETE TO {applicationRoleName};");
 
                 cmd.CommandText = sb.ToString();
-
 
                 if (sqlConnection.State != System.Data.ConnectionState.Open) sqlConnection.Open();
 

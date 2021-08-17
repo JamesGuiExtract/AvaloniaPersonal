@@ -15,10 +15,13 @@
 
 #include <RegistryPersistenceMgr.h>
 #include <FileProcessingConfigMgr.h>
+#include <CppApplicationRoleConnection.h>
 #include <LockGuard.h>
 #include <Win32Event.h>
 #include <StringCSIS.h>
 #include <CsisUtils.h>
+#include <SqlApplicationRole.h>
+#include <CppApplicationRoleConnection.h>
 
 #include <string>
 #include <map>
@@ -398,6 +401,8 @@ public:
 	STDMETHOD(GetOneTimePassword)(BSTR* pVal);
 	STDMETHOD(get_CurrentDBSchemaVersion)(LONG* pVal);
 	STDMETHOD(SetFileInformationForFile)(int fileID, long long fileSize, int pageCount);
+	STDMETHOD(get_UseApplicationRoles)(VARIANT_BOOL* pbValue);
+	STDMETHOD(put_UseApplicationRoles)(VARIANT_BOOL bValue);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -436,7 +441,7 @@ private:
 	// Variables
 
 	// Map that contains the open connection for each thread.
-	map<DWORD, _ConnectionPtr> m_mapThreadIDtoDBConnections;
+	map<DWORD, unique_ptr<CppBaseApplicationRoleConnection>> m_mapThreadIDtoDBAppRoleConnections;
 
 	// Cache the actionID associated with each action name for the current workflow, or all action IDs
 	// for all workflows (represented with a key of "").
@@ -707,6 +712,9 @@ private:
 	// After establishing connection, cache DBInfo settings to avoid unnecessary hits on the database.
 	IStrToStrMapPtr m_ipDBInfoSettings;
 
+	// Flag to indicate if an application role should be used
+	bool m_bUseApplicationRoles;
+
 	//-------------------------------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------------------------------
@@ -869,6 +877,14 @@ private:
 
 	// PROMISE: To return the m_ipDBConnection opened database connection for the current thread.
 	_ConnectionPtr getDBConnection();
+
+	void resetOpenConnectionData();
+
+	// PROMISE: To return a connection that does not have application role enabled
+	// NOTE: This is intended to be used for temporary connections only
+	_ConnectionPtr getDBConnectionWithoutAppRole();
+
+	void validateServerAndDatabase();
 
 	// PROMISE: To close the database connection on the current thread, if it is open currently
 	void closeDBConnection();
@@ -1127,6 +1143,8 @@ private:
 
 	// Internal reset DB connection function
 	void resetDBConnection(bool bCheckForUnaffiliatedFiles = false);
+
+	void checkSecurity();
 
 	// Internal close all DB connections. Credentials will be maintained if bTemporaryClose is used
 	// as long as the re-connection is to the same database.

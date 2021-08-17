@@ -2,6 +2,7 @@
 
 #include "FAMUtils.h"
 #include <string>
+#include <map>
 
 /// <summary>
 /// Class to use to enable an application role on a ADO connection
@@ -14,11 +15,12 @@ public:
 	enum AppRoleAccess
 	{
 		NoAccess = 0,
-		SelectAccess = 1,
+		SelectExecuteAccess = 1,
 		InsertAccess = 3,
 		UpdateAccess = 5,
 		DeleteAccess = 9,
-		AllAccess = SelectAccess | InsertAccess | UpdateAccess | DeleteAccess
+		AlterAccess  = 17,
+		AllAccess = SelectExecuteAccess | InsertAccess | UpdateAccess | DeleteAccess | AlterAccess
 	} ;	
 
 	/// <summary>
@@ -30,6 +32,7 @@ public:
 	CppSqlApplicationRole(ADODB::_ConnectionPtr connection, std::string applicationRoleName, std::string password)
 	{
 		ipConnection = connection;
+		_cookie.Clear();
 		if (!applicationRoleName.empty())
 			SetApplicationRole(applicationRoleName, password);
 	}
@@ -37,7 +40,6 @@ public:
 	{
 		UnsetApplicationRole();
 	}
-
 
 	/// <summary>
 	/// Static method to create and Application role
@@ -48,7 +50,7 @@ public:
 	/// <param name="password">Password that will be used to enable the application role</param>
 	/// <param name="access">Access that should be granted for the application role</param>
 	static void CreateApplicationRole(ADODB::_ConnectionPtr ipConnection, std::string applicationRoleName, std::string password, AppRoleAccess access);
-
+	static void CreateAllRoles(ADODB::_ConnectionPtr ipConnection);
 private:
 
 	ADODB::_ConnectionPtr ipConnection;
@@ -56,6 +58,5 @@ private:
 
 	void SetApplicationRole(std::string applictionRoleName, std::string password);
 	void UnsetApplicationRole();
-	
 };
 

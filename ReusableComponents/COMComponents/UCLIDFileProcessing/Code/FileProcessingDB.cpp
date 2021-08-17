@@ -21,11 +21,14 @@
 #include <StopWatch.h>
 #include <stringCSIS.h>
 #include <StringTokenizer.h>
+#include <SqlApplicationRole.h>
+#include <ValueRestorer.h>
 
 #include <atlsafe.h>
 
 #include <string>
 #include <stack>
+#include <map>
 
 using namespace std;
 using namespace ADODB;
@@ -55,52 +58,53 @@ CMutex CFileProcessingDB::ms_mutexSpecialLoggingLock;
 // CFileProcessingDB
 //-------------------------------------------------------------------------------------------------
 CFileProcessingDB::CFileProcessingDB()
-: m_iDBSchemaVersion(0),
-m_hUIWindow(NULL),
-m_strCurrentConnectionStatus(gstrNOT_CONNECTED),
-m_strDatabaseServer(""),
-m_strDatabaseName(""),
-m_strAdvConnStrProperties(""),
-m_lFAMUserID(0),
-m_lMachineID(0),
-m_iCommandTimeout(glDEFAULT_COMMAND_TIMEOUT),
-m_bUpdateQueueEventTable(true),
-m_bUpdateFASTTable(true),
-m_bAutoDeleteFileActionComment(false),
-m_bLoadBalance(true),
-m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
-m_bNumberOfRetriesOverridden(false),
-m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
-m_bRetryTimeoutOverridden(false),
-m_nActiveFAMID(0),
-m_nFAMSessionID(0),
-m_strFPSFileName(""),
-m_strUPI(""),
-m_bFAMRegistered(false),
-m_nActionStatisticsUpdateFreqInSeconds(5),
-m_bValidatingOrUpdatingSchema(false),
-m_bProductSpecificDBSchemasAreValid(false),
-m_bRevertInProgress(false),
-m_bRetryOnTimeout(true),
-m_nActiveActionID(-1),
-m_bLoggedInAsAdmin(false),
-m_bCheckedFeatures(false),
-m_bAllowRestartableProcessing(false),
-m_bStoreDBInfoChangeHistory(false),
-m_bWorkItemRevertInProgress(false),
-m_strEncryptedDatabaseID(""),
-m_bDatabaseIDValuesValidated(false),
-m_ipSecureCounters(__nullptr),
-m_strActiveWorkflow(""),
-m_nActiveWorkflowID(0),
-m_bUsingWorkflowsForCurrentAction(false),
-m_bRunningAllWorkflows(false),
-m_nLastFAMFileID(0),
-m_bDeniedFastCountPermission(false),
-m_ipFAMTagManager(__nullptr),
-m_bCurrentSessionIsWebSession(false),
-m_dwLastPingTime(0),
-m_ipDBInfoSettings(__nullptr)
+	: m_iDBSchemaVersion(0),
+	m_hUIWindow(NULL),
+	m_strCurrentConnectionStatus(gstrNOT_CONNECTED),
+	m_strDatabaseServer(""),
+	m_strDatabaseName(""),
+	m_strAdvConnStrProperties(""),
+	m_lFAMUserID(0),
+	m_lMachineID(0),
+	m_iCommandTimeout(glDEFAULT_COMMAND_TIMEOUT),
+	m_bUpdateQueueEventTable(true),
+	m_bUpdateFASTTable(true),
+	m_bAutoDeleteFileActionComment(false),
+	m_bLoadBalance(true),
+	m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
+	m_bNumberOfRetriesOverridden(false),
+	m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
+	m_bRetryTimeoutOverridden(false),
+	m_nActiveFAMID(0),
+	m_nFAMSessionID(0),
+	m_strFPSFileName(""),
+	m_strUPI(""),
+	m_bFAMRegistered(false),
+	m_nActionStatisticsUpdateFreqInSeconds(5),
+	m_bValidatingOrUpdatingSchema(false),
+	m_bProductSpecificDBSchemasAreValid(false),
+	m_bRevertInProgress(false),
+	m_bRetryOnTimeout(true),
+	m_nActiveActionID(-1),
+	m_bLoggedInAsAdmin(false),
+	m_bCheckedFeatures(false),
+	m_bAllowRestartableProcessing(false),
+	m_bStoreDBInfoChangeHistory(false),
+	m_bWorkItemRevertInProgress(false),
+	m_strEncryptedDatabaseID(""),
+	m_bDatabaseIDValuesValidated(false),
+	m_ipSecureCounters(__nullptr),
+	m_strActiveWorkflow(""),
+	m_nActiveWorkflowID(0),
+	m_bUsingWorkflowsForCurrentAction(false),
+	m_bRunningAllWorkflows(false),
+	m_nLastFAMFileID(0),
+	m_bDeniedFastCountPermission(false),
+	m_ipFAMTagManager(__nullptr),
+	m_bCurrentSessionIsWebSession(false),
+	m_dwLastPingTime(0),
+	m_ipDBInfoSettings(__nullptr),
+	m_bUseApplicationRoles(true)
 {
 	try
 	{
@@ -150,7 +154,7 @@ CFileProcessingDB::~CFileProcessingDB()
 	try
 	{
 		// Clean up the map of connections
-		m_mapThreadIDtoDBConnections.clear();
+		m_mapThreadIDtoDBAppRoleConnections.clear();
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14981");
 }
@@ -707,13 +711,18 @@ STDMETHODIMP CFileProcessingDB::Clear(VARIANT_BOOL vbRetainUserValues)
 
 	try
 	{
+		ValueRestorer<bool> UseApplicationRolesRestorer(m_bUseApplicationRoles);
+
+		getThisAsCOMPtr()->UseApplicationRoles = VARIANT_FALSE;
+
 		// Validate the license
 		validateLicense();
-	
+
 		// Always lock the database for Clear()
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-			
+
 		Clear_Internal(true, vbRetainUserValues);
+		getThisAsCOMPtr()->CloseAllDBConnections();
 
 		return S_OK;
 	}
@@ -1197,6 +1206,10 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 		// Close any existing connection. P13 #4666
 		closeDBConnection();
 
+		ValueRestorer<bool> UseApplicationRolesRestorer(m_bUseApplicationRoles);
+
+		getThisAsCOMPtr()->UseApplicationRoles = VARIANT_FALSE;
+
 		// Database server needs to be set in order to create a new database
 		if (m_strDatabaseServer.empty())
 		{
@@ -1207,7 +1220,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 
 		// Set the database name to the given database name
 		m_strDatabaseName = asString(bstrNewDBName);
-		
+
 		if (m_strDatabaseName.empty())
 		{
 			UCLIDException ue("ELI18327", "Database name must not be empty!");
@@ -1229,9 +1242,9 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 			// ShowLogin being called and, therefore, the prompt to initialize the database.
 			return S_OK;
 		}
-		
+
 		// Create a connection object to the master db to create the database
-		ADODB::_ConnectionPtr ipDBConnection(__uuidof(Connection)); 
+		ADODB::_ConnectionPtr ipDBConnection(__uuidof(Connection));
 
 		// Open a connection to the master database on the database server
 		ipDBConnection->Open(createConnectionString(m_strDatabaseServer, "master").c_str(),
@@ -1246,6 +1259,11 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 			{
 				// Execute the query to create the new database
 				ipDBConnection->Execute(strCreateDB.c_str(), NULL, adCmdText | adExecuteNoRecords);
+
+				ipDBConnection->Close();
+				ipDBConnection->Open(createConnectionString(m_strDatabaseServer, m_strDatabaseName).c_str(),
+					"", "", adConnectUnspecified);
+				CppSqlApplicationRole::CreateAllRoles(ipDBConnection);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41506")
 		}
@@ -1262,9 +1280,9 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 
 				DWORD dwThreadID = GetCurrentThreadId();
 				CSingleLock lg(&m_criticalSection, TRUE);
-				m_mapThreadIDtoDBConnections.erase(dwThreadID);
+				m_mapThreadIDtoDBAppRoleConnections.erase(dwThreadID);
 			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41507")
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41507");
 
 			throw ex;
 		}
@@ -1281,6 +1299,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 			// Clear the new database to set up the tables
 			clear(false, true, false);
 		}
+		getThisAsCOMPtr()->CloseAllDBConnections();
 
 		return S_OK;
 	}
@@ -1297,6 +1316,10 @@ STDMETHODIMP CFileProcessingDB::CreateNew80DB(BSTR bstrNewDBName)
 		// Close any existing connection. P13 #4666
 		closeDBConnection();
 
+		ValueRestorer<bool> UseApplicationRolesRestorer(m_bUseApplicationRoles);
+
+		getThisAsCOMPtr()->UseApplicationRoles = VARIANT_FALSE;
+
 		// Database server needs to be set in order to create a new database
 		if (m_strDatabaseServer.empty())
 		{
@@ -1307,15 +1330,15 @@ STDMETHODIMP CFileProcessingDB::CreateNew80DB(BSTR bstrNewDBName)
 
 		// Set the database name to the given database name
 		m_strDatabaseName = asString(bstrNewDBName);
-		
+
 		if (m_strDatabaseName.empty())
 		{
 			UCLIDException ue("ELI34234", "Database name must not be empty!");
 			throw ue;
 		}
-		
+
 		// Create a connection object to the master db to create the database
-		ADODB::_ConnectionPtr ipDBConnection(__uuidof(Connection)); 
+		ADODB::_ConnectionPtr ipDBConnection(__uuidof(Connection));
 
 		// Open a connection to the master database on the database server
 		ipDBConnection->Open(createConnectionString(m_strDatabaseServer, "master").c_str(),
@@ -1336,6 +1359,7 @@ STDMETHODIMP CFileProcessingDB::CreateNew80DB(BSTR bstrNewDBName)
 		// The only reason an 80 DB is created is for the purpose of updating the schema. Set
 		// this flag so that any calls to validateDBSchemaVersion during this update are ignored.
 		m_bValidatingOrUpdatingSchema = true;
+		getThisAsCOMPtr()->CloseAllDBConnections();
 
 		return S_OK;
 	}
@@ -5333,6 +5357,32 @@ STDMETHODIMP CFileProcessingDB::GetOneTimePassword(BSTR* pVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49832");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::get_UseApplicationRoles(VARIANT_BOOL* pbValue)
+{
+	try
+	{
+		*pbValue = asVariantBool(m_bUseApplicationRoles);
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI51780");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::put_UseApplicationRoles(VARIANT_BOOL bValue)
+{
+	try
+	{
+		bool newValue = asCppBool(bValue);
+		if (newValue != m_bUseApplicationRoles)
+		{
+			m_bUseApplicationRoles = newValue;
+			getThisAsCOMPtr()->CloseAllDBConnections();
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI51781");
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -21,6 +21,7 @@ static const string& gstrPROVIDER = "Provider=SQLNCLI11";
 static const string& gstrINTEGRATED_SECURITY = "Integrated Security=SSPI";
 static const string& gstrDATA_TYPE_COMPATIBILITY = "DataTypeCompatibility=80";
 static const string& gstrMARS_CONNECTION = "MARS Connection=True";
+static const string& gstrTURN_OFF_CONNECTION_POOLING = "OLE DB Services = -2; ";
 
 // Misc queries
 static const string gstrGET_SQL_SERVER_TIME = "SELECT GETDATE() as CurrDateTime";
@@ -662,7 +663,9 @@ string createConnectionString(const string& strServer, const string& strDatabase
 
 	// Add the remaining settings that are needed
 	strConnectionString += gstrMARS_CONNECTION + ";";
-	strConnectionString += gstrDATA_TYPE_COMPATIBILITY;
+	strConnectionString += gstrDATA_TYPE_COMPATIBILITY + ";";
+	
+	strConnectionString += gstrTURN_OFF_CONNECTION_POOLING;
 
 	// If anything is specified in strAdvancedConnectionStringProperties, update the
 	// strConnectionString with the advanced values.

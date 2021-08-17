@@ -4,12 +4,12 @@
 #include <UCLIDException.h>
 
 
-void CppSqlApplicationRole::SetApplicationRole(std::string applictionRoleName, std::string password)
+void CppSqlApplicationRole::SetApplicationRole(std::string applicationRoleName, std::string password)
 {
 	try
 	{
 		ASSERT_ARGUMENT("ELI51761", ipConnection->State != adStateClosed);
-		
+
 		_CommandPtr cmd;
 		cmd.CreateInstance(__uuidof(Command));
 		ASSERT_RESOURCE_ALLOCATION("ELI51762", cmd != __nullptr);
@@ -18,12 +18,25 @@ void CppSqlApplicationRole::SetApplicationRole(std::string applictionRoleName, s
 		cmd->CommandText = _bstr_t("sys.sp_setapprole");
 		cmd->CommandType = adCmdStoredProc;
 		cmd->Parameters->Refresh();
-		cmd->Parameters->Item["@rolename"]->Value = applictionRoleName.c_str();
+		if (cmd->Parameters->Count <= 4 )
+		{
+			UCLIDException ue("ELI51799", "Unable to get paramters to set app role.");
+			ue.addDebugInfo("Count", cmd->Parameters->Count);
+			throw ue;
+		}
+		cmd->Parameters->Item["@rolename"]->Value = applicationRoleName.c_str();
 		cmd->Parameters->Item["@password"]->Value = password.c_str();
 		cmd->Parameters->Item["@encrypt"]->Value = "none";
 		cmd->Parameters->Item["@fCreateCookie"]->Value = VARIANT_TRUE;
-		
+
 		cmd->Execute(NULL, NULL, adCmdStoredProc);
+		auto cookie = cmd->Parameters->Item["@cookie"];
+		if (cookie == __nullptr)
+		{
+			UCLIDException ue("ELI51790", "Unable to set Application Role.");
+			ue.addDebugInfo("Role", applicationRoleName);
+			throw ue;
+		}
 		_cookie = cmd->Parameters->Item["@cookie"]->Value;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51759");
@@ -72,22 +85,34 @@ void CppSqlApplicationRole::CreateApplicationRole(
 			// Parameters are not being used here because the "CREATE APPLICATION ROLE" sql would not accept them.
 			string sql = "CREATE APPLICATION ROLE " + applicationRoleName + " WITH PASSWORD = '" + password + "', DEFAULT_SCHEMA = dbo; ";
 			if (access > 0)
-				sql += "\r\nGRANT SELECT TO " + applicationRoleName +"; ";
-			if ((access & AppRoleAccess::InsertAccess) > 0)
+			{
+				sql += "\r\nGRANT EXECUTE TO " + applicationRoleName + "; ";
+				sql += "\r\nGRANT SELECT TO " + applicationRoleName + "; ";
+			}
+			if ((access & AppRoleAccess::InsertAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
 				sql += "\r\nGRANT INSERT TO " + applicationRoleName + "; ";
-			if ((access & AppRoleAccess::UpdateAccess) > 0)
+			if ((access & AppRoleAccess::UpdateAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
 				sql += "\r\nGRANT UPDATE TO " + applicationRoleName + "; ";
-			if ((access & AppRoleAccess::DeleteAccess) > 0)
+			if ((access & AppRoleAccess::DeleteAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
 				sql += "\r\nGRANT DELETE TO " + applicationRoleName + "; ";
+			if ((access & AppRoleAccess::AlterAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
+				sql += "\r\nGRANT ALTER TO " + applicationRoleName + "; ";
 
 			cmd->CommandText = sql.c_str();
-			cmd->Execute(NULL, NULL, adCmdText);
+
+			executeCmd(cmd);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51765")
 	}
 	catch (UCLIDException& ue)
 	{
 		ue.addDebugInfo("ApplicationRole", applicationRoleName);
+		ue.log();
 		throw;
 	}
+}
+void CppSqlApplicationRole::CreateAllRoles(ADODB::_ConnectionPtr ipConnection)
+{
+	CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractSecurityRole", "Change2This3Password", CppSqlApplicationRole::SelectExecuteAccess);
+	CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractRole", "Change2This3Password", CppSqlApplicationRole::AllAccess);
 }

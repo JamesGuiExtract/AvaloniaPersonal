@@ -94,7 +94,7 @@ namespace FAMUtils {
 			map<std::string, variant_t> mapEmpty;
 			selectCmd = buildCmd(connection, "SELECT Count(ID) c FROM DBINFO", mapEmpty);
 
-			if ((access & CppSqlApplicationRole::SelectAccess) > 0)
+			if ((access & CppSqlApplicationRole::SelectExecuteAccess) > 0)
 			{
 				auto selectResults = selectCmd->Execute(NULL, NULL, adCmdText);
 				Assert::Greater(selectResults->Fields->Item["c"]->Value, 0, description + ": Number of records in DBInfo should be > 0");
@@ -107,7 +107,7 @@ namespace FAMUtils {
 			insertCmd = buildCmd(connection, "INSERT INTO DBInfo(Name, Value) VALUES(@Name, '1'); ",
 				{{"@Name", (marshal_as<std::string>(description) + "_TestName_Delete").c_str()}});
 
-			if ((access & CppSqlApplicationRole::InsertAccess) > 0)
+			if ((access & CppSqlApplicationRole::InsertAccess & ~ CppSqlApplicationRole::SelectExecuteAccess) > 0)
 			{
 				variant_t records;
 				insertCmd->Execute(&records, NULL, adCmdText);
@@ -128,7 +128,7 @@ namespace FAMUtils {
 
 			updateCmd = buildCmd(connection, "UPDATE DBInfo Set Value = '200' WHERE Name = 'CommandTimeout'", mapEmpty);
 
-			if ((access & CppSqlApplicationRole::UpdateAccess) > 0)
+			if ((access & CppSqlApplicationRole::UpdateAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
 			{
 				variant_t records;
 				updateCmd->Execute(&records, NULL, adCmdText);
@@ -139,10 +139,9 @@ namespace FAMUtils {
 				Assert::IsTrue(throwsException(updateCmd), description + ": Update command should throw exception");
 			}
 
-			deleteCmd = buildCmd(connection, "DELETE FROM DBInfo WHERE Name = @Name",
-				{ {"@Name", (marshal_as<std::string>(description) + "_TestName_Delete").c_str()} });
+			deleteCmd = buildCmd(connection, "DELETE TOP(1) FROM DBInfo", mapEmpty);
 
-			if ((access & CppSqlApplicationRole::DeleteAccess) > 0)
+			if ((access & CppSqlApplicationRole::DeleteAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
 			{
 				variant_t records;
 				deleteCmd->Execute(&records, NULL, adCmdText);

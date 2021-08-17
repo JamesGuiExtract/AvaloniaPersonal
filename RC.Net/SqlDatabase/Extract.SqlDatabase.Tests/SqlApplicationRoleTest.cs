@@ -45,7 +45,7 @@ namespace Extract.SqlDatabase.Tests
         [Category("Automated")]
         [Category("SQLApplicationRoleTests")]
         [TestCase(SqlApplicationRole.AppRoleAccess.NoAccess, "TestSqlApplicationRoleTest_NoAccess", Description = "Sql Application role for no access")]
-        [TestCase(SqlApplicationRole.AppRoleAccess.SelectAccess, "TestSqlApplicationRoleTest_SelectAccess", Description = "Sql Application role for Select access")]
+        [TestCase(SqlApplicationRole.AppRoleAccess.SelectExecuteAccess, "TestSqlApplicationRoleTest_SelectExecuteAccess", Description = "Sql Application role for Select and Execute access")]
         [TestCase(SqlApplicationRole.AppRoleAccess.InsertAccess, "TestSqlApplicationRoleTest_InsertAccess", Description = "Sql Application role for Insert access")]
         [TestCase(SqlApplicationRole.AppRoleAccess.UpdateAccess, "TestSqlApplicationRoleTest_UpdateAccess", Description = "Sql Application role for Update access")]
         [TestCase(SqlApplicationRole.AppRoleAccess.DeleteAccess, "TestSqlApplicationRoleTest_DeleteAccess", Description = "Sql Application role for Delete access")]
@@ -56,8 +56,9 @@ namespace Extract.SqlDatabase.Tests
             {
                 var fileProcessingDb = testDbManager.GetNewDatabase(testDBName);
 
-                using var connection = SqlUtil.NewSqlDBConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
-                connection.Open();
+                using var applicationRoleConnection = new NoAppRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+
                 // create new records in the DBInfo table that will be used in the test
                 using var cmd = connection.CreateCommand();
                 cmd.CommandText = "INSERT INTO DBInfo (Name, Value) VALUES ('Access Set', 'Access Set'), ('Restored access', 'Restored access');";
@@ -80,27 +81,10 @@ namespace Extract.SqlDatabase.Tests
         {
             SqlCommand selectCmd, insertCmd, updateCmd, deleteCmd;
             // Verify that the required access is given
-            selectCmd = connection.CreateCommand();
-            selectCmd.CommandText = "SELECT Count(ID) FROM DBINFO";
-            if ((access & SqlApplicationRole.AppRoleAccess.SelectAccess) > 0)
-            {
-                Assert.DoesNotThrow(() =>
-                {
-                    Assert.Greater((int)selectCmd.ExecuteScalar(), 0, $"{description}: Number of records in DBInfo should be > 0");
-                }, $"{description}: Should execute Select statement on database");
-
-            }
-            else
-            {
-                Assert.Throws<SqlException>(() =>
-                {
-                    selectCmd.ExecuteScalar();
-                }, $"{ description}: Select statement Should throw the SqlException");
-
-            }
+            selectCmd = ValidateSelectCommand(access, connection, description);
             insertCmd = connection.CreateCommand();
             insertCmd.CommandText = $"INSERT INTO DBInfo (Name, Value) VALUES( '{description}_TestName_Delete', '1');";
-            if ((access & SqlApplicationRole.AppRoleAccess.InsertAccess) > 0)
+            if ((access & SqlApplicationRole.AppRoleAccess.InsertAccess & ~SqlApplicationRole.AppRoleAccess.SelectExecuteAccess) > 0)
             {
                 Assert.DoesNotThrow(() =>
                 {
@@ -120,7 +104,7 @@ namespace Extract.SqlDatabase.Tests
             }
             updateCmd = connection.CreateCommand();
             updateCmd.CommandText = "UPDATE DBInfo Set Value = '200' WHERE Name = 'CommandTimeout'";
-            if ((access & SqlApplicationRole.AppRoleAccess.UpdateAccess) > 0)
+            if ((access & SqlApplicationRole.AppRoleAccess.UpdateAccess & ~SqlApplicationRole.AppRoleAccess.SelectExecuteAccess) > 0)
             {
                 Assert.DoesNotThrow(() =>
                 {
@@ -136,8 +120,8 @@ namespace Extract.SqlDatabase.Tests
 
             }
             deleteCmd = connection.CreateCommand();
-            deleteCmd.CommandText = $"DELETE FROM DBInfo WHERE Name = '{description}'";
-            if ((access & SqlApplicationRole.AppRoleAccess.DeleteAccess) > 0)
+            deleteCmd.CommandText = $"DELETE TOP(1) FROM DBInfo";
+            if ((access & SqlApplicationRole.AppRoleAccess.DeleteAccess & ~SqlApplicationRole.AppRoleAccess.SelectExecuteAccess) > 0)
             {
                 Assert.DoesNotThrow(() =>
                 {
@@ -151,6 +135,30 @@ namespace Extract.SqlDatabase.Tests
                     deleteCmd.ExecuteNonQuery();
                 }, $"{description}: Delete statement should throw SqlException");
             }
+        }
+
+        private static SqlCommand ValidateSelectCommand(SqlApplicationRole.AppRoleAccess access, SqlConnection connection, string description)
+        {
+            SqlCommand selectCmd = connection.CreateCommand();
+            selectCmd.CommandText = "SELECT Count(ID) FROM DBINFO";
+            if ((access & SqlApplicationRole.AppRoleAccess.SelectExecuteAccess) > 0)
+            {
+                Assert.DoesNotThrow(() =>
+                {
+                    Assert.Greater((int)selectCmd.ExecuteScalar(), 0, $"{description}: Number of records in DBInfo should be > 0");
+                }, $"{description}: Should execute Select statement on database");
+
+            }
+            else
+            {
+                Assert.Throws<SqlException>(() =>
+                {
+                    selectCmd.ExecuteScalar();
+                }, $"{ description}: Select statement Should throw the SqlException");
+
+            }
+
+            return selectCmd;
         }
     }
 }

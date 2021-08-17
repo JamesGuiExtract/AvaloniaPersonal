@@ -41,7 +41,7 @@ namespace FAMUtils {
 			[TestCase(3/*SqlApplicationRole.AppRoleAccess.InsertAccess*/, "TestCppUseApplicationRoleTest_InsertAccess", Description = "Sql Application role for Insert access")]
 			[TestCase(5/*SqlApplicationRole.AppRoleAccess.UpdateAccess*/, "TestCppUseApplicationRoleTest_UpdateAccess", Description = "Sql Application role for Update access")]
 			[TestCase(9/*SqlApplicationRole.AppRoleAccess.DeleteAccess*/, "TestCppUseApplicationRoleTest_DeleteAccess", Description = "Sql Application role for Delete access")]
-			[TestCase(int::MaxValue /*SqlApplicationRole.AppRoleAccess.AllAccess*/, "TestCppUseApplicationRoleTest_AllAccess", Description = "Sql Application role for All access")]
+			[TestCase(15 /*SqlApplicationRole.AppRoleAccess.AllAccess*/, "TestCppUseApplicationRoleTest_AllAccess", Description = "Sql Application role for All access")]
 			static void UseApplicationRoleTest(int access, System::String^ testDBName);
 		};
 	}

@@ -24,6 +24,7 @@
 #include <StringTokenizer.h>
 #include <ValueRestorer.h>
 #include <DateUtil.h>
+#include <SqlApplicationRole.h>
 
 #include <atlsafe.h>
 
@@ -41,7 +42,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 196;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 197;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3196,6 +3197,33 @@ int UpdateToSchemaVersion196(_ConnectionPtr ipConnection, long* pnNumSteps,
 		return nNewSchemaVersion;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51768");
+}
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion197(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 197;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractSecurityRole", "Change2This3Password", CppSqlApplicationRole::AllAccess);
+		CppSqlApplicationRole::CreateApplicationRole(ipConnection, "ExtractRole", "Change2This3Password", CppSqlApplicationRole::AllAccess);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51777");
 }
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -8122,6 +8150,10 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 	{
 		try
 		{
+			ValueRestorer<bool> UseApplicationRolesRestorer(m_bUseApplicationRoles);
+
+			getThisAsCOMPtr()->UseApplicationRoles = VARIANT_FALSE;
+
 			// Make sure all Product specific DB managers have been recognized.
 			checkForNewDBManagers();
 
@@ -8273,7 +8305,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 193:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion194);
 				case 194:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion195);
 				case 195:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion196);
-				case 196:
+				case 196:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion197);
+				case 197: 
 					break;
 
 				default:

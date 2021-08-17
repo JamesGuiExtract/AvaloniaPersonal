@@ -2,6 +2,7 @@
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace Extract.SqlDatabase.Tests
@@ -52,7 +53,8 @@ namespace Extract.SqlDatabase.Tests
             {
                 var fileProcessingDb = testDbManager.GetNewDatabase(testDBName);
 
-                using var connection = SqlUtil.NewSqlDBConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
+                using var applicationRoleConnection = new NoAppRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
 
                 Assert.DoesNotThrow(() => { SqlApplicationRole.CreateApplicationRole(connection, "TestRole", "Test-Password2", SqlApplicationRole.AppRoleAccess.AllAccess); }
                     , "CreateApplication call must not throw an exception");

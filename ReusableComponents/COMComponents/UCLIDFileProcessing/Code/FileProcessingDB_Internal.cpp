@@ -24,6 +24,7 @@
 #include <ValueRestorer.h>
 #include <VectorOperations.h>
 #include <FAMDBSemaphore.h>
+#include <CppApplicationRoleConnection.h>
 
 #include <string>
 #include <memory>
@@ -74,18 +75,14 @@ void CFileProcessingDB::closeDBConnection()
 	// Get the current thread ID
 	DWORD dwThreadID = GetCurrentThreadId();
 
-	map<DWORD, _ConnectionPtr>::iterator it;
-	it = m_mapThreadIDtoDBConnections.find(dwThreadID);
+	map<DWORD, unique_ptr<CppBaseApplicationRoleConnection>>::iterator it;
+	it = m_mapThreadIDtoDBAppRoleConnections.find(dwThreadID);
 
-	if (it != m_mapThreadIDtoDBConnections.end())
+	if (it != m_mapThreadIDtoDBAppRoleConnections.end())
 	{
-		// close the connection if it is open
-		_ConnectionPtr ipConnection = it->second;
-		if (ipConnection != __nullptr && ipConnection->State != adStateClosed)
-		{
-			// close the database connection
-			ipConnection->Close();
-		}
+		it->second.reset(__nullptr);
+		m_mapThreadIDtoDBAppRoleConnections.erase(it);
+		
 		// Post message indicating that the database's connection is no longer established
 		postStatusUpdateNotification(kConnectionNotEstablished);
 	}
@@ -1449,6 +1446,8 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 	{
 		try
 		{
+			validateServerAndDatabase();
+
 			// Get the current threads ID
 			DWORD dwThreadID = GetCurrentThreadId();
 
@@ -1458,116 +1457,57 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 			// connection to be reset
 			CSingleLock lg(&m_criticalSection, TRUE);
 
-			map<DWORD, _ConnectionPtr>::iterator it;
-			it = m_mapThreadIDtoDBConnections.find(dwThreadID);
+			map<DWORD, unique_ptr<CppBaseApplicationRoleConnection>>::iterator it;
+			it = m_mapThreadIDtoDBAppRoleConnections.find(dwThreadID);
 			_lastCodePos = "5";
 
-			if (it != m_mapThreadIDtoDBConnections.end())
+			if (it != m_mapThreadIDtoDBAppRoleConnections.end())
 			{
-				ipConnection = it->second;
+				ipConnection = *it->second;
+				if (ipConnection->State != adStateClosed) return ipConnection;
 			}
 
-			// check to see if the DB connection has been allocated
-			if (ipConnection == __nullptr)
-			{
-				_lastCodePos = "10";
-				ipConnection.CreateInstance(__uuidof(Connection));
-				ASSERT_RESOURCE_ALLOCATION("ELI13650",  ipConnection != __nullptr);
+			bool bFirstConnection = m_mapThreadIDtoDBAppRoleConnections.size() == 0;
+			if ( bFirstConnection)
+				resetOpenConnectionData();
 
-				// Reset the schema version to indicate that it needs to be read from DB
-				m_iDBSchemaVersion = 0;
-			}
+			ipConnection = getDBConnectionWithoutAppRole();
+			ASSERT_RESOURCE_ALLOCATION("ELI13650", ipConnection != __nullptr);
 
 			_lastCodePos = "20";
+			if (m_bUseApplicationRoles)
+				m_mapThreadIDtoDBAppRoleConnections[dwThreadID].reset(new ExtractRoleConnection(ipConnection));
+			else
+				m_mapThreadIDtoDBAppRoleConnections[dwThreadID].reset(new NoRoleConnection(ipConnection));
 
-			// if closed and Database server and database name are defined,  open the database connection
-			if (ipConnection->State == adStateClosed && !m_strDatabaseServer.empty() 
-				&& !m_strDatabaseName.empty())
-			{
-				_lastCodePos = "30";
+			ipConnection = m_mapThreadIDtoDBAppRoleConnections[dwThreadID]->operator ADODB::_ConnectionPtr();
 
-				// Since the database is being opened reset the m_lFAMUserID and m_lMachineID
-				m_lFAMUserID = 0;
-				m_lMachineID = 0;
-				m_bDeniedFastCountPermission = false;
-				m_mapWorkflowDefinitions.clear();
-				m_mapActionIdsForActiveWorkflow.clear();
-
-				// Zero indicates the ID needs to be looked up next time the ID is requested.
-				// -1 indicates there is no active workflow.
-				m_nActiveWorkflowID = 0;
-
-				// Set the status of the connection to not connected
-				m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
-				m_ipDBInfoSettings = __nullptr;
-
-				// Create the connection string with the current server and database
-				strConnectionString = createConnectionString(m_strDatabaseServer, 
-					m_strDatabaseName);
-
-				// If any advanced connection string properties are specified, update/override the
-				// default connection string.
-				if (!m_strAdvConnStrProperties.empty())
-				{
-					updateConnectionStringProperties(strConnectionString, m_strAdvConnStrProperties);
-					
-					// Log an application trace to indicate this process in connecting with advanced
-					// connection string properties. Only do this once per process unless the
-					// connection string changes.
-					CSingleLock lock(&ms_mutexSpecialLoggingLock, TRUE);
-					if (ms_strLastUsedAdvConnStr != strConnectionString)
-					{
-						UCLIDException ue("ELI35133", "Application trace: Attempting connection with "
-							"advanced connection string attributes.");
-						ue.addDebugInfo("Connection string", strConnectionString, true);
-						ue.log();
-						ms_strLastUsedAdvConnStr = strConnectionString;
-					}
-				}
-
-				_lastCodePos = "40";
-
-				// Open the database
-				ipConnection->Open (strConnectionString.c_str(), "", "", adConnectUnspecified);
-
-				_lastCodePos = "50";
-
-				// Reset the schema version to indicate that it needs to be read from DB
-				m_iDBSchemaVersion = 0;
-
-				// After every successful connection, re-check the enabled features from the DB.
-				m_bCheckedFeatures = false;
-
-				// Add the connection to the map
-				m_mapThreadIDtoDBConnections[dwThreadID] = ipConnection;
-
-				// Load the database settings
+			if (bFirstConnection)
 				loadDBInfoSettings(ipConnection);
 
-				_lastCodePos = "60";
+			_lastCodePos = "60";
 
-				// Set the command timeout
-				ipConnection->CommandTimeout = m_iCommandTimeout;
+			// Set the command timeout
+			ipConnection->CommandTimeout = m_iCommandTimeout;
 
-				_lastCodePos = "70";
+			_lastCodePos = "70";
 
-				// Connection has been established 
-				m_strCurrentConnectionStatus = gstrCONNECTION_ESTABLISHED;
+			// Connection has been established 
+			m_strCurrentConnectionStatus = gstrCONNECTION_ESTABLISHED;
 
-				// Ensure that if we have connected to a different DB that we last connected to,
-				// user will need to re-authenticate.
-				if (strConnectionString != m_strLastConnectionString)
-				{
-					m_bLoggedInAsAdmin = false;
-				}
-
-				m_strLastConnectionString = strConnectionString;
-
-				_lastCodePos = "80";
-
-				// Post message indicating that the database's connection is now established
-				postStatusUpdateNotification(kConnectionEstablished);
+			// Ensure that if we have connected to a different DB that we last connected to,
+			// user will need to re-authenticate.
+			if (strConnectionString != m_strLastConnectionString)
+			{
+				m_bLoggedInAsAdmin = false;
 			}
+
+			m_strLastConnectionString = strConnectionString;
+
+			_lastCodePos = "80";
+
+			// Post message indicating that the database's connection is now established
+			postStatusUpdateNotification(kConnectionEstablished);
 
 			// return the open connection
 			return ipConnection;
@@ -1592,6 +1532,80 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 		throw ue;
 	}
 }
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::resetOpenConnectionData()
+{
+	// Since the database is being opened reset the m_lFAMUserID and m_lMachineID
+	m_lFAMUserID = 0;
+	m_lMachineID = 0;
+	m_bDeniedFastCountPermission = false;
+	m_mapWorkflowDefinitions.clear();
+	m_mapActionIdsForActiveWorkflow.clear();
+
+	// Zero indicates the ID needs to be looked up next time the ID is requested.
+	// -1 indicates there is no active workflow.
+	m_nActiveWorkflowID = 0;
+
+	// Set the status of the connection to not connected
+	m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
+	m_ipDBInfoSettings = __nullptr;
+
+
+	// Reset the schema version to indicate that it needs to be read from DB
+	m_iDBSchemaVersion = 0;
+
+	// After every successful connection, re-check the enabled features from the DB.
+	m_bCheckedFeatures = false;
+}
+//--------------------------------------------------------------------------------------------------
+_ConnectionPtr CFileProcessingDB::getDBConnectionWithoutAppRole()
+{
+	_ConnectionPtr ipConnection(__uuidof(Connection));
+	ASSERT_RESOURCE_ALLOCATION("ELI51778", ipConnection != __nullptr);
+
+	validateServerAndDatabase();
+	
+	// Create the connection string with the current server and database
+	string strConnectionString = createConnectionString(m_strDatabaseServer,
+		m_strDatabaseName);
+
+	// If any advanced connection string properties are specified, update/override the
+	// default connection string.
+	if (!m_strAdvConnStrProperties.empty())
+	{
+		updateConnectionStringProperties(strConnectionString, m_strAdvConnStrProperties);
+
+		// Log an application trace to indicate this process in connecting with advanced
+		// connection string properties. Only do this once per process unless the
+		// connection string changes.
+		CSingleLock lock(&ms_mutexSpecialLoggingLock, TRUE);
+		if (ms_strLastUsedAdvConnStr != strConnectionString)
+		{
+			UCLIDException ue("ELI35133", "Application trace: Attempting connection with "
+				"advanced connection string attributes.");
+			ue.addDebugInfo("Connection string", strConnectionString, true);
+			ue.log();
+			ms_strLastUsedAdvConnStr = strConnectionString;
+		}
+	}
+
+	// Open the database
+	ipConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
+
+	return ipConnection;
+}
+
+void CFileProcessingDB::validateServerAndDatabase()
+{
+	if (m_strDatabaseName.empty() || m_strDatabaseServer.empty())
+	{
+		UCLIDException ue("ELI51779", "No Database or Server set.");
+		ue.addDebugInfo("Server", m_strDatabaseServer);
+		ue.addDebugInfo("Database", m_strDatabaseName);
+		throw ue;
+	}
+}
+
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::validateLicense()
 {
@@ -3243,7 +3257,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 			if (!bConnectionGood)
 			{
 				CSingleLock lock(&m_criticalSection, TRUE);
-				bAllConnectionsClosed = (m_mapThreadIDtoDBConnections.size() == 0);
+				bAllConnectionsClosed = (m_mapThreadIDtoDBAppRoleConnections.size() == 0);
 			}
 
 			// Ensure the semaphore lock is released if we had it.
@@ -4450,19 +4464,6 @@ void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = fa
 
 			_lastCodePos = "50";
 
-			// Ensure the database has been initialized.
-			if (isBlankDB())
-			{
-				m_strCurrentConnectionStatus = gstrDB_NOT_INITIALIZED;
-
-				UCLIDException ue("ELI36146", "The database has not been initialized.");
-				ue.addDebugInfo("Database Name", m_strDatabaseName);
-				ue.addDebugInfo("Database Server", m_strDatabaseServer);
-				throw ue;
-			}
-
-			_lastCodePos = "60";
-
 			// Validate the schema
 			validateDBSchemaVersion(bCheckForUnaffiliatedFiles);
 		}
@@ -4477,6 +4478,29 @@ void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = fa
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");
 }
 //--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::checkSecurity()
+{
+	validateServerAndDatabase();
+
+	auto ipConnection = getDBConnectionWithoutAppRole();
+	unique_ptr<CppBaseApplicationRoleConnection> securityCheckRole;
+	try
+	{
+		securityCheckRole.reset(new SecurityRoleConnection(ipConnection));
+	}
+	catch (...)
+	{
+		m_bUseApplicationRoles = false;
+		securityCheckRole.reset(new NoRoleConnection(ipConnection));
+	}
+
+	// TODO: Code for checking what the user is allowed to do before openning Full security
+	// expectation is that normal users have only Connect access to the database
+	// Throw exception if user is not allowed access.
+	// If users is admin user it m_UseApplicationRoles should be set to false
+
+}
+//--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI03275");
@@ -4486,41 +4510,8 @@ void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 		
 		_lastCodePos = "20";
 		
-		// Initialize count for MLI Code iteration count
-		long nCount = 0;
-		map<DWORD, _ConnectionPtr>::iterator it;
-		for (it = m_mapThreadIDtoDBConnections.begin(); it != m_mapThreadIDtoDBConnections.end(); it++)
-		{
-
-			// Do the close within a try catch because an exception on the close could just mean the connection is in a bad state and
-			// recreating and opening will put it in a good state
-			try
-			{
-				try
-				{
-					_ConnectionPtr ipDBConnection = it->second;
-					_lastCodePos = "25-" + asString(nCount);
-
-					// This will close the existing connection if not already closed
-					if (ipDBConnection != __nullptr && ipDBConnection->State != adStateClosed)
-					{
-						_lastCodePos = "30";
-
-						ipDBConnection->Close();
-					}
-				}
-				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI29884")
-			}
-			catch (UCLIDException &ue)
-			{
-				UCLIDException uexOuter("ELI35366",
-					"Application trace: Failed to clean up old connection.", ue);
-				uexOuter.log();
-			}
-		}
-
 		// Clear all of the connections in all of the threads
-		m_mapThreadIDtoDBConnections.clear();
+		m_mapThreadIDtoDBAppRoleConnections.clear();
 		_lastCodePos = "35";
 
 		// If the close is not temporary, don't carry any credentials over to the next connection.
@@ -4571,7 +4562,7 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 					assertProcessingNotActiveForAnyAction(true);
 				}
 			}
-		
+
 			// Need to make sure the databaseID is loaded from the DBInfo table if it is there
 			if (doesTableExist(ipConnection, gstrDB_INFO))
 			{
@@ -4604,10 +4595,10 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 			{
 				ipProdSpecMgrs = removeProductSpecificDB(true, retainUserValues);
 				ASSERT_RESOURCE_ALLOCATION("ELI38283", ipProdSpecMgrs != __nullptr);
-				
+
 				// Clear Status info from DatabaseService table - this needs to be done before tables are dropped
 				executeCmdQuery(ipConnection, gstr_CLEAR_DATABASE_SERVICE_STATUS_FIELDS);
-				
+
 				dropTables(retainUserValues);
 			}
 
@@ -4639,11 +4630,12 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 			addProductSpecificDB(ipConnection, ipProdSpecMgrs, !bInitializing, !retainUserValues);
 			tg.CommitTrans();
 
-			// Reset the database connection
-			resetDBConnection();
-
 			// Shrink the database
 			executeCmdQuery(getDBConnection(), gstrSHRINK_DATABASE);
+
+			m_bUseApplicationRoles = true;
+			// Reset the database connection
+			resetDBConnection();
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26870");
 	}

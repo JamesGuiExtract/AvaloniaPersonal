@@ -203,6 +203,9 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 
 		// Expand the action name
 		string strExpandedAction = getExpandedActionName();
+		
+		// Reset the DB Connection
+		getFPMDB()->ResetDBConnection(VARIANT_FALSE, VARIANT_FALSE);
 
 		// Validate that the action name exists in the database (auto-create if that setting is set)
 		getFPMDB()->AutoCreateAction(strExpandedAction.c_str());
@@ -210,9 +213,6 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 		// start the processing
 		m_bPaused = false;
 		m_bCancelling = false;
-
-		// Reset the DB Connection
-		getFPMDB()->ResetDBConnection(VARIANT_FALSE, VARIANT_FALSE);
 
 		// Before starting processing or supplying verify that the workflow configuration is correct
 		UCLID_FILEPROCESSINGLib::IFileActionMgmtRolePtr ipSupplyingActionMgmtRole =

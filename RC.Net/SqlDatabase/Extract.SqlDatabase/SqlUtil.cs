@@ -6,16 +6,27 @@ namespace Extract.SqlDatabase
     {
         public static SqlConnection NewSqlDBConnection(string databaseServer, string databaseName, bool enlist = true)
         {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = databaseServer;
-            sqlConnectionBuild.InitialCatalog = databaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            sqlConnectionBuild.Enlist = enlist;
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
+            try
+            {
+                // Build the connection string from the settings
+                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
+                sqlConnectionBuild.DataSource = databaseServer;
+                sqlConnectionBuild.InitialCatalog = databaseName;
+                sqlConnectionBuild.IntegratedSecurity = true;
+                sqlConnectionBuild.NetworkLibrary = "dbmssocn";
+                sqlConnectionBuild.MultipleActiveResultSets = true;
+                sqlConnectionBuild.Enlist = enlist;
+                sqlConnectionBuild.MultipleActiveResultSets = true;
+                sqlConnectionBuild.Pooling = false;
+                return new SqlConnection(sqlConnectionBuild.ConnectionString);
+            }
+            catch (System.Exception ex)
+            {
+                ExtractException ee = ex.AsExtract("ELI51774");
+                ee.AddDebugData("DatabaseServer", databaseServer);
+                ee.AddDebugData("DatabaseName", databaseName);
+                throw ee;
+            }
         }
     }
 }
