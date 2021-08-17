@@ -1,4 +1,5 @@
-﻿using Extract;
+﻿using Extract; 
+using Extract.SqlDatabase;
 using System;
 using System.ComponentModel;
 using System.Data.Common;
@@ -43,7 +44,9 @@ namespace DatabaseMigrationWizard.Database.Input
 
         public SqlTransaction Transaction { get; set; }
 
-        public SqlConnection SqlConnection { get; set; }
+        public ApplicationRoleConnection RoleConnection { get; set; }
+
+        public SqlConnection SqlConnection { get { return RoleConnection?.SqlConnection; } }
 
         public void ExecuteCommand(string command)
         {

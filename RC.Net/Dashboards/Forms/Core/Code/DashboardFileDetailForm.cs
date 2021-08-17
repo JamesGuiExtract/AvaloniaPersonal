@@ -1,5 +1,6 @@
 ﻿using Extract.AttributeFinder;
 using Extract.Imaging.Forms;
+using Extract.SqlDatabase;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -160,27 +161,26 @@ namespace Extract.Dashboard.Forms
             {
                 if (!_attributesByIdAndXPathContext.ContainsKey(attributeFileSetID))
                 {
-                    using (var connection = NewSqlDBConnection())
-                    {
-                        connection.Open();
-                        var cmd = connection.CreateCommand();
-                        cmd.CommandTimeout = 60;
-                        cmd.CommandText = "SELECT VOA FROM AttributeSetForFile WHERE ID = @AttributeSetForFileID";
-                        cmd.Parameters.AddWithValue("@AttributeSetForFileID", attributeFileSetID);
-                        using (SqlDataReader voaReader = cmd.ExecuteReader())
-                        {
-                            int VOAColumn = voaReader.GetOrdinal("VOA");
-                            if (voaReader.Read())
-                            {
-                                Stream voaStream = voaReader.GetStream(VOAColumn);
-                                IUnknownVector attributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(voaStream);
+                    using var applicationRoleConnection = new ExtractRoleConnection(ServerName, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
 
-                                _attributesByIdAndXPathContext[attributeFileSetID] = new XPathContext(attributes);
-                            }
-                            else
-                            {
-                                return null;
-                            }
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandTimeout = 60;
+                    cmd.CommandText = "SELECT VOA FROM AttributeSetForFile WHERE ID = @AttributeSetForFileID";
+                    cmd.Parameters.AddWithValue("@AttributeSetForFileID", attributeFileSetID);
+                    using (SqlDataReader voaReader = cmd.ExecuteReader())
+                    {
+                        int VOAColumn = voaReader.GetOrdinal("VOA");
+                        if (voaReader.Read())
+                        {
+                            Stream voaStream = voaReader.GetStream(VOAColumn);
+                            IUnknownVector attributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(voaStream);
+
+                            _attributesByIdAndXPathContext[attributeFileSetID] = new XPathContext(attributes);
+                        }
+                        else
+                        {
+                            return null;
                         }
                     }
                 }
@@ -246,24 +246,22 @@ namespace Extract.Dashboard.Forms
                     // Setup task to get the data from the database
                     _loadingTask = Task.Run<DataTable>(() =>
                     {
-                        using (var connection = NewSqlDBConnection())
+                        using var applicationRoleConnection = new ExtractRoleConnection(ServerName, DatabaseName);
+                        SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                        using var command = connection.CreateCommand();
+                        command.CommandTimeout = 0;
+                        command.CommandText = _gridDetailConfiguration.RowQuery + " OPTION (RECOMPILE)";
+
+                        // add the column values as parameters for the query
+                        foreach (var kp in _columnValues)
                         {
-                            connection.Open();
-
-                            var command = connection.CreateCommand();
-                            command.CommandTimeout = 0;
-                            command.CommandText = _gridDetailConfiguration.RowQuery + " OPTION (RECOMPILE)";
-
-                            // add the column values as parameters for the query
-                            foreach (var kp in _columnValues)
-                            {
-                                command.Parameters.AddWithValue("@" + kp.Key, ((object)kp.Value) ?? DBNull.Value);
-                            }
-                            var gridDataTable = new DataTable();
-                            gridDataTable.Locale = CultureInfo.CurrentCulture;
-                            gridDataTable.Load(command.ExecuteReader());
-                            return gridDataTable;
+                            command.Parameters.AddWithValue("@" + kp.Key, ((object)kp.Value) ?? DBNull.Value);
                         }
+                        var gridDataTable = new DataTable();
+                        gridDataTable.Locale = CultureInfo.CurrentCulture;
+                        gridDataTable.Load(command.ExecuteReader());
+                        return gridDataTable;
                     });
 
                     // Set up timer to populate the grid when the task is done
@@ -325,22 +323,6 @@ namespace Extract.Dashboard.Forms
                     col.HeaderCell.Style.BackColor = color;
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns a connection to the configured database. 
-        /// </summary>
-        /// <returns>SqlConnection that connects to the <see cref="DatabaseServer"/> and <see cref="DatabaseName"/></returns>
-        SqlConnection NewSqlDBConnection()
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = ServerName;
-            sqlConnectionBuild.InitialCatalog = DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using Extract.Utilities;
+﻿using Extract.SqlDatabase;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -108,35 +109,34 @@ namespace Extract.ETL
             };
             dataGridView.Columns.Add(dashboardAttributeNameColumn);
             _defaultsForNew.DashboardAttributeName = "";
-            
-            using (var connection = NewSqlDBConnection())
-            {
-                connection.Open();
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = "Select ID, Description FROM AttributeSetName";
-                    DataTable attributeSets = new DataTable();
-                    attributeSets.Locale = CultureInfo.CurrentCulture;
-                    attributeSets.Load(cmd.ExecuteReader());
-                    if (attributeSets.Rows.Count < 1)
-                    {
-                        ExtractException ex = new ExtractException("ELI46108", "No AttributeSets are defined.");
-                        throw ex;
-                    }
 
-                    var attributeSetColumn = new DataGridViewComboBoxColumn()
-                    {
-                        DataPropertyName = "AttributeSetNameID",
-                        HeaderText = "Attribute Set Name",
-                        DataSource = attributeSets,
-                        ValueMember = "ID",
-                        DisplayMember = "Description",
-                        AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-                    };
-                    dataGridView.Columns.Add(attributeSetColumn);
-                    _defaultsForNew.AttributeSetNameID = (Int64) attributeSets.Rows[0]["ID"];
-                }
+            using var applicationRoleConnection = new ExtractRoleConnection(ExpandAttributesService.DatabaseServer,
+                                                               ExpandAttributesService.DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+            using var cmd = connection.CreateCommand();
+
+            cmd.CommandText = "Select ID, Description FROM AttributeSetName";
+            DataTable attributeSets = new DataTable();
+            attributeSets.Locale = CultureInfo.CurrentCulture;
+            attributeSets.Load(cmd.ExecuteReader());
+            if (attributeSets.Rows.Count < 1)
+            {
+                ExtractException ex = new ExtractException("ELI46108", "No AttributeSets are defined.");
+                throw ex;
             }
+
+            var attributeSetColumn = new DataGridViewComboBoxColumn()
+            {
+                DataPropertyName = "AttributeSetNameID",
+                HeaderText = "Attribute Set Name",
+                DataSource = attributeSets,
+                ValueMember = "ID",
+                DisplayMember = "Description",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            };
+            dataGridView.Columns.Add(attributeSetColumn);
+            _defaultsForNew.AttributeSetNameID = (Int64)attributeSets.Rows[0]["ID"];
 
             var pathForAttributeInAttributeSetColumn = new DataGridViewTextBoxColumn()
             {
@@ -147,24 +147,6 @@ namespace Extract.ETL
             };
             dataGridView.Columns.Add(pathForAttributeInAttributeSetColumn);
             _defaultsForNew.PathForAttributeInAttributeSet = "";
-        }
-
-        /// <summary>
-        /// Returns a connection to the configured database
-        /// </summary>
-        /// <param name="enlist">Whether to enlist in a transaction scope if there is one</param>
-        /// <returns>SqlConnection that connects to the <see cref="DatabaseServer"/> and <see cref="DatabaseName"/></returns>
-        protected virtual SqlConnection NewSqlDBConnection(bool enlist = true)
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = ExpandAttributesService.DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = ExpandAttributesService.DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            sqlConnectionBuild.Enlist = enlist;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         #endregion

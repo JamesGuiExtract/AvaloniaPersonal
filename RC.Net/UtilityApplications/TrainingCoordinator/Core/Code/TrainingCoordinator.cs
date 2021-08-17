@@ -1,9 +1,11 @@
 ﻿using Extract.Code.Attributes;
 using Extract.ETL;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -275,39 +277,25 @@ namespace Extract.UtilityApplications.MachineLearning
                     Log += UtilityMethods.FormatCurrent($"{DateTime.Now}\r\n",
                             $"Removing old ML data... \r\n");
 
-                    using (var connection = NewSqlDBConnection())
+                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = _REMOVE_MARKED_MLDATA;
+
+                    // Set the timeout so that it waits indefinitely
+                    cmd.CommandTimeout = 0;
+
+                    try
                     {
-                        try
-                        {
-                            connection.Open();
-                        }
-                        catch (Exception ex)
-                        {
-                            var ue = ex.AsExtract("ELI45801");
-                            ue.AddDebugData("Database Server", DatabaseServer, false);
-                            ue.AddDebugData("Database Name", DatabaseName, false);
-                            throw ue;
-                        }
-
-                        using (var cmd = connection.CreateCommand())
-                        {
-                            cmd.CommandText = _REMOVE_MARKED_MLDATA;
-
-                            // Set the timeout so that it waits indefinitely
-                            cmd.CommandTimeout = 0;
-
-                            try
-                            {
-                                int rowsRemoved = cmd.ExecuteNonQuery();
-                                Log += UtilityMethods.FormatCurrent($"{rowsRemoved} records removed\r\n\r\n");
-                            }
-                            catch (Exception ex)
-                            {
-                                Log += UtilityMethods.FormatCurrent($"{DateTime.Now}\r\n",
-                                    $"Error occurred: {ex.Message}\r\n\r\n");
-                                ex.ExtractLog("ELI45802");
-                            }
-                        }
+                        int rowsRemoved = cmd.ExecuteNonQuery();
+                        Log += UtilityMethods.FormatCurrent($"{rowsRemoved} records removed\r\n\r\n");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log += UtilityMethods.FormatCurrent($"{DateTime.Now}\r\n",
+                            $"Error occurred: {ex.Message}\r\n\r\n");
+                        ex.ExtractLog("ELI45802");
                     }
 
                     SaveStatus(Status);
@@ -561,37 +549,34 @@ namespace Extract.UtilityApplications.MachineLearning
 
         internal void AddModels(IEnumerable<string> names)
         {
-            using (var connection = NewSqlDBConnection())
-            {
-                connection.Open();
-                var trans = connection.BeginTransaction();
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
 
+            var trans = connection.BeginTransaction();
+
+            try
+            {
+                foreach (var modelName in names)
+                {
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = @"INSERT INTO MLModel(Name) VALUES(@ModelName)";
+                    cmd.Parameters.AddWithValue("@ModelName", modelName);
+                    cmd.Transaction = trans;
+                    cmd.ExecuteNonQuery();
+                }
+                trans.Commit();
+            }
+            catch (Exception ex)
+            {
                 try
                 {
-                    foreach (var modelName in names)
-                    {
-                        using (var cmd = connection.CreateCommand())
-                        {
-                            cmd.CommandText = @"INSERT INTO MLModel(Name) VALUES(@ModelName)";
-                            cmd.Parameters.AddWithValue("@ModelName", modelName);
-                            cmd.Transaction = trans;
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                    trans.Commit();
+                    trans.Rollback();
                 }
-                catch (Exception ex)
+                catch (Exception rollbackException)
                 {
-                    try
-                    {
-                        trans.Rollback();
-                    }
-                    catch (Exception rollbackException)
-                    {
-                        rollbackException.ExtractLog("ELI45811");
-                    }
-                    throw new ExtractException("ELI45812", "Unable to add model name", ex);
+                    rollbackException.ExtractLog("ELI45811");
                 }
+                throw new ExtractException("ELI45812", "Unable to add model name", ex);
             }
         }
 

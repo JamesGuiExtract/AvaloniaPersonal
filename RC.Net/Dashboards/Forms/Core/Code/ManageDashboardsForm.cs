@@ -1,4 +1,5 @@
 ﻿using Extract.Interfaces;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -40,13 +41,13 @@ namespace Extract.Dashboard.Forms
                 DatabaseName = databaseName;
                 DatabaseServer = databaseServer;
                 FAMUserID = GetFAMUserID();
-                using (var connection = NewSqlDBConnection())
-                using (var cmd = connection.CreateCommand())
-                {
-                    connection.Open();
-                    cmd.CommandText = "SELECT Value FROM DBInfo WHERE [Name] = 'RootPathForDashboardExtractedData'";
-                    RootFolderForExtractedDataFiles = cmd.ExecuteScalar() as string;
-                }
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                using var cmd = connection.CreateCommand();
+                 
+                cmd.CommandText = "SELECT Value FROM DBInfo WHERE [Name] = 'RootPathForDashboardExtractedData'";
+                RootFolderForExtractedDataFiles = cmd.ExecuteScalar() as string;
             }
             catch (Exception ex)
             {
@@ -93,17 +94,16 @@ namespace Extract.Dashboard.Forms
                 {
                     var v = dashboardDataGridView.CurrentRow.Cells["UseExtractedData"].Value as bool?;
 
-                    using (var connection = NewSqlDBConnection())
-                    {
-                        connection.Open();
-                        var command = connection.CreateCommand();
-                        command.CommandText =
-                            "UPDATE Dashboard SET UseExtractedData = @NewUseExtractedDataValue WHERE DashboardName = @DashboardName";
-                        command.Parameters.AddWithValue("@DashboardName", dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value as string);
-                        command.Parameters.Add("@NewUseExtractedDataValue", SqlDbType.Bit).Value = !v;
-                        command.ExecuteNonQuery();
-                        dashboardDataGridView.CurrentRow.Cells["UseExtractedData"].Value = !v;
-                    }
+                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    
+                    using var command = connection.CreateCommand();
+                    command.CommandText =
+                        "UPDATE Dashboard SET UseExtractedData = @NewUseExtractedDataValue WHERE DashboardName = @DashboardName";
+                    command.Parameters.AddWithValue("@DashboardName", dashboardDataGridView.CurrentRow.Cells["DashboardName"].Value as string);
+                    command.Parameters.Add("@NewUseExtractedDataValue", SqlDbType.Bit).Value = !v;
+                    command.ExecuteNonQuery();
+                    dashboardDataGridView.CurrentRow.Cells["UseExtractedData"].Value = !v;
 
                     return;
                 }
@@ -184,12 +184,12 @@ namespace Extract.Dashboard.Forms
                         GetDashboardDefinitions(dashboardName, selectForm.DashboardFile, out XDocument extractedDataDashboardDefinition,
                             out XDocument dashboardDefinition);
 
-                        using (var connect = NewSqlDBConnection())
-                        {
-                            connect.Open();
-                            var command = connect.CreateCommand();
-                            command.CommandText =
-                                @"UPDATE [Dashboard]
+                        using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                        SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                        using var command = connection.CreateCommand();
+                        command.CommandText =
+                            @"UPDATE [Dashboard]
                                       SET 
                                         [Definition] = @Definition, 
                                         [FAMUserID] = @FAMUserID, 
@@ -205,13 +205,13 @@ namespace Extract.Dashboard.Forms
                                         WHERE [DashboardName] = @DashboardName
                                 ";
 
-                            command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = dashboardName;
-                            command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
-                            command.Parameters.Add("@Definition", SqlDbType.Xml).Value = dashboardDefinition.ToString(SaveOptions.None);
-                            command.Parameters.Add("@ExtractedDataDefinition", SqlDbType.Xml).Value =
-                                (object)extractedDataDashboardDefinition?.ToString(SaveOptions.None) ?? DBNull.Value;
-                            command.ExecuteScalar();
-                        }
+                        command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = dashboardName;
+                        command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
+                        command.Parameters.Add("@Definition", SqlDbType.Xml).Value = dashboardDefinition.ToString(SaveOptions.None);
+                        command.Parameters.Add("@ExtractedDataDefinition", SqlDbType.Xml).Value =
+                            (object)extractedDataDashboardDefinition?.ToString(SaveOptions.None) ?? DBNull.Value;
+                        command.ExecuteScalar();
+
                         LoadDashboardGrid();
                     }
                 }
@@ -276,16 +276,14 @@ namespace Extract.Dashboard.Forms
 
                     if (dashboardDataGridView.CurrentCell.Value as string != _originalCellValue)
                     {
-                        using (var connection = NewSqlDBConnection())
-                        {
-                            connection.Open();
-                            var command = connection.CreateCommand();
-                            command.CommandText =
-                                "UPDATE Dashboard SET DashboardName = @NewDashboardName WHERE DashboardName = @OldDashboardName";
-                            command.Parameters.AddWithValue("@OldDashboardName", _originalCellValue);
-                            command.Parameters.AddWithValue("@NewDashboardName", dashboardDataGridView.CurrentCell.Value as string);
-                            command.ExecuteNonQuery();
-                        }
+                        using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                        SqlConnection connection = applicationRoleConnection.SqlConnection;
+                        using var command = connection.CreateCommand();
+                        command.CommandText =
+                            "UPDATE Dashboard SET DashboardName = @NewDashboardName WHERE DashboardName = @OldDashboardName";
+                        command.Parameters.AddWithValue("@OldDashboardName", _originalCellValue);
+                        command.Parameters.AddWithValue("@NewDashboardName", dashboardDataGridView.CurrentCell.Value as string);
+                        command.ExecuteNonQuery();
                     }
                 }
             }
@@ -339,15 +337,15 @@ namespace Extract.Dashboard.Forms
                             MessageBoxDefaultButton.Button1,
                             (MessageBoxOptions)0) == DialogResult.Yes)
                     {
-                        using (var connection = NewSqlDBConnection())
-                        {
-                            connection.Open();
-                            var command = connection.CreateCommand();
+                        using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                        SqlConnection connection = applicationRoleConnection.SqlConnection;
 
-                            command.CommandText = "DELETE FROM Dashboard WHERE DashboardName = @DashboardName";
-                            command.Parameters.AddWithValue("@DashboardName", dashboardName);
-                            command.ExecuteNonQuery();
-                        }
+                        using var command = connection.CreateCommand();
+
+                        command.CommandText = "DELETE FROM Dashboard WHERE DashboardName = @DashboardName";
+                        command.Parameters.AddWithValue("@DashboardName", dashboardName);
+                        command.ExecuteNonQuery();
+
                         // reload the grid
                         LoadDashboardGrid();
                     }
@@ -369,23 +367,22 @@ namespace Extract.Dashboard.Forms
                 {
                     GetDashboardDefinitions(selectForm.DashboardName, selectForm.DashboardFile, out XDocument ExtractedDataDoc, out XDocument xDoc);
 
-                    using (var connect = NewSqlDBConnection())
-                    {
-                        connect.Open();
-                        var command = connect.CreateCommand();
+                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    using var command = connection.CreateCommand();
 
-                        command.CommandText =
-                            "INSERT INTO Dashboard ([DashboardName], [Definition], [FAMUserID], [LastImportedDate], [ExtractedDataDefinition]) " +
-                            "VALUES ( @DashboardName, @Definition, @FAMUserID, GETDATE(), @ExtractedDataDefinition)";
+                    command.CommandText =
+                        "INSERT INTO Dashboard ([DashboardName], [Definition], [FAMUserID], [LastImportedDate], [ExtractedDataDefinition]) " +
+                        "VALUES ( @DashboardName, @Definition, @FAMUserID, GETDATE(), @ExtractedDataDefinition)";
 
-                        command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = selectForm.DashboardName;
-                        command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
-                        command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString(SaveOptions.None);
-                        command.Parameters.Add("@ExtractedDataDefinition", SqlDbType.Xml).Value =
-                            (object)ExtractedDataDoc?.ToString(SaveOptions.None) ?? DBNull.Value;
+                    command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = selectForm.DashboardName;
+                    command.Parameters.AddWithValue("@FAMUserID", FAMUserID);
+                    command.Parameters.Add("@Definition", SqlDbType.Xml).Value = xDoc.ToString(SaveOptions.None);
+                    command.Parameters.Add("@ExtractedDataDefinition", SqlDbType.Xml).Value =
+                        (object)ExtractedDataDoc?.ToString(SaveOptions.None) ?? DBNull.Value;
 
-                        command.ExecuteScalar();
-                    }
+                    command.ExecuteScalar();
+
                     // reload the grid
                     LoadDashboardGrid();
                 }
@@ -428,21 +425,21 @@ namespace Extract.Dashboard.Forms
                 {
                     Directory.CreateDirectory(defaultFolder);
                 }
-               
+
                 var newFolder = FormsMethods.BrowseForFolder("Folder for extracted data files.", defaultFolder);
                 if (string.IsNullOrEmpty(newFolder))
                 {
                     ExtractException ee = new ExtractException("ELI46879", "Unable to get path for extracted data files.");
                     throw ee;
                 }
-                using (var connection = NewSqlDBConnection())
-                using (var cmd = connection.CreateCommand())
-                {
-                    connection.Open();
-                    cmd.CommandText = "UPDATE DBInfo Set Value = @NewValue WHERE [Name] = 'RootPathForDashboardExtractedData'";
-                    cmd.Parameters.AddWithValue("@NewValue", newFolder);
-                    cmd.ExecuteNonQuery();
-                }
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "UPDATE DBInfo Set Value = @NewValue WHERE [Name] = 'RootPathForDashboardExtractedData'";
+                cmd.Parameters.AddWithValue("@NewValue", newFolder);
+                cmd.ExecuteNonQuery();
+
                 RootFolderForExtractedDataFiles = newFolder;
             }
             extractedDataDashboardDefinition = null;
@@ -463,12 +460,12 @@ namespace Extract.Dashboard.Forms
         {
             try
             {
-                using (var connection = NewSqlDBConnection())
-                {
-                    connection.Open();
-                    var command = connection.CreateCommand();
-                    command.CommandText =
-                        @"SELECT 
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                using var command = connection.CreateCommand();
+                command.CommandText =
+                    @"SELECT 
                             DashboardName, 
                             IsNull(FullUserName, UserName) FullUserName, 
                             LastImportedDate, 
@@ -477,22 +474,21 @@ namespace Extract.Dashboard.Forms
                         FROM Dashboard 
                             INNER JOIN FAMUser ON Dashboard.FAMUserID = FAMUser.ID";
 
-                    DataTable dataTable = new DataTable();
-                    dataTable.Locale = CultureInfo.CurrentCulture;
-                    dataTable.Load(command.ExecuteReader());
-                    dashboardDataGridView.DataSource = dataTable;
-                    dashboardDataGridView.Columns["DashboardName"].HeaderText = "Dashboard Name";
-                    dashboardDataGridView.Columns["DashboardName"].FillWeight = 400;
-                    dashboardDataGridView.Columns["DashboardName"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    dashboardDataGridView.Columns["FullUserName"].HeaderText = "User Imported";
-                    dashboardDataGridView.Columns["LastImportedDate"].HeaderText = "Last Imported";
-                    dashboardDataGridView.Columns["LastImportedDate"].FillWeight = 150;
-                    dashboardDataGridView.Columns["UseExtractedData"].HeaderText = "Use Cached Data";
-                    dashboardDataGridView.Columns["UseExtractedData"].FillWeight = 50;
-                    dashboardDataGridView.Columns["CanCache"].Visible = false;
+                DataTable dataTable = new DataTable();
+                dataTable.Locale = CultureInfo.CurrentCulture;
+                dataTable.Load(command.ExecuteReader());
+                dashboardDataGridView.DataSource = dataTable;
+                dashboardDataGridView.Columns["DashboardName"].HeaderText = "Dashboard Name";
+                dashboardDataGridView.Columns["DashboardName"].FillWeight = 400;
+                dashboardDataGridView.Columns["DashboardName"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                dashboardDataGridView.Columns["FullUserName"].HeaderText = "User Imported";
+                dashboardDataGridView.Columns["LastImportedDate"].HeaderText = "Last Imported";
+                dashboardDataGridView.Columns["LastImportedDate"].FillWeight = 150;
+                dashboardDataGridView.Columns["UseExtractedData"].HeaderText = "Use Cached Data";
+                dashboardDataGridView.Columns["UseExtractedData"].FillWeight = 50;
+                dashboardDataGridView.Columns["CanCache"].Visible = false;
 
-                    EnableButtons();
-                }
+                EnableButtons();
             }
             catch (Exception ex)
             {
@@ -501,55 +497,35 @@ namespace Extract.Dashboard.Forms
         }
 
         /// <summary>
-        /// Returns a connection to the configured database. 
-        /// </summary>
-        /// <returns>SqlConnection that connects to the <see cref="DatabaseServer"/> and <see cref="DatabaseName"/></returns>
-        SqlConnection NewSqlDBConnection()
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
-        }
-
-        /// <summary>
         /// Gets or creates a FAMUserId for the current user
         /// </summary>
         /// <returns>ID of the user in the FAMUser table</returns>
         int GetFAMUserID()
         {
-            using (var connection = NewSqlDBConnection())
-            {
-                connection.Open();
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                        DECLARE @FAMUserName nvarchar(50)= SUBSTRING(SUSER_SNAME(), CHARINDEX('\',SUSER_SNAME()) +1, 50)
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = @"
+                DECLARE @FAMUserName nvarchar(50)= SUBSTRING(SUSER_SNAME(), CHARINDEX('\',SUSER_SNAME()) +1, 50)
                         
-                        DECLARE @FAMUserID INT
+                DECLARE @FAMUserID INT
                         
-                        SELECT @FAMUserID = ID FROM FAMUser WHERE UserName = @FAMUserName
+                SELECT @FAMUserID = ID FROM FAMUser WHERE UserName = @FAMUserName
                         
-                        IF @FAMUserID IS NULL
-                        BEGIN
-                        	INSERT INTO FAMUser(UserName, FullUserName)
-                        	VALUES ( @FAMUserName, @FullUserName)
+                IF @FAMUserID IS NULL
+                BEGIN
+                    INSERT INTO FAMUser(UserName, FullUserName)
+                    VALUES ( @FAMUserName, @FullUserName)
                         
-                        	SELECT @FAMUserID = ID FROM FAMUser WHERE UserName = @FAMUserName
-                        END
+                    SELECT @FAMUserID = ID FROM FAMUser WHERE UserName = @FAMUserName
+                END
                         
-                        SELECT @FAMUserID AS FAMUserID";
+                SELECT @FAMUserID AS FAMUserID";
 
-                    cmd.Parameters.Add("@FullUserName", SqlDbType.NVarChar, 128).Value = UserPrincipal.Current.DisplayName;
+            cmd.Parameters.Add("@FullUserName", SqlDbType.NVarChar, 128).Value = UserPrincipal.Current.DisplayName;
 
-                    var result = cmd.ExecuteScalar() as int?;
-                    return result ?? 0;
-                }
-            }
+            var result = cmd.ExecuteScalar() as int?;
+            return result ?? 0;
         }
 
         /// <summary>
@@ -559,18 +535,14 @@ namespace Extract.Dashboard.Forms
         /// <returns></returns>
         string GetDashboardDefinition(string dashboardName)
         {
-            using (var connection = NewSqlDBConnection())
-            {
-                connection.Open();
-                using (var command = connection.CreateCommand())
-                {
-                    command.CommandText =
-                        "SELECT Definition FROM Dashboard WHERE DashboardName = @DashboardName";
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var command = connection.CreateCommand();
+            command.CommandText =
+                "SELECT Definition FROM Dashboard WHERE DashboardName = @DashboardName";
 
-                    command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = dashboardName;
-                    return command.ExecuteScalar() as string;
-                }
-            }
+            command.Parameters.Add("@DashboardName", SqlDbType.NVarChar, 100).Value = dashboardName;
+            return command.ExecuteScalar() as string;
         }
 
         /// <summary>

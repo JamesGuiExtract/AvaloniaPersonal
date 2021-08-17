@@ -1,4 +1,5 @@
 ﻿using Extract.Code.Attributes;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -229,39 +230,37 @@ namespace Extract.ETL
 
                 while (_status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
                 {
-                    using (var scope = GetNewTransactionScope())
-                    using (var connection = NewSqlDBConnection())
+                    using var scope = GetNewTransactionScope();
+                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                    using var sourceCmd = connection.CreateCommand();
+
+
+                    int endOfBatch = Math.Min(_status.LastFileTaskSessionIDProcessed + PROCESS_BATCH_SIZE, maxFileTaskSession);
+
+                    sourceCmd.CommandTimeout = 0;
+                    sourceCmd.CommandText = _QUERY_FOR_SOURCE_RECORDS;
+
+                    sourceCmd.Parameters.AddWithValue("@LastProcessedFileTaskSessionID", _status.LastFileTaskSessionIDProcessed);
+                    sourceCmd.Parameters.AddWithValue("@EndOfBatch", endOfBatch);
+
+                    sourceCmd.CommandTimeout = 0;
+                    using (var readerTask = sourceCmd.ExecuteReaderAsync(cancelToken))
                     {
-                        connection.Open();
-
-                        using (var sourceCmd = connection.CreateCommand())
-                        {
-                            int endOfBatch = Math.Min(_status.LastFileTaskSessionIDProcessed + PROCESS_BATCH_SIZE, maxFileTaskSession);
-
-                            sourceCmd.CommandTimeout = 0;
-                            sourceCmd.CommandText = _QUERY_FOR_SOURCE_RECORDS;
-
-                            sourceCmd.Parameters.AddWithValue("@LastProcessedFileTaskSessionID", _status.LastFileTaskSessionIDProcessed);
-                            sourceCmd.Parameters.AddWithValue("@EndOfBatch", endOfBatch);
-
-                            sourceCmd.CommandTimeout = 0;
-                            using (var readerTask = sourceCmd.ExecuteReaderAsync(cancelToken))
-                            {
-                                ProcessBatch(connection, readerTask);
-                            }
-                            _status.LastFileTaskSessionIDProcessed = endOfBatch;
-
-                        }
-
-                        scope.Complete();
+                        ProcessBatch(connection, readerTask);
                     }
+                    _status.LastFileTaskSessionIDProcessed = endOfBatch;
+
+
+                    scope.Complete();
 
                     // There is a chance that this status will get out of sync with the ReportingVerificationRates
                     try
                     {
                         SaveStatus();
                     }
-                    catch (Exception saveException )
+                    catch (Exception saveException)
                     {
                         ExtractException saveStatusException = new ExtractException("ELI46124", "There was a problem saving status", saveException);
                         saveStatusException.AddDebugData("DatabaseService", Description, false);
@@ -294,20 +293,17 @@ namespace Extract.ETL
 
             SaveStatus();
 
-            using (var scope = GetNewTransactionScope())
-            using (var connection = NewSqlDBConnection())
-            {
-                connection.Open();
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandTimeout = 0;
-                    cmd.CommandText = "DELETE FROM [ReportingVerificationRates]";
-                    var deleteTask = cmd.ExecuteNonQueryAsync();
-                    deleteTask.Wait(_cancelToken);
+            using var scope = GetNewTransactionScope();
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
 
-                    scope.Complete();
-                }
-            }
+            using var cmd = connection.CreateCommand();
+            cmd.CommandTimeout = 0;
+            cmd.CommandText = "DELETE FROM [ReportingVerificationRates]";
+            var deleteTask = cmd.ExecuteNonQueryAsync();
+            deleteTask.Wait(_cancelToken);
+
+            scope.Complete();
         }
 
         /// <summary>

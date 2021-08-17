@@ -1,6 +1,8 @@
 ﻿using Extract.Code.Attributes;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
+using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -349,38 +351,13 @@ namespace Extract.ETL
             try
             {
                 _processing = true;
-
                 cancelToken.ThrowIfCancellationRequested();
 
                 RefreshStatus();
                 ExtractException.Assert("ELI46592", "Status cannot be null", _status != null);
 
-                using (var connection = NewSqlDBConnection())
-                {
-                    // Open the connection
-                    connection.Open();
-
-                    // Clear the ReportingHIMStats table if the LastFileTaskSessionIDProcessed is 0
-                    if (_status.LastFileTaskSessionIDProcessed == 0)
-                    {
-                        using (var deleteCmd = connection.CreateCommand())
-                        using (var scope = new TransactionScope(
-                            TransactionScopeOption.Required,
-                            new TransactionOptions()
-                            {
-                                IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
-                                Timeout = TransactionManager.MaximumTimeout,
-                            },
-                            TransactionScopeAsyncFlowOption.Enabled))
-                        {
-                            deleteCmd.CommandTimeout = 0;
-                            deleteCmd.CommandText = "DELETE FROM ReportingHIMStats";
-                            var task = deleteCmd.ExecuteNonQueryAsync();
-                            task.Wait(cancelToken);
-                            scope.Complete();
-                        }
-                    }
-                }
+                if (_status.LastFileTaskSessionIDProcessed != 0)
+                    ClearReportingHIMStats(cancelToken);
 
                 // Get the maximum File task session id available
                 Int32 maxFileTaskSession = MaxReportableFileTaskSessionId(false);
@@ -394,33 +371,31 @@ namespace Extract.ETL
 
                     int lastInBatchToProcess = Math.Min(_status.LastFileTaskSessionIDProcessed + BatchSize, maxFileTaskSession);
 
-                    using (var connection = NewSqlDBConnection())
-                    {
-                        connection.Open();
+                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
 
-                        using (var cmd = connection.CreateCommand())
-                        using (var scope = new TransactionScope(
-                            TransactionScopeOption.Required,
-                            new TransactionOptions()
-                            {
-                                IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
-                                Timeout = TransactionManager.MaximumTimeout,
-                            },
-                            TransactionScopeAsyncFlowOption.Enabled))
+                    using var cmd = connection.CreateCommand();
+                    using var scope = new TransactionScope(
+                        TransactionScopeOption.Required,
+                        new TransactionOptions()
                         {
-                            cmd.CommandText = _UpdateQuery;
-                            cmd.CommandTimeout = 0;
-                            cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
-                            cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
-                            var task = cmd.ExecuteNonQueryAsync();
-                            task.Wait(cancelToken);
+                            IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                            Timeout = TransactionManager.MaximumTimeout,
+                        },
+                        TransactionScopeAsyncFlowOption.Enabled);
 
-                            _status.LastFileTaskSessionIDProcessed = lastInBatchToProcess;
-                            _status.SaveStatus(connection, DatabaseServiceID);
 
-                            scope.Complete();
-                        }
-                    }
+                    cmd.CommandText = _UpdateQuery;
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
+                    cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
+                    var task = cmd.ExecuteNonQueryAsync();
+                    task.Wait(cancelToken);
+
+                    _status.LastFileTaskSessionIDProcessed = lastInBatchToProcess;
+                    _status.SaveStatus(connection, DatabaseServiceID);
+
+                    scope.Complete();
                 }
             }
             catch (Exception ex)
@@ -430,6 +405,32 @@ namespace Extract.ETL
             finally
             {
                 _processing = false;
+            }
+        }
+
+        private void ClearReportingHIMStats(CancellationToken cancelToken)
+        {
+            if (_status.LastFileTaskSessionIDProcessed != 0) return;
+
+            var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+
+            using (var deleteCmd = connection.CreateCommand())
+            using (var scope = new TransactionScope(
+                TransactionScopeOption.Required,
+                new TransactionOptions()
+                {
+                    IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                    Timeout = TransactionManager.MaximumTimeout,
+                },
+                TransactionScopeAsyncFlowOption.Enabled))
+            {
+                deleteCmd.CommandTimeout = 0;
+                deleteCmd.CommandText = "DELETE FROM ReportingHIMStats";
+                var task = deleteCmd.ExecuteNonQueryAsync();
+                task.Wait(cancelToken);
+                scope.Complete();
             }
         }
 

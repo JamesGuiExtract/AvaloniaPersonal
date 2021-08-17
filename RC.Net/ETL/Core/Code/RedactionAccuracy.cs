@@ -1,6 +1,7 @@
 ﻿using Extract.AttributeFinder;
 using Extract.Code.Attributes;
 using Extract.DataCaptureStats;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -258,32 +259,7 @@ namespace Extract.ETL
                 RefreshStatus();
                 ExtractException.Assert("ELI46587", "Status cannot be null", _status != null);
 
-                using (var connection = NewSqlDBConnection())
-                {
-                    // Open the connection
-                    connection.Open();
-
-                    // Clear the ReportingRedactionAccuracy table if the LastFileTaskSessionIDProcessed is 0
-                    if (_status.LastFileTaskSessionIDProcessed == 0)
-                    {
-                        using (var deleteCmd = connection.CreateCommand())
-                        using (var scope = new TransactionScope(TransactionScopeOption.Required,
-                            new TransactionOptions()
-                            {
-                                IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
-                                Timeout = TransactionManager.MaximumTimeout
-                            },
-                            TransactionScopeAsyncFlowOption.Enabled))
-                        {
-                            deleteCmd.CommandTimeout = 0;
-                            deleteCmd.CommandText = "DELETE FROM ReportingRedactionAccuracy WHERE DatabaseServiceID = @DatabaseServiceID";
-                            deleteCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                            var task = deleteCmd.ExecuteNonQueryAsync();
-                            task.Wait(cancelToken);
-                            scope.Complete();
-                        }
-                    }
-                }
+                ClearReportingReportingRedactionAccuracy(cancelToken);
 
                 // Get the maximum File task session id available
                 Int32 maxFileTaskSession = MaxReportableFileTaskSessionId(true);
@@ -291,69 +267,62 @@ namespace Extract.ETL
                 // Process the entries in chunks of 100 file task session
                 while (_status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
                 {
-                    ConcurrentQueue<string> queriesToRunInBatch = new ConcurrentQueue<string>(); 
+                    ConcurrentQueue<string> queriesToRunInBatch = new ConcurrentQueue<string>();
 
                     cancelToken.ThrowIfCancellationRequested();
 
                     int lastInBatchToProcess = Math.Min(_status.LastFileTaskSessionIDProcessed + _PROCESS_BATCH_SIZE, maxFileTaskSession);
 
-                    using (var connection = NewSqlDBConnection())
-                    using (SqlCommand cmd = connection.CreateCommand())
-                    {
-                        connection.Open();
+                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    using var cmd = connection.CreateCommand();
 
-                        // Set the timeout so that it waits indefinitely
-                        cmd.CommandTimeout = 0;
-                        cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
+                    // Set the timeout so that it waits indefinitely
+                    cmd.CommandTimeout = 0;
+                    cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
 
-                        cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
-                        cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
-                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                        cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
-                        cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
+                    cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
+                    cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
+                    cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                    cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
+                    cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
 
-                        queriesToRunInBatch.Enqueue(DELETE_OLD_DATA);
+                    queriesToRunInBatch.Enqueue(DELETE_OLD_DATA);
 
-                        // Get VOA data for each file
-                        SaveAccuracy(cmd, queriesToRunInBatch, cancelToken);
-                    }
+                    // Get VOA data for each file
+                    SaveAccuracy(cmd, queriesToRunInBatch, cancelToken);
 
                     // Records to calculate stats
-                    using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                    using var scope = new TransactionScope(TransactionScopeOption.Required,
                         new TransactionOptions()
                         {
                             IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
                             Timeout = TransactionManager.MaximumTimeout
                         },
-                        TransactionScopeAsyncFlowOption.Enabled))
+                        TransactionScopeAsyncFlowOption.Enabled);
+
+                    using var saveApplicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection saveConnection = saveApplicationRoleConnection.SqlConnection;
+
+                    foreach (var q in queriesToRunInBatch)
                     {
+                        using SqlCommand saveCmd = saveConnection.CreateCommand();
+                        cmd.CommandTimeout = 0;
+                        cmd.CommandText = q;
+                        cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
+                        cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
+                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                        cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
+                        cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
+                        var saveTask = saveCmd.ExecuteNonQueryAsync();
+                        saveTask.Wait(cancelToken);
 
-                        using (var saveConnection = NewSqlDBConnection())
-                        {
-                            saveConnection.Open();
-                            foreach (var q in queriesToRunInBatch)
-                            {
-                                using (SqlCommand cmd = saveConnection.CreateCommand())
-                                {
-                                    cmd.CommandTimeout = 0;
-                                    cmd.CommandText = q;
-                                    cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
-                                    cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
-                                    cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                                    cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
-                                    cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
-                                    var saveTask = cmd.ExecuteNonQueryAsync();
-                                    saveTask.Wait(cancelToken);
-                                }
-
-                            }
-
-                            _status.LastFileTaskSessionIDProcessed = lastInBatchToProcess;
-
-                            _status.SaveStatus(saveConnection, DatabaseServiceID);
-                        }
-                        scope.Complete();
                     }
+
+                    _status.LastFileTaskSessionIDProcessed = lastInBatchToProcess;
+
+                    _status.SaveStatus(saveConnection, DatabaseServiceID);
+                    scope.Complete();
                 }
             }
             catch (Exception ex)
@@ -363,6 +332,32 @@ namespace Extract.ETL
             finally
             {
                 _processing = false;
+            }
+        }
+
+        private void ClearReportingReportingRedactionAccuracy(CancellationToken cancelToken)
+        {
+            var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+            // Clear the ReportingRedactionAccuracy table if the LastFileTaskSessionIDProcessed is 0
+            if (_status.LastFileTaskSessionIDProcessed == 0)
+            {
+                using var deleteCmd = connection.CreateCommand();
+                using var scope = new TransactionScope(TransactionScopeOption.Required,
+                    new TransactionOptions()
+                    {
+                        IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
+                        Timeout = TransactionManager.MaximumTimeout
+                    },
+                    TransactionScopeAsyncFlowOption.Enabled);
+
+                deleteCmd.CommandTimeout = 0;
+                deleteCmd.CommandText = "DELETE FROM ReportingRedactionAccuracy WHERE DatabaseServiceID = @DatabaseServiceID";
+                deleteCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                var task = deleteCmd.ExecuteNonQueryAsync();
+                task.Wait(cancelToken);
+                scope.Complete();
             }
         }
         #endregion

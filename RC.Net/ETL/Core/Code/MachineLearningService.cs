@@ -1,4 +1,5 @@
 ﻿using Extract.AttributeFinder;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Microsoft.VisualBasic.FileIO;
 using System;
@@ -201,41 +202,40 @@ namespace Extract.ETL
         /// </summary>
         public void MarkAllDataForDeletion()
         {
-            using (var connection = NewSqlDBConnection())
+            try
             {
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = _MARK_ALL_DATA_FOR_DELETION;
+                cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
+
+                // Set the timeout so that it waits indefinitely
+                cmd.CommandTimeout = 0;
+
                 try
                 {
-                    connection.Open();
+                    cmd.ExecuteNonQuery();
                 }
                 catch (Exception ex)
                 {
-                    var ue = ex.AsExtract("ELI45969");
+                    var ue = new ExtractException("ELI45970", "Failed to mark data for deletion", ex);
                     ue.AddDebugData("Database Server", DatabaseServer, false);
                     ue.AddDebugData("Database Name", DatabaseName, false);
                     throw ue;
                 }
 
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = _MARK_ALL_DATA_FOR_DELETION;
-                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
-
-                    // Set the timeout so that it waits indefinitely
-                    cmd.CommandTimeout = 0;
-
-                    try
-                    {
-                        cmd.ExecuteNonQuery();
-                    }
-                    catch (Exception ex)
-                    {
-                        var ue = new ExtractException("ELI45970", "Failed to mark data for deletion", ex);
-                        ue.AddDebugData("Database Server", DatabaseServer, false);
-                        ue.AddDebugData("Database Name", DatabaseName, false);
-                        throw ue;
-                    }
-                }
             }
+            catch (Exception ex)
+            {
+                var ue = ex.AsExtract("ELI45969");
+                ue.AddDebugData("Database Server", DatabaseServer, false);
+                ue.AddDebugData("Database Name", DatabaseName, false);
+                throw ue;
+            }   
         }
 
         #endregion Public Methods
@@ -322,36 +322,35 @@ namespace Extract.ETL
 
                 // Change ML Data in the DB
                 int rowsChanged = 0;
-                using (var connection = NewSqlDBConnection())
+
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = _GET_ALL_MLDATA_FOR_NAME;
+                cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
+                using var adapter = new SqlDataAdapter(cmd);
+                using var dt = new DataTable { Locale = CultureInfo.CurrentCulture };
+
+                var builder = new SqlCommandBuilder();
+                builder.DataAdapter = adapter;
+                adapter.Fill(dt);
+                foreach (DataRow row in dt.Rows)
                 {
-                    connection.Open();
-                    var cmd = connection.CreateCommand();
-                    cmd.CommandText = _GET_ALL_MLDATA_FOR_NAME;
-                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
-                    using (var adapter = new SqlDataAdapter(cmd))
-                    using (var dt = new DataTable { Locale = CultureInfo.CurrentCulture })
+                    string csv = row.Field<string>("Data");
+                    using (var sr = new StringReader(csv))
+                    using (var csvReader = new TextFieldParser(sr) { Delimiters = new[] { "," } })
                     {
-                        var builder = new SqlCommandBuilder();
-                        builder.DataAdapter = adapter;
-                        adapter.Fill(dt);
-                        foreach (DataRow row in dt.Rows)
+                        var fields = csvReader.ReadFields();
+                        string answer = fields[0];
+                        if (string.Equals(answer, oldAnswer, StringComparison.OrdinalIgnoreCase))
                         {
-                            string csv = row.Field<string>("Data");
-                            using (var sr = new StringReader(csv))
-                            using (var csvReader = new TextFieldParser(sr) { Delimiters = new[] { "," } })
-                            {
-                                var fields = csvReader.ReadFields();
-                                string answer = fields[0];
-                                if (string.Equals(answer, oldAnswer, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    fields[0] = newAnswer;
-                                    row["Data"] = string.Join(",", fields.Select(f => f.QuoteIfNeeded("\"", ",")));
-                                }
-                            }
+                            fields[0] = newAnswer;
+                            row["Data"] = string.Join(",", fields.Select(f => f.QuoteIfNeeded("\"", ",")));
                         }
-                        rowsChanged = adapter.Update(dt);
                     }
                 }
+                rowsChanged = adapter.Update(dt);
 
                 bool changedAnything = encoderUpdated || rowsChanged > 0;
 

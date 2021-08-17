@@ -1,5 +1,6 @@
 ﻿using Extract.AttributeFinder;
 using Extract.Code.Attributes;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -390,27 +391,24 @@ namespace Extract.ETL
                     int lastInBatch = Math.Min(currentLastProcessed + _BATCH_SIZE, maxFileTaskSession);
 
                     // Process each batch
-                    using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                    using var scope = new TransactionScope(TransactionScopeOption.Required,
                         new TransactionOptions()
                         {
                             IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
                             Timeout = TransactionManager.MaximumTimeout,
                         },
-                        TransactionScopeAsyncFlowOption.Enabled))
+                        TransactionScopeAsyncFlowOption.Enabled);
+
+                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                    using (var readerTask = GetAttributeSetsToPopulate(connection, currentLastProcessed, lastInBatch, cancelToken))
+                    using (SqlDataReader VOAsToStore = readerTask.Result)
                     {
-                        using (var connection = NewSqlDBConnection())
-                        {
-                            connection.Open();
-
-                            using (var readerTask = GetAttributeSetsToPopulate(connection, currentLastProcessed, lastInBatch, cancelToken))
-                            using (SqlDataReader VOAsToStore = readerTask.Result)
-                            {
-                                ProcessBatch(connection, VOAsToStore, cancelToken);
-                            }
-
-                            scope.Complete();
-                        }
+                        ProcessBatch(connection, VOAsToStore, cancelToken);
                     }
+
+                    scope.Complete();
 
                     currentLastProcessed = lastInBatch;
                     // Since there may be FileTaskSessions that have nothing to do with attributes update all the 
@@ -689,33 +687,31 @@ namespace Extract.ETL
                 }
                 foreach (var d in itemsToDelete)
                 {
-                    using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                    using var scope = new TransactionScope(TransactionScopeOption.Required,
                         new TransactionOptions()
                         {
                             IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
                             Timeout = TransactionManager.MaximumTimeout
                         },
-                        TransactionScopeAsyncFlowOption.Enabled))
-                    {
-                        using (var connection = NewSqlDBConnection())
-                        {
-                            connection.Open();
-                            using (var cmd = connection.CreateCommand())
-                            {
-                                DashboardAttributeField dashboardAttributeField = DashboardAttributeField.FromString(d);
-                                cmd.CommandTimeout = 0;
-                                cmd.CommandText = String.Format(CultureInfo.InvariantCulture,
-                                    @"DELETE FROM DashboardAttributeFields
+                        TransactionScopeAsyncFlowOption.Enabled);
+
+                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+
+                    using var cmd = connection.CreateCommand();
+
+                    DashboardAttributeField dashboardAttributeField = DashboardAttributeField.FromString(d);
+                    cmd.CommandTimeout = 0;
+                    cmd.CommandText = String.Format(CultureInfo.InvariantCulture,
+                        @"DELETE FROM DashboardAttributeFields
                                                 WHERE [Name] = '{0}' AND [AttributeSetForFileID] = {1}",
-                                    dashboardAttributeField.DashboardAttributeName, dashboardAttributeField.AttributeSetNameID);
-                                var task = cmd.ExecuteNonQueryAsync();
-                                task.Wait(_cancelToken);
-                            }
-                        }
-                        _status.LastIDProcessedForDashboardAttribute.Remove(d);
-                        SaveStatus();
-                        scope.Complete();
-                    }
+                        dashboardAttributeField.DashboardAttributeName, dashboardAttributeField.AttributeSetNameID);
+                    var task = cmd.ExecuteNonQueryAsync();
+                    task.Wait(_cancelToken);
+                    _status.LastIDProcessedForDashboardAttribute.Remove(d);
+                    SaveStatus();
+                    scope.Complete();
                 }
             }
         }

@@ -1,10 +1,11 @@
 ﻿using Extract.Code.Attributes;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.ComponentModel;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
@@ -267,14 +268,13 @@ namespace Extract.ETL
         {
             try
             {
-                using (var connection = NewSqlDBConnection())
-                {
-                    connection.Open();
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
 
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText =
-                            @"DECLARE @MachineID INT;
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText =
+                        @"DECLARE @MachineID INT;
                         SELECT @MachineID = ID
                         FROM Machine
                         WHERE MachineName = @MachineName;
@@ -286,27 +286,26 @@ namespace Extract.ETL
 	                        MachineID = @MachineID
                         WHERE ID = @DatabaseServiceID AND ActiveFAMID = @ActiveFAMID";
 
-                        cmd.Parameters.Add("@MachineName", SqlDbType.NVarChar, 50).Value = Environment.MachineName;
-                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                        cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
-                        if (Schedule?.GetNextOccurrence() is DateTime nextOccurrence)
-                        {
-                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", nextOccurrence);
-                        }
-                        else
-                        {
-                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", DBNull.Value);
-                        }
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected < 1)
-                        {
-                            ExtractException ee = new ExtractException("ELI46294", "Unable to Record process start");
-                            ee.AddDebugData("SQL", cmd.CommandText, false);
-                            ee.AddDebugData("@DatabaseServiceID", DatabaseServiceID, false);
-                            ee.AddDebugData("@ActiveFAMID", _activeFAMID, false);
-                            ee.AddDebugData("@MachineName", Environment.MachineName, false);
-                            throw ee;
-                        }
+                    cmd.Parameters.Add("@MachineName", SqlDbType.NVarChar, 50).Value = Environment.MachineName;
+                    cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                    cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
+                    if (Schedule?.GetNextOccurrence() is DateTime nextOccurrence)
+                    {
+                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", nextOccurrence);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", DBNull.Value);
+                    }
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    if (rowsAffected < 1)
+                    {
+                        ExtractException ee = new ExtractException("ELI46294", "Unable to Record process start");
+                        ee.AddDebugData("SQL", cmd.CommandText, false);
+                        ee.AddDebugData("@DatabaseServiceID", DatabaseServiceID, false);
+                        ee.AddDebugData("@ActiveFAMID", _activeFAMID, false);
+                        ee.AddDebugData("@MachineName", Environment.MachineName, false);
+                        throw ee;
                     }
                 }
             }
@@ -325,49 +324,46 @@ namespace Extract.ETL
         {
             try
             {
-                using (var connection = NewSqlDBConnection())
-                {
-                    connection.Open();
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
 
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText =
-                            @"UPDATE DatabaseService 
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText =
+                        @"UPDATE DatabaseService 
                                 SET     EndTime = GetDate(),
                                         NextScheduledRunTime = @NextScheduledRunTime,
                                         Exception = @Exception
                               WHERE ID = @DatabaseServiceID AND ActiveFAMID = @ActiveFAMID";
 
-                        if (string.IsNullOrEmpty(stringizedException))
-                        {
-                            cmd.Parameters.AddWithValue("@Exception", DBNull.Value);
-                        }
-                        else
-                        {
-                            cmd.Parameters.AddWithValue("@Exception", stringizedException);
-                        }
-                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                        cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
-                        if (Schedule?.GetNextOccurrence() is DateTime nextOccurrence)
-                        {
-                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", nextOccurrence);
-                        }
-                        else
-                        {
-                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", DBNull.Value);
-                        }
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected < 1)
-                        {
-                            ExtractException ee = new ExtractException("ELI50081", "Unable to Record process start");
-                            ee.AddDebugData("SQL", cmd.CommandText, false);
-                            ee.AddDebugData("@DatabaseServiceID", DatabaseServiceID, false);
-                            ee.AddDebugData("@ActiveFAMID", _activeFAMID, false);
-                            throw ee;
-                        }
+                    if (string.IsNullOrEmpty(stringizedException))
+                    {
+                        cmd.Parameters.AddWithValue("@Exception", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@Exception", stringizedException);
+                    }
+                    cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                    cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
+                    if (Schedule?.GetNextOccurrence() is DateTime nextOccurrence)
+                    {
+                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", nextOccurrence);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", DBNull.Value);
+                    }
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    if (rowsAffected < 1)
+                    {
+                        ExtractException ee = new ExtractException("ELI50081", "Unable to Record process start");
+                        ee.AddDebugData("SQL", cmd.CommandText, false);
+                        ee.AddDebugData("@DatabaseServiceID", DatabaseServiceID, false);
+                        ee.AddDebugData("@ActiveFAMID", _activeFAMID, false);
+                        throw ee;
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -383,31 +379,31 @@ namespace Extract.ETL
         {
             try
             {
-                using (var scope = new TransactionScope(TransactionScopeOption.Required,
+                using var scope = new TransactionScope(TransactionScopeOption.Required,
                     new TransactionOptions
                     {
                         IsolationLevel = System.Transactions.IsolationLevel.Serializable
-                    }))
-                using (var connection = NewSqlDBConnection())
-                {
-                    connection.Open();
-                    // check the existing value - since this is done within a transaction another process will not be able to change
-                    // it after this process reads it
-                    using (var cmdExisting = connection.CreateCommand())
-                    {
-                        cmdExisting.CommandText = "SELECT [ActiveFAMID] FROM DatabaseService WHERE ID = @DatabaseServiceID";
-                        cmdExisting.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                    });
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
 
-                        var result = cmdExisting.ExecuteScalar();
-                        if (result != DBNull.Value)
-                        {
-                            return (int?)result == _activeFAMID;
-                        }
-                    }
-                    using (var cmd = connection.CreateCommand())
+                // check the existing value - since this is done within a transaction another process will not be able to change
+                // it after this process reads it
+                using (var cmdExisting = connection.CreateCommand())
+                {
+                    cmdExisting.CommandText = "SELECT [ActiveFAMID] FROM DatabaseService WHERE ID = @DatabaseServiceID";
+                    cmdExisting.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+
+                    var result = cmdExisting.ExecuteScalar();
+                    if (result != DBNull.Value)
                     {
-                        cmd.CommandText =
-                            @"DECLARE @MachineID INT;
+                        return (int?)result == _activeFAMID;
+                    }
+                }
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText =
+                        @"DECLARE @MachineID INT;
                               SELECT @MachineID = ID
                               FROM Machine
                               WHERE MachineName = @MachineName;
@@ -416,22 +412,21 @@ namespace Extract.ETL
                                       NextScheduledRunTime = @NextScheduledRunTime,
                                       ActiveServiceMachineID = @MachineID
                               WHERE ID = @DatabaseServiceID";
-                        cmd.Parameters.AddWithValue("@ActiveFAMID", activeFAMId);
-                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                        cmd.Parameters.Add("@MachineName", SqlDbType.NVarChar, 50).Value = Environment.MachineName;
-                        if (Schedule?.GetNextOccurrence() is DateTime nextOccurrence)
-                        {
-                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", nextOccurrence);
-                        }
-                        else
-                        {
-                            cmd.Parameters.AddWithValue("@NextScheduledRunTime", DBNull.Value);
-                        }
-                        cmd.ExecuteNonQuery();
-                        _activeFAMID = activeFAMId;
+                    cmd.Parameters.AddWithValue("@ActiveFAMID", activeFAMId);
+                    cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                    cmd.Parameters.Add("@MachineName", SqlDbType.NVarChar, 50).Value = Environment.MachineName;
+                    if (Schedule?.GetNextOccurrence() is DateTime nextOccurrence)
+                    {
+                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", nextOccurrence);
                     }
-                    scope.Complete();
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@NextScheduledRunTime", DBNull.Value);
+                    }
+                    cmd.ExecuteNonQuery();
+                    _activeFAMID = activeFAMId;
                 }
+                scope.Complete();
 
                 return true;
             }
@@ -449,22 +444,19 @@ namespace Extract.ETL
             try
             {
                 // I only want to stop the active schedule if the current process is the one that started it
-                using (var connection = NewSqlDBConnection())
-                {
-                    connection.Open();
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText =
-                            @"UPDATE [DatabaseService] 
-                                SET     ActiveFAMID = NULL,
-                                        ActiveServiceMachineID = NULL,
-                                        NextScheduledRunTime = NULL
-                            WHERE ID = @DatabaseServiceID AND ActiveFAMID = @ActiveFAMID";
-                        cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
-                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                        cmd.ExecuteNonQuery();
-                    }
-                }
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText =
+                    @"UPDATE [DatabaseService] 
+                        SET     ActiveFAMID = NULL,
+                                ActiveServiceMachineID = NULL,
+                                NextScheduledRunTime = NULL
+                    WHERE ID = @DatabaseServiceID AND ActiveFAMID = @ActiveFAMID";
+                cmd.Parameters.AddWithValue("@ActiveFAMID", _activeFAMID);
+                cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                cmd.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
@@ -486,29 +478,25 @@ namespace Extract.ETL
                 }
 
                 // Save status to the DB
-                using (var connection = NewSqlDBConnection())
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                if (status == null)
                 {
-                    connection.Open();
-
-                    if (status == null)
-                    {
-                        using (var cmd = connection.CreateCommand())
-                        {
-                            cmd.CommandText = @"
-                                UPDATE [DatabaseService]
-                                SET [Status] = NULL,
-                                [LastFileTaskSessionIDProcessed] = NULL
-                                WHERE ID = @DatabaseServiceID";
-                            cmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                    else
-                    {
-                        status.SaveStatus(connection, DatabaseServiceID);
-                    }
-
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = @"
+                            UPDATE [DatabaseService]
+                            SET [Status] = NULL,
+                            [LastFileTaskSessionIDProcessed] = NULL
+                            WHERE ID = @DatabaseServiceID";
+                    cmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
+                    cmd.ExecuteNonQuery();
                 }
+                else
+                {
+                    status.SaveStatus(connection, DatabaseServiceID);
+                }
+
             }
             catch (Exception ex)
             {
@@ -530,12 +518,12 @@ namespace Extract.ETL
                 _databaseServer = databaseServer;
                 _databaseName = databaseName;
 
-                using (var trans = new TransactionScope())
-                using (var connection = NewSqlDBConnection())
-                {
-                    connection.Open();
-                    var cmd = connection.CreateCommand();
-                    cmd.CommandText = @"
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var trans = new TransactionScope();
+
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = @"
                         INSERT INTO [dbo].[DatabaseService]
                                     ([Description]
                                     ,[Settings]
@@ -547,14 +535,14 @@ namespace Extract.ETL
                             @Settings,
                             @Enabled)";
 
-                    cmd.Parameters.AddWithValue("@Description", Description);
-                    cmd.Parameters.AddWithValue("@Settings", ToJson());
-                    cmd.Parameters.AddWithValue("@Enabled", true);
+                cmd.Parameters.AddWithValue("@Description", Description);
+                cmd.Parameters.AddWithValue("@Settings", ToJson());
+                cmd.Parameters.AddWithValue("@Enabled", true);
 
-                    // Some services allow editing of initial status values so save 
-                    if (this is IHasConfigurableDatabaseServiceStatus hasStatus)
-                    {
-                        cmd.CommandText = @"
+                // Some services allow editing of initial status values so save 
+                if (this is IHasConfigurableDatabaseServiceStatus hasStatus)
+                {
+                    cmd.CommandText = @"
                             INSERT INTO [dbo].[DatabaseService]
                                         ([Description]
                                         ,[Settings]
@@ -570,32 +558,31 @@ namespace Extract.ETL
                                 @Status,
                                 @LastFileTaskSession)";
 
-                        string status = hasStatus.Status?.ToJson();
-                        if (status != null)
-                        {
-                            cmd.Parameters.AddWithValue("@Status", status);
-                        }
-                        else
-                        {
-                            cmd.Parameters.AddWithValue("@Status", DBNull.Value);
-                        }
-                        var fileTaskSessionStatus = hasStatus.Status as IFileTaskSessionServiceStatus;
-                        int? lastFileTaskSession = fileTaskSessionStatus?.LastFileTaskSessionIDProcessed;
-                        if (lastFileTaskSession is null)
-                        {
-                            cmd.Parameters.AddWithValue("@LastFileTaskSession", DBNull.Value);
-                        }
-                        else
-                        {
-                            cmd.Parameters.AddWithValue("@LastFileTaskSession", lastFileTaskSession);
-                        }
+                    string status = hasStatus.Status?.ToJson();
+                    if (status != null)
+                    {
+                        cmd.Parameters.AddWithValue("@Status", status);
                     }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@Status", DBNull.Value);
+                    }
+                    var fileTaskSessionStatus = hasStatus.Status as IFileTaskSessionServiceStatus;
+                    int? lastFileTaskSession = fileTaskSessionStatus?.LastFileTaskSessionIDProcessed;
+                    if (lastFileTaskSession is null)
+                    {
+                        cmd.Parameters.AddWithValue("@LastFileTaskSession", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@LastFileTaskSession", lastFileTaskSession);
+                    }
+                }
 
-                    _databaseServiceID = (int)cmd.ExecuteScalar();
-                    trans.Complete();
+                _databaseServiceID = (int)cmd.ExecuteScalar();
+                trans.Complete();
 
-                    return _databaseServiceID;
-               }
+                return _databaseServiceID;
             }
             catch (Exception ex)
             {
@@ -613,44 +600,43 @@ namespace Extract.ETL
                 ExtractException.Assert("ELI46505", "Database Server must be set.", !string.IsNullOrWhiteSpace(DatabaseServer));
                 ExtractException.Assert("ELI46506", "Database Name must be set.", !string.IsNullOrWhiteSpace(DatabaseName));
 
-                using (var trans = new TransactionScope())
-                using (var connection = NewSqlDBConnection())
-                {
-                    connection.Open();
-                    var cmd = connection.CreateCommand();
-                    cmd.CommandText = @"
+                using var trans = new TransactionScope();
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = @"
                                 UPDATE DatabaseService 
                                 SET [Description] = @Description,
                                     [Settings]    = @Settings
                                 WHERE ID = @DatabaseServiceID";
-                    cmd.Parameters.AddWithValue("@Description", Description);
-                    cmd.Parameters.AddWithValue("@Settings", ToJson());
-                    cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                cmd.Parameters.AddWithValue("@Description", Description);
+                cmd.Parameters.AddWithValue("@Settings", ToJson());
+                cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
 
-                    // Some services allow editing of initial status values so update the status column in that case
-                    if (this is IHasConfigurableDatabaseServiceStatus hasStatus)
-                    {
-                        cmd.CommandText = @"
+                // Some services allow editing of initial status values so update the status column in that case
+                if (this is IHasConfigurableDatabaseServiceStatus hasStatus)
+                {
+                    cmd.CommandText = @"
                                     UPDATE DatabaseService 
                                     SET [Description] = @Description,
                                         [Settings]    = @Settings,
                                         [Status]      = @Status
                                     WHERE ID = @DatabaseServiceID";
 
-                        string status = hasStatus.Status?.ToJson();
-                        if (status != null)
-                        {
-                            cmd.Parameters.AddWithValue("@Status", status);
-                        }
-                        else
-                        {
-                            cmd.Parameters.AddWithValue("@Status", DBNull.Value);
-                        }
+                    string status = hasStatus.Status?.ToJson();
+                    if (status != null)
+                    {
+                        cmd.Parameters.AddWithValue("@Status", status);
                     }
-
-                    cmd.ExecuteNonQuery();
-                    trans.Complete();
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@Status", DBNull.Value);
+                    }
                 }
+
+                cmd.ExecuteNonQuery();
+                trans.Complete();
             }
             catch (Exception ex)
             {
@@ -672,89 +658,84 @@ namespace Extract.ETL
             {
                 return creator();
             }
-            using (var connection = NewSqlDBConnection(enlist: false))
-            using (var statusCmd = connection.CreateCommand())
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName, enlist: false);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+            using var statusCmd = connection.CreateCommand();
+
+            // need to get the previous status
+            statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID";
+            statusCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+            using var statusResult = statusCmd.ExecuteReader();
+
+            if (!statusResult.HasRows)
             {
-                connection.Open();
+                ExtractException ee = new ExtractException("ELI45479", "Invalid DatabaseServiceID.");
+                ee.AddDebugData("DatabaseServiceID", DatabaseServiceID, false);
+                throw ee;
+            }
 
-                // need to get the previous status
-                statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID";
-                statusCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                using (var statusResult = statusCmd.ExecuteReader())
+            string jsonStatus = string.Empty;
+            Int32? lastFileTaskSessionID = null;
+            if (statusResult.Read() && !statusResult.IsDBNull(statusResult.GetOrdinal("Status")))
+            {
+                jsonStatus = statusResult.GetString(statusResult.GetOrdinal("Status"));
+                if (!statusResult.IsDBNull(statusResult.GetOrdinal("LastFileTaskSessionIDProcessed")))
                 {
-                    if (!statusResult.HasRows)
-                    {
-                        ExtractException ee = new ExtractException("ELI45479", "Invalid DatabaseServiceID.");
-                        ee.AddDebugData("DatabaseServiceID", DatabaseServiceID, false);
-                        throw ee;
-                    }
+                    lastFileTaskSessionID = statusResult.GetInt32(statusResult.GetOrdinal("LastFileTaskSessionIDProcessed"));
+                }
+            }
 
-                    string jsonStatus = string.Empty;
-                    Int32? lastFileTaskSessionID = null;
-                    if (statusResult.Read() && !statusResult.IsDBNull(statusResult.GetOrdinal("Status")))
+            if (string.IsNullOrWhiteSpace(jsonStatus))
+            {
+                return creator();
+            }
+            else
+            {
+                if (DatabaseServiceStatus.FromJson(jsonStatus) is T status)
+                {
+                    var fileTaskSessionServiceStatus = status as IFileTaskSessionServiceStatus;
+                    if (fileTaskSessionServiceStatus != null)
                     {
-                        jsonStatus = statusResult.GetString(statusResult.GetOrdinal("Status"));
-                        if (!statusResult.IsDBNull(statusResult.GetOrdinal("LastFileTaskSessionIDProcessed")))
+                        // if the DatabaseService record doesn't have a value for LastFileTaskSessionIDProcessed set
+                        // it to the one in the status
+                        if (lastFileTaskSessionID is null)
                         {
-                            lastFileTaskSessionID = statusResult.GetInt32(statusResult.GetOrdinal("LastFileTaskSessionIDProcessed"));
-                        }
-                    }
+                            // Check for the Old value of LastFileTaskSessionIDProcessed in the json
+                            JObject search = JObject.Parse(jsonStatus);
+                            JToken lastFileTaskSessionFromStatus = search.SelectToken("LastFileTaskSessionIDProcessed");
 
-                    if (string.IsNullOrWhiteSpace(jsonStatus))
-                    {
-                        return creator();
-                    }
-                    else
-                    {
-                        if (DatabaseServiceStatus.FromJson(jsonStatus) is T status)
-                        {
-                            var fileTaskSessionServiceStatus = status as IFileTaskSessionServiceStatus;
-                            if (fileTaskSessionServiceStatus != null)
+                            // If there was a value in the json set the DatabaseService.LastFileTaskSessionIDProcessed column
+                            // to that value
+                            if (lastFileTaskSessionFromStatus != null)
                             {
-                                // if the DatabaseService record doesn't have a value for LastFileTaskSessionIDProcessed set
-                                // it to the one in the status
-                                if (lastFileTaskSessionID is null)
-                                {
-                                    // Check for the Old value of LastFileTaskSessionIDProcessed in the json
-                                    JObject search = JObject.Parse(jsonStatus);
-                                    JToken lastFileTaskSessionFromStatus = search.SelectToken("LastFileTaskSessionIDProcessed");
+                                // The LastFileTaskSessionIDProcessed in the DatabaseService record was null so
+                                // set it to the value in the status record
+                                using var saveAppRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                                SqlConnection saveConnection = saveAppRoleConnection.SqlConnection;
 
-                                    // If there was a value in the json set the DatabaseService.LastFileTaskSessionIDProcessed column
-                                    // to that value
-                                    if (lastFileTaskSessionFromStatus != null)
-                                    {
-                                        // The LastFileTaskSessionIDProcessed in the DatabaseService record was null so
-                                        // set it to the value in the status record
-                                        using (var saveConnection = NewSqlDBConnection())
-                                        {
-                                            saveConnection.Open();
-                                            using (var saveCmd = saveConnection.CreateCommand())
-                                            {
-                                                lastFileTaskSessionID = lastFileTaskSessionFromStatus.Value<int>();
-                                                saveCmd.CommandText =
-                                                    "UPDATE DatabaseService Set LastFileTaskSessionIDProcessed = @LastFileTaskSessionID WHERE ID = @DatabaseServiceID";
-                                                saveCmd.Parameters.AddWithValue("@LastFileTaskSessionID", lastFileTaskSessionID);
-                                                saveCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                                                saveCmd.ExecuteNonQuery();
-                                            }
-                                        }
-                                    }
-                                }
-                                if (lastFileTaskSessionID != null)
-                                {
-                                    fileTaskSessionServiceStatus.LastFileTaskSessionIDProcessed = (int)lastFileTaskSessionID;
-                                }
+                                using var saveCmd = saveConnection.CreateCommand();
+                                lastFileTaskSessionID = lastFileTaskSessionFromStatus.Value<int>();
+                                saveCmd.CommandText =
+                                    "UPDATE DatabaseService Set LastFileTaskSessionIDProcessed = @LastFileTaskSessionID WHERE ID = @DatabaseServiceID";
+                                saveCmd.Parameters.AddWithValue("@LastFileTaskSessionID", lastFileTaskSessionID);
+                                saveCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                                saveCmd.ExecuteNonQuery();
                             }
-                            return status;
                         }
-                        else
+                        if (lastFileTaskSessionID != null)
                         {
-                            ExtractException statusException = new ExtractException("ELI45710", "Service could not determine previous status.");
-                            statusException.AddDebugData("DatabaseServiceID", DatabaseServiceID, false);
-                            statusException.AddDebugData("jsonStatusString", jsonStatus, false);
-                            throw statusException;
+                            fileTaskSessionServiceStatus.LastFileTaskSessionIDProcessed = (int)lastFileTaskSessionID;
                         }
                     }
+                    return status;
+                }
+                else
+                {
+                    ExtractException statusException = new ExtractException("ELI45710", "Service could not determine previous status.");
+                    statusException.AddDebugData("DatabaseServiceID", DatabaseServiceID, false);
+                    statusException.AddDebugData("jsonStatusString", jsonStatus, false);
+                    throw statusException;
                 }
             }
         }
@@ -770,13 +751,11 @@ namespace Extract.ETL
         {
             try
             {
-                using (var connection = NewSqlDBConnection())
-                {
-                    connection.Open();
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
 
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = @"
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = @"
                             SELECT COALESCE(MIN(CASE WHEN ActiveFAM.ID IS NOT NULL AND DateTimeStamp IS NULL THEN FileTaskSession.ID END) - 1,
                                     MAX(FileTaskSession.ID))
                                 FROM FileTaskSession WITH (NOLOCK)
@@ -785,20 +764,18 @@ namespace Extract.ETL
                                 LEFT JOIN ActiveFAM WITH (NOLOCK) ON FAMSession.ID = ActiveFAM.FAMSessionID 
                         ";
 
-                        if (onlyTasksStoringAttributes)
-                        {
-                            cmd.CommandText += 
-                                Invariant($@"WHERE TaskClass.GUID in (
+                if (onlyTasksStoringAttributes)
+                {
+                    cmd.CommandText +=
+                        Invariant($@"WHERE TaskClass.GUID in (
                                     '{Constants.TaskClassStoreRetrieveAttributes}', 
                                     '{Constants.TaskClassDocumentApi}',
                                     '{Constants.TaskClassWebVerification}')");
-                        }
-                        var result = cmd.ExecuteScalar();
-                        
-                        // The value returned could be a DBNull value so check
-                        return (int)((result == DBNull.Value) ? -1 : result);
-                    }
                 }
+                var result = cmd.ExecuteScalar();
+
+                // The value returned could be a DBNull value so check
+                return (int)((result == DBNull.Value) ? -1 : result);
             }
             catch (Exception ex)
             {
@@ -867,24 +844,6 @@ namespace Extract.ETL
         #endregion INotifyPropertyChanged
 
         #region Helper members
-
-        /// <summary>
-        /// Returns a connection to the configured database
-        /// </summary>
-        /// <param name="enlist">Whether to enlist in a transaction scope if there is one</param>
-        /// <returns>SqlConnection that connects to the <see cref="DatabaseServer"/> and <see cref="DatabaseName"/></returns>
-        protected virtual SqlConnection NewSqlDBConnection(bool enlist = true)
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            sqlConnectionBuild.Enlist = enlist;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
-        }
 
         /// <summary>
         /// This method is called by the Set accessor of properties that support notification

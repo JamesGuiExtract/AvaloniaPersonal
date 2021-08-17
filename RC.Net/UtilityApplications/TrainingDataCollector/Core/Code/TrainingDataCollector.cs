@@ -5,8 +5,9 @@ using System.Runtime.Serialization;
 using System.Threading;
 using Extract.AttributeFinder;
 using Extract.ETL;
-using Extract.Utilities;
 using Extract.Code.Attributes;
+using Extract.SqlDatabase;
+using Extract.Utilities;
 using System.Transactions;
 using System.Data.SqlClient;
 using System.Linq;
@@ -199,25 +200,23 @@ namespace Extract.UtilityApplications.MachineLearning
                 _processing = true;
 
                 List<long> availableIDs = new List<long>();
-                using (var connection = NewSqlDBConnection())
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = _GET_AVAILABLE_IDS;
+                cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
+                cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+                cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
+                cmd.CommandTimeout = 0;
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read())
                 {
-                    connection.Open();
-
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = _GET_AVAILABLE_IDS;
-                        cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
-                        cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
-                        cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
-                        cmd.CommandTimeout = 0;
-
-                        var reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            availableIDs.Add(reader.GetInt64(0));
-                        }
-                    }
+                    availableIDs.Add(reader.GetInt64(0));
                 }
+
 
                 AppendToLog(UtilityMethods.FormatCurrent($"{availableIDs.Count} files to process"));
 
@@ -278,7 +277,7 @@ namespace Extract.UtilityApplications.MachineLearning
                             }
 
                             var rng = randomSeed is int seed ? new Random(seed) : null;
-                            CollectionMethods.Shuffle(data, rng); 
+                            CollectionMethods.Shuffle(data, rng);
                             int testingCount = testingPercent * data.Count / 100;
                             testingData = data.Take(testingCount);
                             trainingData = data.Skip(testingCount);
@@ -292,8 +291,8 @@ namespace Extract.UtilityApplications.MachineLearning
                         },
                         executeInTransaction: () =>
                         {
-                            var rowsAdded = WriteCsvToDB(testingData, false);
-                            rowsAdded += WriteCsvToDB(trainingData, true);
+                            var rowsAdded = WriteCsvToDB(connection, testingData, false);
+                            rowsAdded += WriteCsvToDB(connection, trainingData, true);
                             if (rowsAdded != data.Count)
                             {
                                 AppendToLog(UtilityMethods.FormatCurrent($"Attempted to write {data.Count} MLData records for {QualifiedModelName} but {rowsAdded} were added"));
@@ -321,25 +320,22 @@ namespace Extract.UtilityApplications.MachineLearning
         private List<long> GetAvailableIDs()
         {
             var availableIDs = new List<long>();
-            using (var connection = NewSqlDBConnection())
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = _GET_AVAILABLE_IDS;
+            cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
+            cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+            cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
+            cmd.CommandTimeout = 0;
+
+            var reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                connection.Open();
-
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = _GET_AVAILABLE_IDS;
-                    cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
-                    cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
-                    cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
-                    cmd.CommandTimeout = 0;
-
-                    var reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        availableIDs.Add(reader.GetInt64(0));
-                    }
-                }
+                availableIDs.Add(reader.GetInt64(0));
             }
+
             return availableIDs;
         }
 
@@ -470,42 +466,26 @@ namespace Extract.UtilityApplications.MachineLearning
 
         public override int CalculateUnprocessedRecordCount()
         {
-            using (var connection = NewSqlDBConnection())
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = _GET_NEW_DATA_COUNT;
+            cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
+            cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+            cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
+            cmd.CommandTimeout = 0;
+
+            int newCount = 0;
+            using (var reader = cmd.ExecuteReader())
             {
-                try
+                if (reader.Read())
                 {
-                    connection.Open();
+                    newCount = reader.GetInt32(0);
                 }
-                catch (Exception ex)
-                {
-                    var ue = ex.AsExtract("ELI45759");
-                    ue.AddDebugData("Database Server", DatabaseServer, false);
-                    ue.AddDebugData("Database Name", DatabaseName, false);
-                    ue.AddDebugData("MLModel", QualifiedModelName, false);
-                    throw ue;
-                }
-
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = _GET_NEW_DATA_COUNT;
-                    cmd.Parameters.AddWithValue("@AttributeSetName", AttributeSetName);
-                    cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
-                    cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
-                    cmd.CommandTimeout = 0;
-
-                    int newCount = 0;
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            newCount = reader.GetInt32(0);
-                        }
-                        reader.Close();
-                    }
-                    return newCount;
-                }
+                reader.Close();
             }
-            
+            return newCount;
         }
 
         /// <summary>
@@ -781,37 +761,30 @@ namespace Extract.UtilityApplications.MachineLearning
         /// <summary>
         /// Writes LearningMachine data to DB
         /// </summary>
-        private int WriteCsvToDB(IEnumerable<IEnumerable<string>> data, bool isTrainingSet)
+        private int WriteCsvToDB(SqlConnection connection, IEnumerable<IEnumerable<string>> data, bool isTrainingSet)
         {
-            using (var connection = NewSqlDBConnection())
-            {
-                connection.Open();
-
-                var cmdText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
+            var cmdText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
                 SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
                 FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName
                 SELECT @@ROWCOUNT";
-                int rowsAdded = 0;
-                foreach (var record in data)
+            int rowsAdded = 0;
+            foreach (var record in data)
+            {
+                using var cmd = new SqlCommand(cmdText, connection);
+                cmd.Parameters.AddWithValue("@IsTrainingData", isTrainingSet.ToString());
+                cmd.Parameters.AddWithValue("@ModelName", QualifiedModelName);
+                var ussPath = record.First();
+                var featureData = record.Skip(2); // Second item is index in the file and isn't needed
+                                                  // Data for NER is a single blob of text, not a CSV, so doesn't need escaping
+                if (ModelType != ModelType.NamedEntityRecognition)
                 {
-                    using (var cmd = new SqlCommand(cmdText, connection))
-                    {
-                        cmd.Parameters.AddWithValue("@IsTrainingData", isTrainingSet.ToString());
-                        cmd.Parameters.AddWithValue("@ModelName", QualifiedModelName);
-                        var ussPath = record.First();
-                        var featureData = record.Skip(2); // Second item is index in the file and isn't needed
-                        // Data for NER is a single blob of text, not a CSV, so doesn't need escaping
-                        if (ModelType != ModelType.NamedEntityRecognition)
-                        {
-                            featureData = featureData.Select(s => s.QuoteIfNeeded("\"", ","));
-                        }
-                        cmd.Parameters.AddWithValue("@Data", string.Join(",", featureData));
-                        cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
-                        rowsAdded += (int)cmd.ExecuteScalar();
-                    }
+                    featureData = featureData.Select(s => s.QuoteIfNeeded("\"", ","));
                 }
-                return rowsAdded;
+                cmd.Parameters.AddWithValue("@Data", string.Join(",", featureData));
+                cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
+                rowsAdded += (int)cmd.ExecuteScalar();
             }
+            return rowsAdded;
         }
 
         #endregion Private Methods

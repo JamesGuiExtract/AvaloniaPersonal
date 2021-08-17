@@ -1,6 +1,7 @@
 ﻿using Extract.Code.Attributes;
 using Extract.Dashboard.Utilities;
 using Extract.ETL;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Linq;
@@ -106,34 +107,31 @@ namespace Extract.Dashboard.ETL
 
                 _cancelToken = cancelToken;
 
-                using (var connection = NewSqlDBConnection())
-                using (var cmd = connection.CreateCommand())
+                using var applicationRole = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                var connection = applicationRole.SqlConnection;
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "SELECT ExtractedDataDefinition, DashboardName FROM dbo.Dashboard WHERE UseExtractedData = 1";
+
+                using var task = cmd.ExecuteReaderAsync(_cancelToken);
+                using var reader = task.Result;
+
+                while (reader.Read() && !_cancelToken.IsCancellationRequested)
                 {
-                    connection.Open();
-                    cmd.CommandText = "SELECT ExtractedDataDefinition, DashboardName FROM dbo.Dashboard WHERE UseExtractedData = 1";
-                    using (var task = cmd.ExecuteReaderAsync(_cancelToken))
-                    using (var reader = task.Result)
+                    var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
+                    using var dashboard = new DevExpress.DashboardCommon.Dashboard();
+                    dashboard.LoadFromXDocument(xdoc);
+
+                    string dashboardName = reader.GetString(1);
+
+                    try
                     {
-                        while (reader.Read() && !_cancelToken.IsCancellationRequested)
-                        {
-                            var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
-                            using (var dashboard = new DevExpress.DashboardCommon.Dashboard())
-                            {
-                                dashboard.LoadFromXDocument(xdoc);
-
-                                string dashboardName = reader.GetString(1);
-
-                                try
-                                {
-                                    DashboardDataConverter.UpdateExtractedDataSources(dashboard, _cancelToken);
-                                }
-                                catch (ExtractException ee)
-                                {
-                                    ee.AddDebugData("DashboardName", dashboardName);
-                                    ee.Log();
-                                }
-                            }
-                        }
+                        DashboardDataConverter.UpdateExtractedDataSources(dashboard, _cancelToken);
+                    }
+                    catch (ExtractException ee)
+                    {
+                        ee.AddDebugData("DashboardName", dashboardName);
+                        ee.Log();
                     }
                 }
 

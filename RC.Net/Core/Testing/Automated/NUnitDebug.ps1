@@ -20,8 +20,14 @@ if (!$FileList){
     $FileList = @(Get-ChildItem "$dllDir\*.Test.dll" | ForEach-Object{ '"' + $_.FullName + '"' })
 } 
 
-$params = $FileList + $Options + $AdditionalOptions
+foreach($FullFileName in $FileList){
+	$FileName = Split-Path -Path $FullFileName -Leaf
+	$FileName = $FileName -Replace ".dll" -Replace "\." 
+	$Options = ("--where:`"cat!=Interactive and cat!=Broken and cat!=Automated_ADMIN`"", "--dispose-runners", "--result=`"$OutputFile.$FileName.xml`"", "--result=`"$OutputFile.$FileName.htm;transform=$Transform`"")
+	
+	$params = @($FullFileName) + $Options + $AdditionalOptions
 
-$ConsoleRunner
-$params
-& $ConsoleRunner $params
+	$ConsoleRunner
+	$params
+	& $ConsoleRunner $params
+}

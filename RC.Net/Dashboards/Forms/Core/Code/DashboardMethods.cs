@@ -1,4 +1,5 @@
-﻿using Extract.Utilities;
+﻿using Extract.SqlDatabase;
+using Extract.Utilities;
 using System;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -74,25 +75,24 @@ namespace Extract.Dashboard.Forms
             {
                 var DashboardNames = new Collection<SourceLink>();
 
-                using (var connection = NewSqlDBConnection(server, database))
-                using (var command = connection.CreateCommand())
+                using var applicationRoleConnection = new ExtractRoleConnection(server, database);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var command = connection.CreateCommand();
+
+                command.CommandText = withDocumentParameter ? GetDashboardsWithDocumentOrFileNameQuery() : DashboardsQuery;
+
+                DataTable dataTable = new DataTable();
+                dataTable.Locale = CultureInfo.CurrentCulture;
+                dataTable.Load(command.ExecuteReader());
+
+
+                foreach (var row in dataTable.Rows.OfType<DataRow>())
                 {
-                    connection.Open();
-                    command.CommandText = withDocumentParameter ? GetDashboardsWithDocumentOrFileNameQuery() : DashboardsQuery;
-
-                    DataTable dataTable = new DataTable();
-                    dataTable.Locale = CultureInfo.CurrentCulture;
-                    dataTable.Load(command.ExecuteReader());
-
-
-                    foreach (var row in dataTable.Rows.OfType<DataRow>())
+                    var name = (string)row["DashboardName"];
+                    var xdoc = XDocument.Parse((string)row["Definition"]);
+                    if (!withDocumentParameter || HasDocumentParameter(xdoc))
                     {
-                        var name = (string)row["DashboardName"];
-                        var xdoc = XDocument.Parse((string)row["Definition"]);
-                        if (!withDocumentParameter || HasDocumentParameter(xdoc))
-                        {
-                            DashboardNames.Add(new SourceLink(name, false));
-                        }
+                        DashboardNames.Add(new SourceLink(name, false));
                     }
                 }
 
@@ -134,24 +134,6 @@ namespace Extract.Dashboard.Forms
             {
                 throw ex.AsExtract("ELI49927");
             }
-        }
-
-        /// <summary>
-        /// Returns a connection to the configured database. 
-        /// </summary>
-        /// <param name="DatabaseServer">Server Name to connect to</param>
-        /// <param name="DatabaseName">Database Name to connect to</param>
-        /// <returns></returns>
-        private static SqlConnection NewSqlDBConnection(string DatabaseServer, string DatabaseName)
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         private static bool HasDocumentParameter(XDocument xDocument)

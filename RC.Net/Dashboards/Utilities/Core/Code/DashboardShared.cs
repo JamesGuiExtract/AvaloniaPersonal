@@ -6,6 +6,7 @@ using DevExpress.Utils.Extensions;
 using DevExpress.XtraBars;
 using Extract.Dashboard.Forms;
 using Extract.FileActionManager.Forms;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -577,59 +578,56 @@ namespace Extract.Dashboard.Utilities
                     return;
                 }
 
-                using (var connection = NewSqlDBConnection())
+                using var applicationRole = new ExtractRoleConnection(_dashboardForm.ServerName, _dashboardForm.DatabaseName);
+                var connection = applicationRole.SqlConnection;
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = @"
+                      SELECT [AppName], [ApplicationPath], [Arguments], [AllowMultipleFiles], 
+                          [SupportsErrorHandling], [Blocking], [WorkflowName]
+                      FROM [FileHandler] WHERE [Enabled] = 1 AND [AdminOnly] = 0 
+                      ORDER BY [AppName]";
+
+                var results = cmd.ExecuteReader().Cast<IDataRecord>();
+
+                var fileHandlers = results.Select(row => new FileHandlerItem
                 {
-                    connection.Open();
-                    using (var cmd = connection.CreateCommand())
+                    Name = (string)row["AppName"],
+                    ApplicationPath = (string)row["ApplicationPath"],
+                    Arguments = row["Arguments"].ToString(),
+                    AllowMultipleFiles = (bool)row["AllowMultipleFiles"],
+                    SupportsErrorHandling = (bool)row["SupportsErrorHandling"],
+                    Blocking = (bool)row["Blocking"],
+                    Workflow = (string)((row["WorkflowName"] == DBNull.Value) ? string.Empty : row["WorkflowName"])
+                }).ToList();
+
+                bool firstInGroupSet = false;
+
+                foreach (var fileHander in fileHandlers)
+                {
+                    var menuItem = new BarButtonItem();
+
+                    menuItem.Caption = fileHander.Name;
+
+                    if (!firstInGroupSet)
                     {
-                        cmd.CommandText = @"
-                            SELECT [AppName], [ApplicationPath], [Arguments], [AllowMultipleFiles], 
-                                [SupportsErrorHandling], [Blocking], [WorkflowName]
-                            FROM [FileHandler] WHERE [Enabled] = 1 AND [AdminOnly] = 0 
-                            ORDER BY [AppName]";
-
-                        var results = cmd.ExecuteReader().Cast<IDataRecord>();
-
-                        var fileHandlers = results.Select(row => new FileHandlerItem
-                        {
-                            Name = (string)row["AppName"],
-                            ApplicationPath = (string)row["ApplicationPath"],
-                            Arguments = row["Arguments"].ToString(),
-                            AllowMultipleFiles = (bool)row["AllowMultipleFiles"],
-                            SupportsErrorHandling = (bool)row["SupportsErrorHandling"],
-                            Blocking = (bool)row["Blocking"],
-                            Workflow = (string)((row["WorkflowName"] == DBNull.Value) ? string.Empty : row["WorkflowName"])
-                        }).ToList();
-
-                        bool firstInGroupSet = false;
-
-                        foreach (var fileHander in fileHandlers)
-                        {
-                            var menuItem = new BarButtonItem();
-
-                            menuItem.Caption = fileHander.Name;
-
-                            if (!firstInGroupSet)
-                            {
-                                menuItem.Tag = new Dictionary<string, object>
+                        menuItem.Tag = new Dictionary<string, object>
                                 {
                                     { "FileHanderRecord", fileHander },
                                     { _BEGIN_GROUP, true }
                                 };
-                                firstInGroupSet = true;
-                            }
-                            else
-                            {
-                                menuItem.Tag = new Dictionary<string, object>
+                        firstInGroupSet = true;
+                    }
+                    else
+                    {
+                        menuItem.Tag = new Dictionary<string, object>
                                 {
                                     { "FileHanderRecord", fileHander },
                                     { _BEGIN_GROUP, false }
                                 };
-                            }
-                            menuItem.ItemClick += HandleCustomFileHanderClick;
-                            items.Add(menuItem);
-                        }
                     }
+                    menuItem.ItemClick += HandleCustomFileHanderClick;
+                    items.Add(menuItem);
                 }
             }
             catch (Exception ex)
@@ -1129,24 +1127,6 @@ namespace Extract.Dashboard.Utilities
                 throw ex.AsExtract("ELI46208");
             }
         }
-
-
-        /// <summary>
-        /// Returns a connection to the configured database
-        /// </summary>
-        /// <returns>SqlConnection that connects to the Server and Database from the form</returns>
-        private SqlConnection NewSqlDBConnection()
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = _dashboardForm.ServerName;
-            sqlConnectionBuild.InitialCatalog = _dashboardForm.DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
-        }
-
 
         /// <summary>
         /// Shows a modal, non-closeable message box with the specified <see param="messageText"/> while the specified

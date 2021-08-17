@@ -3,6 +3,7 @@ using Accord.Statistics;
 using Accord.Statistics.Analysis;
 using Extract.Encryption;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using LearningMachineTrainer;
 using System;
@@ -1231,26 +1232,6 @@ namespace Extract.AttributeFinder
         }
 
         /// <summary>
-        /// Returns a connection to the specified database
-        /// </summary>
-        /// <param name="databaseServer">The DB server to connect to</param>
-        /// <param name="databaseName">The DB name to connect to</param>
-        /// <param name="enlist">Whether to enlist in a transaction scope if there is one</param>
-        static SqlConnection NewSqlDBConnection(string databaseServer, string databaseName, bool enlist = true)
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = databaseServer;
-            sqlConnectionBuild.InitialCatalog = databaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            sqlConnectionBuild.Enlist = enlist;
-            return new SqlConnection( sqlConnectionBuild.ConnectionString);
-        }
-
-
-        /// <summary>
         /// Gets the image file list and, if usage is doc classification, the answers from the DB
         /// </summary>
         private (string[] imagePaths, AttributeOrAnswerCollection maybeAnswers) GetImageFileListFromDB(
@@ -1263,115 +1244,112 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                using (var connection = NewSqlDBConnection(databaseServer, databaseName, false))
+                using var applicationRoleConnection = new ExtractRoleConnection(databaseServer, databaseName, false);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                bool getDocTypeFromVoa = useAttributeSetForExpected
+                    && Usage == LearningMachineUsage.DocumentCategorization;
+
+                // Check for a configuration error of using the LM specification for answers
+                // when the LM doesn't specify a pattern
+                ExtractException.Assert("ELI45988", "No answer source available. Try using the attribute set for expected values",
+                    Usage != LearningMachineUsage.DocumentCategorization
+                    || useAttributeSetForExpected
+                    || !string.IsNullOrEmpty(InputConfig.AnswerPath));
+
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = useAttributeSetForExpected
+                    ? _GET_FILE_LIST_AND_VOA
+                    : _GET_FILE_LIST;
+                cmd.Parameters.AddWithValue("@AttributeSetName", attributeSetName);
+                cmd.Parameters.AddWithValue("@FirstIDToProcess", lowestIDToProcess);
+                cmd.Parameters.AddWithValue("@LastIDToProcess", highestIDToProcess);
+
+                // Set the timeout so that it waits indefinitely
+                cmd.CommandTimeout = 0;
+                var reader = cmd.ExecuteReader();
+                var imagePaths = new List<string>();
+                var answers = getDocTypeFromVoa
+                    ? new List<string>()
+                    : null;
+                var answerVOAs = !getDocTypeFromVoa && useAttributeSetForExpected
+                    ? new List<byte[]>()
+                    : null;
+                var afutil = new AFUtilityClass();
+                foreach (IDataRecord record in reader)
                 {
-                    connection.Open();
-
-                    bool getDocTypeFromVoa = useAttributeSetForExpected
-                        && Usage == LearningMachineUsage.DocumentCategorization;
-
-                    // Check for a configuration error of using the LM specification for answers
-                    // when the LM doesn't specify a pattern
-                    ExtractException.Assert("ELI45988", "No answer source available. Try using the attribute set for expected values",
-                        Usage != LearningMachineUsage.DocumentCategorization
-                        || useAttributeSetForExpected
-                        || !string.IsNullOrEmpty(InputConfig.AnswerPath));
-
-                    using (var cmd = connection.CreateCommand())
+                    // Filter out images that are missing or have missing uss files
+                    // so that this process doesn't log a ton of errors and/or fail at some later point
+                    var imagePath = record.GetString(0);
+                    var ussPath = imagePath + ".uss";
+                    var imageExists = File.Exists(imagePath);
+                    var ussExists = File.Exists(ussPath);
+                    if (!imageExists || !ussExists)
                     {
-                        cmd.CommandText = useAttributeSetForExpected
-                            ? _GET_FILE_LIST_AND_VOA
-                            : _GET_FILE_LIST;
-                        cmd.Parameters.AddWithValue("@AttributeSetName", attributeSetName);
-                        cmd.Parameters.AddWithValue("@FirstIDToProcess", lowestIDToProcess);
-                        cmd.Parameters.AddWithValue("@LastIDToProcess", highestIDToProcess);
-
-                        // Set the timeout so that it waits indefinitely
-                        cmd.CommandTimeout = 0;
-                        var reader = cmd.ExecuteReader();
-                        var imagePaths = new List<string>();
-                        var answers = getDocTypeFromVoa
-                            ? new List<string>()
-                            : null;
-                        var answerVOAs = !getDocTypeFromVoa && useAttributeSetForExpected
-                            ? new List<byte[]>()
-                            : null;
-                        var afutil = new AFUtilityClass();
-                        foreach (IDataRecord record in reader)
+                        var ue = new ExtractException("ELI46574", "Missing ML data source file");
+                        if (!imageExists)
                         {
-                            // Filter out images that are missing or have missing uss files
-                            // so that this process doesn't log a ton of errors and/or fail at some later point
-                            var imagePath = record.GetString(0);
-                            var ussPath = imagePath + ".uss";
-                            var imageExists = File.Exists(imagePath);
-                            var ussExists = File.Exists(ussPath);
-                            if (!imageExists || !ussExists)
-                            {
-                                var ue = new ExtractException("ELI46574", "Missing ML data source file");
-                                if (!imageExists)
-                                {
-                                    ue.AddDebugData("Missing image file", imagePath);
-                                }
-                                if (!ussExists)
-                                {
-                                    ue.AddDebugData("Missing uss file", ussPath);
-                                }
-                                ue.Log();
-                                continue;
-                            }
+                            ue.AddDebugData("Missing image file", imagePath);
+                        }
+                        if (!ussExists)
+                        {
+                            ue.AddDebugData("Missing uss file", ussPath);
+                        }
+                        ue.Log();
+                        continue;
+                    }
 
-                            if (useAttributeSetForExpected)
+                    if (useAttributeSetForExpected)
+                    {
+                        object answer = null;
+                        if (!reader.IsDBNull(1))
+                        {
+                            using (var stream = reader.GetStream(1))
                             {
-                                object answer = null;
-                                if (!reader.IsDBNull(1))
-                                {
-                                    using (var stream = reader.GetStream(1))
-                                    {
-                                        if (getDocTypeFromVoa)
-                                        {
-                                            var voa = AttributeMethods.GetVectorOfAttributesFromSqlBinary(stream);
-                                            voa.ReportMemoryUsage();
-                                            answer = afutil.QueryAttributes(voa, "DocumentType", false)
-                                                .ToIEnumerable<ComAttribute>()
-                                                .FirstOrDefault()?.Value.String;
-
-                                            // Skip file if no document type exists
-                                            // https://extract.atlassian.net/browse/ISSUE-15724
-                                            if (answer == null)
-                                            {
-                                                var ue = new ExtractException("ELI46575", "Missing DocumentType for ML training (file will be skipped)");
-                                                ue.AddDebugData("Image file", imagePath);
-                                                ue.AddDebugData("Attribute set name", attributeSetName);
-                                                ue.Log();
-                                                continue;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            answer = stream.ToByteArray();
-                                        }
-                                    }
-                                }
                                 if (getDocTypeFromVoa)
                                 {
-                                    answers.Add((string)answer ?? "");
+                                    var voa = AttributeMethods.GetVectorOfAttributesFromSqlBinary(stream);
+                                    voa.ReportMemoryUsage();
+                                    answer = afutil.QueryAttributes(voa, "DocumentType", false)
+                                        .ToIEnumerable<ComAttribute>()
+                                        .FirstOrDefault()?.Value.String;
+
+                                    // Skip file if no document type exists
+                                    // https://extract.atlassian.net/browse/ISSUE-15724
+                                    if (answer == null)
+                                    {
+                                        var ue = new ExtractException("ELI46575", "Missing DocumentType for ML training (file will be skipped)");
+                                        ue.AddDebugData("Image file", imagePath);
+                                        ue.AddDebugData("Attribute set name", attributeSetName);
+                                        ue.Log();
+                                        continue;
+                                    }
                                 }
                                 else
                                 {
-                                    answerVOAs.Add((byte[])answer);
+                                    answer = stream.ToByteArray();
                                 }
                             }
-
-                            imagePaths.Add(record.GetString(0));
                         }
-                        var attributeOrAnswerCollection = getDocTypeFromVoa
-                            ? new AttributeOrAnswerCollection(answers.ToArray())
-                            : useAttributeSetForExpected
-                                ? new AttributeOrAnswerCollection(answerVOAs.ToArray())
-                                : null;
-                        return (imagePaths.ToArray(), attributeOrAnswerCollection);
+                        if (getDocTypeFromVoa)
+                        {
+                            answers.Add((string)answer ?? "");
+                        }
+                        else
+                        {
+                            answerVOAs.Add((byte[])answer);
+                        }
                     }
+
+                    imagePaths.Add(record.GetString(0));
                 }
+                var attributeOrAnswerCollection = getDocTypeFromVoa
+                    ? new AttributeOrAnswerCollection(answers.ToArray())
+                    : useAttributeSetForExpected
+                        ? new AttributeOrAnswerCollection(answerVOAs.ToArray())
+                        : null;
+                return (imagePaths.ToArray(), attributeOrAnswerCollection);
+
             }
             catch (Exception ex)
             {

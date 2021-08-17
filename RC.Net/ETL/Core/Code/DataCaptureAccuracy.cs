@@ -1,6 +1,7 @@
 ﻿using Extract.AttributeFinder;
 using Extract.Code.Attributes;
 using Extract.DataCaptureStats;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -227,7 +228,7 @@ namespace Extract.ETL
                     var endFileTaskSessionID =
                         Math.Min(LastFileTaskSessionIDProcessed + PROCESS_BATCH_SIZE, maxReportableFileTaskSession);
 
-                    retryBatch.DoRetry(()=> ProcessBatch(cancelToken, endFileTaskSessionID));
+                    retryBatch.DoRetry(() => ProcessBatch(cancelToken, endFileTaskSessionID));
                 }
             }
             catch (Exception ex)
@@ -251,81 +252,77 @@ namespace Extract.ETL
         {
             var queriesToRunInBatch = new ConcurrentQueue<string>();
 
-            using (var connection = NewSqlDBConnection())
-            using(SqlCommand cmd = connection.CreateCommand())
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using SqlCommand cmd = connection.CreateCommand();
+
+            // Set the timeout so that it waits indefinitely
+            cmd.CommandTimeout = 0;
+
+            // This command gets the data to work with in this batch
+            cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
+
+            addParametersToCommand(cmd, endFileTaskSessionID);
+
+            // Keep track of active threads
+            using CountdownEvent threadCountDown = new CountdownEvent(1);
+            using Semaphore threadSemaphore = new Semaphore(NumberOfProcessingThreads, NumberOfProcessingThreads);
+            using SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader();
+            using CancellationTokenSource exceptionCancelSource = new CancellationTokenSource();
+            using CancellationTokenSource multipleCancel = CancellationTokenSource.CreateLinkedTokenSource(exceptionCancelSource.Token, cancelToken);
+
+            try
             {
-                // Open the connection
-                connection.Open();
+                multipleCancel.Token.ThrowIfCancellationRequested();
 
-                // Set the timeout so that it waits indefinitely
-                cmd.CommandTimeout = 0;
-
-                // This command gets the data to work with in this batch
-                cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
-
-                addParametersToCommand(cmd, endFileTaskSessionID);
-
-                // Keep track of active threads
-                using (CountdownEvent threadCountDown = new CountdownEvent(1))
-                using (Semaphore threadSemaphore = new Semaphore(NumberOfProcessingThreads, NumberOfProcessingThreads))
-                using (SqlDataReader ExpectedAndFoundReader = cmd.ExecuteReader())
-                using(CancellationTokenSource exceptionCancelSource = new CancellationTokenSource())
-                using(CancellationTokenSource multipleCancel = CancellationTokenSource.CreateLinkedTokenSource(exceptionCancelSource.Token, cancelToken))
+                // Get VOA and other relevant data for each file needed to calculate capture statistics.
+                while (ReadDataAccuracyQueryData(ExpectedAndFoundReader, cancelToken, out var queryResultRow))
                 {
-                    try
-                    {
-						multipleCancel.Token.ThrowIfCancellationRequested();
+                    // Increment the number of pending threads
+                    threadCountDown.AddCount();
 
-                        // Get VOA and other relevant data for each file needed to calculate capture statistics.
-                        while (ReadDataAccuracyQueryData(ExpectedAndFoundReader, cancelToken, out var queryResultRow))
+                    // Get Semaphore before creating the thread
+                    threadSemaphore.WaitOne();
+
+                    // Create a thread pool thread to do the comparison
+                    ThreadPool.QueueUserWorkItem(delegate
+                    {
+                        try
                         {
-                            // Increment the number of pending threads
-                            threadCountDown.AddCount();
-
-                            // Get Semaphore before creating the thread
-                            threadSemaphore.WaitOne();
-
-                            // Create a thread pool thread to do the comparison
-                            ThreadPool.QueueUserWorkItem(delegate
-                            {
-                                try
-                                {
-                                    multipleCancel.Token.ThrowIfCancellationRequested();
-                                    CalculateStats(queriesToRunInBatch, queryResultRow, multipleCancel.Token);
-                                }
-                                catch(OperationCanceledException)
-                                {
-                                    throw;
-                                }
-                                catch (Exception ex)
-                                {
-                                    ex.AsExtract("ELI49993").Log();
-                                }
-                                finally
-                                {
-                                    // Release semaphore after thread has been created
-                                    threadSemaphore.Release();
-
-                                    // Decrement the number of pending threads
-                                    threadCountDown.Signal();
-                                }
-                            });
+                            multipleCancel.Token.ThrowIfCancellationRequested();
+                            CalculateStats(queriesToRunInBatch, queryResultRow, multipleCancel.Token);
                         }
-                    }
-                    catch
-                    {
-                       	exceptionCancelSource.Cancel();
-                        throw;
-                    }
-                    finally
-                    {
-                        threadCountDown.Signal();
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.AsExtract("ELI49993").Log();
+                        }
+                        finally
+                        {
+                            // Release semaphore after thread has been created
+                            threadSemaphore.Release();
 
-                        // Don't need to wait on CancelToken because the threads will be stopped when there is a cancel and
-                        // need to make sure all the threads exit.
-                        threadCountDown.Wait();
-                    }
+                            // Decrement the number of pending threads
+                            threadCountDown.Signal();
+                        }
+                    });
                 }
+            }
+            catch
+            {
+                exceptionCancelSource.Cancel();
+                throw;
+            }
+            finally
+            {
+                threadCountDown.Signal();
+
+                // Don't need to wait on CancelToken because the threads will be stopped when there is a cancel and
+                // need to make sure all the threads exit.
+                threadCountDown.Wait();
             }
 
             cancelToken.ThrowIfCancellationRequested();
@@ -339,57 +336,52 @@ namespace Extract.ETL
         void AddTheDataToTheDatabase(ConcurrentQueue<string> queriesToRunInBatch, int endFileTaskSessionID,
             CancellationToken cancelToken)
         {
-            using (TransactionScope scope = new TransactionScope(
+            using TransactionScope scope = new TransactionScope(
                TransactionScopeOption.Required,
                new TransactionOptions()
                {
                    IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
                    Timeout = TransactionManager.MaximumTimeout,
                },
-               TransactionScopeAsyncFlowOption.Enabled))
+               TransactionScopeAsyncFlowOption.Enabled);
+
+
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+            // delete the old records
+            using var deleteCmd = connection.CreateCommand();
+            deleteCmd.CommandTimeout = 0;
+            deleteCmd.CommandText = DELETE_OLD_DATA;
+            addParametersToCommand(deleteCmd, endFileTaskSessionID);
+            var deleteTask = deleteCmd.ExecuteNonQueryAsync();
+            deleteTask.Wait(cancelToken);
+
+            // Run the queries to add the accuracy records
+            foreach (var q in queriesToRunInBatch)
             {
-                using (var connection = NewSqlDBConnection())
+                try
                 {
-                    connection.Open();
+                    using var cmd = connection.CreateCommand();
 
-                    // delete the old records
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandTimeout = 0;
-                        cmd.CommandText = DELETE_OLD_DATA;
-                        addParametersToCommand(cmd, endFileTaskSessionID);
-                        var deleteTask = cmd.ExecuteNonQueryAsync();
-                        deleteTask.Wait(cancelToken);
-                    }
-
-                    // Run the queries to add the accuracy records
-                    foreach (var q in queriesToRunInBatch)
-                    {
-                        try
-                        {
-                            using (var cmd = connection.CreateCommand())
-                            {
-                                cmd.CommandTimeout = 0;
-                                cmd.CommandText = q;
-                                var addTask = cmd.ExecuteNonQueryAsync();
-                                addTask.Wait(cancelToken);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            var ee = ex.AsExtract("ELI46166");
-                            ee.AddDebugData("Query", q, false);
-                            throw ee;
-                        }
-                    }
-
-                    // If Canceled, there will have been an exception everything but saving the status is done 
-                    LastFileTaskSessionIDProcessed = endFileTaskSessionID;
-
-                    Status.SaveStatus(connection, DatabaseServiceID);
+                    cmd.CommandTimeout = 0;
+                    cmd.CommandText = q;
+                    var addTask = cmd.ExecuteNonQueryAsync();
+                    addTask.Wait(cancelToken);
                 }
-                scope.Complete();
+                catch (Exception ex)
+                {
+                    var ee = ex.AsExtract("ELI46166");
+                    ee.AddDebugData("Query", q, false);
+                    throw ee;
+                }
             }
+
+            // If Canceled, there will have been an exception everything but saving the status is done 
+            LastFileTaskSessionIDProcessed = endFileTaskSessionID;
+
+            Status.SaveStatus(connection, DatabaseServiceID);
+            scope.Complete();
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using Extract.AttributeFinder;
 using Extract.AttributeFinder.Rules;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Extract.Utilities.FSharp.NERAnnotation;
 using Extract.Utilities.FSharp;
@@ -501,28 +502,22 @@ namespace Extract.UtilityApplications.NERAnnotation
                 {
                     try
                     {
-                        using (var connection = NewSqlDBConnection(enlist: false))
-                        {
-                            connection.Open();
+                        using var applicationRoleConnection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName, enlist: false);
+                        SqlConnection connection = applicationRoleConnection.SqlConnection;
 
-                            using (var cmd = connection.CreateCommand())
-                            {
-                                cmd.CommandText = _GET_FILE_LIST;
-                                cmd.Parameters.AddWithValue("@AttributeSetName", _settings.AttributeSetName);
-                                cmd.Parameters.AddWithValue("@FirstIDToProcess", _settings.FirstIDToProcess);
-                                cmd.Parameters.AddWithValue("@LastIDToProcess", _settings.LastIDToProcess);
+                        using var cmd = connection.CreateCommand();
+                        cmd.CommandText = _GET_FILE_LIST;
+                        cmd.Parameters.AddWithValue("@AttributeSetName", _settings.AttributeSetName);
+                        cmd.Parameters.AddWithValue("@FirstIDToProcess", _settings.FirstIDToProcess);
+                        cmd.Parameters.AddWithValue("@LastIDToProcess", _settings.LastIDToProcess);
 
-                                // Set the timeout so that it waits indefinitely
-                                cmd.CommandTimeout = 0;
-                                using (var reader = cmd.ExecuteReader())
-                                {
-                                    files = reader
-                                        .Cast<IDataRecord>()
-                                        .Select(record => record.GetString(0) + ".uss")
-                                        .ToList();
-                                }
-                            }
-                        }
+                        // Set the timeout so that it waits indefinitely
+                        cmd.CommandTimeout = 0;
+                        using var reader = cmd.ExecuteReader();
+                        files = reader
+                            .Cast<IDataRecord>()
+                            .Select(record => record.GetString(0) + ".uss")
+                            .ToList();
                     }
                     catch (Exception ex)
                     {
@@ -624,32 +619,28 @@ namespace Extract.UtilityApplications.NERAnnotation
                 {
                     // If processing pages in parallel then records will already be a list but otherwise it will be an enumerable
                     // Ensure all processing is completed before opening the connection
-                    var recordsList = processPagesInParallel ? (List<(string fileName, string data)>) records : records.ToList();
+                    var recordsList = processPagesInParallel ? (List<(string fileName, string data)>)records : records.ToList();
 
-                    using (var connection = NewSqlDBConnection())
+                    using var applicationRoleConnection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    try
                     {
-                        connection.Open();
-                        try
+                        foreach (var (ussPath, data) in recordsList)
                         {
-                            foreach (var (ussPath, data) in recordsList)
-                            {
-                                using (var cmd = connection.CreateCommand())
-                                {
-                                    cmd.CommandText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
+                            using var cmd = connection.CreateCommand();
+                            cmd.CommandText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
                                 SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
                                 FROM MLModel, FAMFILE WHERE MLModel.Name = @ModelName AND FAMFile.FileName = @FileName";
-                                    cmd.Parameters.AddWithValue("@IsTrainingData", appendToTrainingSet.ToString());
-                                    cmd.Parameters.AddWithValue("@Data", data);
-                                    cmd.Parameters.AddWithValue("@ModelName", _settings.ModelName);
-                                    cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
-                                    cmd.ExecuteNonQuery();
-                                }
-                            }
+                            cmd.Parameters.AddWithValue("@IsTrainingData", appendToTrainingSet.ToString());
+                            cmd.Parameters.AddWithValue("@Data", data);
+                            cmd.Parameters.AddWithValue("@ModelName", _settings.ModelName);
+                            cmd.Parameters.AddWithValue("@FileName", ussPath.Substring(0, ussPath.Length - 4));
+                            cmd.ExecuteNonQuery();
                         }
-                        catch (Exception ex)
-                        {
-                            throw new ExtractException("ELI45758", "Unable to write ml data", ex);
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ExtractException("ELI45758", "Unable to write ml data", ex);
                     }
                 }
             }
@@ -1353,49 +1344,32 @@ namespace Extract.UtilityApplications.NERAnnotation
             // Set enlist to false to prevent the transaction from escalating to a distributed transaction
             // (which requires the MSDTC service to be running)
             // (This is not an update command anyway so no need to be in the transaction...)
-            using (var connection = NewSqlDBConnection(enlist: false))
-            using (var cmd = connection.CreateCommand())
+            using var applicationRoleConnection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName, enlist: false);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+            using var cmd = connection.CreateCommand();
+
+            cmd.CommandText = _GET_VOA_FROM_DB;
+            cmd.Parameters.AddWithValue("@AttributeSetName", _settings.AttributeSetName);
+            cmd.Parameters.AddWithValue("@FileName", imageName);
+
+            using (var reader = cmd.ExecuteReader())
             {
-                cmd.CommandText = _GET_VOA_FROM_DB;
-                cmd.Parameters.AddWithValue("@AttributeSetName", _settings.AttributeSetName);
-                cmd.Parameters.AddWithValue("@FileName", imageName);
 
-                connection.Open();
-                using (var reader = cmd.ExecuteReader())
+                if (reader.Read() && !reader.IsDBNull(0))
                 {
-
-                    if (reader.Read() && !reader.IsDBNull(0))
+                    using (var stream = reader.GetStream(0))
                     {
-                        using (var stream = reader.GetStream(0))
-                        {
-                            var voa = AttributeMethods.GetVectorOfAttributesFromSqlBinary(stream);
-                            voa.ReportMemoryUsage();
-                            return voa;
-                        }
-                    }
-                    else
-                    {
-                        return null;
+                        var voa = AttributeMethods.GetVectorOfAttributesFromSqlBinary(stream);
+                        voa.ReportMemoryUsage();
+                        return voa;
                     }
                 }
+                else
+                {
+                    return null;
+                }
             }
-        }
-
-        /// <summary>
-        /// Returns a connection to the configured database
-        /// </summary>
-        /// <param name="enlist">Whether to enlist in a transaction scope if there is one</param>
-        SqlConnection NewSqlDBConnection(bool enlist = true)
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = _settings.DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = _settings.DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            sqlConnectionBuild.Enlist = enlist;
-            return new SqlConnection( sqlConnectionBuild.ConnectionString);
         }
 
         #region IDisposable Support

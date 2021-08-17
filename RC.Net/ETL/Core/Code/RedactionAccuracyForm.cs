@@ -1,4 +1,5 @@
-﻿using Extract.Utilities;
+﻿using Extract.SqlDatabase;
+using Extract.Utilities;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -71,39 +72,20 @@ namespace Extract.ETL
         /// </summary>
         void LoadComboBoxes()
         {
-            using (var connection = NewSqlDBConnection())
-            {
-                connection.Open();
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = "SELECT [Description] FROM [dbo].[AttributeSetName]";
-                    var results = cmd.ExecuteReader()
-                        .Cast<IDataRecord>()
-                        .Select(r => r.GetString(r.GetOrdinal("Description"))).ToArray();
+            using var applicationRoleConnection = new ExtractRoleConnection(RedactionAccuracyService.DatabaseServer,
+                                                               RedactionAccuracyService.DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT [Description] FROM [dbo].[AttributeSetName]";
+            var results = cmd.ExecuteReader()
+                .Cast<IDataRecord>()
+                .Select(r => r.GetString(r.GetOrdinal("Description"))).ToArray();
 
-                    _expectedAttributeSetComboBox.Items.Clear();
-                    _expectedAttributeSetComboBox.Items.AddRange(results);
+            _expectedAttributeSetComboBox.Items.Clear();
+            _expectedAttributeSetComboBox.Items.AddRange(results);
 
-                    _foundAttributeSetComboBox.Items.Clear();
-                    _foundAttributeSetComboBox.Items.AddRange(results);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns a connection to the configured database. Can be overridden if needed
-        /// </summary>
-        /// <returns>SqlConnection that connects to the <see cref="DatabaseServer"/> and <see cref="DatabaseName"/></returns>
-        SqlConnection NewSqlDBConnection()
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = RedactionAccuracyService.DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = RedactionAccuracyService.DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
+            _foundAttributeSetComboBox.Items.Clear();
+            _foundAttributeSetComboBox.Items.AddRange(results);
         }
 
         #endregion

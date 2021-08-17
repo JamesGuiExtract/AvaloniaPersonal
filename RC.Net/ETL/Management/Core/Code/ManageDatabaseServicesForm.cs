@@ -1,4 +1,5 @@
-﻿using Extract.Utilities;
+﻿using Extract.SqlDatabase;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
@@ -207,89 +208,70 @@ namespace Extract.ETL.Management
             try
             {
                 var table = new DataTable();
-                using (var connection = NewSqlDBConnection())
-                {
-                    connection.Open();
+                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                SqlConnection connection = applicationRoleConnection.SqlConnection;
 
-                    using (var command = connection.CreateCommand())
+
+                using var command = connection.CreateCommand();
+
+                command.CommandText = _DatabaseServiceSql;
+
+                table.Load(command.ExecuteReader());
+
+                var dataToDisplay = table.AsEnumerable()
+                    .Select(r =>
                     {
-                        command.CommandText = _DatabaseServiceSql;
-
-                        table.Load(command.ExecuteReader());
-
-                        var dataToDisplay = table.AsEnumerable()
-                            .Select(r =>
-                            {
-                                var service = DatabaseService.FromJson(r.Field<string>("Settings"));
+                        var service = DatabaseService.FromJson(r.Field<string>("Settings"));
 
                                 // An empty settings string results in a null service object
                                 return service == null
-                                    ? null
-                                    : new DatabaseServiceData
-                                    {
-                                        ID = r.Field<Int32>("ID"),
-                                        Description = r.Field<string>("Description"),
-                                        Service = service,
-                                        ServiceType = service.ExtractCategoryType,
-                                        Enabled = r.Field<bool>("Enabled")
-                                    };
-                            })
-                            .Where(s => s != null)
-                            .ToList();
+                            ? null
+                            : new DatabaseServiceData
+                            {
+                                ID = r.Field<Int32>("ID"),
+                                Description = r.Field<string>("Description"),
+                                Service = service,
+                                ServiceType = service.ExtractCategoryType,
+                                Enabled = r.Field<bool>("Enabled")
+                            };
+                    })
+                    .Where(s => s != null)
+                    .ToList();
 
-                        _listOfDataToDisplay = new BindingList<DatabaseServiceData>(dataToDisplay);
-                        BindingSource bindingSource = new BindingSource();
-                        bindingSource.DataSource = _listOfDataToDisplay;
+                _listOfDataToDisplay = new BindingList<DatabaseServiceData>(dataToDisplay);
+                BindingSource bindingSource = new BindingSource();
+                bindingSource.DataSource = _listOfDataToDisplay;
 
-                        _databaseServicesDataGridView.DataSource = bindingSource;
+                _databaseServicesDataGridView.DataSource = bindingSource;
 
-                        // Hide the ID column
-                        _databaseServicesDataGridView.Columns["ID"].Visible = false;
-                        _databaseServicesDataGridView.Columns["Service"].Visible = false;
-                        _databaseServicesDataGridView.Columns["ServiceType"].HeaderText = "Service Type";
-                        _databaseServicesDataGridView.Columns["ServiceType"].MinimumWidth = 150;
-                        _databaseServicesDataGridView.Columns["Enabled"].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
-                        _databaseServicesDataGridView.Columns["Enabled"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-                        _databaseServicesDataGridView.Columns["Description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    }
+                // Hide the ID column
+                _databaseServicesDataGridView.Columns["ID"].Visible = false;
+                _databaseServicesDataGridView.Columns["Service"].Visible = false;
+                _databaseServicesDataGridView.Columns["ServiceType"].HeaderText = "Service Type";
+                _databaseServicesDataGridView.Columns["ServiceType"].MinimumWidth = 150;
+                _databaseServicesDataGridView.Columns["Enabled"].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+                _databaseServicesDataGridView.Columns["Enabled"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+                _databaseServicesDataGridView.Columns["Description"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
-                    // This is not a field or property because ManagerDatabaseServicesForm is used by FAMDBAdmin and
-                    // if FileProcessingDB is a property or field FAMDBAdmin doesn't always compile(C++ CLR project)
-                    FileProcessingDB famDB = new FileProcessingDB();
-                    famDB.DatabaseServer = DatabaseServer;
-                    famDB.DatabaseName = DatabaseName;
+                // This is not a field or property because ManagerDatabaseServicesForm is used by FAMDBAdmin and
+                // if FileProcessingDB is a property or field FAMDBAdmin doesn't always compile(C++ CLR project)
+                FileProcessingDB famDB = new FileProcessingDB();
+                famDB.DatabaseServer = DatabaseServer;
+                famDB.DatabaseName = DatabaseName;
 
-                    // Get the ETLRestart
-                    string etlRestartString = famDB.GetDBInfoSetting("ETLRestart", false);
-                    //  if it is empty set it to current datetime or if it doesn't parse as a date
-                    if (string.IsNullOrEmpty(etlRestartString) || !DateTime.TryParse(etlRestartString, out _EtlRestartTime))
-                    {
-                        _EtlRestartTime = DateTime.Now;
-                        famDB.SetDBInfoSetting("ETLRestart", _EtlRestartTime.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"), true, false);
-                    }
+                // Get the ETLRestart
+                string etlRestartString = famDB.GetDBInfoSetting("ETLRestart", false);
+                //  if it is empty set it to current datetime or if it doesn't parse as a date
+                if (string.IsNullOrEmpty(etlRestartString) || !DateTime.TryParse(etlRestartString, out _EtlRestartTime))
+                {
+                    _EtlRestartTime = DateTime.Now;
+                    famDB.SetDBInfoSetting("ETLRestart", _EtlRestartTime.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz"), true, false);
                 }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45588");
             }
-        }
-
-        /// <summary>
-        /// Gets a new <see cref="SqlConnection"/> using the configured server and database
-        /// </summary>
-        /// <returns></returns>
-        SqlConnection NewSqlDBConnection()
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            sqlConnectionBuild.Encrypt = false;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         /// <summary>
@@ -303,25 +285,23 @@ namespace Extract.ETL.Management
             DatabaseServiceData currentData = row.DataBoundItem as DatabaseServiceData;
 
             // Get current data from the database
-            using (var connection = NewSqlDBConnection())
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+            using var command = connection.CreateCommand();
+            command.CommandText = _DatabaseServiceSql + " WHERE ID = @DatabaseServiceID";
+            command.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
+
+            var data = command.ExecuteReader();
+            if (!data.Read())
             {
-                connection.Open();
-
-                var command = connection.CreateCommand();
-                command.CommandText = _DatabaseServiceSql + " WHERE ID = @DatabaseServiceID";
-                command.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
-
-                var data = command.ExecuteReader();
-                if (!data.Read())
-                {
-                    MessageBox.Show("Database Service no longer exists.");
-                    _listOfDataToDisplay.Remove((DatabaseServiceData)row.DataBoundItem);
-                    return false;
-                }
-                currentData.Description = data.GetString(data.GetOrdinal("Description"));
-                currentData.Service = DatabaseService.FromJson(data.GetString(data.GetOrdinal("Settings")));
-                return true;
+                MessageBox.Show("Database Service no longer exists.");
+                _listOfDataToDisplay.Remove((DatabaseServiceData)row.DataBoundItem);
+                return false;
             }
+            currentData.Description = data.GetString(data.GetOrdinal("Description"));
+            currentData.Service = DatabaseService.FromJson(data.GetString(data.GetOrdinal("Settings")));
+            return true;
         }
 
         /// <summary>
@@ -404,23 +384,22 @@ namespace Extract.ETL.Management
                     bool newEnabledValue = !currentData.Enabled;
 
                     // Update the value in the database
-                    using (var trans = new TransactionScope())
-                    using (var connection = NewSqlDBConnection())
-                    {
-                        connection.Open();
-                        var cmd = connection.CreateCommand();
-                        cmd.CommandText = @"
+                    using var trans = new TransactionScope();
+                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = @"
                             UPDATE DatabaseService 
                             SET [Enabled] = @Enabled
                             WHERE ID = @DatabaseServiceID";
-                        cmd.Parameters.AddWithValue("@Enabled", newEnabledValue);
-                        cmd.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
-                        cmd.ExecuteNonQuery();
-                        trans.Complete();
+                    cmd.Parameters.AddWithValue("@Enabled", newEnabledValue);
+                    cmd.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
+                    cmd.ExecuteNonQuery();
+                    trans.Complete();
 
-                        // update the data for the row
-                        currentData.Enabled = newEnabledValue;
-                    }
+                    // update the data for the row
+                    currentData.Enabled = newEnabledValue;
                 }
                 EnableButtons();
             }
@@ -528,20 +507,20 @@ namespace Extract.ETL.Management
                 {
                     Int32 ID = (Int32)row.Cells["ID"].Value;
 
-                    using (var trans = new TransactionScope())
-                    using (var connection = NewSqlDBConnection())
-                    {
-                        connection.Open();
-                        var cmd = connection.CreateCommand();
-                        cmd.CommandText = @"
+                    using var trans = new TransactionScope();
+                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = @"
                                 DELETE FROM DatabaseService 
                                 WHERE ID = @DatabaseServiceID";
-                        cmd.Parameters.AddWithValue("@DatabaseServiceID", ID);
-                        cmd.ExecuteNonQuery();
-                        trans.Complete();
+                    cmd.Parameters.AddWithValue("@DatabaseServiceID", ID);
+                    cmd.ExecuteNonQuery();
+                    trans.Complete();
 
-                        _listOfDataToDisplay.Remove((DatabaseServiceData)row.DataBoundItem);
-                    }
+                    _listOfDataToDisplay.Remove((DatabaseServiceData)row.DataBoundItem);
                 }
                 EnableButtons();
             }

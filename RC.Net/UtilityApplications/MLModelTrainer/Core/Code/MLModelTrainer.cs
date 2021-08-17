@@ -1,10 +1,12 @@
 ﻿using Extract.AttributeFinder;
 using Extract.Code.Attributes;
 using Extract.ETL;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -360,45 +362,33 @@ namespace Extract.UtilityApplications.MachineLearning
 
                         if (MarkOldDataForDeletion)
                         {
-                            using (var connection = NewSqlDBConnection())
+
+                            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+                            using var cmd = connection.CreateCommand();
+
+                            cmd.CommandText = _MARK_OLD_DATA_FOR_DELETION;
+                            cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
+                            cmd.Parameters.AddWithValue("@FirstIDTrained", firstIDTrained);
+                            cmd.Parameters.AddWithValue("@FirstIDTested", firstIDTested);
+
+                            // Set the timeout so that it waits indefinitely
+                            cmd.CommandTimeout = 0;
+
+                            try
                             {
-                                try
-                                {
-                                    connection.Open();
-                                }
-                                catch (Exception ex)
-                                {
-                                    var ue = ex.AsExtract("ELI45761");
-                                    ue.AddDebugData("Database Server", DatabaseServer, false);
-                                    ue.AddDebugData("Database Name", DatabaseName, false);
-                                    throw ue;
-                                }
-
-                                using (var cmd = connection.CreateCommand())
-                                {
-                                    cmd.CommandText = _MARK_OLD_DATA_FOR_DELETION;
-                                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
-                                    cmd.Parameters.AddWithValue("@FirstIDTrained", firstIDTrained);
-                                    cmd.Parameters.AddWithValue("@FirstIDTested", firstIDTested);
-
-                                    // Set the timeout so that it waits indefinitely
-                                    cmd.CommandTimeout = 0;
-
-                                    try
-                                    {
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        var ue = new ExtractException("ELI45762", "Failed to mark data for deletion", ex);
-                                        ue.AddDebugData("Database Server", DatabaseServer, false);
-                                        ue.AddDebugData("Database Name", DatabaseName, false);
-                                        throw ue;
-                                    }
-                                }
+                                cmd.ExecuteNonQuery();
                             }
-                        }
+                            catch (Exception ex)
+                            {
+                                var ue = new ExtractException("ELI45762", "Failed to mark data for deletion", ex);
+                                ue.AddDebugData("Database Server", DatabaseServer, false);
+                                ue.AddDebugData("Database Name", DatabaseName, false);
+                                throw ue;
+                            }
 
+                        }
                         // Save status to the DB
                         SaveStatus();
                     }
@@ -476,42 +466,28 @@ namespace Extract.UtilityApplications.MachineLearning
 
         public override int CalculateUnprocessedRecordCount()
         {
-            using (var connection = NewSqlDBConnection())
+
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+
+            using var cmd = connection.CreateCommand();
+
+            cmd.CommandText = _GET_NEW_DATA_COUNT;
+            cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
+            cmd.Parameters.AddWithValue("@IsTrainingData", true);
+            cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+            cmd.CommandTimeout = 0;
+
+            int newCount = 0;
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
             {
-                try
-                {
-                    connection.Open();
-                }
-                catch (Exception ex)
-                {
-                    var ue = ex.AsExtract("ELI45755");
-                    ue.AddDebugData("Database Server", DatabaseServer, false);
-                    ue.AddDebugData("Database Name", DatabaseName, false);
-                    ue.AddDebugData("MLModel", QualifiedModelName, false);
-                    throw ue;
-                }
-
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = _GET_NEW_DATA_COUNT;
-                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
-                    cmd.Parameters.AddWithValue("@IsTrainingData", true);
-                    cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
-                    cmd.CommandTimeout = 0;
-
-                    int newCount = 0;
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            newCount = reader.GetInt32(0);
-                        }
-                        reader.Close();
-                    }
-                    return newCount;
-                }
+                newCount = reader.GetInt32(0);
             }
-            
+            reader.Close();
+            return newCount;
+
         }
 
         /// <summary>
@@ -594,7 +570,7 @@ namespace Extract.UtilityApplications.MachineLearning
         {
 
             MLModelTrainerConfigurationDialog configurationDialog = new MLModelTrainerConfigurationDialog(this, DatabaseServer, DatabaseName);
-            
+
             return configurationDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK;
         }
 
@@ -880,7 +856,7 @@ namespace Extract.UtilityApplications.MachineLearning
                                         var f1String = ((YamlScalarNode)f1Node.Value).Value;
                                         AppendToLog(((YamlScalarNode)f1Node.Key).Value + ": " + f1String);
 
-                                        if(!double.TryParse(f1String, out double f1))
+                                        if (!double.TryParse(f1String, out double f1))
                                         {
                                             // This was triggering a warning. I am not sure how you want to handle an error if this fails.
                                         }
@@ -955,81 +931,53 @@ namespace Extract.UtilityApplications.MachineLearning
 
         int GetLastProcessedCount(bool trainingData)
         {
-            using (var connection = NewSqlDBConnection())
+
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+
+            // Get last processed count
+            using var cmd = connection.CreateCommand();
+
+            int max = trainingData ? MaximumTrainingRecords : MaximumTestingRecords;
+            cmd.CommandText = _GET_LAST_PROCESSED_COUNT;
+            cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
+            cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
+            cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
+            cmd.CommandTimeout = 0;
+
+            int lastCount = 0;
+            using (var reader = cmd.ExecuteReader())
             {
-                try
+                if (reader.Read())
                 {
-                    connection.Open();
+                    lastCount = reader.GetInt32(0);
                 }
-                catch (Exception ex)
-                {
-                    var ue = ex.AsExtract("ELI45093");
-                    ue.AddDebugData("Database Server", DatabaseServer, false);
-                    ue.AddDebugData("Database Name", DatabaseName, false);
-                    ue.AddDebugData("MLModel", QualifiedModelName, false);
-                    throw ue;
-                }
-
-                // Get last processed count
-                using (var cmd = connection.CreateCommand())
-                {
-                    int max = trainingData ? MaximumTrainingRecords : MaximumTestingRecords;
-                    cmd.CommandText = _GET_LAST_PROCESSED_COUNT;
-                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
-                    cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
-                    cmd.Parameters.AddWithValue("@LastIDProcessed", LastIDProcessed);
-                    cmd.CommandTimeout = 0;
-
-                    int lastCount = 0;
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            lastCount = reader.GetInt32(0);
-                        }
-                        reader.Close();
-                    }
-                    return Math.Min(lastCount, max);
-                }
+                reader.Close();
             }
+            return Math.Min(lastCount, max);
         }
+
 
         IEnumerable<(string data, int id)> GetDataFromDB(bool trainingData, int maxRecords)
         {
-            using (var connection = NewSqlDBConnection())
+            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            SqlConnection connection = applicationRoleConnection.SqlConnection;
+
+            using var cmd = connection.CreateCommand();
+
+            cmd.CommandText = _GET_MLDATA;
+            cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
+            cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
+            cmd.Parameters.AddWithValue("@Max", maxRecords);
+            cmd.CommandTimeout = 0;
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                try
-                {
-                    connection.Open();
-                }
-                catch (Exception ex)
-                {
-                    var ue = ex.AsExtract("ELI50054");
-                    ue.AddDebugData("Database Server", DatabaseServer, false);
-                    ue.AddDebugData("Database Name", DatabaseName, false);
-                    ue.AddDebugData("MLModel", QualifiedModelName, false);
-                    throw ue;
-                }
-
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = _GET_MLDATA;
-                    cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
-                    cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
-                    cmd.Parameters.AddWithValue("@Max", maxRecords);
-                    cmd.CommandTimeout = 0;
-
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int id = reader.GetInt32(0);
-                            string line = reader.GetString(1);
-                            yield return (line, id);
-                        }
-                    }
-                }
-                connection.Close();
+                int id = reader.GetInt32(0);
+                string line = reader.GetString(1);
+                yield return (line, id);
             }
         }
 
@@ -1085,18 +1033,14 @@ namespace Extract.UtilityApplications.MachineLearning
         /// </summary>
         void SaveStatus()
         {
-            using (var connection = NewSqlDBConnection())
-            {
-                connection.Open();
-                if (Container is DatabaseService hasStatusRecord
+            if (Container is DatabaseService hasStatusRecord
                     && Container is IHasConfigurableDatabaseServiceStatus hasStatus)
-                {
-                    hasStatusRecord.SaveStatus(hasStatus.Status);
-                }
-                else
-                {
-                    SaveStatus(new MLModelTrainerStatus(this));
-                }
+            {
+                hasStatusRecord.SaveStatus(hasStatus.Status);
+            }
+            else
+            {
+                SaveStatus(new MLModelTrainerStatus(this));
             }
         }
 

@@ -3,6 +3,7 @@ using DatabaseMigrationWizard.Database.Input.DataTransformObject;
 using DatabaseMigrationWizard.Database.Output;
 using Extract.FileActionManager.Database.Test;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -354,10 +355,9 @@ namespace DatabaseMigrationWizard.Test
         {
             StringWriter stringWriter = new StringWriter(CultureInfo.InvariantCulture);
 
-            using (SqlConnection sqlConnection = new SqlConnection($@"Server=(local);Database={DatabaseName};Integrated Security=SSPI"))
+            using (ApplicationRoleConnection Role = new ExtractRoleConnection("(local)", DatabaseName))
             {
-                sqlConnection.Open();
-                serialize.SerializeTable(sqlConnection, stringWriter);
+                serialize.SerializeTable(Role.SqlConnection, stringWriter);
             }
 
             return stringWriter;

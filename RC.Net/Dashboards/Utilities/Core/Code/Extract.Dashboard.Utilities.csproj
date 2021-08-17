@@ -88,6 +88,10 @@
       <Project>{8267221b-52c3-490b-a98f-7a51ebeb2a2b}</Project>
       <Name>Extract.Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
+      <Project>{b3ce129b-ddab-46fd-abd2-89c659718bbe}</Project>
+      <Name>Extract.SqlDatabase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>

@@ -1,6 +1,7 @@
 ﻿using DatabaseMigrationWizard.Pages.Utility;
 using Extract;
 using Extract.Database;
+using Extract.SqlDatabase;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -28,8 +29,7 @@ namespace DatabaseMigrationWizard.Database.Input
         {
             this.ImportOptions = importOptions;
             this.Progress = progress;
-            this.ImportOptions.SqlConnection = new SqlConnection($@"Server={ImportOptions.ConnectionInformation.DatabaseServer};Database={ImportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI");
-            this.ImportOptions.SqlConnection.Open();
+            this.ImportOptions.RoleConnection = new ExtractRoleConnection(ImportOptions.ConnectionInformation.DatabaseServer, ImportOptions.ConnectionInformation.DatabaseName);
             this.ImportOptions.Transaction = this.ImportOptions.SqlConnection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
         }
 
@@ -259,8 +259,8 @@ namespace DatabaseMigrationWizard.Database.Input
                 this.ImportOptions.Transaction?.Dispose();
                 this.ImportOptions.Transaction = null;
                 this.ImportOptions.SqlConnection?.Close();
-                this.ImportOptions.SqlConnection?.Dispose();
-                this.ImportOptions.SqlConnection = null;
+                this.ImportOptions.RoleConnection?.Dispose();
+                this.ImportOptions.RoleConnection = null;
             }
         }
     }

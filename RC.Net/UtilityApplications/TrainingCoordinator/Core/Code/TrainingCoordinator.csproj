@@ -124,6 +124,10 @@
       <Project>{9CA28A56-27B0-4F3A-BD61-970B3DE2A793}</Project>
       <Name>Extract.Code.Attributes</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
+      <Project>{A75275DE-A979-41E6-8E46-546270D51E55}</Project>
+      <Name>Extract.SqlDatabase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\MLModelTrainer\Core\Code\MLModelTrainer.csproj">
       <Project>{A7FAD56F-541D-41A0-9DA7-683572F50A20}</Project>
       <Name>MLModelTrainer</Name>

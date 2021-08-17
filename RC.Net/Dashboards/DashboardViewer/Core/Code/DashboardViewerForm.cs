@@ -8,6 +8,7 @@ using DevExpress.XtraGrid.Views.Grid;
 using Extract.Dashboard.Forms;
 using Extract.Dashboard.Utilities;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -126,20 +127,19 @@ namespace Extract.DashboardViewer
                 {
                     if (_databaseVersion == 0 && IsDatabaseOverridden)
                     {
-                        using (var connection = NewSqlDBConnection())
+                        using var applicationRole = new ExtractRoleConnection(ServerName, DatabaseName);
+                        var connection = applicationRole.SqlConnection;
+
+                        using var command = connection.CreateCommand();
+                        command.CommandText = "SELECT [Value] FROM DBInfo WHERE [Name] = 'FAMDBSchemaVersion'";
+                        int version;
+                        if (int.TryParse(command.ExecuteScalar() as string, out version))
                         {
-                            connection.Open();
-                            var command = connection.CreateCommand();
-                            command.CommandText = "SELECT [Value] FROM DBInfo WHERE [Name] = 'FAMDBSchemaVersion'";
-                            int version;
-                            if (int.TryParse(command.ExecuteScalar() as string, out version))
-                            {
-                                _databaseVersion = version;
-                            }
-                            else
-                            {
-                                _databaseVersion = 0;
-                            }
+                            _databaseVersion = version;
+                        }
+                        else
+                        {
+                            _databaseVersion = 0;
                         }
                     }
                 }
@@ -1010,22 +1010,6 @@ namespace Extract.DashboardViewer
             {
                 throw ex.AsExtract("ELI50075");
             }
-        }
-
-        /// <summary>
-        /// Returns a connection to the configured database. 
-        /// </summary>
-        /// <returns>SqlConnection that connects to the <see cref="DatabaseServer"/> and <see cref="DatabaseName"/></returns>
-        SqlConnection NewSqlDBConnection()
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = ServerName;
-            sqlConnectionBuild.InitialCatalog = DatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         /// <summary>
