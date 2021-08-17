@@ -359,13 +359,12 @@ namespace Extract.UtilityApplications.MachineLearning
                         {
                             FileSystemMethods.MoveFile(_tempModelFile.FileName, dest, true);
                         }
+                       
+                        using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                        connection.Open();
 
                         if (MarkOldDataForDeletion)
                         {
-
-                            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                            SqlConnection connection = applicationRoleConnection.SqlConnection;
-
                             using var cmd = connection.CreateCommand();
 
                             cmd.CommandText = _MARK_OLD_DATA_FOR_DELETION;
@@ -390,7 +389,7 @@ namespace Extract.UtilityApplications.MachineLearning
 
                         }
                         // Save status to the DB
-                        SaveStatus();
+                        SaveStatus(connection);
                     }
                     else
                     {
@@ -467,9 +466,8 @@ namespace Extract.UtilityApplications.MachineLearning
         public override int CalculateUnprocessedRecordCount()
         {
 
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
-
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
 
             using var cmd = connection.CreateCommand();
 
@@ -932,9 +930,8 @@ namespace Extract.UtilityApplications.MachineLearning
         int GetLastProcessedCount(bool trainingData)
         {
 
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
-
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
 
             // Get last processed count
             using var cmd = connection.CreateCommand();
@@ -961,8 +958,8 @@ namespace Extract.UtilityApplications.MachineLearning
 
         IEnumerable<(string data, int id)> GetDataFromDB(bool trainingData, int maxRecords)
         {
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
 
             using var cmd = connection.CreateCommand();
 
@@ -1031,16 +1028,16 @@ namespace Extract.UtilityApplications.MachineLearning
         /// <summary>
         /// Saves the current <see cref="DatabaseServiceStatus"/> to the DB
         /// </summary>
-        void SaveStatus()
+        void SaveStatus(SqlAppRoleConnection connection)
         {
             if (Container is DatabaseService hasStatusRecord
                     && Container is IHasConfigurableDatabaseServiceStatus hasStatus)
             {
-                hasStatusRecord.SaveStatus(hasStatus.Status);
+                hasStatusRecord.SaveStatus(connection, hasStatus.Status);
             }
             else
             {
-                SaveStatus(new MLModelTrainerStatus(this));
+                SaveStatus(connection, new MLModelTrainerStatus(this));
             }
         }
 

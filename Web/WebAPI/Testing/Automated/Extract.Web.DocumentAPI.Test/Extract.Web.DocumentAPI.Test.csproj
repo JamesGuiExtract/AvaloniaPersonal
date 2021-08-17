@@ -202,6 +202,10 @@
       <Project>{e610e652-0891-40d4-b5ca-a622b87c7979}</Project>
       <Name>Extract.Imaging.Utilities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
+      <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
+      <Name>Extract.SqlDatabase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>

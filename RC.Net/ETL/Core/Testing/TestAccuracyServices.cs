@@ -1,4 +1,5 @@
 ﻿using Extract.FileActionManager.Database.Test;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
@@ -186,32 +187,31 @@ namespace Extract.ETL.Test
                 // Create DataCaptureAccuracy object using the initialized database
                 DataCaptureAccuracy dataCaptureAccuracy = CreateTestDataCapture(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
 
-                using (var connection = NewSqlConnection(dataCaptureAccuracy.DatabaseServer, dataCaptureAccuracy.DatabaseName))
-                {
-                    connection.Open();
-                    SqlCommand cmd = connection.CreateCommand();
 
-                    // no records should be produced by this
-                    Assert.Throws<ExtractException>(() => dataCaptureAccuracy.Process(_cancel));
-                    cmd.CommandText = "SELECT COUNT(ID) FROM ReportingDataCaptureAccuracy";
+                using var connection = new ExtractRoleConnection(dataCaptureAccuracy.DatabaseServer, dataCaptureAccuracy.DatabaseName);
+                connection.Open();
+                using var cmd = connection.CreateCommand();
 
-                    Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
+                // no records should be produced by this
+                Assert.Throws<ExtractException>(() => dataCaptureAccuracy.Process(_cancel));
+                cmd.CommandText = "SELECT COUNT(ID) FROM ReportingDataCaptureAccuracy";
 
-                    // Process using the settings
-                    dataCaptureAccuracy.Process(_noCancel);
+                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
 
-                    // Get the data from the database after processing
-                    cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"
+                // Process using the settings
+                dataCaptureAccuracy.Process(_noCancel);
+
+                // Get the data from the database after processing
+                cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"
                         SELECT * FROM ReportingDataCaptureAccuracy WHERE DatabaseServiceID = {0}"
-                        , dataCaptureAccuracy.DatabaseServiceID);
+                    , dataCaptureAccuracy.DatabaseServiceID);
 
-                    CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
+                CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
 
-                    // Run again - There should be no changes
-                    dataCaptureAccuracy.Process(_noCancel);
+                // Run again - There should be no changes
+                dataCaptureAccuracy.Process(_noCancel);
 
-                    CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
-                }
+                CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
             }
             finally
             {
@@ -236,26 +236,24 @@ namespace Extract.ETL.Test
                 // Create DataCaptureAccuracy object using the initialized database
                 DataCaptureAccuracy dataCaptureAccuracy = CreateTestDataCapture(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
 
-                using (var connection = NewSqlConnection(dataCaptureAccuracy.DatabaseServer, dataCaptureAccuracy.DatabaseName))
-                {
-                    connection.Open();
-                    SqlCommand cmd = connection.CreateCommand();
+                using var connection = new ExtractRoleConnection(dataCaptureAccuracy.DatabaseServer, dataCaptureAccuracy.DatabaseName);
+                connection.Open();
+                using var cmd = connection.CreateCommand();
 
-                    // Process using the settings
-                    dataCaptureAccuracy.Process(_noCancel);
+                // Process using the settings
+                dataCaptureAccuracy.Process(_noCancel);
 
-                    // Get the data from the database after processing
-                    cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"
-                        SELECT * FROM ReportingDataCaptureAccuracy WHERE DatabaseServiceID = {0}"
-                        , dataCaptureAccuracy.DatabaseServiceID);
+                // Get the data from the database after processing
+                cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"
+                    SELECT * FROM ReportingDataCaptureAccuracy WHERE DatabaseServiceID = {0}"
+                    , dataCaptureAccuracy.DatabaseServiceID);
 
-                    CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
+                CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
 
-                    // Run again - There should be no changes
-                    dataCaptureAccuracy.Process(_noCancel);
+                // Run again - There should be no changes
+                dataCaptureAccuracy.Process(_noCancel);
 
-                    CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
-                }
+                CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
             }
             finally
             {
@@ -280,65 +278,63 @@ namespace Extract.ETL.Test
                 // Create DataCaptureAccuracy object using the initialized database
                 DataCaptureAccuracy dataCaptureAccuracy = CreateTestDataCapture(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
 
-                using (var connection = NewSqlConnection(dataCaptureAccuracy.DatabaseServer, dataCaptureAccuracy.DatabaseName))
+                dataCaptureAccuracy.RefreshStatus();
+                var status = dataCaptureAccuracy.Status as DataCaptureAccuracy.DataCaptureAccuracyStatus;
+
+                Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 0");
+                Assert.AreEqual(status.LastFileTaskSessionIDProcessed, dataCaptureAccuracy.LastFileTaskSessionIDProcessed,
+                    "LastFileTaskSessionIDProcessed for status and data capture accuracy object should be equal");
+
+                // Process using the settings
+                dataCaptureAccuracy.Process(_noCancel);
+
+                dataCaptureAccuracy.RefreshStatus();
+                status = dataCaptureAccuracy.Status as DataCaptureAccuracy.DataCaptureAccuracyStatus;
+
+                Assert.AreEqual(9, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 9");
+                Assert.AreEqual(status.LastFileTaskSessionIDProcessed, dataCaptureAccuracy.LastFileTaskSessionIDProcessed,
+                    "LastFileTaskSessionIDProcessed for status and data capture accuracy object should be equal");
+
+                // Run again - There should be no changes
+                dataCaptureAccuracy.Process(_noCancel);
+
+                dataCaptureAccuracy.RefreshStatus();
+                status = dataCaptureAccuracy.Status as DataCaptureAccuracy.DataCaptureAccuracyStatus;
+
+                Assert.AreEqual(9, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 9");
+                Assert.AreEqual(status.LastFileTaskSessionIDProcessed, dataCaptureAccuracy.LastFileTaskSessionIDProcessed,
+                    "LastFileTaskSessionIDProcessed for status and data capture accuracy object should be equal");
+                
+                using var connection = new ExtractRoleConnection(dataCaptureAccuracy.DatabaseServer, dataCaptureAccuracy.DatabaseName);
+                connection.Open();
+                using (var statusCmd = connection.CreateCommand())
                 {
-                    connection.Open();
-
-                    dataCaptureAccuracy.RefreshStatus();
-                    var status = dataCaptureAccuracy.Status as DataCaptureAccuracy.DataCaptureAccuracyStatus;
-
-                    Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 0");
-                    Assert.AreEqual(status.LastFileTaskSessionIDProcessed, dataCaptureAccuracy.LastFileTaskSessionIDProcessed,
-                        "LastFileTaskSessionIDProcessed for status and data capture accuracy object should be equal");
-
-                    // Process using the settings
-                    dataCaptureAccuracy.Process(_noCancel);
-
-                    dataCaptureAccuracy.RefreshStatus();
-                    status = dataCaptureAccuracy.Status as DataCaptureAccuracy.DataCaptureAccuracyStatus;
-
-                    Assert.AreEqual(9, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 9");
-                    Assert.AreEqual(status.LastFileTaskSessionIDProcessed, dataCaptureAccuracy.LastFileTaskSessionIDProcessed,
-                        "LastFileTaskSessionIDProcessed for status and data capture accuracy object should be equal");
-
-                    // Run again - There should be no changes
-                    dataCaptureAccuracy.Process(_noCancel);
-
-                    dataCaptureAccuracy.RefreshStatus();
-                    status = dataCaptureAccuracy.Status as DataCaptureAccuracy.DataCaptureAccuracyStatus;
-
-                    Assert.AreEqual(9, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 9");
-                    Assert.AreEqual(status.LastFileTaskSessionIDProcessed, dataCaptureAccuracy.LastFileTaskSessionIDProcessed,
-                        "LastFileTaskSessionIDProcessed for status and data capture accuracy object should be equal");
-
-                    using (var statusCmd = connection.CreateCommand())
-                    {
-                        statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
-                        statusCmd.Parameters.AddWithValue("@DatabaseServiceID", dataCaptureAccuracy.DatabaseServiceID);
-                        var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
-                        Assert.AreNotEqual(null, result, "A single record should be returned");
-                        Assert.AreNotEqual(DBNull.Value, result["Status"], "Status should not be null");
-                        Assert.AreNotEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should not be null");
-                    }
-                    fileProcessingDb.Clear(true);
-
-                    using (var statusCmd = connection.CreateCommand())
-                    {
-                        statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
-                        statusCmd.Parameters.AddWithValue("@DatabaseServiceID", dataCaptureAccuracy.DatabaseServiceID);
-                        var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
-                        Assert.AreNotEqual(null, result, "A single record should be returned");
-                        Assert.AreEqual(DBNull.Value, result["Status"], "Status should not be null");
-                        Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should not be null");
-                    }
-
-                    dataCaptureAccuracy.RefreshStatus();
-                    status = dataCaptureAccuracy.Status as DataCaptureAccuracy.DataCaptureAccuracyStatus;
-
-                    Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 0");
-                    Assert.AreEqual(status.LastFileTaskSessionIDProcessed, dataCaptureAccuracy.LastFileTaskSessionIDProcessed,
-                        "LastFileTaskSessionIDProcessed for status and data capture accuracy object should be equal");
+                    statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
+                    statusCmd.Parameters.AddWithValue("@DatabaseServiceID", dataCaptureAccuracy.DatabaseServiceID);
+                    var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                    Assert.AreNotEqual(null, result, "A single record should be returned");
+                    Assert.AreNotEqual(DBNull.Value, result["Status"], "Status should not be null");
+                    Assert.AreNotEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should not be null");
                 }
+                fileProcessingDb.Clear(true);
+
+                using (var statusCmd = connection.CreateCommand())
+                {
+                    statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
+                    statusCmd.Parameters.AddWithValue("@DatabaseServiceID", dataCaptureAccuracy.DatabaseServiceID);
+                    var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                    Assert.AreNotEqual(null, result, "A single record should be returned");
+                    Assert.AreEqual(DBNull.Value, result["Status"], "Status should not be null");
+                    Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should not be null");
+                }
+                connection.Close();
+
+                dataCaptureAccuracy.RefreshStatus();
+                status = dataCaptureAccuracy.Status as DataCaptureAccuracy.DataCaptureAccuracyStatus;
+
+                Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 0");
+                Assert.AreEqual(status.LastFileTaskSessionIDProcessed, dataCaptureAccuracy.LastFileTaskSessionIDProcessed,
+                    "LastFileTaskSessionIDProcessed for status and data capture accuracy object should be equal");
             }
             finally
             {
@@ -448,26 +444,6 @@ namespace Extract.ETL.Test
             };
             accuracy.UpdateDatabaseServiceSettings();
             return accuracy;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="SqlConnection"/> with the given database server and database name
-        /// </summary>
-        /// <param name="databaseServer">Database server to use</param>
-        /// <param name="databaseName">Database name to use</param>
-        /// <returns>A new <see cref="SqlConnection"/></returns>
-        static SqlConnection NewSqlConnection(string databaseServer, string databaseName)
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = databaseServer;
-            sqlConnectionBuild.InitialCatalog = databaseName;
-
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         #endregion

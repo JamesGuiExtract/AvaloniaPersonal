@@ -2,6 +2,7 @@
 using Extract.AttributeFinder;
 using Extract.FileActionManager.Database.Test;
 using Extract.FileActionManager.FileProcessors;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using Extract.Utilities.FSharp;
@@ -679,38 +680,26 @@ namespace Extract.UtilityApplications.NERAnnotation.Test
                 // Verify tags
                 var expectedFile = _testFiles.GetFile("Resources.opennlp.train_list.train.txt");
 
-                // Build the connection string from the settings
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-                {
-                    DataSource = "(local)",
-                    InitialCatalog = _DB_NAME,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
-
                 string trainingOutput = null;
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+
+                using var connection = new ExtractRoleConnection(settings.DatabaseServer, settings.DatabaseName);
+                connection.Open();
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = _GET_MLDATA;
+                cmd.Parameters.AddWithValue("@Name", _MODEL_NAME);
+                cmd.Parameters.AddWithValue("@IsTrainingData", true);
+
+                var lines = new List<string>();
+                using (var reader = cmd.ExecuteReader())
                 {
-                    connection.Open();
-                    using (var cmd = connection.CreateCommand())
+                    while (reader.Read())
                     {
-                        cmd.CommandText = _GET_MLDATA;
-                        cmd.Parameters.AddWithValue("@Name", _MODEL_NAME);
-                        cmd.Parameters.AddWithValue("@IsTrainingData", true);
-
-                        var lines = new List<string>();
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                lines.Add(reader.GetString(0));
-                            }
-
-                            trainingOutput = string.Join("\r\n", lines) + "\r\n";
-                            reader.Close();
-                        }
+                        lines.Add(reader.GetString(0));
                     }
-                    connection.Close();
+
+                    trainingOutput = string.Join("\r\n", lines) + "\r\n";
+                    reader.Close();
                 }
                 CompareExpectedFileToFoundText(expectedFile, trainingOutput);
             }

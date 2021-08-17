@@ -161,8 +161,8 @@ namespace Extract.Dashboard.Forms
             {
                 if (!_attributesByIdAndXPathContext.ContainsKey(attributeFileSetID))
                 {
-                    using var applicationRoleConnection = new ExtractRoleConnection(ServerName, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    using var connection = new ExtractRoleConnection(ServerName, DatabaseName);
+                    connection.Open();
 
                     using var cmd = connection.CreateCommand();
                     cmd.CommandTimeout = 60;
@@ -246,8 +246,8 @@ namespace Extract.Dashboard.Forms
                     // Setup task to get the data from the database
                     _loadingTask = Task.Run<DataTable>(() =>
                     {
-                        using var applicationRoleConnection = new ExtractRoleConnection(ServerName, DatabaseName);
-                        SqlConnection connection = applicationRoleConnection.SqlConnection;
+                        using var connection = new ExtractRoleConnection(ServerName, DatabaseName);
+                        connection.Open();
 
                         using var command = connection.CreateCommand();
                         command.CommandTimeout = 0;

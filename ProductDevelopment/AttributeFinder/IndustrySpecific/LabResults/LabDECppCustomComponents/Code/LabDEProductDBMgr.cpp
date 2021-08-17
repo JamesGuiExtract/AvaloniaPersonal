@@ -704,9 +704,9 @@ int UpdateToSchemaVersion17(_ConnectionPtr ipConnection, long* pnNumSteps,
 //-------------------------------------------------------------------------------------------------
 CLabDEProductDBMgr::CLabDEProductDBMgr()
 : m_ipFAMDB(__nullptr)
-, m_ipDBConnection(__nullptr)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
+, m_currentRole(CppBaseApplicationRoleConnection::kExtractRole)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -914,6 +914,8 @@ STDMETHODIMP CLabDEProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessing
         IFileProcessingDBPtr ipDB(pDB);
         ASSERT_RESOURCE_ALLOCATION("ELI37850", ipDB != __nullptr);
 
+        m_ipFAMDB = ipDB;
+
         string strValue = asString(ipDB->GetDBInfoSetting(
             gstrLABDE_SCHEMA_VERSION_NAME.c_str(), VARIANT_FALSE));
 
@@ -927,26 +929,16 @@ STDMETHODIMP CLabDEProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcessing
             *pbSchemaExists = VARIANT_TRUE;
         }
 
-        // Create the connection object
-        ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
-        ASSERT_RESOURCE_ALLOCATION("ELI37851", ipDBConnection != __nullptr);
-        
-        string strDatabaseServer = asString(ipDB->DatabaseServer);
-        string strDatabaseName = asString(ipDB->DatabaseName);
-
-        // create the connection string
-        string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-
-        ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
+        auto roleConnection = getAppRoleConnection();
 
         vector<string> vecTables;
         getLabDETables(vecTables);
 
-        dropTablesInVector(ipDBConnection, vecTables);
+        dropTablesInVector(roleConnection->ADOConnection(), vecTables);
 
         if (!asCppBool(bOnlyTables))
         {
-            executeCmdQuery(ipDBConnection, "DROP PROCEDURE [CullEmptyORMMessageNodes]", false);
+            executeCmdQuery(roleConnection->ADOConnection(), "DROP PROCEDURE [CullEmptyORMMessageNodes]", false);
         }
 
         return S_OK;
@@ -1254,7 +1246,7 @@ STDMETHODIMP CLabDEProductDBMgr::put_FAMDB(IFileProcessingDB* newVal)
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-ADODB::_ConnectionPtr CLabDEProductDBMgr::getDBConnection()
+unique_ptr<CppBaseApplicationRoleConnection> CLabDEProductDBMgr::getAppRoleConnection()
 {
     // If the FAMDB is not set throw an exception
     if (m_ipFAMDB == __nullptr)
@@ -1264,38 +1256,64 @@ ADODB::_ConnectionPtr CLabDEProductDBMgr::getDBConnection()
         throw ue;
     }
 
-    // Check if connection has been created
-    if (m_ipDBConnection == __nullptr)
+    bool connectionExists = m_ipDBConnection != __nullptr && m_ipDBConnection->State != adStateClosed;
+
+    if (connectionExists) return createAppRole(m_ipDBConnection);
+
+    m_ipDBConnection.CreateInstance(_uuidof(Connection));
+    ASSERT_RESOURCE_ALLOCATION("ELI51856", m_ipDBConnection != __nullptr);	
+
+    // Get database server from FAMDB
+    string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
+
+    // Get DatabaseName from FAMDB
+    string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
+
+    // create the connection string
+    string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
+    if (!strDatabaseServer.empty() && !strDatabaseName.empty())
     {
-        m_ipDBConnection.CreateInstance(__uuidof( Connection));
-        ASSERT_RESOURCE_ALLOCATION("ELI37866", m_ipDBConnection != __nullptr);
+        m_ipDBConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
+
+        // Get the command timeout from the FAMDB DBInfo table
+        string strValue = asString(
+            m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
+
+        // Set the command timeout
+        m_ipDBConnection->CommandTimeout = asLong(strValue);
     }
 
-    // if closed and Database server and database name are defined,  open the database connection
-    if ( m_ipDBConnection->State == adStateClosed)
+    return createAppRole(m_ipDBConnection);
+}
+//-------------------------------------------------------------------------------------------------
+unique_ptr<CppBaseApplicationRoleConnection> CLabDEProductDBMgr::createAppRole(_ConnectionPtr ipConnection)
+{
+    unique_ptr<CppBaseApplicationRoleConnection> role;
+	
+    try
     {
-        // Get database server from FAMDB
-        string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
-
-        // Get DatabaseName from FAMDB
-        string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
-
-        // create the connection string
-        string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-        if (!strDatabaseServer.empty() && !strDatabaseName.empty())
+        switch (m_currentRole)
         {
-            m_ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified);
-
-            // Get the command timeout from the FAMDB DBInfo table
-            string strValue = asString(
-                m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
-
-            // Set the command timeout
-            m_ipDBConnection->CommandTimeout = asLong(strValue);
+        case CppBaseApplicationRoleConnection::kNoRole:
+            role.reset(new NoRoleConnection(ipConnection));
+            break;
+        case CppBaseApplicationRoleConnection::kExtractRole:
+            role.reset(new ExtractRoleConnection(ipConnection));
+            break;
+        case CppBaseApplicationRoleConnection::kSecurityRole:
+            role.reset(new SecurityRoleConnection(ipConnection));
+            break;
+        default:
+            UCLIDException ue("ELI51845", "Unknown application role requested.");
+            ue.addDebugInfo("ApplicationRole", (int)m_currentRole);
+            throw ue;
         }
     }
-    
-    return m_ipDBConnection;
+    catch (...)
+    {
+        role.reset(new NoRoleConnection(ipConnection));
+    }
+    return role;
 }
 //-------------------------------------------------------------------------------------------------
 void CLabDEProductDBMgr::validateLicense()

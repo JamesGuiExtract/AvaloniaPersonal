@@ -53,8 +53,8 @@ namespace Extract.SqlDatabase.Tests
             {
                 var fileProcessingDb = testDbManager.GetNewDatabase(testDBName);
 
-                using var applicationRoleConnection = new NoAppRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new NoAppRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
+                connection.Open();
 
                 Assert.DoesNotThrow(() => { SqlApplicationRole.CreateApplicationRole(connection, "TestRole", "Test-Password2", SqlApplicationRole.AppRoleAccess.AllAccess); }
                     , "CreateApplication call must not throw an exception");

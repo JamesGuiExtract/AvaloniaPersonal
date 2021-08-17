@@ -177,6 +177,10 @@
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
+      <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
+      <Name>Extract.SqlDatabase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>

@@ -578,8 +578,8 @@ namespace Extract.Dashboard.Utilities
                     return;
                 }
 
-                using var applicationRole = new ExtractRoleConnection(_dashboardForm.ServerName, _dashboardForm.DatabaseName);
-                var connection = applicationRole.SqlConnection;
+                using var connection = new ExtractRoleConnection(_dashboardForm.ServerName, _dashboardForm.DatabaseName);
+                connection.Open();
                 using var cmd = connection.CreateCommand();
 
                 cmd.CommandText = @"

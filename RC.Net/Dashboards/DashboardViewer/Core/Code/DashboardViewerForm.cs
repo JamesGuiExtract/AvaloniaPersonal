@@ -127,8 +127,8 @@ namespace Extract.DashboardViewer
                 {
                     if (_databaseVersion == 0 && IsDatabaseOverridden)
                     {
-                        using var applicationRole = new ExtractRoleConnection(ServerName, DatabaseName);
-                        var connection = applicationRole.SqlConnection;
+                        using var connection = new ExtractRoleConnection(ServerName, DatabaseName);
+                        connection.Open();
 
                         using var command = connection.CreateCommand();
                         command.CommandText = "SELECT [Value] FROM DBInfo WHERE [Name] = 'FAMDBSchemaVersion'";
@@ -856,45 +856,40 @@ namespace Extract.DashboardViewer
                 DisposeOfDashboardsAndDereferenceTempFiles();
             }
 
-            using (var connection = NewSqlDBConnection())
+            using var connection = new ExtractRoleConnection(ServerName, DatabaseName);
+            connection.Open();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = @"
+                SELECT 
+                        CASE
+                            WHEN [UseExtractedData] = 0
+                                OR [ExtractedDataDefinition] IS NULL
+                            THEN [Definition]
+                            ELSE [ExtractedDataDefinition]
+                        END
+                        AS [Definition],
+                        CASE
+                            WHEN [UseExtractedData] = 0
+                                OR [ExtractedDataDefinition] IS NULL
+                            THEN 0
+                            ELSE 1
+                        END
+                        AS UseExtractedData
+                FROM [dbo].[Dashboard]
+                WHERE [DashboardName] = @DashboardName";
+            cmd.Parameters.AddWithValue("@DashboardName", dashboardName);
+            var reader = cmd.ExecuteReader();
+            if (reader.Read())
             {
-                connection.Open();
+                UpdateMainTitle();
 
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                        SELECT 
-                               CASE
-                                   WHEN [UseExtractedData] = 0
-                                        OR [ExtractedDataDefinition] IS NULL
-                                   THEN [Definition]
-                                   ELSE [ExtractedDataDefinition]
-                               END
-                               AS [Definition],
-                               CASE
-                                   WHEN [UseExtractedData] = 0
-                                        OR [ExtractedDataDefinition] IS NULL
-                                   THEN 0
-                                   ELSE 1
-                               END
-                               AS UseExtractedData
-                        FROM [dbo].[Dashboard]
-                        WHERE [DashboardName] = @DashboardName";
-                    cmd.Parameters.AddWithValue("@DashboardName", dashboardName);
-                    var reader = cmd.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        UpdateMainTitle();
+                var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
 
-                        var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
-
-                        // Set empty dashboard to clear previous parameters 
-                        // https://extract.atlassian.net/browse/ISSUE-17169
-                        dashboardViewerMain.Dashboard?.Dispose();
-                        dashboardViewerMain.Dashboard = new DevExpress.DashboardCommon.Dashboard();
-                        dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
-                    }
-                }
+                // Set empty dashboard to clear previous parameters 
+                // https://extract.atlassian.net/browse/ISSUE-17169
+                dashboardViewerMain.Dashboard?.Dispose();
+                dashboardViewerMain.Dashboard = new DevExpress.DashboardCommon.Dashboard();
+                dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
             }
             UpdateMainTitle();
         }
@@ -1136,21 +1131,20 @@ namespace Extract.DashboardViewer
         {
             try
             {
-                using(var connection = NewSqlDBConnection())
-                using (var cmd = connection.CreateCommand())
-                {
-                    connection.Open();
-                    cmd.CommandText = "SELECT Value FROM DBInfo WHERE [Name] = @SettingName";
-                    cmd.Parameters.AddWithValue("@SettingName", "DashboardIncludeFilter");
-                    var includeFilter = cmd.ExecuteScalar() as string ?? "";
-                    includeFilter = string.IsNullOrWhiteSpace(includeFilter) ? "(?=)" : includeFilter;
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("@SettingName", "DashboardExcludeFilter");
-                    var excludeFilter = cmd.ExecuteScalar() as string ?? "";
-                    excludeFilter = string.IsNullOrWhiteSpace(excludeFilter) ? "(?!)" : excludeFilter;
+                using var connection = new ExtractRoleConnection(ServerName, DatabaseName);
+                connection.Open();
+                using var cmd = connection.CreateCommand();
 
-                    return (includeFilter, excludeFilter);
-                }
+                cmd.CommandText = "SELECT Value FROM DBInfo WHERE [Name] = @SettingName";
+                cmd.Parameters.AddWithValue("@SettingName", "DashboardIncludeFilter");
+                var includeFilter = cmd.ExecuteScalar() as string ?? "";
+                includeFilter = string.IsNullOrWhiteSpace(includeFilter) ? "(?=)" : includeFilter;
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@SettingName", "DashboardExcludeFilter");
+                var excludeFilter = cmd.ExecuteScalar() as string ?? "";
+                excludeFilter = string.IsNullOrWhiteSpace(excludeFilter) ? "(?!)" : excludeFilter;
+
+                return (includeFilter, excludeFilter);
             }
             catch (Exception ex)
             {

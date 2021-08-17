@@ -107,8 +107,8 @@ namespace Extract.Dashboard.ETL
 
                 _cancelToken = cancelToken;
 
-                using var applicationRole = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                var connection = applicationRole.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
                 using var cmd = connection.CreateCommand();
 
                 cmd.CommandText = "SELECT ExtractedDataDefinition, DashboardName FROM dbo.Dashboard WHERE UseExtractedData = 1";

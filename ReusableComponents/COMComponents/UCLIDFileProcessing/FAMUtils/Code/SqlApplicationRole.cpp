@@ -8,13 +8,13 @@ void CppSqlApplicationRole::SetApplicationRole(std::string applicationRoleName, 
 {
 	try
 	{
-		ASSERT_ARGUMENT("ELI51761", ipConnection->State != adStateClosed);
+		ASSERT_ARGUMENT("ELI51761", m_ipConnection->State != adStateClosed);
 
 		_CommandPtr cmd;
 		cmd.CreateInstance(__uuidof(Command));
 		ASSERT_RESOURCE_ALLOCATION("ELI51762", cmd != __nullptr);
 
-		cmd->ActiveConnection = ipConnection;
+		cmd->ActiveConnection = m_ipConnection;
 		cmd->CommandText = _bstr_t("sys.sp_setapprole");
 		cmd->CommandType = adCmdStoredProc;
 		cmd->Parameters->Refresh();
@@ -47,13 +47,13 @@ void CppSqlApplicationRole::UnsetApplicationRole()
 	try
 	{
 		if (_cookie.vt == VT_EMPTY) return;
-		if (ipConnection == __nullptr || ipConnection->State != adStateOpen) return;
+		if (m_ipConnection == __nullptr || m_ipConnection->State == adStateClosed) return;
 
 		_CommandPtr cmd;
 		cmd.CreateInstance(__uuidof(Command));
 		ASSERT_RESOURCE_ALLOCATION("ELI51764", cmd != __nullptr);
 
-		cmd->ActiveConnection = ipConnection;
+		cmd->ActiveConnection = m_ipConnection;
 		cmd->CommandText = _bstr_t("sys.sp_unsetapprole");
 		cmd->CommandType = adCmdStoredProc;
 		cmd->Parameters->Refresh();
@@ -83,9 +83,12 @@ void CppSqlApplicationRole::CreateApplicationRole(
 			cmd->ActiveConnection = ipConnection;
 			
 			// Parameters are not being used here because the "CREATE APPLICATION ROLE" sql would not accept them.
-			string sql = "CREATE APPLICATION ROLE " + applicationRoleName + " WITH PASSWORD = '" + password + "', DEFAULT_SCHEMA = dbo; ";
+			string sql = " IF DATABASE_PRINCIPAL_ID('" + applicationRoleName + "') IS NULL \r\n";
+			sql += "BEGIN \r\n";
+			sql += "CREATE APPLICATION ROLE " + applicationRoleName + " WITH PASSWORD = '" + password + "', DEFAULT_SCHEMA = dbo; ";
 			if (access > 0)
 			{
+				sql += "\r\nGRANT VIEW DEFINITION TO " + applicationRoleName + "; ";
 				sql += "\r\nGRANT EXECUTE TO " + applicationRoleName + "; ";
 				sql += "\r\nGRANT SELECT TO " + applicationRoleName + "; ";
 			}
@@ -96,7 +99,12 @@ void CppSqlApplicationRole::CreateApplicationRole(
 			if ((access & AppRoleAccess::DeleteAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
 				sql += "\r\nGRANT DELETE TO " + applicationRoleName + "; ";
 			if ((access & AppRoleAccess::AlterAccess & ~CppSqlApplicationRole::SelectExecuteAccess) > 0)
+			{
 				sql += "\r\nGRANT ALTER TO " + applicationRoleName + "; ";
+				sql += "\r\nGRANT REFERENCES TO " + applicationRoleName + "; ";
+				sql += "\r\nALTER ROLE db_owner ADD MEMBER " + applicationRoleName + "; ";
+			}
+			sql += " END\r\n";
 
 			cmd->CommandText = sql.c_str();
 

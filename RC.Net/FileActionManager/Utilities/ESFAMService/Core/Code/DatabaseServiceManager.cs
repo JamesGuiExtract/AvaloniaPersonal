@@ -1,11 +1,13 @@
 ﻿using Extract.Database;
 using Extract.ETL;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,10 +48,10 @@ namespace Extract.FileActionManager.Utilities
         CancellationTokenSource _canceller = new CancellationTokenSource();
 
         /// <summary>
-        /// An OLE database connection to the FAM database for the purpose of initializing the
+        /// An Sql database connection to the FAM database for the purpose of initializing the
         /// services.
         /// </summary>
-        OleDbConnection _oleDbConnection;
+        ExtractRoleConnection _sqlDbConnection;
 
         /// <summary>
         /// A <see cref="FileProcessingDB"/> used to create FAMSession rows such that only one
@@ -97,12 +99,14 @@ namespace Extract.FileActionManager.Utilities
             try
             {
                 _etlString = "ETL";
-                _oleDbConnection = new OleDbConnection(connectionString);
-                _oleDbConnection.Open();
+                OleDbConnectionStringBuilder oleBuilder = new (connectionString);
+                
+                _sqlDbConnection = new ExtractRoleConnection(oleBuilder.DataSource, oleBuilder["Database"] as string);
+                _sqlDbConnection.Open();
 
                 _fileProcessingDb = new FileProcessingDB();
-                _fileProcessingDb.DatabaseServer = _oleDbConnection.DataSource;
-                _fileProcessingDb.DatabaseName = _oleDbConnection.Database;
+                _fileProcessingDb.DatabaseServer = _sqlDbConnection.DataSource;
+                _fileProcessingDb.DatabaseName = _sqlDbConnection.Database;
 
                 TryStart();
             }
@@ -139,8 +143,8 @@ namespace Extract.FileActionManager.Utilities
                 _fileProcessingDb.DatabaseServer = serverName;
                 _fileProcessingDb.DatabaseName = databaseName;
 
-                _oleDbConnection = new OleDbConnection(_fileProcessingDb.ConnectionString);
-                _oleDbConnection.Open();
+                _sqlDbConnection = new ExtractRoleConnection(serverName, databaseName);
+                _sqlDbConnection.Open();
 
                 TryStart();
             }
@@ -191,11 +195,8 @@ namespace Extract.FileActionManager.Utilities
                 // Dispose of managed resources
                 try
                 {
-                    if (_oleDbConnection != null)
-                    {
-                        _oleDbConnection.Dispose();
-                        _oleDbConnection = null;
-                    }
+                    _sqlDbConnection?.Dispose();
+                    _sqlDbConnection = null;
 
                     try
                     {
@@ -413,7 +414,7 @@ namespace Extract.FileActionManager.Utilities
 
                 query = query.Replace("<ETLProcess>", _etlString.Replace("'", "''") + " Manager");
 
-                if (DBMethods.GetQueryResultsAsStringArray(_oleDbConnection, query).Any())
+                if (DBMethods.GetQueryResultsAsStringArray(_sqlDbConnection, query).Any())
                 {
                     // There is already another service executing ETL on this database;
                     // check every 5 minutes to see if other ETL services are still running.
@@ -457,7 +458,7 @@ namespace Extract.FileActionManager.Utilities
                         query += " AND Description = '" + etlDescription.Replace("'", "''") + "'";
                     }
 
-                    using (DataTable dbServiceDefinitions = DBMethods.ExecuteDBQuery(_oleDbConnection, query))
+                    using (DataTable dbServiceDefinitions = DBMethods.ExecuteDBQuery(_sqlDbConnection, query))
                     {
                         if (!runAll && dbServiceDefinitions.Rows.Count == 0)
                         {
@@ -473,8 +474,8 @@ namespace Extract.FileActionManager.Utilities
                                 !_excludedETLProcesses.Contains("ETL: " + dbService.Description, StringComparer.OrdinalIgnoreCase))
                             {
                                 dbService.DatabaseServiceID = (int)dbServiceRow["ID"];
-                                dbService.DatabaseServer = _oleDbConnection.DataSource;
-                                dbService.DatabaseName = _oleDbConnection.Database;
+                                dbService.DatabaseServer = _sqlDbConnection.DataSource;
+                                dbService.DatabaseName = _sqlDbConnection.Database;
 
                                 if (dbService.StartActiveSchedule(_fileProcessingDb.ActiveFAMID))
                                 {

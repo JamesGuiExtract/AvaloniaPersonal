@@ -1,4 +1,5 @@
 ﻿using Extract.FileActionManager.Database.Test;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
@@ -217,61 +218,58 @@ namespace Extract.ETL.Test
                 RedactionAccuracy redactionAccuracy = CreateTestRedactionAccuracy(fileProcessingDb.DatabaseServer,
                     fileProcessingDb.DatabaseName);
 
-                using (var connection = NewSqlConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName))
-                {
-                    connection.Open();
+                redactionAccuracy.RefreshStatus();
+                var status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
 
-                    redactionAccuracy.RefreshStatus();
-                    var status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
+                Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 0");
 
-                    Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 0");
+                // Process using the settings
+                redactionAccuracy.Process(_noCancel);
 
-                    // Process using the settings
-                    redactionAccuracy.Process(_noCancel);
+                // Status should have been updated by the process
+                status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
 
-                    // Status should have been updated by the process
-                    status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
+                Assert.AreEqual(8, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 8");
 
-                    Assert.AreEqual(8, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 8");
+                // Refresh from the Database to make sure the database was updated properly
+                redactionAccuracy.RefreshStatus();
+                status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
 
-                    // Refresh from the Database to make sure the database was updated properly
-                    redactionAccuracy.RefreshStatus();
-                    status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
+                Assert.AreEqual(8, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 8");
 
-                    Assert.AreEqual(8, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed is 8");
+                var result = TestServiceRecordInDatabase(redactionAccuracy);
+                Assert.AreNotEqual(DBNull.Value, result["Status"], "Status should not be null");
+                Assert.AreNotEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should not be null");
 
-                    using (var statusCmd = connection.CreateCommand())
-                    {
-                        statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
-                        statusCmd.Parameters.AddWithValue("@DatabaseServiceID", redactionAccuracy.DatabaseServiceID);
-                        var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
-                        Assert.AreNotEqual(null, result, "A single record should be returned");
-                        Assert.AreNotEqual(DBNull.Value, result["Status"], "Status should not be null");
-                        Assert.AreNotEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should not be null");
-                    }
+                fileProcessingDb.Clear(true);
 
-                    fileProcessingDb.Clear(true);
+                result = TestServiceRecordInDatabase(redactionAccuracy);
+                Assert.AreEqual(DBNull.Value, result["Status"], "Status should not be null");
+                Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should not be null");
 
-                    using (var statusCmd = connection.CreateCommand())
-                    {
-                        statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
-                        statusCmd.Parameters.AddWithValue("@DatabaseServiceID", redactionAccuracy.DatabaseServiceID);
-                        var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
-                        Assert.AreNotEqual(null, result, "A single should be returned");
-                        Assert.AreEqual(DBNull.Value, result["Status"], "Status should be null");
-                        Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should be null");
-                    }
+                redactionAccuracy.RefreshStatus();
+                status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
 
-                    redactionAccuracy.RefreshStatus();
-                    status = redactionAccuracy.Status as RedactionAccuracy.RedactionAccuracyStatus;
-
-                    Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 0");
-                }
+                Assert.AreEqual(0, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 0");
             }
             finally
             {
                 _testDbManager.RemoveDatabase(testDBName);
             }
+        }
+
+        private static IDataRecord TestServiceRecordInDatabase(RedactionAccuracy redactionAccuracy)
+        {
+            using var connection = new ExtractRoleConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName);
+            connection.Open();
+            using var statusCmd = connection.CreateCommand();
+
+            statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
+            statusCmd.Parameters.AddWithValue("@DatabaseServiceID", redactionAccuracy.DatabaseServiceID);
+            var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+            Assert.AreNotEqual(null, result, "A single record should be returned");
+            return result;
+
         }
 
         /// <summary>
@@ -293,33 +291,32 @@ namespace Extract.ETL.Test
                 RedactionAccuracy redactionAccuracy = CreateTestRedactionAccuracy(fileProcessingDb.DatabaseServer,
                     fileProcessingDb.DatabaseName);
 
-                using (var connection = NewSqlConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName))
-                {
-                    connection.Open();
-                    SqlCommand cmd = connection.CreateCommand();
 
-                    // with the _cancel token there should be no results
-                    Assert.Throws<ExtractException>(() => redactionAccuracy.Process(_cancel));
+                // with the _cancel token there should be no results
+                Assert.Throws<ExtractException>(() => redactionAccuracy.Process(_cancel));
 
-                    cmd.CommandText = "Select Count(ID) from ReportingRedactionAccuracy";
+                using var connection = new ExtractRoleConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName);
+                connection.Open();
 
-                    Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
+                using SqlCommand cmd = connection.CreateCommand();
 
-                    // Process using the settings
-                    redactionAccuracy.Process(_noCancel);
+                cmd.CommandText = "Select Count(ID) from ReportingRedactionAccuracy";
 
-                    // Get the data from the database after processing
-                    cmd.CommandText = Utilities.UtilityMethods.FormatInvariant(
-                        $"SELECT * FROM ReportingRedactionAccuracy WHERE DatabaseServiceID = {redactionAccuracy.DatabaseServiceID}");
-                        
+                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
 
-                    CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
+                // Process using the settings
+                redactionAccuracy.Process(_noCancel);
 
-                    // Run again - There should be no changes
-                    redactionAccuracy.Process(_noCancel);
+                // Get the data from the database after processing
+                cmd.CommandText =
+                    $"SELECT * FROM ReportingRedactionAccuracy WHERE DatabaseServiceID = {redactionAccuracy.DatabaseServiceID}";
 
-                    CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
-                }
+                CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
+
+                // Run again - There should be no changes
+                redactionAccuracy.Process(_noCancel);
+
+                CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
             }
             finally
             {
@@ -342,29 +339,28 @@ namespace Extract.ETL.Test
                 var fileProcessingDb = _testDbManager.GetDatabase(_RERUN_DATABASE, testDBName);
 
                 // Create DataCaptureAccuracy object using the initialized database
-                RedactionAccuracy redactionAccuracy = CreateTestRedactionAccuracy(fileProcessingDb.DatabaseServer, 
+                RedactionAccuracy redactionAccuracy = CreateTestRedactionAccuracy(fileProcessingDb.DatabaseServer,
                     fileProcessingDb.DatabaseName);
 
-                using (var connection = NewSqlConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName))
-                {
-                    connection.Open();
-                    SqlCommand cmd = connection.CreateCommand();
+                // Process using the settings
+                redactionAccuracy.Process(_noCancel);
 
-                    // Process using the settings
-                    redactionAccuracy.Process(_noCancel);
+                using var connection = new ExtractRoleConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName);
+                connection.Open();
 
-                    // Get the data from the database after processing
-                    cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"
+                using SqlCommand cmd = connection.CreateCommand();
+
+                // Get the data from the database after processing
+                cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"
                         SELECT * FROM ReportingRedactionAccuracy WHERE DatabaseServiceID = {0}"
-                        , redactionAccuracy.DatabaseServiceID);
+                    , redactionAccuracy.DatabaseServiceID);
 
-                    CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
+                CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
 
-                    // Run again - There should be no changes
-                    redactionAccuracy.Process(_noCancel);
+                // Run again - There should be no changes
+                redactionAccuracy.Process(_noCancel);
 
-                    CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
-                }
+                CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
             }
             finally
             {
@@ -477,26 +473,6 @@ namespace Extract.ETL.Test
             };
             accuracy.UpdateDatabaseServiceSettings();
             return accuracy;
-        }
-
-        /// <summary>
-        /// Creates a new <see cref="SqlConnection"/> with the given database server and database name
-        /// </summary>
-        /// <param name="databaseServer">Database server to use</param>
-        /// <param name="databaseName">Database name to use</param>
-        /// <returns>A new <see cref="SqlConnection"/></returns>
-        static SqlConnection NewSqlConnection(string databaseServer, string databaseName)
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = databaseServer;
-            sqlConnectionBuild.InitialCatalog = databaseName;
-
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         #endregion

@@ -29,8 +29,6 @@ namespace DatabaseMigrationWizard.Test
 
         private static ImportOptions ImportOptions;
 
-        private static SqlConnection SqlConnection;
-
         private static DatabaseMigrationWizardTestHelper DatabaseMigrationWizardTestHelper;
 
         /// <summary>
@@ -57,19 +55,15 @@ namespace DatabaseMigrationWizard.Test
             ImportHelper importHelper = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
             importHelper.Import();
             importHelper.CommitTransaction();
-
-            SqlConnection = new SqlConnection($@"Server={ImportOptions.ConnectionInformation.DatabaseServer};Database={ImportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI");
-            SqlConnection.Open();
         }
 
         /// <summary>
-        /// TearDown method to destory testing environment.
+        /// TearDown method to destroy testing environment.
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", Justification = "Nunit made me")]
         [OneTimeTearDown]
         public static void TearDown()
         {
-            SqlConnection.Close();
             FamTestDbManager.RemoveDatabase(DatabaseName);
             Directory.Delete(ImportOptions.ImportPath, true);
         }
@@ -355,9 +349,10 @@ namespace DatabaseMigrationWizard.Test
         {
             StringWriter stringWriter = new StringWriter(CultureInfo.InvariantCulture);
 
-            using (ApplicationRoleConnection Role = new ExtractRoleConnection("(local)", DatabaseName))
+            using (var connection = new ExtractRoleConnection("(local)", DatabaseName))
             {
-                serialize.SerializeTable(Role.SqlConnection, stringWriter);
+                connection.Open();
+                serialize.SerializeTable(connection, stringWriter);
             }
 
             return stringWriter;

@@ -371,8 +371,8 @@ namespace Extract.ETL
 
                     int lastInBatchToProcess = Math.Min(_status.LastFileTaskSessionIDProcessed + BatchSize, maxFileTaskSession);
 
-                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    connection.Open();
 
                     using var cmd = connection.CreateCommand();
                     using var scope = new TransactionScope(
@@ -412,8 +412,8 @@ namespace Extract.ETL
         {
             if (_status.LastFileTaskSessionIDProcessed != 0) return;
 
-            var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
 
 
             using (var deleteCmd = connection.CreateCommand())

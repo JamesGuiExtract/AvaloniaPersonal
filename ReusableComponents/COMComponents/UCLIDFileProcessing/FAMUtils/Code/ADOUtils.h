@@ -53,7 +53,7 @@ static const string& gstrINITIAL_CATALOG = "Initial Catalog";
 // NOTE:	 Especially if using IFileProcessingDB::GetConnectionRetrySettings to get the values,
 //			 values for nMaxRetryCount and dRetryTimeout should be obtained before
 //			 BEGIN_ADO_CONNECTION_RETRY to avoid repeated COM calls to get the same settings.
-#define END_ADO_CONNECTION_RETRY(ipRetryConnection, getDBConnection, nMaxRetryCount, dRetryTimeout, strELICode) \
+#define END_ADO_CONNECTION_RETRY(ipRetryConnection, getAppRoleConnection, nMaxRetryCount, dRetryTimeout, strELICode) \
 					bRetrySuccess = true; \
 				}\
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION(strELICode)\
@@ -93,7 +93,7 @@ static const string& gstrINITIAL_CATALOG = "Initial Catalog";
 						{ \
 							/* This will create a new connection for this thread and initialize */ \
 							/* the schema */ \
-							ipRetryConnection = getDBConnection(true); \
+							ipRetryConnection = getAppRoleConnection(true)->ADOConnection(); \
 							\
 							UCLIDException ueConnected("ELI29854", "Application trace: Connection retry successful."); \
 							ueConnected.log(); \

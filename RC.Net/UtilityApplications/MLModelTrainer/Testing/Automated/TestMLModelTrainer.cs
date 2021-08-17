@@ -3,6 +3,7 @@ using Extract.AttributeFinder;
 using Extract.AttributeFinder.Rules;
 using Extract.FileActionManager.Database.Test;
 using Extract.FileActionManager.FileProcessors;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using LearningMachineTrainer;
@@ -379,8 +380,8 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     LastF1Score = 0.4,
                     LastIDProcessed = 5
                 };
-
-                int id = trainer.AddToDatabase("(local)", dbName);
+                string serverName = "(local)";
+                int id = trainer.AddToDatabase(serverName, dbName);
 
                 string statusJson = trainer.Status.ToJson();
 
@@ -406,25 +407,12 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 string resetStatusJson = trainer.Status.ToJson();
                 Assert.AreEqual(statusJson, resetStatusJson);
 
-                // Clear the status column
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-                {
-                    DataSource = "(local)",
-                    InitialCatalog = dbName,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
-
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
-                {
-                    connection.Open();
-
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "UPDATE DatabaseService SET Status = NULL";
-                        cmd.ExecuteNonQuery();
-                    }
-                }
+                using var connection = new ExtractRoleConnection(serverName, dbName);
+                connection.Open();
+                using var cmd = connection.CreateCommand();
+                     
+                cmd.CommandText = "UPDATE DatabaseService SET Status = NULL";
+                cmd.ExecuteNonQuery();
 
                 // Refresh the status and confirm values are defaults
                 trainer.RefreshStatus();
@@ -434,17 +422,10 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 Assert.AreEqual(defaultStatusJson, clearedStatusJson);
 
                 // Set back to original values
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
-                {
-                    connection.Open();
-
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "UPDATE DatabaseService SET Status = @Status";
-                        cmd.Parameters.AddWithValue("@Status", statusJson);
-                        cmd.ExecuteNonQuery();
-                    }
-                }
+                using var restoreStatusCmd = connection.CreateCommand();
+                restoreStatusCmd.CommandText = "UPDATE DatabaseService SET Status = @Status";
+                restoreStatusCmd.Parameters.AddWithValue("@Status", statusJson);
+                restoreStatusCmd.ExecuteNonQuery();
 
                 // Refresh the status and confirm values are back to original values
                 trainer.RefreshStatus();
@@ -1021,15 +1002,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 fileProcessingDB.AddFileNoQueue("dummy", 0, 0, EFilePriority.kPriorityNormal, -1);
                 fileProcessingDB.CloseAllDBConnections();
 
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-                {
-                    DataSource = fileProcessingDB.DatabaseServer,
-                    InitialCatalog = fileProcessingDB.DatabaseName,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
-
-                var connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
+                using var connection = new ExtractRoleConnection("(local)", dbName);
                 connection.Open();
 
                 // Add record for DatabaseService so that there's a valid ID
@@ -1160,24 +1133,12 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 fileProcessingDB.RecordFAMSessionStop();
                 fileProcessingDB.CloseAllDBConnections();
 
-                // Add record for DatabaseService so that there's a valid ID
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-                {
-                    DataSource = fileProcessingDB.DatabaseServer,
-                    InitialCatalog = fileProcessingDB.DatabaseName,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
+                using var connection = new ExtractRoleConnection("(local)", dbName);
+                connection.Open();
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('Unit tests'' service', '')";
+                cmd.ExecuteNonQuery();
 
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
-                {
-                    connection.Open();
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('Unit tests'' service', '')";
-                        cmd.ExecuteNonQuery();
-                    }
-                }
                 return dbName;
             }
             catch (Exception ex)

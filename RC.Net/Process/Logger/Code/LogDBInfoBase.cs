@@ -34,14 +34,14 @@ namespace Extract.Process.Logger
         #region Constructors
 
         /// <summary>
-        /// Default contructor
+        /// Default constructor
         /// </summary>
         protected LogDBInfoBase()
         {
         }
 
         /// <summary>
-        /// Constructor that initiallizes all properties
+        /// Constructor that initializes all properties
         /// </summary>
         /// <param name="logDirectory">The directory for the log file </param>
         /// <param name="logFileName">The name of the log file</param>

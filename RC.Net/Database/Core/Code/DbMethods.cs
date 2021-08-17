@@ -674,7 +674,7 @@ namespace Extract.Database
                 // will restore the earliest version, not the latest. To use the latest version, 
                 // a separate "RESTORE HEADERONLY" needs to be run to find the latest version and
                 // then that needs to be specified instead of in the "WITH FILE=x" clause below.
-
+                // This connection Should not use Application Roles
                 using (var dbConnection = new SqlConnection(
                         "Server=(local);Integrated Security=SSPI"))
                 {

@@ -4,6 +4,7 @@ using Extract.DataEntry;
 using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Extract.Utilities.Parsers;
 using System;
@@ -34,7 +35,7 @@ namespace Extract.FileActionManager.Conditions
     public enum DatabaseContentsConditionSearchModifier
     {
         /// <summary>
-        /// If any specified field value matches the retured value for a row, the condition will be
+        /// If any specified field value matches the returned value for a row, the condition will be
         /// considered as met.
         /// </summary>
         Any = 0,
@@ -1514,11 +1515,8 @@ namespace Extract.FileActionManager.Conditions
         {
             if (disposing)
             {
-                if (_dbConnection != null)
-                {
-                    _dbConnection.Dispose();
-                    _dbConnection = null;                    
-                }
+                _dbConnection?.Dispose();
+                _dbConnection = null;
 
                 if (_databaseConnectionInfo != null)
                 {
@@ -1527,7 +1525,7 @@ namespace Extract.FileActionManager.Conditions
                 }
             }
 
-            // Dispose of ummanaged resources
+            // Dispose of unmanaged resources
         }
 
         #endregion IDisposable Members
@@ -1673,7 +1671,7 @@ namespace Extract.FileActionManager.Conditions
                 else
                 {
                     var ee = ExtractException.CreateComVisible("ELI36946",
-                        "Error occured in '" + _COMPONENT_DESCRIPTION + "'", ex);
+                        "Error occurred in '" + _COMPONENT_DESCRIPTION + "'", ex);
                     if (ErrorBehavior == DatabaseContentsConditionErrorBehavior.Log)
                     {
                         ee.Log();
@@ -1698,7 +1696,7 @@ namespace Extract.FileActionManager.Conditions
                 _databaseConnectionInfo.CloseManagedDbConnection();
                 if (_dbConnection != null)
                 {
-                    _dbConnection.Dispose();
+                    _dbConnection?.Dispose();
                     _dbConnection = null;
                 }
             }
@@ -1992,7 +1990,13 @@ namespace Extract.FileActionManager.Conditions
             {
                 if (_dbConnection == null)
                 {
-                    _dbConnection = new OleDbConnection(fileProcessingDB.ConnectionString);
+                    OleDbConnectionStringBuilder oleDbConnectionStringBuilder
+                            = new OleDbConnectionStringBuilder(fileProcessingDB.GetLastConnectionStringConfiguredThisProcess());
+
+                    string server = oleDbConnectionStringBuilder.DataSource;
+                    string database = (string)oleDbConnectionStringBuilder["Database"];
+
+                    _dbConnection = new ExtractRoleConnection(SqlUtil.CreateConnectionString(server, database));
                     _dbConnection.Open();
                 }
 

@@ -1,6 +1,7 @@
 using Extract.ETL;
 using Extract.FileActionManager.Database;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Extract.Utilities.SqlCompactToSqliteConverter;
 using FAMProcessLib;
@@ -1172,7 +1173,8 @@ namespace Extract.FileActionManager.Utilities
                                         ExtractException restroredActiveFAM = new ExtractException("ELI46692", "Application Trace: ETL Polling ActiveFAM was restored.");
                                         restroredActiveFAM.Log();
                                     }
-                                    using var connection = GetSQLConneciton();
+
+                                    using var connection = new ExtractRoleConnection(_etlDatabaseServer, _etlDatabaseName);
                                     connection.Open();
                                     
                                     using var cmd = connection.CreateCommand();
@@ -1285,31 +1287,17 @@ namespace Extract.FileActionManager.Utilities
                 return new List<string>();
             }
 
-            using (var connection = GetSQLConneciton())
-            {
-                connection.Open();
-                using (var cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = "SELECT Settings FROM DatabaseService WHERE Enabled = 1";
-                    var result = cmd.ExecuteReader().Cast<IDataRecord>()
-                        .Select(r => r.GetString(r.GetOrdinal("Settings"))).ToList();
-                    result.Sort();
-                    return result;
-                }
-            }
-        }
+            using var connection = new ExtractRoleConnection(_etlDatabaseServer, _etlDatabaseName);
+            connection.Open();
 
-        private SqlConnection  GetSQLConneciton()
-        {
+            using var cmd = connection.CreateCommand();
 
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = _etlDatabaseServer;
-            sqlConnectionBuild.InitialCatalog = _etlDatabaseName;
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
+            cmd.CommandText = "SELECT Settings FROM DatabaseService WHERE Enabled = 1";
+            var result = cmd.ExecuteReader().Cast<IDataRecord>()
+                .Select(r => r.GetString(r.GetOrdinal("Settings"))).ToList();
+            result.Sort();
+
+            return result;
         }
 
         /// <summary>

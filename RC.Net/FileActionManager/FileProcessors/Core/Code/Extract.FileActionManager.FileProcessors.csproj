@@ -300,6 +300,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
+      <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
+      <Name>Extract.SqlDatabase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\UtilityApplications\Extract.FileConverter\Extract.FileConverter.csproj">
       <Project>{e1f701d9-7822-42ab-9510-9fcafb718e0d}</Project>
       <Name>Extract.FileConverter</Name>

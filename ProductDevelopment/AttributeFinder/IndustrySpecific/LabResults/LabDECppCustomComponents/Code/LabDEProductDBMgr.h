@@ -6,6 +6,7 @@
 
 #include <FPCategories.h>
 #include <ADOUtils.h>
+#include <CppApplicationRoleConnection.h>
 
 #include <string>
 #include <vector>
@@ -82,7 +83,8 @@ private:
 	// Pointer for the main FAMDB
 	IFileProcessingDBPtr m_ipFAMDB;
 
-	// This it the pointer to the database connection
+	CppBaseApplicationRoleConnection::AppRoles m_currentRole;
+
 	ADODB::_ConnectionPtr m_ipDBConnection; 
 
 	// Contains the number of times an attempt to reconnect. Each time the reconnect attempt times
@@ -96,9 +98,9 @@ private:
 	// Methods
 	//////////////
 
-	// Returns the m_ipDBConnection value, if it is NULL it is created using the 
+	// Returns CppBaseApplicationRoleConnection object, if it is NULL it is created using the 
 	// DatabaseServer and DatabaseName from the m_ipFAMDB
-	ADODB::_ConnectionPtr getDBConnection();
+	unique_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection();
 
 	// Puts all of the tables managed in the rvecTables vector
 	void getLabDETables(std::vector<std::string>& rvecTables);
@@ -119,6 +121,10 @@ private:
 
 	// Adds old tables that are no longer in the database
 	void addOldTables(vector<string>& vecTables);
+	
+	// Returns a CppBaseApplicationRoleConnection object based on the m_currentRole with 
+    // given connection
+	unique_ptr<CppBaseApplicationRoleConnection> createAppRole(_ConnectionPtr ipConnection);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(LabDEProductDBMgr), CLabDEProductDBMgr)

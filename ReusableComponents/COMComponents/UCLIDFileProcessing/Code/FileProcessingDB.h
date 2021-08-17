@@ -20,8 +20,6 @@
 #include <Win32Event.h>
 #include <StringCSIS.h>
 #include <CsisUtils.h>
-#include <SqlApplicationRole.h>
-#include <CppApplicationRoleConnection.h>
 
 #include <string>
 #include <map>
@@ -401,8 +399,6 @@ public:
 	STDMETHOD(GetOneTimePassword)(BSTR* pVal);
 	STDMETHOD(get_CurrentDBSchemaVersion)(LONG* pVal);
 	STDMETHOD(SetFileInformationForFile)(int fileID, long long fileSize, int pageCount);
-	STDMETHOD(get_UseApplicationRoles)(VARIANT_BOOL* pbValue);
-	STDMETHOD(put_UseApplicationRoles)(VARIANT_BOOL bValue);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL* pbValue);
@@ -441,7 +437,10 @@ private:
 	// Variables
 
 	// Map that contains the open connection for each thread.
-	map<DWORD, unique_ptr<CppBaseApplicationRoleConnection>> m_mapThreadIDtoDBAppRoleConnections;
+	map<DWORD, _ConnectionPtr> m_mapThreadIDtoDBConnections;
+
+
+	CppBaseApplicationRoleConnection::AppRoles m_currentRole;
 
 	// Cache the actionID associated with each action name for the current workflow, or all action IDs
 	// for all workflows (represented with a key of "").
@@ -712,9 +711,6 @@ private:
 	// After establishing connection, cache DBInfo settings to avoid unnecessary hits on the database.
 	IStrToStrMapPtr m_ipDBInfoSettings;
 
-	// Flag to indicate if an application role should be used
-	bool m_bUseApplicationRoles;
-
 	//-------------------------------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------------------------------
@@ -875,8 +871,11 @@ private:
 	// modify strFileName to match the file name stored in the database using the connection provided.
 	long getFileID(_ConnectionPtr ipConnection, string& rstrFileName);
 
-	// PROMISE: To return the m_ipDBConnection opened database connection for the current thread.
-	_ConnectionPtr getDBConnection();
+	// PROMISE: To return a CppBaseApplicationRoleConnection containing the m_ipDBConnection 
+	// opened database connection for the current thread.
+	unique_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection();
+
+	unique_ptr<CppBaseApplicationRoleConnection>  createAppRole(_ConnectionPtr ipConnection);
 
 	void resetOpenConnectionData();
 
@@ -1128,7 +1127,7 @@ private:
 	bool isConnectionAlive(_ConnectionPtr ipConnection);
 
 	// Recreates the connection for the current thread. If there is no connection object for 
-	// the current thread it will be created using the getDBConnection method. If the creation of
+	// the current thread it will be created using the getAppRoleConnection method. If the creation of
 	// the connection object fails it will be reattempted for gdRETRY_TIMEOUT (120sec) If after the
 	// timeout it was still not possible to create the connection object false will be returned,
 	// otherwise true will be returned.
@@ -1143,8 +1142,6 @@ private:
 
 	// Internal reset DB connection function
 	void resetDBConnection(bool bCheckForUnaffiliatedFiles = false);
-
-	void checkSecurity();
 
 	// Internal close all DB connections. Credentials will be maintained if bTemporaryClose is used
 	// as long as the re-connection is to the same database.
@@ -1658,7 +1655,8 @@ OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)
 			{ \
 				bool bConnectionAlive = isConnectionAlive(ipRetryConnection); \
 				bool bTimeout = ue.getTopText().find("timeout") != string::npos; \
-				if (((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
+				bool bDBSettingsValid = m_strDatabaseServer.empty() || m_strDatabaseName.empty(); \
+				if (bDBSettingsValid && ((!bTimeout || !m_bRetryOnTimeout) && bConnectionAlive) \
 					|| nRetryCount >= m_iNumberOfRetries) \
 				{ \
 					throw ue; \

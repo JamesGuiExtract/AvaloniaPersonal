@@ -204,8 +204,8 @@ namespace Extract.ETL
         {
             try
             {
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
 
 
                 using var cmd = connection.CreateCommand();
@@ -323,8 +323,8 @@ namespace Extract.ETL
                 // Change ML Data in the DB
                 int rowsChanged = 0;
 
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
 
                 using var cmd = connection.CreateCommand();
                 cmd.CommandText = _GET_ALL_MLDATA_FOR_NAME;

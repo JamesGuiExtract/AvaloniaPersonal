@@ -6,6 +6,7 @@
 
 #include <FPCategories.h>
 #include <ADOUtils.h>
+#include <CppApplicationRoleConnection.h>
 
 #include <string>
 #include <vector>
@@ -131,11 +132,15 @@ private:
 	// Methods
 	//////////////
 
-	// Returns the m_ipDBConnection value, if it is NULL it is created using the
-	// DatabaseServer and DatabaseName from the m_ipFAMDB
+	// Returns a CppBaseApplicationRoleConnection object that contains the m_ipDBConnection value, 
+	// if it is NULL it is created using the DatabaseServer and DatabaseName from the m_ipFAMDB
 	// if bReset is true the current connection in m_ipDBConnection is set to NULL and recreated
 	// and make the default false
-	ADODB::_ConnectionPtr getDBConnection(bool bReset = false);
+	unique_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection(bool bReset = false);
+
+	unique_ptr<CppBaseApplicationRoleConnection> createAppRole(_ConnectionPtr ipConnection);
+
+	CppBaseApplicationRoleConnection::AppRoles m_currentRole;
 
 	// Puts all of the tables managed in the rvecTables vector
 	std::vector<std::string> getAttributeTables();

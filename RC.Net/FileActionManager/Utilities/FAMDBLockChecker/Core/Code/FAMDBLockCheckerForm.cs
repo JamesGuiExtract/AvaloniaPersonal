@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extract.SqlDatabase;
+using System;
 using System.Data.Linq;
 using System.Data.Linq.Mapping;
 using System.Data.SqlClient;
@@ -260,30 +261,27 @@ namespace Extract.FileActionManager.Utilities
                 var sleepTime = _numericTextMilliseconds.Int32Value;
                 sleepTime *= 2;
 
-                using (var connection = new SqlConnection(BuildConnectionString()))
+                using ExtractRoleConnection extractRole = new ExtractRoleConnection(BuildConnectionString());
+                do
                 {
-                    connection.Open();
-                    do
+                    using (var context = new DataContext(extractRole))
                     {
-                        using (var context = new DataContext(connection))
+                        // Get the count of locks from the lock table
+                        var lockTables = context.GetTable<LockTable>();
+                        if (lockTables.Count() > 0)
                         {
-                            // Get the count of locks from the lock table
-                            var lockTables = context.GetTable<LockTable>();
-                            if (lockTables.Count() > 0)
-                            {
-                                // If there is at least 1 lock, increment count
-                                ++_numLocks;
-                            }
-
-                            // Always increment the number of checks performed
-                            ++_numChecks;
-
-                            // Update the UI with the new counts
-                            UpdateCounts();
+                            // If there is at least 1 lock, increment count
+                            ++_numLocks;
                         }
+
+                        // Always increment the number of checks performed
+                        ++_numChecks;
+
+                        // Update the UI with the new counts
+                        UpdateCounts();
                     }
-                    while (!_endThread.WaitOne(random.Next(1, sleepTime)));
                 }
+                while (!_endThread.WaitOne(random.Next(1, sleepTime)));
             }
             catch (ThreadAbortException)
             {

@@ -3,6 +3,7 @@ using DatabaseMigrationWizard.Database.Input.DataTransformObject;
 using DatabaseMigrationWizard.Database.Output;
 using Extract.FileActionManager.Database.Test;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -34,14 +35,12 @@ namespace DatabaseMigrationWizard.Test
 
         private static ImportOptions ImportOptions;
 
-        private static SqlConnection SqlConnection;
-
         private static DatabaseMigrationWizardTestHelper DatabaseMigrationWizardTestHelper;
 
         /// <summary>
         /// The testing methodology here is as follows
         /// I'm going to define a rename as changing both the name and the values of whatever is already there.
-        /// 1. Run the import to populate inital values in the database.
+        /// 1. Run the import to populate initial values in the database.
         /// 2. Rename a bunch of values.
         /// 3. Rerun the import with those renames
         /// 4. Ensure those records got renamed.
@@ -73,19 +72,15 @@ namespace DatabaseMigrationWizard.Test
             var importHelper2 = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
             importHelper2.Import();
             importHelper2.CommitTransaction();
-
-            SqlConnection = new SqlConnection($@"Server={ImportOptions.ConnectionInformation.DatabaseServer};Database={ImportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI");
-            SqlConnection.Open();
         }
 
         /// <summary>
-        /// TearDown method to destory testing environment.
+        /// TearDown method to destroy testing environment.
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", Justification = "Nunit made me")]
         [OneTimeTearDown]
         public static void TearDown()
         {
-            SqlConnection?.Close();
             FamTestDbManager.RemoveDatabase(DatabaseName);
             Directory.Delete(ImportOptions.ImportPath, true);
         }
@@ -371,17 +366,16 @@ namespace DatabaseMigrationWizard.Test
         {
             StringWriter stringWriter = new StringWriter(CultureInfo.InvariantCulture);
 
-            using (SqlConnection sqlConnection = new SqlConnection($@"Server=(local);Database={DatabaseName};Integrated Security=SSPI"))
-            {
-                sqlConnection.Open();
-                serialize.SerializeTable(sqlConnection, stringWriter);
-            }
+            using var sqlConnection = new ExtractRoleConnection("(local)", DatabaseName);
+            sqlConnection.Open();
+             
+            serialize.SerializeTable(sqlConnection, stringWriter);
 
             return stringWriter;
         }
 
         /// <summary>
-        /// Renames everything about the first record in each table (Except db info because hardcoded schema).
+        /// Renames everything about the first record in each table (Except db info because hard coded schema).
         /// </summary>
         private static void RenameRecords()
         {

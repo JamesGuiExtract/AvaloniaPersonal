@@ -1,6 +1,7 @@
 ﻿using DatabaseMigrationWizard.Pages.Utility;
 using Extract;
 using Extract.Database;
+using Extract.SqlDatabase;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -130,12 +131,11 @@ namespace DatabaseMigrationWizard.Database.Output
             var TableName = instance.ToString().Substring(instance.ToString().LastIndexOf("Serialize", StringComparison.OrdinalIgnoreCase)).Replace("Serialize", string.Empty);
             progress.Report(TableName);
 
-            using (var sqlConnection = new SqlConnection($@"Server={exportOptions.ConnectionInformation.DatabaseServer};Database={exportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI"))
-            using (StreamWriter writer = File.CreateText($@"{exportOptions.ExportPath}\{TableName}.json"))
-            {
-                sqlConnection.Open();
-                instance.SerializeTable(sqlConnection, writer);
-            }
+            using var connection = new ExtractRoleConnection(exportOptions.ConnectionInformation.DatabaseServer, exportOptions.ConnectionInformation.DatabaseName);
+            connection.Open();
+            using StreamWriter writer = File.CreateText($@"{exportOptions.ExportPath}\{TableName}.json");
+             
+            instance.SerializeTable(connection, writer);
 
             progress.Report(TableName);
         }

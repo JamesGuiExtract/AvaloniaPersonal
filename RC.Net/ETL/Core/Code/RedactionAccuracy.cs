@@ -273,26 +273,31 @@ namespace Extract.ETL
 
                     int lastInBatchToProcess = Math.Min(_status.LastFileTaskSessionIDProcessed + _PROCESS_BATCH_SIZE, maxFileTaskSession);
 
-                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
-                    using var cmd = connection.CreateCommand();
+                    using (var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName))
+                    {
+                        connection.Open();
+                        using var cmd = connection.CreateCommand();
 
-                    // Set the timeout so that it waits indefinitely
-                    cmd.CommandTimeout = 0;
-                    cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
+                        // Set the timeout so that it waits indefinitely
+                        cmd.CommandTimeout = 0;
+                        cmd.CommandText = UPDATE_ACCURACY_DATA_SQL;
 
-                    cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
-                    cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
-                    cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                    cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
-                    cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
+                        cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
+                        cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
+                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                        cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
+                        cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
 
-                    queriesToRunInBatch.Enqueue(DELETE_OLD_DATA);
+                        queriesToRunInBatch.Enqueue(DELETE_OLD_DATA);
 
-                    // Get VOA data for each file
-                    SaveAccuracy(cmd, queriesToRunInBatch, cancelToken);
+                        // Get VOA data for each file
+                        SaveAccuracy(cmd, queriesToRunInBatch, cancelToken);
+                    }
 
                     // Records to calculate stats
+                    using var saveConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    saveConnection.Open();
+
                     using var scope = new TransactionScope(TransactionScopeOption.Required,
                         new TransactionOptions()
                         {
@@ -301,19 +306,16 @@ namespace Extract.ETL
                         },
                         TransactionScopeAsyncFlowOption.Enabled);
 
-                    using var saveApplicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection saveConnection = saveApplicationRoleConnection.SqlConnection;
-
                     foreach (var q in queriesToRunInBatch)
                     {
                         using SqlCommand saveCmd = saveConnection.CreateCommand();
-                        cmd.CommandTimeout = 0;
-                        cmd.CommandText = q;
-                        cmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
-                        cmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
-                        cmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-                        cmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
-                        cmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
+                        saveCmd.CommandTimeout = 0;
+                        saveCmd.CommandText = q;
+                        saveCmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
+                        saveCmd.Parameters.AddWithValue("@ExpectedSetName", ExpectedAttributeSetName);
+                        saveCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                        saveCmd.Parameters.AddWithValue("@LastProcessedID", _status.LastFileTaskSessionIDProcessed);
+                        saveCmd.Parameters.AddWithValue("@LastInBatchID", lastInBatchToProcess);
                         var saveTask = saveCmd.ExecuteNonQueryAsync();
                         saveTask.Wait(cancelToken);
 
@@ -337,8 +339,8 @@ namespace Extract.ETL
 
         private void ClearReportingReportingRedactionAccuracy(CancellationToken cancelToken)
         {
-            var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
 
             // Clear the ReportingRedactionAccuracy table if the LastFileTaskSessionIDProcessed is 0
             if (_status.LastFileTaskSessionIDProcessed == 0)

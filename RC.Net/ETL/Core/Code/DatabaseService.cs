@@ -268,8 +268,8 @@ namespace Extract.ETL
         {
             try
             {
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
 
                 using (var cmd = connection.CreateCommand())
                 {
@@ -324,8 +324,8 @@ namespace Extract.ETL
         {
             try
             {
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
 
                 using (var cmd = connection.CreateCommand())
                 {
@@ -379,13 +379,14 @@ namespace Extract.ETL
         {
             try
             {
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
+
                 using var scope = new TransactionScope(TransactionScopeOption.Required,
                     new TransactionOptions
                     {
                         IsolationLevel = System.Transactions.IsolationLevel.Serializable
                     });
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
 
                 // check the existing value - since this is done within a transaction another process will not be able to change
                 // it after this process reads it
@@ -444,8 +445,8 @@ namespace Extract.ETL
             try
             {
                 // I only want to stop the active schedule if the current process is the one that started it
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
                 using var cmd = connection.CreateCommand();
 
                 cmd.CommandText =
@@ -467,8 +468,9 @@ namespace Extract.ETL
         /// <summary>
         /// Saves <see paramref="status"/> to the DB for this <see cref="DatabaseServiceID"/>
         /// </summary>
+        /// <param name="connection">Connection to use for saving the status</param>
         /// <param name="status">The <see cref="DatabaseServiceStatus"/> instance to save</param>
-        public void SaveStatus(DatabaseServiceStatus status)
+        public void SaveStatus(SqlAppRoleConnection connection, DatabaseServiceStatus status)
         {
             try
             {
@@ -476,10 +478,6 @@ namespace Extract.ETL
                 {
                     return;
                 }
-
-                // Save status to the DB
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
 
                 if (status == null)
                 {
@@ -518,8 +516,8 @@ namespace Extract.ETL
                 _databaseServer = databaseServer;
                 _databaseName = databaseName;
 
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
                 using var trans = new TransactionScope();
 
                 using var cmd = connection.CreateCommand();
@@ -600,9 +598,9 @@ namespace Extract.ETL
                 ExtractException.Assert("ELI46505", "Database Server must be set.", !string.IsNullOrWhiteSpace(DatabaseServer));
                 ExtractException.Assert("ELI46506", "Database Name must be set.", !string.IsNullOrWhiteSpace(DatabaseName));
 
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
                 using var trans = new TransactionScope();
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
 
                 using var cmd = connection.CreateCommand();
                 cmd.CommandText = @"
@@ -654,35 +652,46 @@ namespace Extract.ETL
         /// <param name="creator">The function used to create a new instance, if needed</param>
         protected T GetLastOrCreateStatus<T>(Func<T> creator) where T : DatabaseServiceStatus
         {
+            if (string.IsNullOrWhiteSpace(DatabaseServer) || string.IsNullOrWhiteSpace(DatabaseName))
+            {
+                ExtractException ee = new ExtractException("ELI51835", "Server or Database not specified.");
+                ee.AddDebugData("Server", DatabaseServer);
+                ee.AddDebugData("Database", DatabaseName);
+                throw ee;
+            }
+
             if (DatabaseServiceID <= 0)
             {
                 return creator();
             }
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName, enlist: false);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
-
-            using var statusCmd = connection.CreateCommand();
-
-            // need to get the previous status
-            statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID";
-            statusCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
-            using var statusResult = statusCmd.ExecuteReader();
-
-            if (!statusResult.HasRows)
-            {
-                ExtractException ee = new ExtractException("ELI45479", "Invalid DatabaseServiceID.");
-                ee.AddDebugData("DatabaseServiceID", DatabaseServiceID, false);
-                throw ee;
-            }
-
             string jsonStatus = string.Empty;
             Int32? lastFileTaskSessionID = null;
-            if (statusResult.Read() && !statusResult.IsDBNull(statusResult.GetOrdinal("Status")))
+
+            using (var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName, enlist: false))
             {
-                jsonStatus = statusResult.GetString(statusResult.GetOrdinal("Status"));
-                if (!statusResult.IsDBNull(statusResult.GetOrdinal("LastFileTaskSessionIDProcessed")))
+                connection.Open();
+
+                using var statusCmd = connection.CreateCommand();
+
+                // need to get the previous status
+                statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID";
+                statusCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
+                using var statusResult = statusCmd.ExecuteReader();
+
+                if (!statusResult.HasRows)
                 {
-                    lastFileTaskSessionID = statusResult.GetInt32(statusResult.GetOrdinal("LastFileTaskSessionIDProcessed"));
+                    ExtractException ee = new ExtractException("ELI45479", "Invalid DatabaseServiceID.");
+                    ee.AddDebugData("DatabaseServiceID", DatabaseServiceID, false);
+                    throw ee;
+                }
+
+                if (statusResult.Read() && !statusResult.IsDBNull(statusResult.GetOrdinal("Status")))
+                {
+                    jsonStatus = statusResult.GetString(statusResult.GetOrdinal("Status"));
+                    if (!statusResult.IsDBNull(statusResult.GetOrdinal("LastFileTaskSessionIDProcessed")))
+                    {
+                        lastFileTaskSessionID = statusResult.GetInt32(statusResult.GetOrdinal("LastFileTaskSessionIDProcessed"));
+                    }
                 }
             }
 
@@ -711,8 +720,8 @@ namespace Extract.ETL
                             {
                                 // The LastFileTaskSessionIDProcessed in the DatabaseService record was null so
                                 // set it to the value in the status record
-                                using var saveAppRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                                SqlConnection saveConnection = saveAppRoleConnection.SqlConnection;
+                                using var saveConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                                saveConnection.Open();
 
                                 using var saveCmd = saveConnection.CreateCommand();
                                 lastFileTaskSessionID = lastFileTaskSessionFromStatus.Value<int>();
@@ -721,7 +730,7 @@ namespace Extract.ETL
                                 saveCmd.Parameters.AddWithValue("@LastFileTaskSessionID", lastFileTaskSessionID);
                                 saveCmd.Parameters.AddWithValue("@DatabaseServiceID", DatabaseServiceID);
                                 saveCmd.ExecuteNonQuery();
-                            }
+                            }   
                         }
                         if (lastFileTaskSessionID != null)
                         {
@@ -751,8 +760,8 @@ namespace Extract.ETL
         {
             try
             {
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
 
                 using var cmd = connection.CreateCommand();
                 cmd.CommandText = @"

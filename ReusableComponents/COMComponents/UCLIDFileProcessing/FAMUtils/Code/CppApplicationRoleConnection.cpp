@@ -53,6 +53,10 @@ void NoRoleConnection::AssignRole()
 	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, Password));
 }
 
+CppBaseApplicationRoleConnection::AppRoles NoRoleConnection::ActiveRole()
+{
+	return AppRoles::kNoRole;
+}
 
 SecurityRoleConnection::SecurityRoleConnection(ADODB::_ConnectionPtr ipConnection) 
 	: CppBaseApplicationRoleConnection(ipConnection)
@@ -80,6 +84,10 @@ void SecurityRoleConnection::SecurityRoleConnection::AssignRole()
 	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, Password));
 }
 
+CppBaseApplicationRoleConnection::AppRoles SecurityRoleConnection::ActiveRole()
+{
+	return AppRoles::kSecurityRole;
+}
 
 ExtractRoleConnection::ExtractRoleConnection(ADODB::_ConnectionPtr ipConnection)
 	: CppBaseApplicationRoleConnection(ipConnection)
@@ -108,7 +116,10 @@ void ExtractRoleConnection::ExtractRoleConnection::AssignRole()
 	m_ApplicationRole.reset(new CppSqlApplicationRole(m_ipConnection, Role, Password));
 }
 
-
+CppBaseApplicationRoleConnection::AppRoles ExtractRoleConnection::ActiveRole()
+{
+	return AppRoles::kExtractRole;
+}
 
 
 

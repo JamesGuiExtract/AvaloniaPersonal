@@ -2201,9 +2201,6 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To return a IActionStatistics pointer that contains the current stats where WorkflowFile.Invisible is true for the specified action name across all workflows
 		[id(216), helpstring("method GetInvisibleFileStatsAllWorkflows")] HRESULT GetInvisibleFileStatsAllWorkflows(
 			[in] BSTR bstrActionName, [in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
-
-		[propget, id(217), helpstring("property UseApplicationRoles")] HRESULT UseApplicationRoles([out, retval] VARIANT_BOOL* pbValue);
-		[propput, id(217), helpstring("property UseApplicationRoles")] HRESULT UseApplicationRoles([in] VARIANT_BOOL bValue);
 	};
 
 	[

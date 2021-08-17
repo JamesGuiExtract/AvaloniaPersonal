@@ -3,6 +3,7 @@ using DatabaseMigrationWizard.Database.Input.DataTransformObject;
 using DatabaseMigrationWizard.Database.Output;
 using Extract.FileActionManager.Database.Test;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -34,13 +35,11 @@ namespace DatabaseMigrationWizard.Test
 
         private static ImportOptions ImportOptions;
 
-        private static SqlConnection SqlConnection;
-
         private static DatabaseMigrationWizardTestHelper DatabaseMigrationWizardTestHelper;
 
         /// <summary>
         /// The testing methodology here is as follows
-        /// 1. Run the import to populate inital values in the database.
+        /// 1. Run the import to populate initial values in the database.
         /// 2. Add a bunch of new records to the existing exported files
         /// 3. Rerun the import with those new values added
         /// 4. Ensure those new values are merged in.
@@ -72,18 +71,15 @@ namespace DatabaseMigrationWizard.Test
             var importHelper1 = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
             importHelper1.Import();
             importHelper1.CommitTransaction();
-            SqlConnection = new SqlConnection($@"Server={ImportOptions.ConnectionInformation.DatabaseServer};Database={ImportOptions.ConnectionInformation.DatabaseName};Integrated Security=SSPI");
-            SqlConnection.Open();
         }
 
         /// <summary>
-        /// TearDown method to destory testing environment.
+        /// TearDown method to destroy testing environment.
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", Justification = "Nunit made me")]
         [OneTimeTearDown]
         public static void TearDown()
         {
-            SqlConnection.Close();
             FamTestDbManager.RemoveDatabase(DatabaseName);
             Directory.Delete(ImportOptions.ImportPath, true);
         }
@@ -369,17 +365,16 @@ namespace DatabaseMigrationWizard.Test
         {
             StringWriter stringWriter = new StringWriter(CultureInfo.InvariantCulture);
 
-            using (SqlConnection sqlConnection = new SqlConnection($@"Server=(local);Database={DatabaseName};Integrated Security=SSPI"))
-            {
-                sqlConnection.Open();
-                serialize.SerializeTable(sqlConnection, stringWriter);
-            }
+            using var sqlConnection = new ExtractRoleConnection("(local)", DatabaseName);
+            sqlConnection.Open();
+            
+            serialize.SerializeTable(sqlConnection, stringWriter);
 
             return stringWriter;
         }
 
         /// <summary>
-        /// Adds a new record to every table except for DBInfo, because thats hardcoded and you will get an error if you add to that table.
+        /// Adds a new record to every table except for DBInfo, because thats hard coded and you will get an error if you add to that table.
         /// </summary>
         private static void AddNewRecords()
         {

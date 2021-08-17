@@ -75,14 +75,18 @@ void CFileProcessingDB::closeDBConnection()
 	// Get the current thread ID
 	DWORD dwThreadID = GetCurrentThreadId();
 
-	map<DWORD, unique_ptr<CppBaseApplicationRoleConnection>>::iterator it;
-	it = m_mapThreadIDtoDBAppRoleConnections.find(dwThreadID);
+	map<DWORD, _ConnectionPtr>::iterator it;
+	it = m_mapThreadIDtoDBConnections.find(dwThreadID);
 
-	if (it != m_mapThreadIDtoDBAppRoleConnections.end())
+	if (it != m_mapThreadIDtoDBConnections.end())
 	{
-		it->second.reset(__nullptr);
-		m_mapThreadIDtoDBAppRoleConnections.erase(it);
-		
+		// close the connection if it is open
+		_ConnectionPtr ipConnection = it->second;
+		if (ipConnection != __nullptr && ipConnection->State != adStateClosed)
+	{
+			// close the database connection
+			ipConnection->Close();
+		}
 		// Post message indicating that the database's connection is no longer established
 		postStatusUpdateNotification(kConnectionNotEstablished);
 	}
@@ -1437,7 +1441,7 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26937");
 }
 //--------------------------------------------------------------------------------------------------
-_ConnectionPtr CFileProcessingDB::getDBConnection()
+unique_ptr<CppBaseApplicationRoleConnection>   CFileProcessingDB::getAppRoleConnection()
 {
 	string strConnectionString;
 
@@ -1452,35 +1456,35 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 			DWORD dwThreadID = GetCurrentThreadId();
 
 			_ConnectionPtr ipConnection = __nullptr;
+			unique_ptr<CppBaseApplicationRoleConnection> returnAppRoleConnection;
 
 			// Lock mutex to keep other instances from running code that may cause the
 			// connection to be reset
 			CSingleLock lg(&m_criticalSection, TRUE);
 
-			map<DWORD, unique_ptr<CppBaseApplicationRoleConnection>>::iterator it;
-			it = m_mapThreadIDtoDBAppRoleConnections.find(dwThreadID);
+			map<DWORD, _ConnectionPtr>::iterator it;
+			it = m_mapThreadIDtoDBConnections.find(dwThreadID);
 			_lastCodePos = "5";
 
-			if (it != m_mapThreadIDtoDBAppRoleConnections.end())
+			if (it != m_mapThreadIDtoDBConnections.end())
 			{
-				ipConnection = *it->second;
-				if (ipConnection->State != adStateClosed) return ipConnection;
+				bool connectionFound = it->second != __nullptr ;
+
+				if (it->second != __nullptr && it->second != ADODB::adStateClosed)
+				{
+					return createAppRole(it->second);
+				}
+				m_mapThreadIDtoDBConnections.erase(dwThreadID);
 			}
 
-			bool bFirstConnection = m_mapThreadIDtoDBAppRoleConnections.size() == 0;
+			bool bFirstConnection = m_mapThreadIDtoDBConnections.size() == 0;
 			if ( bFirstConnection)
 				resetOpenConnectionData();
-
+			
 			ipConnection = getDBConnectionWithoutAppRole();
-			ASSERT_RESOURCE_ALLOCATION("ELI13650", ipConnection != __nullptr);
+			m_mapThreadIDtoDBConnections[dwThreadID] = ipConnection;
 
-			_lastCodePos = "20";
-			if (m_bUseApplicationRoles)
-				m_mapThreadIDtoDBAppRoleConnections[dwThreadID].reset(new ExtractRoleConnection(ipConnection));
-			else
-				m_mapThreadIDtoDBAppRoleConnections[dwThreadID].reset(new NoRoleConnection(ipConnection));
-
-			ipConnection = m_mapThreadIDtoDBAppRoleConnections[dwThreadID]->operator ADODB::_ConnectionPtr();
+			returnAppRoleConnection = createAppRole(ipConnection);
 
 			if (bFirstConnection)
 				loadDBInfoSettings(ipConnection);
@@ -1510,7 +1514,7 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 			postStatusUpdateNotification(kConnectionEstablished);
 
 			// return the open connection
-			return ipConnection;
+			return returnAppRoleConnection;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18320");
 	}
@@ -1531,6 +1535,39 @@ _ConnectionPtr CFileProcessingDB::getDBConnection()
 		// throw the exception to the outer scope
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+unique_ptr<CppBaseApplicationRoleConnection>  CFileProcessingDB::createAppRole(_ConnectionPtr ipConnection)
+{
+	ASSERT_ARGUMENT("ELI13650", ipConnection != __nullptr);
+	
+	unique_ptr<CppBaseApplicationRoleConnection> roleInstance;
+
+	try
+	{
+		switch (m_currentRole)
+		{
+		case CppBaseApplicationRoleConnection::kNoRole:
+			roleInstance.reset(new NoRoleConnection(ipConnection));
+			break;
+		case CppBaseApplicationRoleConnection::kExtractRole:
+			roleInstance.reset(new ExtractRoleConnection(ipConnection));
+			break;
+		case CppBaseApplicationRoleConnection::kSecurityRole:
+			roleInstance.reset(new SecurityRoleConnection(ipConnection));
+			break;
+		default:
+			UCLIDException ue("ELI51837", "Unknown application role requested.");
+			ue.addDebugInfo("ApplicationRole", (int)m_currentRole);
+			throw ue;
+		}
+	}
+	catch (...)
+	{
+		// Try with the no role 
+		roleInstance.reset(new NoRoleConnection(ipConnection));
+	}
+	return roleInstance;
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::resetOpenConnectionData()
@@ -1591,6 +1628,12 @@ _ConnectionPtr CFileProcessingDB::getDBConnectionWithoutAppRole()
 
 	// Open the database
 	ipConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
+	if ((ipConnection->State & ADODB::adStateOpen) == 0)
+	{
+		UCLIDException ue("ELI51852", "Connection was not opened");
+		ue.addDebugInfo("ConnectionString", strConnectionString);
+		throw ue;
+	}
 
 	return ipConnection;
 }
@@ -1605,7 +1648,6 @@ void CFileProcessingDB::validateServerAndDatabase()
 		throw ue;
 	}
 }
-
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::validateLicense()
 {
@@ -1684,7 +1726,8 @@ void CFileProcessingDB::dropTables(bool bRetainUserTables)
 		eraseFromVector(vecTables, gstrSECURE_COUNTER_VALUE_CHANGE);
 
 		// Drop the tables in the vector
-		dropTablesInVector(getDBConnection(), vecTables);
+		auto role = getAppRoleConnection();
+		dropTablesInVector(role->ADOConnection(), vecTables);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27605")
 }
@@ -1697,7 +1740,8 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vector<string> vecQueries = getTableCreationQueries(bAddUserTables);
 
 		// Only create the login table if it does not already exist
-		if (doesTableExist(getDBConnection(), "Login"))
+		auto role = getAppRoleConnection();
+		if (doesTableExist(role->ADOConnection(), "Login"))
 		{
 			eraseFromVector(vecQueries, gstrCREATE_LOGIN_TABLE);
 		}
@@ -1706,7 +1750,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		// and so we don't want to create it again
 		bool bAddSecureCounterTablesFK = false;
 		// Only create the SecureCounter table if it does not already exist
-		if (doesTableExist(getDBConnection(), gstrSECURE_COUNTER))
+		if (doesTableExist(role->ADOConnection(), gstrSECURE_COUNTER))
 		{
 			eraseFromVector(vecQueries, gstrCREATE_SECURE_COUNTER);
 		}
@@ -1715,7 +1759,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 			bAddSecureCounterTablesFK = true;
 		}
 		// Only create the SecureCounterValueChange table if it does not already exist
-		if (doesTableExist(getDBConnection(), gstrSECURE_COUNTER_VALUE_CHANGE))
+		if (doesTableExist(role->ADOConnection(), gstrSECURE_COUNTER_VALUE_CHANGE))
 		{
 			eraseFromVector(vecQueries, gstrCREATE_SECURE_COUNTER_VALUE_CHANGE);
 		}
@@ -1914,7 +1958,7 @@ void CFileProcessingDB::addTables(bool bAddUserTables)
 		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
 
 		// Execute all of the queries
-		executeVectorOfSQL(getDBConnection(), vecQueries);
+		executeVectorOfSQL(role->ADOConnection(), vecQueries);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18011");
 }
@@ -1988,7 +2032,7 @@ void CFileProcessingDB::addTables80()
 		vecQueries.push_back(gstrADD_INPUT_EVENT_FAMUSER_FK_80);
 
 		// Execute all of the queries
-		executeVectorOfSQL(getDBConnection(), vecQueries);
+		executeVectorOfSQL(getDBConnectionWithoutAppRole(), vecQueries);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34240");
 }
@@ -2169,7 +2213,8 @@ void CFileProcessingDB::initializeTableValues(bool bInitializeUserTables)
 		vecQueries.push_back("UPDATE DatabaseService SET Status = NULL");
 
 		// Execute all of the queries
-		executeVectorOfSQL(getDBConnection(), vecQueries);
+		auto role = getAppRoleConnection();
+		executeVectorOfSQL(role->ADOConnection(), vecQueries);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27606")
 }
@@ -2303,7 +2348,7 @@ void CFileProcessingDB::initializeTableValues80()
 		vecQueries.push_back(strSQL);
 
 		// Execute all of the queries
-		executeVectorOfSQL(getDBConnection(), vecQueries);
+		executeVectorOfSQL(getDBConnectionWithoutAppRole(), vecQueries);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34239")
 }
@@ -2376,10 +2421,10 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 
 	// Create a new database ID  or use existing if it has been set
 	ByteStream bsDatabaseID;
-
+	auto role = getAppRoleConnection();
 	if (!m_bDatabaseIDValuesValidated)
 	{
-		createDatabaseID(getDBConnection(), bsDatabaseID);
+		createDatabaseID(role->ADOConnection(), bsDatabaseID);
 	}
 	else
 	{
@@ -2397,7 +2442,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	
 	try
 	{
-		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = getSQLServerDateTime(getDBConnection());
+		mapDefaultValues[gstrLAST_DB_INFO_CHANGE] = getSQLServerDateTime(role->ADOConnection());
 	}
 	catch(...)
 	{
@@ -2871,7 +2916,8 @@ int CFileProcessingDB::getDBSchemaVersion()
 	}
 
 	// Get all of the settings from the DBInfo
-	loadDBInfoSettings(getDBConnection());
+	auto role = getAppRoleConnection();
+	loadDBInfoSettings(role->ADOConnection());
 
 	// if the Schema version is still 0 there is a problem
 	if (m_iDBSchemaVersion == 0)
@@ -2949,7 +2995,8 @@ void CFileProcessingDB::validateDBSchemaVersion(bool bCheckForUnaffiliatedFiles/
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::unaffiliatedWorkflowFilesExist()
 {
-	_ConnectionPtr ipConnection = getDBConnection();
+	auto role = getAppRoleConnection();
+	_ConnectionPtr ipConnection = role->ADOConnection();
 	ASSERT_RESOURCE_ALLOCATION("ELI43449", ipConnection != __nullptr);
 
 	if (databaseUsingWorkflows(ipConnection))
@@ -3257,7 +3304,7 @@ void CFileProcessingDB::lockDB(_ConnectionPtr ipConnection, const string& strLoc
 			if (!bConnectionGood)
 			{
 				CSingleLock lock(&m_criticalSection, TRUE);
-				bAllConnectionsClosed = (m_mapThreadIDtoDBAppRoleConnections.size() == 0);
+				bAllConnectionsClosed = (m_mapThreadIDtoDBConnections.size() == 0);
 			}
 
 			// Ensure the semaphore lock is released if we had it.
@@ -3365,7 +3412,8 @@ bool CFileProcessingDB::getEncryptedPWFromDB(string &rstrEncryptedPW, bool bUseA
 
 		string username = m_strFAMUserName;
 		replaceVariable(username, "'", "''");
-		auto ipConnection = getDBConnection();
+		auto role = getAppRoleConnection();
+		auto ipConnection = role->ADOConnection();
 
 		// setup the SQL Query to get the encrypted combo for admin or user
 		string strSQL = "SELECT * FROM LOGIN WHERE UserName = @UserName ";
@@ -3412,17 +3460,19 @@ void CFileProcessingDB::storeEncryptedPasswordAndUserName(const string& strUser,
 	_RecordsetPtr ipLoginSet(__uuidof(Recordset));
 	ASSERT_RESOURCE_ALLOCATION("ELI15722", ipLoginSet != __nullptr);
 
+	auto role = getAppRoleConnection();
+
 	// Begin Transaction if needed
 	unique_ptr<TransactionGuard> apTg;
 	if (bCreateTransactionGuard)
 	{
-		apTg.reset(new TransactionGuard(getDBConnection(), adXactChaos, __nullptr));
+		apTg.reset(new TransactionGuard(role->ADOConnection(), adXactChaos, __nullptr));
 		ASSERT_RESOURCE_ALLOCATION("ELI29896", apTg.get() != __nullptr);
 	}
 
 	// Retrieve records from Login table for the admin or current user
 	string strSQL = "SELECT * FROM LOGIN WHERE UserName = @UserName";
-	auto cmd = buildCmd(getDBConnection(), strSQL, { {"@UserName", strUser.c_str()} });
+	auto cmd = buildCmd(role->ADOConnection(), strSQL, { {"@UserName", strUser.c_str()} });
 	ipLoginSet->Open((IDispatch*)cmd, vtMissing,
 		adOpenDynamic, adLockPessimistic, adCmdText);
 
@@ -3623,7 +3673,8 @@ void CFileProcessingDB::authenticateOneTimePassword(const string& strPassword)
 	{
 		try
 		{
-			_ConnectionPtr ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			_ConnectionPtr ipConnection = role->ADOConnection();
 			long nFAMSessionID = 0;
 
 			auto cmd = buildCmd(ipConnection, strQueryForSession,
@@ -3689,7 +3740,7 @@ bool CFileProcessingDB::isExistingDB()
 			_RecordsetPtr results = dbConnection->Execute(dbExistsQuery.c_str(), NULL, adCmdText);
 
 			// The query returns a closed recordset if the DB does not exist but check for not EOF just in case
-			bool dbExists = results->State == adStateOpen && !results->adoEOF;
+			bool dbExists = ((results->State & adStateOpen) >  0) && !results->adoEOF;
 
 			dbConnection->Close();
 
@@ -3714,10 +3765,10 @@ bool CFileProcessingDB::isBlankDB()
 	try
 	{
 		_ConnectionPtr ipConnection;
-
+		auto role = getAppRoleConnection();
 		try
 		{
-			ipConnection = getDBConnection();
+			ipConnection = role->ADOConnection();
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI49933")
 
@@ -3867,7 +3918,8 @@ void CFileProcessingDB::dropAllFKConstraints()
 	getExpectedTables(vecTables);
 
 	// Drop the constraints
-	dropFKContraintsOnTables(getDBConnection(), vecTables);
+	auto role = getAppRoleConnection();
+	dropFKContraintsOnTables(role->ADOConnection(), vecTables);
 }
 //--------------------------------------------------------------------------------------------------
 long CFileProcessingDB::getMachineID(_ConnectionPtr ipConnection)
@@ -4460,7 +4512,7 @@ void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = fa
 			m_bValidatingOrUpdatingSchema = false;
 
 			// This will create a new connection for this thread and initialize the schema
-			getDBConnection();
+			auto role = getAppRoleConnection();
 
 			_lastCodePos = "50";
 
@@ -4478,29 +4530,6 @@ void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = fa
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::checkSecurity()
-{
-	validateServerAndDatabase();
-
-	auto ipConnection = getDBConnectionWithoutAppRole();
-	unique_ptr<CppBaseApplicationRoleConnection> securityCheckRole;
-	try
-	{
-		securityCheckRole.reset(new SecurityRoleConnection(ipConnection));
-	}
-	catch (...)
-	{
-		m_bUseApplicationRoles = false;
-		securityCheckRole.reset(new NoRoleConnection(ipConnection));
-	}
-
-	// TODO: Code for checking what the user is allowed to do before openning Full security
-	// expectation is that normal users have only Connect access to the database
-	// Throw exception if user is not allowed access.
-	// If users is admin user it m_UseApplicationRoles should be set to false
-
-}
-//--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI03275");
@@ -4509,9 +4538,9 @@ void CFileProcessingDB::closeAllDBConnections(bool bTemporaryClose)
 		CSingleLock lock(&m_criticalSection, TRUE);
 		
 		_lastCodePos = "20";
-		
+
 		// Clear all of the connections in all of the threads
-		m_mapThreadIDtoDBAppRoleConnections.clear();
+		m_mapThreadIDtoDBConnections.clear();
 		_lastCodePos = "35";
 
 		// If the close is not temporary, don't carry any credentials over to the next connection.
@@ -4538,102 +4567,105 @@ void CFileProcessingDB::clear(bool bLocked, bool bInitializing, bool retainUserV
 	{
 		try
 		{
-			// Get the connection pointer
-			_ConnectionPtr ipConnection = getDBConnection();
-
-			// If the ActiveFAM table does exist will need check for active processing
-			// since part of checking will be to revert timed out FAMS need to lock the database
-			// LegacyRCAndUtils #5940
-			if (doesTableExist(ipConnection, gstrACTIVE_FAM))
 			{
-				if (!bLocked)
+
+				// Get the connection pointer
+				auto role = getAppRoleConnection();
+				_ConnectionPtr ipConnection = role->ADOConnection();
+
+				// If the ActiveFAM table does exist will need check for active processing
+				// since part of checking will be to revert timed out FAMS need to lock the database
+				// LegacyRCAndUtils #5940
+				if (doesTableExist(ipConnection, gstrACTIVE_FAM))
 				{
-					// Make sure processing is not active
-					// This check needs to be done with the database locked since it will attempt to
-					// revert timed out FAM's as part of the check for active processing
-					// Lock the database for this instance
-					LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
-						gstrMAIN_DB_LOCK);
+					if (!bLocked)
+					{
+						// Make sure processing is not active
+						// This check needs to be done with the database locked since it will attempt to
+						// revert timed out FAM's as part of the check for active processing
+						// Lock the database for this instance
+						LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(),
+							gstrMAIN_DB_LOCK);
 
-					assertProcessingNotActiveForAnyAction(true);
+						assertProcessingNotActiveForAnyAction(true);
+					}
+					else
+					{
+						assertProcessingNotActiveForAnyAction(true);
+					}
 				}
-				else
+
+				// Need to make sure the databaseID is loaded from the DBInfo table if it is there
+				if (doesTableExist(ipConnection, gstrDB_INFO))
 				{
-					assertProcessingNotActiveForAnyAction(true);
+					m_strEncryptedDatabaseID = "";
+					m_bDatabaseIDValuesValidated = false;
+
+					// this will load from db info and validate the string if not valid it will
+					// leave it blank
+					checkDatabaseIDValid(ipConnection, false);
 				}
+
+				CSingleLock lock(&m_criticalSection, TRUE);
+
+				// Begin a transaction
+				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
+
+				string strAdminPW;
+
+				// Only get the admin password if we are not retaining user values and the
+				// Login table already exists [LRCAU #5780]
+				if (!retainUserValues && doesTableExist(ipConnection, "Login"))
+				{
+					// Need to store the admin login and add it back after re-adding the table
+					getEncryptedPWFromDB(strAdminPW, true);
+				}
+
+				// First remove all Product Specific stuff
+				IIUnknownVectorPtr ipProdSpecMgrs = __nullptr;
+				if (!bInitializing)
+				{
+					ipProdSpecMgrs = removeProductSpecificDB(true, retainUserValues);
+					ASSERT_RESOURCE_ALLOCATION("ELI38283", ipProdSpecMgrs != __nullptr);
+
+					// Clear Status info from DatabaseService table - this needs to be done before tables are dropped
+					executeCmdQuery(ipConnection, gstr_CLEAR_DATABASE_SERVICE_STATUS_FIELDS);
+
+					dropTables(retainUserValues);
+				}
+
+				// Add the tables back
+				addTables(!retainUserValues);
+
+				// Setup the tables that require initial values
+				initializeTableValues(!retainUserValues);
+
+				// Add the admin user back with admin PW
+				if (!strAdminPW.empty())
+				{
+					storeEncryptedPasswordAndUserName(gstrADMIN_USER, strAdminPW, false, false);
+				}
+
+				if (bInitializing)
+				{
+					// https://extract.atlassian.net/browse/ISSUE-12686
+					// When creating a new database to ensure we are adding all schema currently
+					// installed and licensed, do a check for any schema manager whose components are
+					// not yet registered.
+					checkForNewDBManagers();
+
+					ipProdSpecMgrs = getLicensedProductSpecificMgrs();
+					ASSERT_RESOURCE_ALLOCATION("ELI38284", ipProdSpecMgrs != __nullptr);
+				}
+
+				// Add the Product specific db 
+				addProductSpecificDB(ipConnection, ipProdSpecMgrs, !bInitializing, !retainUserValues);
+				tg.CommitTrans();
+
+				// Shrink the database
+				executeCmdQuery(role->ADOConnection(), gstrSHRINK_DATABASE);
 			}
 
-			// Need to make sure the databaseID is loaded from the DBInfo table if it is there
-			if (doesTableExist(ipConnection, gstrDB_INFO))
-			{
-				m_strEncryptedDatabaseID = "";
-				m_bDatabaseIDValuesValidated = false;
-
-				// this will load from db info and validate the string if not valid it will
-				// leave it blank
-				checkDatabaseIDValid(ipConnection, false);
-			}
-
-			CSingleLock lock(&m_criticalSection, TRUE);
-
-			// Begin a transaction
-			TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
-
-			string strAdminPW;
-
-			// Only get the admin password if we are not retaining user values and the
-			// Login table already exists [LRCAU #5780]
-			if (!retainUserValues && doesTableExist(ipConnection, "Login"))
-			{
-				// Need to store the admin login and add it back after re-adding the table
-				getEncryptedPWFromDB(strAdminPW, true);
-			}
-
-			// First remove all Product Specific stuff
-			IIUnknownVectorPtr ipProdSpecMgrs = __nullptr;
-			if (!bInitializing)
-			{
-				ipProdSpecMgrs = removeProductSpecificDB(true, retainUserValues);
-				ASSERT_RESOURCE_ALLOCATION("ELI38283", ipProdSpecMgrs != __nullptr);
-
-				// Clear Status info from DatabaseService table - this needs to be done before tables are dropped
-				executeCmdQuery(ipConnection, gstr_CLEAR_DATABASE_SERVICE_STATUS_FIELDS);
-
-				dropTables(retainUserValues);
-			}
-
-			// Add the tables back
-			addTables(!retainUserValues);
-
-			// Setup the tables that require initial values
-			initializeTableValues(!retainUserValues);
-
-			// Add the admin user back with admin PW
-			if (!strAdminPW.empty())
-			{
-				storeEncryptedPasswordAndUserName(gstrADMIN_USER, strAdminPW, false, false);
-			}
-
-			if (bInitializing)
-			{
-				// https://extract.atlassian.net/browse/ISSUE-12686
-				// When creating a new database to ensure we are adding all schema currently
-				// installed and licensed, do a check for any schema manager whose components are
-				// not yet registered.
-				checkForNewDBManagers();
-
-				ipProdSpecMgrs = getLicensedProductSpecificMgrs();
-				ASSERT_RESOURCE_ALLOCATION("ELI38284", ipProdSpecMgrs != __nullptr);
-			}
-
-			// Add the Product specific db 
-			addProductSpecificDB(ipConnection, ipProdSpecMgrs, !bInitializing, !retainUserValues);
-			tg.CommitTrans();
-
-			// Shrink the database
-			executeCmdQuery(getDBConnection(), gstrSHRINK_DATABASE);
-
-			m_bUseApplicationRoles = true;
 			// Reset the database connection
 			resetDBConnection();
 		}
@@ -4659,7 +4691,7 @@ void CFileProcessingDB::init80DB()
 		try
 		{
 			// Get the connection pointer
-			_ConnectionPtr ipConnection = getDBConnection();
+			_ConnectionPtr ipConnection = getDBConnectionWithoutAppRole();
 
 			CSingleLock lock(&m_criticalSection, TRUE);
 
@@ -4678,7 +4710,8 @@ void CFileProcessingDB::init80DB()
 			addProductSpecificDB80();
 
 			// Shrink the database
-			executeCmdQuery(getDBConnection(), gstrSHRINK_DATABASE);
+			auto role = getAppRoleConnection();
+			executeCmdQuery(role->ADOConnection(), gstrSHRINK_DATABASE);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34237");
 	}
@@ -5057,14 +5090,15 @@ void CFileProcessingDB::pingDB()
 
 	// Always call the getKeyID to make sure the record wasn't removed by another instance because
 	// this instance lost the DB for a while.
+	auto role = getAppRoleConnection();
 	try
 	{
 		try
 		{
 			// Will throw an exception if m_nActiveFAMID does not exist in the ActiveFAM table.
 			long nFAMSessionID = 0;
-			// Return FAMSessionID as ID so it will populate nFAMSessionID.
-			getCmdId(buildCmd(getDBConnection(),
+			// Return FAMSessionID as ID so it will populate nFAMSessionID
+			getCmdId(buildCmd(role->ADOConnection(),
 				"SELECT [FAMSessionID] AS [ID] FROM [ActiveFAM] WITH (NOLOCK) WHERE [ID] = @ActiveFAMID ", { {"@ActiveFAMID", m_nActiveFAMID} }),
 				&nFAMSessionID);
 			if (nFAMSessionID != m_nFAMSessionID)
@@ -5086,7 +5120,7 @@ void CFileProcessingDB::pingDB()
 	}
 
 	// Update the ping record. 
-	executeCmd(buildCmd(getDBConnection(),
+	executeCmd(buildCmd(role->ADOConnection(),
 		"UPDATE [ActiveFAM] SET [LastPingTime]=GETUTCDATE() WHERE [ID] = @ActiveFAMID", { {"@ActiveFAMID", m_nActiveFAMID} }));
 
 	m_dwLastPingTime = GetTickCount();
@@ -5123,6 +5157,7 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 						{
 							try
 							{
+								auto role = pDB->getAppRoleConnection();
 								if (bLock)
 								{
 									// Lock the database if the last attempt with a valid connection
@@ -5130,13 +5165,13 @@ UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
 									LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(
 										pDB, gstrMAIN_DB_LOCK);
 
-									ipConnection = pDB->getDBConnection();
+									ipConnection = role->ADOConnection();
 
 									pDB->pingDB();
 								}
 								else
 								{
-									ipConnection = pDB->getDBConnection();
+									ipConnection = role->ADOConnection();
 
 									pDB->pingDB();
 								}
@@ -5253,7 +5288,8 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 								continue;
 							}
 
-							ipConnection = pDB->getDBConnection();
+							auto role = pDB->getAppRoleConnection();
+							ipConnection = role->ADOConnection();
 
 							// Check that an update is needed before any attempt at locking the DB.
 							nActionID = pDB->m_nActiveActionID;
@@ -5426,7 +5462,8 @@ void CFileProcessingDB::ensureFAMRegistration()
 
 		BEGIN_CONNECTION_RETRY();
 
-		ipConnection = getDBConnection();
+		auto role = getAppRoleConnection();
+		ipConnection = role->ADOConnection();
 
 		// Re-add a new ActiveFAM table entry. (The circumstances where this code will be used are
 		// rare, and not worth finding a way to pass on whether queuing is active).
@@ -6064,7 +6101,8 @@ void CFileProcessingDB::assertProcessingNotActiveForAction(bool bDBLocked, _Conn
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 {
-	_ConnectionPtr ipConnection = getDBConnection();
+	auto role = getAppRoleConnection();
+	_ConnectionPtr ipConnection = role->ADOConnection();
 
 	// If the ActiveFAM table does not exist nothing is processing so return
 	if (!doesTableExist(ipConnection, gstrACTIVE_FAM))
@@ -6084,7 +6122,8 @@ bool CFileProcessingDB::isFAMActiveForAnyAction(bool bDBLocked)
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 {
-	_ConnectionPtr ipConnection = getDBConnection();
+	auto role = getAppRoleConnection();
+	_ConnectionPtr ipConnection = role->ADOConnection();
 
 	// Check for active processing 
 	if (isFAMActiveForAnyAction(bDBLocked))
@@ -6096,7 +6135,8 @@ void CFileProcessingDB::assertProcessingNotActiveForAnyAction(bool bDBLocked)
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingDB::assertNotActiveBeforeSchemaUpdate()
 {
-	_ConnectionPtr ipConnection = getDBConnection();
+	auto role = getAppRoleConnection();
+	_ConnectionPtr ipConnection = role->ADOConnection();
 	
 	// In schema versions < 110, the ProcessingFAM table will contain the processing FAMs
 	if (doesTableExist(ipConnection, gstrPROCESSING_FAM))
@@ -6801,7 +6841,8 @@ string CFileProcessingDB::updateCounters(_ConnectionPtr ipConnection, DBCounterU
 
 	// Get the new DatabaseID - will be the same as old except for the LastUpdated
 	DatabaseIDValues newDatabaseIDValues = m_DatabaseIDValues;
-	newDatabaseIDValues.m_stLastUpdated = getSQLServerDateTimeAsSystemTime(getDBConnection());
+	auto role = getAppRoleConnection();
+	newDatabaseIDValues.m_stLastUpdated = getSQLServerDateTimeAsSystemTime(role->ADOConnection());
 
 	// Get the time since the request was generated
 	CTimeSpan tsDiff = CTime(newDatabaseIDValues.m_stLastUpdated) - CTime(counterUpdates.m_stTimeCodeGenerated);
@@ -7001,7 +7042,8 @@ void CFileProcessingDB::getCounterInfo(map<long, CounterOperation> &mapOfCounter
 {
 	// Load counters from the database and check that they the SecureCounterValueChange table last
 	// counter value matches the encrypted counter value.
-	ADODB::_ConnectionPtr ipConnection = getDBConnection();
+	auto role = getAppRoleConnection();
+	ADODB::_ConnectionPtr ipConnection = role->ADOConnection();
 	
 	// Create a pointer to a recordset
 	_RecordsetPtr ipResultSet(__uuidof(Recordset));
@@ -7061,7 +7103,8 @@ void CFileProcessingDB::unlockCounters(_ConnectionPtr ipConnection, DBCounterUpd
 	DatabaseIDValues &newDatabaseID = counterUpdates.m_DatabaseID;
 	
 	// Update the counterUpdates DatabaseID to have a new last updated time
-	newDatabaseID.m_stLastUpdated = getSQLServerDateTimeAsSystemTime(getDBConnection());
+	auto role = getAppRoleConnection();
+	newDatabaseID.m_stLastUpdated = getSQLServerDateTimeAsSystemTime(role->ADOConnection());
 
 	// Get the time since the request was generated
 	CTimeSpan tsDiff = CTime(newDatabaseID.m_stLastUpdated) - CTime(counterUpdates.m_stTimeCodeGenerated);
@@ -7504,7 +7547,8 @@ vector<tuple<long, string>> CFileProcessingDB::getWorkflowStatus(long nFileID,
 
 	BEGIN_CONNECTION_RETRY();
 
-		ipConnection = getDBConnection();
+		auto role = getAppRoleConnection();
+		ipConnection = role->ADOConnection();
 		validateDBSchemaVersion();
 
 		long nWorkflowID = getActiveWorkflowID(ipConnection);
@@ -7713,7 +7757,8 @@ void CFileProcessingDB::modifyActionStatusForSelection(
 	_bstr_t bstrQueryFrom = ipFileSelector->BuildQuery(
 		getThisAsCOMPtr(), "[FAMFile].[ID]", "", VARIANT_FALSE);
 
-	_ConnectionPtr ipConnection = getDBConnection();
+	auto role = getAppRoleConnection();
+	_ConnectionPtr ipConnection = role->ADOConnection();
 
 	// Open the file set
 	ipFileSet->Open(bstrQueryFrom, _variant_t(ipConnection, true),

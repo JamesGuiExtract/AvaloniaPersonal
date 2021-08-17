@@ -1,4 +1,5 @@
-﻿using Extract.Utilities;
+﻿using Extract.SqlDatabase;
+using Extract.Utilities;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -18,7 +19,7 @@ namespace Extract.FileActionManager.Forms
         string _databaseServer;
         string _databaseName;
         string _tableName;
-        SqlConnection _connection;
+        SqlAppRoleConnection _connection;
         SqlCommand _command;
         SqlDataAdapter _adapter;
         SqlCommandBuilder _builder;
@@ -60,18 +61,12 @@ namespace Extract.FileActionManager.Forms
             {
                 base.OnLoad(e);
 
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-                {
-                    DataSource = _databaseServer,
-                    InitialCatalog = _databaseName,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
-
-                _connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
+                _connection = new ExtractRoleConnection(_databaseServer, _databaseName);
                 _connection.Open();
+
                 var sql = UtilityMethods.FormatInvariant($"SELECT * FROM {_tableName}");
-                _command = new SqlCommand(sql, _connection);
+                _command = _connection.CreateCommand();
+                _command.CommandText = sql;
                 _adapter = new SqlDataAdapter(_command);
                 _builder = new SqlCommandBuilder
                 {
@@ -80,7 +75,6 @@ namespace Extract.FileActionManager.Forms
                 _dataSet = new DataSet { Locale = CultureInfo.CurrentCulture };
                 _adapter.Fill(_dataSet, _tableName);
                 _dataTable = _dataSet.Tables[_tableName];
-                _connection.Close();
 
                 _dataGridView.DataSource = _dataSet.Tables[_tableName];
                 HideColumns(_dataGridView, "ID", "GUID");

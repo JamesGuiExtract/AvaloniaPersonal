@@ -41,8 +41,8 @@ namespace Extract.Dashboard.Forms
                 DatabaseName = databaseName;
                 DatabaseServer = databaseServer;
                 FAMUserID = GetFAMUserID();
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
 
                 using var cmd = connection.CreateCommand();
                  
@@ -94,8 +94,8 @@ namespace Extract.Dashboard.Forms
                 {
                     var v = dashboardDataGridView.CurrentRow.Cells["UseExtractedData"].Value as bool?;
 
-                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    connection.Open();
                     
                     using var command = connection.CreateCommand();
                     command.CommandText =
@@ -184,8 +184,8 @@ namespace Extract.Dashboard.Forms
                         GetDashboardDefinitions(dashboardName, selectForm.DashboardFile, out XDocument extractedDataDashboardDefinition,
                             out XDocument dashboardDefinition);
 
-                        using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                        SqlConnection connection = applicationRoleConnection.SqlConnection;
+                        using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                        connection.Open();
 
                         using var command = connection.CreateCommand();
                         command.CommandText =
@@ -276,8 +276,8 @@ namespace Extract.Dashboard.Forms
 
                     if (dashboardDataGridView.CurrentCell.Value as string != _originalCellValue)
                     {
-                        using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                        SqlConnection connection = applicationRoleConnection.SqlConnection;
+                        using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                        connection.Open();
                         using var command = connection.CreateCommand();
                         command.CommandText =
                             "UPDATE Dashboard SET DashboardName = @NewDashboardName WHERE DashboardName = @OldDashboardName";
@@ -337,8 +337,8 @@ namespace Extract.Dashboard.Forms
                             MessageBoxDefaultButton.Button1,
                             (MessageBoxOptions)0) == DialogResult.Yes)
                     {
-                        using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                        SqlConnection connection = applicationRoleConnection.SqlConnection;
+                        using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                        connection.Open();
 
                         using var command = connection.CreateCommand();
 
@@ -367,8 +367,8 @@ namespace Extract.Dashboard.Forms
                 {
                     GetDashboardDefinitions(selectForm.DashboardName, selectForm.DashboardFile, out XDocument ExtractedDataDoc, out XDocument xDoc);
 
-                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    connection.Open();
                     using var command = connection.CreateCommand();
 
                     command.CommandText =
@@ -432,8 +432,8 @@ namespace Extract.Dashboard.Forms
                     ExtractException ee = new ExtractException("ELI46879", "Unable to get path for extracted data files.");
                     throw ee;
                 }
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
                 using var cmd = connection.CreateCommand();
 
                 cmd.CommandText = "UPDATE DBInfo Set Value = @NewValue WHERE [Name] = 'RootPathForDashboardExtractedData'";
@@ -460,8 +460,8 @@ namespace Extract.Dashboard.Forms
         {
             try
             {
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
 
                 using var command = connection.CreateCommand();
                 command.CommandText =
@@ -502,8 +502,8 @@ namespace Extract.Dashboard.Forms
         /// <returns>ID of the user in the FAMUser table</returns>
         int GetFAMUserID()
         {
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
             using var cmd = connection.CreateCommand();
             cmd.CommandText = @"
                 DECLARE @FAMUserName nvarchar(50)= SUBSTRING(SUSER_SNAME(), CHARINDEX('\',SUSER_SNAME()) +1, 50)
@@ -535,8 +535,8 @@ namespace Extract.Dashboard.Forms
         /// <returns></returns>
         string GetDashboardDefinition(string dashboardName)
         {
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
             using var command = connection.CreateCommand();
             command.CommandText =
                 "SELECT Definition FROM Dashboard WHERE DashboardName = @DashboardName";

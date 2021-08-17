@@ -63,7 +63,8 @@ namespace DatabaseMigrationWizard.Test
             databaseMigrationWizardTestHelper.WriteEverythingToDirectory(ImportOptions.ImportPath);
             try
             {
-                new ImportHelper(ImportOptions, new Progress<string>((garbage) => { })).Import();
+                using var helper = new ImportHelper(ImportOptions, new Progress<string>((garbage) => { }));
+                helper.Import();
                 // The import should fail because dbinfo tables should not lign up
                 Assert.True(false);
             }

@@ -623,6 +623,7 @@ namespace Extract.DataEntry.LabDE.Test
             finally
             {
                 _famDB?.CloseAllDBConnections();
+                _famDB = null;
                 _testDbManager.RemoveDatabase(testDBName);
             }
         }

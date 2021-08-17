@@ -675,6 +675,7 @@ CAttributeDBMgr::CAttributeDBMgr()
 , m_ipDBConnection(__nullptr)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
+, m_currentRole(CppBaseApplicationRoleConnection::kExtractRole)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -837,6 +838,8 @@ STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( IFileProcessingDB
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI38526", ipDB != __nullptr);
 
+		m_ipFAMDB = ipDB;
+
 		auto value = asString( ipDB->GetDBInfoSetting( gstrSCHEMA_VERSION_NAME.c_str(),
 													   VARIANT_FALSE) );
 		if ( value.empty() )
@@ -849,20 +852,10 @@ STDMETHODIMP CAttributeDBMgr::raw_RemoveProductSpecificSchema( IFileProcessingDB
 			*pbSchemaExists = VARIANT_TRUE;
 		}
 
-		// Create the connection object
-		ADODB::_ConnectionPtr ipDBConnection( __uuidof( Connection ) );
-		ASSERT_RESOURCE_ALLOCATION( "ELI38527", ipDBConnection != __nullptr );
-
-		string strDatabaseServer = asString(ipDB->DatabaseServer);
-		string strDatabaseName = asString(ipDB->DatabaseName);
-
-		// create the connection string
-		string strConnectionString = createConnectionString( strDatabaseServer,
-															 strDatabaseName );
-		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
+		auto role = getAppRoleConnection();
 
 		VectorOfString tableNames = GetCurrentTableNames( asCppBool(bRetainUserTables) );
-		dropTablesInVector(ipDBConnection, tableNames);
+		dropTablesInVector(role->ADOConnection(), tableNames);
 
 		return S_OK;
 	}
@@ -1632,8 +1625,9 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 
 			BEGIN_ADO_CONNECTION_RETRY();
 
+			auto role = getAppRoleConnection();
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			ipConnection = role->ADOConnection();
 
 			TransactionGuard tg( ipConnection, adXactRepeatableRead, __nullptr );
 
@@ -1654,7 +1648,7 @@ bool CAttributeDBMgr::CreateNewAttributeSetForFile_Internal( bool bDbLocked,
 
 			tg.CommitTrans();
 
-			END_ADO_CONNECTION_RETRY(ipConnection, getDBConnection, m_nNumberOfRetries,
+			END_ADO_CONNECTION_RETRY(ipConnection, getAppRoleConnection, m_nNumberOfRetries,
 				m_dRetryTimeout, "ELI39232");
 
 			return true;
@@ -1737,7 +1731,8 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 			BEGIN_ADO_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			string strQuery = GetQueryForAttributeSetForFile(fileID, attributeSetName, relativeIndex);
 
@@ -1799,7 +1794,7 @@ bool CAttributeDBMgr::GetAttributeSetForFile_Internal( bool bDbLocked,
 
 			*ppAttributes = ipAttributes.Detach();
 #endif
-			END_ADO_CONNECTION_RETRY(ipConnection, getDBConnection, m_nNumberOfRetries,
+			END_ADO_CONNECTION_RETRY(ipConnection, getAppRoleConnection, m_nNumberOfRetries,
 				m_dRetryTimeout, "ELI39233");
 
 			return true;
@@ -1958,7 +1953,7 @@ STDMETHODIMP CAttributeDBMgr::GetAllAttributeSetNames(IStrToStrMap** ippNames)
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-ADODB::_ConnectionPtr CAttributeDBMgr::getDBConnection(bool bReset)
+unique_ptr<CppBaseApplicationRoleConnection> CAttributeDBMgr::getAppRoleConnection(bool bReset)
 {
 	// If the FAMDB is not set throw an exception
 	if (m_ipFAMDB == __nullptr)
@@ -1968,47 +1963,24 @@ ADODB::_ConnectionPtr CAttributeDBMgr::getDBConnection(bool bReset)
 		throw ue;
 	}
 
-	// Check if the connection should be reset
-	if (bReset && m_ipDBConnection != __nullptr)
+	bool exitingConnection = m_ipDBConnection != __nullptr && m_ipDBConnection->State != adStateClosed;
+	
+	if (exitingConnection) return createAppRole(m_ipDBConnection);
+
+	m_ipDBConnection.CreateInstance(_uuidof(Connection));
+	string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
+	string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
+	string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
+	if (!strDatabaseServer.empty() && !strDatabaseName.empty())
 	{
-		// if the database is not closed close it
-		if (m_ipDBConnection->State != adStateClosed)
-		{
-			// Do the close in a try catch so that if there is an exception it will be logged
-			try
-			{
-				m_ipDBConnection->Close();
-			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI40165");
-		}
-		// Create a new connection
-		m_ipDBConnection = __nullptr;
+		m_ipDBConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
+
+		// Get the command timeout from the FAMDB DBInfo table
+		m_ipDBConnection->CommandTimeout =
+			asLong(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
 	}
 
-	// Check if connection has been created
-	if (m_ipDBConnection == __nullptr)
-	{
-		m_ipDBConnection.CreateInstance(__uuidof( Connection));
-		ASSERT_RESOURCE_ALLOCATION("ELI38543", m_ipDBConnection != __nullptr);
-	}
-
-	// if closed and Database server and database name are defined,  open the database connection
-	if ( m_ipDBConnection->State == adStateClosed )
-	{
-		string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
-		string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
-		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-		if ( !strDatabaseServer.empty() && !strDatabaseName.empty() )
-		{
-			m_ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified);
-
-			// Get the command timeout from the FAMDB DBInfo table
-			m_ipDBConnection->CommandTimeout =
-				asLong(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
-		}
-	}
-
-	return m_ipDBConnection;
+	return createAppRole(m_ipDBConnection);
 }
 //-------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::validateLicense()
@@ -2032,6 +2004,36 @@ void CAttributeDBMgr::validateSchemaVersion()
 		ue.addDebugInfo("Database Version", value);
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+unique_ptr<CppBaseApplicationRoleConnection> CAttributeDBMgr::createAppRole(_ConnectionPtr ipConnection)
+{
+	unique_ptr<CppBaseApplicationRoleConnection> role;
+	try
+	{
+		switch (m_currentRole)
+		{
+		case CppBaseApplicationRoleConnection::kNoRole:
+			role.reset(new NoRoleConnection(ipConnection));
+			break;
+		case CppBaseApplicationRoleConnection::kExtractRole:
+			role.reset(new ExtractRoleConnection(ipConnection));
+			break;
+		case CppBaseApplicationRoleConnection::kSecurityRole:
+			role.reset(new SecurityRoleConnection(ipConnection));
+			break;
+		default:
+			UCLIDException ue("ELI51838", "Unknown application role requested.");
+			ue.addDebugInfo("ApplicationRole", (int)m_currentRole);
+			throw ue;
+		}
+	}
+	catch (...)
+	{
+		// Try with the no role 
+		role.reset(new NoRoleConnection(ipConnection));
+	}
+	return role;
 }
 //-------------------------------------------------------------------------------------------------
 map<string, string> CAttributeDBMgr::getDBInfoDefaultValues()

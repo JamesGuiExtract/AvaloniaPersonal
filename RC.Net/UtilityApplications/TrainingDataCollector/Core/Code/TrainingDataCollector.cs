@@ -200,8 +200,8 @@ namespace Extract.UtilityApplications.MachineLearning
                 _processing = true;
 
                 List<long> availableIDs = new List<long>();
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
 
                 using var cmd = connection.CreateCommand();
 
@@ -236,7 +236,7 @@ namespace Extract.UtilityApplications.MachineLearning
                     List<string[]> data = null;
                     IEnumerable<string[]> trainingData = null;
                     IEnumerable<string[]> testingData = null;
-                    ProcessInVariableBatches(availableIDs,
+                    ProcessInVariableBatches(connection, availableIDs,
                         executeBeforeTransaction: (lowestIDToProcess, highestIDToProcess) =>
                         {
                             // Make sure the output file is empty
@@ -320,8 +320,8 @@ namespace Extract.UtilityApplications.MachineLearning
         private List<long> GetAvailableIDs()
         {
             var availableIDs = new List<long>();
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
 
             using var cmd = connection.CreateCommand();
             cmd.CommandText = _GET_AVAILABLE_IDS;
@@ -466,8 +466,8 @@ namespace Extract.UtilityApplications.MachineLearning
 
         public override int CalculateUnprocessedRecordCount()
         {
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
 
             using var cmd = connection.CreateCommand();
             cmd.CommandText = _GET_NEW_DATA_COUNT;
@@ -633,16 +633,16 @@ namespace Extract.UtilityApplications.MachineLearning
         /// <summary>
         /// Saves the current <see cref="DatabaseServiceStatus"/> to the DB
         /// </summary>
-        void SaveStatus()
+        void SaveStatus(SqlAppRoleConnection connection)
         {
             if (Container is DatabaseService hasStatusRecord
                 && Container is IHasConfigurableDatabaseServiceStatus hasStatus)
             {
-                hasStatusRecord.SaveStatus(hasStatus.Status);
+                hasStatusRecord.SaveStatus(connection, hasStatus.Status);
             }
             else
             {
-                SaveStatus(new TrainingDataCollectorStatus(this));
+                SaveStatus(connection, new TrainingDataCollectorStatus(this));
             }
         }
 
@@ -651,7 +651,7 @@ namespace Extract.UtilityApplications.MachineLearning
         /// Runs data collection and storage actions for batches of files,
         /// retrying with small batch size if there is a failure
         /// </summary>
-        private void ProcessInVariableBatches(List<long> availableIDs,
+        private void ProcessInVariableBatches(SqlAppRoleConnection connection, List<long> availableIDs,
             Action<long, long> executeBeforeTransaction, Action executeInTransaction,
             CancellationToken cancellationToken, int maxBatchSize)
         {
@@ -681,7 +681,7 @@ namespace Extract.UtilityApplications.MachineLearning
 
                         // Save status to the DB each loop
                         LastIDProcessed = highestIDToProcess;
-                        SaveStatus();
+                        SaveStatus(connection);
 
                         ts.Complete();
                     }
@@ -743,7 +743,7 @@ namespace Extract.UtilityApplications.MachineLearning
                         {
                             // Save status to the DB each loop
                             LastIDProcessed = lowestIDToProcess;
-                            SaveStatus();
+                            SaveStatus(connection);
 
                             ts.Complete();
                         }
@@ -761,7 +761,7 @@ namespace Extract.UtilityApplications.MachineLearning
         /// <summary>
         /// Writes LearningMachine data to DB
         /// </summary>
-        private int WriteCsvToDB(SqlConnection connection, IEnumerable<IEnumerable<string>> data, bool isTrainingSet)
+        private int WriteCsvToDB(SqlAppRoleConnection connection, IEnumerable<IEnumerable<string>> data, bool isTrainingSet)
         {
             var cmdText = @"INSERT INTO MLData(MLModelID, FileID, IsTrainingData, DateTimeStamp, Data)
                 SELECT MLModel.ID, FAMFile.ID, @IsTrainingData, GETDATE(), @Data
@@ -770,7 +770,8 @@ namespace Extract.UtilityApplications.MachineLearning
             int rowsAdded = 0;
             foreach (var record in data)
             {
-                using var cmd = new SqlCommand(cmdText, connection);
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = cmdText;
                 cmd.Parameters.AddWithValue("@IsTrainingData", isTrainingSet.ToString());
                 cmd.Parameters.AddWithValue("@ModelName", QualifiedModelName);
                 var ussPath = record.First();

@@ -390,25 +390,26 @@ namespace Extract.ETL
                 {
                     int lastInBatch = Math.Min(currentLastProcessed + _BATCH_SIZE, maxFileTaskSession);
 
+                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    connection.Open();
+
                     // Process each batch
-                    using var scope = new TransactionScope(TransactionScopeOption.Required,
+                    using (var scope = new TransactionScope(TransactionScopeOption.Required,
                         new TransactionOptions()
                         {
                             IsolationLevel = System.Transactions.IsolationLevel.RepeatableRead,
                             Timeout = TransactionManager.MaximumTimeout,
                         },
-                        TransactionScopeAsyncFlowOption.Enabled);
-
-                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
-
-                    using (var readerTask = GetAttributeSetsToPopulate(connection, currentLastProcessed, lastInBatch, cancelToken))
-                    using (SqlDataReader VOAsToStore = readerTask.Result)
+                        TransactionScopeAsyncFlowOption.Enabled))
                     {
-                        ProcessBatch(connection, VOAsToStore, cancelToken);
-                    }
+                        using (var readerTask = GetAttributeSetsToPopulate(connection, currentLastProcessed, lastInBatch, cancelToken))
+                        using (SqlDataReader VOAsToStore = readerTask.Result)
+                        {
+                            ProcessBatch(connection, VOAsToStore, cancelToken);
+                        }
 
-                    scope.Complete();
+                        scope.Complete();
+                    }
 
                     currentLastProcessed = lastInBatch;
                     // Since there may be FileTaskSessions that have nothing to do with attributes update all the 
@@ -418,7 +419,7 @@ namespace Extract.ETL
                         .ToList()
                         .ForEach(k => _status.LastIDProcessedForDashboardAttribute[k] =
                                      Math.Max(lastInBatch, _status.LastIDProcessedForDashboardAttribute[k]));
-                    SaveStatus();
+                    SaveStatus(connection);
                 }
             }
             catch (Exception ex)
@@ -434,12 +435,12 @@ namespace Extract.ETL
         /// <summary>
         /// Gets the attribute sets to populate.
         /// </summary>
-        /// <param name="connection">The <see cref="SqlConnection"/> to use.</param>
+        /// <param name="connection">The <see cref="SqlAppRoleConnection"/> to use.</param>
         /// <param name="currentLastProcessed">The last processed file task session.</param>
         /// <param name="lastInBatch">The last file task session in this batch.</param>
         /// <param name="cancelToken">The cancel token that should be used to abort this
         /// query if processing is cancelled.</param>
-        static Task<SqlDataReader> GetAttributeSetsToPopulate(SqlConnection connection, int currentLastProcessed, int lastInBatch, CancellationToken cancelToken)
+        static Task<SqlDataReader> GetAttributeSetsToPopulate(SqlAppRoleConnection connection, int currentLastProcessed, int lastInBatch, CancellationToken cancelToken)
         {
             // Records that contain attributes that need to be stored
             using (SqlCommand cmd = connection.CreateCommand())
@@ -470,10 +471,10 @@ namespace Extract.ETL
         /// <summary>
         /// Process a batch of VOA's from the database
         /// </summary>
-        /// <param name="connection">The <see cref="SqlConnection"/> to use.</param>
+        /// <param name="connection">The <see cref="SqlAppRoleConnection"/> to use.</param>
         /// <param name="VOAsToStore"><see cref="SqlDataReader"/> that contains the records to process</param>
         /// <param name="cancelToken"><see cref="CancellationToken"/> that could cancel the operation</param>
-        void ProcessBatch(SqlConnection connection, SqlDataReader VOAsToStore, CancellationToken cancelToken)
+        void ProcessBatch(SqlAppRoleConnection connection, SqlDataReader VOAsToStore, CancellationToken cancelToken)
         {
             // Get the ordinals needed
             int attributeSetForFileIDColumn = VOAsToStore.GetOrdinal("AttributeSetForFileID");
@@ -687,6 +688,9 @@ namespace Extract.ETL
                 }
                 foreach (var d in itemsToDelete)
                 {
+                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    connection.Open();
+
                     using var scope = new TransactionScope(TransactionScopeOption.Required,
                         new TransactionOptions()
                         {
@@ -694,11 +698,7 @@ namespace Extract.ETL
                             Timeout = TransactionManager.MaximumTimeout
                         },
                         TransactionScopeAsyncFlowOption.Enabled);
-
-                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
-
-
+                        
                     using var cmd = connection.CreateCommand();
 
                     DashboardAttributeField dashboardAttributeField = DashboardAttributeField.FromString(d);
@@ -710,7 +710,7 @@ namespace Extract.ETL
                     var task = cmd.ExecuteNonQueryAsync();
                     task.Wait(_cancelToken);
                     _status.LastIDProcessedForDashboardAttribute.Remove(d);
-                    SaveStatus();
+                    SaveStatus(connection);
                     scope.Complete();
                 }
             }
@@ -740,7 +740,7 @@ namespace Extract.ETL
         /// <param name="attributes">The attributes to add</param>
         /// <param name="attributeSetForFileID">The ID of the AttributeSetForFileID record that contains the VOA being added</param>
         /// <param name="parentAttributeID">The ID of the parent Attribute record. if 0 it is a top level attribute</param>
-        void addAttributes(SqlConnection connection, IUnknownVector attributes,
+        void addAttributes(SqlAppRoleConnection connection, IUnknownVector attributes,
             Int64 attributeSetForFileID, CancellationToken cancelToken,
             Int64 parentAttributeID = 0)
         {
@@ -901,9 +901,9 @@ namespace Extract.ETL
         /// <summary>
         /// Saves the current <see cref="DatabaseServiceStatus"/> to the DB
         /// </summary>
-        void SaveStatus()
+        void SaveStatus(SqlAppRoleConnection connection)
         {
-            SaveStatus(_status);
+            SaveStatus(connection, _status);
         }
         #endregion
 

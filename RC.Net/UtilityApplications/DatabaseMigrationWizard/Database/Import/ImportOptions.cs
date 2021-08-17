@@ -44,9 +44,7 @@ namespace DatabaseMigrationWizard.Database.Input
 
         public SqlTransaction Transaction { get; set; }
 
-        public ApplicationRoleConnection RoleConnection { get; set; }
-
-        public SqlConnection SqlConnection { get { return RoleConnection?.SqlConnection; } }
+        public SqlAppRoleConnection SqlConnection { get; set; }
 
         public void ExecuteCommand(string command)
         {

@@ -72,9 +72,9 @@ namespace Extract.ETL
         /// </summary>
         void LoadComboBoxes()
         {
-            using var applicationRoleConnection = new ExtractRoleConnection(RedactionAccuracyService.DatabaseServer,
+            using var connection = new ExtractRoleConnection(RedactionAccuracyService.DatabaseServer,
                                                                RedactionAccuracyService.DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            connection.Open();
             using var cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT [Description] FROM [dbo].[AttributeSetName]";
             var results = cmd.ExecuteReader()

@@ -1,6 +1,7 @@
 ﻿using Extract.Database;
 using Extract.FileActionManager.Forms;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Microsoft.Data.ConnectionUI;
@@ -9,6 +10,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
+using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
@@ -400,6 +402,9 @@ namespace Extract.FileActionManager.Conditions
                     _schemaInfoDbConnectionInfo.Dispose();
                     _schemaInfoDbConnectionInfo = null;
                 }
+
+                _schemaInfoDbConnection?.Dispose();
+                _schemaInfoDbConnection = null;
             }
             base.Dispose(disposing);
         }
@@ -1227,7 +1232,7 @@ namespace Extract.FileActionManager.Conditions
 
             if (_schemaInfoDbConnection != null)
             {
-                _schemaInfoDbConnection.Dispose();
+                _schemaInfoDbConnection?.Dispose();
                 _schemaInfoDbConnection = null;
             }
 
@@ -1236,8 +1241,13 @@ namespace Extract.FileActionManager.Conditions
                 fileProcessingDB.ConnectLastUsedDBThisProcess();
                 var connectionStringBuilder = new DbConnectionStringBuilder();
                 connectionStringBuilder.ConnectionString = fileProcessingDB.ConnectionString;
+
                 connectionStringBuilder.Add("Timeout", _SCHEMA_UPDATE_TIMEOUT);
-                _schemaInfoDbConnection = new OleDbConnection(connectionStringBuilder.ConnectionString);
+                SqlConnectionStringBuilder sqlConnectionStringBuilder = new SqlConnectionStringBuilder(                
+                     SqlUtil.CreateConnectionString(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName));
+                sqlConnectionStringBuilder.ConnectTimeout = _SCHEMA_UPDATE_TIMEOUT;
+
+                _schemaInfoDbConnection = new ExtractRoleConnection(connectionStringBuilder.ConnectionString);
                 _schemaInfoDbConnection.Open();
             }
             else

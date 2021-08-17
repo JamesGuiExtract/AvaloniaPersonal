@@ -3,6 +3,7 @@ using Extract.DataEntry;
 using Extract.FileActionManager.Forms;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using System;
 using System.Data.Common;
 using System.Data.OleDb;
@@ -119,7 +120,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         DbConnection _dbConnection;
 
-        #endregion Fields
+       #endregion Fields
 
         #region Constructors
 
@@ -454,11 +455,8 @@ namespace Extract.FileActionManager.FileProcessors
             }
             finally
             {
-                if (_dbConnection != null)
-                {
-                    _dbConnection.Dispose();
-                    _dbConnection = null;
-                }
+                _dbConnection?.Dispose();
+                _dbConnection = null;
             }
         }
 
@@ -617,11 +615,8 @@ namespace Extract.FileActionManager.FileProcessors
             if (disposing)
             {
                 // Dispose of managed resources
-                if (_dbConnection != null)
-                {
-                    _dbConnection.Dispose();
-                    _dbConnection = null;
-                }
+                _dbConnection?.Dispose();
+                _dbConnection = null;
             }
 
             // Dispose of unmanaged resources
@@ -698,7 +693,8 @@ namespace Extract.FileActionManager.FileProcessors
                         {
                             if (fileProcessingDB != null)
                             {
-                                _dbConnection = new OleDbConnection(fileProcessingDB.ConnectionString);
+                                var connectionString = SqlUtil.CreateConnectionString(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+                                _dbConnection = new ExtractRoleConnection(connectionString);
                                 _dbConnection.Open();
                             }
 

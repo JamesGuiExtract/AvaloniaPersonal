@@ -104,7 +104,7 @@ CFileProcessingDB::CFileProcessingDB()
 	m_bCurrentSessionIsWebSession(false),
 	m_dwLastPingTime(0),
 	m_ipDBInfoSettings(__nullptr),
-	m_bUseApplicationRoles(true)
+	m_currentRole(CppBaseApplicationRoleConnection::kExtractRole)
 {
 	try
 	{
@@ -153,8 +153,15 @@ CFileProcessingDB::~CFileProcessingDB()
 	// and don't want to throw an exception from a catch
 	try
 	{
+		m_mapWorkflowDefinitions.clear();
+		if (m_ipSecureCounters != __nullptr) m_ipSecureCounters->Clear();
+		m_ipSecureCounters = __nullptr;
+		m_ipFAMTagManager = __nullptr;
+		if (m_ipDBInfoSettings != __nullptr) m_ipDBInfoSettings->Clear();
+		m_ipDBInfoSettings = __nullptr;
+
 		// Clean up the map of connections
-		m_mapThreadIDtoDBAppRoleConnections.clear();
+		closeAllDBConnections(false);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14981");
 }
@@ -163,6 +170,8 @@ void CFileProcessingDB::FinalRelease()
 {
 	try
 	{
+		// Clean up the map of connections
+		closeAllDBConnections(false);
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27324");
 }
@@ -506,7 +515,8 @@ STDMETHODIMP CFileProcessingDB::SetFileInformationForFile(int fileID, long long 
 		ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
+		auto role = getAppRoleConnection();
+		ipConnection = role->ADOConnection();
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -711,10 +721,6 @@ STDMETHODIMP CFileProcessingDB::Clear(VARIANT_BOOL vbRetainUserValues)
 
 	try
 	{
-		ValueRestorer<bool> UseApplicationRolesRestorer(m_bUseApplicationRoles);
-
-		getThisAsCOMPtr()->UseApplicationRoles = VARIANT_FALSE;
-
 		// Validate the license
 		validateLicense();
 
@@ -765,7 +771,8 @@ STDMETHODIMP CFileProcessingDB::ResetDBLock(void)
 		BEGIN_CONNECTION_RETRY();
 		
 		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
+		auto role = getAppRoleConnection();
+		ipConnection = role->ADOConnection();
 
 		// The mutex only needs to be locked while the data is being obtained
 		CSingleLock lock(&m_criticalSection, TRUE);
@@ -1206,9 +1213,8 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 		// Close any existing connection. P13 #4666
 		closeDBConnection();
 
-		ValueRestorer<bool> UseApplicationRolesRestorer(m_bUseApplicationRoles);
-
-		getThisAsCOMPtr()->UseApplicationRoles = VARIANT_FALSE;
+		ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRoleRestorer(m_currentRole);
+		m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
 
 		// Database server needs to be set in order to create a new database
 		if (m_strDatabaseServer.empty())
@@ -1280,7 +1286,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName, BSTR bstrInitWit
 
 				DWORD dwThreadID = GetCurrentThreadId();
 				CSingleLock lg(&m_criticalSection, TRUE);
-				m_mapThreadIDtoDBAppRoleConnections.erase(dwThreadID);
+				m_mapThreadIDtoDBConnections.erase(dwThreadID);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI41507");
 
@@ -1316,26 +1322,14 @@ STDMETHODIMP CFileProcessingDB::CreateNew80DB(BSTR bstrNewDBName)
 		// Close any existing connection. P13 #4666
 		closeDBConnection();
 
-		ValueRestorer<bool> UseApplicationRolesRestorer(m_bUseApplicationRoles);
+		ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> applicationRolesRestorer(m_currentRole);
 
-		getThisAsCOMPtr()->UseApplicationRoles = VARIANT_FALSE;
+		m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
 
-		// Database server needs to be set in order to create a new database
-		if (m_strDatabaseServer.empty())
-		{
-			UCLIDException ue("ELI34233", "Database server must be set!");
-			ue.addDebugInfo("New DB name", asString(bstrNewDBName));
-			throw ue;
-		}
+		validateServerAndDatabase();
 
 		// Set the database name to the given database name
 		m_strDatabaseName = asString(bstrNewDBName);
-
-		if (m_strDatabaseName.empty())
-		{
-			UCLIDException ue("ELI34234", "Database name must not be empty!");
-			throw ue;
-		}
 
 		// Create a connection object to the master db to create the database
 		ADODB::_ConnectionPtr ipDBConnection(__uuidof(Connection));
@@ -1450,7 +1444,8 @@ STDMETHODIMP CFileProcessingDB::LockDB_InternalOnly(BSTR bstrLockName)
 		postStatusUpdateNotification(kWaitingForLock);
 
 		// lock the database
-		lockDB(getDBConnection(), asString(bstrLockName));
+		auto role = getAppRoleConnection();
+		lockDB(role->ADOConnection(), asString(bstrLockName));
 
 		// Post message indicating that the database is now busy
 		postStatusUpdateNotification(kConnectionBusy);
@@ -1471,7 +1466,8 @@ STDMETHODIMP CFileProcessingDB::UnlockDB_InternalOnly(BSTR bstrLockName)
 		try
 		{
 			// Unlock the DB
-			unlockDB(getDBConnection(), asString(bstrLockName));
+			auto role = getAppRoleConnection();
+			unlockDB(role->ADOConnection(), asString(bstrLockName));
 		}
 		catch(...)
 		{
@@ -2101,8 +2097,9 @@ STDMETHODIMP CFileProcessingDB::RegisterActiveFAM()
 
 		// This creates a record in the ActiveFAM table and the LastPingTime
 		// is set to the current time by default.
+		auto role = getAppRoleConnection();
 		getCmdId(
-			buildCmd(getDBConnection(),
+			buildCmd(role->ADOConnection(),
 				"INSERT INTO ActiveFAM (FAMSessionID) "
 				"	OUTPUT INSERTED.ID "
 				"	VALUES (@FAMSessionID)",
@@ -2543,7 +2540,8 @@ STDMETHODIMP CFileProcessingDB::CanSkipAuthenticationOnThisMachine(VARIANT_BOOL*
 		BEGIN_CONNECTION_RETRY();
 
 		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
+		auto role = getAppRoleConnection();
+		ipConnection = role->ADOConnection();
 
 		// Check whether the current machine is in the list of machines to skip user
 		// authentication when running as a service
@@ -2694,7 +2692,8 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSettings(IStrToStrMap* pSettings, long*
 		int nSize = ipPairs->Size();
 		vector<_CommandPtr> vecCommands;
 		vecCommands.reserve(nSize);
-		auto ipConnection = getDBConnection();
+		auto role = getAppRoleConnection();
+		auto ipConnection = role->ADOConnection();
 		int famUserID = getFAMUserID(ipConnection);
 		int machineID = getMachineID(ipConnection);
 
@@ -2773,7 +2772,8 @@ STDMETHODIMP CFileProcessingDB::RecalculateStatistics()
 		assertProcessingNotActiveForAnyAction(true);
 
 		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
+		auto role = getAppRoleConnection();
+		ipConnection = role->ADOConnection();
 		
 		// Create a pointer to a recordset
 		_RecordsetPtr ipActionSet(__uuidof(Recordset));
@@ -3045,7 +3045,8 @@ STDMETHODIMP CFileProcessingDB::DuplicateConnection(IFileProcessingDB *pConnecti
 		BEGIN_CONNECTION_RETRY();
 		
 		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
+		auto role = getAppRoleConnection();
+		ipConnection = role->ADOConnection();
 
 		END_CONNECTION_RETRY(ipConnection, "ELI36073");
 
@@ -3956,7 +3957,8 @@ STDMETHODIMP CFileProcessingDB::get_DatabaseID(BSTR* pbstrDatabaseID)
 		validateLicense();
 		ASSERT_ARGUMENT("ELI39078", pbstrDatabaseID != nullptr);
 
-		checkDatabaseIDValid(getDBConnection(), false);
+		auto role = getAppRoleConnection();
+		checkDatabaseIDValid(role->ADOConnection(), false);
 		string strDatabaseID = asString(m_DatabaseIDValues.m_GUID);
 		replaceVariable(strDatabaseID, "{", "");
 		replaceVariable(strDatabaseID, "}", "");
@@ -3977,7 +3979,8 @@ STDMETHODIMP CFileProcessingDB::get_ConnectedDatabaseServer(BSTR* pbstrDatabaseS
 		validateLicense();
 		ASSERT_ARGUMENT("ELI39080", pbstrDatabaseServer != nullptr);
 
-		checkDatabaseIDValid(getDBConnection(), false);
+		auto role = getAppRoleConnection();
+		checkDatabaseIDValid(role->ADOConnection(), false);
 		
 		*pbstrDatabaseServer = get_bstr_t(m_DatabaseIDValues.m_strServer.c_str()).Detach();
 
@@ -3995,7 +3998,8 @@ STDMETHODIMP CFileProcessingDB::get_ConnectedDatabaseName(BSTR* pbstrDatabaseNam
 		validateLicense();
 		ASSERT_ARGUMENT("ELI39082", pbstrDatabaseName != nullptr);
 
-		checkDatabaseIDValid(getDBConnection(), false);
+		auto role = getAppRoleConnection();
+		checkDatabaseIDValid(role->ADOConnection(), false);
 		
 		*pbstrDatabaseName = get_bstr_t(m_DatabaseIDValues.m_strName.c_str()).Detach();
 
@@ -5089,7 +5093,8 @@ STDMETHODIMP CFileProcessingDB::GetNumberSkippedForUser(BSTR bstrUserName, long 
 
 		replaceVariable(strQuery, "<UserName>", strUser);
 		long lNumberSkipped;
-		executeCmdQuery(getDBConnection(), strQuery, "NumberSkippedForUser", false, &lNumberSkipped);
+		auto role = getAppRoleConnection();
+		executeCmdQuery(role->ADOConnection(), strQuery, "NumberSkippedForUser", false, &lNumberSkipped);
 
 		*pnFilesSkipped = lNumberSkipped;
 
@@ -5166,7 +5171,8 @@ STDMETHODIMP CFileProcessingDB::GetCachedPageNumbers(long nFileTaskSessionID, EC
 		ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 		// Get the connection for the thread and save it locally.
-		ipConnection = getDBConnection();
+		auto role = getAppRoleConnection();
+		ipConnection = role->ADOConnection();
 
 		vector<string> vecFieldRestrictions;
 		if (eCacheDataType & ECacheDataType::kImage)
@@ -5342,7 +5348,8 @@ STDMETHODIMP CFileProcessingDB::GetOneTimePassword(BSTR* pVal)
 			getThisAsCOMPtr()->RecordFAMSessionStart(
 				gstrONE_TIME_ADMIN_USER.c_str(), "", VARIANT_FALSE, VARIANT_FALSE);
 
-			string strPassword = getOneTimePassword(getDBConnection());
+			auto role = getAppRoleConnection();
+			string strPassword = getOneTimePassword(role->ADOConnection());
 			
 			// Once the password is generated, the session ID in use for this instance should be reset.
 			m_nFAMSessionID = 0;
@@ -5357,32 +5364,6 @@ STDMETHODIMP CFileProcessingDB::GetOneTimePassword(BSTR* pVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI49832");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::get_UseApplicationRoles(VARIANT_BOOL* pbValue)
-{
-	try
-	{
-		*pbValue = asVariantBool(m_bUseApplicationRoles);
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI51780");
-}
-//-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::put_UseApplicationRoles(VARIANT_BOOL bValue)
-{
-	try
-	{
-		bool newValue = asCppBool(bValue);
-		if (newValue != m_bUseApplicationRoles)
-		{
-			m_bUseApplicationRoles = newValue;
-			getThisAsCOMPtr()->CloseAllDBConnections();
-		}
-
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI51781");
 }
 
 //-------------------------------------------------------------------------------------------------

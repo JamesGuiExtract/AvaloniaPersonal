@@ -37,7 +37,7 @@ namespace FAMUtils {
 			[Category("Automated")]
 			[Category("Cpp")]
 			[TestCase(0/*SqlApplicationRole.AppRoleAccess.NoAccess*/, "TestCppUseApplicationRoleTest_NoAccess", Description = "Sql Application role for no access")]
-			[TestCase(1/*SqlApplicationRole.AppRoleAccess.SelectAccess*/, "TestCppUseApplicationRoleTest_SelectAccess", Description = "Sql Application role for Select access")]
+			[TestCase(1/*SqlApplicationRole.AppRoleAccess.SelectExecuteAccess*/, "TestCppUseApplicationRoleTest_SelectExecuteAccess", Description = "Sql Application role for Select and Execute access")]
 			[TestCase(3/*SqlApplicationRole.AppRoleAccess.InsertAccess*/, "TestCppUseApplicationRoleTest_InsertAccess", Description = "Sql Application role for Insert access")]
 			[TestCase(5/*SqlApplicationRole.AppRoleAccess.UpdateAccess*/, "TestCppUseApplicationRoleTest_UpdateAccess", Description = "Sql Application role for Update access")]
 			[TestCase(9/*SqlApplicationRole.AppRoleAccess.DeleteAccess*/, "TestCppUseApplicationRoleTest_DeleteAccess", Description = "Sql Application role for Delete access")]

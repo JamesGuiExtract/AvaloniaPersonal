@@ -183,6 +183,7 @@ int UpdateToSchemaVersion6(_ConnectionPtr ipConnection, long* pnNumSteps,
 CIDShieldProductDBMgr::CIDShieldProductDBMgr()
 : m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
+, m_currentRole(CppBaseApplicationRoleConnection::kExtractRole)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -384,6 +385,8 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcess
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI18956", ipDB != __nullptr);
 
+		m_ipFAMDB = ipDB;
+
 		string strValue = asString(ipDB->GetDBInfoSetting(
 			gstrID_SHIELD_SCHEMA_VERSION_NAME.c_str(), VARIANT_FALSE));
 
@@ -397,22 +400,12 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_RemoveProductSpecificSchema(IFileProcess
 			*pbSchemaExists = VARIANT_TRUE;
 		}
 
-		// Create the connection object
-		ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI18957", ipDBConnection != __nullptr);
-		
-		string strDatabaseServer = asString(ipDB->DatabaseServer);
-		string strDatabaseName = asString(ipDB->DatabaseName);
-
-		// create the connection string
-		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-
-		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
+		auto role = getAppRoleConnection();
 
 		vector<string> vecTables;
 		getIDShieldTables(vecTables);
 
-		dropTablesInVector(ipDBConnection, vecTables);
+		dropTablesInVector(role->ADOConnection(), vecTables);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18687");
 
@@ -692,64 +685,71 @@ STDMETHODIMP CIDShieldProductDBMgr::Initialize(IFileProcessingDB* pFAMDB)
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-ADODB::_ConnectionPtr CIDShieldProductDBMgr::getDBConnection(bool bReset)
+unique_ptr<CppBaseApplicationRoleConnection> CIDShieldProductDBMgr::getAppRoleConnection(bool bReset)
 {
 	// If the FAMDB is not set throw an exception
 	if (m_ipFAMDB == __nullptr)
 	{
 		UCLIDException ue("ELI18935", "FAMDB pointer has not been initialized! Unable to open connection.");
 		throw ue;
-	}
-
-	// Check if the connection should be reset
-	if (bReset)
-	{
-		// if the database is not closed close it
-		if (m_ipDBConnection->State != adStateClosed)
-		{
-			// Do the close in a try catch so that if there is an exception it will be logged
-			try
-			{
-				m_ipDBConnection->Close();
-			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI40162");
-		}
-		// Create a new connection
-		m_ipDBConnection = __nullptr;
-	}
-
-	// Check if connection has been created
-	if (m_ipDBConnection == __nullptr)
-	{
-		m_ipDBConnection.CreateInstance(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI19795", m_ipDBConnection != __nullptr);
-	}
-
-	// if closed and Database server and database name are defined,  open the database connection
-	if ( m_ipDBConnection->State == adStateClosed)
-	{
-		// Get database server from FAMDB
-		string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
-
-		// Get DatabaseName from FAMDB
-		string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
-
-		// create the connection string
-		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-		if (!strDatabaseServer.empty() && !strDatabaseName.empty())
-		{
-			m_ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
-
-			// Get the command timeout from the FAMDB DBInfo table
-			string strValue = asString(
-				m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
-
-			// Set the command timeout
-			m_ipDBConnection->CommandTimeout = asLong(strValue);
-		}
-	}
+	} 
 	
-	return m_ipDBConnection;
+	bool connectionExists = m_ipDBConnection != __nullptr && m_ipDBConnection->State != adStateClosed;
+	if (connectionExists) return createAppRole(m_ipDBConnection);
+
+	m_ipDBConnection.CreateInstance(_uuidof(Connection));
+	ASSERT_RESOURCE_ALLOCATION("ELI51857", m_ipDBConnection != __nullptr);	
+
+	// Get database server from FAMDB
+	string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
+
+	// Get DatabaseName from FAMDB
+	string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
+
+	// create the connection string
+	string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
+	if (!strDatabaseServer.empty() && !strDatabaseName.empty())
+	{
+		m_ipDBConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
+
+		// Get the command timeout from the FAMDB DBInfo table
+		string strValue = asString(
+			m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
+
+		// Set the command timeout
+		m_ipDBConnection->CommandTimeout = asLong(strValue);
+	}
+
+	return createAppRole(m_ipDBConnection);
+}
+//-------------------------------------------------------------------------------------------------
+unique_ptr<CppBaseApplicationRoleConnection> CIDShieldProductDBMgr::createAppRole(_ConnectionPtr ipConnection)
+{
+	unique_ptr<CppBaseApplicationRoleConnection> role;
+	try
+	{
+		switch (m_currentRole)
+		{
+		case CppBaseApplicationRoleConnection::kNoRole:
+			role.reset(new NoRoleConnection(ipConnection));
+			break;
+		case CppBaseApplicationRoleConnection::kExtractRole:
+			role.reset(new ExtractRoleConnection(ipConnection));
+			break;
+		case CppBaseApplicationRoleConnection::kSecurityRole:
+			role.reset(new SecurityRoleConnection(ipConnection));
+			break;
+		default:
+			UCLIDException ue("ELI51837", "Unknown application role requested.");
+			ue.addDebugInfo("ApplicationRole", (int)m_currentRole);
+			throw ue;
+		}
+	}
+	catch (...)
+	{
+		role.reset(new NoRoleConnection(ipConnection));
+	}
+	return role;
 }
 //-------------------------------------------------------------------------------------------------
 void CIDShieldProductDBMgr::validateLicense()
@@ -803,7 +803,9 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long nFileT
 			BEGIN_ADO_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Create a pointer to a recordset
 			_RecordsetPtr ipSet( __uuidof( Recordset ));
@@ -830,7 +832,7 @@ bool CIDShieldProductDBMgr::AddIDShieldData_Internal(bool bDBLocked, long nFileT
 			tg.CommitTrans();
 
 			END_ADO_CONNECTION_RETRY(
-				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29858");
+				ipConnection, getAppRoleConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29858");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30710");
 	}
@@ -861,7 +863,8 @@ bool CIDShieldProductDBMgr::GetResultsForQuery_Internal(bool bDBLocked, BSTR bst
 			BEGIN_ADO_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Create a pointer to a recordset
 			_RecordsetPtr ipResultSet( __uuidof( Recordset ));
@@ -874,7 +877,7 @@ bool CIDShieldProductDBMgr::GetResultsForQuery_Internal(bool bDBLocked, BSTR bst
 			*ppVal = ipResultSet.Detach();
 
 			END_ADO_CONNECTION_RETRY(
-				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29859");
+				ipConnection, getAppRoleConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29859");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34112");
 	}
@@ -904,14 +907,15 @@ bool CIDShieldProductDBMgr::GetFileID_Internal(bool bDBLocked, BSTR bstrFileName
 			BEGIN_ADO_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// query the database for the file ID
 			*plFileID = getKeyID(ipConnection, "FAMFile", "FileName", asString(bstrFileName), 
 				false);
 
 			END_ADO_CONNECTION_RETRY(
-				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29860");
+				ipConnection, getAppRoleConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29860");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34113");
 	}

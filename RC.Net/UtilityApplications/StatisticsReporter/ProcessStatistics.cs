@@ -1,6 +1,7 @@
 ﻿using Extract;
 using Extract.AttributeFinder;
 using Extract.DataCaptureStats;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -357,9 +358,8 @@ namespace StatisticsReporter
         #region Fields
 
         /// <summary>
-        /// Connection to the database
+        /// Application Role to access the database
         /// </summary>
-        SqlConnection _Connection;
         volatile int _errorCount = 0;
 
         #endregion
@@ -629,10 +629,6 @@ namespace StatisticsReporter
             {
                 throw e.AsExtract("ELI41496");
             }
-            finally
-            {
-                _Connection.Close();
-            }
         }
 
 
@@ -711,22 +707,13 @@ namespace StatisticsReporter
 
             try
             {
-                // Build the connection string from the settings
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-                sqlConnectionBuild.DataSource = Settings.DatabaseServer;
-                sqlConnectionBuild.InitialCatalog = Settings.DatabaseName;
-                sqlConnectionBuild.IntegratedSecurity = true;
-                sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-
-                _Connection = new SqlConnection(sqlConnectionBuild.ConnectionString);
-
-                // Open the connection
-                _Connection.Open();
+                using var connection = new ExtractRoleConnection(Settings.DatabaseServer, Settings.DatabaseName);
+                connection.Open();
 
                 // Verify that the Found and expected attributes sets exist
-                ValidateSetNames(_Connection.CreateCommand());
+                ValidateSetNames(connection.CreateCommand());
 
-                SqlCommand cmd = _Connection.CreateCommand();
+                using SqlCommand cmd = connection.CreateCommand();
 
                 // Set the timeout so that it waits indefinitely
                 cmd.CommandTimeout = 0;
@@ -817,10 +804,6 @@ namespace StatisticsReporter
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
-                    if (_Connection != null)
-                    {
-                        _Connection.Dispose();
-                    }
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.

@@ -2,6 +2,7 @@
 using DatabaseMigrationWizard.Database.Output;
 using Extract.FileActionManager.Database.Test;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -489,11 +490,10 @@ namespace DatabaseMigrationWizard.Test
         {
             StringWriter stringWriter = new StringWriter(CultureInfo.InvariantCulture);
 
-            using(SqlConnection sqlConnection = new SqlConnection($@"Server=(local);Database={DatabaseName};Integrated Security=SSPI"))
-            {
-                sqlConnection.Open();
-                serialize.SerializeTable(sqlConnection, stringWriter);
-            }
+            using var connection = new ExtractRoleConnection($@"Server=(local);Database={DatabaseName};Integrated Security=SSPI;Pooling=false");
+            connection.Open();
+
+            serialize.SerializeTable(connection, stringWriter);
 
             return stringWriter;
         }

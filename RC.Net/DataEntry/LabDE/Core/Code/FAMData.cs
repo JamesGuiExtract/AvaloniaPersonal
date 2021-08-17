@@ -1,4 +1,5 @@
 ﻿using Extract.Database;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Data.OleDb;
+using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -22,10 +24,10 @@ namespace Extract.DataEntry.LabDE
         #region Fields
 
         /// <summary>
-        /// An <see cref="OleDbConnection"/> to use for querying against the specified
+        /// An <see cref="ExtractRoleConnection"/> for use when querying against the specified database
         /// <see cref="FileProcessingDB"/>.
         /// </summary>
-        OleDbConnection _oleDbConnection;
+        ExtractRoleConnection _extractRole;
 
         /// <summary>
         /// Maps each <see cref="DataEntryTableRow"/> in a LabDE table to an
@@ -190,7 +192,7 @@ namespace Extract.DataEntry.LabDE
                 var recordInfoQuery = DataConfiguration.GetRecordInfoQuery(recordIds, queryForRecordIds);
 
                 string lastRecordID = null;
-                using (DataTable results = DBMethods.ExecuteDBQuery(OleDbConnection, recordInfoQuery))
+                using (DataTable results = DBMethods.ExecuteDBQuery(SqlDbAppRoleConnection, recordInfoQuery))
                 {
                     // The results will contain both an extra column (FileID) not expected by the
                     // caller, as well as potentially multiple rows per record for records for which
@@ -538,7 +540,7 @@ namespace Extract.DataEntry.LabDE
                     "'" + orderNumber + "'", fileId, dateTime);
 
                 // The query has no results-- immediately dispose of the DataTable returned.
-                DBMethods.ExecuteDBQuery(OleDbConnection, query).Dispose();
+                DBMethods.ExecuteDBQuery(SqlDbAppRoleConnection, query).Dispose();
             }
             catch (Exception ex)
             {
@@ -581,7 +583,7 @@ namespace Extract.DataEntry.LabDE
                     "'" + encounterID + "'", fileId, dateTime);
 
                 // The query has no results-- immediately dispose of the DataTable returned.
-                DBMethods.ExecuteDBQuery(OleDbConnection, query).Dispose();
+                DBMethods.ExecuteDBQuery(SqlDbAppRoleConnection, query).Dispose();
             }
             catch (Exception ex)
             {
@@ -624,7 +626,7 @@ namespace Extract.DataEntry.LabDE
         /// <returns></returns>
         public DataTable ExecuteDBQuery(string query)
         {
-            return DBMethods.ExecuteDBQuery(OleDbConnection, query);
+            return DBMethods.ExecuteDBQuery(SqlDbAppRoleConnection, query);
         }
 
         #endregion Methods
@@ -657,11 +659,8 @@ namespace Extract.DataEntry.LabDE
                     _rowData = null;
                 }
 
-                if (_oleDbConnection != null)
-                {
-                    _oleDbConnection.Dispose();
-                    _oleDbConnection = null;
-                }
+                _extractRole?.Dispose();
+                _extractRole = null;
             }
 
             // Dispose of unmanaged resources
@@ -719,29 +718,33 @@ namespace Extract.DataEntry.LabDE
         #region Private Members
 
         /// <summary>
-        /// Gets a lazily instantiated <see cref="OleDbConnection"/> instance against the currently
+        /// Gets a lazily instantiated <see cref="SqlConnection"/> instance against the currently
         /// specified <see cref="FileProcessingDB"/>.
         /// </summary>
         /// <value>
-        /// A <see cref="OleDbConnection"/> against the currently specified
+        /// A <see cref="SqlConnection"/> against the currently specified
         /// <see cref="FileProcessingDB"/>.
         /// </value>
         /// Using the same casing as MS's own type name for crissakes
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Db")]
-        protected OleDbConnection OleDbConnection
+        protected SqlAppRoleConnection SqlDbAppRoleConnection
         {
             get
             {
-                if (_oleDbConnection == null)
+                if (_extractRole == null)
                 {
                     ExtractException.Assert("ELI38156", "Missing database connection.",
                         FileProcessingDB != null);
+                    OleDbConnectionStringBuilder oleDbConnectionStringBuilder
+                            = new OleDbConnectionStringBuilder(FileProcessingDB.ConnectionString);
 
-                    _oleDbConnection = new OleDbConnection(FileProcessingDB.ConnectionString);
-                    _oleDbConnection.Open();
+                    string server = oleDbConnectionStringBuilder.DataSource;
+                    string database = (string)oleDbConnectionStringBuilder["Database"];
+
+                    _extractRole = new ExtractRoleConnection(SqlUtil.CreateConnectionString(server, database));
                 }
 
-                return _oleDbConnection;
+                return _extractRole;
             }
         }
 

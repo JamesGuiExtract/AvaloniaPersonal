@@ -252,8 +252,8 @@ namespace Extract.ETL
         {
             var queriesToRunInBatch = new ConcurrentQueue<string>();
 
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
             using SqlCommand cmd = connection.CreateCommand();
 
             // Set the timeout so that it waits indefinitely
@@ -336,6 +336,9 @@ namespace Extract.ETL
         void AddTheDataToTheDatabase(ConcurrentQueue<string> queriesToRunInBatch, int endFileTaskSessionID,
             CancellationToken cancelToken)
         {
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
+
             using TransactionScope scope = new TransactionScope(
                TransactionScopeOption.Required,
                new TransactionOptions()
@@ -344,10 +347,6 @@ namespace Extract.ETL
                    Timeout = TransactionManager.MaximumTimeout,
                },
                TransactionScopeAsyncFlowOption.Enabled);
-
-
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
 
             // delete the old records
             using var deleteCmd = connection.CreateCommand();

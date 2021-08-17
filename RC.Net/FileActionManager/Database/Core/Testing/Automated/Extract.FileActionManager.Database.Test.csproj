@@ -33,6 +33,7 @@
     <ProjectReference Include="..\..\..\..\Forms\Core\Code\Extract.FileActionManager.Forms.csproj" />
     <ProjectReference Include="..\..\..\..\Utilities\FAMServiceManager\FAMServiceManager\Extract.FileActionManager.Utilities.FAMServiceManager.fsproj" />
     <ProjectReference Include="..\..\Code\Extract.FileActionManager.Database.csproj" />
+	<ProjectReference Include="..\..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">

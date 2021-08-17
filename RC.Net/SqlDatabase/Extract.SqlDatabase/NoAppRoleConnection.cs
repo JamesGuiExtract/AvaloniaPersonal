@@ -7,23 +7,16 @@ using System.Threading.Tasks;
 
 namespace Extract.SqlDatabase
 {
-    public sealed class NoAppRoleConnection : ApplicationRoleConnection
+    public sealed class NoAppRoleConnection : SqlAppRoleConnection
     {
-        public NoAppRoleConnection(SqlConnection sqlConnection)
-            : base(sqlConnection)
-        {
-            AssignRole();
-        }
         public NoAppRoleConnection(string server, string database, bool enlist = true)
-            : base(server, database ,enlist)
+            : base(SqlUtil.NewSqlDBConnection(server, database, enlist))
         {
-            AssignRole();
         }
 
         public NoAppRoleConnection(string connectionString)
-            : base(connectionString)
+            : base(SqlUtil.NewSqlDBConnection(connectionString))
         {
-            AssignRole();
         }
 
         protected override void AssignRole()

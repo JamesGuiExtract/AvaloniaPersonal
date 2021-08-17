@@ -75,8 +75,8 @@ namespace Extract.Dashboard.Forms
             {
                 var DashboardNames = new Collection<SourceLink>();
 
-                using var applicationRoleConnection = new ExtractRoleConnection(server, database);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var connection = new ExtractRoleConnection(server, database);
+                connection.Open();
                 using var command = connection.CreateCommand();
 
                 command.CommandText = withDocumentParameter ? GetDashboardsWithDocumentOrFileNameQuery() : DashboardsQuery;

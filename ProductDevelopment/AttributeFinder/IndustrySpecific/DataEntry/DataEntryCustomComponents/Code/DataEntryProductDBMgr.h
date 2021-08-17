@@ -6,6 +6,7 @@
 
 #include <FPCategories.h>
 #include <ADOUtils.h>
+#include <CppApplicationRoleConnection.h>
 
 #include <string>
 #include <vector>
@@ -84,7 +85,8 @@ private:
 	// Pointer for the main FAMDB
 	IFileProcessingDBPtr m_ipFAMDB;
 
-	// This it the pointer to the database connection
+	CppBaseApplicationRoleConnection::AppRoles m_currentRole;
+
 	ADODB::_ConnectionPtr m_ipDBConnection; 
 
 	// An IAFUtility instance to be used to execute attribute queries.
@@ -101,11 +103,11 @@ private:
 	// Methods
 	//////////////
 
-	// Returns the m_ipDBConnection value, if it is NULL it is created using the 
-	// DatabaseServer and DatabaseName from the m_ipFAMDB
+	// Returns a CppBaseApplicationRoleConnection object with the connection
+    // if it is NULL it is created using the DatabaseServer and DatabaseName from the m_ipFAMDB
 	// if bReset is true the current connection in m_ipDBConnection is set to NULL and recreated
 	// and make the default false
-	ADODB::_ConnectionPtr getDBConnection(bool bReset = false);
+	unique_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection(bool bReset = false);
 
 	// Puts all of the tables managed in the rvecTables vector
 	void getDataEntryTables(std::vector<std::string>& rvecTables);
@@ -133,6 +135,10 @@ private:
 	// Retrieves a map of each DBInfo value the DataEntry specific DB component uses and its default
 	// value.
 	map<string, string> getDBInfoDefaultValues();
+	
+	// Returns a CppBaseApplicationRoleConnection object based on the m_currentRole with the
+    // given connection
+	unique_ptr<CppBaseApplicationRoleConnection> createAppRole(_ConnectionPtr ipConnection);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(DataEntryProductDBMgr), CDataEntryProductDBMgr)

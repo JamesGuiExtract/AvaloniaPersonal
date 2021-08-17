@@ -1,5 +1,6 @@
 ﻿using DatabaseMigrationWizard.Database;
 using Extract;
+using Extract.SqlDatabase;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
@@ -63,16 +64,13 @@ namespace DatabaseMigrationWizard.Pages.Utility
         {
             try
             {
-                if(string.IsNullOrEmpty(connectionInformation.DatabaseServer))
+                if (string.IsNullOrEmpty(connectionInformation.DatabaseServer))
                 {
                     return false;
                 }
-                using (var sqlConnection = new SqlConnection($@"Server={connectionInformation.DatabaseServer};Integrated Security=SSPI; Connection Timeout=5"))
-                {
-                    sqlConnection.Open();
+                using var sqlConnection = new SqlConnection($@"Server={connectionInformation.DatabaseServer};Integrated Security=SSPI; Connection Timeout=5");
 
-                    return true;
-                }
+                return true;
             }
             catch (Exception)
             {
@@ -91,19 +89,16 @@ namespace DatabaseMigrationWizard.Pages.Utility
             Collection<string> databaseNames = new Collection<string>();
             try
             {
-                using (var sqlConnection = new SqlConnection($@"Server={connectionInformation.DatabaseServer};Integrated Security=SSPI; Connection Timeout=5"))
+                using var sqlConnection = new SqlConnection($@"Server={connectionInformation.DatabaseServer};Integrated Security=SSPI; Connection Timeout=5");
+
+                using var command = sqlConnection.CreateCommand();
+                command.CommandText = "SELECT name FROM master.sys.databases";
+                using SqlDataReader rdr = command.ExecuteReader();
+
+                while (rdr.Read())
                 {
-                    sqlConnection.Open();
-                    var command = sqlConnection.CreateCommand();
-                    command.CommandText = "SELECT name FROM master.sys.databases";
-                    using (SqlDataReader rdr = command.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            var myString = rdr.GetString(0);
-                            databaseNames.Add(myString);
-                        }
-                    }
+                    var myString = rdr.GetString(0);
+                    databaseNames.Add(myString);
                 }
             }
             catch (Exception) { }

@@ -1,4 +1,5 @@
 ﻿using Extract.FileActionManager.Database.Test;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
@@ -1577,21 +1578,15 @@ namespace Extract.Web.WebAPI.Test
 
         public static void ModifyTable(string dbName, string command)
         {
-            using (var cmd = new SqlCommand())
+            // NOTE: "Pooling=false;" keeps the connection from being pooled, and 
+            // allows the connection to REALLY close, so the DB can be removed later.
+            string connectionString = $"Server=(local);Database={dbName};Trusted_Connection=True;Pooling=false;";
+            using (var connection = new ExtractRoleConnection(connectionString))
             {
-                // NOTE: "Pooling=false;" keeps the connection from being pooled, and 
-                // allows the conneciton to REALLY close, so the DB can be removed later.
-                string connectionString = "Server=(local);Database=" + dbName + ";Trusted_Connection=True;Pooling=false;";
-                using (var conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    cmd.Connection = conn;
-                    cmd.CommandText = command;
-                    cmd.ExecuteNonQuery();
-
-                    conn.Close();
-                }
+                connection.Open();
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = command;
+                cmd.ExecuteNonQuery();
             }
         }
 

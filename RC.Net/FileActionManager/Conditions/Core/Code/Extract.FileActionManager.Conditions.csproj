@@ -186,6 +186,10 @@
       <Project>{44B108A6-5A58-4F2C-8126-BAF763A304BF}</Project>
       <Name>Extract.Redaction</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
+      <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
+      <Name>Extract.SqlDatabase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>

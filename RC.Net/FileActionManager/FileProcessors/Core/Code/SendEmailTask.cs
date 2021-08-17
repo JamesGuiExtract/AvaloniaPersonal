@@ -5,6 +5,7 @@ using Extract.FileActionManager.Forms;
 using Extract.Interfaces;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Extract.Utilities.Email;
 using System;
@@ -781,11 +782,8 @@ namespace Extract.FileActionManager.FileProcessors
             }
             finally
             {
-                if (_dbConnection != null)
-                {
-                    _dbConnection.Dispose();
-                    _dbConnection = null;
-                }
+                _dbConnection?.Dispose();
+                _dbConnection = null;
 
                 if (tempExceptionFile != null)
                 {
@@ -967,11 +965,8 @@ namespace Extract.FileActionManager.FileProcessors
             if (disposing)
             {
                 // Dispose of managed resources
-                if (_dbConnection != null)
-                {
-                    _dbConnection.Dispose();
-                    _dbConnection = null;
-                }
+                _dbConnection?.Dispose();
+                _dbConnection = null;
             }
 
             // Dispose of unmanaged resources
@@ -1106,7 +1101,8 @@ namespace Extract.FileActionManager.FileProcessors
                         {
                             if (fileProcessingDB != null)
                             {
-                                _dbConnection = new OleDbConnection(fileProcessingDB.ConnectionString);
+                                var connectionString = SqlUtil.CreateConnectionString(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+                                _dbConnection = new ExtractRoleConnection(connectionString);
                                 _dbConnection.Open();
                             }
 

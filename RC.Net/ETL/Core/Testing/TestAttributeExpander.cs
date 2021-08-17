@@ -1,17 +1,16 @@
-﻿using Extract.AttributeFinder;
-using Extract.Database;
+﻿using Extract.Database;
 using Extract.FileActionManager.Database.Test;
+using Extract.FileActionManager.FileProcessors;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Threading;
-using UCLID_COMUTILSLib;
 
 namespace Extract.ETL.Test
 {
@@ -260,9 +259,15 @@ namespace Extract.ETL.Test
                 expandAttributes.UpdateDatabaseServiceSettings();
 
                 expandAttributes.RefreshStatus();
-                expandAttributes.SaveStatus(expandAttributes.Status);
 
-                status = expandAttributes.Status as ExpandAttributes.ExpandAttributesStatus;
+                {
+                    using var saveConnection = new ExtractRoleConnection("(local)", testDBName);
+                    saveConnection.Open();
+
+                    expandAttributes.SaveStatus(saveConnection, expandAttributes.Status);
+
+                    status = expandAttributes.Status as ExpandAttributes.ExpandAttributesStatus;
+                }
 
                 Assert.AreEqual(-1, status.LastIDProcessedForDashboardAttribute[testValue.ToString()], "Status for new attribute should be -1");
 
@@ -285,19 +290,16 @@ namespace Extract.ETL.Test
                 // Test that the status is cleared for the database service is the database is cleared with retain settings
                 fileProcessingDb.Clear(true);
 
-                using (var connection = NewSqlConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName))
-                {
-                    connection.Open();
-                    using (var statusCmd = connection.CreateCommand())
-                    {
-                        statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
-                        statusCmd.Parameters.AddWithValue("@DatabaseServiceID", expandAttributes.DatabaseServiceID);
-                        var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
-                        Assert.AreNotEqual(null, result, "A single record should be returned");
-                        Assert.AreEqual(DBNull.Value, result["Status"], "Status should be null");
-                        Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should be null");
-                    }
-                }
+                using var connection = new ExtractRoleConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName);
+                connection.Open();
+                using var statusCmd = connection.CreateCommand();
+
+                statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
+                statusCmd.Parameters.AddWithValue("@DatabaseServiceID", expandAttributes.DatabaseServiceID);
+                var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                Assert.AreNotEqual(null, result, "A single record should be returned");
+                Assert.AreEqual(DBNull.Value, result["Status"], "Status should be null");
+                Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should be null");
 
                 expandAttributes.RefreshStatus();
 
@@ -335,17 +337,13 @@ namespace Extract.ETL.Test
 
                 Assert.DoesNotThrow(() => expandAttributes.Process(_noCancel), "Test that 1000 raster zone spatialString expands");
 
-                // There should 1320 RasterZones added
-                using (var connection = NewSqlConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName))
-                {
-                    connection.Open();
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "SELECT COUNT(ID) NumberOfRasterZones FROM RasterZone";
-                        var result = cmd.ExecuteScalar();
-                        Assert.AreEqual(1320, (int)result, "There should be 1320 raster zones added");
-                    }
-                }
+                using var connection = new ExtractRoleConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName);
+                connection.Open();
+                using var cmd = connection.CreateCommand();
+
+                cmd.CommandText = "SELECT COUNT(ID) NumberOfRasterZones FROM RasterZone";
+                var result = cmd.ExecuteScalar();
+                Assert.AreEqual(1320, (int)result, "There should be 1320 raster zones added");
             }
             finally
             {
@@ -366,34 +364,32 @@ namespace Extract.ETL.Test
 
                 ExpandAttributes expandAttributes;
 
-                using (var connection = NewSqlConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName))
+                using var connection = new ExtractRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
+                connection.Open();
+
+                using (var cmd = connection.CreateCommand())
                 {
-                    connection.Open();
+                    cmd.CommandText = "SELECT Settings FROM DatabaseService";
+                    var databaseServiceSettings = cmd.ExecuteScalar() as string;
+                    expandAttributes = ExpandAttributes.FromJson(databaseServiceSettings) as ExpandAttributes;
+                    expandAttributes.DatabaseServiceID = 1;
+                    expandAttributes.DatabaseServer = fileProcessingDb.DatabaseServer;
+                    expandAttributes.DatabaseName = fileProcessingDb.DatabaseName;
+                }
 
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "SELECT Settings FROM DatabaseService";
-                        var databaseServiceSettings = cmd.ExecuteScalar() as string;
-                        expandAttributes = ExpandAttributes.FromJson(databaseServiceSettings) as ExpandAttributes;
-                        expandAttributes.DatabaseServiceID = 1;
-                        expandAttributes.DatabaseServer = fileProcessingDb.DatabaseServer;
-                        expandAttributes.DatabaseName = fileProcessingDb.DatabaseName;
-                    }
+                expandAttributes.RefreshStatus();
 
-                    expandAttributes.RefreshStatus();
+                // Process
+                expandAttributes.Process(CancellationToken.None);
 
-                    // Process
-                    expandAttributes.Process(CancellationToken.None);
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT AttributeSetForFileID FROM DashboardAttributeFields";
+                    var IDs = cmd.ExecuteReader().Cast<IDataRecord>().Select(r => r.GetInt64(0)).ToList();
 
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "SELECT AttributeSetForFileID FROM DashboardAttributeFields";
-                        var IDs = cmd.ExecuteReader().Cast<IDataRecord>().Select(r => r.GetInt64(0)).ToList();
+                    Assert.AreEqual(2, IDs.Count(), "DashboardAttributeFields table should contain 2 records.");
 
-                        Assert.AreEqual(2, IDs.Count(), "DashboardAttributeFields table should contain 2 records.");
-
-                        Assert.That(IDs.Contains(2), "The AttributeSetForFileID of 2 should be in the DashboardAttributeFields table.");
-                    }
+                    Assert.That(IDs.Contains(2), "The AttributeSetForFileID of 2 should be in the DashboardAttributeFields table.");
                 }
             }
             finally
@@ -403,144 +399,48 @@ namespace Extract.ETL.Test
 
         }
 
-        /// Confirm that relative and absolute paths to attributes and scalar functions
-        /// all work to get values for dashboard fields
-        [Test, Category("Automated"), Category("ETL")]
-        public static void GetValueForDashboardAttributeField()
-        {
-            var attributeCreator = new AttributeCreator("placeholder");
-            var attributes = new IUnknownVectorClass();
-            var test = attributeCreator.Create("Test", "N/A");
-            test.SubAttributes.PushBack(attributeCreator.Create("Name", "CBC"));
-            test.SubAttributes.PushBack(attributeCreator.Create("Component", "RBC"));
-            test.SubAttributes.PushBack(attributeCreator.Create("Component", "WBC"));
-            attributes.PushBack(test);
-
-            test = attributeCreator.Create("Test", "N/A");
-            test.SubAttributes.PushBack(attributeCreator.Create("Name", "TSH"));
-            test.SubAttributes.PushBack(attributeCreator.Create("Component", "TSH"));
-            attributes.PushBack(test);
-            attributes.PushBack(attributeCreator.Create("Path", @"C:\Temp"));
-            attributes.ReportMemoryUsage();
-
-            XPathContext pathContext = new(attributes);
-
-            List<ExpandAttributes.DashboardAttributeField> fields = new()
-            {
-                new ExpandAttributes.DashboardAttributeField
-                {
-                    DashboardAttributeName = "MissingAttribute",
-                    AttributeSetNameID = 1,
-                    PathForAttributeInAttributeSet = "Not/There"
-                },
-                new ExpandAttributes.DashboardAttributeField
-                {
-                    DashboardAttributeName = "Test",
-                    AttributeSetNameID = 1,
-                    PathForAttributeInAttributeSet = "Test/Name"
-                },
-                new ExpandAttributes.DashboardAttributeField
-                {
-                    DashboardAttributeName = "AbsoluteTest",
-                    AttributeSetNameID = 1,
-                    PathForAttributeInAttributeSet = "/*/Test/Name"
-                },
-                new ExpandAttributes.DashboardAttributeField
-                {
-                    DashboardAttributeName = "Test/Component",
-                    AttributeSetNameID = 1,
-                    PathForAttributeInAttributeSet = "Test/Component"
-                },
-                new ExpandAttributes.DashboardAttributeField
-                {
-                    DashboardAttributeName = "NumTests",
-                    AttributeSetNameID = 1,
-                    PathForAttributeInAttributeSet = "count(Test)"
-                },
-                new ExpandAttributes.DashboardAttributeField
-                {
-                    DashboardAttributeName = "NumTestsAbsolute",
-                    AttributeSetNameID = 1,
-                    PathForAttributeInAttributeSet = "count(/*/Test)"
-                },
-                new ExpandAttributes.DashboardAttributeField
-                {
-                    DashboardAttributeName = "NumComponents",
-                    AttributeSetNameID = 1,
-                    PathForAttributeInAttributeSet = "count(Test/Component)"
-                },
-                new ExpandAttributes.DashboardAttributeField
-                {
-                    DashboardAttributeName = "BackslashesInPath",
-                    AttributeSetNameID = 1,
-                    PathForAttributeInAttributeSet = @"concat(Path/text(), '\Subfolder')"
-                }
-            };
-
-            List<string> expectedResults = new()
-            {
-                "UNKNOWN",
-                "CBC",
-                "CBC",
-                "RBC",
-                "2",
-                "2",
-                "3",
-                @"C:\Temp\Subfolder",
-            };
-
-            List<string> results = fields
-                .Select(field => ExpandAttributes.GetValueForDashboardAttributeField(field, pathContext))
-                .ToList();
-
-            CollectionAssert.AreEqual(expectedResults, results);
-        }
-
         #endregion
 
         #region Helper methods
 
         static void processTest(string resultsDbName, ExpandAttributes expandAttributes, string expectedResultsSQL)
         {
-            using (var connection = NewSqlConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName))
+
+            using var connection = new ExtractRoleConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName);
+            connection.Open();
+            using SqlCommand cmd = connection.CreateCommand();
+
+            // Database should have one record in the DatabaseService table - not using the settings in the table
+            cmd.CommandText = @"SELECT TOP (1) [ID] FROM [dbo].[DatabaseService]";
+
+            expandAttributes.DatabaseServiceID = (int)cmd.ExecuteScalar();
+            expandAttributes.UpdateDatabaseServiceSettings();
+
+            Assert.Throws<ExtractException>(() => expandAttributes.Process(_cancel));
+            cmd.CommandText = "SELECT COUNT(ID) FROM Attribute ";
+            Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
+
+            // Process using the settings
+            expandAttributes.Process(_noCancel);
+
+            // Get the results
+            cmd.CommandText = _QUERY_ATTRIBUTE_RESULTS;
+            var results = cmd.ExecuteReader().Cast<IDataRecord>().ToList();
+            
+            // Expected results is NOT a FileProcessing DB and should be opened as a normal connection
+            using var expectedResultsConnection = SqlUtil.NewSqlDBConnection(expandAttributes.DatabaseServer, resultsDbName);
+            expectedResultsConnection.Open();
+            using SqlCommand expectedCmd = expectedResultsConnection.CreateCommand();
+            expectedCmd.CommandText = expectedResultsSQL;
+            var expected = expectedCmd.ExecuteReader().Cast<IDataRecord>().ToList();
+
+            bool matches = results.Count == expected.Count;
+            for (int i = 0; matches && i < results.Count && i < expected.Count; i++)
             {
-                connection.Open();
-                SqlCommand cmd = connection.CreateCommand();
-
-                // Database should have one record in the DatabaseService table - not using the settings in the table
-                cmd.CommandText = @"SELECT TOP (1) [ID] FROM [dbo].[DatabaseService]";
-
-                expandAttributes.DatabaseServiceID = (int)cmd.ExecuteScalar();
-                expandAttributes.UpdateDatabaseServiceSettings();
-
-                Assert.Throws<ExtractException>(() => expandAttributes.Process(_cancel));
-                cmd.CommandText = "SELECT COUNT(ID) FROM Attribute ";
-                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
-
-                // Process using the settings
-                expandAttributes.Process(_noCancel);
-
-                // Get the results
-                cmd.CommandText = _QUERY_ATTRIBUTE_RESULTS;
-                var results = cmd.ExecuteReader().Cast<IDataRecord>().ToList();
-
-                using (var expectedResultsConnection = NewSqlConnection(expandAttributes.DatabaseServer, resultsDbName))
-                {
-                    expectedResultsConnection.Open();
-                    var expectedCmd = expectedResultsConnection.CreateCommand();
-                    expectedCmd.CommandText = expectedResultsSQL;
-
-                    var expected = expectedCmd.ExecuteReader().Cast<IDataRecord>().ToList();
-
-                    bool matches = results.Count == expected.Count;
-                    for (int i = 0; matches && i < results.Count && i < expected.Count; i++)
-                    {
-                        matches = matches && isEqual(results[i], expected[i]);
-                    }
-
-                    Assert.That(matches, "Verify that the results match expected");
-                }
+                matches = matches && isEqual(results[i], expected[i]);
             }
+
+            Assert.That(matches, "Verify that the results match expected");
         }
 
         static bool isEqual(IDataRecord a, IDataRecord b)
@@ -599,20 +499,6 @@ namespace Extract.ETL.Test
             }
         }
 
-        static SqlConnection NewSqlConnection(string databaseServer, string databaseName)
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = databaseServer;
-            sqlConnectionBuild.InitialCatalog = databaseName;
-
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
-        }
-
         #endregion
-
     }
 }

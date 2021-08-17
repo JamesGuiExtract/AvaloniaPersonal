@@ -180,6 +180,7 @@ namespace Extract.FileActionManager.Database.Test
                     ex.ExtractLog("ELI41912");
                 }
             }
+            fileProcessingDb = null;
         }
 
         #endregion Methods

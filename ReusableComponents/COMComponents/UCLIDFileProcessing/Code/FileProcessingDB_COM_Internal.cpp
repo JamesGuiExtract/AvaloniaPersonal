@@ -3245,7 +3245,8 @@ bool CFileProcessingDB::DefineNewAction_Internal(bool bDBLocked, BSTR strAction,
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -3291,7 +3292,8 @@ bool CFileProcessingDB::DeleteAction_Internal(bool bDBLocked, BSTR strAction)
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				string strActionName = asString(strAction);
 
@@ -3341,7 +3343,8 @@ bool CFileProcessingDB::GetActions_Internal(bool bDBLocked, IStrToStrMap * * pma
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -3381,7 +3384,8 @@ bool CFileProcessingDB::GetAllActions_Internal(bool bDBLocked, IStrToStrMap** pm
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
@@ -3431,10 +3435,12 @@ bool CFileProcessingDB::AddFile_Internal(bool bDBLocked, BSTR strFile,  BSTR str
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 			
-			BEGIN_CONNECTION_RETRY();
+			BEGIN_CONNECTION_RETRY()
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -3769,10 +3775,11 @@ bool CFileProcessingDB::RemoveFile_Internal(bool bDBLocked, BSTR strFile, BSTR s
 			// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
-			BEGIN_CONNECTION_RETRY();
+			BEGIN_CONNECTION_RETRY()
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -3894,7 +3901,8 @@ bool CFileProcessingDB::NotifyFileProcessed_Internal(bool bDBLocked, long nFileI
 				BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Ensure file gets added to current workflow if it is missing (setFileActionState)
 				nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
@@ -3943,7 +3951,8 @@ bool CFileProcessingDB::NotifyFileFailed_Internal(bool bDBLocked, long nFileID, 
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Ensure file gets added to current workflow if it is missing (setFileActionState)
 				nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
@@ -3993,7 +4002,8 @@ bool CFileProcessingDB::SetFileStatusToPending_Internal(bool bDBLocked, long nFi
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 				
 				// Ensure file gets added to current workflow if it is missing (setFileActionState)
 				long nWorkflowID = getActiveWorkflowID(ipConnection);
@@ -4038,7 +4048,8 @@ bool CFileProcessingDB::SetFileStatusToUnattempted_Internal(bool bDBLocked, long
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();;
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();;
 
 				// Begin a transaction
 				TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -4078,7 +4089,8 @@ bool CFileProcessingDB::SetFileStatusToSkipped_Internal(bool bDBLocked, long nFi
 			BEGIN_CONNECTION_RETRY();
 		
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Ensure file gets added to current workflow if it is missing (setFileActionState)
 			long nWorkflowID = getActiveWorkflowID(ipConnection);
@@ -4120,7 +4132,8 @@ bool CFileProcessingDB::GetFileStatus_Internal(bool bDBLocked, long nFileID,  BS
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -4203,7 +4216,8 @@ bool CFileProcessingDB::SetStatusForAllFiles_Internal(bool bDBLocked, BSTR strAc
 				CSingleLock lock(&m_criticalSection, TRUE);
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -4271,7 +4285,8 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Ensure file gets added to current workflow if it is missing (setFileActionState)
 			nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
@@ -4320,7 +4335,8 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
@@ -4382,7 +4398,8 @@ bool CFileProcessingDB::GetFileToProcess_Internal(bool bDBLocked, long nFileID, 
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
@@ -4475,7 +4492,8 @@ bool CFileProcessingDB::RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BS
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();		
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();		
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -4568,7 +4586,8 @@ bool CFileProcessingDB::GetStatsAllWorkflows_Internal(bool bDBLocked, BSTR bstrA
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
@@ -4645,7 +4664,8 @@ bool CFileProcessingDB::GetStats_Internal(bool bDBLocked, long nActionID,
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -4704,7 +4724,8 @@ bool CFileProcessingDB::CopyActionStatusFromAction_Internal(bool bDBLocked, long
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -4750,7 +4771,8 @@ bool CFileProcessingDB::RenameAction_Internal(bool bDBLocked, BSTR bstrOldAction
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -4847,7 +4869,8 @@ bool CFileProcessingDB::ExportFileList_Internal(bool bDBLocked, BSTR strQuery, B
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -4930,7 +4953,8 @@ bool CFileProcessingDB::GetActionID_Internal(bool bDBLocked, BSTR bstrActionName
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 
 				// Get the action ID
@@ -4968,7 +4992,8 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				_CommandPtr queryCmd = buildCmd(ipConnection, gstrDBINFO_SETTING_QUERY,
 					{ {gstrSETTING_NAME, bstrSettingName} });
@@ -5041,7 +5066,8 @@ bool CFileProcessingDB::GetDBInfoSetting_Internal(bool bDBLocked, const string& 
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -5079,7 +5105,8 @@ bool CFileProcessingDB::GetResultsForQuery_Internal(bool bDBLocked, BSTR bstrQue
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Create a pointer to a recordset
 				_RecordsetPtr ipResultSet(__uuidof(Recordset));
@@ -5123,7 +5150,8 @@ bool CFileProcessingDB::GetFileID_Internal(bool bDBLocked, BSTR bstrFileName, lo
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Get the file ID
 				*pnFileID = getFileID(ipConnection, asString(bstrFileName));
@@ -5157,7 +5185,8 @@ bool CFileProcessingDB::GetActionName_Internal(bool bDBLocked, long nActionID, B
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Get the action name from the database
 				string strActionName = getActionName(ipConnection, nActionID);
@@ -5192,8 +5221,10 @@ bool CFileProcessingDB::NotifyFileSkipped_Internal(bool bDBLocked, long nFileID,
 			ADODB::_ConnectionPtr ipConnection = __nullptr;
 
 			BEGIN_CONNECTION_RETRY();
+				
+				auto role = getAppRoleConnection();
 
-				ipConnection = getDBConnection();
+				ipConnection = role->ADOConnection();
 
 				// Ensure file gets added to current workflow if it is missing (setFileActionState)
 				nWorkflowID = nWorkflowID == -1 ? getActiveWorkflowID(ipConnection) : nWorkflowID;
@@ -5245,7 +5276,8 @@ bool CFileProcessingDB::SetFileActionComment_Internal(bool bDBLocked, long nFile
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -5341,7 +5373,8 @@ bool CFileProcessingDB::GetFileActionComment_Internal(bool bDBLocked, long nFile
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -5391,7 +5424,8 @@ bool CFileProcessingDB::ClearFileActionComment_Internal(bool bDBLocked, long nFi
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -5445,7 +5479,8 @@ bool CFileProcessingDB::ModifyActionStatusForSelection_Internal(bool bDBLocked,
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 				
 				validateDBSchemaVersion();
 
@@ -5588,7 +5623,8 @@ bool CFileProcessingDB::GetTags_Internal(bool bDBLocked, IStrToStrMap **ppTags)
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -5654,7 +5690,8 @@ bool CFileProcessingDB::GetTagNames_Internal(bool bDBLocked, IVariantVector **pp
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -5713,7 +5750,8 @@ bool CFileProcessingDB::HasTags_Internal(bool bDBLocked, VARIANT_BOOL* pvbVal)
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -5764,7 +5802,8 @@ bool CFileProcessingDB::TagFile_Internal(bool bDBLocked, long nFileID, BSTR bstr
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -5835,7 +5874,8 @@ bool CFileProcessingDB::UntagFile_Internal(bool bDBLocked, long nFileID, BSTR bs
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -5924,7 +5964,8 @@ bool CFileProcessingDB::ToggleTagOnFile_Internal(bool bDBLocked, long nFileID, B
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -5992,7 +6033,8 @@ bool CFileProcessingDB::AddTag_Internal(bool bDBLocked, const string& strTagName
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -6075,7 +6117,8 @@ bool CFileProcessingDB::DeleteTag_Internal(bool bDBLocked, BSTR bstrTagName)
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -6151,7 +6194,8 @@ bool CFileProcessingDB::ModifyTag_Internal(bool bDBLocked, BSTR bstrOldTagName, 
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -6290,7 +6334,8 @@ bool CFileProcessingDB::GetFilesWithTags_Internal(bool bDBLocked, IVariantVector
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -6357,7 +6402,8 @@ bool CFileProcessingDB::GetTagsOnFile_Internal(bool bDBLocked, long nFileID, IVa
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -6416,7 +6462,8 @@ bool CFileProcessingDB::ExecuteCommandQuery_Internal(bool bDBLocked, BSTR bstrQu
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
@@ -6473,7 +6520,8 @@ ExecuteCommandReturnLongLongResult_Internal( bool bDBLocked,
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, nullptr);
@@ -6536,15 +6584,17 @@ bool CFileProcessingDB::UnregisterActiveFAM_Internal(bool bDBLocked)
 			
 			// set FAMRegistered flag to false since thread has exited
 			m_bFAMRegistered = false;
-
+			
+			auto role = getAppRoleConnection();
+			
 			// Set the transaction guard
-			TransactionGuard tg(getDBConnection(), adXactRepeatableRead, &m_criticalSection);
+			TransactionGuard tg(role->ADOConnection(), adXactRepeatableRead, &m_criticalSection);
 
 			// Make sure there are no linked records in the LockedFile table 
 			// and if there are records reset their status to StatusBeforeLock if their current
 			// state for the action is processing.
 			UCLIDException uex("ELI30304", "Application Trace: Files were reverted to original status.");
-			revertLockedFilesToPreviousState(getDBConnection(), m_nActiveFAMID,
+			revertLockedFilesToPreviousState(role->ADOConnection(), m_nActiveFAMID,
 				"Processing FAM is exiting.", &uex);
 
 			// Reset m_nActiveFAMID to 0 to specify that it is not registered.
@@ -6587,7 +6637,8 @@ bool CFileProcessingDB::SetPriorityForFiles_Internal(bool bDBLocked, BSTR bstrSe
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -6699,7 +6750,8 @@ bool CFileProcessingDB::AddUserCounter_Internal(bool bDBLocked, BSTR bstrCounter
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
@@ -6778,7 +6830,8 @@ bool CFileProcessingDB::RemoveUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
@@ -6838,7 +6891,8 @@ bool CFileProcessingDB::RenameUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
@@ -6920,7 +6974,8 @@ bool CFileProcessingDB::SetUserCounterValue_Internal(bool bDBLocked, BSTR bstrCo
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
@@ -6978,7 +7033,8 @@ bool CFileProcessingDB::GetUserCounterValue_Internal(bool bDBLocked, BSTR bstrCo
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7039,7 +7095,8 @@ bool CFileProcessingDB::GetUserCounterNames_Internal(bool bDBLocked, IVariantVec
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7101,7 +7158,8 @@ bool CFileProcessingDB::GetUserCounterNamesAndValues_Internal(bool bDBLocked, IS
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7171,7 +7229,8 @@ bool CFileProcessingDB::IsUserCounterValid_Internal(bool bDBLocked, BSTR bstrCou
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7226,7 +7285,8 @@ bool CFileProcessingDB::OffsetUserCounter_Internal(bool bDBLocked, BSTR bstrCoun
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7310,7 +7370,8 @@ bool CFileProcessingDB::RecordFAMSessionStart_Internal(bool bDBLocked, BSTR bstr
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7408,7 +7469,8 @@ bool CFileProcessingDB::RecordWebSessionStart_Internal(bool bDBLocked, VARIANT_B
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
@@ -7493,7 +7555,8 @@ bool CFileProcessingDB::RecordFAMSessionStop_Internal(bool bDBLocked)
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Set the transaction guard
 				TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
@@ -7538,7 +7601,8 @@ bool CFileProcessingDB::RecordInputEvent_Internal(bool bDBLocked, BSTR bstrTimeS
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7630,7 +7694,8 @@ bool CFileProcessingDB::GetLoginUsers_Internal(bool bDBLocked, IStrToStrMap**  p
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7704,7 +7769,8 @@ bool CFileProcessingDB::AddLoginUser_Internal(bool bDBLocked, BSTR bstrUserName)
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7764,7 +7830,8 @@ bool CFileProcessingDB::RemoveLoginUser_Internal(bool bDBLocked, BSTR bstrUserNa
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7818,7 +7885,8 @@ bool CFileProcessingDB::RenameLoginUser_Internal(bool bDBLocked, BSTR bstrUserNa
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7879,7 +7947,8 @@ bool CFileProcessingDB::ClearLoginUserPassword_Internal(bool bDBLocked, BSTR bst
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -7922,7 +7991,8 @@ bool CFileProcessingDB::GetAutoCreateActions_Internal(bool bDBLocked, VARIANT_BO
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Get the setting
 				string strSetting =
@@ -7966,7 +8036,8 @@ bool CFileProcessingDB::AutoCreateAction_Internal(bool bDBLocked, BSTR bstrActio
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -8046,7 +8117,8 @@ bool CFileProcessingDB::GetFileRecord_Internal(bool bDBLocked, BSTR bstrFile, BS
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -8110,7 +8182,8 @@ bool CFileProcessingDB::SetFileStatusToProcessing_Internal(bool bDBLocked, long 
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -8150,9 +8223,9 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 	{
 		try
 		{
-			ValueRestorer<bool> UseApplicationRolesRestorer(m_bUseApplicationRoles);
+			ValueRestorer<CppBaseApplicationRoleConnection::AppRoles> UseApplicationRolesRestorer(m_currentRole);
 
-			getThisAsCOMPtr()->UseApplicationRoles = VARIANT_FALSE;
+			m_currentRole = CppBaseApplicationRoleConnection::kNoRole;
 
 			// Make sure all Product specific DB managers have been recognized.
 			checkForNewDBManagers();
@@ -8172,7 +8245,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
             ipConnection->CommandTimeout = 0;
 
 			assertNotActiveBeforeSchemaUpdate();
@@ -8498,7 +8572,8 @@ bool CFileProcessingDB::RenameFile_Internal(bool bDBLocked, IFileRecord* pFileRe
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				auto cmd = buildCmd(ipConnection,
 					strChangeNameQuery,
@@ -8575,7 +8650,8 @@ bool CFileProcessingDB::get_DBInfoSettings_Internal(bool bDBLocked, IStrToStrMap
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
@@ -8617,7 +8693,8 @@ bool CFileProcessingDB::SetDBInfoSettings_Internal(bool bDBLocked, vector<_Comma
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -8672,7 +8749,8 @@ bool CFileProcessingDB::RecordFTPEvent_Internal(bool bDBLocked, long nFileId, lo
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
@@ -8746,7 +8824,8 @@ bool CFileProcessingDB::IsAnyFAMActive_Internal(bool bDBLocked, VARIANT_BOOL* pv
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			if (isFAMActiveForAnyAction(bDBLocked))
 			{
@@ -8784,7 +8863,8 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Create a pointer to a recordset
 			_RecordsetPtr ipResultSet(__uuidof(Recordset));
@@ -8843,7 +8923,7 @@ bool CFileProcessingDB::GetFileCount_Internal(bool bDBLocked, VARIANT_BOOL bUseO
 					// but it threw an exception due to a permissions problem 
 					// so check if the result set is open and close it if it is
 					// https://extract.atlassian.net/browse/ISSUE-15680
-					if (ipResultSet->State == adStateOpen)
+					if ((ipResultSet->State & adStateOpen) > 0 )
 					{
 						ipResultSet->Close();
 					}
@@ -8902,7 +8982,8 @@ bool CFileProcessingDB::IsFeatureEnabled_Internal(bool bDBLocked, BSTR bstrFeatu
 
 				BEGIN_CONNECTION_RETRY();
 
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				checkFeatures(ipConnection);
 
@@ -8948,7 +9029,8 @@ bool CFileProcessingDB::GetWorkItemsForGroup_Internal(bool bDBLocked, long nWork
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9030,7 +9112,8 @@ bool CFileProcessingDB::GetWorkItemGroupStatus_Internal(bool bDBLocked, long nWo
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9166,7 +9249,8 @@ bool CFileProcessingDB::CreateWorkItemGroup_Internal(bool bDBLocked,  long nFile
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9234,7 +9318,8 @@ bool CFileProcessingDB::AddWorkItems_Internal(bool bDBLocked, long nWorkItemGrou
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9334,7 +9419,8 @@ bool CFileProcessingDB::GetWorkItemToProcess_Internal(bool bDBLocked, string str
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9376,7 +9462,8 @@ bool CFileProcessingDB::NotifyWorkItemFailed_Internal(bool bDBLocked, long nWork
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9416,7 +9503,8 @@ bool CFileProcessingDB::NotifyWorkItemCompleted_Internal(bool bDBLocked, long nW
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9463,7 +9551,8 @@ bool CFileProcessingDB::GetWorkGroupData_Internal(bool bDBLocked, long nWorkItem
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9523,7 +9612,8 @@ bool CFileProcessingDB::SaveWorkItemOutput_Internal(bool bDBLocked, long WorkIte
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9578,7 +9668,8 @@ bool CFileProcessingDB::FindWorkItemGroup_Internal(bool bDBLocked,  long nFileID
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9645,7 +9736,8 @@ bool CFileProcessingDB::SaveWorkItemBinaryOutput_Internal(bool bDBLocked, long W
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9723,7 +9815,8 @@ bool CFileProcessingDB::GetFileSetFileNames_Internal(bool bDBLocked, BSTR bstrFi
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Set up a query to get the filename for every ID in the fileset.
 			vector<int>& vecFileIDs = iterFileSet->second;
@@ -9807,7 +9900,8 @@ bool CFileProcessingDB::SetFallbackStatus_Internal(bool bDBLocked, IFileRecord* 
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
@@ -9881,7 +9975,8 @@ bool CFileProcessingDB::GetWorkItemsToProcess_Internal(bool bDBLocked, string st
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9922,7 +10017,8 @@ bool CFileProcessingDB::SetWorkItemToPending_Internal(bool bDBLocked, long nWork
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -9963,7 +10059,8 @@ bool CFileProcessingDB::GetFailedWorkItemsForGroup_Internal(bool bDBLocked, long
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -10035,7 +10132,8 @@ bool CFileProcessingDB::SetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -10082,7 +10180,8 @@ bool CFileProcessingDB::GetMetadataFieldValue_Internal(bool bDBLocked, long nFil
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 				
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -10144,7 +10243,8 @@ bool CFileProcessingDB::GetMetadataFieldNames_Internal(bool bDBLocked, IVariantV
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -10200,7 +10300,8 @@ bool CFileProcessingDB::AddMetadataField_Internal(bool bDBLocked, const string& 
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -10273,7 +10374,8 @@ bool CFileProcessingDB::DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMe
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -10335,7 +10437,8 @@ bool CFileProcessingDB::RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOl
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				validateDBSchemaVersion();
 
@@ -10422,7 +10525,8 @@ bool CFileProcessingDB::StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrT
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			validateDBSchemaVersion();
 
@@ -10464,7 +10568,8 @@ bool CFileProcessingDB::EndFileTaskSession_Internal(bool bDBLocked, long nFileTa
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			validateDBSchemaVersion();
 
@@ -10526,7 +10631,8 @@ bool CFileProcessingDB::GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL 
 			InvalidatePreviousCachedInfoIfNecessary();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			bool bIsDatabaseIDValid = checkDatabaseIDValid(ipConnection, false);
 
 			// Get the last issued FAMFile id
@@ -10612,7 +10718,8 @@ bool CFileProcessingDB::GetSecureCounterName_Internal(bool bDBLocked, long nCoun
 
 			BEGIN_CONNECTION_RETRY();
 			
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				string strQuery = "SELECT CounterName FROM SecureCounter WHERE ID = " + asString(nCounterID);
 				
@@ -10684,7 +10791,8 @@ bool CFileProcessingDB::ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BS
 			_ConnectionPtr ipConnection;
 			BEGIN_CONNECTION_RETRY();
 
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 				bool bValid = checkDatabaseIDValid(ipConnection, false);
 
 				// Begin a transaction
@@ -10766,7 +10874,8 @@ bool CFileProcessingDB::GetSecureCounterValue_Internal(bool bDBLocked, long nCou
 			_ConnectionPtr ipConnection;
 			BEGIN_CONNECTION_RETRY();
 
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				string strQuery = "SELECT * FROM [dbo].[SecureCounter] WHERE ID = " +
 					 asString(nCounterID);
@@ -10831,7 +10940,8 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 			_ConnectionPtr ipConnection;
 			BEGIN_CONNECTION_RETRY();
 
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				string strQuery = "SELECT * FROM [dbo].[SecureCounter] WHERE ID = " +
 						asString(nCounterID);
@@ -10884,7 +10994,7 @@ bool CFileProcessingDB::DecrementSecureCounter_Internal(bool bDBLocked, long nCo
 
 						dbCounterChange.m_llMinFAMFileCount = m_nLastFAMFileID;
 										
-						dbCounterChange.m_stUpdatedTime = getSQLServerDateTimeAsSystemTime(getDBConnection());
+						dbCounterChange.m_stUpdatedTime = getSQLServerDateTimeAsSystemTime(role->ADOConnection());
 
 						dbCounterChange.CalculateHashValue(dbCounterChange.m_llHashValue);
 
@@ -10961,7 +11071,8 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 
 			BEGIN_CONNECTION_RETRY();
 
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				bool bValid = checkDatabaseIDValid(ipConnection, false);
 
@@ -11044,7 +11155,7 @@ bool CFileProcessingDB::GetCounterUpdateRequestCode_Internal(bool bDBLocked, BST
 					: tzi.Bias + tzi.StandardBias);
 
 				// Add the current time
-				bsmRequest << getSQLServerDateTimeAsSystemTime(getDBConnection());
+				bsmRequest << getSQLServerDateTimeAsSystemTime(role->ADOConnection());
 
 				bsmRequest << (((nNumCounters == 0) || bValid) ? nNumCounters : -nNumCounters);
 
@@ -11126,7 +11237,8 @@ bool CFileProcessingDB::SetSecureCounterAlertLevel_Internal(bool bDBLocked, long
 
 			BEGIN_CONNECTION_RETRY();
 
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				string strQuery = Util::Format(
 					"UPDATE [SecureCounter] SET [AlertLevel] = %d, [AlertMultiple] = %d  "
@@ -11175,7 +11287,8 @@ bool CFileProcessingDB::AddFileNoQueue_Internal(bool bDBLocked, BSTR bstrFile, l
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -11311,7 +11424,8 @@ bool CFileProcessingDB::AddPaginationHistory_Internal(bool bDBLocked, long nOutp
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -11354,7 +11468,8 @@ bool CFileProcessingDB::AddWorkflow_Internal(bool bDBLocked, BSTR bstrName, EWor
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			validateDBSchemaVersion();
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -11408,7 +11523,8 @@ bool CFileProcessingDB::DeleteWorkflow_Internal(bool bDBLocked, long nID)
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			validateDBSchemaVersion();
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -11458,7 +11574,8 @@ bool CFileProcessingDB::GetWorkflowDefinition_Internal(bool bDBLocked, long nID,
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			validateDBSchemaVersion();
 
 			UCLID_FILEPROCESSINGLib::IWorkflowDefinitionPtr ipWorkflowDefinition =
@@ -11498,7 +11615,8 @@ bool CFileProcessingDB::SetWorkflowDefinition_Internal(bool bDBLocked,
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			validateDBSchemaVersion();
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -11674,7 +11792,8 @@ bool CFileProcessingDB::GetWorkflows_Internal(bool bDBLocked,
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
@@ -11725,7 +11844,8 @@ bool CFileProcessingDB::GetWorkflowActions_Internal(bool bDBLocked, long nID,
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			validateDBSchemaVersion();
 
 			IIUnknownVectorPtr ipActions(CLSID_IUnknownVector);
@@ -11778,7 +11898,8 @@ bool CFileProcessingDB::SetWorkflowActions_Internal(bool bDBLocked, long nID,
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			validateDBSchemaVersion();
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -12042,7 +12163,8 @@ bool CFileProcessingDB::GetWorkflowID_Internal(bool bDBLocked, BSTR bstrWorkflow
 
 			BEGIN_CONNECTION_RETRY();
 
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 				validateDBSchemaVersion();
 
 				*pnID = getWorkflowID(ipConnection, asString(bstrWorkflowName));
@@ -12074,7 +12196,8 @@ bool CFileProcessingDB::IsFileInWorkflow_Internal(bool bDBLocked, long nFileID, 
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			validateDBSchemaVersion();
 
 			// -1 = not in WorkflowFile, 0 = marked Invisible in WorkflowFile, 1 = in workflow, not marked Invisible
@@ -12106,7 +12229,8 @@ bool CFileProcessingDB::GetUsingWorkflows_Internal(bool bDBLocked, VARIANT_BOOL 
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			*pbUsingWorkflows = asVariantBool(databaseUsingWorkflows(ipConnection));
 
@@ -12136,7 +12260,8 @@ bool CFileProcessingDB::GetWorkflowNameFromActionID_Internal(bool bDBLocked, lon
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			string strQuery = "SELECT COALESCE( Workflow.Name, '') AS [Name] ";
 			strQuery += "FROM  Action LEFT JOIN ";
@@ -12193,7 +12318,8 @@ bool CFileProcessingDB::GetActionIDForWorkflow_Internal(bool bDBLocked, BSTR bst
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Get the action ID
 			*pnActionID = getActionIDNoThrow(ipConnection, asString(bstrActionName), nWorkflowID);
@@ -12230,7 +12356,8 @@ bool CFileProcessingDB::MoveFilesToWorkflowFromQuery_Internal(bool bDBLocked, BS
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
 
@@ -12463,7 +12590,8 @@ bool CFileProcessingDB::GetAttributeValue_Internal(bool bDBLocked, BSTR bstrSour
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			_RecordsetPtr ipResult(__uuidof(Recordset));
 			ASSERT_RESOURCE_ALLOCATION("ELI43521", ipResult != __nullptr);
@@ -12514,7 +12642,8 @@ bool CFileProcessingDB::IsFileNameInWorkflow_Internal(bool bDBLocked, BSTR bstrF
 			
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			validateDBSchemaVersion();
 
 			// -1 = not in WorkflowFile, 0 = marked Invisible in WorkflowFile, 1 = in workflow, not marked Invisible
@@ -12548,7 +12677,8 @@ bool CFileProcessingDB::SaveWebAppSettings_Internal(bool bDBLocked, long nWorkfl
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			validateDBSchemaVersion();
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
@@ -12614,7 +12744,8 @@ bool CFileProcessingDB::LoadWebAppSettings_Internal(bool bDBLocked, long nWorkfl
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 			validateDBSchemaVersion();
 
 			if (nWorkflowID <= 0)
@@ -12657,7 +12788,8 @@ bool CFileProcessingDB::DefineNewMLModel_Internal(bool bDBLocked, BSTR bstrMLMod
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -12697,7 +12829,8 @@ bool CFileProcessingDB::DeleteMLModel_Internal(bool bDBLocked, BSTR bstrMLModel)
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -12742,7 +12875,8 @@ bool CFileProcessingDB::GetMLModels_Internal(bool bDBLocked, IStrToStrMap * * pm
 			BEGIN_CONNECTION_RETRY();
 
 				// Get the connection for the thread and save it locally.
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				// Make sure the DB Schema is the expected version
 				validateDBSchemaVersion();
@@ -12815,7 +12949,8 @@ bool CFileProcessingDB::GetActiveUsers_Internal(bool bDBLocked, BSTR bstrAction,
 			BEGIN_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			string strQuery = "SELECT DISTINCT [UserName] "
 				"FROM [ActiveFAM] WITH (NOLOCK) "
@@ -12885,7 +13020,8 @@ bool CFileProcessingDB::AbortFAMSession_Internal(bool bDBLocked, long nFAMSessio
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			string strQueryActiveFAM = "SELECT [ID] FROM [ActiveFAM] WHERE [FAMSessionID] = " + asString(nFAMSessionID);
 
@@ -12900,10 +13036,10 @@ bool CFileProcessingDB::AbortFAMSession_Internal(bool bDBLocked, long nFAMSessio
 				FieldsPtr ipFields = ipActiveFAMSet->Fields;
 				long nActiveFAMID = getLongField(ipFields, "ID");
 
-				TransactionGuard tg(getDBConnection(), adXactRepeatableRead, &m_criticalSection);
+				TransactionGuard tg(role->ADOConnection(), adXactRepeatableRead, &m_criticalSection);
 
 				UCLIDException uex("ELI46249", "Application Trace: Files were reverted to original status.");
-				revertLockedFilesToPreviousState(getDBConnection(), nActiveFAMID,
+				revertLockedFilesToPreviousState(role->ADOConnection(), nActiveFAMID,
 					"FAM session is being reactivated.", &uex);
 
 				tg.CommitTrans();
@@ -12941,7 +13077,8 @@ bool CFileProcessingDB::MarkFileDeleted_Internal(bool bDBLocked, long nFileID, l
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			TransactionGuard tg(ipConnection, adXactIsolated, &m_criticalSection);
 
@@ -13065,7 +13202,8 @@ bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked,
 			{
 				BEGIN_CONNECTION_RETRY();
 
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				CacheFileTaskSessionData_InternalHelper(ipConnection, nFileTaskSessionID,
 					nPage, parrayImageData, bstrUssData, bstrWordZoneData, bstrAttributeData,
@@ -13079,7 +13217,8 @@ bool CFileProcessingDB::CacheFileTaskSessionData_Internal(bool bDBLocked,
 				// data will simply not be cached. In unit tests, this prevents cache threads from hanging
 				// around doing retries after the databases have been closed.
 				
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				CacheFileTaskSessionData_InternalHelper(ipConnection, nFileTaskSessionID,
 					nPage, parrayImageData, bstrUssData, bstrWordZoneData, bstrAttributeData,
@@ -13243,7 +13382,8 @@ bool CFileProcessingDB::GetCachedFileTaskSessionData_Internal(bool bDBLocked, lo
 			{
 				BEGIN_CONNECTION_RETRY();
 
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				bFoundCacheData = GetCachedFileTaskSessionData_InternalHelper(
 					ipConnection, nFileTaskSessionID, nPage,
@@ -13265,7 +13405,8 @@ bool CFileProcessingDB::GetCachedFileTaskSessionData_Internal(bool bDBLocked, lo
 				// BEGIN_CONNECTION_RETRY not used for non-crucial retrieval. If the DB connection is lost, this
 				// data will simply not be retrieved. 
 
-				ipConnection = getDBConnection();
+				auto role = getAppRoleConnection();
+				ipConnection = role->ADOConnection();
 
 				bFoundCacheData = GetCachedFileTaskSessionData_InternalHelper(
 					ipConnection, nFileTaskSessionID, nPage,
@@ -13506,7 +13647,8 @@ bool CFileProcessingDB::CacheAttributeData_Internal(bool bDBLocked, long nFileTa
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			TransactionGuard tg(ipConnection, adXactRepeatableRead, &m_criticalSection);
 
@@ -13578,7 +13720,8 @@ bool CFileProcessingDB::MarkAttributeDataUnmodified_Internal(bool bDBLocked, lon
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			string strMarkAttributeUnmodifiedQuery = gstrMARK_TASK_SESSION_ATTRIBUTE_DATA_UNMODIFIED;
 			replaceVariable(strMarkAttributeUnmodifiedQuery, "<FileTaskSessionID>", asString(nFileTaskSessionID));
@@ -13617,7 +13760,8 @@ bool CFileProcessingDB::GetUncommittedAttributeData_Internal(bool bDBLocked, lon
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			_RecordsetPtr ipCachedDataRow(__uuidof(Recordset));
 			ASSERT_RESOURCE_ALLOCATION("ELI49523", ipCachedDataRow != __nullptr);
@@ -13677,7 +13821,8 @@ bool CFileProcessingDB::DiscardOldCacheData_Internal(bool bDBLocked, long nFileI
 
 			BEGIN_CONNECTION_RETRY();
 
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			string strDiscardQuery = gstrDISCARD_OLD_CACHE_DATA;
 			replaceVariable(strDiscardQuery, "<FileID>", asString(nFileID));

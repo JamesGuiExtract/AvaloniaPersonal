@@ -502,8 +502,8 @@ namespace Extract.UtilityApplications.NERAnnotation
                 {
                     try
                     {
-                        using var applicationRoleConnection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName, enlist: false);
-                        SqlConnection connection = applicationRoleConnection.SqlConnection;
+                        using var connection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName, enlist: false);
+                        connection.Open();
 
                         using var cmd = connection.CreateCommand();
                         cmd.CommandText = _GET_FILE_LIST;
@@ -621,8 +621,8 @@ namespace Extract.UtilityApplications.NERAnnotation
                     // Ensure all processing is completed before opening the connection
                     var recordsList = processPagesInParallel ? (List<(string fileName, string data)>)records : records.ToList();
 
-                    using var applicationRoleConnection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    using var connection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName);
+                    connection.Open();
                     try
                     {
                         foreach (var (ussPath, data) in recordsList)
@@ -1344,8 +1344,8 @@ namespace Extract.UtilityApplications.NERAnnotation
             // Set enlist to false to prevent the transaction from escalating to a distributed transaction
             // (which requires the MSDTC service to be running)
             // (This is not an update command anyway so no need to be in the transaction...)
-            using var applicationRoleConnection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName, enlist: false);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var connection = new ExtractRoleConnection(_settings.DatabaseServer, _settings.DatabaseName, enlist: false);
+            connection.Open();
 
             using var cmd = connection.CreateCommand();
 

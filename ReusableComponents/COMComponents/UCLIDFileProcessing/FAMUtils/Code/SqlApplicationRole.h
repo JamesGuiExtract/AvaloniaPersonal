@@ -31,7 +31,7 @@ public:
 	/// <param name="password">Password for the given application role</param>
 	CppSqlApplicationRole(ADODB::_ConnectionPtr connection, std::string applicationRoleName, std::string password)
 	{
-		ipConnection = connection;
+		m_ipConnection = connection;
 		_cookie.Clear();
 		if (!applicationRoleName.empty())
 			SetApplicationRole(applicationRoleName, password);
@@ -39,6 +39,7 @@ public:
 	~CppSqlApplicationRole()
 	{
 		UnsetApplicationRole();
+		m_ipConnection = __nullptr;
 	}
 
 	/// <summary>
@@ -53,7 +54,7 @@ public:
 	static void CreateAllRoles(ADODB::_ConnectionPtr ipConnection);
 private:
 
-	ADODB::_ConnectionPtr ipConnection;
+	ADODB::_ConnectionPtr m_ipConnection;
 	variant_t _cookie;
 
 	void SetApplicationRole(std::string applictionRoleName, std::string password);

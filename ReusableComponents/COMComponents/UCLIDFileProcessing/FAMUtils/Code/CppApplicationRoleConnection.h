@@ -7,9 +7,15 @@
 #include <memory>
 
 
-class FAMUTILS_API CppBaseApplicationRoleConnection 
+class FAMUTILS_API CppBaseApplicationRoleConnection
 {
 public:
+	typedef  enum {
+		kNoRole,
+		kExtractRole,
+		kSecurityRole
+	} AppRoles;
+
 	CppBaseApplicationRoleConnection(ADODB::_ConnectionPtr ipConnection);
 	CppBaseApplicationRoleConnection(std::string server, std::string database, bool enlist = true);
 	CppBaseApplicationRoleConnection(std::string connectionString);
@@ -18,21 +24,23 @@ public:
 	virtual void AssignRole() = 0;
 	void AssignRoleToConnection(ADODB::_ConnectionPtr ipConnection);
 
+	virtual AppRoles ActiveRole() = 0;
+
 	~CppBaseApplicationRoleConnection()
 	{
 		try
 		{
-			if (m_ipConnection != __nullptr && m_ipConnection->State != ADODB::adStateClosed)
+			if (m_ipConnection != __nullptr && (m_ipConnection->State != ADODB::adStateClosed)) 
 			{
 				m_ApplicationRole.reset(__nullptr);
-				m_ipConnection->Close();
 				m_ipConnection = __nullptr;
 			}
 		}
 		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI51770")
 	}
 
-	operator ADODB::_ConnectionPtr() const { return m_ipConnection; };
+	ADODB::_ConnectionPtr ADOConnection() { return m_ipConnection; };
+
 protected:
 	ADODB::_ConnectionPtr m_ipConnection;
 	std::unique_ptr<CppSqlApplicationRole> m_ApplicationRole;
@@ -48,6 +56,7 @@ public:
 	NoRoleConnection() : CppBaseApplicationRoleConnection() {};
 
 	virtual void AssignRole();
+	virtual AppRoles ActiveRole();
 };
 
 
@@ -60,6 +69,7 @@ public:
 	SecurityRoleConnection() : CppBaseApplicationRoleConnection() {};
 
 	virtual void AssignRole();
+	virtual AppRoles ActiveRole();
 };
 
 
@@ -72,4 +82,5 @@ public:
 	ExtractRoleConnection() : CppBaseApplicationRoleConnection() {};
 
 	virtual void AssignRole();
+	virtual AppRoles ActiveRole();
 };

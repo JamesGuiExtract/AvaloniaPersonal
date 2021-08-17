@@ -1,6 +1,7 @@
 ﻿using AttributeDbMgrComponentsLib;
 using Extract.FileActionManager.Database.Test;
 using Extract.FileActionManager.FileProcessors;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using Extract.UtilityApplications.NERAnnotation;
@@ -8,7 +9,6 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -134,8 +134,8 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                     var baseResourceName = "Resources.Example{0:D2}.tif{1}";
                     var baseName = "Example{0:D2}.tif{1}";
 
-                    string resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, "");
-                    string fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, "");
+                    string resourceName = string.Format(CultureInfo.CurrentCulture, baseResourceName, i, string.Empty);
+                    string fileName = string.Format(CultureInfo.CurrentCulture, baseName, i, string.Empty);
                     string path = Path.Combine(_inputFolder.Last(), fileName);
                     _testFiles.GetFile(resourceName, path);
 
@@ -164,23 +164,12 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 fileProcessingDB.CloseAllDBConnections();
 
                 // Add record for DatabaseService so that there's a valid ID
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-                {
-                    DataSource = fileProcessingDB.DatabaseServer,
-                    InitialCatalog = fileProcessingDB.DatabaseName,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
+                using var connection = new ExtractRoleConnection(fileProcessingDB.DatabaseServer, fileProcessingDB.DatabaseName);
+                connection.Open();
+                using var cmd = connection.CreateCommand();
 
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
-                {
-                    connection.Open();
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('Unit tests'' service', '')";
-                        cmd.ExecuteNonQuery();
-                    }
-                }
+                cmd.CommandText = "INSERT DatabaseService (Description, Settings) VALUES('Unit tests'' service', '')";
+                cmd.ExecuteNonQuery();
 
                 return dbName;
             }
@@ -197,24 +186,13 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         {
             try
             {
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-                {
-                    DataSource = "(local)",
-                    InitialCatalog = dbName,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
+                using var connection = new ExtractRoleConnection("(local)", dbName);
+                connection.Open();
+                using var cmd = connection.CreateCommand();
 
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
-                {
-                    connection.Open();
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "UPDATE FileTaskSession SET DateTimeStamp = @Date";
-                        cmd.Parameters.AddWithValue("@Date", date.ToString("s", CultureInfo.InvariantCulture));
-                        cmd.ExecuteNonQuery();
-                    }
-                }
+                cmd.CommandText = "UPDATE FileTaskSession SET DateTimeStamp = @Date";
+                cmd.Parameters.AddWithValue("@Date", date.ToString("s", CultureInfo.InvariantCulture));
+                cmd.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
@@ -229,39 +207,28 @@ namespace Extract.UtilityApplications.MachineLearning.Test
         private static string GetDataFromDB(string dbName, bool trainingData)
         {
             string recordSeparator = "\r\n";
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-            {
-                DataSource = "(local)",
-                InitialCatalog = dbName,
-                IntegratedSecurity = true,
-                NetworkLibrary = "dbmssocn"
-            };
-
             string trainingOutput = null;
-            using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+
+            using var connection = new ExtractRoleConnection("(local)", dbName);
+            connection.Open();
+            using var cmd = connection.CreateCommand();
+
+            cmd.CommandText = _GET_MLDATA;
+            cmd.Parameters.AddWithValue("@Name", _MODEL_NAME);
+            cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
+
+            var lines = new List<string>();
+            using (var reader = cmd.ExecuteReader())
             {
-                connection.Open();
-                using (var cmd = connection.CreateCommand())
+                while (reader.Read())
                 {
-                    cmd.CommandText = _GET_MLDATA;
-                    cmd.Parameters.AddWithValue("@Name", _MODEL_NAME);
-                    cmd.Parameters.AddWithValue("@IsTrainingData", trainingData);
-
-                    var lines = new List<string>();
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            lines.Add(reader.GetString(0));
-                        }
-
-                        trainingOutput = string.Join(recordSeparator, lines);
-                        reader.Close();
-                    }
+                    lines.Add(reader.GetString(0));
                 }
-                connection.Close();
+
+                trainingOutput = string.Join(recordSeparator, lines);
+                reader.Close();
             }
+
             return trainingOutput;
         }
 
@@ -352,7 +319,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             string dbName = CreateDatabase();
             try
             {
-                foreach(var fileName in Directory.GetFiles(_inputFolder.Last(), "*.tif"))
+                foreach (var fileName in Directory.GetFiles(_inputFolder.Last(), "*.tif"))
                 {
                     File.Delete(fileName);
                 }
@@ -387,7 +354,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             string dbName = CreateDatabase();
             try
             {
-                foreach(var fileName in Directory.GetFiles(_inputFolder.Last(), "*.uss"))
+                foreach (var fileName in Directory.GetFiles(_inputFolder.Last(), "*.uss"))
                 {
                     File.Delete(fileName);
                 }
@@ -395,7 +362,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 Process(dbName);
 
                 // Verify empty data
-                var expected = "";
+                var expected = string.Empty;
 
                 string trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 Assert.AreEqual(expected, trainingOutput);
@@ -421,7 +388,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             string dbName = CreateDatabase();
             try
             {
-                foreach(var fileName in Directory.GetFiles(_inputFolder.Last(), "*.uss"))
+                foreach (var fileName in Directory.GetFiles(_inputFolder.Last(), "*.uss"))
                 {
                     File.Delete(fileName);
                 }
@@ -444,7 +411,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 collector.Process(System.Threading.CancellationToken.None);
 
                 // Verify empty data
-                var expected = "";
+                var expected = string.Empty;
 
                 string trainingOutput = GetDataFromDB(dbName, trainingData: true);
                 Assert.AreEqual(expected, trainingOutput);
@@ -468,7 +435,7 @@ namespace Extract.UtilityApplications.MachineLearning.Test
             {
                 var files = Directory.GetFiles(_inputFolder.Last(), "*.uss");
                 CollectionMethods.Shuffle(files, new Random(0));
-                foreach(var fileName in files.Take(5))
+                foreach (var fileName in files.Take(5))
                 {
                     File.Delete(fileName);
                 }
@@ -654,23 +621,12 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 Assert.AreEqual(statusJson, resetStatusJson);
 
                 // Clear the status column
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-                {
-                    DataSource = "(local)",
-                    InitialCatalog = dbName,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
-
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                using (var connection = new ExtractRoleConnection("(local)", dbName))
                 {
                     connection.Open();
-
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "UPDATE DatabaseService SET Status = NULL";
-                        cmd.ExecuteNonQuery();
-                    }
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = "UPDATE DatabaseService SET Status = NULL";
+                    cmd.ExecuteNonQuery();
                 }
 
                 // Refresh the status and confirm values are defaults
@@ -681,16 +637,13 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 Assert.AreEqual(defaultStatusJson, clearedStatusJson);
 
                 // Set back to original values
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                using (var connection = new ExtractRoleConnection("(local)", dbName))
                 {
                     connection.Open();
-
-                    using (var cmd = connection.CreateCommand())
-                    {
-                        cmd.CommandText = "UPDATE DatabaseService SET Status = @Status";
-                        cmd.Parameters.AddWithValue("@Status", statusJson);
-                        cmd.ExecuteNonQuery();
-                    }
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = "UPDATE DatabaseService SET Status = @Status";
+                    cmd.Parameters.AddWithValue("@Status", statusJson);
+                    cmd.ExecuteNonQuery();
                 }
 
                 // Refresh the status and confirm values are back to original values

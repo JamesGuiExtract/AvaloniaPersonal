@@ -1,4 +1,5 @@
 ﻿using Extract.FileActionManager.Database.Test;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
@@ -186,7 +187,7 @@ namespace Extract.ETL.Test
                 int actionID1 = setupData.db.GetActionID(_ACTION_A);
 
                 PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionID1, 10.0, 1.0, 10.0);
-                
+
                 DocumentVerificationRates rates = new DocumentVerificationRates();
                 rates.DatabaseServer = setupData.db.DatabaseServer;
                 rates.DatabaseName = setupData.db.DatabaseName;
@@ -241,19 +242,16 @@ namespace Extract.ETL.Test
                 // Test that the status gets reset if the database is cleared with retain settings
                 setupData.db.Clear(true);
 
-                using (var connection = GetConnection(rates))
-                {
-                    connection.Open();
-                    using (var statusCmd = connection.CreateCommand())
-                    {
-                        statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
-                        statusCmd.Parameters.AddWithValue("@DatabaseServiceID", rates.DatabaseServiceID);
-                        var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
-                        Assert.AreNotEqual(null, result, "A single record was returned");
-                        Assert.AreEqual(DBNull.Value, result["Status"], "Status is null");
-                        Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed is null");
-                    }
-                }
+                using var connection = new ExtractRoleConnection(rates.DatabaseServer, rates.DatabaseName);
+                connection.Open();
+                SqlCommand statusCmd = connection.CreateCommand();
+
+                statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
+                statusCmd.Parameters.AddWithValue("@DatabaseServiceID", rates.DatabaseServiceID);
+                var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                Assert.AreNotEqual(null, result, "A single record was returned");
+                Assert.AreEqual(DBNull.Value, result["Status"], "Status is null");
+                Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed is null");
 
                 rates.RefreshStatus();
                 status = rates.Status as DocumentVerificationStatus;
@@ -387,37 +385,22 @@ namespace Extract.ETL.Test
         {
             try
             {
-                using (var connection = GetConnection(rates))
-                {
-                    connection.Open();
-                    SqlCommand cmd = connection.CreateCommand();
+                using var connection = new ExtractRoleConnection(rates.DatabaseServer, rates.DatabaseName);
+                connection.Open();
+                using SqlCommand cmd = connection.CreateCommand();
 
-                    // Database should have one record in the DatabaseService table - not using the settings in the table
-                    cmd.CommandText = @"INSERT INTO [dbo].[DatabaseService]([Description], [Settings])
+                // Database should have one record in the DatabaseService table - not using the settings in the table
+                cmd.CommandText = @"INSERT INTO [dbo].[DatabaseService]([Description], [Settings])
                           OUTPUT inserted.ID
                           VALUES (@Description, @Settings )";
-                    cmd.Parameters.Add("@Description", SqlDbType.NVarChar).Value = rates.Description;
-                    cmd.Parameters.Add("@Settings", SqlDbType.NVarChar).Value = rates.ToJson();
-                    return (Int32)cmd.ExecuteScalar();
-                }
+                cmd.Parameters.Add("@Description", SqlDbType.NVarChar).Value = rates.Description;
+                cmd.Parameters.Add("@Settings", SqlDbType.NVarChar).Value = rates.ToJson();
+                return (Int32)cmd.ExecuteScalar();
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI45488");
             }
-        }
-
-        static SqlConnection GetConnection(DocumentVerificationRates rates)
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = rates.DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = rates.DatabaseName;
-
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }
 
         static void CheckResults(DocumentVerificationRates rates, string taskGuid, VerificationRatesList expected)
@@ -433,56 +416,54 @@ namespace Extract.ETL.Test
                     OverheadTime: e.OverheadTime,
                     ActivityTime: e.ActivityTime
                     )).ToList();
-            using (var connection = GetConnection(rates))
-            {
-                connection.Open();
 
-                var cmd = connection.CreateCommand();
+            using var connection = new ExtractRoleConnection(rates.DatabaseServer, rates.DatabaseName);
+            connection.Open();
+            using SqlCommand cmd = connection.CreateCommand();
 
-                cmd.CommandText = "SELECT COUNT(ID) FROM [dbo].[ReportingVerificationRates]";
 
-                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, adjustedExpected.Count);
+            cmd.CommandText = "SELECT COUNT(ID) FROM [dbo].[ReportingVerificationRates]";
 
-                cmd.CommandText = @"
-                        SELECT    [DatabaseServiceID]
-                                  ,[FileID]
-                                  ,[ActionID]
-                                  ,CONVERT(nvarchar(50), TaskClass.GUID) TaskClassGuid
-                                  ,[LastFileTaskSessionID]
-                                  ,[Duration]
-                                  ,[OverheadTime]
-                                  ,[ActivityTime]  
-                        FROM [dbo].[ReportingVerificationRates] INNER JOIN [dbo].[TaskClass] 
+            Assert.AreEqual(cmd.ExecuteScalar() as Int32?, adjustedExpected.Count);
+
+            cmd.CommandText = @"
+                    SELECT    [DatabaseServiceID]
+                                ,[FileID]
+                                ,[ActionID]
+                                ,CONVERT(nvarchar(50), TaskClass.GUID) TaskClassGuid
+                                ,[LastFileTaskSessionID]
+                                ,[Duration]
+                                ,[OverheadTime]
+                                ,[ActivityTime]  
+                    FROM [dbo].[ReportingVerificationRates] INNER JOIN [dbo].[TaskClass] 
                         ON [dbo].[ReportingVerificationRates].TaskClassID = [dbo].[TaskClass].ID";
 
-                using (var reader = cmd.ExecuteReader())
-                {
-                    // Convert reader to IEnummerable
-                    var results = reader.Cast<IDataRecord>();
+            using var reader = cmd.ExecuteReader();
 
-                    var resultsInTuples = results.Select(r => (
-                        DatabaseServiceID: r.GetInt32(r.GetOrdinal("DatabaseServiceID")),
-                        FileID: r.GetInt32(r.GetOrdinal("FileID")),
-                        ActionID: r.GetInt32(r.GetOrdinal("ActionID")),
-                        TaskClassGuid: r.GetString(r.GetOrdinal("TaskClassGuid")),
-                        LastFileTaskSessionID: r.GetInt32(r.GetOrdinal("LastFileTaskSessionID")),
-                        Duration: r.GetDouble(r.GetOrdinal("Duration")),
-                        OverheadTime: r.GetDouble(r.GetOrdinal("OverheadTime")),
-                        ActivityTime: r.GetDouble(r.GetOrdinal("ActivityTime"))
-                    )).ToList();
+            // Convert reader to IEnummerable
+            var results = reader.Cast<IDataRecord>();
 
-                    Assert.AreEqual(resultsInTuples.Count, adjustedExpected.Count,
-                        string.Format(CultureInfo.InvariantCulture, "Found {0} and expected {1}",
-                        resultsInTuples.Count, adjustedExpected.Count));
-                    Assert.That(resultsInTuples
-                            .OrderBy(a => a.DatabaseServiceID)
-                            .ThenBy(a => a.FileID)
-                        .SequenceEqual(adjustedExpected
-                            .OrderBy(r => r.DatabaseServiceID)
-                            .ThenBy(r => r.FileID)),
-                        "Compare the actual data with the expected");
-                }
-            }
+            var resultsInTuples = results.Select(r => (
+                DatabaseServiceID: r.GetInt32(r.GetOrdinal("DatabaseServiceID")),
+                FileID: r.GetInt32(r.GetOrdinal("FileID")),
+                ActionID: r.GetInt32(r.GetOrdinal("ActionID")),
+                TaskClassGuid: r.GetString(r.GetOrdinal("TaskClassGuid")),
+                LastFileTaskSessionID: r.GetInt32(r.GetOrdinal("LastFileTaskSessionID")),
+                Duration: r.GetDouble(r.GetOrdinal("Duration")),
+                OverheadTime: r.GetDouble(r.GetOrdinal("OverheadTime")),
+                ActivityTime: r.GetDouble(r.GetOrdinal("ActivityTime"))
+            )).ToList();
+
+            Assert.AreEqual(resultsInTuples.Count, adjustedExpected.Count,
+                string.Format(CultureInfo.InvariantCulture, "Found {0} and expected {1}",
+                resultsInTuples.Count, adjustedExpected.Count));
+            Assert.That(resultsInTuples
+                    .OrderBy(a => a.DatabaseServiceID)
+                    .ThenBy(a => a.FileID)
+                .SequenceEqual(adjustedExpected
+                    .OrderBy(r => r.DatabaseServiceID)
+                    .ThenBy(r => r.FileID)),
+                "Compare the actual data with the expected");
         }
 
         static (IFileProcessingDB db, string fileName1, FileRecord fileRecord1, string fileName2, FileRecord fileRecord2) SetupDatabase(string testDBName)

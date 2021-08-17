@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Extract.SqlDatabase;
+using Newtonsoft.Json;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -63,9 +64,9 @@ namespace Extract.ETL
         /// <summary>
         /// Saves the status to the given connection with the given transaction to the record with the given database service id
         /// </summary>
-        /// <param name="connection">An open <see cref="SqlConnection"/> to the database to save the status to</param>
+        /// <param name="connection">An open <see cref="SqlAppRoleConnection"/> to the database to save the status to</param>
         /// <param name="databaseServiceId">The ID of the DatabaseService record to update</param>
-        public void SaveStatus(SqlConnection connection, Int32 databaseServiceId)
+        public void SaveStatus(SqlAppRoleConnection connection, Int32 databaseServiceId)
         {
             try
             {

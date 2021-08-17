@@ -1,10 +1,12 @@
 ﻿using AttributeDbMgrComponentsLib;
 using Extract.ETL;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -273,8 +275,10 @@ namespace Extract.UtilityApplications.MachineLearning
                         UtilityMethods.FormatCurrent($"Model trainer at index {idx} is not configured"));
                 }
 
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
                 // Save any status modifications to the status column
-                _settings.SaveStatus(_settings.Status);
+                _settings.SaveStatus(connection, _settings.Status);
 
                 Dirty = false;
                 DialogResult = DialogResult.OK;

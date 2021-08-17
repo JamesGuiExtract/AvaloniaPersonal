@@ -230,9 +230,9 @@ namespace Extract.ETL
 
                 while (_status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
                 {
+                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    connection.Open();
                     using var scope = GetNewTransactionScope();
-                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
 
                     using var sourceCmd = connection.CreateCommand();
 
@@ -258,7 +258,7 @@ namespace Extract.ETL
                     // There is a chance that this status will get out of sync with the ReportingVerificationRates
                     try
                     {
-                        SaveStatus();
+                        SaveStatus(connection);
                     }
                     catch (Exception saveException)
                     {
@@ -288,15 +288,15 @@ namespace Extract.ETL
         /// </summary>
         void ResetStatistics()
         {
-            _status.LastFileTaskSessionIDProcessed = -1;
-            _status.SetOfActiveFileTaskIds.Clear();
-
-            SaveStatus();
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
 
             using var scope = GetNewTransactionScope();
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
 
+            _status.LastFileTaskSessionIDProcessed = -1;
+            _status.SetOfActiveFileTaskIds.Clear();
+            SaveStatus(connection);
+            
             using var cmd = connection.CreateCommand();
             cmd.CommandTimeout = 0;
             cmd.CommandText = "DELETE FROM [ReportingVerificationRates]";
@@ -311,7 +311,7 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="readerTask">Reader task that contains the records to be processed</param>
         /// <param name="connection">Connection to use to process the batch</param>
-        void ProcessBatch(SqlConnection connection,  Task<SqlDataReader> readerTask)
+        void ProcessBatch(SqlAppRoleConnection connection,  Task<SqlDataReader> readerTask)
         {
             using (var sourceReader = readerTask.Result)
             {
@@ -393,9 +393,10 @@ namespace Extract.ETL
         /// <summary>
         /// Saves the current <see cref="DatabaseServiceStatus"/> to the DB
         /// </summary>
-        void SaveStatus()
+        /// <param name="connection">Connection to use to save status</param>
+        void SaveStatus(SqlAppRoleConnection connection)
         {
-            SaveStatus(_status);
+            SaveStatus(connection, _status);
         }
 
         /// <summary>

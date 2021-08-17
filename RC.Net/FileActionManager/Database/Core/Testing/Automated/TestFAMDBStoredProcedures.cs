@@ -1,4 +1,5 @@
-﻿using Extract.Testing.Utilities;
+﻿using Extract.SqlDatabase;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
@@ -69,11 +70,12 @@ namespace Extract.FileActionManager.Database.Test
                 // Create an empty database
                 famDB = _testDbManager.GetNewDatabase(testDBName);
 
-                using var sqlDB = NewSQLConnection(famDB);
+                using var sqlDB = new ExtractRoleConnection(famDB.DatabaseServer, famDB.DatabaseName);
+                sqlDB.Open();
                 using var cmd = sqlDB.CreateCommand();
                 cmd.CommandText = "SELECT ItemValue FROM dbo.fn_TableFromCommaSeparatedList(@List)";
                 cmd.Parameters.AddWithValue("@List", commaSeparatedList);
-                sqlDB.Open();
+                
                 using var reader = cmd.ExecuteReader();
                 var results = reader.Cast<IDataRecord>()
                     .Select(r => r.GetString(r.GetOrdinal("ItemValue")));
@@ -92,19 +94,6 @@ namespace Extract.FileActionManager.Database.Test
         }
 
         #region Private methods
-
-        private static SqlConnection NewSQLConnection(FileProcessingDB famDB)
-        {
-            // Build the connection string from the settings
-            SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder();
-            sqlConnectionBuild.DataSource = famDB.DatabaseServer;
-            sqlConnectionBuild.InitialCatalog = famDB.DatabaseName;
-
-            sqlConnectionBuild.IntegratedSecurity = true;
-            sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
-            return new SqlConnection(sqlConnectionBuild.ConnectionString);
-        }
 
         #endregion
     }

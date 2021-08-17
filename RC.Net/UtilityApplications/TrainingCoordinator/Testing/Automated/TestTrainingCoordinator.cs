@@ -1,5 +1,6 @@
 ﻿using Extract.ETL;
 using Extract.FileActionManager.Database.Test;
+using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
@@ -145,7 +146,11 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 var updatedStatusJson = updatedStatus.ToJson();
                 Assert.AreNotEqual(statusJson, updatedStatusJson, "Status is stale!");
 
-                coordinator.SaveStatus(updatedStatus);
+                using (var connection = new ExtractRoleConnection("(local)", DBName)) 
+                {
+                    connection.Open();
+                    coordinator.SaveStatus(connection, updatedStatus);
+                }
 
                 // Disconnect from the DB and change values
                 coordinator.DatabaseServiceID = 0;
@@ -161,19 +166,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 string resetStatusJson = coordinator.Status.ToJson();
                 Assert.AreEqual(updatedStatusJson, resetStatusJson);
 
-                // Clear the status column
-                SqlConnectionStringBuilder sqlConnectionBuild = new SqlConnectionStringBuilder
-                {
-                    DataSource = "(local)",
-                    InitialCatalog = DBName,
-                    IntegratedSecurity = true,
-                    NetworkLibrary = "dbmssocn"
-                };
-
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                using (var connection = new ExtractRoleConnection("(local)", DBName))
                 {
                     connection.Open();
-
                     using var cmd = connection.CreateCommand();
                     cmd.CommandText = "UPDATE DatabaseService SET Status = NULL";
                     cmd.ExecuteNonQuery();
@@ -189,10 +184,9 @@ namespace Extract.UtilityApplications.MachineLearning.Test
                 Assert.AreEqual(11, coordinator.DataCollectors[0].LastIDProcessed);
 
                 // Set back to original values
-                using (var connection = new SqlConnection(sqlConnectionBuild.ConnectionString))
+                using (var connection = new ExtractRoleConnection("(local)", DBName))
                 {
                     connection.Open();
-
                     using var cmd = connection.CreateCommand();
                     cmd.CommandText = "UPDATE DatabaseService SET Status = @Status";
                     cmd.Parameters.AddWithValue("@Status", statusJson);

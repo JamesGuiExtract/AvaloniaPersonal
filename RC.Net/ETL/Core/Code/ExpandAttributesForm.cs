@@ -110,9 +110,9 @@ namespace Extract.ETL
             dataGridView.Columns.Add(dashboardAttributeNameColumn);
             _defaultsForNew.DashboardAttributeName = "";
 
-            using var applicationRoleConnection = new ExtractRoleConnection(ExpandAttributesService.DatabaseServer,
+            using var connection = new ExtractRoleConnection(ExpandAttributesService.DatabaseServer,
                                                                ExpandAttributesService.DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            connection.Open();
 
             using var cmd = connection.CreateCommand();
 

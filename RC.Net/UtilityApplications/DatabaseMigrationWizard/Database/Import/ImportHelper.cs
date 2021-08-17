@@ -29,7 +29,8 @@ namespace DatabaseMigrationWizard.Database.Input
         {
             this.ImportOptions = importOptions;
             this.Progress = progress;
-            this.ImportOptions.RoleConnection = new ExtractRoleConnection(ImportOptions.ConnectionInformation.DatabaseServer, ImportOptions.ConnectionInformation.DatabaseName);
+            this.ImportOptions.SqlConnection = new ExtractRoleConnection(ImportOptions.ConnectionInformation.DatabaseServer, ImportOptions.ConnectionInformation.DatabaseName);
+            this.ImportOptions.SqlConnection.Open();
             this.ImportOptions.Transaction = this.ImportOptions.SqlConnection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
         }
 
@@ -37,7 +38,7 @@ namespace DatabaseMigrationWizard.Database.Input
         /// Populates a temporary table in batches from a json file.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="tablePath">The filepath to the exported table</param>
+        /// <param name="tablePath">The file path to the exported table</param>
         /// <param name="insertTemporaryTableSql">The insert command for a given table</param>
         /// <param name="dbConnection">A connection to the database</param>
         [SuppressMessage("Microsoft.Design", "CA1004:IdentifiersShouldBeCasedCorrectly", Justification = "The generic type is required for NewtonsoftJSON, and therefore it required.")]
@@ -45,7 +46,7 @@ namespace DatabaseMigrationWizard.Database.Input
         {
             try
             {
-                // 999 batchsize because that is the maximum our driver will allow... (I wanted 50k =( )
+                // 999 batch size because that is the maximum our driver will allow... (I wanted 50k =( )
                 int batchSize = 999;
                 StringBuilder insertBuilder = new StringBuilder(insertTemporaryTableSql);
                 var serializer = new JsonSerializer();
@@ -99,7 +100,7 @@ namespace DatabaseMigrationWizard.Database.Input
         }
 
         /// <summary>
-        /// Begins the import from the filesystem to the database.
+        /// Begins the import from the file system to the database.
         /// <para><b>NOTE</b></para>
         /// Upon exception, it is the caller's responsibility to call <see cref="RollbackTransaction"/>
         /// once any reporting data from the current operation is gathered.
@@ -221,7 +222,7 @@ namespace DatabaseMigrationWizard.Database.Input
         /// <typeparam name="T">The generic type to deserialize to</typeparam>
         /// <param name="reader">The reference to the json reader.</param>
         /// <param name="serializer">The reference to the serializer</param>
-        /// <returns>Returns a list of deserialized obejcts, and returns true if there are still records to process</returns>
+        /// <returns>Returns a list of deserialized objects, and returns true if there are still records to process</returns>
         private static (List<T> deSerializedTable, bool keepReadingFile) LoadFromJSON<T>(ref JsonTextReader reader, ref JsonSerializer serializer)
         {
             int bufferSize = 20000;
@@ -259,8 +260,6 @@ namespace DatabaseMigrationWizard.Database.Input
                 this.ImportOptions.Transaction?.Dispose();
                 this.ImportOptions.Transaction = null;
                 this.ImportOptions.SqlConnection?.Close();
-                this.ImportOptions.RoleConnection?.Dispose();
-                this.ImportOptions.RoleConnection = null;
             }
         }
     }

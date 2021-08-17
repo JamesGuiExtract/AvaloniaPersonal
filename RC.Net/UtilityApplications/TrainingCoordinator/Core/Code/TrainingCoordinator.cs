@@ -268,8 +268,10 @@ namespace Extract.UtilityApplications.MachineLearning
                             $"Error occurred: {ex.Message}\r\n\r\n");
                         ex.ExtractLog("ELI45800");
                     }
-
-                    SaveStatus(Status);
+                    
+                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    connection.Open();
+                    SaveStatus(connection, Status);
                 }
 
                 if (DeleteMarkedMLData && !cancelToken.IsCancellationRequested)
@@ -277,8 +279,8 @@ namespace Extract.UtilityApplications.MachineLearning
                     Log += UtilityMethods.FormatCurrent($"{DateTime.Now}\r\n",
                             $"Removing old ML data... \r\n");
 
-                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    connection.Open();
 
                     using var cmd = connection.CreateCommand();
                     cmd.CommandText = _REMOVE_MARKED_MLDATA;
@@ -298,7 +300,7 @@ namespace Extract.UtilityApplications.MachineLearning
                         ex.ExtractLog("ELI45802");
                     }
 
-                    SaveStatus(Status);
+                    SaveStatus(connection, Status);
                 }
             }
             catch (OperationCanceledException)
@@ -549,8 +551,8 @@ namespace Extract.UtilityApplications.MachineLearning
 
         internal void AddModels(IEnumerable<string> names)
         {
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
 
             var trans = connection.BeginTransaction();
 

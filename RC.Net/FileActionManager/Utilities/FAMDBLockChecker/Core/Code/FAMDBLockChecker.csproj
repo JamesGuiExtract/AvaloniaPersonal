@@ -72,6 +72,10 @@
     <ApplicationIcon>Resources\FAMDBLocker.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Extract.SqlDatabase, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Binaries\Debug\Extract.SqlDatabase.dll</HintPath>
+    </Reference>
     <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />

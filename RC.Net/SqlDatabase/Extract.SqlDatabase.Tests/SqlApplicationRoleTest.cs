@@ -1,6 +1,7 @@
 ﻿using Extract.FileActionManager.Database.Test;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
+using System;
 using System.Data.SqlClient;
 
 namespace Extract.SqlDatabase.Tests
@@ -8,6 +9,37 @@ namespace Extract.SqlDatabase.Tests
     [TestFixture()]
     public class SqlApplicationRoleTest
     {
+        class TestAppRoleConnection : SqlAppRoleConnection
+        {
+            public string Role { get; set; }
+            public string Password { get; set; }
+
+            public TestAppRoleConnection(string server, string database, bool enlist = true)
+                : base(SqlUtil.NewSqlDBConnection(server, database, enlist))
+            {
+            }
+
+            public TestAppRoleConnection(string connectionString)
+                : base(SqlUtil.NewSqlDBConnection(connectionString))
+            {
+            }
+
+            protected override void AssignRole()
+            {
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(Role) || string.IsNullOrWhiteSpace(Password))
+                        return;
+
+                    SetApplicationRole(Role, Password);
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI51850");
+                }
+            }
+        }
+
         /// <summary>
         /// Manages test FAM DBs
         /// </summary>
@@ -56,20 +88,30 @@ namespace Extract.SqlDatabase.Tests
             {
                 var fileProcessingDb = testDbManager.GetNewDatabase(testDBName);
 
-                using var applicationRoleConnection = new NoAppRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
+                using var roleConnection = new NoAppRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
+                roleConnection.Open();
 
                 // create new records in the DBInfo table that will be used in the test
-                using var cmd = connection.CreateCommand();
-                cmd.CommandText = "INSERT INTO DBInfo (Name, Value) VALUES ('Access Set', 'Access Set'), ('Restored access', 'Restored access');";
-                cmd.ExecuteNonQuery();
-
-                SqlApplicationRole.CreateApplicationRole(connection, "TestRole", "Test-Password2", access);
+                using (var cmd = roleConnection.CreateCommand())
                 {
-                    using SqlApplicationRole sqlApplicationRole = new SqlApplicationRole(connection, "TestRole", "Test-Password2");
-                    CheckAccess(access, connection, "Access Set");
+                    cmd.CommandText = "INSERT INTO DBInfo (Name, Value) VALUES ('Access Set', 'Access Set'), ('Restored access', 'Restored access');";
+                    cmd.ExecuteNonQuery();
                 }
-                CheckAccess(SqlApplicationRole.AppRoleAccess.AllAccess, connection, "Restored access");
+
+                SqlApplicationRole.CreateApplicationRole(roleConnection, "TestRole", "Test-Password2", access);
+                using (var sqlApplicationRole = new TestAppRoleConnection(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName))
+                {
+                    sqlApplicationRole.Role = "TestRole";
+                    sqlApplicationRole.Password = "Test-Password2";
+                    sqlApplicationRole.Open();
+                    CheckAccess(access, sqlApplicationRole, "Access Set");
+                    sqlApplicationRole.Close();
+
+                    sqlApplicationRole.Role = string.Empty;
+                    sqlApplicationRole.Password = string.Empty;
+                    sqlApplicationRole.Open();
+                    CheckAccess(SqlApplicationRole.AppRoleAccess.AllAccess, sqlApplicationRole, "Restored access");
+                }
             }
             finally
             {
@@ -77,12 +119,11 @@ namespace Extract.SqlDatabase.Tests
             }
         }
 
-        private static void CheckAccess(SqlApplicationRole.AppRoleAccess access, SqlConnection connection, string description)
+        private static void CheckAccess(SqlApplicationRole.AppRoleAccess access, SqlAppRoleConnection connection, string description)
         {
-            SqlCommand selectCmd, insertCmd, updateCmd, deleteCmd;
             // Verify that the required access is given
-            selectCmd = ValidateSelectCommand(access, connection, description);
-            insertCmd = connection.CreateCommand();
+            using var selectCmd = ValidateSelectCommand(access, connection, description);
+            using var insertCmd = connection.CreateCommand();
             insertCmd.CommandText = $"INSERT INTO DBInfo (Name, Value) VALUES( '{description}_TestName_Delete', '1');";
             if ((access & SqlApplicationRole.AppRoleAccess.InsertAccess & ~SqlApplicationRole.AppRoleAccess.SelectExecuteAccess) > 0)
             {
@@ -102,7 +143,7 @@ namespace Extract.SqlDatabase.Tests
                     insertCmd.ExecuteNonQuery();
                 }, $"{description}: Insert command should throw SqlException");
             }
-            updateCmd = connection.CreateCommand();
+            using var updateCmd = connection.CreateCommand();
             updateCmd.CommandText = "UPDATE DBInfo Set Value = '200' WHERE Name = 'CommandTimeout'";
             if ((access & SqlApplicationRole.AppRoleAccess.UpdateAccess & ~SqlApplicationRole.AppRoleAccess.SelectExecuteAccess) > 0)
             {
@@ -119,7 +160,7 @@ namespace Extract.SqlDatabase.Tests
                 }, $"{description}: Update command should throw SqlException");
 
             }
-            deleteCmd = connection.CreateCommand();
+            using var deleteCmd = connection.CreateCommand();
             deleteCmd.CommandText = $"DELETE TOP(1) FROM DBInfo";
             if ((access & SqlApplicationRole.AppRoleAccess.DeleteAccess & ~SqlApplicationRole.AppRoleAccess.SelectExecuteAccess) > 0)
             {
@@ -137,9 +178,9 @@ namespace Extract.SqlDatabase.Tests
             }
         }
 
-        private static SqlCommand ValidateSelectCommand(SqlApplicationRole.AppRoleAccess access, SqlConnection connection, string description)
+        private static SqlCommand ValidateSelectCommand(SqlApplicationRole.AppRoleAccess access, SqlAppRoleConnection connection, string description)
         {
-            SqlCommand selectCmd = connection.CreateCommand();
+            using SqlCommand selectCmd = connection.CreateCommand();
             selectCmd.CommandText = "SELECT Count(ID) FROM DBINFO";
             if ((access & SqlApplicationRole.AppRoleAccess.SelectExecuteAccess) > 0)
             {

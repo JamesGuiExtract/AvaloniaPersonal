@@ -208,9 +208,8 @@ namespace Extract.ETL.Management
             try
             {
                 var table = new DataTable();
-                using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                SqlConnection connection = applicationRoleConnection.SqlConnection;
-
+                using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                connection.Open();
 
                 using var command = connection.CreateCommand();
 
@@ -285,8 +284,8 @@ namespace Extract.ETL.Management
             DatabaseServiceData currentData = row.DataBoundItem as DatabaseServiceData;
 
             // Get current data from the database
-            using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-            SqlConnection connection = applicationRoleConnection.SqlConnection;
+            using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+            connection.Open();
 
             using var command = connection.CreateCommand();
             command.CommandText = _DatabaseServiceSql + " WHERE ID = @DatabaseServiceID";
@@ -385,8 +384,8 @@ namespace Extract.ETL.Management
 
                     // Update the value in the database
                     using var trans = new TransactionScope();
-                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    connection.Open();
 
                     using var cmd = connection.CreateCommand();
                     cmd.CommandText = @"
@@ -507,10 +506,10 @@ namespace Extract.ETL.Management
                 {
                     Int32 ID = (Int32)row.Cells["ID"].Value;
 
-                    using var trans = new TransactionScope();
-                    using var applicationRoleConnection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
-                    SqlConnection connection = applicationRoleConnection.SqlConnection;
+                    using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
+                    connection.Open();
 
+                    using var trans = new TransactionScope();
 
                     using var cmd = connection.CreateCommand();
                     cmd.CommandText = @"

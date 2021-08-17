@@ -176,6 +176,7 @@ CDataEntryProductDBMgr::CDataEntryProductDBMgr()
 , m_ipAFUtility(NULL)
 , m_nNumberOfRetries(0)
 , m_dRetryTimeout(0.0)
+, m_currentRole(CppBaseApplicationRoleConnection::kExtractRole)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -336,17 +337,10 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema80(IFileProcess
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI34261", ipDB != NULL);
 
-		// Create the connection object
-		_ConnectionPtr ipDBConnection(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI34262", ipDBConnection != NULL);
-
 		string strDatabaseServer = asString(ipDB->DatabaseServer);
 		string strDatabaseName = asString(ipDB->DatabaseName);
 
-		// create the connection string
-		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-
-		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
+		NoRoleConnection roleConnection(strDatabaseServer, strDatabaseName);
 
 		// Create the vector of Queries to execute
 		vector<string> vecCreateQueries;
@@ -378,7 +372,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_AddProductSpecificSchema80(IFileProcess
 			gstrENABLE_DATA_ENTRY_COUNTERS_DEFAULT_SETTING + "')");
 
 		// Execute the queries to create the data entry table
-		executeVectorOfSQL(ipDBConnection, vecCreateQueries);
+		executeVectorOfSQL(roleConnection.ADOConnection(), vecCreateQueries);
 	
 		return S_OK;
 	}
@@ -400,6 +394,8 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProces
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI28993", ipDB != __nullptr);
 
+		m_ipFAMDB = ipDB;
+
 		string strValue = asString(ipDB->GetDBInfoSetting(
 			gstrDATA_ENTRY_SCHEMA_VERSION_NAME.c_str(), VARIANT_FALSE));
 
@@ -412,18 +408,8 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProces
 		{
 			*pbSchemaExists = VARIANT_TRUE;
 		}
-
-		// Create the connection object
-		ADODB::_ConnectionPtr ipDBConnection(__uuidof( Connection ));
-		ASSERT_RESOURCE_ALLOCATION("ELI28994", ipDBConnection != __nullptr);
 		
-		string strDatabaseServer = asString(ipDB->DatabaseServer);
-		string strDatabaseName = asString(ipDB->DatabaseName);
-
-		// create the connection string
-		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-
-		ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
+		auto roleConnection = getAppRoleConnection();
 
 		vector<string> vecTables;
 		getDataEntryTables(vecTables);
@@ -433,7 +419,7 @@ STDMETHODIMP CDataEntryProductDBMgr::raw_RemoveProductSpecificSchema(IFileProces
 			eraseFromVector(vecTables, gstrDATAENTRY_DATA_COUNTER_DEFINITION);
 		}
 
-		dropTablesInVector(ipDBConnection, vecTables);
+		dropTablesInVector(roleConnection->ADOConnection(), vecTables);
 
 		return S_OK;
 	}
@@ -657,7 +643,7 @@ STDMETHODIMP CDataEntryProductDBMgr::Initialize(IFileProcessingDB* pFAMDB)
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-ADODB::_ConnectionPtr CDataEntryProductDBMgr::getDBConnection(bool bReset)
+unique_ptr<CppBaseApplicationRoleConnection> CDataEntryProductDBMgr::getAppRoleConnection(bool bReset)
 {
 	// If the FAMDB is not set throw an exception
 	if (m_ipFAMDB == __nullptr)
@@ -667,56 +653,63 @@ ADODB::_ConnectionPtr CDataEntryProductDBMgr::getDBConnection(bool bReset)
 		throw ue;
 	}
 
-	// Check if the connection should be reset
-	if (bReset)
+	bool connectionExists = m_ipDBConnection != __nullptr && m_ipDBConnection->State != adStateClosed;
+
+	if (connectionExists) return createAppRole(m_ipDBConnection);
+
+	m_ipDBConnection.CreateInstance(_uuidof(Connection));
+	ASSERT_RESOURCE_ALLOCATION("ELI51855", m_ipDBConnection != __nullptr);
+
+	// Get database server from FAMDB
+	string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
+
+	// Get DatabaseName from FAMDB
+	string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
+
+	// create the connection string
+	string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
+	if (!strDatabaseServer.empty() && !strDatabaseName.empty())
 	{
-		// if the database is not closed close it
-		if (m_ipDBConnection->State != adStateClosed)
+		m_ipDBConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
+
+		// Get the command timeout from the FAMDB DBInfo table
+		string strValue = asString(
+			m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
+
+		// Set the command timeout
+		m_ipDBConnection->CommandTimeout = asLong(strValue);
+	}
+
+	return createAppRole(m_ipDBConnection);
+}
+//-------------------------------------------------------------------------------------------------
+unique_ptr<CppBaseApplicationRoleConnection> CDataEntryProductDBMgr::createAppRole(_ConnectionPtr ipConnection)
+{
+	unique_ptr<CppBaseApplicationRoleConnection> role;
+	try
+	{
+		switch (m_currentRole)
 		{
-			// Do the close in a try catch so that if there is an exception it will be logged
-			try
-			{
-				m_ipDBConnection->Close();
-			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI40164");
-		}
-		// Create a new connection
-		m_ipDBConnection = __nullptr;
-	}
-
-
-	// Check if connection has been created
-	if (m_ipDBConnection == __nullptr)
-	{
-		m_ipDBConnection.CreateInstance(__uuidof( Connection));
-		ASSERT_RESOURCE_ALLOCATION("ELI29002", m_ipDBConnection != __nullptr);
-	}
-
-	// if closed and Database server and database name are defined,  open the database connection
-	if ( m_ipDBConnection->State == adStateClosed)
-	{
-		// Get database server from FAMDB
-		string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
-
-		// Get DatabaseName from FAMDB
-		string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
-
-		// create the connection string
-		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-		if (!strDatabaseServer.empty() && !strDatabaseName.empty())
-		{
-			m_ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified);
-
-			// Get the command timeout from the FAMDB DBInfo table
-			string strValue = asString(
-				m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
-
-			// Set the command timeout
-			m_ipDBConnection->CommandTimeout = asLong(strValue);
+		case CppBaseApplicationRoleConnection::kNoRole:
+			role.reset(new NoRoleConnection(ipConnection));
+			break;
+		case CppBaseApplicationRoleConnection::kExtractRole:
+			role.reset(new ExtractRoleConnection(ipConnection));
+			break;
+		case CppBaseApplicationRoleConnection::kSecurityRole:
+			role.reset(new SecurityRoleConnection(ipConnection));
+			break;
+		default:
+			UCLIDException ue("ELI51843", "Unknown application role requested.");
+			ue.addDebugInfo("ApplicationRole", (int)m_currentRole);
+			throw ue;
 		}
 	}
-	
-	return m_ipDBConnection;
+	catch (...)
+	{
+		role.reset(new NoRoleConnection(ipConnection));
+	}
+	return role;
 }
 //-------------------------------------------------------------------------------------------------
 void CDataEntryProductDBMgr::validateLicense()
@@ -804,7 +797,8 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, VARIAN
 			BEGIN_ADO_CONNECTION_RETRY();
 
 			// Get the connection for the thread and save it locally.
-			ipConnection = getDBConnection();
+			auto role = getAppRoleConnection();
+			ipConnection = role->ADOConnection();
 
 			// Cache the result of areCountersEnabled;
 			static bool countersAreEnabled = areCountersEnabled();
@@ -868,7 +862,7 @@ bool CDataEntryProductDBMgr::RecordCounterValues_Internal(bool bDBLocked, VARIAN
 			}
 
 			END_ADO_CONNECTION_RETRY(
-				ipConnection, getDBConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29838");
+				ipConnection, getAppRoleConnection, m_nNumberOfRetries, m_dRetryTimeout, "ELI29838");
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI30715");
 	}

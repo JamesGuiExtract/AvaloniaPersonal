@@ -2,6 +2,7 @@
 using Extract.DataEntry;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Spring.Core.TypeResolution;
 using System;
@@ -961,14 +962,17 @@ namespace Extract.AttributeFinder.Rules
                         // been used. The connection string is based only on the properties of an
                         // IFileProcessingDB instance that have been set, not based on a connection
                         // that has actually been opened. Thus, for example, if we are running
-                        // within a RunFPSFile instance with the /ingoreDB flag, even though the
+                        // within a RunFPSFile instance with the /ignoreDB flag, even though the
                         // FAM instance will not have connected to a database, the database info
                         // will still have been loaded from the FPS file and that is what will be
                         // used here.
                         IFileProcessingDB fileProcessingDB = new FileProcessingDBClass();
-                        dbConnection = new OleDbConnection(
-                            fileProcessingDB.GetLastConnectionStringConfiguredThisProcess());
-                        dbConnection.Open();
+                        OleDbConnectionStringBuilder oleDbConnectionStringBuilder 
+                            = new OleDbConnectionStringBuilder(fileProcessingDB.GetLastConnectionStringConfiguredThisProcess());
+
+                        string server = oleDbConnectionStringBuilder.DataSource;
+                        string database = (string)oleDbConnectionStringBuilder["Database"];
+                        dbConnection = new ExtractRoleConnection(SqlUtil.CreateConnectionString(server, database));
                     }
                     else if (UseSpecifiedDBConnection)
                     {
@@ -984,12 +988,6 @@ namespace Extract.AttributeFinder.Rules
                     result = query.Evaluate();
                 }
                 AttributeStatusInfo.ResetData();
-
-                // Close the database connection if one was opened.
-                if (dbConnection != null)
-                {
-                    dbConnection.Close();
-                }
 
                 // If the database was an SQL CE database that was opened under a working copy name,
                 // copy the working copy back over the master.
@@ -1019,6 +1017,7 @@ namespace Extract.AttributeFinder.Rules
                 {
                     dbConnection.Close();
                     dbConnection.Dispose();
+                    dbConnection = null;
                 }
             }
         }
