@@ -22,17 +22,12 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
                 IList<string> args = eventData.Args;
                 if (args.Any())
                 {
-                    DatabaseInputOutputEvent paths = new() { InputDatabasePath = args[0].TrimPath() };
-                    if (args.Count > 1)
-                    {
-                        paths.OutputDatabasePath = args[1].TrimPath();
-                    }
-                    else
-                    {
-                        paths.OutputDatabasePath = Path.ChangeExtension(paths.InputDatabasePath, ".sqlite");
-                    }
+                    string inputPath = Path.GetFullPath(args[0].TrimPath());
+                    string outputPath = args.Count > 1
+                        ? Path.GetFullPath(args[1].TrimPath())
+                        : Path.ChangeExtension(inputPath, ".sqlite");
 
-                    EventAggregator.Publish(paths);
+                    EventAggregator.Publish(new DatabaseInputOutputEvent(inputPath, outputPath));
                 }
             }
             catch (Exception ex)

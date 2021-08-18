@@ -62,11 +62,7 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
             Assert.IsNull(_viewModel.OutputDatabasePath);
 
             // Publish event
-            _viewModel.OnEvent(new DatabaseInputOutputEvent
-            {
-                InputDatabasePath = inputPath,
-                OutputDatabasePath = outputPath
-            });
+            _viewModel.OnEvent(new DatabaseInputOutputEvent(inputPath, outputPath));
 
             // Confirm that both paths have been set
             Assert.AreEqual(inputPath, _viewModel.InputDatabasePath);
@@ -80,11 +76,7 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
         {
             Assert.IsFalse(_viewModel.ConvertCommand.CanExecute(null));
 
-            _viewModel.OnEvent(new DatabaseInputOutputEvent
-            {
-                InputDatabasePath = "input.db",
-                OutputDatabasePath = "output.db"
-            });
+            _viewModel.OnEvent(new DatabaseInputOutputEvent("input.db", "output.db"));
 
             Assert.IsTrue(_viewModel.ConvertCommand.CanExecute(null));
         }

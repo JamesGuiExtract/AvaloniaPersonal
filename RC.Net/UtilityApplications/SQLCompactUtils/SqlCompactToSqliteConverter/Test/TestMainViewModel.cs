@@ -3,6 +3,7 @@ using Moq;
 using MvvmGen.Events;
 using NUnit.Framework;
 using System;
+using System.IO;
 
 namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
 {
@@ -50,9 +51,11 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
             // Publish event
             _mainViewModel.OnEvent(new ArgumentsEvent(new[] { "input.db", "output.db" }));
 
+            var expectedPaths = new DatabaseInputOutputEvent(Path.GetFullPath("input.db"), Path.GetFullPath("output.db"));
+
             // Confirm another event is published with the input/output paths
             _eventAggregatorMock.Verify(ea => ea.Publish(It.Is<DatabaseInputOutputEvent>(paths =>
-                paths.InputDatabasePath == "input.db" && paths.OutputDatabasePath == "output.db")), Times.Once);
+                paths == expectedPaths)), Times.Once);
         }
 
         /// Confirm that the view model doesn't publish an event when no arguments are supplied
@@ -73,8 +76,11 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
         public void ShouldPublishDatabaseInputOutputEventInResponseToSingleArgument()
         {
             _mainViewModel.OnEvent(new ArgumentsEvent(new[] { "input.db" }));
+
+            var expectedPaths = new DatabaseInputOutputEvent(Path.GetFullPath("input.db"), Path.GetFullPath("input.sqlite"));
+
             _eventAggregatorMock.Verify(ea => ea.Publish(It.Is<DatabaseInputOutputEvent>(paths =>
-                paths.InputDatabasePath == "input.db" && paths.OutputDatabasePath == "input.sqlite")), Times.Once);
+                paths == expectedPaths)), Times.Once);
         }
     }
 }
