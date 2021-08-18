@@ -1,14 +1,16 @@
-﻿using Extract.Licensing;
+﻿using Extract.Database;
+using Extract.Licensing;
+using Extract.Utilities.ContextTags.SqliteModels.Version3;
+using LinqToDB;
 using System;
 using System.ComponentModel;
-using System.Data.Common;
 using System.Linq;
 using System.Windows.Forms;
 
 namespace Extract.Utilities.ContextTags
 {
     /// <summary>
-    /// A <see cref="Form"/> that allows editing of a <see cref="ContextTagDatabase"/>'s context
+    /// A <see cref="Form"/> that allows editing of a <see cref="CustomTagsDB"/>'s context
     /// table.
     /// </summary>
     public partial class ContextEditingForm : Form
@@ -25,9 +27,9 @@ namespace Extract.Utilities.ContextTags
         #region Fields
 
         /// <summary>
-        /// The <see cref="ContextTagDatabase"/> to edit.
+        /// The <see cref="CustomTagsDB"/> to edit.
         /// </summary>
-        ContextTagDatabase _database;
+        CustomTagsDB _database;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -41,12 +43,14 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// Initializes a new instance of the <see cref="ContextEditingForm"/> class.
         /// </summary>
-        /// <param name="connection">The <see cref="DbConnection"/> of the database to edit.
+        /// <param name="databaseFile">The path to the database to edit.
         /// </param>
-        public ContextEditingForm(DbConnection connection)
+        public ContextEditingForm(string databasePath)
         {
             try
             {
+                _ = databasePath ?? throw new ArgumentNullException(nameof(databasePath));
+
                 _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
 
                 if (_inDesignMode)
@@ -59,12 +63,15 @@ namespace Extract.Utilities.ContextTags
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI38022",
                     _OBJECT_NAME);
 
-                ExtractException.Assert("ELI38023", "Null argument exception", connection != null);
-
                 InitializeComponent();
 
-                _database = new ContextTagDatabase(connection);
-                _dataGridView.DataSource = _database.Context;
+                _database = new CustomTagsDB(SqliteMethods.BuildConnectionOptions(databasePath));
+                _database.BeginTransaction();
+
+                _contextTableBindingSource.DataSource = _database.Contexts.ToList();
+                _contextTableBindingSource.ListChanged += ContextTableBindingSource_ListChanged;
+
+                _contextTableDataGridView.UserDeletingRow += ContextTableDataGridView_UserDeletingRow;
             }
             catch (Exception ex)
             {
@@ -115,10 +122,10 @@ namespace Extract.Utilities.ContextTags
         {
             try 
 	        {
-                DataGridViewColumn nameColumn = _dataGridView.Columns["_nameColumn"];
-		        DataGridViewColumn fpsFileDirColumn = _dataGridView.Columns["_fpsFileDirColumn"];
+                DataGridViewColumn nameColumn = _contextTableDataGridView.Columns["_nameColumn"];
+		        DataGridViewColumn fpsFileDirColumn = _contextTableDataGridView.Columns["_fpsFileDirColumn"];
 
-                if (_dataGridView.Rows.Cast<DataGridViewRow>()
+                if (_contextTableDataGridView.Rows.Cast<DataGridViewRow>()
                     .Where(row => !row.IsNewRow)
                     .Select(row => row.Cells[nameColumn.Index])
                     .Any(cell => string.IsNullOrWhiteSpace(cell.Value as string)))
@@ -129,7 +136,7 @@ namespace Extract.Utilities.ContextTags
                     return;
                 }
 
-                if (_dataGridView.Rows.Cast<DataGridViewRow>()
+                if (_contextTableDataGridView.Rows.Cast<DataGridViewRow>()
                     .Where(row => !row.IsNewRow)
                     .Select(row => row.Cells[fpsFileDirColumn.Index])
                     .Any(cell => string.IsNullOrWhiteSpace(cell.Value as string)))
@@ -140,7 +147,7 @@ namespace Extract.Utilities.ContextTags
                     return;
                 }
 
-                if (_dataGridView.Rows.Cast<DataGridViewRow>()
+                if (_contextTableDataGridView.Rows.Cast<DataGridViewRow>()
                     .Where (row => !row.IsNewRow)
                     .Select(row => row.Cells[fpsFileDirColumn.Index])
                     .Any(cell => !((string)cell.Value).StartsWith(@"\\",
@@ -162,19 +169,18 @@ namespace Extract.Utilities.ContextTags
 
                 try
                 {
-                    // Remove any trailing backslash to ensure as best as possible that paths
-                    // will match exactly when identifying the current context.
-                    foreach (var cell in _dataGridView.Rows.Cast<DataGridViewRow>()
-                                .Where(row => !row.IsNewRow)
-                                .Select(row => row.Cells[fpsFileDirColumn.Index])
-                                .Where(cell => ((string)cell.Value).EndsWith(@"\", 
-                                    StringComparison.OrdinalIgnoreCase)))
+                    // Add new rows to the database
+                    foreach (Context context in _contextTableBindingSource.List)
                     {
-                        string stringValue = (string)cell.Value;
-                        cell.Value = stringValue.Substring(0, stringValue.Length - 1);
+                        if (context.ID == 0)
+                        {
+                            TrimFPSDir(context);
+                            _database.Insert(context);
+                        }
                     }
 
-                    _database.SubmitChanges();
+                    // Commit all changes
+                    _database.CommitTransaction();
                 }
                 catch (Exception ex)
                 {
@@ -188,6 +194,73 @@ namespace Extract.Utilities.ContextTags
 	        }
         }
 
+        /// Delete the context from the database before the row is removed from the bound list
+        private void ContextTableDataGridView_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            try
+            {
+                Context context = (Context)e.Row.DataBoundItem;
+                _database.Delete(context);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI51826");
+
+                // Not sure why this would fail but seems like the delete should be canceled if it does...
+                e.Cancel = true;
+            }
+        }
+
+        /// Trim trailing backslash from FPSFileDir and update the database when an existing row is changed
+        private void ContextTableBindingSource_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            try
+            {
+                if (e.ListChangedType == ListChangedType.ItemChanged)
+                {
+                    Context context = (Context)_contextTableBindingSource.List[e.NewIndex];
+
+                    TrimFPSDir(context);
+
+                    if (context.ID > 0)
+                    {
+                        try
+                        {
+                            _database.Update(context);
+                        }
+                        catch (System.Data.SQLite.SQLiteException sqlExn)
+                        {
+                            sqlExn.ExtractDisplay("ELI51827");
+
+                            // Revert the failed change so that the UI is correct
+                            if (_database.Contexts.Find(context.ID) is Context previousVersion)
+                            {
+                                _contextTableBindingSource.List[e.NewIndex] = previousVersion;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI51828");
+            }
+        }
+
         #endregion Event Handlers
+
+        #region Private Methods
+
+        // Remove any trailing backslash to ensure as best as possible that paths
+        // will match exactly when identifying the current context.
+        private static void TrimFPSDir(Context context)
+        {
+            if (context.FPSFileDir is string dir && dir.EndsWith("\\", StringComparison.Ordinal))
+            {
+                context.FPSFileDir = dir.Substring(0, dir.Length - 1);
+            }
+        }
+
+        #endregion Private Methods
     }
 }

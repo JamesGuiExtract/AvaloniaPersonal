@@ -17,36 +17,36 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ContextEditingForm));
-            this._dataGridView = new System.Windows.Forms.DataGridView();
+            this._contextTableDataGridView = new System.Windows.Forms.DataGridView();
             this._idColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._nameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._fpsFileDirColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this._contextTableV1BindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this._contextTableBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this._cancelButton = new System.Windows.Forms.Button();
             this._okButton = new System.Windows.Forms.Button();
             this._fpsFileDirInfoTip = new Extract.Utilities.Forms.InfoTip();
-            ((System.ComponentModel.ISupportInitialize)(this._dataGridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this._contextTableV1BindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._contextTableDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._contextTableBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
-            // _dataGridView
+            // _contextTableDataGridView
             // 
-            this._dataGridView.AllowUserToResizeRows = false;
-            this._dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this._contextTableDataGridView.AllowUserToResizeRows = false;
+            this._contextTableDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this._dataGridView.AutoGenerateColumns = false;
-            this._dataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-            this._dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this._contextTableDataGridView.AutoGenerateColumns = false;
+            this._contextTableDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this._contextTableDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._contextTableDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._idColumn,
             this._nameColumn,
             this._fpsFileDirColumn});
-            this._dataGridView.DataSource = this._contextTableV1BindingSource;
-            this._dataGridView.Location = new System.Drawing.Point(0, 0);
-            this._dataGridView.Name = "_dataGridView";
-            this._dataGridView.Size = new System.Drawing.Size(647, 174);
-            this._dataGridView.TabIndex = 0;
+            this._contextTableDataGridView.DataSource = this._contextTableBindingSource;
+            this._contextTableDataGridView.Location = new System.Drawing.Point(0, 0);
+            this._contextTableDataGridView.Name = "_contextTableDataGridView";
+            this._contextTableDataGridView.Size = new System.Drawing.Size(647, 174);
+            this._contextTableDataGridView.TabIndex = 0;
             // 
             // _idColumn
             // 
@@ -71,9 +71,9 @@
             this._fpsFileDirColumn.HeaderText = "FPSFileDir";
             this._fpsFileDirColumn.Name = "_fpsFileDirColumn";
             // 
-            // _contextTableV1BindingSource
+            // _contextTableBindingSource
             // 
-            this._contextTableV1BindingSource.DataSource = typeof(Extract.Utilities.ContextTags.ContextTableV1);
+            this._contextTableBindingSource.DataSource = typeof(Extract.Utilities.ContextTags.SqliteModels.Version3.Context);
             // 
             // _cancelButton
             // 
@@ -119,7 +119,7 @@
             this.Controls.Add(this._fpsFileDirInfoTip);
             this.Controls.Add(this._okButton);
             this.Controls.Add(this._cancelButton);
-            this.Controls.Add(this._dataGridView);
+            this.Controls.Add(this._contextTableDataGridView);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(250, 100);
@@ -128,18 +128,18 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Edit contexts";
-            ((System.ComponentModel.ISupportInitialize)(this._dataGridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this._contextTableV1BindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._contextTableDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._contextTableBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.DataGridView _dataGridView;
+        private System.Windows.Forms.DataGridView _contextTableDataGridView;
         private System.Windows.Forms.Button _cancelButton;
         private System.Windows.Forms.Button _okButton;
-        private System.Windows.Forms.BindingSource _contextTableV1BindingSource;
+        private System.Windows.Forms.BindingSource _contextTableBindingSource;
         private System.Windows.Forms.DataGridViewTextBoxColumn _idColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _nameColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _fpsFileDirColumn;

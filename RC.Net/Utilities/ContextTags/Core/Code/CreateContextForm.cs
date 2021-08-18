@@ -1,7 +1,10 @@
-﻿using Extract.Licensing;
+﻿using Extract.Database;
+using Extract.Licensing;
+using Extract.Utilities.ContextTags.SqliteModels.Version3;
+using LinqToDB;
 using System;
 using System.ComponentModel;
-using System.Data.Common;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Extract.Utilities.ContextTags
@@ -24,9 +27,9 @@ namespace Extract.Utilities.ContextTags
         #region Fields
 
         /// <summary>
-        /// The <see cref="ContextTagDatabase"/> to edit.
+        /// The <see cref="CustomTagsDB"/> to edit.
         /// </summary>
-        ContextTagDatabase _database;
+        CustomTagsDB _database;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -40,11 +43,8 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateContextForm"/> class.
         /// </summary>
-        /// <param name="connection">The <see cref="DbConnection"/> of the database to edit.
-        /// </param>
-        /// <param name="fpsFileDir">The FPS file directory to associate with the new context.
-        /// </param>
-        public CreateContextForm(DbConnection connection, string fpsFileDir)
+        /// <param name="databasePath">The path of the database to edit.
+        public CreateContextForm(string databasePath)
         {
             try
             {
@@ -62,9 +62,10 @@ namespace Extract.Utilities.ContextTags
 
                 InitializeComponent();
 
-                _database = new ContextTagDatabase(connection);
+                _database = new CustomTagsDB(SqliteMethods.BuildConnectionOptions(databasePath));
 
-                _fpsFileDirTextBox.Text = fpsFileDir;
+                _fpsFileDirTextBox.Text =
+                    CustomTagsDBMethods.GetCanonicalFPSFileDir(Path.GetDirectoryName(databasePath));
             }
             catch (Exception ex)
             {
@@ -161,8 +162,7 @@ namespace Extract.Utilities.ContextTags
                             context.FPSFileDir.Substring(0, context.FPSFileDir.Length -1);
                     }
 
-                    _database.Context.InsertOnSubmit(context);
-                    _database.SubmitChanges();
+                    _database.Insert(context);
                 }
                 catch (Exception ex)
                 {

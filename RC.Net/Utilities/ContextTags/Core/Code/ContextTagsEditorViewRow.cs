@@ -1,8 +1,10 @@
 ﻿using Extract.Licensing;
+using Extract.Utilities.ContextTags.SqliteModels.Version3;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using LinqToDB;
 
 namespace Extract.Utilities.ContextTags
 {
@@ -25,8 +27,7 @@ namespace Extract.Utilities.ContextTags
         /// than the current context for the given database. (No need to prompt for each individual
         /// value that is edited.)
         /// </summary>
-        static HashSet<ContextTagDatabase> _promptedForCrossContextEdit =
-            new HashSet<ContextTagDatabase>();
+        static HashSet<CustomTagsDB> _promptedForCrossContextEdit = new();
 
         /// <summary>
         /// Constant string for the database server tag.
@@ -51,7 +52,7 @@ namespace Extract.Utilities.ContextTags
         /// Tracks the <see cref="ContextTagDatabase"/> currently associated with this class type on
         /// the current thread.
         /// </summary>
-        ContextTagDatabase _database;
+        CustomTagsDB _database;
 
         /// <summary>
         /// Tracks the <see cref="PropertyDescriptorCollection"/> currently associated with this
@@ -65,9 +66,9 @@ namespace Extract.Utilities.ContextTags
         string _activeContextName;
 
         /// <summary>
-        /// The <see cref="CustomTagTableV1"/> row represented by this instance.
+        /// The <see cref="CustomTag"/> row represented by this instance.
         /// </summary>
-        CustomTagTableV1 _customTag;
+        CustomTag _customTag;
 
         /// <summary>
         /// The current workflow that is being edited.
@@ -109,10 +110,10 @@ namespace Extract.Utilities.ContextTags
         /// represent the specified <see paramref="customTag"/>
         /// </summary>
         /// <param name="database"></param>
-        /// <param name="customTag">The <see cref="CustomTagTableV1"/> row represented by this
+        /// <param name="customTag">The <see cref="CustomTag"/> row represented by this
         /// instance.</param>
         /// <param name="workflow">Workflow that is currently active</param>
-        public ContextTagsEditorViewRow(ContextTagDatabase database, CustomTagTableV1 customTag, string workflow)
+        public ContextTagsEditorViewRow(CustomTagsDB database, CustomTag customTag, string workflow)
         {
             try
             {
@@ -209,7 +210,7 @@ namespace Extract.Utilities.ContextTags
         /// <param name="database">The <see cref="ContextTagDatabase"/> instance associated with
         /// this row.</param>
         /// <param name="workflow">The currently active workflow</param>
-        public void Initialize(ContextTagDatabase database, string workflow)
+        public void Initialize(CustomTagsDB database, string workflow)
         {
             try
             {
@@ -240,10 +241,9 @@ namespace Extract.Utilities.ContextTags
                 if (_customTag != null)
                 {
                     // Deletes will cascade.
-                    _database.CustomTag.DeleteOnSubmit(CustomTag);
-                    _database.SubmitChanges();
+                    _database.Delete(_customTag);
 
-                    // Only consider this a data change if the row had not yet been committed to the DB.
+                    // Only consider this a data change if the row had been committed to the DB.
                     if (HasBeenCommitted)
                     {
                         OnDataChanged();
@@ -268,14 +268,13 @@ namespace Extract.Utilities.ContextTags
                 // to delete.
                 if (_customTag != null)
                 {
-                    var Context = _database.Context.Single(c => c.Name == context);
+                    var Context = _database.Contexts.Single(c => c.Name == context);
 
-                    var TagValue = _database.TagValue
+                    var TagValue = _database.TagValues
                         .Single(t => t.ContextID == Context.ID && t.TagID == _customTag.ID && t.Workflow == _workflow);
 
                     // Deletes will cascade.
-                    _database.TagValue.DeleteOnSubmit(TagValue);
-                    _database.SubmitChanges();
+                    _database.Delete(TagValue);
 
                     if (HasBeenCommitted)
                     {
@@ -354,48 +353,43 @@ namespace Extract.Utilities.ContextTags
         #region Private Members
 
         /// <summary>
-        /// The <see cref="CustomTagTableV1"/> row represented by this instance.
+        /// The <see cref="CustomTag"/> row represented by this instance.
         /// </summary>
-        CustomTagTableV1 CustomTag
+        CustomTag CustomTag
         {
             get
             {
                 if (_customTag == null)
                 {
                     // Create the CustomTagTableV1 row to be represented by this instance.
-                    _customTag = new CustomTagTableV1();
+                    _customTag = new CustomTag();
                     // Set the name to non-null so that it can be submitted (the name column has a
                     // non-null constraint.
                     _customTag.Name = "";
-                    _database.CustomTag.InsertOnSubmit(_customTag);
-
-                    // Submit the new row to get the ID which can then be used to initialize values
-                    // for all the contexts.
-                    _database.SubmitChanges();
+                    _customTag.ID = (long)_database.InsertWithIdentity(_customTag);
 
                     // Use a local version of ActiveWorkflow to eliminate the locking in the loop
                     string workflowForValue = ActiveWorkflow;
 
-                    foreach (var context in _database.Context)
+                    foreach (var context in _database.Contexts.ToList())
                     {
-                        var tagValue = new TagValueTableV2();
-                        tagValue.ContextID = context.ID;
-                        tagValue.TagID = _customTag.ID;
+                        var tagValue = new TagValue();
+                        tagValue.ContextID = (int)context.ID;
+                        tagValue.TagID = (int)_customTag.ID;
                         tagValue.Workflow = workflowForValue;
                         tagValue.Value = "";
-                        _database.TagValue.InsertOnSubmit(tagValue);
+                        _database.Insert(tagValue);
                         
                         if (!string.IsNullOrEmpty(workflowForValue))
                         {
-                            tagValue = new TagValueTableV2();
-                            tagValue.ContextID = context.ID;
-                            tagValue.TagID = _customTag.ID;
+                            tagValue = new TagValue();
+                            tagValue.ContextID = (int)context.ID;
+                            tagValue.TagID = (int)_customTag.ID;
                             tagValue.Workflow = "";
                             tagValue.Value = "";
-                            _database.TagValue.InsertOnSubmit(tagValue);
+                            _database.Insert(tagValue);
                         }
                     }
-                    _database.SubmitChanges();
 
                     // After the custom tag has been added, set the name back to null to ensure it
                     // gets set before the row as a whole can be committed. (row will remain invalid
@@ -412,7 +406,7 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         /// <param name="database">The <see cref="ContextTagDatabase"/> associated with this
         /// instance.</param>
-        void SetDatabase(ContextTagDatabase database)
+        void SetDatabase(CustomTagsDB database)
         {
             _database = database;
 
@@ -421,7 +415,7 @@ namespace Extract.Utilities.ContextTags
                 .Union(GetContextPropertyDescriptors())
                 .ToArray());
 
-            _activeContextName = _database.GetContextNameForDirectory(_database.DatabaseDirectory);
+            _activeContextName = _database.GetContextNameForDatabaseDirectory();
         }
 
         /// <summary>
@@ -447,7 +441,7 @@ namespace Extract.Utilities.ContextTags
             // The AsEnumerable method here is critical; it flattens the results (contexts) to be
             // evaluated separately. Otherwise, this statement fails to get converted in to SQL.
             // See: http://stackoverflow.com/questions/5179341/a-lambda-expression-with-a-statement-body-cannot-be-converted-to-an-expression
-            return _database.Context.AsEnumerable().Select(context =>
+            return _database.Contexts.AsEnumerable().Select(context =>
             {
                 var propertyDescriptor = new ContextTagsEditorViewPropertyDescriptor(
                     context.Name,
@@ -491,7 +485,8 @@ namespace Extract.Utilities.ContextTags
 
                 row.CustomTag.Name = newName;
 
-                _database.SubmitChanges();
+                _database.Update(row.CustomTag);
+
                 row.HasBeenCommitted = true;
                 row.OnDataChanged();
             }
@@ -505,12 +500,12 @@ namespace Extract.Utilities.ContextTags
         /// Gets the value of the tag for the specified <see paramref="row"/> and
         /// <see paramref="context"/>.
         /// </summary>
-        /// <param name="context">The <see cref="ContextTableV1"/> for which the tag value should be
+        /// <param name="context">The <see cref="Context"/> for which the tag value should be
         /// retrieved.</param>
         /// <param name="row">The <see cref="ContextTagsEditorViewRow"/> for which the tag value
         /// should be retrieved.</param>
         /// <returns>The value of the tag</returns>
-        string GetTagValue(ContextTagsEditorViewRow row, ContextTableV1 context)
+        string GetTagValue(ContextTagsEditorViewRow row, Context context)
         {
             try
             {
@@ -519,7 +514,7 @@ namespace Extract.Utilities.ContextTags
                     return null;
                 }
 
-                var contextValues = _database.TagValue
+                var contextValues = _database.TagValues
                     .Where(tagValue => tagValue.ContextID == context.ID);
 
                 var workflowContextValues = contextValues
@@ -544,10 +539,10 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         /// <param name="row">The <see cref="ContextTagsEditorViewRow"/> for which the tag value
         /// should be set.</param>
-        /// <param name="context">The <see cref="ContextTableV1"/> for which the tag value should be
+        /// <param name="context">The <see cref="Context"/> for which the tag value should be
         /// set.</param>
         /// <param name="value">The value to set.</param>
-        void SetTagValue(ContextTagsEditorViewRow row, ContextTableV1 context, object value)
+        void SetTagValue(ContextTagsEditorViewRow row, Context context, object value)
         {
             try
             {
@@ -563,7 +558,7 @@ namespace Extract.Utilities.ContextTags
                 {
                     workflowForValue = ActiveWorkflow;
                 }
-                var targetValue = _database.TagValue
+                var targetValue = _database.TagValues
                     .Where(tagValue =>
                         tagValue.TagID == row.CustomTag.ID &&
                         tagValue.ContextID == context.ID &&
@@ -572,12 +567,12 @@ namespace Extract.Utilities.ContextTags
 
                 if (targetValue == null)
                 {
-                    targetValue = new TagValueTableV2();
-                    targetValue.ContextID = context.ID;
-                    targetValue.TagID = row.CustomTag.ID;
+                    targetValue = new TagValue();
+                    targetValue.ContextID = (int)context.ID;
+                    targetValue.TagID = (int)row.CustomTag.ID;
                     targetValue.Workflow = workflowForValue;
                     targetValue.Value = "";
-                    _database.TagValue.InsertOnSubmit(targetValue);
+                    _database.Insert(targetValue);
                 }
 
                 string newValue = ((string)value) ?? "";
@@ -597,7 +592,8 @@ namespace Extract.Utilities.ContextTags
                 }
 
                 targetValue.Value = newValue;
-                _database.SubmitChanges();
+                _database.Update(targetValue);
+
                 row.HasBeenCommitted = true;
                 row.OnDataChanged();
             }
@@ -612,11 +608,11 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         /// <param name="row">The <see cref="ContextTagsEditorViewRow"/> for which the tag value
         /// should be set.</param>
-        /// <param name="context">The <see cref="ContextTableV1"/> for which the tag value should be
+        /// <param name="context">The <see cref="Context"/> for which the tag value should be
         /// set.</param>
         /// <returns><see langword="true"/> if current value is workflow specific <see langword="false"/>
         /// if it is not</returns>
-        bool IsWorkflowValue(ContextTagsEditorViewRow row, ContextTableV1 context)
+        bool IsWorkflowValue(ContextTagsEditorViewRow row, Context context)
         {
             try
             {
@@ -625,7 +621,7 @@ namespace Extract.Utilities.ContextTags
                     return false;
                 }
 
-                var contextValues = _database.TagValue
+                var contextValues = _database.TagValues
                     .Where(tagValue => tagValue.ContextID == context.ID);
 
                 var workflowContextValue = contextValues

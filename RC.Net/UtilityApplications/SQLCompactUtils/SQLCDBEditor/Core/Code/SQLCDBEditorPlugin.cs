@@ -1,10 +1,9 @@
 ﻿using Extract.Utilities;
 using System;
-using System.Data.SqlServerCe;
+using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Data.Common;
 
 namespace Extract.SQLCDBEditor
 {

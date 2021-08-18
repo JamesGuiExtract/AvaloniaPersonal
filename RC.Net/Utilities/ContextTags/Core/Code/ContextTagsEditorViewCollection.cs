@@ -1,18 +1,18 @@
 ﻿using Extract.Licensing;
+using Extract.Utilities.ContextTags.SqliteModels.Version3;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Data.Linq;
 using System.Linq;
 using System.Windows.Forms;
 
 namespace Extract.Utilities.ContextTags
 {
     /// <summary>
-    /// Defines an editable view of a a <see cref="ContextTagDatabase"/> (CustomTag.sdf) database
+    /// Defines an editable view of a a <see cref="CustomTagsDB"/> (CustomTags.sqlite) database
     /// where the defined contexts comprise the columns and the custom tags comprise the rows.
     /// </summary>
     public class ContextTagsEditorViewCollection : BindingSource, IList<ContextTagsEditorViewRow>
@@ -29,10 +29,10 @@ namespace Extract.Utilities.ContextTags
         #region Fields
 
         /// <summary>
-        /// Tracks the <see cref="ContextTagDatabase"/> currently associated with this class type on
+        /// Tracks the <see cref="CustomTagsDB"/> currently associated with this class type on
         /// the current thread.
         /// </summary>
-        ContextTagDatabase _database;
+        readonly CustomTagsDB _database;
 
         /// <summary>
         /// A default instance of <see cref="ContextTagsEditorViewRow"/> used to describe the
@@ -43,8 +43,7 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// The <see cref="ContextTagsEditorViewRow"/>s comprising the collection.
         /// </summary>
-        ObservableCollection<ContextTagsEditorViewRow> _contextRows =
-            new ObservableCollection<ContextTagsEditorViewRow>();
+        readonly ObservableCollection<ContextTagsEditorViewRow> _contextRows = new();
 
         /// <summary>
         /// Flag to indicate that data is being loaded from the database
@@ -69,7 +68,7 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         /// <param name="database">The database.</param>
         /// <param name="workflow">The workflow to use</param>
-        public ContextTagsEditorViewCollection(ContextTagDatabase database, string workflow)
+        public ContextTagsEditorViewCollection(CustomTagsDB database, string workflow)
         {
             try
             {
@@ -507,16 +506,11 @@ namespace Extract.Utilities.ContextTags
                 _dataLoading = true;
                 if (_database != null)
                 {
-                    // Ensure all relevant tables are up-to-date.
-                    _database.Refresh(RefreshMode.OverwriteCurrentValues, _database.Context);
-                    _database.Refresh(RefreshMode.OverwriteCurrentValues, _database.CustomTag);
-                    _database.Refresh(RefreshMode.OverwriteCurrentValues, _database.TagValue);
-
                     // _defaultViewRow will be used to describe the collection's properties independent
                     // of specific rows in the collection.
                     _defaultViewRow = new ContextTagsEditorViewRow(_database, null, ActiveWorkflow);
 
-                    foreach (var customTag in _database.CustomTag.OrderBy(ct => ct.Name))
+                    foreach (var customTag in _database.CustomTags.OrderBy(ct => ct.Name).ToList())
                     {
                         // The row that is mapped to the new row in a DataGridView can end up being
                         // persisted. Ignore and delete any unnamed custom tags on load.

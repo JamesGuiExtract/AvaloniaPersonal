@@ -3490,7 +3490,7 @@ bool FileProcessingDlg::displayRecentContextSelection()
 	ipContextTags->CloseDatabase();
 
 	CDialogSelect dlgSelect("Select the context to use:", "Select Context", vecContexts,
-		nSize > 0 ? vecContexts.front() : "");
+		vecContexts.size() > 0 ? vecContexts.front() : "");
 
 	if (dlgSelect.DoModal() == IDOK)
 	{

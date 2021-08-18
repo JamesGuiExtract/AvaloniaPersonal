@@ -1,21 +1,25 @@
-﻿using Extract.Licensing;
+﻿using Extract.Database;
+using Extract.Licensing;
 using Extract.SQLCDBEditor;
+using Extract.Utilities.ContextTags.SqliteModels.Version3;
 using Extract.Utilities.Forms;
+using LinqToDB;
+using LinqToDB.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Common;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
-using System.Threading;
 
 namespace Extract.Utilities.ContextTags
 {
     /// <summary>
     /// A <see cref="SQLCDBEditorPlugin"/> implementation that allows for editing of a
-    /// <see cref="ContextTagDatabase"/> in a convenient, editable view.
+    /// <see cref="CustomTagsDB"/> in a convenient, editable view.
     /// </summary>
     public class ContextTagsPlugin : SQLCDBEditorPlugin
     {
@@ -46,14 +50,16 @@ namespace Extract.Utilities.ContextTags
         #region Fields
 
         /// <summary>
-        /// The <see cref="DbConnection"/> for the database to be edited.
+        /// The path of the database to be edited.
         /// </summary>
-        DbConnection _connection;
+        string _databasePath;
         
         /// <summary>
-        /// A <see cref="ContextTagDatabase"/> instance representing the database.
+        /// A <see cref="CustomTagsDB"/> instance representing the database.
         /// </summary>
-        ContextTagDatabase _database;
+        CustomTagsDB _database;
+
+#pragma warning disable CA2213 // Disposable fields should be disposed (These fields are expected to be managed by the plugin manager)
 
         /// <summary>
         /// A <see cref="ContextTagsEditorViewCollection"/> providing the editable view used in the
@@ -80,6 +86,8 @@ namespace Extract.Utilities.ContextTags
         /// Label for the workflow combo
         /// </summary>
         Label _workflowLabel;
+
+#pragma warning restore CA2213 // Disposable fields should be disposed
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
@@ -195,28 +203,8 @@ namespace Extract.Utilities.ContextTags
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this plugin's data is valid.
-        /// </summary>
-        /// <value><see langword="true"/> if the plugin data is valid; otherwise,
-        /// <see langword="false"/>.
-        /// </value>
-        public override bool DataIsValid
-        {
-            get
-            {
-                try
-                {
-                    _database.SubmitChanges();
-
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
+        /// Returns true
+        public override bool DataIsValid => true;
 
         /// <summary>
         /// Allows plugin to initialize.
@@ -224,20 +212,20 @@ namespace Extract.Utilities.ContextTags
         /// <param name="pluginManager">The <see cref="ISQLCDBEditorPluginManager"/> manager for
         /// this plugin.</param>
         /// <param name="connection">The <see cref="DbConnection"/> for use by the plugin.</param>
-        public override void LoadPlugin(ISQLCDBEditorPluginManager pluginManager,
-            DbConnection connection)
+        /// <remarks>The connection parameter must be a <see cref="System.Data.SQLite.SQLiteConnection"/></remarks>
+        public override void LoadPlugin(ISQLCDBEditorPluginManager pluginManager, DbConnection connection)
         {
             try
             {
-                _ = pluginManager ?? throw new ArgumentNullException(nameof(pluginManager));
+                if (connection is not System.Data.SQLite.SQLiteConnection sqliteConnection)
+                {
+                    throw new ArgumentException("Connection must be a SQLiteConnection", nameof(connection));
+                }
+                _databasePath = sqliteConnection.FileName;
 
-                _pluginManager = pluginManager;
+                _pluginManager = pluginManager ?? throw new ArgumentNullException(nameof(pluginManager));
                 _pluginManager.AllowUserToAddRows = true;
                 _pluginManager.AllowUserToDeleteRows = true;
-
-                ExtractException.Assert("ELI38034", "Null argument exception", connection != null);
-
-                _connection = connection;
 
                 _editContextsButton = pluginManager.GetNewButton();
                 _editContextsButton.Text = "Edit Contexts";
@@ -297,12 +285,11 @@ namespace Extract.Utilities.ContextTags
             {
                 base.RefreshData();
 
-                ExtractException.Assert("ELI38036", "Database connection is missing",
-                    _connection != null);
+                ExtractException.Assert("ELI38036", "Database path is missing", !String.IsNullOrWhiteSpace(_databasePath));
 
                 if (_database == null)
                 {
-                    _database = new ContextTagDatabase(_connection);
+                    _database = new CustomTagsDB(SqliteMethods.BuildConnectionOptions(_databasePath));
                 }
 
 				// Initialize or refresh data in the context tags view
@@ -346,12 +333,6 @@ namespace Extract.Utilities.ContextTags
                 }
             }
 
-            _addDatabaseTagsButton?.Dispose();
-            _contextTagsView?.Dispose();
-            _editContextsButton?.Dispose();
-            _workflowComboBox?.Dispose();
-            _workflowLabel?.Dispose();
-
             base.Dispose(disposing);
         }
 
@@ -393,12 +374,10 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                using (var contextEditingForm = new ContextEditingForm(_connection))
+                using ContextEditingForm contextEditingForm = new(_databasePath);
+                if (contextEditingForm.ShowDialog(this) == DialogResult.OK)
                 {
-                    if (contextEditingForm.ShowDialog(this) == DialogResult.OK)
-                    {
-                        OnDataChanged(true, true);
-                    }
+                    OnDataChanged(true, true);
                 }
             }
             catch (Exception ex)
@@ -418,7 +397,7 @@ namespace Extract.Utilities.ContextTags
             try
             {
                 string[] tagsToAdd = new[] { _DATABASE_SERVER_TAG, _DATABASE_NAME_TAG };
-                tagsToAdd = tagsToAdd.Except(_database.CustomTag.Select(tag => tag.Name)).ToArray();
+                tagsToAdd = tagsToAdd.Except(_database.CustomTags.Select(tag => tag.Name)).ToArray();
 
                 if (!tagsToAdd.Any())
                 {
@@ -427,14 +406,8 @@ namespace Extract.Utilities.ContextTags
                     return;
                 }
 
-                foreach (string tagToAdd in tagsToAdd)
-                {
-                    var customTag = new CustomTagTableV1();
-                    customTag.Name = tagToAdd;
-                    _database.CustomTag.InsertOnSubmit(customTag);
-                }
+                _database.BulkCopy(tagsToAdd.Select(tag => new CustomTag { Name = tag }));
 
-                _database.SubmitChanges();
                 OnDataChanged(true, true);
             }
             catch (Exception ex)
@@ -555,8 +528,7 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-
-                // Check the row index is withing the bounds of the _contextTagsView
+                // Check the row index is within the bounds of the _contextTagsView
                 if (e.RowIndex >= _contextTagsView.Count || e.RowIndex < 0 || e.ColumnIndex < 0) 
                 {
                     return;
@@ -623,18 +595,14 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                // If there is any context matching the database's directory display a dialog that
+                // If there isn't a context matching the database's directory display a dialog that
                 // allows creating of a context for the current directory.
-                if (string.IsNullOrWhiteSpace(
-                    _database.GetContextNameForDirectory(_database.DatabaseDirectory)))
+                if (string.IsNullOrWhiteSpace(_database.GetContextNameForDatabaseDirectory()))
                 {
-                    using (var createContextForm = new CreateContextForm(
-                        _connection, _database.DatabaseDirectory))
+                    using CreateContextForm createContextForm = new(_databasePath);
+                    if (createContextForm.ShowDialog(this) == DialogResult.OK)
                     {
-                        if (createContextForm.ShowDialog(this) == DialogResult.OK)
-                        {
-                            OnDataChanged(true, true);
-                        }
+                        OnDataChanged(true, true);
                     }
                 }
             }
@@ -666,7 +634,7 @@ namespace Extract.Utilities.ContextTags
         void GetWorkflows()
         {
             // Add the workflows that are already in the database
-            var workflowsInContextDB = _database.TagValue
+            var workflowsInContextDB = _database.TagValues
                 .Where(w => w.Workflow.Length != 0)
                 .Select(s => s.Workflow)
                 .Distinct().AsEnumerable()
@@ -674,11 +642,11 @@ namespace Extract.Utilities.ContextTags
 
             _workflows.AddRange(workflowsInContextDB);
 
-            var DatabaseServerTagID = _database.CustomTag
+            var DatabaseServerTagID = _database.CustomTags
                 .Where(t => t.Name == _DATABASE_SERVER_TAG)
                 .Select(s => s.ID)
                 .SingleOrDefault();
-            var DatabaseNameTagID = _database.CustomTag
+            var DatabaseNameTagID = _database.CustomTags
                 .Where(t => t.Name == _DATABASE_NAME_TAG)
                 .Select(s => s.ID)
                 .SingleOrDefault();
@@ -690,17 +658,17 @@ namespace Extract.Utilities.ContextTags
             }
 
             // Get the all the context id's
-            var ContextIDs = _database.Context.Select(c => c.ID).Distinct();
+            var ContextIDs = _database.Contexts.Select(c => c.ID).ToList();
 
             // For each context ID get the database name and database Server (if it exists)
             foreach (var contextID in ContextIDs)
             {
                 DatabaseData db = new DatabaseData();
-                db.Server = _database.TagValue
+                db.Server = _database.TagValues
                     .Where(t => t.TagID == DatabaseServerTagID && t.ContextID == contextID)
                     .Select(t => t.Value)
                     .SingleOrDefault();
-                db.Database = _database.TagValue
+                db.Database = _database.TagValues
                   .Where(t => t.TagID == DatabaseNameTagID && t.ContextID == contextID)
                   .Select(t => t.Value)
                   .SingleOrDefault();
