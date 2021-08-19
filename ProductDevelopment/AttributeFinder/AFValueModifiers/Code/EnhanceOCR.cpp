@@ -1003,7 +1003,7 @@ void CEnhanceOCR::enhanceOCR(IAFDocumentPtr ipAFDoc, IOCRParametersPtr ipOCRPara
 						// update the progress status any further.
 						m_ipProgressStatus = __nullptr;
 
-						if (!bRetried && !Contains(ue.getTopText(), "Too many lines"))
+						if (!bRetried)
 						{
 							UCLIDException uexOuter("ELI36715",
 								"Enhance OCR attempt failed; retrying...", ue);

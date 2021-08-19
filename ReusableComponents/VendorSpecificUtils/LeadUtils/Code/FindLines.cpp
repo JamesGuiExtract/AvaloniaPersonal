@@ -48,8 +48,8 @@ static const int gnFAT_LINE_CUTTOFF = 25;
 static const int gnFAT_LINE_MAX_CHECK_PERCENT = 25;
 static const int gnFAT_LINE_LENGTH_OVERLAP = 85;
 
-// Too many lines cause unacceptable processing times
-static const int gnMAX_LINES_TO_PROCESS = 1000;
+// Too many lines cause unacceptable processing times in correctFatLines
+static const int gnMAX_LINES_TO_CORRECT = 5000;
 
 //-------------------------------------------------------------------------------------------------
 // Statics
@@ -183,11 +183,12 @@ void LeadToolsLineFinder::findLines(pBITMAPHANDLE pBitmap, L_UINT uFlags, vector
 				throwExceptionIfNotSuccess(nRet, "ELI19045", "Failure when searching for image lines!");
 			}
 
-			ASSERT_RUNTIME_CONDITION("ELI51403", m_pvecLines->size() <= gnMAX_LINES_TO_PROCESS, "Too many lines detected: " + asString(m_pvecLines->size()));
-
 			// [P16:2884] A higher LINEREMOVE::iWall settings means some lines will have a larger width
 			// than appropriate.  Attempt to correct such lines.
-			correctFatLines(rvecLines);
+			if (m_pvecLines->size() <= gnMAX_LINES_TO_CORRECT)
+			{
+				correctFatLines(rvecLines);
+			}
 
 			_lastCodePos = "40";
 
@@ -288,8 +289,6 @@ void LeadToolsLineFinder::correctFatLines(vector<LineRect>& rvecLines)
 			LINEREMOVE lr(m_lr);
 			lr.iWall = m_lr.iWall / 2;
 			L_LineRemoveBitmap(&hBitmapRegion, &lr, lineRemoveCB, (LPVOID *)this, 0);
-
-			ASSERT_RUNTIME_CONDITION("ELI51404", m_pvecLines->size() <= gnMAX_LINES_TO_PROCESS, "Too many lines detected: " + asString(m_pvecLines->size()));
 
 			_lastCodePos = "50";
 
