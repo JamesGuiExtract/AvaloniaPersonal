@@ -384,7 +384,8 @@ namespace Extract.Utilities.ContextTags
             {
                 try
                 {
-                    return GetSchemaVersion() < CurrentSchemaVersion;
+                    // Update the schema past the current version to hand-off management to ContextTagsSqliteDatabaseManager
+                    return GetSchemaVersion() < 3;
                 }
                 catch (Exception ex)
                 {
@@ -424,7 +425,7 @@ namespace Extract.Utilities.ContextTags
             {
                 if (connection == null)
                 {
-                    throw new ArgumentNullException("connection");
+                    throw new ArgumentNullException(nameof(connection));
                 }
 
                 if (!(connection is SqlCeConnection))
@@ -471,7 +472,7 @@ namespace Extract.Utilities.ContextTags
 
                 if (cancelTokenSource == null)
                 {
-                    throw new ArgumentNullException("cancelTokenSource");
+                    throw new ArgumentNullException(nameof(cancelTokenSource));
                 }
 
                 int version = GetSchemaVersion();
@@ -482,7 +483,7 @@ namespace Extract.Utilities.ContextTags
 
                 CancellationToken ct = cancelTokenSource.Token;
 
-                var task = Task.Factory.StartNew<string>(() =>
+                var task = Task.Run(() =>
                 {
                     // Check if the task has already been cancelled
                     ct.ThrowIfCancellationRequested();
@@ -491,7 +492,7 @@ namespace Extract.Utilities.ContextTags
                     ResetDatabase();
                     string backUpFileName = BackupDatabase();
 
-                    while (version < CurrentSchemaVersion)
+                    while (version < 3)
                     {
                         switch (version)
                         {
@@ -499,6 +500,7 @@ namespace Extract.Utilities.ContextTags
                                 UpdateFromVersion1SchemaToVersion2();
                                 break;
                             case 2:
+                                UpdateFromVersion2SchemaToVersion3();
                                 break;
 
                             default:
@@ -586,6 +588,51 @@ namespace Extract.Utilities.ContextTags
             }
         }
 
+        // Replace the schema manager with ContextTagsSqliteDatabaseManager
+        private void UpdateFromVersion2SchemaToVersion3()
+        {
+            using ContextTagDatabase currentDb = new(_databaseFile);
+            if (currentDb.Connection.State != ConnectionState.Open)
+            {
+                currentDb.Connection.Open();
+            }
+            using DbTransaction trans = currentDb.Connection.BeginTransaction();
+            currentDb.Transaction = trans;
+
+            var schemaManager = currentDb.Settings
+                .Where(s => s.Name == DatabaseHelperMethods.DatabaseSchemaManagerKey)
+                .FirstOrDefault();
+
+            if (schemaManager is null)
+            {
+                currentDb.Settings.InsertOnSubmit(new Settings()
+                {
+                    Name = DatabaseHelperMethods.DatabaseSchemaManagerKey,
+                    Value = ContextTagsSqliteDatabaseManager.DBSchemaManager
+                });
+            }
+            else
+            {
+                schemaManager.Value = ContextTagsSqliteDatabaseManager.DBSchemaManager;
+            }
+
+            // Update the schema version to 3
+            var setting = currentDb.Settings
+                .Where(s => s.Name == ContextTagsDBSchemaVersionKey)
+                .FirstOrDefault();
+            if (setting.Value is null)
+            {
+                var ee = new ExtractException("ELI51830",
+                    "No context tags db schema version key found.");
+                ee.AddDebugData("Database File", _databaseFile, false);
+                throw ee;
+            }
+            setting.Value = "3";
+
+            currentDb.SubmitChanges(ConflictMode.FailOnFirstConflict);
+            trans.Commit();
+        }
+
         #endregion
 
         #region IDisposable
@@ -606,7 +653,7 @@ namespace Extract.Utilities.ContextTags
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {

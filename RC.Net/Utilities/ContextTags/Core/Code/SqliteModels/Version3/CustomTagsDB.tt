@@ -1,0 +1,12 @@
+﻿<#@ template language="C#" debug="True" hostSpecific="True" #>
+<#@ output extension=".generated.cs"                        #>
+
+<#@ include file="$(LinqToDBT4SQLiteTemplatesPath)LinqToDB.SQLite.Tools.ttinclude" once="true" #>
+<#@ include file="$(LinqToDBT4SQLiteTemplatesPath)PluralizationService.ttinclude"  once="true" #>
+<#
+	NamespaceName = "Extract.Utilities.ContextTags.SqliteModels.Version3";
+
+	LoadSQLiteMetadata(Host.ResolveAssemblyReference("$(ProjectDir)SqliteModels\\Version3"), "CustomTags.sqlite");
+
+	GenerateModel();
+#>

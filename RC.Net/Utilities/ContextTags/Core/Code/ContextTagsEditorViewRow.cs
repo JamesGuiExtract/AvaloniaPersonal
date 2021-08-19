@@ -31,17 +31,17 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// Constant string for the database server tag.
         /// </summary>
-        static readonly string DatabaseServerTag = "<DatabaseServer>";
+        const string DatabaseServerTag = "<DatabaseServer>";
 
         /// <summary>
         /// Constant string for the database name tag.
         /// </summary>
-        static readonly string DatabaseNameTag = "<DatabaseName>";
+        const string DatabaseNameTag = "<DatabaseName>";
 
         /// <summary>
         /// Constant string for the default values tag
         /// </summary>
-        static readonly string DefaultValuesTag = "<DefaultValues>";
+        const string DefaultValuesTag = "<DefaultValues>";
 
         #endregion Constants
 
@@ -170,17 +170,9 @@ namespace Extract.Utilities.ContextTags
         {
             get
             {
-                try
+                lock (_workflowLock)
                 {
-                    lock (_workflowLock)
-                    {
-                        return _workflow;
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI43269");
+                    return _workflow;
                 }
             }
             set
@@ -536,7 +528,7 @@ namespace Extract.Utilities.ContextTags
                     .SingleOrDefault();
 
                 return workflowContextValues ??  contextValues
-                     .Where(tagValue => tagValue.TagID == row.CustomTag.ID && tagValue.Workflow == "")
+                     .Where(tagValue => tagValue.TagID == row.CustomTag.ID && tagValue.Workflow.Length == 0)
                      .Select(tagValue => tagValue.Value)
                      .SingleOrDefault();
             }

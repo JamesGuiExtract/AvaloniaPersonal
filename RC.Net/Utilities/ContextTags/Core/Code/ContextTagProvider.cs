@@ -1,6 +1,7 @@
 ﻿using Extract.Licensing;
 using Extract.SQLCDBEditor;
 using Extract.Utilities.Forms;
+using Extract.Utilities.SqlCompactToSqliteConverter;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -33,12 +34,12 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// The name of the SQL CE database file that defines the context-specific tags.
         /// </summary>
-        static readonly string _SETTING_FILENAME = "CustomTags.sdf";
+        const string _SETTING_FILENAME = "CustomTags.sqlite";
 
         /// <summary>
         /// The label of the option in the tags list to edit the available custom tags.
         /// </summary>
-        static readonly string _EDIT_CUSTOM_TAGS_LABEL = "Edit custom tags...";
+        const string _EDIT_CUSTOM_TAGS_LABEL = "Edit custom tags...";
 
         #endregion Constants
 
@@ -49,13 +50,12 @@ namespace Extract.Utilities.ContextTags
         /// Primary key is workflow name
         /// Secondary key is tag name
         /// </summary>
-        Dictionary<string, Dictionary<string, string>> _workflowTagValues =
-            new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, Dictionary<string, string>> _workflowTagValues = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// A cached <see cref="VariantVector"/> for each thread that calls into GetTagNames.
         /// </summary>
-        Dictionary<int, VariantVector> _tagNamesVectors = new Dictionary<int, VariantVector>();
+        readonly Dictionary<int, VariantVector> _tagNamesVectors = new();
 
         /// <summary>
         /// The path for which the tags apply (the directory where the FPS files that will use
@@ -70,20 +70,9 @@ namespace Extract.Utilities.ContextTags
         string _activeContext;
 
         /// <summary>
-        /// For the specified contextPath, the currently available manager (if any).
-        /// </summary>
-        (string contextPath, ContextTagDatabaseManager manager) _readOnlyManager;
-
-        /// <summary>
-        /// Indicates whether access to a local read-only context database has been permanently
-        /// closed.
-        /// </summary>
-        bool _localDatabaseClosed;
-
-        /// <summary>
         /// Controls access to _tagValues from multiple threads.
         /// </summary>
-        object _lock = new object();
+        readonly object _lock = new();
 
         #endregion Fields
 
@@ -111,25 +100,6 @@ namespace Extract.Utilities.ContextTags
 
         #endregion Constructors
 
-        #region Finalizer
-
-        /// <summary>
-        /// Finalizes an instance of the <see cref="ContextTagProvider"/> class.
-        /// </summary>
-        ~ContextTagProvider()
-        {
-            try
-            {
-                _readOnlyManager.manager?.Dispose();
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractLog("ELI44958");
-            }
-        }
-
-        #endregion Finalizer
-
         #region IContextTagProvider
 
         /// <summary>
@@ -152,6 +122,7 @@ namespace Extract.Utilities.ContextTags
                 {
                     if (value != _contextPath)
                     {
+                        _ = value ?? throw new ArgumentNullException(nameof(value));
                         LoadTagsForPath(value);
                         _contextPath = value;
                     }
@@ -266,24 +237,22 @@ namespace Extract.Utilities.ContextTags
                     bool createdDatabase = false;
 
                     // Create the database if it doesn't already exist.
-                    string settingFileName = Path.Combine(ContextPath, _SETTING_FILENAME);
-                    if (!File.Exists(settingFileName))
+                    string customTagsDatabase = GetCustomTagsDatabasePath(ContextPath);
+                    if (!File.Exists(customTagsDatabase))
                     {
-                        using (var manager = new ContextTagDatabaseManager(settingFileName, readOnly: false))
-                        {
-                            manager.CreateDatabase(true);
-                            createdDatabase = true;
-                        }
+                        var manager = new ContextTagsSqliteDatabaseManager(customTagsDatabase);
+                        manager.CreateDatabase();
+                        createdDatabase = true;
                     }
 
-                    EditDatabase(settingFileName, (IntPtr)hParentWindow);
+                    EditDatabase(customTagsDatabase, (IntPtr)hParentWindow);
 
                     // Re-load so that the available tags reflect the edits.
                     if (!LoadTagsForPath(ContextPath) && createdDatabase)
                     {
                         // If the database didn't previously exist and no tags were added, don't
                         // keep the database file.
-                        FileSystemMethods.DeleteFile(settingFileName);
+                        FileSystemMethods.DeleteFile(customTagsDatabase);
 
                         // Clear the "No context defined!" message if the database isn't to be
                         // persisted.
@@ -403,8 +372,15 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                var manager = GetReadOnlyManager(contextPath);
-                return manager?.IsUpdateRequired ?? false;
+                string customTagsDatabase = GetCustomTagsDatabasePath(contextPath);
+
+                if (!File.Exists(customTagsDatabase))
+                {
+                    return false;
+                }
+
+                var manager = new ContextTagsSqliteDatabaseManager(customTagsDatabase);
+                return manager.IsUpdateRequired;
             }
             catch (Exception ex)
             {
@@ -424,12 +400,11 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
-                string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
-                using (var manager = new ContextTagDatabaseManager(settingFileName, readOnly: false))
-                {
-                    var task = manager.BeginUpdateToLatestSchema(null, new CancellationTokenSource());
-                    task.Wait();
-                }
+                string customTagsDatabase = GetCustomTagsDatabasePath(contextPath);
+
+                var manager = new ContextTagsSqliteDatabaseManager(customTagsDatabase);
+                using var tokenSource = new CancellationTokenSource();
+                manager.UpdateToLatestSchema().GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -437,73 +412,14 @@ namespace Extract.Utilities.ContextTags
             }
         }
 
-        /// <summary>
-        /// Closes any open read-only context tag database. This is permanent; this instance will no
-        /// longer have access to a read-only copy of the context tag database.
-        /// </summary>
+        /// Does nothing
         public void CloseDatabase()
         {
-            try
-            {
-                lock (_lock)
-                {
-                    _localDatabaseClosed = true;
-                    CloseDB();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI44955");
-            }
         }
 
         #endregion IContextTagProvider
 
         #region Private Members
-
-        /// <summary>
-        /// Gets a <see cref="ContextTagDatabaseManager"/> instance for the specified
-        /// <see cref="ContextTagDatabaseManager"/> in read-only mode.
-        /// </summary>
-        /// <param name="contextPath">The context path for the manager.</param>
-        /// <returns></returns>
-        ContextTagDatabaseManager GetReadOnlyManager(string contextPath)
-        {
-            try
-            {
-                lock (_lock)
-                {
-                    if (_localDatabaseClosed)
-                    {
-                        return null;
-                    }
-
-                    if (_readOnlyManager.contextPath != contextPath)
-                    {
-                        CloseDB();
-                    }
-
-                    if (_readOnlyManager.manager == null)
-                    {
-                        string settingFileName = Path.Combine(contextPath, _SETTING_FILENAME);
-                        if (File.Exists(settingFileName))
-                        {
-                            _readOnlyManager = (contextPath, new ContextTagDatabaseManager(settingFileName, true));
-                        }
-                    }
-                    else
-                    {
-                        _readOnlyManager.manager.RefreshDatabase();
-                    }
-
-                    return _readOnlyManager.manager;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI44950");
-            }
-        }
 
         /// <summary>
         /// Initializes <see cref="_workflowTagValues"/> with the tags for the specified
@@ -532,25 +448,26 @@ namespace Extract.Utilities.ContextTags
                     return false;
                 }
 
-                // If _SETTING_FILENAME doesn't exist, there is nothing more to do.
-                var manager = GetReadOnlyManager(contextPath);
-                if (manager == null)
+                // If _SETTING_FILENAME doesn't exist, there is not much more to do.
+                string customTagsDatabase = GetCustomTagsDatabasePath(contextPath);
+                if (!File.Exists(customTagsDatabase))
                 {
                     // Even if there are no custom tags available, provide the option to edit.
                     _workflowTagValues[""].Add(_EDIT_CUSTOM_TAGS_LABEL, "");
                     return false;
                 }
 
+                var manager = new ContextTagsSqliteDatabaseManager(customTagsDatabase);
+
                 // Check if the database is the current version
                 if (manager.IsUpdateRequired)
                 {
-                    ExtractException updateRequiredException = new ExtractException("ELI43316", "ContextTag database requires update.");
+                    ExtractException updateRequiredException = new("ELI43316", "ContextTag database requires update.");
                     try
                     {
-                        string settingFileName = Path.Combine(ContextPath, _SETTING_FILENAME);
-                        updateRequiredException.AddDebugData("ContextTagDatabase", settingFileName, false);
+                        updateRequiredException.AddDebugData("ContextTagDatabase", customTagsDatabase, false);
                         updateRequiredException.AddDebugData("DatabaseVersion", manager.GetSchemaVersion(), false);
-                        updateRequiredException.AddDebugData("ExpectedVersion", ContextTagDatabaseManager.CurrentSchemaVersion, false);
+                        updateRequiredException.AddDebugData("ExpectedVersion", ContextTagsSqliteDatabaseManager.CurrentSchemaVersion, false);
                         throw updateRequiredException;
                     }
                     catch(Exception ex)
@@ -560,63 +477,12 @@ namespace Extract.Utilities.ContextTags
                     }
                 }
 
-                // In case some users are using a mapped drive, convert to a UNC path to try
-                // to ensure as much as possible that all users accessing the same folder
-                // will be correctly associated with the proper context.
-                string UNCPath = contextPath;
-                FileSystemMethods.ConvertToNetworkPath(ref UNCPath, false);
-                if (UNCPath.EndsWith("\\", StringComparison.OrdinalIgnoreCase))
-                {
-                    UNCPath = UNCPath.Substring(0, UNCPath.Length - 1);
-                }
+                _activeContext = manager.GetContextNameForDirectory(contextPath);
 
-                _activeContext = manager.ContextTagDatabase.GetContextNameForDirectory(UNCPath);
-
-                // We were able to find a proper context; load all tag values for this
-                // context.
+                // We were able to find a proper context; load all tag values for this context.
                 if (_activeContext != null)
                 {
-                    // The row that is mapped to the new row in a DataGridView can end up being
-                    // persisted. Ignore any unnamed custom tags.
-
-                    // Get the workflows
-                    var workflows = manager.ContextTagDatabase.TagValue
-                        .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
-                            tagValue.CustomTag.Name != "")
-                        .Select(w => w.Workflow)
-                        .Distinct().ToList();
-
-                    // Get dictionary of values for each workflow
-                    foreach (string workflow in workflows)
-                    {
-                        // Get the values that are for the current workflow
-                        var workflowValues = manager.ContextTagDatabase.TagValue
-                            .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
-                                tagValue.CustomTag.Name != "" && tagValue.Workflow == workflow)
-                            .Select(tagValue => new { tagValue.CustomTag.Name, tagValue.Value })
-                            .Distinct();
-
-                        var definedTags = workflowValues.Select(v => v.Name);
-
-                        if (!string.IsNullOrEmpty(workflow))
-                        {
-                            _workflowTagValues.Remove(workflow);
-                            _workflowTagValues[workflow] = workflowValues
-                                .Union(manager.ContextTagDatabase.TagValue
-                                .Where(tagValue => tagValue.Context.Name.Equals(_activeContext) &&
-                                    tagValue.CustomTag.Name != "" && !definedTags.Contains(tagValue.CustomTag.Name) && tagValue.Workflow == "")
-                                .Select(tagValue => new { tagValue.CustomTag.Name, tagValue.Value })
-                                .Distinct())
-                                .ToDictionary(tagValue =>
-                                    tagValue.Name, tagValue => tagValue.Value, StringComparer.OrdinalIgnoreCase);
-                        }
-                        else
-                        {
-                            _workflowTagValues.Remove(workflow);
-                            _workflowTagValues[workflow] = workflowValues.ToDictionary(tagValue =>
-                                tagValue.Name, tagValue => tagValue.Value, StringComparer.OrdinalIgnoreCase);
-                        }
-                    }
+                    _workflowTagValues = manager.GetContextTagsByWorkflow(_activeContext);
                 }
                 else
                 {
@@ -625,9 +491,7 @@ namespace Extract.Utilities.ContextTags
  
                 _workflowTagValues[""].Add(_EDIT_CUSTOM_TAGS_LABEL, "");
 
-                bool dataLoaded = manager.ContextTagDatabase.Context.Any() || manager.ContextTagDatabase.CustomTag.Any();
-
-                manager.ResetDatabase();
+                bool dataLoaded = !manager.IsDatabaseEmpty();
 
                 return dataLoaded;
             }
@@ -700,15 +564,6 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Closes any open read-only context tag database.
-        /// </summary>
-        void CloseDB()
-        {
-            _readOnlyManager.manager?.Dispose();
-            _readOnlyManager = ("", null);
-        }
-
-        /// <summary>
         /// Idles the current thread until while running the message loop until 
         /// <see paramref="waitHandle"/> is signaled.
         /// </summary>
@@ -725,6 +580,17 @@ namespace Extract.Utilities.ContextTags
                     WindowsMessage.DoEventsExcept(WindowsMessage.UserInputMessages);
                 }
             }
+        }
+
+        /// Compute the path to the custom tags database and convert from Sql Compact to SQLite if needed
+        static string GetCustomTagsDatabasePath(string contextPath)
+        {
+            string customTagsDatabase = Path.Combine(contextPath, _SETTING_FILENAME);
+
+            // Convert from sql compact to sqlite if needed/possible
+            DatabaseConverter.ConvertDatabaseIfNeeded(customTagsDatabase).GetAwaiter().GetResult();
+
+            return customTagsDatabase;
         }
 
         #endregion Private Members

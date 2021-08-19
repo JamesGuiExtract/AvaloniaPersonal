@@ -1,5 +1,6 @@
 using Extract.FileActionManager.Database;
 using Extract.Utilities;
+using Extract.Utilities.SqlCompactToSqliteConverter;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -68,7 +69,7 @@ namespace Extract.FileActionManager.Utilities
             {
                 string databaseFile = ESFAMService.GetDatabaseFileName(_serviceInstaller.ServiceName);
 
-                bool convertedFromSqlCompact = ESFAMService.ConvertDatabaseIfNeeded(databaseFile).GetAwaiter().GetResult();
+                bool convertedFromSqlCompact = DatabaseConverter.ConvertDatabaseIfNeeded(databaseFile).GetAwaiter().GetResult();
 
                 var manager = new FAMServiceSqliteDatabaseManager(databaseFile);
 

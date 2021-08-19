@@ -758,7 +758,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.DataEntry.LabDE", "
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Utilities.ContextTags", "..\..\..\..\..\RC.Net\Utilities\ContextTags\Core\Code\Extract.Utilities.ContextTags.csproj", "{4114A956-D3F0-4D89-B3BF-8BC45046129C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.ContextTags", "..\..\..\..\..\RC.Net\Utilities\ContextTags\Core\Code\Extract.Utilities.ContextTags.csproj", "{4114A956-D3F0-4D89-B3BF-8BC45046129C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
 		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
@@ -1318,6 +1318,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SQLiteDataProvider", "..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SQLiteDataProvider\Microsoft.Data.ConnectionUI.SQLiteDataProvider.csproj", "{B97CAC92-16D9-48C6-B177-322457DCC8E8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.SqlCompactToSqliteConverter", "..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SqlCompactToSqliteConverter\Lib\Extract.Utilities.SqlCompactToSqliteConverter.csproj", "{F3F0B503-593E-4356-A619-BA451134AF00}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.ContextTags.Test", "..\..\..\..\..\RC.Net\Utilities\ContextTags\Core\Test\Extract.Utilities.ContextTags.Test.csproj", "{DEC469CB-1E54-4F58-9B09-4582A832B26C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -6777,6 +6779,36 @@ Global
 		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|x64.Build.0 = Debug|Any CPU
 		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|x86.ActiveCfg = Debug|Any CPU
 		{F3F0B503-593E-4356-A619-BA451134AF00}.Template|x86.Build.0 = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Debug|Win32.Build.0 = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Debug|x64.Build.0 = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Debug|x86.Build.0 = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Release|Win32.Build.0 = Release|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Release|x64.ActiveCfg = Release|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Release|x64.Build.0 = Release|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Release|x86.ActiveCfg = Release|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Release|x86.Build.0 = Release|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Template|Win32.Build.0 = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Template|x64.ActiveCfg = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Template|x64.Build.0 = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Template|x86.ActiveCfg = Debug|Any CPU
+		{DEC469CB-1E54-4F58-9B09-4582A832B26C}.Template|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

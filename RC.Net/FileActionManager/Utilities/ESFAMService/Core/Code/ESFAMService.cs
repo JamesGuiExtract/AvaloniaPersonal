@@ -251,7 +251,7 @@ namespace Extract.FileActionManager.Utilities
                 if (TryGetServiceName(out _serviceName))
                 {
                     _databaseFile = GetDatabaseFileName(_serviceName);
-                    ConvertDatabaseIfNeeded(_databaseFile).GetAwaiter().GetResult();
+                    DatabaseConverter.ConvertDatabaseIfNeeded(_databaseFile).GetAwaiter().GetResult();
                 }
                 else
                 {
@@ -1629,25 +1629,6 @@ namespace Extract.FileActionManager.Utilities
         {
             return FileSystemMethods.PathCombine(
                 FileSystemMethods.CommonApplicationDataPath, "ESFAMService", serviceName + ".sqlite");
-        }
-
-        /// <summary>
-        /// Creates a sqlite database at the supplied path if the file doesn't already exist and there is
-        /// an existing sql compact database with the same name (the extension of the supplied path changed to .sdf)
-        /// </summary>
-        /// <param name="databaseFile">The path to a sqlite database that may or may not exist</param>
-        /// <returns>True if the file was created by this method and false if it was not</returns>
-        internal static async Task<bool> ConvertDatabaseIfNeeded(string databaseFile)
-        {
-            string legacyDatabaseFile = Path.ChangeExtension(databaseFile, ".sdf");
-            if (File.Exists(legacyDatabaseFile) && !File.Exists(databaseFile))
-            {
-                var converter = new DatabaseConverter(new DatabaseSchemaManagerProvider());
-                await converter.Convert(legacyDatabaseFile, databaseFile).ConfigureAwait(false);
-                return true;
-            }
-
-            return false;
         }
     }
 }

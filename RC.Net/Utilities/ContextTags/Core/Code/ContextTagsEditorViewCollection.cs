@@ -49,7 +49,7 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// Flag to indicate that data is being loaded from the database
         /// </summary>
-        bool _dataLoading = false;
+        bool _dataLoading;
 
         #endregion Fields
 
@@ -149,13 +149,13 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Retrieves an array of <see cref="T:PropertyDescriptor"/> objects representing the
+        /// Retrieves an array of <see cref="PropertyDescriptor"/> objects representing the
         /// bindable properties of the data source list type.
         /// </summary>
-        /// <param name="listAccessors">An array of <see cref="T:PropertyDescriptor"/> objects to
+        /// <param name="listAccessors">An array of <see cref="PropertyDescriptor"/> objects to
         /// find in the list as bindable.</param>
         /// <returns>
-        /// An array of <see cref="T:System.ComponentModel.PropertyDescriptor"/> objects that
+        /// An array of <see cref="System.ComponentModel.PropertyDescriptor"/> objects that
         /// represents the properties on this list type used to bind data.
         /// </returns>
         public override PropertyDescriptorCollection GetItemProperties(
@@ -180,9 +180,9 @@ namespace Extract.Utilities.ContextTags
         #region IList<ContextTagsEditorView> Members
 
         /// <summary>
-        /// Determines the index of a specific item in the <see cref="T:IList`1"/>.
+        /// Determines the index of a specific item in the <see cref="IList`1"/>.
         /// </summary>
-        /// <param name="item">The object to locate in the <see cref="T:IList`1"/>.</param>
+        /// <param name="item">The object to locate in the <see cref="IList`1"/>.</param>
         /// <returns>
         /// The index of item if found in the list; otherwise, -1.
         /// </returns>
@@ -199,10 +199,10 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Inserts an item to the <see cref="T:IList`1"/> at the specified index.
+        /// Inserts an item to the <see cref="IList`1"/> at the specified index.
         /// </summary>
         /// <param name="index">The zero-based index at which item should be inserted.</param>
-        /// <param name="item">The object to insert into the <see cref="T:IList`1"/>.</param>
+        /// <param name="item">The object to insert into the <see cref="IList`1"/>.</param>
         void IList<ContextTagsEditorViewRow>.Insert(int index, ContextTagsEditorViewRow item)
         {
             try
@@ -262,9 +262,9 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Adds an item to the <see cref="T:ICollection`1"/>.
+        /// Adds an item to the <see cref="ICollection`1"/>.
         /// </summary>
-        /// <param name="item">The object to add to the <see cref="T:ICollection`1"/>.</param>
+        /// <param name="item">The object to add to the <see cref="ICollection`1"/>.</param>
         void ICollection<ContextTagsEditorViewRow>.Add(ContextTagsEditorViewRow item)
         {
             try
@@ -294,11 +294,11 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Determines whether the <see cref="T:ICollection`1"/> contains a specific value.
+        /// Determines whether the <see cref="ICollection`1"/> contains a specific value.
         /// </summary>
-        /// <param name="item">The object to locate in the <see cref="T:ICollection`1"/>.</param>
+        /// <param name="item">The object to locate in the <see cref="ICollection`1"/>.</param>
         /// <returns>
-        /// <see langword="true"/> if item is found in the <see cref="T:ICollection`1"/>; otherwise,
+        /// <see langword="true"/> if item is found in the <see cref="ICollection`1"/>; otherwise,
         /// <see langword="false"/>.
         /// </returns>
         bool ICollection<ContextTagsEditorViewRow>.Contains(ContextTagsEditorViewRow item)
@@ -314,7 +314,7 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Copies the elements of the <see cref="T:ICollection`1"/> to an
+        /// Copies the elements of the <see cref="ICollection`1"/> to an
         /// <see cref="ContextTagsEditorViewRow"/> array, starting at a particular index.
         /// </summary>
         /// <param name="array">The array.</param>
@@ -366,14 +366,14 @@ namespace Extract.Utilities.ContextTags
         }
 
         /// <summary>
-        /// Removes the first occurrence of a specific object from the <see cref="T:ICollection`1"/>.
+        /// Removes the first occurrence of a specific object from the <see cref="ICollection`1"/>.
         /// </summary>
-        /// <param name="item">The object to remove from the <see cref="T:ICollection`1"/>.</param>
+        /// <param name="item">The object to remove from the <see cref="ICollection`1"/>.</param>
         /// <returns>
         /// <see langword="true"/> if item was successfully removed from the
-        /// <see cref="T:ICollection`1"/>; otherwise, <see langword="false"/>. This method also
+        /// <see cref="ICollection`1"/>; otherwise, <see langword="false"/>. This method also
         /// returns <see langword="false"/> if item is not found in the original
-        /// <see cref="T:ICollection`1"/>.
+        /// <see cref="ICollection`1"/>.
         /// </returns>
         bool ICollection<ContextTagsEditorViewRow>.Remove(ContextTagsEditorViewRow item)
         {
@@ -391,7 +391,7 @@ namespace Extract.Utilities.ContextTags
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns>
-        /// A <see cref="T:IEnumerator`1"/> that can be used to iterate through the collection.
+        /// A <see cref="IEnumerator`1"/> that can be used to iterate through the collection.
         /// </returns>
         IEnumerator<ContextTagsEditorViewRow> IEnumerable<ContextTagsEditorViewRow>.GetEnumerator()
         {
@@ -409,7 +409,7 @@ namespace Extract.Utilities.ContextTags
         /// Retrieves an enumerator for the <see cref="P:BindingSource.List"/>.
         /// </summary>
         /// <returns>
-        /// An <see cref="T:Collections.IEnumerator"/> for the <see cref="P:BindingSource.List"/>.
+        /// An <see cref="Collections.IEnumerator"/> for the <see cref="P:BindingSource.List"/>.
         /// </returns>
         IEnumerator IEnumerable.GetEnumerator()
         {

@@ -88,23 +88,34 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
 
                 if (_schemaManagerProvider.GetSqlCompactSchemaManager(databasePath) is IDatabaseSchemaManager updater)
                 {
-                    using SqlCeConnection connection = new(SqlCompactMethods.BuildDBConnectionString(databasePath, true));
-                    updater.SetDatabaseConnection(connection);
-                    if (updater.IsUpdateRequired)
+                    try
                     {
-                        using CancellationTokenSource tokenSource = new();
-                        string backupPath = await updater.BeginUpdateToLatestSchema(null, tokenSource).ConfigureAwait(false);
-
-                        if (!string.IsNullOrEmpty(backupPath))
+                        using SqlCeConnection connection = new(SqlCompactMethods.BuildDBConnectionString(databasePath, true));
+                        updater.SetDatabaseConnection(connection);
+                        if (updater.IsUpdateRequired)
                         {
-                            File.Delete(backupPath);
-                        }
+                            using CancellationTokenSource tokenSource = new();
+                            string backupPath = await updater.BeginUpdateToLatestSchema(null, tokenSource).ConfigureAwait(false);
 
-                        statusCallback(" Updated schema.");
+                            if (!string.IsNullOrEmpty(backupPath))
+                            {
+                                File.Delete(backupPath);
+                            }
+
+                            statusCallback(" Updated schema.");
+                        }
+                        else
+                        {
+                            statusCallback(" No updates required.");
+                        }
                     }
-                    else
+                    finally
                     {
-                        statusCallback(" No updates required.");
+                        // ContextTagDatabaseManager is an IDisposable, e.g.
+                        if (updater is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
                     }
                 }
                 else
@@ -151,6 +162,25 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
             {
                 yield return accumulator.ToString().TrimEnd();
             }
+        }
+
+        /// <summary>
+        /// Creates a sqlite database at the supplied path if the file doesn't already exist and there is
+        /// an existing sql compact database with the same name (the extension of the supplied path changed to .sdf)
+        /// </summary>
+        /// <param name="databaseFile">The path to a sqlite database that may or may not exist</param>
+        /// <returns>True if the file was created by this method and false if it was not</returns>
+        public static async Task<bool> ConvertDatabaseIfNeeded(string databaseFile)
+        {
+            string legacyDatabaseFile = Path.ChangeExtension(databaseFile, ".sdf");
+            if (File.Exists(legacyDatabaseFile) && !File.Exists(databaseFile))
+            {
+                var converter = new DatabaseConverter(new DatabaseSchemaManagerProvider());
+                await converter.Convert(legacyDatabaseFile, databaseFile).ConfigureAwait(false);
+                return true;
+            }
+
+            return false;
         }
 
         // Export a SQL Compact DB to a script file

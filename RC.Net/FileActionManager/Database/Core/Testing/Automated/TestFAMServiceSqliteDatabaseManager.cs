@@ -143,6 +143,24 @@ namespace Extract.FileActionManager.Database.Test
             Assert.AreEqual(1, _manager.GetSchemaVersion());
         }
 
+        /// Confirm that no update is required for a new database
+        [Test, Category("Automated")]
+        public void IsUpdateRequired_IsFalseForNewDatabase()
+        {
+            Assert.IsFalse(_manager.IsUpdateRequired);
+        }
+
+        /// Confirm update is required for an old database version
+        [Test, Category("Automated")]
+        public void IsUpdateRequired_IsTrueWhenVersionIsOld()
+        {
+            // Change the schema version
+            using var db = new CurrentFAMServiceDB(SqliteMethods.BuildConnectionOptions(_currentServiceDBFile.FileName));
+            db.Update(new Settings { Name = CurrentFAMServiceDBSettings.ServiceDBSchemaVersionKey, Value = "1" });
+
+            Assert.IsTrue(_manager.IsUpdateRequired);
+        }
+
         // Confirm that GetFpsFileData returns the correct data
         [TestCase(false, TestName = "GetFpsFileData_IncludingZeroInstanceRows")]
         [TestCase(true, TestName = "GetFpsFileData_ExcludingZeroInstanceRows")]
@@ -186,7 +204,6 @@ namespace Extract.FileActionManager.Database.Test
             CollectionAssert.AreEquivalent(new KeyValuePair<string, string>[0], actualSettings);
         }
 
-
         /// The manager class can be created from the value in the settings table
         [Test]
         [Category("Automated")]
@@ -198,6 +215,7 @@ namespace Extract.FileActionManager.Database.Test
 
             Assert.AreEqual(typeof(FAMServiceSqliteDatabaseManager), manager.GetType());
         }
+
 
         // Check that the managed db has the correct schema
         // TODO: This could be made more thorough...

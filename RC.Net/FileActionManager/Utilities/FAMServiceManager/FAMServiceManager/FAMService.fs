@@ -109,12 +109,7 @@ module FAMService =
     async {
       let programData = FileSystemMethods.CommonApplicationDataPath
       let sqlitePath = Path.Combine(programData, "ESFAMService", serviceName + ".sqlite")
-      if not (File.Exists sqlitePath)
-      then
-        let sdfPath = Path.Combine(programData, "ESFAMService", serviceName + ".sdf")
-        if File.Exists sdfPath then
-          let converter = DatabaseConverter(DatabaseSchemaManagerProvider())
-          do! Async.AwaitTask (converter.Convert(sdfPath, sqlitePath))
+      let! _ = Async.AwaitTask (DatabaseConverter.ConvertDatabaseIfNeeded sqlitePath)
       return sqlitePath
     }
     |> Async.RunSynchronously

@@ -29,17 +29,17 @@ namespace Extract.Utilities.ContextTags
         /// <summary>
         /// Database server tag name.
         /// </summary>
-        static readonly string _DATABASE_SERVER_TAG = "<DatabaseServer>";
+        const string _DATABASE_SERVER_TAG = "<DatabaseServer>";
 
         /// <summary>
         /// Database name tag name.
         /// </summary>
-        static readonly string _DATABASE_NAME_TAG = "<DatabaseName>";
+        const string _DATABASE_NAME_TAG = "<DatabaseName>";
 
         /// <summary>
         /// Constant string for the default values tag
         /// </summary>
-        static readonly string DefaultValuesTag = "<DefaultValues>";
+        const string DefaultValuesTag = "<DefaultValues>";
 
         #endregion Constants
 
@@ -229,6 +229,8 @@ namespace Extract.Utilities.ContextTags
         {
             try
             {
+                _ = pluginManager ?? throw new ArgumentNullException(nameof(pluginManager));
+
                 _pluginManager = pluginManager;
                 _pluginManager.AllowUserToAddRows = true;
                 _pluginManager.AllowUserToDeleteRows = true;
@@ -343,6 +345,12 @@ namespace Extract.Utilities.ContextTags
                     _database = null;
                 }
             }
+
+            _addDatabaseTagsButton?.Dispose();
+            _contextTagsView?.Dispose();
+            _editContextsButton?.Dispose();
+            _workflowComboBox?.Dispose();
+            _workflowLabel?.Dispose();
 
             base.Dispose(disposing);
         }
@@ -642,9 +650,8 @@ namespace Extract.Utilities.ContextTags
         /// <param name="addedWorkflows">Workflow to add</param>
         void AddWorkflows(List<string> addedWorkflows)
         {
-            var workflowsToAdd = addedWorkflows
-                 .Except(_workflows, StringComparer.CurrentCultureIgnoreCase);
-            if (workflowsToAdd.Count() > 0)
+            var workflowsToAdd = addedWorkflows.Except(_workflows, StringComparer.CurrentCultureIgnoreCase);
+            if (workflowsToAdd.Any())
             {
                 _workflows.AddRange(workflowsToAdd);
                 LoadWorkflowsIntoComboBox();
@@ -660,7 +667,7 @@ namespace Extract.Utilities.ContextTags
         {
             // Add the workflows that are already in the database
             var workflowsInContextDB = _database.TagValue
-                .Where(w => w.Workflow != "")
+                .Where(w => w.Workflow.Length != 0)
                 .Select(s => s.Workflow)
                 .Distinct().AsEnumerable()
                 .Except(_workflows, StringComparer.CurrentCultureIgnoreCase); 
@@ -729,7 +736,7 @@ namespace Extract.Utilities.ContextTags
                             .Select(w => w.Key)
                             .ToList();
 
-                        if (workflowsToAdd.Count() > 0)
+                        if (workflowsToAdd.Count > 0)
                         {
                             _workflowComboBox.SafeBeginInvoke("ELI43446", () =>
                                  {

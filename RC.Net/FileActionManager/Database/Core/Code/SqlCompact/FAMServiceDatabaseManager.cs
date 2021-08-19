@@ -1028,7 +1028,7 @@ namespace Extract.FileActionManager.Database
                 .FirstOrDefault();
             if (setting.Value is null)
             {
-                var ee = new ExtractException("ELI46429",
+                var ee = new ExtractException("ELI51833",
                     "No Service db schema version key found.");
                 ee.AddDebugData("Database File", _databaseFile, false);
                 throw ee;
