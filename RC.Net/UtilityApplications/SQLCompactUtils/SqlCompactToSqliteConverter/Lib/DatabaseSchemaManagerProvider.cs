@@ -52,7 +52,10 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
                     string className = result[0]["Value"].ToString();
                     updater =
                         UtilityMethods.CreateTypeFromTypeName(className) as IDatabaseSchemaManager;
-                    if (updater == null)
+                    // Fate of OMDB in SQLite world to be decided. For now, just ignore OrderMapperDatabaseSchemaManager
+                    // https://extract.atlassian.net/browse/ISSUE-17684
+                    if (updater == null
+                        && className != "Extract.LabResultsCustomComponents.OrderMapperDatabaseSchemaManager")
                     {
                         var ee = new ExtractException("ELI31154",
                             "Database contained an entry for schema manager, "

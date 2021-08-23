@@ -90,6 +90,14 @@
     <EmbeddedResource Include="SqliteModels\Version8\DDL.sql" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="SqliteModels\Version8\FAMServiceDB.generated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FAMServiceDB.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="RegAsm &quot;$(TargetPath)&quot; /tlb:&quot;$(ProjectDir)$(TargetName).tlb&quot;&#xD;&#xA;          if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>

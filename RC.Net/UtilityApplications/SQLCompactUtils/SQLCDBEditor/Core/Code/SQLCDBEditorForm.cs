@@ -4,12 +4,13 @@ using Extract.Licensing;
 using Extract.SQLCDBEditor.Properties;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
+using Extract.Utilities.SqlCompactToSqliteConverter;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlServerCe;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -21,6 +22,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TD.SandDock;
+
+using static System.FormattableString;
 
 namespace Extract.SQLCDBEditor
 {
@@ -178,7 +181,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// The database schema manager used to update the current schema
         /// </summary>
-        IDatabaseSchemaManager _schemaManager;
+        ISqliteDatabaseManager _schemaManager;
 
         /// <summary>
         /// Saves/restores window state info
@@ -339,7 +342,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 // Make sure the user.config file is in a good state
-				// https://extract.atlassian.net/browse/ISSUE-12830
+                // https://extract.atlassian.net/browse/ISSUE-12830
                 UserConfigChecker.EnsureValidUserConfigFile();
 
                 base.OnClosing(e);
@@ -476,8 +479,8 @@ namespace Extract.SQLCDBEditor
                 // Setup OpenFileDialog to get the database to open
                 using (OpenFileDialog openDatabaseFile = new OpenFileDialog())
                 {
-                    openDatabaseFile.DefaultExt = "sdf";
-                    openDatabaseFile.Filter = "Database files (*.sdf)|*.sdf|All files (*.*)|*.*";
+                    openDatabaseFile.DefaultExt = "sqlite";
+                    openDatabaseFile.Filter = "Database files (*.sqlite;*.sqlite3;*.db)|*.sqlite;*.sqlite3;*.db|All files (*.*)|*.*";
 
                     // Get the database to open
                     if (openDatabaseFile.ShowDialog() == DialogResult.OK)
@@ -672,7 +675,7 @@ namespace Extract.SQLCDBEditor
                     }
 
                     bool isEditableQuery =
-                        (_contextMenuItem.QueryAndResultsType == QueryAndResultsType.Query) && 
+                        (_contextMenuItem.QueryAndResultsType == QueryAndResultsType.Query) &&
                         !_contextMenuItem.IsReadOnly;
 
                     _renameQueryMenuItem.Visible = isEditableQuery;
@@ -942,7 +945,7 @@ namespace Extract.SQLCDBEditor
                             {
                                 e.DockControl.Controls.Clear();
                             }
-                            
+
                         }
                         else
                         {
@@ -1482,14 +1485,14 @@ namespace Extract.SQLCDBEditor
             {
                 if (_tableNames == null)
                 {
-                    _tableNames = new HashSet<string>(DBMethods.GetQueryResultsAsStringArray(
-                        _connection, "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES"));
+                    _tableNames = new HashSet<string>(DBMethods.GetQueryResultsAsStringArray(_connection,
+                        "SELECT [name] FROM [sqlite_master] WHERE [type] = 'table' AND [name] NOT LIKE 'sqlite_%'"));
                 }
 
                 return _tableNames;
             }
         }
-                
+
         /// <summary>
         /// Method loads the names of the tables in the opened database into the list box. This
         /// method does not save any changes to the database that was previously loaded. If the 
@@ -1568,7 +1571,7 @@ namespace Extract.SQLCDBEditor
             {
                 _pluginList.AddRange(
                     Directory.EnumerateFiles(Path.GetDirectoryName(_databaseFileName), "*.plugin")
-                    .Select(fileName => 
+                    .Select(fileName =>
                         UtilityMethods.CreateTypeFromAssembly<SQLCDBEditorPlugin>(fileName))
                     .Where(plugin => plugin != null)
                     .Select(plugin => new QueryAndResultsControl(plugin)));
@@ -1890,7 +1893,7 @@ namespace Extract.SQLCDBEditor
                     invalidQueryAndResultsControl.DisplayName + "\" has invalid data.");
                 ee.AddDebugData("Error", errorText, false);
                 ee.Display();
-                
+
                 return false;
             }
 
@@ -2045,6 +2048,13 @@ namespace Extract.SQLCDBEditor
                     }
                 }
 
+                // If this is an SQL Compact version it needs to be converted or an existing sqlite version
+                // needs to be opened instead.
+                if (OpenSQLCompactAsSQLite())
+                {
+                    return;
+                }
+
                 // Create a new working copy.
                 FileSystemMethods.PerformFileOperationWithRetry(() =>
                     File.Copy(_databaseFileName, _databaseWorkingCopyFileName),
@@ -2054,9 +2064,8 @@ namespace Extract.SQLCDBEditor
 
                 try
                 {
-                    // Create the connection to the database
-                    _connection = new SqlCeConnection(
-                        SqlCompactMethods.BuildDBConnectionString(_databaseWorkingCopyFileName, true));
+                    _connection = new SQLiteConnection(
+                        SqlCompactMethods.BuildDBConnectionString(_databaseWorkingCopyFileName, false, 0, 0, false));
 
                     // Open the connection.
                     _connection.Open();
@@ -2076,15 +2085,15 @@ namespace Extract.SQLCDBEditor
                 }
 
                 CheckSchemaVersionAndPromptForUpdate();
-                
-                if(!_customerSchemaUpdating)
+
+                if (!_customerSchemaUpdating)
                 {
                     _customerSchemaUpdating = true;
                     CheckCustomerSchemaVersionAndPromtForUpdate(databaseToOpen);
                     OpenDatabase(databaseToOpen);
                     _customerSchemaUpdating = false;
                     return;
-                }                
+                }
 
                 UsingUIReplacement =
                     _schemaManager != null &&
@@ -2124,7 +2133,7 @@ namespace Extract.SQLCDBEditor
 
                     _tablesListBox.Focus();
                 }
-                
+
                 // Reset the _dirty flag
                 _dirty = false;
 
@@ -2144,35 +2153,79 @@ namespace Extract.SQLCDBEditor
             }
         }
 
+        /// Prompt to convert and open current SQL compact database to SQLite or open exisiting SQLite version instead.
+        /// <returns>True if current database was SQL compact and SQLite version was opened instead; false otherwise.</returns>
+        bool OpenSQLCompactAsSQLite()
+        {
+            if (Path.GetExtension(_databaseFileName).Equals(".sdf", StringComparison.OrdinalIgnoreCase))
+            {
+                var convertedDatabaseFileName = Path.ChangeExtension(_databaseFileName, ".sqlite");
+                if (File.Exists(_databaseFileName) && !File.Exists(convertedDatabaseFileName))
+                {
+                    using CustomizableMessageBox messageBox = new()
+                    {
+                        Caption = "Convert database?",
+                        Text = $"The database \"{_databaseFileName}\" is an SQL Compact database that needs to be converted to SQLite before use." +
+                                "\r\n\r\nConvert now?",
+                        StandardIcon = MessageBoxIcon.Warning
+                    };
+                    messageBox.AddStandardButtons(MessageBoxButtons.OKCancel);
+                    ExtractException.Assert("ELI0", "SQL Compact database conversion aborted",
+                        messageBox.Show() == "Ok",
+                        "Database", _databaseFileName);
+
+                    DatabaseConverter.ConvertDatabaseIfNeeded(convertedDatabaseFileName).GetAwaiter().GetResult();
+                    OpenDatabase(convertedDatabaseFileName);
+                    return true;
+                }
+                else
+                {
+                    using CustomizableMessageBox messageBox = new()
+                    {
+                        Caption = "Open SQLite version?",
+                        Text = "NOTICE: This is an unsupported SQLCompact database for which an SQLite database exists!" +
+                            "\r\n\r\nOpen the SQLite version?",
+                        StandardIcon = MessageBoxIcon.Warning
+                    };
+                    messageBox.AddStandardButtons(MessageBoxButtons.OKCancel);
+                    ExtractException.Assert("ELI0", "Unsupported SQL Compact database format",
+                        messageBox.Show() == "Ok",
+                        "Database", _databaseFileName);
+                    OpenDatabase(convertedDatabaseFileName);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// This always assumes the settings table exists based on other code checks!
         /// </summary>
         /// <returns>Returns the current schema version.</returns>
-        int GetCustomerSchemaVersion(string databaseFileName)
+        static int GetCustomerSchemaVersion(string databaseFileName)
         {
             int customerSchemaVersion = 0;
 
-            using (var connection = new SqlCeConnection("Data Source = " + databaseFileName))
+            using SQLiteConnection connection = new(
+                SqlCompactMethods.BuildDBConnectionString(databaseFileName, false, 0, 0, false));
+            connection.Open();
+            
+            var command = connection.CreateCommand();
+            command.CommandText = "SELECT Value FROM Settings WHERE Name = 'CustomerSchemaVersion'";
+            var dataReader = command.ExecuteReader();
+            if (dataReader.Read())
             {
-                connection.Open();
-                using (var command = connection.CreateCommand())
+                bool success = int.TryParse(dataReader.GetString(0), out customerSchemaVersion);
+                if (!success)
                 {
-                    command.CommandText = "SELECT Value FROM Settings WHERE Name = 'CustomerSchemaVersion'";
-                    var dataReader = command.ExecuteReader();
-                    if (dataReader.Read())
-                    {
-                        bool success = int.TryParse(dataReader.GetString(0), out customerSchemaVersion);
-                        if (!success)
-                        {
-                            customerSchemaVersion = 0;
-                        }
-                    }
-                    else
-                    {
-                        command.CommandText = "INSERT INTO Settings(Name, Value) VALUES('CustomerSchemaVersion', 0)";
-                        command.ExecuteNonQuery();
-                    }
+                    customerSchemaVersion = 0;
                 }
+            }
+            else
+            {
+                command.CommandText = "INSERT INTO Settings(Name, Value) VALUES('CustomerSchemaVersion', 0)";
+                command.ExecuteNonQuery();
             }
 
             return customerSchemaVersion;
@@ -2182,32 +2235,28 @@ namespace Extract.SQLCDBEditor
         /// Updates the customers schema based on the schema files passed, and creates a backup.
         /// </summary>
         /// <param name="updateFiles">The files to run</param>
-        void updateCustomerSchema(string databaseFile, string[] updateFiles)
+        static void updateCustomerSchema(string databaseFile, string[] updateFiles)
         {
             File.Copy(databaseFile, databaseFile + $"{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss", CultureInfo.InvariantCulture)}.backup");
-            using (var connection = new SqlCeConnection("Data Source = " + databaseFile))
+            using SQLiteConnection connection = new(
+                SqlCompactMethods.BuildDBConnectionString(databaseFile, false, 0, 0, false));
+            connection.Open();
+            try
             {
-                connection.Open();
-                try
+                foreach (string file in updateFiles)
                 {
-                    foreach (string file in updateFiles)
-                    {
-                        using (var command = connection.CreateCommand())
-                        {
-                            command.CommandText = File.ReadAllText(file);
-                            command.ExecuteNonQuery();
-                        }
-                        using (var command = connection.CreateCommand())
-                        {
-                            command.CommandText = $"UPDATE Settings SET Value = {GetNumberFromFileName(file).ToString(CultureInfo.InvariantCulture)} WHERE Name = 'CustomerSchemaVersion'";
-                            command.ExecuteNonQuery();
-                        }
-                    }
+                    using var command = connection.CreateCommand();
+                    command.CommandText = File.ReadAllText(file);
+                    command.ExecuteNonQuery();
+
+                    using var command2 = connection.CreateCommand();
+                    command2.CommandText = $"UPDATE Settings SET Value = {GetNumberFromFileName(file).ToString(CultureInfo.InvariantCulture)} WHERE Name = 'CustomerSchemaVersion'";
+                    command2.ExecuteNonQuery();
                 }
-                catch(Exception e)
-                {
-                    throw new ExtractException("ELI47070", "Query execution failed.", e);
-                }
+            }
+            catch (Exception e)
+            {
+                throw new ExtractException("ELI47070", "Query execution failed.", e);
             }
         }
 
@@ -2237,7 +2286,7 @@ namespace Extract.SQLCDBEditor
         /// </summary>
         /// <param name="array">The array to check</param>
         /// <returns>Returns true if the array is sequential, otherwise false.</returns>
-        bool IsSequential(int[] array)
+        static bool IsSequential(int[] array)
         {
             return array.Zip(array.Skip(1), (a, b) => (a + 1) == b).All(x => x);
         }
@@ -2263,7 +2312,7 @@ namespace Extract.SQLCDBEditor
                                                           .ToArray<string>();
             Array.Sort(updateCustomerSchemaFiles, CompareStrings);
             int maxSchemaVersionFile = updateCustomerSchemaFiles.Length > 0 ? GetNumberFromFileName(updateCustomerSchemaFiles[updateCustomerSchemaFiles.Length - 1]) : 0;
-            
+
             if (customerSchemaVersion < maxSchemaVersionFile)
             {
                 var result = MessageBox.Show("Database schema has an update, would you like to update now?"
@@ -2274,7 +2323,10 @@ namespace Extract.SQLCDBEditor
                 {
                     if (!IsSequential(new[] { customerSchemaVersion }.Concat(updateCustomerSchemaFiles.Select(m => GetNumberFromFileName(m))).ToArray()))
                     {
-                        MessageBox.Show($"You must have sequential update files. Ensure you have the update files {customerSchemaVersion + 1} - {maxSchemaVersionFile}");
+                        UtilityMethods.ShowMessageBox(
+                            "You must have sequential update files." +
+                             Invariant($" Ensure you have the update files {customerSchemaVersion + 1} - {maxSchemaVersionFile}")
+                            ,"Missing update files", true);
                         return;
                     }
 
@@ -2285,26 +2337,24 @@ namespace Extract.SQLCDBEditor
 
         private void checkForSettingsTable()
         {
-            if(!TableNames.Contains("Settings"))
+            if (!TableNames.Contains("Settings"))
             {
                 File.Copy(_databaseFileName, _databaseFileName + $"{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss", CultureInfo.InvariantCulture)}.backup");
-                using (var connection = new SqlCeConnection("Data Source = " + _databaseFileName))
-                {
-                    connection.Open();
-                    using (var command = connection.CreateCommand())
-                    {
-                        command.CommandText = @"CREATE TABLE [Settings] (
-                                                  [Name] nvarchar(100) NOT NULL
-                                                , [Value] nvarchar(512) NULL
-                                                )";
-                        command.ExecuteNonQuery();
-                    }
-                    using (var command = connection.CreateCommand())
-                    {
-                        command.CommandText = "ALTER TABLE[Settings] ADD CONSTRAINT[PK__Settings__00000000000000D9] PRIMARY KEY([Name])";
-                        command.ExecuteNonQuery();
-                    }
-                }
+
+                using SQLiteConnection connection = new(
+                    SqlCompactMethods.BuildDBConnectionString(_databaseFileName, false, 0, 0, false));
+                connection.Open();
+
+                var command = connection.CreateCommand();
+                command.CommandText = @"CREATE TABLE [Settings] (
+                                            [Name] nvarchar(100) NOT NULL
+                                        , [Value] nvarchar(512) NULL
+                                        )";
+                command.ExecuteNonQuery();
+
+                using var command2 = connection.CreateCommand();
+                command2.CommandText = "ALTER TABLE[Settings] ADD CONSTRAINT[PK__Settings__00000000000000D9] PRIMARY KEY([Name])";
+                command2.ExecuteNonQuery();
             }
         }
 
@@ -2323,7 +2373,7 @@ namespace Extract.SQLCDBEditor
             bool canUpdateSchema = false;
             if (_schemaManager != null)
             {
-                _schemaManager.SetDatabaseConnection(_connection);
+                _schemaManager?.SetDatabase(_databaseWorkingCopyFileName);
                 if (_schemaManager.IsUpdateRequired)
                 {
                     promptForUpdate = true;
@@ -2562,9 +2612,10 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// Attempts to get the <see cref="IDatabaseSchemaManager"/> for known schemas.
         /// </summary>
-        IDatabaseSchemaManager GetSchemaUpdater()
+        ISqliteDatabaseManager GetSchemaUpdater()
         {
-            IDatabaseSchemaManager updater = null;
+            ISqliteDatabaseManager updater = null;
+            
             if (TableNames.Contains("Settings"))
             {
                 // Setup dataAdapter to get the data
@@ -2587,8 +2638,11 @@ namespace Extract.SQLCDBEditor
                         // Build the name to the assembly containing the manager
                         var className = result[0]["Value"].ToString();
                         updater =
-                            UtilityMethods.CreateTypeFromTypeName(className) as IDatabaseSchemaManager;
-                        if (updater == null)
+                            UtilityMethods.CreateTypeFromTypeName(className) as ISqliteDatabaseManager;
+                        // Fate of OMDB in SQLite world to be decided. For now, just ignore OrderMapperDatabaseSchemaManager
+                        // https://extract.atlassian.net/browse/ISSUE-17684
+                        if (updater == null
+                            && className != "Extract.LabResultsCustomComponents.OrderMapperDatabaseSchemaManager")
                         {
                             var ee = new ExtractException("ELI31154",
                                 "Database contained an entry for schema manager, "
@@ -2602,7 +2656,7 @@ namespace Extract.SQLCDBEditor
                         // No schema updater defined. Check for FPSFile table
                         if (TableNames.Contains("FPSFile"))
                         {
-                            updater = (IDatabaseSchemaManager)UtilityMethods.CreateTypeFromTypeName(
+                            updater = (ISqliteDatabaseManager)UtilityMethods.CreateTypeFromTypeName(
                                 "Extract.FileActionManager.Database.FAMServiceDatabaseManager");
                         }
                     }
@@ -2614,7 +2668,7 @@ namespace Extract.SQLCDBEditor
                 if (TableNames.Contains("LabOrder") && TableNames.Contains("LabTest")
                     && TableNames.Contains("LabOrderTest") && TableNames.Contains("AlternateTestName"))
                 {
-                    updater = (IDatabaseSchemaManager)UtilityMethods.CreateTypeFromTypeName(
+                    updater = (ISqliteDatabaseManager)UtilityMethods.CreateTypeFromTypeName(
                         "Extract.LabResultsCustomComponents.OrderMapperDatabaseSchemaManager");
                 }
             }
@@ -2639,28 +2693,23 @@ namespace Extract.SQLCDBEditor
                 {
                     var tempTask = Task.Factory.StartNew(() =>
                     {
-                        using (var connection = new SqlCeConnection(SqlCompactMethods.BuildDBConnectionString(tempName, true)))
+                        _schemaManager.SetDatabase(tempName);
+                        try
                         {
-                            _schemaManager.SetDatabaseConnection(connection);
+                            var task = _schemaManager.UpdateToLatestSchema();
+
                             try
                             {
-                                var task =
-                                    _schemaManager.BeginUpdateToLatestSchema(null,
-                                    new CancellationTokenSource());
-
-                                try
-                                {
-                                    task.Wait();
-                                }
-                                finally
-                                {
-                                    task.Dispose();
-                                }
+                                task.Wait();
                             }
                             finally
                             {
-                                eventHandle.Set();
+                                task.Dispose();
                             }
+                        }
+                        finally
+                        {
+                            eventHandle.Set();
                         }
                     });
 
@@ -2748,7 +2797,7 @@ namespace Extract.SQLCDBEditor
             }
 
             _pendingQueryList.Add(queryAndResultsControl);
-
+            
             OpenTableOrQuery(queryAndResultsControl, true, true);
         }
 
@@ -2766,7 +2815,7 @@ namespace Extract.SQLCDBEditor
                     .Union(_pendingQueryList.Select(query => query.Name))
                     .Union(Directory.EnumerateFiles(databasePath, "*.sqlce")
                         .Select(file => Path.GetFileNameWithoutExtension(file))));
-                
+
                 return existingNames;
             }
         }

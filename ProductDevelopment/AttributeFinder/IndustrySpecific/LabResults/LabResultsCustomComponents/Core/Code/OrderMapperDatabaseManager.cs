@@ -1157,7 +1157,10 @@ namespace Extract.LabResultsCustomComponents
             {
                 try
                 {
-                    return GetSchemaVersion() < CurrentSchemaVersion;
+                    // TODO: Temporary ignore updates until deciding the fate of this schema manager
+                    // https://extract.atlassian.net/browse/ISSUE-17684
+                    return false;
+                    //return GetSchemaVersion() < CurrentSchemaVersion;
                 }
                 catch (Exception ex)
                 {

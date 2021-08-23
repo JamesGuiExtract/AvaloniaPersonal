@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -137,7 +138,7 @@ namespace Extract.SQLCDBEditor
         /// Indicates whether an error was encountered the last time the query was executed.
         /// </summary>
         bool _queryError;
-        
+
         /// <summary>
         /// Indicates whether the query text is dirty.
         /// </summary>
@@ -211,7 +212,7 @@ namespace Extract.SQLCDBEditor
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI38021",
                     _OBJECT_NAME);
-               
+
                 InitializeComponent();
 
                 _resultsTable.Locale = CultureInfo.CurrentCulture;
@@ -243,7 +244,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 _inDesignMode = LicenseManager.UsageMode == LicenseUsageMode.Designtime;
-  
+
                 InitializeComponent();
 
                 _resultsTable.Locale = CultureInfo.CurrentCulture;
@@ -823,6 +824,36 @@ namespace Extract.SQLCDBEditor
             }
         }
 
+        bool _tableRefreshPending = false;
+        int? _activeRow;
+
+        /// Code to sync the _resultsGrid and underlying data source after rows are modified via RefreshData -> _adapter.Fill
+        /// otherwise concurrency violations may occur if further edits/deleted are applied to the just editied row.
+        /// This appears to be necessary because they dynamic typing of SQLite triggers changes to the underlying data when
+        /// committed.
+        /// The refresh solution does work properly if done directly as part of row modification handling; needs to be
+        /// invoked via the message loop instead.
+        void ScheduleTableRefresh()
+        {
+            if (!_tableRefreshPending)
+            {
+                _tableRefreshPending = true;
+                _activeRow = _resultsGrid.FirstDisplayedCell?.RowIndex;
+                _resultsGrid.Enabled = false;
+                _resultsGrid.ClearSelection();
+
+                this.SafeBeginInvoke("ELI51847", () =>
+                {
+                    RefreshData(true, true);
+                    if (_activeRow.HasValue)
+                    {
+                        _resultsGrid.FirstDisplayedScrollingRowIndex = _activeRow.Value;
+                    }
+                    _resultsGrid.Enabled = true;
+                });
+            }
+        }
+
         /// <summary>
         /// Refreshes the data.
         /// </summary>
@@ -858,6 +889,7 @@ namespace Extract.SQLCDBEditor
                     _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection,
                         _adapter.SelectCommand.CommandText, parameters: null);
 
+
                     _adapter.Fill(latestDataTable);
                     ApplySchema(latestDataTable);
                     StoreColumnSizes(latestDataTable);
@@ -881,6 +913,8 @@ namespace Extract.SQLCDBEditor
                         // to correcting the data.
                         RemoveConstraints(latestDataTable);
                     }
+
+                    _tableRefreshPending = false;
                 }
                 else if (QueryAndResultsType == QueryAndResultsType.Query)
                 {
@@ -941,7 +975,7 @@ namespace Extract.SQLCDBEditor
                             }
                         }
                     }
-                    EndOfCompare:;
+                EndOfCompare:;
                 }
 
                 // If the data hasn't changed, there is nothing more to do.
@@ -1005,7 +1039,6 @@ namespace Extract.SQLCDBEditor
             // not interpreted as edits by the user.
             if (QueryAndResultsType == QueryAndResultsType.Table)
             {
-                _resultsTable.TableNewRow -= HandleTableNewRow;
                 _resultsTable.ColumnChanged -= HandleColumnChanged;
                 _resultsTable.RowChanged -= HandleRowChanged;
             }
@@ -1028,7 +1061,6 @@ namespace Extract.SQLCDBEditor
             if (QueryAndResultsType == QueryAndResultsType.Table)
             {
                 // Re-register to get data changed events.
-                _resultsTable.TableNewRow += HandleTableNewRow;
                 _resultsTable.ColumnChanged += HandleColumnChanged;
                 _resultsTable.RowChanged += HandleRowChanged;
             }
@@ -1161,7 +1193,7 @@ namespace Extract.SQLCDBEditor
                             newName + ".sqlce");
                         ExtractException.Assert("ELI34585", "No query name specified.",
                             !string.IsNullOrWhiteSpace(newFileName));
-                        
+
                         var eventArgs = new QueryRenamingEventArgs(newName);
                         OnQueryRenaming(eventArgs);
 
@@ -1424,7 +1456,6 @@ namespace Extract.SQLCDBEditor
                     RemoveConstraints(_resultsTable);
                 }
 
-                _resultsTable.TableNewRow += HandleTableNewRow;
                 _resultsTable.ColumnChanged += HandleColumnChanged;
                 _resultsTable.RowChanged += HandleRowChanged;
 
@@ -1443,7 +1474,7 @@ namespace Extract.SQLCDBEditor
         protected override void OnLayout(LayoutEventArgs e)
         {
             try
-            {                
+            {
                 base.OnLayout(e);
 
                 // If this is the first time Layout has been raised since loading, this control is now its final size.
@@ -1490,6 +1521,15 @@ namespace Extract.SQLCDBEditor
                     _plugin = null;
                 }
 
+                // Command builder uses _adapter. When using SQLite, at least, disposing _commandBuilder
+                // appears to try to use _adapter, triggering an exception if _adapter has already been
+                // disposed. (Dispose methods are not supposed to throw ¯\_(ツ)_/¯)
+                if (_commandBuilder != null)
+                {
+                    _commandBuilder.Dispose();
+                    _commandBuilder = null;
+                }
+
                 if (_adapter != null)
                 {
                     _adapter.Dispose();
@@ -1506,12 +1546,6 @@ namespace Extract.SQLCDBEditor
                 {
                     _resultsTable.Dispose();
                     _resultsTable = null;
-                }
-
-                if (_commandBuilder != null)
-                {
-                    _commandBuilder.Dispose();
-                    _commandBuilder = null;
                 }
             }
             base.Dispose(disposing);
@@ -1532,7 +1566,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 _queryAndResultsTableLayoutPanel.SuspendLayout();
-                
+
                 using (new LockControlUpdates(_queryAndResultsTableLayoutPanel))
                 {
                     ParseQuery(_connection, _queryScintillaBox.Text);
@@ -1598,27 +1632,6 @@ namespace Extract.SQLCDBEditor
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI34633");
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="DataTable.TableNewRow"/> event of <see cref="_resultsTable"/>.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The <see cref="System.Data.DataTableNewRowEventArgs"/> instance
-        /// containing the event data.</param>
-        void HandleTableNewRow(object sender, DataTableNewRowEventArgs e)
-        {
-            try
-            {
-                // [DotNetRCAndUtils:837]
-                // Manually validate the correct auto-increment values with the DB to prevent these
-                // values from getting out-of-sync with the database.
-                SetAutoIncrementValues(e.Row);
-            }
-            catch (Exception ex)
-            {
-                ex.ExtractDisplay("ELI36044");
             }
         }
 
@@ -2057,7 +2070,7 @@ namespace Extract.SQLCDBEditor
                     return;
                 }
 
-                ExtractException.Assert("ELI38226","Internal logic error", UsingPluginBindingSource);
+                ExtractException.Assert("ELI38226", "Internal logic error", UsingPluginBindingSource);
 
                 // If there is an active data error for this row, do not allow the user to move on
                 // from this row until the error has been corrected.
@@ -2116,7 +2129,7 @@ namespace Extract.SQLCDBEditor
             {
                 OnDataGridViewCellFormatting(sender, e);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI43347");
             }
@@ -2129,14 +2142,14 @@ namespace Extract.SQLCDBEditor
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="DataGridViewCellContextMenuStripNeededEventArgs"/> instance containing
         /// the event data.</param>
-        void HandleResultsGrid_CellContextMenuStripNeeded(object sender, 
+        void HandleResultsGrid_CellContextMenuStripNeeded(object sender,
             DataGridViewCellContextMenuStripNeededEventArgs e)
         {
             try
             {
                 OnDataGridViewCellContextMenuStripNeeded(sender, e);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI43351");
             }
@@ -2240,7 +2253,7 @@ namespace Extract.SQLCDBEditor
             // Setup dataAdapter to get the data
             DbProviderFactory providerFactory = DBMethods.GetDBProvider(connection);
             _adapter = providerFactory.CreateDataAdapter();
-            _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection, 
+            _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection,
                 Invariant($"SELECT * FROM [{tableName}]"), null);
 
             // Create a command builder for the adapter that allow edits made in the _resultsGrid
@@ -2252,6 +2265,10 @@ namespace Extract.SQLCDBEditor
             _adapter.Fill(_resultsTable);
             ApplySchema(_resultsTable);
             StoreColumnSizes(_resultsTable);
+
+            _adapter.InsertCommand = _commandBuilder.GetInsertCommand();
+            _adapter.UpdateCommand = _commandBuilder.GetUpdateCommand();
+            _adapter.DeleteCommand = _commandBuilder.GetDeleteCommand();
         }
 
         /// <summary>
@@ -2264,19 +2281,6 @@ namespace Extract.SQLCDBEditor
             // Fill the schema for the table for the database
             _adapter.FillSchema(table, SchemaType.Source);
 
-            // The above call does not seem to always set the primary key correctly. If a primary
-            // key is not set, set it manually.
-            if (table.PrimaryKey.Length == 0)
-            {
-                string[] primaryKeyColumns = DBMethods.GetQueryResultsAsStringArray (_connection,
-                    "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.INDEXES WHERE TABLE_NAME = '"
-                    + Name + "' AND PRIMARY_KEY = 1");
-
-                table.PrimaryKey = primaryKeyColumns
-                    .Select(columnName => table.Columns[columnName])
-                    .ToArray();
-            }
-
             // The constraints on the table (including primary key) will be removed before use.
             // Store which columns are the primary key separately.
             _primaryKeyColumnNames = new List<string>(table.PrimaryKey
@@ -2288,8 +2292,7 @@ namespace Extract.SQLCDBEditor
                 foreach (DataColumn c in table.Columns)
                 {
                     using (DbCommand command = DBMethods.CreateDBCommand(_connection,
-                        "SELECT * FROM INFORMATION_SCHEMA.COLUMNS " +
-                        "WHERE TABLE_NAME = @0 AND COLUMN_NAME = @1 ",
+                        "SELECT [name] FROM pragma_table_info(@0) WHERE [name] = @1",
                         new Dictionary<string, string> { { "@0", Name }, { "@1", c.ColumnName } }))
                     using (DbDataReader sqlReader = command.ExecuteReader())
                     {
@@ -2310,6 +2313,9 @@ namespace Extract.SQLCDBEditor
                     ex);
                 ee.Display();
             }
+
+            // So that FKs values are cascaded (not on by default with SQLite).
+            DBMethods.ExecuteDBQuery(_connection, "PRAGMA foreign_keys = ON;");
         }
 
         /// <summary>
@@ -2333,7 +2339,7 @@ namespace Extract.SQLCDBEditor
         /// should be applied.</param>
         /// <param name="columnSchema">The <see cref="DbDataReader"/> containing schema info for
         /// the column.</param>
-        static int SetColumnAutoIncrement(DataColumn dataColumn, DbDataReader columnSchema)
+        int SetColumnAutoIncrement(DataColumn dataColumn, DbDataReader columnSchema)
         {
             int colPos = -1;
             try
@@ -2345,8 +2351,21 @@ namespace Extract.SQLCDBEditor
                     // Get the position of the AUTOINC_NEXT field
                     colPos = columnSchema.GetOrdinal("AUTOINC_NEXT");
 
-                    // Set the seed to the value in the AUTOINC_NEXT field
-                    dataColumn.AutoIncrementSeed = (long)columnSchema.GetValue(colPos);
+                    using var autoIncResult = DBMethods.ExecuteDBQuery(_connection,
+                        $"SELECT [seq] FROM [sqlite_sequence] WHERE [name] = '{dataColumn.Table.TableName}'");
+                    var autoIncSeed = autoIncResult
+                        .Rows
+                        .OfType<DataRow>()
+                        .FirstOrDefault()
+                        ?.ItemArray
+                        .OfType<long>()
+                        .FirstOrDefault();
+
+                    if (autoIncSeed != null)
+                    {
+                        // Set the seed to the value in the AUTOINC_NEXT field
+                        dataColumn.AutoIncrementSeed = autoIncSeed.Value + dataColumn.AutoIncrementStep;
+                    }
                 }
             }
             catch (Exception ex)
@@ -2441,7 +2460,7 @@ namespace Extract.SQLCDBEditor
                     DataGridViewColumn column = _resultsGrid.Columns[i];
 
                     // Default fill weight will be 1 with a minimum width of 50 (~ 6 chars)
-                    float fillWeight = 1.0F; 
+                    float fillWeight = 1.0F;
                     int minSize = 50;
 
                     if (column.ValueType == typeof(bool))
@@ -2495,52 +2514,6 @@ namespace Extract.SQLCDBEditor
                 {
                     column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
                     column.MinimumWidth = 25;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Sets any auto-increment column values by querying the DB directly for the next
-        /// auto-increment value. This avoids the auto-increment values from getting out-of-sync
-        /// with the database.
-        /// </summary>
-        /// <param name="row">The <see cref="DataRow"/> for which auto-increment values should be
-        /// set.</param>
-        void SetAutoIncrementValues(DataRow row)
-        {
-            // Iterate all auto-increment columns in the DB.
-            foreach (DataColumn dataColumn in _resultsTable.Columns
-                .Cast<DataColumn>()
-                .Where(column => column.AutoIncrement))
-            {
-                // Query the next auto-increment value for this column from the DB.
-                var parameters = new Dictionary<string, string>();
-                parameters["@0"] = _tableName;
-                parameters["@1"] = dataColumn.ColumnName;
-                using (var sqlCommand = DBMethods.CreateDBCommand(_connection,
-                    "SELECT AUTOINC_NEXT FROM INFORMATION_SCHEMA.COLUMNS " +
-                        "WHERE TABLE_NAME = @0 AND COLUMN_NAME = @1",
-                    parameters))
-                using (var queryResult = sqlCommand.ExecuteReader())
-                {
-                    // Get the first record in the result set - should only be one
-                    if (queryResult.Read())
-                    {
-                        var nextValue = Convert.ChangeType(queryResult.GetValue(0),
-                            dataColumn.DataType, CultureInfo.InvariantCulture);
-
-                        // If the row's auto-increment value is out of sync with the DB, apply the
-                        // correct value to the row.
-                        var autoIncrementValue = row[dataColumn.Ordinal];
-                        if (!nextValue.Equals(autoIncrementValue))
-                        {
-                            // Since an auto-increment column is going to be read-only, apply
-                            // the new auto-increment value via a separate array variable.
-                            object[] rowData = row.ItemArray;
-                            rowData[dataColumn.Ordinal] = nextValue;
-                            row.ItemArray = rowData;
-                        }
-                    }
                 }
             }
         }
@@ -2762,93 +2735,40 @@ namespace Extract.SQLCDBEditor
         /// <param name="row">The <see cref="DataRow"/> for which edits should be applied.</param>
         void UpdateRow(DataRow row)
         {
-            Exception rowException = null;
+            if (row.RowState == DataRowState.Unchanged
+                || row.RowState == DataRowState.Detached)
+            {
+                return;
+            }
 
             // Clear any errors already associated with the row and re-check for errors.
             row.ClearErrors();
 
-            if (row.RowState == DataRowState.Detached)
+            // Attempt to commit the row data to the table.
+            try
             {
-                // If the row is currently detached (i.e., new), errors such as constraint violations
-                // will not be caught by calling  _adapter.Update(). Adding it to _resultsTable
-                // right away can cause it to be sorted before the user is done entering the entire
-                // row... so add it to a temporary copy of the table with a transaction that gets
-                // rolled back to test if it would be able to be added to _resultsTable without error.
-                using (DataTable tableCopy = row.Table.Copy())
-                using (DbTransaction transaction = _connection.BeginTransaction(IsolationLevel.Serializable))
-                {
-                    if (_adapter.InsertCommand == null)
-                    {
-                        _adapter.InsertCommand = _commandBuilder.GetInsertCommand();
-                    }
-                    if (_adapter.UpdateCommand == null)
-                    {
-                        _adapter.UpdateCommand = _commandBuilder.GetUpdateCommand();
-                    }
+                // Update just the row first so that every row with invalid data gets a validation
+                // error icon and that after correcting the data, the error icon is cleared even if
+                // earlier rows have errors.
+                _adapter.Update(new DataRow[] { row });
 
-                    _adapter.InsertCommand.Transaction = transaction;
-                    _adapter.UpdateCommand.Transaction = transaction;
-
-                    try
-                    {
-                        DataRow rowCopy = tableCopy.Rows.Add(row.ItemArray);
-                        _adapter.Update(new[] { rowCopy });
-                    }
-                    catch (Exception ex)
-                    {
-                        rowException = ex;
-
-                        // An error icon will be displayed to call attention to the problem; no need to
-                        // throw or display exception.
-                    }
-                    finally
-                    {
-                        transaction.Rollback();
-                        _adapter.InsertCommand.Transaction = null;
-                        _adapter.UpdateCommand.Transaction = null;
-                    }
-                }
-            }
-            else
-            {
-                // Attempt to commit the row data to the table.
-                try
-                {
-                    row.EndEdit();
-
-                    // Update just the row first so that every row with invalid data gets a validation
-                    // error icon and that after correcting the data, the error icon is cleared even if
-                    // earlier rows have errors.
-                    _adapter.Update(new DataRow[] { row });
-                }
-                catch (Exception ex)
-                {
-                    rowException = ex;
-
-                    // An error icon will be displayed to call attention to the problem; no need to
-                    // throw or display exception.
-                }
-            }
-
-            if (rowException == null)
-            {
-                // Check to see if the table as a whole is now valid.
                 ValidateTableData();
+
+                ScheduleTableRefresh();
+
+                OnDataChanged(true, false);
             }
-            else
+            catch (Exception ex)
             {
-                // The row update failed.
+                // An error icon will be displayed to call attention to the problem; no need to
+                // throw or display exception.
                 if (!row.HasErrors)
                 {
-                    row.RowError = rowException.Message;
+                    row.RowError = ex.Message;
                 }
 
                 DataIsValid = false;
             }
-
-            _resultsGrid.Invalidate();
-
-            OnDataChanged(true, false);
         }
 
         /// <summary>
@@ -2992,7 +2912,7 @@ namespace Extract.SQLCDBEditor
                     }
                 }
                 // Ignore any exceptions and just use the previous list of available values.
-                catch {}
+                catch { }
             }
         }
 
