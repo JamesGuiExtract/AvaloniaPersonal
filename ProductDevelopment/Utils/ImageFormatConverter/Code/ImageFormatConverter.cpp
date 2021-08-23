@@ -353,6 +353,33 @@ void initNuanceEngineAndLicense()
 
 		rc = kRecSettingSetInt(0, hSetting, 32000);
 		throwExceptionIfNotSuccess(rc, "ELI50257", "Failed to set max Y pixels setting.");
+
+		// Allow comments, etc to be preserved when rasterizing PDFs
+		// https://extract.atlassian.net/browse/ISSUE-17669
+		rc = kRecSetImfLoadFlags(0, IMF_PDF_ANN_TEXT
+									| IMF_PDF_ANN_LINE
+									| IMF_PDF_ANN_SQUARE
+									| IMF_PDF_ANN_CIRCLE
+									| IMF_PDF_ANN_POLYGON
+									| IMF_PDF_ANN_POLYLINE
+									| IMF_PDF_ANN_HIGHLIGHT
+									| IMF_PDF_ANN_UNDERLINE
+									| IMF_PDF_ANN_SQUIGGLY
+									| IMF_PDF_ANN_CROSSOUT
+									| IMF_PDF_ANN_STAMP
+									| IMF_PDF_ANN_CARET
+									| IMF_PDF_ANN_PENCIL
+									| IMF_PDF_ANN_POPUP
+									| IMF_PDF_ANN_FILEATTACHMENT
+									| IMF_PDF_ANN_SOUND
+									| IMF_PDF_ANN_MOVIE
+									| IMF_PDF_ANN_FORM
+									| IMF_PDF_ANN_SCREEN
+									| IMF_PDF_ANN_PRINTERMARK
+									| IMF_PDF_ANN_TRAPNET
+									| IMF_PDF_ANN_WATERMARK
+									| IMF_PDF_ANN_3D);
+		throwExceptionIfNotSuccess(rc, "ELI51834", "Failed to set PDF load flags");
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI34306")
 }
