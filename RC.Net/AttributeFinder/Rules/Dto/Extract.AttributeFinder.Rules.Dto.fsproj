@@ -128,10 +128,6 @@
     <Compile Include="ValueFromList.fs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.6.2" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="regasm &quot;$(TargetPath)&quot; /tlb /codebase" />
   </Target>

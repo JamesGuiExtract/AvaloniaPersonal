@@ -522,6 +522,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\System.Data.SQLite.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@XCOPY "$(BinariesFolder)\x64\SQLite.Interop.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\x64\" /Y
 	@XCOPY "$(BinariesFolder)\x86\SQLite.Interop.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles\x86\" /Y
+	@COPY /V /Y "$(BinariesFolder)\DEPChecker.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 
 # Copy Web files
 	@XCOPY "$(WebAPI)\*.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles" /Y

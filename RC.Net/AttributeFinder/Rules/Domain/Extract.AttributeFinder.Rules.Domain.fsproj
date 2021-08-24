@@ -131,10 +131,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <COMReference Include="UCLID_AFCONDITIONSLib">
       <Guid>{D3DC98FB-A212-409B-B68C-64D1DC430594}</Guid>
       <VersionMajor>1</VersionMajor>

@@ -21,7 +21,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Compiler.Service" Version="37.0.0" />
-    <PackageReference Update="FSharp.Core" Version="4.6.2" /> <!--Update FSharp.Core to override implicit version of the SDK-->
 
     <!--Include these dependencies explicitly in order to avoid version conflicts. Version set in \Engineering\Directory.Build.targets file -->
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
