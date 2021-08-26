@@ -1,10 +1,8 @@
-using Extract;
+using Extract.Database;
 using Extract.Licensing;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.OleDb;
-using System.Data.SqlServerCe;
+using System.Data.Common;
+using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -20,7 +18,7 @@ namespace Extract.SqlCompactExporter
         class Settings
         {
             /// <summary>
-            /// The SQL Compact database to export from.
+            /// The SQLite database to export from.
             /// </summary>
             public string DatabaseFile;
 
@@ -131,13 +129,15 @@ namespace Extract.SqlCompactExporter
         }
 
         /// <summary>
-        /// Exports a table in an SQL compact DB into a text file
+        /// Exports the results of a query into a text file
         /// </summary>
+        /// <remarks>
+        /// This utility is often used to execute non-query commands against a database
+        /// </remarks>
         static void Main(string[] args)
         {
 
-            Settings settings = null;
-
+            Settings settings;
             try
             {
                 Console.WriteLine();
@@ -147,7 +147,9 @@ namespace Extract.SqlCompactExporter
                     "SqlCompactExporter");
 
                 // Check to see if the user is looking for usage information.
-                if (args.Length >= 1 && (args[0].Equals("/?") || args[0].Equals("-?")))
+                if (args.Length >= 1
+                    && (args[0].Equals("/?", StringComparison.Ordinal)
+                        || args[0].Equals("-?", StringComparison.Ordinal)))
                 {
                     PrintUsage();
                     return;
@@ -168,113 +170,109 @@ namespace Extract.SqlCompactExporter
             try
             {
                 // Attempt to connect to the database
-                string connectionString = "Data Source='" + settings.DatabaseFile + "';";
-                using (SqlCeConnection sqlConnection = new SqlCeConnection(connectionString))
+                string connectionString = SqliteMethods.BuildConnectionString(settings.DatabaseFile);
+                using SQLiteConnection sqlConnection = new(connectionString);
+
+                sqlConnection.Open();
+
+                // Issue the query
+                using SQLiteCommand queryCommand = new(settings.Query, sqlConnection);
+                // Initialize a reader for the results.
+                using DbDataReader reader = queryCommand.ExecuteReader();
+
+                int rowsExported = 0;
+
+                // Declare a writer to output the results.
+                StringBuilder sb = new StringBuilder();
+
+                // Write the file prefix if specified
+                if (!string.IsNullOrEmpty(settings.FilePrefix))
                 {
-                    sqlConnection.Open();
-
-                    // Issue the query
-                    using (SqlCeCommand queryCommand = new SqlCeCommand(settings.Query, sqlConnection))
-                    {
-                        // Initialize a reader for the results.
-                        using (SqlCeDataReader reader = queryCommand.ExecuteReader())
-                        {
-                            int rowsExported = 0;
-
-                            // Declare a writer to output the results.
-                            StringBuilder sb = new StringBuilder();
-
-                            // Write the file prefix if specified
-                            if (!string.IsNullOrEmpty(settings.FilePrefix))
-                            {
-                                sb.Append(settings.FilePrefix);
-                            }
-
-                            // Has any data been read?
-                            bool readData = false;
-
-                            // Loop throw each row of the results.
-                            while (reader.Read())
-                            {
-                                // If previous rows have been read, append the row separator
-                                if (readData)
-                                {
-                                    sb.Append(settings.RowDelimiter);
-                                }
-                                readData = true;
-
-                                // Keep track of all column delimiters that are appended. They are
-                                // only added once it is confirmed that there is more data in the
-                                // row.
-                                StringBuilder pendingColumnDelimiters = new StringBuilder();
-
-                                // Loop through each column in the row.
-                                for (int i = 0; i < reader.FieldCount; i++)
-                                {
-                                    // If not the first column result, a column separator may be needed.
-                                    if (i > 0)
-                                    {
-                                        pendingColumnDelimiters.Append(settings.ColumnDelimiter);
-                                    }
-
-                                    // If the column value is NULL, there is nothing to write.
-                                    if (reader.IsDBNull(i))
-                                    {
-                                        continue;
-                                    }
-
-                                    // If the column value is empty, there is nothing to write.
-                                    string value = reader.GetValue(i).ToString();
-                                    if (string.IsNullOrEmpty(value))
-                                    {
-                                        continue;
-                                    }
-
-                                    // If there is data to write, go ahead and commit all pending
-                                    // column delimiters.
-                                    sb.Append(pendingColumnDelimiters.ToString());
-
-                                    // Reset the pending column delimiters
-                                    pendingColumnDelimiters = new StringBuilder();
-
-                                    // Escape for RegEx's if necessary
-                                    if (settings.EscapeForRegEx)
-                                    {
-                                        value = Regex.Escape(value);
-                                        
-                                        // Since our RegEx rule removes whitespace before processing
-                                        // the RegEx, escaped whitespace needs to be converted to
-                                        // hex escaped equivalents to ensure it is preserved.
-                                        value = value.Replace("\\ ", "\\x20");
-                                        value = value.Replace("\\t", "\\x09");
-                                        value = value.Replace("\\r", "\\x0D");
-                                        value = value.Replace("\\n", "\\x0A");
-                                    }
-
-                                    // Write the field value
-                                    sb.Append(value);
-                                }
-
-                                rowsExported++;
-                            }
-
-                            // Write the file suffix if specified
-                            if (!string.IsNullOrEmpty(settings.FileSuffix))
-                            {
-                                sb.Append(settings.FileSuffix);
-                            }
-
-                            if (readData && sb.Length > 0)
-                            {
-                                File.WriteAllText(settings.OutputFile, sb.ToString(),
-                                    settings.Encoding);
-                            }
-
-                            Console.WriteLine("Exported " +
-                                rowsExported.ToString(CultureInfo.CurrentCulture) + " rows.");
-                        }
-                    }
+                    sb.Append(settings.FilePrefix);
                 }
+
+                // Has any data been read?
+                bool readData = false;
+
+                // Loop throw each row of the results.
+                while (reader.Read())
+                {
+                    // If previous rows have been read, append the row separator
+                    if (readData)
+                    {
+                        sb.Append(settings.RowDelimiter);
+                    }
+                    readData = true;
+
+                    // Keep track of all column delimiters that are appended. They are
+                    // only added once it is confirmed that there is more data in the
+                    // row.
+                    StringBuilder pendingColumnDelimiters = new StringBuilder();
+
+                    // Loop through each column in the row.
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        // If not the first column result, a column separator may be needed.
+                        if (i > 0)
+                        {
+                            pendingColumnDelimiters.Append(settings.ColumnDelimiter);
+                        }
+
+                        // If the column value is NULL, there is nothing to write.
+                        if (reader.IsDBNull(i))
+                        {
+                            continue;
+                        }
+
+                        // If the column value is empty, there is nothing to write.
+                        string value = reader.GetValue(i).ToString();
+                        if (string.IsNullOrEmpty(value))
+                        {
+                            continue;
+                        }
+
+                        // If there is data to write, go ahead and commit all pending
+                        // column delimiters.
+                        sb.Append(pendingColumnDelimiters.ToString());
+
+                        // Reset the pending column delimiters
+                        pendingColumnDelimiters = new StringBuilder();
+
+                        // Escape for RegEx's if necessary
+                        if (settings.EscapeForRegEx)
+                        {
+                            value = Regex.Escape(value);
+
+                            // Since our RegEx rule removes whitespace before processing
+                            // the RegEx, escaped whitespace needs to be converted to
+                            // hex escaped equivalents to ensure it is preserved.
+                            value = value.Replace("\\ ", "\\x20");
+                            value = value.Replace("\\t", "\\x09");
+                            value = value.Replace("\\r", "\\x0D");
+                            value = value.Replace("\\n", "\\x0A");
+                        }
+
+                        // Write the field value
+                        sb.Append(value);
+                    }
+
+                    rowsExported++;
+                }
+
+                // Write the file suffix if specified
+                if (!string.IsNullOrEmpty(settings.FileSuffix))
+                {
+                    sb.Append(settings.FileSuffix);
+                }
+
+                if (readData && sb.Length > 0)
+                {
+                    File.WriteAllText(settings.OutputFile, sb.ToString(),
+                        settings.Encoding);
+                }
+
+                Console.WriteLine("Exported " +
+                    rowsExported.ToString(CultureInfo.CurrentCulture) + " rows.");
             }
             catch (Exception ex)
             {
@@ -303,7 +301,7 @@ namespace Extract.SqlCompactExporter
             Console.Write("[/rd <RowDelimiter>] [/cd <ColumnDelimiter>] [/fp <FilePrefix>] ");
             Console.WriteLine("[/fs <FileSuffix>] [/enc <CodePageName>] [/esc]");
             Console.WriteLine();
-            Console.WriteLine("DatabaseFile: The SQL Compact database to export from.");
+            Console.WriteLine("DatabaseFile: The SQLite database to export from.");
             Console.WriteLine("Query: The SQL query that specifies the output data.");
             Console.WriteLine("OutputFileName: The file to export the data to.");
             Console.WriteLine(

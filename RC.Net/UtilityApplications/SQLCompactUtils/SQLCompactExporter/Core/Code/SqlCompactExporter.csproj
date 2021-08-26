@@ -1,117 +1,27 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}</ProjectGuid>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x86</PlatformTarget>
     <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.SqlCompactExporter</RootNamespace>
-    <AssemblyName>SqlCompactExporter</AssemblyName>
-    <AssemblyOriginatorKeyFile>..\..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <SccProjectName>SqlCompactExporter</SccProjectName>
-    <SccLocalPath>2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41</SccLocalPath>
-    <SccAuxPath>http://EngSvr.extract.local/VaultService</SccAuxPath>
-    <SccProvider>SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}</SccProvider>
+    <OutputPath>..\..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Copyright>Copyright © Extract Systems, LLC 2021</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>
     <SignAssembly>true</SignAssembly>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileUpgradeFlags />
-    <OldToolsVersion>2.0</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <PublishUrl>http://localhost/SqlCompactExporter/</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Web</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>true</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\binaries\debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\..\binaries\release\</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.SqlServerCe, Version=3.5.1.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>True</SpecificVersion>
-    </Reference>
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
-      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
-      <Name>Extract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj">
-      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
-      <Name>Extract.Licensing</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (CALL CommonDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Database\Core\Code\Extract.Database.csproj" />
+    <ProjectReference Include="..\..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+  </ItemGroup>
 </Project>
