@@ -270,7 +270,7 @@ namespace Extract.ETL
         ///     @AttributeSetForFileID - the AttributeSetForFileID being processed
         ///     @DashboardAttributeValue - Value for the DashbaordAttribute
         /// </summary>
-        readonly string _AddDashboardAttribute = @"
+        static readonly string _AddDashboardAttribute = @"
                 DELETE FROM DashboardAttributeFields
                 WHERE AttributeSetForFileID = @AttributeSetForFileID AND [Name] = @DashboardNameForAttribute
 
@@ -527,7 +527,16 @@ namespace Extract.ETL
                             // Update the DashboardAttributeFields table
                             foreach (var da in dashboardAttributesNeeded)
                             {
-                                ProccessDashboardAttributeFields(connection, da, attributeSetForFileID, pathContext);
+                                string valueToSave = GetValueForDashboardAttributeField(da, pathContext);
+
+                                using var cmd = connection.CreateCommand();
+                                cmd.CommandText = _AddDashboardAttribute;
+                                cmd.CommandTimeout = 0;
+                                cmd.Parameters.AddWithValue("@DashboardNameForAttribute", da.DashboardAttributeName);
+                                cmd.Parameters.AddWithValue("@AttributeSetForFileID", attributeSetForFileID);
+                                cmd.Parameters.AddWithValue("@DashboardAttributeValue", valueToSave);
+                                var task = cmd.ExecuteNonQueryAsync();
+                                task.Wait(_cancelToken);
                             }
                         }
                     }
@@ -536,32 +545,40 @@ namespace Extract.ETL
         }
 
         /// <summary>
-        /// Save the DashboardAttribute field
+        /// Get the value for a dashboard field
         /// </summary>
-        /// <param name="connection">The <see cref="SqlConnection"/> to use.</param>
         /// <param name="dashboardAttributeField"><see cref="DashboardAttributeField"/> that has the configuration for 
         /// the attribute being saved</param>
-        /// <param name="attributeSetForfileID">The ID for the AttributeSetForFile record for this attribute</param>
         /// <param name="pathContext"><see cref="XPathContext"/> for the VOA that is being processed</param>
-        void ProccessDashboardAttributeFields(SqlConnection connection, DashboardAttributeField dashboardAttributeField, Int64 attributeSetForfileID, XPathContext pathContext)
+        [CLSCompliant(false)]
+        public static string GetValueForDashboardAttributeField(DashboardAttributeField dashboardAttributeField, XPathContext pathContext)
         {
-            string path = "/root/" + dashboardAttributeField.PathForAttributeInAttributeSet.Replace(@"\", "/");
-            var attributesWithPath = pathContext.FindAllOfType<IAttribute>(path);
-            var firstAttribute = attributesWithPath.FirstOrDefault();
+            XPathContext.XPathIterator startAt = pathContext.GetIterator("/*");
+            startAt.MoveNext();
 
-            string valueToSave = firstAttribute?.Value?.String ?? "UNKNOWN";
+            string path = dashboardAttributeField.PathForAttributeInAttributeSet;
 
-            using (var cmd = connection.CreateCommand())
+            object resultOfPath = pathContext.Evaluate(startAt, path);
+            if (resultOfPath is List<object> objectList)
             {
-                cmd.CommandText = _AddDashboardAttribute;
-                cmd.CommandTimeout = 0;
-                cmd.Parameters.AddWithValue("@DashboardNameForAttribute", dashboardAttributeField.DashboardAttributeName);
-                cmd.Parameters.AddWithValue("@AttributeSetForFileID", attributeSetForfileID);
-                cmd.Parameters.AddWithValue("@DashboardAttributeValue", valueToSave);
-
-                var task = cmd.ExecuteNonQueryAsync();
-                task.Wait(_cancelToken);
+                resultOfPath = objectList.FirstOrDefault();
             }
+
+            string value;
+            if (resultOfPath is IAttribute attr)
+            {
+                value = attr.Value.String;
+            }
+            else if (resultOfPath is null)
+            {
+                value = "UNKNOWN";
+            }
+            else
+            {
+                value = resultOfPath.ToString();
+            }
+
+            return value;
         }
 
         #endregion

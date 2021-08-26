@@ -263,7 +263,7 @@ namespace Extract.ETL.Test
         [TestCase(-1, false, TestName = "Schedule start time in past no exception")]
         [TestCase(-1, true, TestName = "Scheduled start time in past completes with exception")]
         [TestCase(10, false, TestName = "Schedule start time in future no exception")]
-        public static void DatabaseServiceTestNonRecurringSchedule(int minutes, bool completeWithException)
+        public static void DatabaseServiceTestNonrecurringSchedule(int minutes, bool completeWithException)
         {
             string testDBName = "DatabaseServiceTestFutureSchedule_test";
             UCLID_FILEPROCESSINGLib.FileProcessingDB fileProcessingDb = null;

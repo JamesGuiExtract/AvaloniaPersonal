@@ -309,8 +309,8 @@ namespace Extract.ETL.Test
                     redactionAccuracy.Process(_noCancel);
 
                     // Get the data from the database after processing
-                    cmd.CommandText =
-                        $"SELECT * FROM ReportingRedactionAccuracy WHERE DatabaseServiceID = {redactionAccuracy.DatabaseServiceID}";
+                    cmd.CommandText = Utilities.UtilityMethods.FormatInvariant(
+                        $"SELECT * FROM ReportingRedactionAccuracy WHERE DatabaseServiceID = {redactionAccuracy.DatabaseServiceID}");
                         
 
                     CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);

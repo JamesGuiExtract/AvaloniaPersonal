@@ -1,15 +1,17 @@
-﻿using Extract.Database;
+﻿using Extract.AttributeFinder;
+using Extract.Database;
 using Extract.FileActionManager.Database.Test;
-using Extract.FileActionManager.FileProcessors;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Threading;
+using UCLID_COMUTILSLib;
 
 namespace Extract.ETL.Test
 {
@@ -401,6 +403,99 @@ namespace Extract.ETL.Test
 
         }
 
+        /// Confirm that relative and absolute paths to attributes and scalar functions
+        /// all work to get values for dashboard fields
+        [Test, Category("Automated"), Category("ETL")]
+        public static void GetValueForDashboardAttributeField()
+        {
+            var attributeCreator = new AttributeCreator("placeholder");
+            var attributes = new IUnknownVectorClass();
+            var test = attributeCreator.Create("Test", "N/A");
+            test.SubAttributes.PushBack(attributeCreator.Create("Name", "CBC"));
+            test.SubAttributes.PushBack(attributeCreator.Create("Component", "RBC"));
+            test.SubAttributes.PushBack(attributeCreator.Create("Component", "WBC"));
+            attributes.PushBack(test);
+
+            test = attributeCreator.Create("Test", "N/A");
+            test.SubAttributes.PushBack(attributeCreator.Create("Name", "TSH"));
+            test.SubAttributes.PushBack(attributeCreator.Create("Component", "TSH"));
+            attributes.PushBack(test);
+            attributes.PushBack(attributeCreator.Create("Path", @"C:\Temp"));
+            attributes.ReportMemoryUsage();
+
+            XPathContext pathContext = new(attributes);
+
+            List<ExpandAttributes.DashboardAttributeField> fields = new()
+            {
+                new ExpandAttributes.DashboardAttributeField
+                {
+                    DashboardAttributeName = "MissingAttribute",
+                    AttributeSetNameID = 1,
+                    PathForAttributeInAttributeSet = "Not/There"
+                },
+                new ExpandAttributes.DashboardAttributeField
+                {
+                    DashboardAttributeName = "Test",
+                    AttributeSetNameID = 1,
+                    PathForAttributeInAttributeSet = "Test/Name"
+                },
+                new ExpandAttributes.DashboardAttributeField
+                {
+                    DashboardAttributeName = "AbsoluteTest",
+                    AttributeSetNameID = 1,
+                    PathForAttributeInAttributeSet = "/*/Test/Name"
+                },
+                new ExpandAttributes.DashboardAttributeField
+                {
+                    DashboardAttributeName = "Test/Component",
+                    AttributeSetNameID = 1,
+                    PathForAttributeInAttributeSet = "Test/Component"
+                },
+                new ExpandAttributes.DashboardAttributeField
+                {
+                    DashboardAttributeName = "NumTests",
+                    AttributeSetNameID = 1,
+                    PathForAttributeInAttributeSet = "count(Test)"
+                },
+                new ExpandAttributes.DashboardAttributeField
+                {
+                    DashboardAttributeName = "NumTestsAbsolute",
+                    AttributeSetNameID = 1,
+                    PathForAttributeInAttributeSet = "count(/*/Test)"
+                },
+                new ExpandAttributes.DashboardAttributeField
+                {
+                    DashboardAttributeName = "NumComponents",
+                    AttributeSetNameID = 1,
+                    PathForAttributeInAttributeSet = "count(Test/Component)"
+                },
+                new ExpandAttributes.DashboardAttributeField
+                {
+                    DashboardAttributeName = "BackslashesInPath",
+                    AttributeSetNameID = 1,
+                    PathForAttributeInAttributeSet = @"concat(Path/text(), '\Subfolder')"
+                }
+            };
+
+            List<string> expectedResults = new()
+            {
+                "UNKNOWN",
+                "CBC",
+                "CBC",
+                "RBC",
+                "2",
+                "2",
+                "3",
+                @"C:\Temp\Subfolder",
+            };
+
+            List<string> results = fields
+                .Select(field => ExpandAttributes.GetValueForDashboardAttributeField(field, pathContext))
+                .ToList();
+
+            CollectionAssert.AreEqual(expectedResults, results);
+        }
+
         #endregion
 
         #region Helper methods
@@ -518,5 +613,6 @@ namespace Extract.ETL.Test
         }
 
         #endregion
+
     }
 }
