@@ -69,7 +69,7 @@ let main argv =
       let verbose = verboseFlag |> (not << Seq.isEmpty)
       LicenseUtilities.LoadLicenseFilesFromFolder(0, MapLabel())
 
-      let path = Path.GetFullPath argv.[0]
+      let path = Path.GetFullPath (argv.[0].TrimEnd '"')
       if File.Exists path && path.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) then
         DEPUtils.checkAssembly path |> Seq.singleton |> printResults verbose
       elif File.Exists path && path.EndsWith(".config", StringComparison.OrdinalIgnoreCase) then
