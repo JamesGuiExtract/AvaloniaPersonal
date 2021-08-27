@@ -8,7 +8,7 @@ param (
     [Parameter(HelpMessage="Name of xslt transform file")]
         [string]$Transform="$PSScriptRoot\html-report.xslt",
     [Parameter(HelpMessage="Options for nunit3")]
-        [string[]]$Options=("--where:`"cat!=Interactive and cat!=Broken and cat!=Automated_ADMIN`"", "--dispose-runners", "--result=`"$OutputFile.xml`"", "--result=`"$OutputFile.htm;transform=$Transform`"", "--agents=1", "--workers=1"),
+        [string[]]$Options=("--where:`"cat!=Interactive and cat!=Broken and cat!=Automated_ADMIN`"", "--dispose-runners", "--result=`"$OutputFile.xml`"", "--result=`"$OutputFile.htm;transform=$Transform`""),
     [Parameter(HelpMessage="Options for nunit3")]
         [string[]]$AdditionalOptions,
     [Parameter(HelpMessage="List of files to run with nunint")]

@@ -17,6 +17,18 @@ namespace Extract.ETL.Test
         #region Constants
 
         static readonly string _DATABASE = "Resources.HIMStatsDB.bak";
+        static readonly string _DATA_UPDATE_HIMSTATS_TEST_SQL = "Resources.DataUpdate_HIMStatsTest.sql";
+        static readonly string _REPORT_HIMSTATS_DATA = @"SELECT 
+                          [PaginationID]
+                          ,[FAMUserID]
+                          ,[SourceFileID]
+                          ,[DestFileID]
+                          ,[OriginalFileID]
+                          ,[DateProcessed]
+                          ,[ActionID]
+                          ,[FileTaskSessionID]
+                          ,[ActionName]
+                FROM [dbo].[ReportingHIMStats] ";
 
         #endregion
 
@@ -148,7 +160,7 @@ namespace Extract.ETL.Test
                             
                             // Process with cancel
                             Assert.Throws<ExtractException>(() => himStats.Process(_cancel), "Process with cancel should throw an ExtractException");
-
+                                   
                             reader = cmd.ExecuteReader();
                             record = reader.Cast<IDataRecord>().First();
 
@@ -206,7 +218,122 @@ namespace Extract.ETL.Test
             }
         }
 
+        /// <summary>
+        /// Test to verify the HIMStats services processes records as expected
+        /// </summary>
+        [Test]
+        [Category("Automated")]
+        [Category("ETL")]
+        public void MultipleBatchTest()
+        {
+            using var testFileManager = new TestFileManager<TestHIMStatsService>();
+            using var testManager = new FAMTestDBManager<TestHIMStatsService>();
+
+            string testDBName1 = "MultipleBatch1_Test";
+            string testDBName2 = "MultipleBatch2_Test";
+            try
+            {
+                var famDB1 = testManager.GetNewDatabase(testDBName1);
+                var sqlUpdateFile = testFileManager.GetFile(_DATA_UPDATE_HIMSTATS_TEST_SQL);
+                var updateSql = System.IO.File.ReadAllText(sqlUpdateFile);
+                famDB1.ExecuteCommandQuery(updateSql);
+
+                HIMStats himStats = new()
+                {
+                    DatabaseName = famDB1.DatabaseName,
+                    DatabaseServer = famDB1.DatabaseServer
+                };
+
+                himStats.AddToDatabase(himStats.DatabaseServer, himStats.DatabaseName);
+
+                himStats.BatchSize = 1;
+                himStats.Process(_noCancel);
+
+                himStats.BatchSize = 100;
+                himStats.Process(_noCancel);
+
+                var famDB2 = testManager.GetNewDatabase(testDBName2);
+                famDB2.ExecuteCommandQuery(updateSql);
+
+                HIMStats himExpected = new()
+                {
+                    DatabaseName = famDB2.DatabaseName,
+                    DatabaseServer = famDB2.DatabaseServer
+                };
+
+                himExpected.AddToDatabase(himExpected.DatabaseServer, himExpected.DatabaseName);
+                himExpected.BatchSize = 101;
+                himExpected.Process(_noCancel);
+
+                // The data for each should be the same
+                using var connection1 = NewSqlConnection(famDB1.DatabaseServer, famDB1.DatabaseName);
+                using var cmd1 = connection1.CreateCommand();
+                connection1.Open();
+                cmd1.CommandText = _REPORT_HIMSTATS_DATA;
+                var reader1 = cmd1.ExecuteReader();
+
+                using var connection2 = NewSqlConnection(famDB2.DatabaseServer, famDB2.DatabaseName);
+                connection2.Open();
+                using var cmd2 = connection2.CreateCommand();
+                cmd2.CommandText = _REPORT_HIMSTATS_DATA;
+
+                var reader2 = cmd2.ExecuteReader();
+
+                CheckResults(reader1, reader2);
+
+            }
+            finally
+            {
+                testManager.RemoveDatabase(testDBName1);
+                testManager.RemoveDatabase(testDBName2);
+            }
+        }
+
         #region Helper methods
+
+        /// <summary>
+        /// Compares what is in the foundResults with expected
+        /// </summary>
+        /// <param name="found">The SqlDataReader for the results generated</param>
+        /// <param name="expected">The Expected results</param>
+        static void CheckResults(SqlDataReader found, SqlDataReader expected)
+        {
+
+            // Compare the found results to the expected
+            var foundResults = ConvertResults(found);
+            var expectedResults = ConvertResults(expected);
+
+            Assert.That(foundResults.Count() == expectedResults.Count,
+                string.Format(CultureInfo.InvariantCulture, "Found {0} and expected {1} ",
+                foundResults.Count(), expectedResults.Count));
+
+            Assert.That(foundResults
+                    .OrderBy(a => a.PaginationID)
+                .SequenceEqual(expectedResults
+                    .OrderBy(r => r.PaginationID )),
+                "Compare the actual data with the expected");
+
+            found.Close();
+            expected.Close();
+        }
+
+        private static List<(int PaginationID, int FAMUserID, int SourceFileID, int DestFileID, int OriginalFileID, int ActionID, int FileTaskSessionID, string ActionName)>
+            ConvertResults(SqlDataReader reader)
+        { 
+            // Convert reader to IEnummerable 
+            var results  = reader.Cast<IDataRecord>();
+
+            return results.Select(r => (
+                   PaginationID: r.GetInt32(r.GetOrdinal("PaginationID")),
+                   FAMUserID: r.GetInt32(r.GetOrdinal("FAMUserID")),
+                   SourceFileID: r.GetInt32(r.GetOrdinal("SourceFileID")),
+                   DestFileID: (r.IsDBNull(r.GetOrdinal("DestFileID"))) ? 0 : r.GetInt32(r.GetOrdinal("DestFileID")),
+                   OriginalFileID: r.GetInt32(r.GetOrdinal("OriginalFileID")),
+                   ActionID: r.GetInt32(r.GetOrdinal("ActionID")),
+                   FileTaskSessionID: r.GetInt32(r.GetOrdinal("FileTaskSessionID")),
+                   ActionName: r.GetString(r.GetOrdinal("ActionName")))).ToList();
+        }
+
 
         /// <summary>
         /// Creates a new <see cref="SqlConnection"/> with the given database server and database name

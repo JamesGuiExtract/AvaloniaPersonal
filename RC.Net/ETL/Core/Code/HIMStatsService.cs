@@ -26,7 +26,7 @@ namespace Extract.ETL
         {
             #region HIMStatsStatus constants
 
-            const int _CURRENT_VERSION = 1;
+            const int _CURRENT_VERSION = 2;
 
             #endregion
 
@@ -57,6 +57,11 @@ namespace Extract.ETL
                     ee.AddDebugData("SavedVersion", Version, false);
                     ee.AddDebugData("CurrentVersion", _CURRENT_VERSION, false);
                     throw ee;
+                }
+                if (Version < _CURRENT_VERSION)
+                {
+                    // Force recalculation all the stats
+                    LastFileTaskSessionIDProcessed = 0;
                 }
 
                 Version = _CURRENT_VERSION;
@@ -103,10 +108,6 @@ namespace Extract.ETL
 
 
         readonly string _UpdateQuery = GET_TOUCHED_FILES + Invariant($@"
-            DELETE FROM ReportingHIMStats
-            FROM ReportingHIMStats
-            Where SourceFileID in (Select FileID FROM @FilesTable);
-            
             WITH PaginationDataWithRank
                  AS (SELECT MAX(Pagination.ID) PaginationID, 
                             FAMSession.FAMUserID, 
@@ -251,6 +252,8 @@ namespace Extract.ETL
             }
         }
 
+        public int BatchSize { get; set; } = _PROCESS_BATCH_SIZE;
+
         #endregion DatabaseService Properties
 
         #region HIMStats Properties
@@ -389,7 +392,7 @@ namespace Extract.ETL
                 {
                     cancelToken.ThrowIfCancellationRequested();
 
-                    int lastInBatchToProcess = Math.Min(_status.LastFileTaskSessionIDProcessed + _PROCESS_BATCH_SIZE, maxFileTaskSession);
+                    int lastInBatchToProcess = Math.Min(_status.LastFileTaskSessionIDProcessed + BatchSize, maxFileTaskSession);
 
                     using (var connection = NewSqlDBConnection())
                     {
