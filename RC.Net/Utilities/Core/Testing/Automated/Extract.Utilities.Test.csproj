@@ -83,6 +83,7 @@
     <Compile Include="TestCommentedTextFileReader.cs" />
     <Compile Include="TestComUtils.cs" />
     <Compile Include="TestExtractSettings.cs" />
+    <Compile Include="TestFunctionLoader.cs" />
     <Compile Include="TestScheduledEvent.cs" />
     <Compile Include="TestFileSystemMethods.cs" />
     <Compile Include="TestSystemMethods.cs" />
@@ -109,6 +110,10 @@
     <ProjectReference Include="..\..\..\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\FSharp\CSharpInterop\Extract.Utilities.FSharp.CSharpInterop.fsproj">
+      <Project>{504dcf5f-fd4e-4e5d-b1ce-2e27518fc0bc}</Project>
+      <Name>Extract.Utilities.FSharp.CSharpInterop</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
@@ -238,6 +243,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="FSharp.Core" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
