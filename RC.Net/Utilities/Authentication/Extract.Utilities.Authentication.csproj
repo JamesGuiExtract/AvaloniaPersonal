@@ -35,15 +35,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Interop.UCLID_COMLMLib">
-      <HintPath>..\..\..\Binaries\Debug\Interop.UCLID_COMLMLib.dll</HintPath>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="Interop.UCLID_FILEPROCESSINGLib">
-      <HintPath>..\..\..\..\WINDOWS\Microsoft.Net\assembly\GAC_32\Interop.UCLID_FILEPROCESSINGLib\v4.0_1.0.0.0__329544a1499f0564\Interop.UCLID_FILEPROCESSINGLib.dll</HintPath>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="System.Security" />
+    <COMReference Include="UCLID_FILEPROCESSINGLib">
+      <Guid>{5fbc9199-d162-4f14-bad9-090f6ab576c5}</Guid>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -5,49 +5,31 @@
 
 #include <UCLIDException.h>
 #include <StringTokenizer.h>
+#include <regex>
 
 //--------------------------------------------------------------------------------------------------
 vector<string> getTableNamesFromCreationQueries(vector<string> vecCreationQueries)
 {
 	int count = vecCreationQueries.size();
 	vector<string> vecTableNames(count);
-
+	// Pattern to match CREATE TABLE [dbo].[TableName], with or without quoting and namespace, or other create/alter statement
+	// Sub-match #1 will have the table name if the match is a create table statement, else it will be empty
+	string strCreateTablePattern = "\\b(?:CREATE\\s+TABLE\\s+(?:\\W?\\w+\\W?\\.)?\\W?(\\w+)|CREATE\\s+SCHEMA|ALTER\\s+TABLE)\\b";
+	regex rgxFindCreateTableName(strCreateTablePattern, std::regex_constants::icase);
 	for (int i = 0; i < count; i++)
 	{
-		vector<string> vecTokens;
-		StringTokenizer::sGetTokens(vecCreationQueries[i], " )(", vecTokens, true);
-		bool foundCreateStatement = false;
-		for (int j = 0, vecTokensSize = vecTokens.size(); j < vecTokensSize; j++)
+		smatch subMatches;
+		if (regex_search(vecCreationQueries[i], subMatches, rgxFindCreateTableName))
 		{
-			if (vecTokensSize - j > 3 && vecTokens[j] == "CREATE" && vecTokens[j+1] == "TABLE")
-			{
-				// Trim enclosing braces as well as any "dbo." prefix.
-				string strTableName = trim(vecTokens[j + 2], "[", "]");
-				if (strTableName.length() > 3 && _stricmp(strTableName.substr(0, 3).c_str(), "dbo") == 0)
-				{
-					strTableName = trim(strTableName.substr(3), "][.", "]");
-				}
-
-				vecTableNames[i] = strTableName;
-
-				foundCreateStatement = true;
-				break;
-			}
-			if (vecTokensSize - j > 3 && ((vecTokens[j] == "'CREATE" && vecTokens[j+1] == "SCHEMA") || vecTokens[j] == "ALTER" && vecTokens[j + 1] == "TABLE"))
-			{
-				foundCreateStatement = true;
-				break;
-			}
+			vecTableNames[i] = subMatches[1];
 		}
-
-		if (!foundCreateStatement)
+		else
 		{
 			UCLIDException ue("ELI31406", "Expected table create query.");
 			ue.addDebugInfo("Query", vecCreationQueries[i], true);
 			throw ue;
 		}
 	}
-
 	return vecTableNames;
 }
 //-------------------------------------------------------------------------------------------------

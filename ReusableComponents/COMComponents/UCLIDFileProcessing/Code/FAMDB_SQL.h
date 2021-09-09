@@ -3742,3 +3742,11 @@ static const string gstrLOGIN_ADD_COLUMN_ALTER_FAMUSER =
 static const string gstrDASHBOARD_CHANGEPK_TO_GUID =
 " ALTER TABLE dbo.Dashboard DROP CONSTRAINT PK_Dashboard;"
 " ALTER TABLE dbo.Dashboard ADD CONSTRAINT PK_Dashboard PRIMARY KEY(Guid); ";
+
+static const string gstrDBINFO_ADD_AZURE_VALUES =
+" IF NOT EXISTS(SELECT Value FROM dbo.DBInfo where Name = 'AzureClientId') "
+" INSERT INTO dbo.DBInfo(Name) VALUES('AzureClientId'); "
+" IF NOT EXISTS(SELECT Value FROM dbo.DBInfo where Name = 'AzureInstance') "
+" INSERT INTO dbo.DBInfo(Name) VALUES('AzureInstance'); "
+" IF NOT EXISTS(SELECT Value FROM dbo.DBInfo where Name = 'AzureTenant') "
+" INSERT INTO dbo.DBInfo(Name) VALUES('AzureTenant'); ";

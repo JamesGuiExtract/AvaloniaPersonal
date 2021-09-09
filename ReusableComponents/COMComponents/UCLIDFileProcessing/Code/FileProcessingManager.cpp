@@ -1893,7 +1893,7 @@ bool CFileProcessingManager::authenticateForProcessing()
 	{
 		VARIANT_BOOL vbCancelled;
 		
-		static IAuthenticationProviderPtr ipAuthenticationProvider(__nullptr);
+		IAuthenticationProviderPtr ipAuthenticationProvider(__nullptr);
 		SECURE_CREATE_OBJECT("ELI49621",
 			ipAuthenticationProvider, "Extract.Utilities.AuthenticationProvider");
 
