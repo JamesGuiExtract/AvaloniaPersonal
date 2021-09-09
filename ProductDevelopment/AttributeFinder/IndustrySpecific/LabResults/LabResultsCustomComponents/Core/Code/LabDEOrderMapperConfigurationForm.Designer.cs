@@ -76,7 +76,7 @@ namespace Extract.LabResultsCustomComponents
             // 
             // _buttonBrowse
             // 
-            this._buttonBrowse.FileFilter = "SQL Compact Database File (*.sdf)|*.sdf||";
+            this._buttonBrowse.FileFilter = "Database files (*.sqlite;*.sqlite3;*.db)|*.sqlite;*.sqlite3;*.db||";
             this._buttonBrowse.Location = new System.Drawing.Point(457, 24);
             this._buttonBrowse.Name = "_buttonBrowse";
             this._buttonBrowse.Size = new System.Drawing.Size(27, 22);

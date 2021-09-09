@@ -8,8 +8,6 @@ using Spring.Core.TypeResolution;
 using System;
 using System.Data.Common;
 using System.Data.OleDb;
-using System.Data.SqlClient;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -102,15 +100,6 @@ namespace Extract.AttributeFinder.Rules
             get;
             set;
         }
-
-        /// <summary>
-        /// Gets or sets whether to open SQL Compact DBs in a read-only fashion.
-        /// </summary>
-        bool OpenSqlCompactReadOnly
-        {
-            get;
-            set;
-        }
     }
 
     /// <summary>
@@ -134,8 +123,9 @@ namespace Extract.AttributeFinder.Rules
         /// Current version.
         /// <para>Version 2: Added UseFAMDbConnection and UseSpecifiedDbConnection.</para>
         /// <para>Version 3: Added OpenSqlCompactReadOnly.</para>
+        /// <para>Version 4: Removed OpenSqlCompactReadOnly.</para>
         /// </summary>
-        const int _CURRENT_VERSION = 3;
+        const int _CURRENT_VERSION = 4;
 
         /// <summary>
         /// The license id to validate in licensing calls
@@ -173,16 +163,6 @@ namespace Extract.AttributeFinder.Rules
         AttributeFinderPathTags _pathTags = new AttributeFinderPathTags();
 
         /// <summary>
-        /// For each instance, keeps track of the local database copy to use.
-        /// </summary>
-        TemporaryFileCopyManager _localDatabaseCopyManager;
-
-        /// <summary>
-        /// Whether to open SQL Compact DBs in a read-only fashion.
-        /// </summary>
-        bool _openSqlCompactReadOnly;
-
-        /// <summary>
         /// <see langword="true"/> if changes have been made to <see cref="DataQueryRuleObject"/>
         /// since it was created; <see langword="false"/> if no changes have been made since it was
         /// created.
@@ -201,7 +181,6 @@ namespace Extract.AttributeFinder.Rules
             try
             {
                 _databaseConnectionInfo.PathTags = _pathTags;
-                _localDatabaseCopyManager = new TemporaryFileCopyManager();
                 TypeRegistry.RegisterType("Regex", typeof(System.Text.RegularExpressions.Regex));
                 TypeRegistry.RegisterType("StringUtils", typeof(Spring.Util.StringUtils));
                 TypeRegistry.RegisterType("CultureInfo", typeof(System.Globalization.CultureInfo));
@@ -225,7 +204,6 @@ namespace Extract.AttributeFinder.Rules
             {
                 CopyFrom(dataQueryRuleObject);
                 _databaseConnectionInfo.PathTags = _pathTags;
-                _localDatabaseCopyManager = new TemporaryFileCopyManager();
             }
             catch (Exception ex)
             {
@@ -414,33 +392,6 @@ namespace Extract.AttributeFinder.Rules
                 catch (Exception ex)
                 {
                     throw ex.AsExtract("ELI34785");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether to open SQL Compact DBs in a read-only fashion
-        /// </summary>
-        public bool OpenSqlCompactReadOnly
-        {
-            get
-            {
-                return _openSqlCompactReadOnly;
-            }
-
-            set
-            {
-                try
-                {
-                    if (value != _openSqlCompactReadOnly)
-                    {
-                        _openSqlCompactReadOnly = value;
-                        _dirty = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI38598");
                 }
             }
         }
@@ -714,7 +665,11 @@ namespace Extract.AttributeFinder.Rules
                     UseSpecifiedDBConnection = (reader.Version >= 2) ? reader.ReadBoolean() :
                         !string.IsNullOrWhiteSpace(DataProviderName);
 
-                    OpenSqlCompactReadOnly = reader.Version >= 3 ? reader.ReadBoolean() : false;
+                    if (reader.Version == 3)
+                    {
+                        // Removed OpenSqlCompactReadOnly
+                        reader.ReadBoolean();
+                    }
 
                     // Load the GUID for the IIdentifiableObject interface.
                     LoadGuid(stream);
@@ -751,8 +706,6 @@ namespace Extract.AttributeFinder.Rules
 
                     writer.Write(UseFAMDBConnection);
                     writer.Write(UseSpecifiedDBConnection);
-
-                    writer.Write(OpenSqlCompactReadOnly);
 
                     // Write to the provided IStream.
                     writer.WriteTo(stream);
@@ -865,12 +818,6 @@ namespace Extract.AttributeFinder.Rules
                     _databaseConnectionInfo.Dispose();
                     _databaseConnectionInfo = null;
                 }
-
-                if (_localDatabaseCopyManager != null)
-                {
-                    _localDatabaseCopyManager.Dispose();
-                    _localDatabaseCopyManager = null;
-                }
             }
 
             // Dispose of unmanaged resources
@@ -918,7 +865,6 @@ namespace Extract.AttributeFinder.Rules
             DataConnectionString = source.DataConnectionString;
             UseFAMDBConnection = source.UseFAMDBConnection;
             UseSpecifiedDBConnection = source.UseSpecifiedDBConnection;
-            OpenSqlCompactReadOnly = source.OpenSqlCompactReadOnly;
 
             _dirty = true;
         }
@@ -947,39 +893,9 @@ namespace Extract.AttributeFinder.Rules
 
             try
             {
-                // Get a database connection. If an SQL CE DB, the database will be opened under a
-                // a temporary name.
-                string databaseWorkingCopyFileName = "";
-                string originalSQLCEDBFileName = "";
-
                 if (QueryUsesSQL)
                 {
-                    if (UseFAMDBConnection)
-                    {
-                        // Initialize a database connection using the last configured
-                        // IFileProcessingDB settings used this process.
-                        // NOTE: The connection string may be for a database that has not actually
-                        // been used. The connection string is based only on the properties of an
-                        // IFileProcessingDB instance that have been set, not based on a connection
-                        // that has actually been opened. Thus, for example, if we are running
-                        // within a RunFPSFile instance with the /ignoreDB flag, even though the
-                        // FAM instance will not have connected to a database, the database info
-                        // will still have been loaded from the FPS file and that is what will be
-                        // used here.
-                        IFileProcessingDB fileProcessingDB = new FileProcessingDBClass();
-                        OleDbConnectionStringBuilder oleDbConnectionStringBuilder 
-                            = new OleDbConnectionStringBuilder(fileProcessingDB.GetLastConnectionStringConfiguredThisProcess());
-
-                        string server = oleDbConnectionStringBuilder.DataSource;
-                        string database = (string)oleDbConnectionStringBuilder["Database"];
-                        dbConnection = new ExtractRoleConnection(SqlUtil.CreateConnectionString(server, database));
-                        dbConnection.Open();
-                    }
-                    else if (UseSpecifiedDBConnection)
-                    {
-                        dbConnection = GetDatabaseConnection(out databaseWorkingCopyFileName,
-                            out originalSQLCEDBFileName);
-                    }
+                    dbConnection = GetDatabaseConnection();
                 }
 
                 QueryResult result = null;
@@ -988,23 +904,8 @@ namespace Extract.AttributeFinder.Rules
                 {
                     result = query.Evaluate();
                 }
+
                 AttributeStatusInfo.ResetData();
-
-                // If the database was an SQL CE database that was opened under a working copy name,
-                // copy the working copy back over the master.
-                if (!string.IsNullOrEmpty(databaseWorkingCopyFileName) &&
-                    !string.IsNullOrEmpty(originalSQLCEDBFileName))
-                {
-                    FileAttributes originalFileAttributes =
-                        File.GetAttributes(originalSQLCEDBFileName);
-                    FileSystemMethods.MoveFile(databaseWorkingCopyFileName, originalSQLCEDBFileName,
-                        true);
-
-                    // Apply the same attributes the primary database had originally.
-                    FileSystemMethods.PerformFileOperationWithRetry(() =>
-                        File.SetAttributes(originalSQLCEDBFileName, originalFileAttributes),
-                        true);
-                }
 
                 return result;
             }
@@ -1024,122 +925,43 @@ namespace Extract.AttributeFinder.Rules
         }
 
         /// <summary>
-        /// Opens the configured database (if any). If the database is an SQL Compact database, it
-        /// will be copied to a working copy name (prefixed with '~') and
+        /// Opens the configured database (if any).
         /// <see paramref="workingCopyFileName"/> and <see paramref="originalFileName"/>
         /// will indicate the working and original database file names.
         /// </summary>
-        /// <param name="workingCopyFileName">The working copy of an SQL Compact database.</param>
-        /// <param name="originalFileName">The original filename of an SQL Compact database that was
-        /// opened under a working copy.</param>
         /// <returns>A <see cref="DbConnection"/> if a database connection was specified;
         /// <see langword="false"/> otherwise.</returns>
-        DbConnection GetDatabaseConnection(out string workingCopyFileName, out string originalFileName)
+        DbConnection GetDatabaseConnection()
         {
-            // Initialize the out parameters to null.
-            workingCopyFileName = null;
-            originalFileName = null;
+            if (UseFAMDBConnection)
+            {
+                // Initialize a database connection using the last configured
+                // IFileProcessingDB settings used this process.
+                // NOTE: The connection string may be for a database that has not actually
+                // been used. The connection string is based only on the properties of an
+                // IFileProcessingDB instance that have been set, not based on a connection
+                // that has actually been opened. Thus, for example, if we are running
+                // within a RunFPSFile instance with the /ignoreDB flag, even though the
+                // FAM instance will not have connected to a database, the database info
+                // will still have been loaded from the FPS file and that is what will be
+                // used here.
+                IFileProcessingDB fileProcessingDB = new FileProcessingDBClass();
+                OleDbConnectionStringBuilder oleDbConnectionStringBuilder
+                    = new OleDbConnectionStringBuilder(fileProcessingDB.GetLastConnectionStringConfiguredThisProcess());
 
+                string server = (string)oleDbConnectionStringBuilder["Server"];
+                string database = (string)oleDbConnectionStringBuilder["Database"];
+                var dbConnection = new ExtractRoleConnection(SqlUtil.CreateConnectionString(server, database));
+                dbConnection.Open();
+
+                return dbConnection;
+            }
             // If a database connection is configured, attempt to open it.
-            if (!string.IsNullOrWhiteSpace(DataProviderName) &&
+            else if (UseSpecifiedDBConnection &&
+                !string.IsNullOrWhiteSpace(DataProviderName) &&
                 !string.IsNullOrWhiteSpace(DataConnectionString))
             {
-                // [FlexIDSCore:5176]
-                // If the database is an SQL compact database, copy the database file to a separate,
-                // temporary filename to ensure the primary database file can be used by our
-                // applications at the same time it is being edited (unless that other application
-                // happens to also be editing the database.
-                if (DatabaseConnectionInfo.DataProvider.ShortDisplayName.StartsWith(
-                    "SqlCe", StringComparison.OrdinalIgnoreCase))
-                {
-                    using (DatabaseConnectionInfo tempDatabaseConnectionInfo =
-                        new DatabaseConnectionInfo(DatabaseConnectionInfo))
-                    {
-                        var connectionStringBuilder = new SqlConnectionStringBuilder(DataConnectionString);
-                        originalFileName = _pathTags.Expand(connectionStringBuilder.DataSource);
-
-                        // If opening read-only then just create a temp copy of the DB
-                        if (OpenSqlCompactReadOnly)
-                        {
-                            workingCopyFileName = _localDatabaseCopyManager.GetCurrentTemporaryFileName(
-                                originalFileName, this, true, true);
-
-                            // Set the new connection string.
-                            connectionStringBuilder.DataSource = workingCopyFileName;
-                            tempDatabaseConnectionInfo.ConnectionString =
-                                connectionStringBuilder.ConnectionString;
-
-                            // Ensure the outer scope won't attempt to "clean up" a temporary database
-                            // created by a different process.
-                            workingCopyFileName = null;
-
-                            return tempDatabaseConnectionInfo.OpenConnection();
-                        }
-                        // Else create a special version along side the original
-                        else
-                        {
-                            workingCopyFileName = Path.Combine(
-                                Path.GetDirectoryName(originalFileName),
-                                "~" + Path.GetFileName(originalFileName));
-
-                            if (File.Exists(workingCopyFileName))
-                            {
-                                try
-                                {
-                                    // If there is a previous copy of the working copy, if it can be deleted
-                                    // the instance that created it is not still open and it can therefore
-                                    // be ignored.
-                                    FileSystemMethods.DeleteFile(workingCopyFileName);
-                                }
-                                catch
-                                {
-                                    // But if it couldn't be deleted, another instance of SQLCDBEditor likely
-                                    // already has the database open for editing; prevent it from being opened.
-                                    ExtractException ee = new ExtractException("ELI35291",
-                                        "This database is currently being edited by another process.");
-                                    ee.AddDebugData("Database Filename", originalFileName, false);
-
-                                    throw ee;
-                                }
-                            }
-
-                            // Create the new working copy.
-                            string sourceFileName = originalFileName;
-                            string destinationFileName = workingCopyFileName;
-                            FileSystemMethods.PerformFileOperationWithRetry(() =>
-                                File.Copy(sourceFileName, destinationFileName),
-                                true);
-                            File.SetAttributes(workingCopyFileName, FileAttributes.Hidden);
-
-                            // Set the new connection string.
-                            connectionStringBuilder.DataSource = workingCopyFileName;
-                            tempDatabaseConnectionInfo.ConnectionString =
-                                connectionStringBuilder.ConnectionString;
-
-                            try
-                            {
-                                // The path is already expanded, so there is no need to provide _pathTags.
-                                return tempDatabaseConnectionInfo.OpenConnection();
-                            }
-                            catch
-                            {
-                                // Cleanup the working copy.
-                                FileSystemMethods.DeleteFile(workingCopyFileName);
-
-                                // Ensure the outer scope won't attempt to "clean up" a temporary database
-                                // created by a different process.
-                                workingCopyFileName = null;
-                                originalFileName = null;
-
-                                throw;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    return DatabaseConnectionInfo.OpenConnection();
-                }
+                return DatabaseConnectionInfo.OpenConnection();
             }
 
             // A database connection has not been configured.

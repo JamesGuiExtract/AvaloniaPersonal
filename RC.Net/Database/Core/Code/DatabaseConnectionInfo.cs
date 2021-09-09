@@ -29,18 +29,6 @@ namespace Extract.Database
         #region Fields
 
         /// <summary>
-        /// For SQL CE database connection opened, keeps track of a local database copy to use across
-        /// instances in this process for case <see cref="ShareLocalDBCopy"/> is <c>true</c>.
-        /// </summary>
-        static TemporaryFileCopyManager _multiThreadedLocalDatabaseCopyManager = new TemporaryFileCopyManager();
-
-        /// <summary>
-        /// For SQL CE database connection opened, keeps track of the local database copy to use
-        /// for this instance only for case <see cref="ShareLocalDBCopy"/> is <c>false</c>.
-        /// </summary>
-        TemporaryFileCopyManager _localDatabaseCopyManager;
-
-        /// <summary>
         /// The type of connection if not provided via the <see cref="DataProvider"/> property.
         /// </summary>
         Type _targetConnectionType = null;
@@ -53,13 +41,11 @@ namespace Extract.Database
 
         /// <summary>
         /// A <see cref="DbConnection"/> managed by this instance for the case that the caller does
-        /// not need to manually handle connection availability and updates of SQL CE files. For
-        /// SQL CE connections, a temporary local copy will be created, updated and deleted
-        /// automatically.
-        /// NOTE:
+        /// not need to manually handle connection availability and updates of SQLite files.
+        /// TODO: Revisit below issues: https://extract.atlassian.net/browse/ISSUE-17697 
         /// https://extract.atlassian.net/browse/ISSUE-15276
         /// As a result of some sporadic database errors that appear to be the result of thread safety
-        /// (at least with SQL CE DBs), each thread will now using it's own managed DB connection.
+        /// that had been present with SQL CE DBs, each thread will now using it's own managed DB connection.
         /// Connection pooling should continue to allow DB connections to be shared in the background,
         /// but will shift thread safety responsibility with the connections.
         /// </summary>
@@ -71,13 +57,6 @@ namespace Extract.Database
         /// </summary>
         [ThreadStatic]
         string _managedConnectionString;
-
-        /// <summary>
-        /// If this instance represents an SQL CE connection and <see cref="UseLocalSqlCeCopy"/> is
-        /// <see langword="true"/>, the name of the master database file used to create the copy
-        /// currently in use.
-        /// </summary>
-        string _activeSqlCeDb;
 
         /// <summary>
         /// Synchronizes access for thread safety.
@@ -384,17 +363,6 @@ namespace Extract.Database
         }
 
         /// <summary>
-        /// <see langword="true"/> to open and manage a local copy of the database if this
-        /// connection is for a SQL CE database.
-        /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Ce")]
-        public bool UseLocalSqlCeCopy
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the <see cref="IPathTags"/> instance used to expand path tags/functions in
         /// the connection string.
         /// </summary>
@@ -410,9 +378,8 @@ namespace Extract.Database
 
         /// <summary>
         /// Gets the <see cref="DbConnection"/> managed by this instance for the case that the
-        /// caller does not need to manually handle connection availability and updates of SQL CE
-        /// files. For SQL CE connections, a temporary local copy will be created, updated and
-        /// deleted automatically.
+        /// caller does not need to manually handle connection availability and updates of SQLite
+        /// files. 
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Db")]
         public DbConnection ManagedDbConnection
@@ -432,14 +399,6 @@ namespace Extract.Database
                             recreateConnection =
                                 _managedDbConnection.GetType() != TargetConnectionType ||
                                 _managedConnectionString != ConnectionString;
-
-                            // The connection should also be reset if we are using a SQL CE connection
-                            // to a local DB copy and the master copy has been updated.
-                            if (!recreateConnection && _activeSqlCeDb != null &&
-                                LocalDatabaseCopyManager.HasFileBeenModified(_activeSqlCeDb))
-                            {
-                                recreateConnection = true;
-                            } 
                         }
 
                         if (recreateConnection)
@@ -478,43 +437,7 @@ namespace Extract.Database
             }
         }
 
-        /// <summary>
-        /// Gets or sets whether local SqlCe database copies should be shared with other instances
-        /// in this processes.
-        /// </summary>
-        /// <value><c>true</c> to share local SqlCe database copies with other <see cref="DatabaseConnectionInfo"/>
-        /// instances; <c>false</c> to keep the local copy for use by this instance only.</value>
-        public bool ShareLocalDBCopy
-        {
-            get;
-            set;
-        }
-
         #endregion Properties
-
-        #region Static Methods
-
-        /// <summary>
-        /// Resets local database copies for the case where <see cref="ShareLocalDBCopy"/> is true
-        /// (allowing the database to be shared across threads)
-        /// </summary>
-        public static void ResetSharedDatabaseCopies()
-        {
-            try
-            {
-                lock (_multiThreadedLocalDatabaseCopyManager)
-                {
-                    _multiThreadedLocalDatabaseCopyManager.Dispose();
-                    _multiThreadedLocalDatabaseCopyManager = new TemporaryFileCopyManager();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI45620");
-            }
-        }
-
-        #endregion Static Methods
 
         #region Methods
 
@@ -569,9 +492,9 @@ namespace Extract.Database
         }
 
         /// <summary>
-        /// Creates and opens a <see cref="ManagedDbConnection"/> for the current configuration.
+        /// Creates and opens a <see cref="DbConnection"/> for the current configuration.
         /// </summary>
-        /// <returns>The open <see cref="ManagedDbConnection"/>.</returns>
+        /// <returns>The open <see cref="DbConnection"/>.</returns>
         public DbConnection OpenConnection()
         {
             try
@@ -587,18 +510,7 @@ namespace Extract.Database
                         ? ConnectionString
                         : PathTags.Expand(ConnectionString);
 
-                    if (UseLocalSqlCeCopy &&
-                        TargetConnectionType.Name.Equals("SqlCeConnection", StringComparison.Ordinal))
-                    {
-                        string connectionString = GetLocalSqlCeConnectionString(expandedConnectionString, out _activeSqlCeDb);
-                        dbConnection.ConnectionString = connectionString;
-                    }
-                    else
-                    {
-                        _activeSqlCeDb = null;
-                        dbConnection.ConnectionString = expandedConnectionString;
-                    }
-
+                    dbConnection.ConnectionString = expandedConnectionString;
                     dbConnection.Open();
 
                     return dbConnection; 
@@ -606,20 +518,6 @@ namespace Extract.Database
             }
             catch (Exception ex)
             {
-                if (!string.IsNullOrEmpty(_activeSqlCeDb))
-                {
-                    try
-                    {
-                        LocalDatabaseCopyManager.Dereference(_activeSqlCeDb, this);
-                    }
-                    catch (Exception ex2)
-                    {
-                        ex2.ExtractLog("ELI37791");
-                    }
-
-                    _activeSqlCeDb = null;
-                }
-
                 throw ex.AsExtract("ELI34759");
             }
         }
@@ -639,11 +537,6 @@ namespace Extract.Database
                     _managedDbConnection.Dispose();
                     _managedDbConnection = null;
                     _managedConnectionString = null;
-                    if (_activeSqlCeDb != null)
-                    {
-                        LocalDatabaseCopyManager.Dereference((string)_activeSqlCeDb, this);
-                        _activeSqlCeDb = null;
-                    }
                 }
             }
             catch (Exception ex)
@@ -757,13 +650,6 @@ namespace Extract.Database
                         _disposeHandler = null;
                     }
 
-                    if (_localDatabaseCopyManager != null &&
-                        _localDatabaseCopyManager != _multiThreadedLocalDatabaseCopyManager)
-                    {
-                        _localDatabaseCopyManager.Dispose();
-                        _localDatabaseCopyManager = null;
-                        _activeSqlCeDb = null;
-                    }
                 }
                 catch { }
             }
@@ -791,69 +677,5 @@ namespace Extract.Database
         }
 
         #endregion IDisposable
-
-        #region Private Members
-
-        /// <summary>
-        /// Gets the <see cref="TemporaryFileCopyManager"/> to manage local SqlCe copy instances
-        /// based on the value of <see cref="ShareLocalDBCopy"/>.
-        /// </summary>
-        TemporaryFileCopyManager LocalDatabaseCopyManager
-        {
-            get
-            {
-                if (_localDatabaseCopyManager == null)
-                {
-                    _localDatabaseCopyManager = ShareLocalDBCopy
-                        ? _multiThreadedLocalDatabaseCopyManager
-                        : new TemporaryFileCopyManager();
-                }
-
-                return _localDatabaseCopyManager;
-            }
-        }
-
-        /// <summary>
-        /// Creates a version of the specified <see paramref="connectionString"/> that points to a
-        /// temporary local copy of the database.
-        /// </summary>
-        /// <param name="connectionString">The connection string that references the master database
-        /// file.</param>
-        /// <param name="sqlceDatabaseFile">The name of the master database file (parsed from
-        /// <see paramref="connectionString"/>.</param>
-        /// <returns>A version of the specified <see paramref="connectionString"/> that points to a
-        /// temporary local copy of the database.</returns>
-        string GetLocalSqlCeConnectionString(string connectionString, out string sqlceDatabaseFile)
-        {
-            var connectionStringBuilder = new DbConnectionStringBuilder();
-            connectionStringBuilder.ConnectionString = connectionString;
-            string parameterName = null;
-            object sqlceDatabaseFileObject = null;
-            if (connectionStringBuilder.TryGetValue("Data Source", out sqlceDatabaseFileObject))
-            {
-                parameterName = "Data Source";
-            }
-            else if (connectionStringBuilder.TryGetValue("DataSource", out sqlceDatabaseFileObject))
-            {
-                parameterName = "DataSource";
-            }
-            else
-            {
-                ExtractException.ThrowLogicException("ELI36924");
-            }
-
-            sqlceDatabaseFile = (string)sqlceDatabaseFileObject;
-
-            // https://extract.atlassian.net/browse/ISSUE-12935
-            // If a copy of the database file has been made, there should no longer be any concern
-            // with the database maintaining read-only status since changes to this copy will not
-            // affect the original. Ensure read-only is off so the database can be used.
-            connectionStringBuilder.Add(parameterName,
-                LocalDatabaseCopyManager.GetCurrentTemporaryFileName(
-                    sqlceDatabaseFile, this, true, true));
-            return connectionStringBuilder.ConnectionString;
-        }
-
-        #endregion Private Members
     }
 }

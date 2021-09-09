@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using static System.FormattableString;
+using Extract.SqlDatabase;
 
 namespace Extract.Database
 {
@@ -26,11 +27,6 @@ namespace Extract.Database
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         private static readonly string _OBJECT_NAME = typeof(DBMethods).ToString();
-
-        /// <summary>
-        /// Provides access to settings in the config file.
-        /// </summary>
-        static ConfigSettings<Properties.Settings> _config = new ConfigSettings<Properties.Settings>(true);
 
         #endregion Constants
 
@@ -154,7 +150,7 @@ namespace Extract.Database
                         .FirstOrDefault();
 
                     providerFactory = (providerRow == null)
-                        ? DbProviderFactories.GetFactory(_config.Settings.DefaultDBProviderFactoryName)
+                        ? new SQLiteFactory()
                         : DbProviderFactories.GetFactory(providerRow);
                 }
 
@@ -219,7 +215,7 @@ namespace Extract.Database
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
         /// <param name="query">The query to execute.</param>
         /// <param name="parameters">Parameters to be used in the query. They key for each parameter
-        /// must begin with the appropriate symbol ("@" for T-SQL and SQL CE, ":" for Oracle) and
+        /// must begin with the appropriate symbol ("@" for T-SQL and SQLite, ":" for Oracle) and
         /// that key should appear in the <see paramref="query"/>.</param>
         /// <returns>A <see cref="DataTable"/> representing the results of the query.</returns>
         public static DataTable ExecuteDBQuery(DbConnection dbConnection, string query,
@@ -235,7 +231,7 @@ namespace Extract.Database
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
         /// <param name="query">The query to execute.</param>
         /// <param name="parameters">Parameters to be used in the query. They key for each parameter
-        /// must begin with the appropriate symbol ("@" for T-SQL and SQL CE, ":" for Oracle) and
+        /// must begin with the appropriate symbol ("@" for T-SQL and SQLite, ":" for Oracle) and
         /// that key should appear in the <see paramref="query"/>.</param>
         /// <param name="transaction">If not <c>null</c>, the transaction in which the query
         /// should run.</param>
@@ -266,7 +262,7 @@ namespace Extract.Database
         /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
         /// <param name="query">The query to execute.</param>
         /// <param name="parameters">Parameters to be used in the query. They key for each parameter
-        /// must begin with the appropriate symbol ("@" for T-SQL and SQL CE, ":" for Oracle) and
+        /// must begin with the appropriate symbol ("@" for T-SQL and SQLite, ":" for Oracle) and
         /// that key should appear in the <see paramref="query"/>.</param>
         /// <param name="columnSeparator">The string used to separate multiple column results.
         /// (Will not be included in any result with less than 2 columns)</param>
@@ -932,6 +928,36 @@ namespace Extract.Database
             }
         }
 
+        /// <summary>
+        /// Gets the table names from the database (will work only on Microsoft databases; an empty
+        /// array will be returned for other databases).
+        /// </summary>
+        /// <param name="dbConnection">The <see cref="DbConnection"/> for which the table list is
+        /// needed.</param>
+        /// <returns>An array of the table names.</returns>
+        public static string[] GetTableNames(DbConnection dbConnection)
+        {
+            try
+            {
+                if (dbConnection.GetType() == typeof(SQLiteConnection))
+                {
+                    return DBMethods.GetQueryResultsAsStringArray(dbConnection,
+                        "SELECT [name] FROM [sqlite_master]" +
+                        "   WHERE [type] = 'table' AND [name] NOT LIKE 'sqlite_%'" +
+                        "   ORDER BY [name]");
+                }
+                else
+                {
+                    return DBMethods.GetQueryResultsAsStringArray(dbConnection,
+                        "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME");
+                }
+            }
+            catch
+            {
+                return new string[0];
+            }
+        }
+
         #endregion Methods
 
         #region Private Members
@@ -952,8 +978,12 @@ namespace Extract.Database
         /// </returns>
         static int GetProviderMatchScore(DataRow providerDataRow, DbConnection dbConnection)
         {
+            var type = (dbConnection is SqlAppRoleConnection appRoleConnection)
+                ? appRoleConnection.GetConnectionType()
+                : dbConnection.GetType();
+
             var connectionNameParser=
-                new AssemblyQualifiedNameParser(dbConnection.GetType().AssemblyQualifiedName);
+                new AssemblyQualifiedNameParser(type.AssemblyQualifiedName);
             var providerNameParser =
                 new AssemblyQualifiedNameParser(providerDataRow["AssemblyQualifiedName"].ToString());
 

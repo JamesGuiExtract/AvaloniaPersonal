@@ -1,5 +1,4 @@
 ﻿using Extract.Database;
-using Extract.DataEntry.LabDE;
 using Extract.Licensing;
 using Extract.SQLCDBEditor;
 using Extract.Utilities;
@@ -8,7 +7,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlServerCe;
 using System.Linq;
 using System.Windows.Forms;
 

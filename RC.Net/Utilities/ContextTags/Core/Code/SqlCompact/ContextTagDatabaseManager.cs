@@ -718,12 +718,14 @@ namespace Extract.Utilities.ContextTags
             {
                 if (_connection == null && _connectionInfo == null && File.Exists(_databaseFile))
                 {
+                    ExtractException.Assert("ELI51886", "Deprecated SQL Compact code", !_readonly);
+
                     // Make a local copy (SQL compact can't handle network shares from multiple processes)
                     // https://extract.atlassian.net/browse/ISSUE-14936
                     _connectionInfo = new DatabaseConnectionInfo(typeof(SqlCeConnection).AssemblyQualifiedName,
                             SqlCompactMethods.BuildDBConnectionString(_databaseFile))
                     {
-                        UseLocalSqlCeCopy = _readonly
+                        //UseLocalDbCopy = _readonly
                     };
                 }
 

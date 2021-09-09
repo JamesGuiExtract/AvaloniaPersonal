@@ -179,5 +179,10 @@ namespace Extract.SqlDatabase
             }
         }
 
+        /// 
+        public Type GetConnectionType()
+        {
+            return BaseSqlConnection?.GetType();
+        }
     }
 }

@@ -6,8 +6,6 @@ using Spring.Core.TypeResolution;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Common;
-using System.Data.SqlServerCe;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -497,8 +495,6 @@ namespace Extract.AttributeFinder.Rules
                 .Where(attribute => attribute.Value != null)
                 .FirstOrDefault();
 
-            _databaseConnectionControl.DatabaseConnectionInfo.UseLocalSqlCeCopy = true;
-
             try
             {
                 AttributeStatusInfo.InitializeForQuery(sourceAttributes,
@@ -521,18 +517,6 @@ namespace Extract.AttributeFinder.Rules
             {
                 _databaseConnectionControl.DatabaseConnectionInfo.CloseManagedDbConnection();
             }
-        }
-
-        /// <summary>
-        /// Gets the database connection.
-        /// </summary>
-        /// <param name="databaseFileName">Name of the database file.</param>
-        /// <returns></returns>
-        static DbConnection GetDatabaseConnection(string databaseFileName)
-        {
-            string connectionString = "Data Source='" + databaseFileName + "';";
-
-            return new SqlCeConnection(connectionString);
         }
 
         #endregion Private Members

@@ -1,4 +1,5 @@
 ﻿using Extract.Database;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -84,7 +85,6 @@ namespace Extract.DataEntry
                             try
                             {
                                 _processCacheManager = null;
-                                DatabaseConnectionInfo.ResetSharedDatabaseCopies();
                             }
                             catch (Exception ex)
                             {
@@ -180,7 +180,10 @@ namespace Extract.DataEntry
                     }
                 }
 
-                string dbType = _currentConnection.GetType().ToString();
+                string dbType = (_currentConnection is SqlAppRoleConnection appRoleConnection)
+                    ? appRoleConnection.GetConnectionType().ToString()
+                    : _currentConnection.GetType().ToString();
+
                 if (dbType.IndexOf("Oracle", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     _parameterMarker = ":";  // Oracle
@@ -193,7 +196,7 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    _parameterMarker = "@";   // MS SQL & SQL CE
+                    _parameterMarker = "@";   // MS SQL & SQLite
                     _useNamedParameters = true;
                 }
             }

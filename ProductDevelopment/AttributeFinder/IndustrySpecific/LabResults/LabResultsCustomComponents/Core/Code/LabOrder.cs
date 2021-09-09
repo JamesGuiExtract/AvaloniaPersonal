@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlServerCe;
+using System.Data.SQLite;
 using System.Linq;
 
 namespace Extract.LabResultsCustomComponents
@@ -139,9 +139,9 @@ namespace Extract.LabResultsCustomComponents
                 + _orderCode.Replace("'", "''") + "' AND [Mandatory] = " + (mandatory ? "1" : "0");
 
             List<string> testCodes = new List<string>();
-            using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
+            using (SQLiteCommand command = new(query, dbCache.DBConnection))
             {
-                using (SqlCeDataReader reader = command.ExecuteReader())
+                using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {

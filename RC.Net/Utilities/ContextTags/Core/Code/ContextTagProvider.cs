@@ -32,7 +32,7 @@ namespace Extract.Utilities.ContextTags
         static readonly string _OBJECT_NAME = typeof(ContextTagProvider).ToString();
 
         /// <summary>
-        /// The name of the SQL CE database file that defines the context-specific tags.
+        /// The name of the SQLite database file that defines the context-specific tags.
         /// </summary>
         const string _SETTING_FILENAME = "CustomTags.sqlite";
 

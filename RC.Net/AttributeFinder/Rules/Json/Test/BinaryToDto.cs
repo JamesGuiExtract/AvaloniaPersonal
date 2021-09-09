@@ -46,6 +46,7 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         [Category("LegacyRulesJsonDeserialization")]
         [TestCase("Resources.RuleObjects.FSharpPreprocessor.hex.txt", "Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "LegacyFSharpPreprocessor")]
         [TestCase("Resources.RuleObjects.MicrFinderV2.hex.txt", "Resources.RuleObjects.MicrFinderV2.1.json", TestName = "LegacyMICRFinder")]
+        [TestCase("Resources.RuleObjects.DataQueryRuleObject.hex.txt", "Resources.RuleObjects.DataQueryRuleObjectV1.1.json", TestName = "LegacyDataQueryRuleObject")]
         public static void LegacyRuleObjects(string legacyResourceName, string currentVersionResourceName)
         {
             var legacyFile = _testFiles.GetFile(legacyResourceName);
@@ -93,7 +94,8 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         /// </summary>
         [Category("RulesJsonSerialization")]
         [TestCase("Resources.RuleObjects.FSharpPreprocessorV2.hex.txt", "Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "FSharpPreprocessorV2")]
-        [TestCase("Resources.RuleObjects.MicrFinderV2.1.hex.txt", "Resources.RuleObjects.MicrFinderV2.1.json", TestName = "MicrFinderV2.1")]
+        [TestCase("Resources.RuleObjects.MicrFinderV2.1.hex.txt", "Resources.RuleObjects.MicrFinderV2.1.json", TestName = "MicrFinderV2_1")]
+        [TestCase("Resources.RuleObjects.DataQueryRuleObject.hex.txt", "Resources.RuleObjects.DataQueryRuleObjectV1.1.json", TestName = "DataQueryRuleObjectV1_1")]
         public static void CurrentVersionRuleObjects(string binaryResourceName, string currentVersionResourceName)
         {
             var legacyFile = _testFiles.GetFile(binaryResourceName);

@@ -176,7 +176,6 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         [TestCase("Resources.RuleObjects.CreateAttribute.hex.txt", TestName = "CreateAttribute")]
         [TestCase("Resources.RuleObjects.CreateValue.hex.txt", TestName = "CreateValue")]
         [TestCase("Resources.RuleObjects.DataEntryPreloader.hex.txt", TestName = "DataEntryPreloader")]
-        [TestCase("Resources.RuleObjects.DataQueryRuleObject.hex.txt", TestName = "DataQueryRuleObject")]
         [TestCase("Resources.RuleObjects.DataScorerBasedAS.hex.txt", TestName = "DataScorerBasedAS")]
         [TestCase("Resources.RuleObjects.DateInputValidator.hex.txt", TestName = "DateInputValidator")]
         [TestCase("Resources.RuleObjects.DateTimeSplitter.hex.txt", TestName = "DateTimeSplitter")]

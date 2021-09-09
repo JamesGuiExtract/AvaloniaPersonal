@@ -24,7 +24,6 @@
             this._databaseConnectionControl = new Extract.Database.DatabaseConnectionControl();
             this._useFAMDBCheckBox = new System.Windows.Forms.CheckBox();
             this._useSpecifiedDBCheckBox = new System.Windows.Forms.CheckBox();
-            this._openSqlCompactReadOnlyCheckBox = new System.Windows.Forms.CheckBox();
             label1 = new System.Windows.Forms.Label();
             panel1 = new System.Windows.Forms.Panel();
             panel1.SuspendLayout();
@@ -139,25 +138,12 @@
             this._useSpecifiedDBCheckBox.Text = "Use specified DB connection:";
             this._useSpecifiedDBCheckBox.UseVisualStyleBackColor = true;
             // 
-            // _openSqlCompactReadOnlyCheckBox
-            // 
-            this._openSqlCompactReadOnlyCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this._openSqlCompactReadOnlyCheckBox.AutoSize = true;
-            this._openSqlCompactReadOnlyCheckBox.Enabled = false;
-            this._openSqlCompactReadOnlyCheckBox.Location = new System.Drawing.Point(244, 538);
-            this._openSqlCompactReadOnlyCheckBox.Name = "_openSqlCompactReadOnlyCheckBox";
-            this._openSqlCompactReadOnlyCheckBox.Size = new System.Drawing.Size(200, 17);
-            this._openSqlCompactReadOnlyCheckBox.TabIndex = 20;
-            this._openSqlCompactReadOnlyCheckBox.Text = "Open SQL Compact DB for read only";
-            this._openSqlCompactReadOnlyCheckBox.UseVisualStyleBackColor = true;
-            // 
             // DataQueryRuleObjectSettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this._cancelButton;
             this.ClientSize = new System.Drawing.Size(850, 694);
-            this.Controls.Add(this._openSqlCompactReadOnlyCheckBox);
             this.Controls.Add(this._useSpecifiedDBCheckBox);
             this.Controls.Add(this._useFAMDBCheckBox);
             this.Controls.Add(panel1);
@@ -189,6 +175,5 @@
         private Database.DatabaseConnectionControl _databaseConnectionControl;
         private System.Windows.Forms.CheckBox _useFAMDBCheckBox;
         private System.Windows.Forms.CheckBox _useSpecifiedDBCheckBox;
-        private System.Windows.Forms.CheckBox _openSqlCompactReadOnlyCheckBox;
     }
 }

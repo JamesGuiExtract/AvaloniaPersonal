@@ -277,7 +277,7 @@ namespace Extract.DataEntry.LabDE
                     "INNER JOIN [ComponentToESComponentMap] ON [LabTest].[TestCode] = [ComponentToESComponentMap].[ComponentCode] " +
                     "LEFT JOIN [DisabledESComponentAKA] ON [ComponentToESComponentMap].[ESComponentCode] = [DisabledESComponentAKA].[ESComponentCode] " +
                     "   AND [DisabledESComponentAKA].[ESComponentAKA] = @0 " +
-                    "WHERE (LEN(@1) = 0 OR [OrderCode] = @1) " +
+                    "WHERE (LENGTH(@1) = 0 OR [OrderCode] = @1) " +
                     "AND [DisabledESComponentAKA].[ESComponentCode] IS NULL " +
                     "AND [ComponentToESComponentMap].[ESComponentCode] IN ('" + string.Join("','", ESComponentCodes) + "')",
                     new Dictionary<string, string>() { { "@0", truncatedComponentAKA }, { "@1", truncatedOrderCode } }, "");
@@ -328,13 +328,13 @@ namespace Extract.DataEntry.LabDE
                     "INNER JOIN [ComponentToESComponentMap] ON [LabTest].[TestCode] = [ComponentToESComponentMap].[ComponentCode] " +
                     "LEFT JOIN [DisabledESComponentAKA] ON [ComponentToESComponentMap].[ESComponentCode] = [DisabledESComponentAKA].[ESComponentCode] " +
                     "   AND [DisabledESComponentAKA].[ESComponentAKA] = @0 " +
-                    "WHERE (LEN(@1) = 0 OR [OrderCode] = @1) " +
+                    "WHERE (LENGTH(@1) = 0 OR [OrderCode] = @1) " +
                     "AND [DisabledESComponentAKA].[ESComponentCode] IS NULL " +
                     "AND [ComponentToESComponentMap].[ESComponentCode] IN ('" + string.Join("','", ESComponentCodes) + "') " +
                     "UNION SELECT [AlternateTestName].[TestCode] FROM [AlternateTestName] " +
                     "INNER JOIN [LabOrderTest] ON [AlternateTestName].[TestCode] = [LabOrderTest].[TestCode] " +
                     "WHERE [Name] = @0 AND [StatusCode] = 'A' " +
-                    "AND (LEN(@1) = 0 OR [OrderCode] = @1) "
+                    "AND (LENGTH(@1) = 0 OR [OrderCode] = @1) "
                     , new Dictionary<string, string>() { { "@0", truncatedComponentAKA }, { "@1", truncatedOrderCode } }, "");
 
                 return customerComponentCodes;

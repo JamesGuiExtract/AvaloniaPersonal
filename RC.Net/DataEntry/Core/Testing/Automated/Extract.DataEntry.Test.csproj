@@ -227,9 +227,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\005.tif" />
-    <EmbeddedResource Include="Resources\DemoFlexIndex.sdf" />
     <EmbeddedResource Include="Resources\Example01.tif" />
-    <EmbeddedResource Include="Resources\OrderMappingDB.sdf" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\005.tif.voa" />
@@ -261,6 +259,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DemoFlexIndex.sqlite" />
+    <EmbeddedResource Include="Resources\OrderMappingDB.sqlite" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

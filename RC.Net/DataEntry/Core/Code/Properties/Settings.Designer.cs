@@ -12,7 +12,7 @@ namespace Extract.DataEntry.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.8.1.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -43,8 +43,8 @@ namespace Extract.DataEntry.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("System.Data.SqlServerCe.SqlCeConnection, System.Data.SqlServerCe, Version=3.5.1.0" +
-            ", Culture=neutral, PublicKeyToken=89845dcd8080cc91")]
+        [global::System.Configuration.DefaultSettingValueAttribute("System.Data.SQLite.SQLiteConnection, System.Data.SQLite, Version=1.0.115.0, Cultu" +
+            "re=neutral, PublicKeyToken=db937bc2d44ff139")]
         public string DatabaseType {
             get {
                 return ((string)(this["DatabaseType"]));

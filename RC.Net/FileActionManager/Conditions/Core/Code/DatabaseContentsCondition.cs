@@ -1770,7 +1770,6 @@ namespace Extract.FileActionManager.Conditions
                 string expandedOutput = "";
                 isDataEntryQueryOnly = false;
 
-                _databaseConnectionInfo.UseLocalSqlCeCopy = true;
                 _databaseConnectionInfo.PathTags = pathTags;
 
                 ExtractException.Assert("ELI36984", "Invalid text expansion parameters.",
@@ -2041,7 +2040,6 @@ namespace Extract.FileActionManager.Conditions
             string sqlQuery = "";
             bool isDataEntryQueryOnly = false;
 
-            _databaseConnectionInfo.UseLocalSqlCeCopy = true;
             _databaseConnectionInfo.PathTags = pathTags;
 
             if (UseQuery)

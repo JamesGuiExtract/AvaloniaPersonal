@@ -1255,7 +1255,6 @@ namespace Extract.FileActionManager.Conditions
                 // Use a DatabaseConnectionInfo instance to open manually specified connections so
                 // that local SQL CE database copies are automatically managed.
                 _schemaInfoDbConnectionInfo = new DatabaseConnectionInfo(connectionInfo);
-                _schemaInfoDbConnectionInfo.UseLocalSqlCeCopy = true;
                 var connectionStringBuilder = new DbConnectionStringBuilder();
                 connectionStringBuilder.ConnectionString = pathTags.Expand(connectionInfo.ConnectionString);
                 if (connectionInfo.DataSource.Name.Equals(DataSource.SqlDataSource.Name, StringComparison.Ordinal))

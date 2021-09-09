@@ -1,0 +1,1302 @@
+[
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n100*<Attribute SpatialField='Top' Type='double'>copy</Attribute> /\r\n<Attribute SpatialField='Bottom' Type='double'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=test-sql08vm;Initial Catalog=LabDE_Test;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'CollectionDate'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute StringList=',' Name='CollectionDate'>_/Test/CollectionDate</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <CollectionDate/>)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=Demo_LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'DocDateAndType'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='DocDateAndType'>_/DocDateAndType</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <DocDateAndType/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=<CustomerOrderMappingDB>",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL>SELECT [Unit] FROM LabTest WHERE [TestCode] = <Attribute>TestCode</Attribute></SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n100*<Attribute SpatialField='Left' Type='double'>copy</Attribute> /\r\n<Attribute SpatialField='Right' Type='double'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=Demo_LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientFirstName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='FirstName'>_/PatientInfo/Name/First</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <FirstName/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<ComponentDataDir>\\LabDE\\TestResults\\OrderMapper\\OrderMappingDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<Declarations>\r\n\t<Composite Name='Apos'>'</Composite>\r\n\t<Expression Name='OriginalName'><Attribute>OriginalName</Attribute>.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>\r\n\t<Composite StringList=\"','\" Name='PotentialComponents'><Attribute>ESComponentCode</Attribute></Composite>\r\n</Declarations>\r\n<Query>\r\n<!--Return 'True' if OriginalName is does not already exist and an AKA for any ESComponentCodes-->\r\n<SQL>\r\n\tSELECT 'True'\r\n\tWHERE LEN(<PotentialComponents/>) &gt; 0\r\n\tAND NOT EXISTS\r\n\t(\r\n\t\tSELECT * FROM [ESComponentAKA]\r\n\t\t\tWHERE [ESComponentCode] IN ('<PotentialComponents Parameterize='False'/>')\r\n\t\t\tAND [Name] = SUBSTRING(<OriginalName/>, 1, 500)\r\n\t)\r\n</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>(\r\n#commonWordPattern = '(?inx)\\b(URINE|TOTAL|UR|ABSOLUTE|BLOOD|ABS|COUNT|RATIO|RANDOM|AUTO|UA|SERUM|EST|VITAMIN|CELL|CELLS|LEVEL|PERCENT|ESTIMATED|DNA|QUANT|QN|DIRECT|LVL|AUTO|CT|PLASMA|FASTING|CALCULATED|ABS|AUTOMATED|CONC|SURFACE|AVERAGE|TOTAL|CALC|BLD)\\b';\r\n\r\n#replacements = 'replacements=([O0]=>[O0])([il!]=>[il!])(m=>(?>rn|m))(%=>(?>%|[569][il:,.-]?[569]?))';\r\n#noisePattern = '(?inx)[^0-9a-z#%]+';\r\n#largePrefix = '(?~&lt;method=fast,error=2,g=true,ws=\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],sub=[^\\r\\n\\t\\x20],'+#replacements;\r\n#mediumPrefix = '(?~&lt;method=fast,error=1,g=true,ws=\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],sub=[^\\r\\n\\t\\x20],'+#replacements;\r\n#smallPrefix = '(?~&lt;method=fast,error=0,g=true,ws=\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],'+#replacements;\r\n\r\n#attrr = <Attribute StringList='|'>*</Attribute>;\r\n#names = #attrr.Split('|'[0])\r\n.distinct()\r\n.sort()\r\n.orderBy('length')\r\n.reverse();\r\n\r\n#names = #names.!{(\r\n  #normalizedName = Regex.Replace(#this, #commonWordPattern, '');\r\n  #normalizedName = Regex.Replace(#normalizedName, #noisePattern, '');\r\n  #name = Regex.Escape(Regex.Replace(#this, #noisePattern, ''));\r\n  #es = ',xtra_ws=' + (#this.Length-1) + '>';\r\n  (#normalizedName.Length > 6\r\n  ? #largePrefix + #es + #name + ')'\r\n  : (#normalizedName.Length > 3\r\n    ? #mediumPrefix + #es + #name + ')'\r\n    : (#this.Length > 2\r\n      ? #smallPrefix + #es + #name + ')'\r\n      : '')))\r\n)}\r\n.?{#this.Length > 0};\r\nStringUtils.CollectionToDelimitedString(#names, '\r\n  | ')\r\n)</Expression>\r\n",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<Declarations>\r\n\t<Composite Name='Apos'>'</Composite>\r\n</Declarations>\r\n<Query>\r\n<!--Adds any AlternateTestName rows for OriginalName attributes that have been deemed qualified to be added and that don't already exist somewhere as an AKA-->\r\n<SQL>\r\n\tINSERT INTO [AlternateTestName] ([TestCode], [Name], [StatusCode])\r\n\tSELECT DISTINCT [ComponentToESComponentMap].[ComponentCode], [OriginalName], 'P' FROM \r\n\t(\r\n\t\t<Composite Parameterize='False' StringList=' UNION ' AbortIfEmpty='True'>\r\n\t\t\t<Composite SelectionMode='Distinct'>\r\n\t\t\t\tSELECT \r\n\t\t\t\t<Attribute Name='QualifiedComponents' SelectionMode='Distinct' Exclude='True'>Test/Component/ESComponentCode</Attribute>\r\n\t\t\t\t'<Expression><Attribute Root='QualifiedComponents'>../OriginalName</Attribute>.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>' AS OriginalName,\r\n\t\t\t\t'<Attribute Root='QualifiedComponents'>../TestCode</Attribute>' AS TestCode\r\n\t\t\t\tWHERE '<Attribute Root='QualifiedComponents'>../Qualified</Attribute>' = 'True'\r\n\t\t\t</Composite>\r\n\t\t</Composite>\r\n\t) AS [VOAFileData]\r\n\tINNER JOIN [ComponentToESComponentMap] ON SUBSTRING([VOAFileData].[TestCode], 1, 255) = [ComponentCode]\r\n\tLEFT JOIN [AlternateTestName] ON [ComponentCode] = [AlternateTestName].[TestCode]\r\n\t\tAND SUBSTRING([VOAFileData].[OriginalName], 1, 255) = [AlternateTestName].[Name]\r\n\tLEFT JOIN [DisabledESComponentAKA] ON [ComponentToESComponentMap].[ESComponentCode] = [DisabledESComponentAKA].[ESComponentCode]\r\n\t\tAND [OriginalName] = [ESComponentAKA]\r\n\tWHERE [AlternateTestName].[TestCode] IS NULL \r\n\t\tAND [DisabledESComponentAKA].[ESComponentCode] IS NULL\r\n\t\tAND LEN([OriginalName]) &gt; 1 AND LEN([OriginalName]) &lt;= 255\r\n</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RSDFileDir>\\..\\Database Files\\OrderMappingDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL>\r\n\tINSERT INTO CandidateAlternateTestName ([TestCode], [Name], [Filename], [Page], [StartX], [StartY], [EndX], [EndY], [Height])\r\n\tSELECT DISTINCT LabTest.TestCode, OriginalName, SourceDocName, Page, StartX, StartY, EndX, EndY, Height FROM\r\n\t(\r\n\t\t<Composite Parameterize=\"false\" StringList=\" UNION \" AbortIfEmpty=\"True\">\r\n\t\t\tSELECT \r\n\t\t\t\t'<Composite Name=\"TestName\" SelectionMode=\"Distinct\">\r\n\t\t\t\t\t<Attribute Name=\"AllTestNames\">Test/Component</Attribute>\r\n\t\t\t\t\t<Expression><AllTestNames SelectionMode=\"First\"/>.Replace(<Composite Name='Apos'>'</Composite>,<Apos/>+<Apos/>)</Expression>\r\n\t\t\t\t</Composite>' AS TestName,\r\n\t\t\t\t'<Expression><Attribute Root=\"TestName\" Name=\"OriginalName\">OriginalName</Attribute>.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>' AS OriginalName,\r\n\t\t\t\t'<SourceDocName />' AS SourceDocName,\r\n\t\t\t\t'<OriginalName SpatialField=\"Page\" />' AS Page,\r\n\t\t\t\t'<OriginalName SpatialField=\"StartX\" />' AS StartX,\r\n\t\t\t\t'<OriginalName SpatialField=\"StartY\" />' AS StartY,\r\n\t\t\t\t'<OriginalName SpatialField=\"EndX\" />' AS EndX,\r\n\t\t\t\t'<OriginalName SpatialField=\"EndY\" />' AS EndY,\r\n\t\t\t\t'<OriginalName SpatialField=\"Height\" />' AS Height\r\n\t\t</Composite>\r\n\t) AS VOAFileData\r\n\tINNER JOIN LabTest ON LabTest.OfficialName = VOAFileData.TestName\r\n\tINNER JOIN LabOrderTest ON LabOrderTest.TestCode = LabTest.TestCode\r\n\tWHERE Page &gt; 0\r\n\t\tAND LEN(OriginalName) &gt; 0 AND LEN(OriginalName) &lt; 50\r\n\t\tAND LabTest.OfficialName &lt;&gt; VOAFileData.OriginalName\r\n\t\tAND LabOrderTest.TestCode &lt;&gt; VOAFileData.OriginalName\r\n\t\tAND NOT VOAFileData.OriginalName IN\r\n\t(\r\n\t\tSELECT [Name] FROM AlternateTestName \r\n\t\t\tINNER JOIN LabTest ON LabTest.OfficialName = VOAFileData.TestName\r\n\t\t\tWHERE LabTest.OfficialName = VOAFileData.TestName\r\n\t)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\"R:\\Rules\\FLEXIndex\\MN - Waseca - TriMin\\TestingFiles\\NLP\\IndexData.mdb\"",
+      "DataProviderName": ".NET Framework Data Provider for OLE DB",
+      "DataSourceName": "Microsoft Access Database File",
+      "Query": "<Declarations>\r\n\t<Expression Name='SDN'><Regex Pattern='\\d+'><SourceDocName UseFullPath='false' /></Regex></Expression>\r\n</Declarations>\r\n<Query>\r\n<SQL>SELECT MortgageAmount FROM DocumentInfo WHERE Image = <SDN/></SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=uwhc-sql08vm;Initial Catalog=LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientDOB'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='DOB'>_/PatientInfo/DOB</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <DOB/>)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"\\\\Gandolf\\PSRaid1\\PS\\Services\\CA Fresno Env Health\\Solution\\Database Files\\FresnoDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL>\r\n\t<Attribute Exclude='True' Name='Value' SelectionMode='Distinct'>\r\n\t\t_/Chemical_Location|_/Chemical_Name|_/Common_Name|_/CAS_Number|_/Component/Name|_/Component/CAS\r\n\t</Attribute>\r\n\t<Expression Exclude='True' Name='Name'>\r\n\t\t(<Attribute Root='Value' Name='Parent' AttributeField='Name'>..</Attribute> == '_')\r\n\t\t\t? <Value AttributeField='Name'/>\r\n\t\t\t: <Parent/> + '_' + <Value AttributeField='Name'/>\r\n\t</Expression>\r\n\tINSERT [PreviouslyUsedFieldValue] ([FieldName], [Value])\r\n\t\tSELECT DISTINCT '<Name Parameterize='False'/>', '<Value Parameterize='False'/>'\r\n\t\tWHERE NOT EXISTS\r\n\t\t(\r\n\t\t\tSELECT * FROM [PreviouslyUsedFieldValue]\r\n\t\t\t\tWHERE [FieldName] = <Name/>\r\n\t\t\t\tAND [Value] = <Value/>\r\n\t\t)\r\n</SQL>\r\n",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'SubmittedByUser'\r\n\r\nSELECT [Value] FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"\\\\Gandolf\\PSRaid1\\PS\\Services\\CA Fresno Env Health\\Solution\\Database Files\\FresnoDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL>\r\n\tINSERT [FileName] ([FileName])\r\n\t\tSELECT DISTINCT '<SourceDocName Parameterize='False'/>'\r\n\t\tWHERE NOT EXISTS\r\n\t\t(\r\n\t\t\tSELECT * FROM [FileName]\r\n\t\t\t\tWHERE [FileName] = <SourceDocName/>\r\n\t\t)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\"R:\\Rules\\FLEXIndex\\NE - Dodge - TriMin\\TestingFiles\\NLP\\IndexData.mdb\"",
+      "DataProviderName": ".NET Framework Data Provider for OLE DB",
+      "DataSourceName": "Microsoft Access Database File",
+      "Query": "<Declarations>\r\n\t<Expression Name='SDN'><Regex Pattern='\\d+'><SourceDocName UseFullPath='false' /></Regex></Expression>\r\n</Declarations>\r\n<Query>\r\n<SQL>SELECT Distinct Subdivision FROM LegalLBS WHERE Image = <SDN/></SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=uwhc-sql08vm;Initial Catalog=LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientFirstName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='FirstName'>_/PatientInfo/Name/First</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <FirstName/>)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<SQL>\r\nSELECT [OrderCode] FROM [LabDEOrder]\r\n\tINNER JOIN [LabDEPatient] ON [LabDEOrder].[PatientMRN] = [LabDEPatient].[MRN]\r\n\tWHERE [LastName] = <Attribute>/Last</Attribute>\r\n\tAND [FirstName] = <Attribute>/First</Attribute>\r\n\tAND FLOOR(CAST([DOB] AS FLOAT)) = FLOOR(CAST(CAST(<Attribute Type='DateTime'>/DOB</Attribute> AS DATETIME) AS FLOAT))\r\n\tAND ABS(CAST([ReferenceDateTime] AS FLOAT) - CAST(CAST(<Attribute Type='DateTime'>/CollectionDate</Attribute> AS DATETIME) AS FLOAT)) &lt; 5\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=test-sql08vm;Initial Catalog=LabDE_Test;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientDOB'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='DOB'>_/PatientInfo/DOB</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <DOB/>)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>(\r\n#replacements = 'replacements=([O0]=>[O0])([il!]=>[il!])(m=>(?>rn|m))';\r\n#veryLargePrefix = '(?''extraLine'')(?~&lt;method=better_fit,error=0,g=true,ws=\\r\\n(?!\\r\\n)|\\b\\r\\n(?=\\r\\n\\b)|(?''-extraLine'')\\x20{4}[^\\r\\n]+[\\r\\n]+|\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],'+#replacements;\r\n#largePrefix = '(?~&lt;method=better_fit,error=0,g=true,ws=\\r\\n(?!\\r\\n)|\\b\\r\\n(?=\\r\\n\\b)|\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],'+#replacements;\r\n#attrr = <Attribute StringList='|'>*</Attribute>;\r\n#names = #attrr.Split('|'[0])\r\n.distinct()\r\n.sort()\r\n.orderBy('length')\r\n.reverse();\r\n#i = 0;\r\n#names = #names.!{(\r\n  #words = Regex.Split(#this, '(?n)(?>(?''1''[_\\W-[#%]]+))(?!$)(?&lt;!^\\1)(?''-1'')').?{#this.Length > 0}\r\n  .!{Regex.Escape(#this)};\r\n  #count = #words.Count;\r\n  #es = ',xtra_ws=' + ((#count-1)*3) + '>';\r\n  #name = '(' + StringUtils.CollectionToDelimitedString(#words, ')(') + ')';\r\n  (#count > 1\r\n  ? (#this.Length > 12\r\n    ? #veryLargePrefix + #es + #name + ')'\r\n    : (#this.Length > 6\r\n      ? #largePrefix + #es + #name + ')'\r\n      : StringUtils.CollectionToDelimitedString(#words, '\\s')))\r\n  : '')\r\n)}.?{#this.Length > 0};\r\nStringUtils.CollectionToDelimitedString(#names, '\r\n  | ')\r\n\r\n)</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n100*<Attribute SpatialField='Right' Type='double'>copy</Attribute> /\r\n<Attribute SpatialField='Right' Type='double'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'ClerkFileNumber'\r\n\r\nSELECT [Value] FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=Demo_LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'CollectionDate'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='DocDateAndType'>_/DocDateAndType</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <DocDateAndType/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=<CustomerOrderMappingDB>",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL StringList='|'>\r\nSELECT DISTINCT REPLACE(UPPER(Name),'|','')\r\nFROM AlternateTestName WHERE StatusCode = 'A'\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n100*(<Attribute SpatialField='Bottom' Type='double'>copy</Attribute> +\r\n<Attribute SpatialField='Top' Type='double'>copy</Attribute>) /\r\n(2 * <Attribute SpatialField='Bottom' Type='double'>PageBoundaries</Attribute>)\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=FL-TGH;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientFirstName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='FirstName'>_/PatientInfo/Name/First</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <FirstName/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>(\r\n#replacements = 'replacements=([O0]=>[O0])([il!]=>[il!])(m=>(?>rn|m))';\r\n#noisePattern = '(?inx)[^0-9a-z#%]+';\r\n#largePrefix = '(?~&lt;method=fast,error=2,g=true,ws=\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],sub=[^\\r\\n\\t\\x20],'+#replacements;\r\n#mediumPrefix = '(?~&lt;method=fast,error=1,g=true,ws=\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],sub=[^\\r\\n\\t\\x20],'+#replacements;\r\n#smallPrefix = '(?~&lt;method=fast,error=0,g=true,ws=\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],'+#replacements;\r\n\r\n#attrr = <Attribute StringList='|'>*</Attribute>;\r\n#names = #attrr.Split('|'[0])\r\n.distinct()\r\n.sort()\r\n.orderBy('length')\r\n.reverse();\r\n\r\n#names = #names.!{(\r\n  #normalizedName = Regex.Replace(#this, #noisePattern, '');\r\n  #name = Regex.Escape(Regex.Replace(#this, #noisePattern, ''));\r\n  #es = ',xtra_ws=' + (#this.Length-1) + '>';\r\n  (#normalizedName.Length > 7\r\n  ? #largePrefix + #es + #name + ')'\r\n  : (#normalizedName.Length > 5\r\n    ? #mediumPrefix + #es + #name + ')'\r\n    : (#this.Length > 4\r\n      ? #smallPrefix + #es + #name + ')'\r\n      : '')))\r\n)}\r\n.?{#this.Length > 0};\r\nStringUtils.CollectionToDelimitedString(#names, '\r\n  | ')\r\n)</Expression>\r\n",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=test-sql08vm;Initial Catalog=LabDE_Test;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientFirstName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = SUBSTRING(<Attribute Name='FirstName'>_/PatientInfo/Name/First</Attribute>,1,400)\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, SUBSTRING(<FirstName/>,1,400))\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=FL-TGH;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientDOB'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='DOB'>_/PatientInfo/DOB</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <DOB/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=test-sql08vm;Initial Catalog=LabDE_Test;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'CollectionDate'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = SUBSTRING(<Attribute StringList=',' Name='CollectionDate'>_/Test/CollectionDate</Attribute>,1,400)\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, SUBSTRING(<CollectionDate/>,1,400))\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RootRSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<Declarations>\r\n\t<Composite Name='Apos'>'</Composite>\r\n</Declarations>\r\n<Query>\r\n<!--Adds any AlternateTestName rows for OriginalName attributes that have been deemed qualified to be added and that don't already exist somewhere as an AKA-->\r\n<SQL>\r\n\tINSERT INTO [AlternateTestName] ([TestCode], [Name], [StatusCode])\r\n\tSELECT DISTINCT [ComponentToESComponentMap].[ComponentCode], [OriginalName], 'P' FROM \r\n\t(\r\n\t\t<Composite Parameterize='False' StringList=' UNION ' AbortIfEmpty='True'>\r\n\t\t\t<Composite SelectionMode='Distinct'>\r\n\t\t\t\tSELECT \r\n\t\t\t\t<Attribute Name='QualifiedComponents' SelectionMode='Distinct' Exclude='True'>Test/Component/ESComponentCode</Attribute>\r\n\t\t\t\t'<Expression><Attribute Root='QualifiedComponents'>../OriginalName</Attribute>.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>' AS OriginalName,\r\n\t\t\t\t'<Attribute Root='QualifiedComponents'>../TestCode</Attribute>' AS TestCode\r\n\t\t\t\tWHERE '<Attribute Root='QualifiedComponents'>../Qualified</Attribute>' = 'True'\r\n\t\t\t</Composite>\r\n\t\t</Composite>\r\n\t) AS [VOAFileData]\r\n\tINNER JOIN [ComponentToESComponentMap] ON SUBSTRING([VOAFileData].[TestCode], 1, 255) = [ComponentCode]\r\n\tLEFT JOIN [AlternateTestName] ON [ComponentCode] = [AlternateTestName].[TestCode]\r\n\t\tAND SUBSTRING([VOAFileData].[OriginalName], 1, 255) = [AlternateTestName].[Name]\r\n\tLEFT JOIN [DisabledESComponentAKA] ON [ComponentToESComponentMap].[ESComponentCode] = [DisabledESComponentAKA].[ESComponentCode]\r\n\t\tAND [OriginalName] = [ESComponentAKA]\r\n\tWHERE [AlternateTestName].[TestCode] IS NULL \r\n\t\tAND [DisabledESComponentAKA].[ESComponentCode] IS NULL\r\n\t\tAND LEN([OriginalName]) &gt; 1 AND LEN([OriginalName]) &lt;= 255\r\n</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=<wordlist>",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL StringList='|'>\r\nSELECT REPLACE(SearchString,'|','')\r\nFROM ClueWords\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\"R:\\Rules\\FLEXIndex\\MN - Waseca - TriMin\\TestingFiles\\NLP\\IndexData.mdb\"",
+      "DataProviderName": ".NET Framework Data Provider for OLE DB",
+      "DataSourceName": "Microsoft Access Database File",
+      "Query": "<Declarations>\r\n\t<Expression Name='SDN'><Regex Pattern='\\d+'><SourceDocName UseFullPath='false' /></Regex></Expression>\r\n</Declarations>\r\n<Query>\r\n<SQL>SELECT Party FROM Parties WHERE Image = <SDN/> AND Type = 'GRANTOR'</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<Declarations>\r\n\t<Composite Name='Apos'>'</Composite>\r\n\t<Expression Name='SDN'><SourceDocName/>.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>\r\n</Declarations>\r\n<Query>\r\n<!--Attempts to add AlternateTestNameSource rows for any OriginaName attributes that correspond with pending AlternateTestName rows-->\r\n<SQL>\r\n\tINSERT INTO [AlternateTestNameSource] ([AlternateTestNameID], [Filename], [Page], [StartX], [StartY], [EndX], [EndY], [Height])\r\n\tSELECT DISTINCT [AlternateTestName].[ID], [VOAFileData].[SourceDocName], [VOAFileData].[Page], [VOAFileData].[StartX],\r\n\t\t[VOAFileData].[StartY], [VOAFileData].[EndX], [VOAFileData].[EndY], [VOAFileData].[Height]\r\n\tFROM\r\n\t(\r\n\t\t<Composite Parameterize='False' StringList=' UNION ' AbortIfEmpty='True'>\r\n\t\t\t<Composite SelectionMode='Distinct'>\r\n\t\t\t\tSELECT \r\n\t\t\t\t<Attribute Name='QualifiedComponents' SelectionMode='Distinct' Exclude='True'>Test/Component</Attribute>\r\n\t\t\t\t'<Expression><Attribute Root='QualifiedComponents' Name='OriginalName'>OriginalName</Attribute>.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>' AS OriginalName,\r\n\t\t\t\t'<Attribute Root='QualifiedComponents'>TestCode</Attribute>' AS TestCode,\r\n\t\t\t\t'<SDN/>' AS SourceDocName,\r\n\t\t\t\t'<OriginalName SpatialField=\"Page\" />' AS Page,\r\n\t\t\t\t'<OriginalName SpatialField=\"StartX\" />' AS StartX,\r\n\t\t\t\t'<OriginalName SpatialField=\"StartY\" />' AS StartY,\r\n\t\t\t\t'<OriginalName SpatialField=\"EndX\" />' AS EndX,\r\n\t\t\t\t'<OriginalName SpatialField=\"EndY\" />' AS EndY,\r\n\t\t\t\t'<OriginalName SpatialField=\"Height\" />' AS Height\r\n\t\t\t</Composite>\r\n\t\t</Composite>\r\n\t) AS [VOAFileData]\r\n\tINNER JOIN [AlternateTestName] ON SUBSTRING([VOAFileData].[TestCode], 1, 255) = [AlternateTestName].[TestCode]\r\n\t\tAND SUBSTRING([OriginalName], 1, 255) = [AlternateTestName].[Name]\r\n\tINNER JOIN [ComponentToESComponentMap] ON [AlternateTestName].[TestCode] = [ComponentCode]\r\n\tLEFT JOIN [AlternateTestNameSource] ON [AlternateTestName].[ID] = [AlternateTestNameID]\r\n\t\tAND [AlternateTestNameSource].[FileName] = SUBSTRING(<SourceDocName/>, 1, 260)\r\n\t\tAND [AlternateTestNameSource].[Page] = [VOAFileData].[Page]\r\n\tLEFT JOIN [DisabledESComponentAKA] ON [ComponentToESComponentMap].[ESComponentCode] = [DisabledESComponentAKA].[ESComponentCode]\r\n\t\tAND [OriginalName] = [ESComponentAKA]\r\n\tWHERE [AlternateTestNameID] IS NULL \r\n\t\tAND [DisabledESComponentAKA].[ESComponentCode] IS NULL\r\n\t\tAND [StatusCode] = 'P'\r\n\t\tAND LEN([OriginalName]) &gt; 1 AND LEN([OriginalName]) &lt;= 255\r\n</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=<highlights>",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL StringList='|'>\r\nSELECT REPLACE(Yellow,'|','')\r\nFROM Color\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=PSSVR;Initial Catalog=Xerox_TX_Tarrant_Sample_Index_MultiPage;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\n -- Get Page value or reset to 0 if non-numeric\r\n DECLARE @Page int\r\n IF (ISNUMERIC(<Attribute>/Page</Attribute>) = 1)\r\n  SET @Page = <Attribute>/Page</Attribute>\r\n ELSE\r\n  SET @Page = 0\r\n  \r\n -- Update table if desired user ID already present\r\n UPDATE TarrantData SET LastVolume = <Attribute>/Volume</Attribute>, LastPage = @Page WHERE UserID IN (SELECT ID FROM FAMUser WHERE UserName = <Composite>$UserName()</Composite>)\r\n \r\n -- Add new row to table if desired user not present yet\r\n INSERT INTO TarrantData (UserID, LastVolume, LastPage)\r\n SELECT ID, <Attribute>/Volume</Attribute>, @Page \r\n FROM\r\n  (\r\n\tSELECT ID FROM FAMUser\r\n\tWHERE UserName = <Composite>$UserName()</Composite>\r\n  ) AS T\r\n  WHERE NOT EXISTS\r\n  (\r\n   SELECT UserID FROM TarrantData INNER JOIN FAMUser ON TarrantData.UserID = FAMUser.ID \r\n\tWHERE FAMUser.UserName = <Composite>$UserName()</Composite>\r\n  )\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=LabDE_UW;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientFirstName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='FirstName'>_/PatientInfo/Name/First</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <FirstName/>)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n<Attribute SpatialField='Page'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n(<Attribute SpatialField='Left' Type='double'>copy</Attribute> +\r\n<Attribute SpatialField='Right' Type='double'>copy</Attribute>) /\r\n(2 * <Attribute SpatialField='Right' Type='double'>PageBoundaries</Attribute>)\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=test-sql08vm;Initial Catalog=LabDE_Test;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientLastName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='LastName'>_/PatientInfo/Name/Last</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <LastName/>)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\"R:\\Rules\\FLEXIndex\\NE - Dodge - TriMin\\TestingFiles\\NLP\\IndexData.mdb\"",
+      "DataProviderName": ".NET Framework Data Provider for OLE DB",
+      "DataSourceName": "Microsoft Access Database File",
+      "Query": "<Declarations>\r\n\t<Expression Name='SDN'><Regex Pattern='\\d+'><SourceDocName UseFullPath='false' /></Regex></Expression>\r\n</Declarations>\r\n<Query>\r\n<SQL>SELECT Party FROM Parties WHERE Image = <SDN/> AND Type = 'GRANTEE'</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RSDFileDir>\\..\\Database Files\\OrderMappingDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL>\r\n\tINSERT INTO CandidateAlternateTestName ([TestCode], [Name], [Filename], [Page], [StartX], [StartY], [EndX], [EndY], [Height])\r\n\tSELECT DISTINCT LabTest.TestCode, OriginalName, SourceDocName, Page, StartX, StartY, EndX, EndY, Height FROM\r\n\t(\r\n\t\t<Composite Parameterize=\"false\" StringList=\" UNION \" AbortIfEmpty=\"True\">\r\n\t\t\tSELECT \r\n\t\t\t\t'<Composite Name=\"TestName\" SelectionMode=\"Distinct\">\r\n\t\t\t\t\t<Attribute Name=\"AllTestNames\">Test/Component</Attribute>\r\n\t\t\t\t\t<Expression><AllTestNames SelectionMode=\"First\"/>.Replace(<Composite Name='Apos'>'</Composite>,<Apos/>+<Apos/>)</Expression>\r\n\t\t\t\t</Composite>' AS TestName,\r\n\t\t\t\t'<Expression><Attribute Root=\"TestName\" Name=\"OriginalName\">OriginalName</Attribute>.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>' AS OriginalName,\r\n\t\t\t\t'<Attribute Root=\"TestName\" Name=\"TestCode\">TestCode</Attribute>' AS TestCode,\r\n\t\t\t\t'<SourceDocName />' AS SourceDocName,\r\n\t\t\t\t'<OriginalName SpatialField=\"Page\" />' AS Page,\r\n\t\t\t\t'<OriginalName SpatialField=\"StartX\" />' AS StartX,\r\n\t\t\t\t'<OriginalName SpatialField=\"StartY\" />' AS StartY,\r\n\t\t\t\t'<OriginalName SpatialField=\"EndX\" />' AS EndX,\r\n\t\t\t\t'<OriginalName SpatialField=\"EndY\" />' AS EndY,\r\n\t\t\t\t'<OriginalName SpatialField=\"Height\" />' AS Height\r\n\t\t</Composite>\r\n\t) AS VOAFileData\r\n  JOIN LabTest ON LabTest.TestCode = VOAFileData.TestCode\r\n  JOIN LabOrderTest ON LabOrderTest.TestCode = LabTest.TestCode\r\n\tWHERE Page &gt; 0\r\n  AND LEN(OriginalName) &gt; 0 AND LEN(OriginalName) &lt; 50\r\n  AND NOT LabTest.OfficialName = VOAFileData.OriginalName\r\n  AND NOT VOAFileData.OriginalName IN\r\n  (\r\n    SELECT [Name] FROM AlternateTestName AKA\r\n    WHERE LabTest.TestCode = AKA.TestCode\r\n  )\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n(\r\nDateTime.TryParse(<Attribute>*</Attribute>, null)\r\n? DateTime.Parse('08/21/2017').Subtract(DateTime.Parse(<Attribute>*</Attribute>)).Days / 30.4166666667\r\n:''\r\n)\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=uwhc-sql08vm;Initial Catalog=LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientLastName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='LastName'>_/PatientInfo/Name/Last</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <LastName/>)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n(<Attribute SpatialField='Bottom' Type='double'>copy</Attribute> -\r\n<Attribute SpatialField='Top' Type='double'>copy</Attribute>) /\r\n<Attribute SpatialField='Bottom' Type='double'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=<highlights>",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL StringList='|'>\r\nSELECT REPLACE(Green,'|','')\r\nFROM Color\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n100*(<Attribute SpatialField='Bottom' Type='double'>copy</Attribute> -\r\n<Attribute SpatialField='Top' Type='double'>copy</Attribute>) /\r\n<Attribute SpatialField='Bottom' Type='double'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=PSSVR;Initial Catalog=z_IntCust_Essentia;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientFirstName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='FirstName'>_/PatientInfo/Name/First</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <FirstName/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'DocumentID'\r\n\r\nSELECT [Value] FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n100*<Attribute SpatialField='Bottom' Type='double'>copy</Attribute> /\r\n<Attribute SpatialField='Bottom' Type='double'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=uwhc-sql08vm;Initial Catalog=LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientLastName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = SUBSTRING(<Attribute Name='LastName'>_/PatientInfo/Name/Last</Attribute>,1,400)\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, SUBSTRING(<LastName/>,1,400))\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Attribute SpatialField='Page'>*</Attribute>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n<Attribute SpatialField='Page'>copy</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n<Attribute SpatialField='Bottom' Type='int'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n100*(<Attribute SpatialField='Left' Type='double'>copy</Attribute> +\r\n<Attribute SpatialField='Right' Type='double'>copy</Attribute>) /\r\n(2 * <Attribute SpatialField='Right' Type='double'>PageBoundaries</Attribute>)\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RootRSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<Declarations>\r\n\t<Composite Name='Apos'>'</Composite>\r\n</Declarations>\r\n<Query>\r\n<!--Adds any AlternateTestName rows for OriginalName attributes that are for unmapped components and that don't already exist somewhere as an AKA-->\r\n<SQL>\r\n\tINSERT INTO [AlternateTestName] ([TestCode], [Name], [StatusCode])\r\n\tSELECT DISTINCT [VOAFileData].[TestCode], [OriginalName], 'P' FROM \r\n\t(\r\n\t\t<Composite Parameterize='False' StringList=' UNION ' AbortIfEmpty='True'>\r\n\t\t\t<Composite SelectionMode='Distinct'>\r\n\t\t\t\tSELECT \r\n\t\t\t\t'<Attribute Name = 'QualifiedComponents' SelectionMode='Distinct'>Test/Component/TestCode</Attribute>' AS TestCode,\r\n\t\t\t\t'<Expression><Attribute Root='QualifiedComponents'>../OriginalName</Attribute>.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>' AS OriginalName\r\n\t\t\t</Composite>\r\n\t\t</Composite>\r\n\t) AS [VOAFileData]\r\n\tLEFT JOIN [ComponentToESComponentMap] ON SUBSTRING([VOAFileData].[TestCode], 1, 255) = [ComponentCode]\r\n\tLEFT JOIN [AlternateTestName] ON [VOAFileData].[TestCode] = [AlternateTestName].[TestCode]\r\n\t\tAND SUBSTRING([VOAFileData].[OriginalName], 1, 255) = [AlternateTestName].[Name]\r\n\tWHERE [AlternateTestName].[TestCode] IS NULL\r\n\t\tAND [ComponentToESComponentMap].[ESComponentCode] IS NULL\r\n\t\tAND LEN([OriginalName]) &gt; 1 AND LEN([OriginalName]) &lt;= 255\r\n</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RootRSDFileDir>\\..\\..\\Database Files\\OrderMappingDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<Declarations>\r\n\t<Composite Name='Apos'>'</Composite>\r\n\t<Expression Name='OriginalName'><Attribute>OriginalName</Attribute>.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>\r\n\t<Expression Name='TestCode'><Attribute>TestCode</Attribute>.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>\r\n</Declarations>\r\n<Query>\r\n<!--Return all possible ESComponentCodes associated with this result component if this OriginalName is qualified to be added to the AKA table-->\r\n<SQL>\r\n\tSELECT [ComponentToESComponentMap].[ESComponentCode] FROM [ComponentToESComponentMap]\r\n\tLEFT JOIN [AlternateTestName] ON [ComponentToESComponentMap].[ComponentCode] = [AlternateTestName].[TestCode]\r\n\t\tAND SUBSTRING(<OriginalName/>, 1, 255) = [AlternateTestName].[Name]\r\n\tLEFT JOIN [DisabledESComponentAKA] ON [ComponentToESComponentMap].[ESComponentCode] = [DisabledESComponentAKA].[ESComponentCode]\r\n\t\tAND SUBSTRING(<OriginalName/>, 1, 255) = [ESComponentAKA] \r\n\tWHERE [ComponentToESComponentMap].[ComponentCode] = SUBSTRING(<TestCode/>, 1, 255)\r\n\t\tAND [AlternateTestName].[TestCode] IS NULL\r\n\t\tAND [DisabledESComponentAKA].[ESComponentCode] IS NULL\r\n\t\tAND LEN(<OriginalName/>) &gt; 1 AND LEN(<OriginalName/>) &lt;= 255\r\n</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=uwhc-sql08vm;Initial Catalog=LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'CollectionDate'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = SUBSTRING(<Attribute StringList=',' Name='CollectionDate'>_/Test/CollectionDate</Attribute>,1,400)\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, SUBSTRING(<CollectionDate/>,1,400))\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=<CustomerOrderMappingDB>",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL>\r\nSELECT [Code] FROM [LabOrder]\r\n    WHERE [Code] NOT IN ('<Attribute Parameterize='False' StringList=\"','\">/InvalidOrderCode</Attribute>')\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=pssvr;Initial Catalog=z_IntCust_Essentia;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'UniqueDocString'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='UniqueDocString'>_/UniqueDocString</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <UniqueDocString/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>(\r\n#replacements = 'replacements=([O0]=>[O0])([il!]=>[il!])(m=>(?>rn|m))';\r\n#prefix =      '(?~&lt;error=0,g=true,ws=\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],'+#replacements;\r\n#smallPrefix = '(?~&lt;error=0,g=true,ws=\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],xtra_ws=1>';\r\n#attrr = <Attribute StringList='|'>*</Attribute>;\r\n#names = #attrr.Split('|'[0])\r\n.distinct()\r\n.sort()\r\n.orderBy('length')\r\n.reverse();\r\n\r\n#names = #names.?{\r\n  Regex.Split(#this, '(?n)(?>(?''1''[_\\W-[#%]]+))(?!$)(?&lt;!^\\1)(?''-1'')').?{#this.Length > 0}.Count == 1\r\n}.!{(\r\n  #name = Regex.Escape(#this);\r\n  (#this.Length > 5\r\n  ? (\r\n    #es = ',xtra_ws=' + (#this.Length-1) + '>';\r\n    #prefix + #es + #name + ')'\r\n    )\r\n  : (#this.Length > 1\r\n    ? (\r\n\t#es = ',xtra_ws=' + (#this.Length-1) + '>';\r\n\t'\\b' + #prefix + #es + #name + ')' + '\\b')\r\n    : #name)\r\n  )\r\n)};\r\nStringUtils.CollectionToDelimitedString(#names, '\r\n  | ')\r\n)</Expression>\r\n",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=PSSVR;Initial Catalog=Cedars_Test1_Model;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nSELECT [AccessionNumber] FROM [LabDEOrder]\r\n\tJOIN [LabDEPatient] ON [LabDEOrder].[PatientMRN] = [LabDEPatient].[MRN]\r\n\tWHERE [AccessionNumber] = <Attribute>/AccessionNumber</Attribute>\r\n\tAND NOT (\r\n\t\t\t[LastName] = <Attribute>/Last</Attribute>\r\n\t\t\tAND [FirstName] = <Attribute>/First</Attribute>\r\n\t\tOR\t(\r\n\t\t\t\t[LastName] = <Attribute>/Last</Attribute>\r\n\t\t\t\tOR [FirstName] = <Attribute>/First</Attribute>\r\n\t\t\t)\r\n\t\t\tAND \r\n\t\t\t\tFLOOR(CAST([DOB] AS FLOAT)) =\r\n\t\t\t\tFLOOR(CAST(CAST(<Attribute Type='DateTime'>/DOB</Attribute> AS DATETIME) AS FLOAT))\r\n\t\t)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\"R:\\Rules\\FLEXIndex\\NE - Dodge - TriMin\\TestingFiles\\NLP\\IndexData.mdb\"",
+      "DataProviderName": ".NET Framework Data Provider for OLE DB",
+      "DataSourceName": "Microsoft Access Database File",
+      "Query": "<Declarations>\r\n\t<Expression Name='SDN'><Regex Pattern='\\d+'><SourceDocName UseFullPath='false' /></Regex></Expression>\r\n</Declarations>\r\n<Query>\r\n<SQL>SELECT MortgageAmount FROM DocumentInfo WHERE Image = <SDN/></SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=uwhc-sql08vm;Initial Catalog=LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'CollectionDate'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute StringList=',' Name='CollectionDate'>_/Test/CollectionDate</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <CollectionDate/>)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=Demo_LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'CollectionDate'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Expression StringList=',' Name='CollectionDate'><Attribute Type='string[]'>_/Test/CollectionDate</Attribute>.distinct()</Expression>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <CollectionDate/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n<Attribute SpatialField='Left' Type='double'>copy</Attribute> /\r\n<Attribute SpatialField='Right' Type='double'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n100*(<Attribute SpatialField='Right' Type='double'>copy</Attribute> -\r\n<Attribute SpatialField='Left' Type='double'>copy</Attribute>) /\r\n<Attribute SpatialField='Right' Type='double'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\"R:\\Rules\\FLEXIndex\\MN - Waseca - TriMin\\TestingFiles\\NLP\\IndexData.mdb\"",
+      "DataProviderName": ".NET Framework Data Provider for OLE DB",
+      "DataSourceName": "Microsoft Access Database File",
+      "Query": "<Declarations>\r\n\t<Expression Name='SDN'><Regex Pattern='\\d+'><SourceDocName UseFullPath='false' /></Regex></Expression>\r\n</Declarations>\r\n<Query>\r\n<SQL>SELECT Party FROM Parties WHERE Image = <SDN/> AND Type = 'GRANTEE'</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RSDFileDir>\\..\\Database Files\\OrderMappingDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL>\r\n  INSERT INTO CandidateAlternateTestName ([TestCode], [Name], [Filename], [Page], [StartX], [StartY], [EndX], [EndY], [Height])\r\n  SELECT DISTINCT LabTest.TestCode, OriginalName, SourceDocName, Page, StartX, StartY, EndX, EndY, Height FROM\r\n  (\r\n    <Composite Parameterize=\"false\" StringList=\" UNION \" AbortIfEmpty=\"True\">\r\n      SELECT \r\n        '<Attribute SelectionMode=\"Distinct\" Name=\"TestName\">/Test/Component</Attribute>' AS TestName,\r\n        '<Attribute Root=\"TestName\" Name=\"OriginalName\">OriginalName</Attribute>' AS OriginalName,\r\n        '<Attribute Root=\"TestName\" Name=\"TestCode\">TestCode</Attribute>' AS TestCode,\r\n        '<SourceDocName />' AS SourceDocName,\r\n        <Expression>(<OriginalName SpatialField=\"Page\" Type='int' Name='Page'/> == 0) ? 1 : <Page/></Expression> AS Page,\r\n        '<OriginalName SpatialField=\"StartX\" />' AS StartX,\r\n        '<OriginalName SpatialField=\"StartY\" />' AS StartY,\r\n        '<OriginalName SpatialField=\"EndX\" />' AS EndX,\r\n        '<OriginalName SpatialField=\"EndY\" />' AS EndY,\r\n        '<OriginalName SpatialField=\"Height\" />' AS Height\r\n    </Composite>\r\n  ) AS VOAFileData\r\n  JOIN LabTest ON LabTest.TestCode = VOAFileData.TestCode\r\n  JOIN LabOrderTest ON LabOrderTest.TestCode = LabTest.TestCode\r\n  WHERE LEN(OriginalName) &gt; 1\r\n  AND NOT LabTest.OfficialName = VOAFileData.OriginalName\r\n  AND NOT VOAFileData.OriginalName IN\r\n  (\r\n    SELECT [Name] FROM AlternateTestName AKA\r\n    WHERE LabTest.TestCode = AKA.TestCode\r\n  )\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\"R:\\Rules\\FLEXIndex\\MN - Waseca - TriMin\\TestingFiles\\NLP\\IndexData.mdb\"",
+      "DataProviderName": ".NET Framework Data Provider for OLE DB",
+      "DataSourceName": "Microsoft Access Database File",
+      "Query": "<Declarations>\r\n\t<Expression Name='SDN'><Regex Pattern='\\d+'><SourceDocName UseFullPath='false' /></Regex></Expression>\r\n</Declarations>\r\n<Query>\r\n<SQL>SELECT DocumentReference FROM DocumentReference WHERE Image = <SDN/></SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'NewOrderNumber'\r\n\r\nDECLARE @orderID INT\r\nSELECT @orderID = [Value] FROM [FileMetadataFieldValue] \r\nWHERE [FileID] = @fileID \r\nAND [MetadataFieldID] = @fieldID\r\n\r\nINSERT INTO [LabDEOrderFile] ([OrderNumber], [FileID], [CollectionDate])\r\nVALUES (@orderID, (SELECT CAST([ID] as VARCHAR(MAX)) FROM [FAMFile] WHERE [FileName] = <SourceDocName/>), NULL)\r\n\r\nSELECT @orderID\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=Demo_LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'CollectionDate'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Expression StringList=',' Name='CollectionDate'><Attribute Type='string[]'>_/DocumentInfo/DocumentDate</Attribute>.distinct()</Expression>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <CollectionDate/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RSDFileDir>\\..\\..\\Database Files\\EnterpriseDataConfiguration.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<Query>\r\n<SQL>\r\n\tSELECT * from DocumentType\r\n\tWHERE Name = <Attribute>/DT</Attribute> AND EmrLevel = 'Do Not Send'\r\n</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=pssvr;Initial Catalog=z_IntCust_Essentia;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\n\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'Folder'\r\n\r\nSELECT [Value] FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\n\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=<highlights>",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL StringList='|'>\r\nSELECT REPLACE(Red,'|','')\r\nFROM Color\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<NRSOrderMappingDB>\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL StringList='|'>\r\nSELECT REPLACE(UPPER(Name),'|','') FROM ESComponent\r\nUNION SELECT UPPER(Name) FROM ESComponentAKA\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\"R:\\Rules\\FLEXIndex\\NE - Dodge - TriMin\\TestingFiles\\NLP\\IndexData.mdb\"",
+      "DataProviderName": ".NET Framework Data Provider for OLE DB",
+      "DataSourceName": "Microsoft Access Database File",
+      "Query": "<Declarations>\r\n\t<Expression Name='SDN'><Regex Pattern='\\d+'><SourceDocName UseFullPath='false' /></Regex></Expression>\r\n</Declarations>\r\n<Query>\r\n<SQL>SELECT DocumentDate FROM DocumentInfo WHERE Image = <SDN/></SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=gizmo;Initial Catalog=MGICDoctypes;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>SELECT DocumentType FROM SDNwithDoctypes WHERE SDN = <SourceDocName/></SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'RecordDate'\r\n\r\nSELECT [Value] FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n(<Attribute SpatialField='Bottom' Type='double'>copy</Attribute> +\r\n<Attribute SpatialField='Top' Type='double'>copy</Attribute>) /\r\n(2 * <Attribute SpatialField='Bottom' Type='double'>PageBoundaries</Attribute>)\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\"R:\\Rules\\FLEXIndex\\MN - Waseca - TriMin\\TestingFiles\\NLP\\IndexData.mdb\"",
+      "DataProviderName": ".NET Framework Data Provider for OLE DB",
+      "DataSourceName": "Microsoft Access Database File",
+      "Query": "<Declarations>\r\n\t<Expression Name='SDN'><Regex Pattern='\\d+'><SourceDocName UseFullPath='false' /></Regex></Expression>\r\n</Declarations>\r\n<Query>\r\n<SQL>SELECT DocumentDate FROM DocumentInfo WHERE Image = <SDN/></SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=FL-TGH;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'CollectionDate'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Expression StringList=',' Name='CollectionDate'><Attribute Type='string[]'>_/Test/CollectionDate</Attribute>.distinct()</Expression>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <CollectionDate/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>(\r\n#replacements = 'replacements=([O0]=>[O0])([il!]=>[il!])(m=>(?>rn|m))(%=>(?>%|[569][il:,.-]?[569]?))';\r\n#prefix = '(?~&lt;error=0,g=true,ws=\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],'+#replacements;\r\n#smallPrefix = '(?~&lt;error=0,g=true,ws=\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],xtra_ws=1>';\r\n#attrr = <Attribute StringList='|'>*</Attribute>;\r\n#names = #attrr.Split('|'[0])\r\n.distinct()\r\n.sort()\r\n.orderBy('length')\r\n.reverse();\r\n\r\n#names = #names.?{\r\n  Regex.Split(#this, '(?n)(?>(?''1''[_\\W-[#%]]+))(?!$)(?&lt;!^\\1)(?''-1'')').?{#this.Length > 0}.Count == 1\r\n}.!{(\r\n  #name = Regex.Escape(#this);\r\n  (#this.Length > 2\r\n  ? (\r\n    #es = ',xtra_ws=' + (#this.Length-1) + '>';\r\n    #prefix + #es + #name + ')'\r\n    )\r\n  : (#this.Length > 1\r\n    ?  #smallPrefix + #name + ')'\r\n    : #name))\r\n)};\r\nStringUtils.CollectionToDelimitedString(#names, '\r\n  | ')\r\n)</Expression>\r\n",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n(<Attribute SpatialField='Right' Type='double'>copy</Attribute> -\r\n<Attribute SpatialField='Left' Type='double'>copy</Attribute>) /\r\n<Attribute SpatialField='Right' Type='double'>PageBoundaries</Attribute>\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>(\r\n#replacements = 'replacements=([O0]=>[O0])([il!]=>[il!])(m=>(?>rn|m))';\r\n#veryLargePrefix = '(?''extraLine'')(?~&lt;error=0,g=true,ws=\\r\\n(?!\\r\\n)|\\b\\r\\n(?=\\r\\n\\b)|(?''-extraLine'')\\x20{4}[^\\r\\n]+[\\r\\n]+|\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],'+#replacements;\r\n#largePrefix = '(?~&lt;error=0,g=true,ws=\\r\\n(?!\\r\\n)|\\b\\r\\n(?=\\r\\n\\b)|\\x20(?!\\x20)|__?(?!_)|[\\W-[\\x20\\r\\n\\t]],'+#replacements;\r\n#attrr = <Attribute StringList='|'>*</Attribute>;\r\n#names = #attrr.Split('|'[0])\r\n.distinct()\r\n.sort()\r\n.orderBy('length')\r\n.reverse();\r\n#i = 0;\r\n#names = #names.!{(\r\n  #words = Regex.Split(#this, '(?n)(?>(?''1''[_\\W-[#%]]+))(?!$)(?&lt;!^\\1)(?''-1'')').?{#this.Length > 0}\r\n  .!{Regex.Escape(#this)};\r\n  #count = #words.Count;\r\n  #es = ',xtra_ws=' + ((#count-1)*3) + '>';\r\n  #name = '(' + StringUtils.CollectionToDelimitedString(#words, ')(') + ')';\r\n  (#count > 1\r\n  ? (#this.Length > 12\r\n    ? #veryLargePrefix + #es + #name + ')'\r\n    : (#this.Length > 6\r\n      ? #largePrefix + #es + #name + ')'\r\n      : StringUtils.CollectionToDelimitedString(#words, '\\s')))\r\n  : '')\r\n)}.?{#this.Length > 0};\r\nStringUtils.CollectionToDelimitedString(#names, '\r\n  | ')\r\n\r\n)</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'DocumentType'\r\n\r\nSELECT [Value] FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RSDFileDir>\\..\\Database Files\\OrderMappingDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL>\r\n  INSERT INTO CandidateAlternateTestName ([TestCode], [Name], [Filename], [Page], [StartX], [StartY], [EndX], [EndY], [Height])\r\n  SELECT DISTINCT LabTest.TestCode, OriginalName, SourceDocName, Page, StartX, StartY, EndX, EndY, Height FROM\r\n  (\r\n    <Composite Parameterize=\"false\" StringList=\" UNION \" AbortIfEmpty=\"True\">\r\n      SELECT \r\n        '<Attribute SelectionMode=\"Distinct\" Name=\"TestName\">/Panel/Test/Component</Attribute>' AS TestName,\r\n        '<Attribute Root=\"TestName\" Name=\"OriginalName\">OriginalName</Attribute>' AS OriginalName,\r\n        '<Attribute Root=\"TestName\" Name=\"TestCode\">TestCode</Attribute>' AS TestCode,\r\n        '<SourceDocName />' AS SourceDocName,\r\n        <Expression>(<OriginalName SpatialField=\"Page\" Type='int' Name='Page'/> == 0) ? 1 : <Page/></Expression> AS Page,\r\n        '<OriginalName SpatialField=\"StartX\" />' AS StartX,\r\n        '<OriginalName SpatialField=\"StartY\" />' AS StartY,\r\n        '<OriginalName SpatialField=\"EndX\" />' AS EndX,\r\n        '<OriginalName SpatialField=\"EndY\" />' AS EndY,\r\n        '<OriginalName SpatialField=\"Height\" />' AS Height\r\n    </Composite>\r\n  ) AS VOAFileData\r\n  JOIN LabTest ON LabTest.TestCode = VOAFileData.TestCode\r\n  JOIN LabOrderTest ON LabOrderTest.TestCode = LabTest.TestCode\r\n  WHERE LEN(OriginalName) &gt; 1\r\n  AND NOT LabTest.OfficialName = VOAFileData.OriginalName\r\n  AND NOT VOAFileData.OriginalName IN\r\n  (\r\n    SELECT [Name] FROM AlternateTestName AKA\r\n    WHERE LabTest.TestCode = AKA.TestCode\r\n  )\r\n  AND NOT VOAFileData.OriginalName IN\r\n  (\r\n    SELECT DisplayName FROM LabOrder\r\n    JOIN LabOrderTest ON Code = OrderCode\r\n    WHERE LabTest.TestCode = LabOrderTest.TestCode\r\n  )\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=pssvr;Initial Catalog=z_IntCust_Essentia;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientDOB'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='DOB'>_/PatientInfo/DOB</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <DOB/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=LabDE_UW;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientDOB'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='DOB'>_/PatientInfo/DOB</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <DOB/>)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=\"R:\\Rules\\FLEXIndex\\MN - Waseca - TriMin\\TestingFiles\\NLP\\IndexData.mdb\"",
+      "DataProviderName": ".NET Framework Data Provider for OLE DB",
+      "DataSourceName": "Microsoft Access Database File",
+      "Query": "<Declarations>\r\n\t<Expression Name='SDN'><Regex Pattern='\\d+'><SourceDocName UseFullPath='false' /></Regex></Expression>\r\n</Declarations>\r\n<Query>\r\n<SQL>SELECT Distinct Subdivision FROM LegalLBS WHERE Image = <SDN/></SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=LabDE_UW;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientLastName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='LastName'>_/PatientInfo/Name/Last</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <LastName/>)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=FL-TGH;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientLastName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='LastName'>_/PatientInfo/Name/Last</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <LastName/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=Demo_LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientDOB'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='DOB'>_/PatientInfo/DOB</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <DOB/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n( $current = CultureInfo.CurrentCulture;\r\n  $dtfi = $current.DateTimeFormat.Clone();\r\n  $dtfi.Calendar = $dtfi.Calendar.Clone();\r\n  $dtfi.Calendar.TwoDigitYearMax = DateTime.Now.Year;\r\n  DateTime.TryParse(<Attribute>*</Attribute>, null)\r\n  ? DateTime.Parse(<Attribute>*</Attribute>, $dtfi).ToString('MM/dd/yyyy HH:mm') : '')\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RSDFileDir>\\..\\OrderToFileLookup\\OrderToFileLookup.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL>\r\n\tINSERT [Filename] ([Filename])\r\n\t\tSELECT DISTINCT '<SourceDocName Parameterize='False'/>'\r\n\t\tWHERE NOT EXISTS\r\n\t\t(\r\n\t\t\tSELECT * FROM [Filename]\r\n\t\t\t\tWHERE [Filename] = <SourceDocName/>\r\n\t\t)\r\n</SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "",
+      "DataProviderName": "",
+      "DataSourceName": "",
+      "Query": "<Expression>\r\n( $current = CultureInfo.CurrentCulture;\r\n  $dtfi = $current.DateTimeFormat.Clone();\r\n  $dtfi.Calendar = $dtfi.Calendar.Clone();\r\n  $dtfi.Calendar.TwoDigitYearMax = DateTime.Now.Year + 5;\r\n  DateTime.TryParse(<Attribute>*</Attribute>, null)\r\n  ? DateTime.Parse(<Attribute>*</Attribute>, $dtfi).ToString('MM/dd/yyyy') : '')\r\n</Expression>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"\\\\Gandolf\\PSRaid1\\PS\\Services\\CA Fresno Env Health\\Solution\\Database Files\\FresnoDB.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<SQL>\r\n\t<Attribute Exclude='True' Name='Value' SelectionMode='Distinct'>\r\n\t\t_/Chemical_Location|_/Chemical_Name|_/Common_Name|_/CAS_Number|_/Component/Name|_/Component/CAS\r\n\t</Attribute>\r\n\t<Expression Exclude='True' Name='Name'>\r\n\t\t(<Attribute Root='Value' Name='Parent' AttributeField='Name'>..</Attribute> == '_')\r\n\t\t\t? <Value AttributeField='Name'/>\r\n\t\t\t: <Parent/> + '_' + <Value AttributeField='Name'/>\r\n\t</Expression>\r\n\tINSERT [FileNameToValue] ([FileNameID], [PreviouslyUsedFieldValueID])\r\n\t\tSELECT DISTINCT * FROM\r\n\t\t(\r\n\t\t\tSELECT [FileName].[ID] AS [FileNameID],\r\n\t\t\t\t\t[PreviouslyUsedFieldValue].[ID] AS [PreviouslyUsedFieldValueID]\r\n\t\t\t\tFROM [FileName], [PreviouslyUsedFieldValue]\r\n\t\t\t\tWHERE [FileName] = <SourceDocName/>\r\n\t\t\t\tAND [FieldName] = <Name/>\r\n\t\t\t\tAND [Value] = <Value/>\r\n\t\t) AS T\r\n\t\tWHERE NOT EXISTS\r\n\t\t(\r\n\t\t\tSELECT * FROM\r\n\t\t\t(\r\n\t\t\t\tSELECT [FileName].[ID], [FileNameID], NULL AS [PreviouslyUsedFieldValueID] FROM [FileName]\r\n\t\t\t\t\tLEFT JOIN [FileNameToValue] ON [FileNameID] = [FileName].[ID]\r\n\t\t\t\t\tWHERE [FileName] = <SourceDocName/>\r\n\t\t\t\t\tAND [FileNameID] IS NOT NULL\r\n\t\t\t) AS T2,\r\n\t\t\t(\r\n\t\t\t\tSELECT NULL AS [FileNameID], [PreviouslyUsedFieldValue].[ID] FROM [PreviouslyUsedFieldValue]\r\n\t\t\t\t\tLEFT JOIN [FileNameToValue] ON [PreviouslyUsedFieldValueID] = [PreviouslyUsedFieldValue].[ID]\r\n\t\t\t\t\tWHERE [FieldName] = <Name/>\r\n\t\t\t\t\tAND [Value] = <Value/>\r\n\t\t\t\t\tAND [PreviouslyUsedFieldValueID] IS NOT NULL\r\n\t\t\t) AS T3\r\n\t\t)\r\n</SQL>\r\n",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=\"<RSDFileDir>\\..\\..\\Database Files\\Trimin.sdf\"",
+      "DataProviderName": ".NET Framework Data Provider for Microsoft SQL Server Compact 3.5",
+      "DataSourceName": "Microsoft SQL Server Compact 3.5",
+      "Query": "<Declarations>\r\n\t<Composite Name='Apos'>'</Composite>\r\n</Declarations>\r\n<Query>\r\n<SQL>\r\n\tSELECT [VOAFileData].[Name], [VOAFileData].[AKA] FROM \r\n\t(\r\n\t\tSELECT\r\n\t\t'<Expression Parameterize='False'><Attribute>/LegalDescription/Subdivision</Attribute>\r\n\t\t\t.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>' AS [Name],\r\n\t\t'<Expression Parameterize='False'><Attribute>/LegalDescription/OriginalSubdivisionName</Attribute>\r\n\t\t\t.Replace(<Apos/>,<Apos/>+<Apos/>)</Expression>' AS [AKA]\r\n\t) AS [VOAFileData]\r\n\tINNER JOIN [Subdivision] ON SUBSTRING([VOAFileData].[Name], 1, 255) = [Subdivision].[Name]\r\n\tLEFT JOIN [SubdivisionAKA] ON SUBSTRING([VOAFileData].[Name], 1, 255) = [SubdivisionAKA].[Name]\r\n\t\tAND SUBSTRING([VOAFileData].[AKA], 1, 255) = [SubdivisionAKA].[AKA]\r\n\tWHERE [SubdivisionAKA].[AKA] IS NULL\r\n\t\tAND [VOAFileData].[Name] &lt;&gt; [VOAFileData].[AKA]\r\n\t\tAND LEN([VOAFileData].[AKA]) &gt; 1\r\n\t\tAND LEN([VOAFileData].[AKA]) &lt;= 255\r\n</SQL>\r\n</Query>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=(local);Initial Catalog=Demo_LabDE;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>\r\nDECLARE @fileID INT\r\nSELECT @fileID = [ID] FROM [FAMFile]\r\n\tWHERE [FileName] = <SourceDocName/>\r\n\r\nDECLARE @fieldID INT\r\nSELECT @fieldID = [ID] FROM [MetadataField]\r\n\tWHERE [Name] = 'PatientLastName'\r\n\r\nIF EXISTS (SELECT * FROM [FileMetadataFieldValue] WHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID)\r\n\tUPDATE [FileMetadataFieldValue] SET [Value] = <Attribute Name='LastName'>_/PatientInfo/Name/Last</Attribute>\r\n\t\tWHERE [FileID] = @fileID AND [MetadataFieldID] = @fieldID\r\nELSE\r\n\tINSERT INTO [FileMetadataFieldValue] ([FileID], [MetadataFieldID], [Value])\r\n\t\tVALUES (@fileID, @fieldID, <LastName/>)\r\n</SQL>",
+      "UseFAMDBConnection": true,
+      "UseSpecifiedDBConnection": false
+    }
+  },
+  {
+    "Type": "DataQueryRuleObject",
+    "Description": "",
+    "Enabled": true,
+    "Object": {
+      "DataConnectionString": "Data Source=gizmo;Initial Catalog=MGICDoctypes;Integrated Security=True",
+      "DataProviderName": ".NET Framework Data Provider for SQL Server",
+      "DataSourceName": "Microsoft SQL Server",
+      "Query": "<SQL>SELECT DocumentType FROM SDNwithDoctypes WHERE SDN LIKE <RegEx Pattern='batch\\d{4,5}[\\\\\\/].*\\.[\\w:]+'><SourceDocName/></RegEx></SQL>",
+      "UseFAMDBConnection": false,
+      "UseSpecifiedDBConnection": true
+    }
+  }
+]

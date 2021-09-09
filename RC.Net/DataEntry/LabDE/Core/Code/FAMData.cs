@@ -738,7 +738,7 @@ namespace Extract.DataEntry.LabDE
                     OleDbConnectionStringBuilder oleDbConnectionStringBuilder
                             = new OleDbConnectionStringBuilder(FileProcessingDB.ConnectionString);
 
-                    string server = oleDbConnectionStringBuilder.DataSource;
+                    string server = (string)oleDbConnectionStringBuilder["Server"];
                     string database = (string)oleDbConnectionStringBuilder["Database"];
 
                     _extractRole = new ExtractRoleConnection(SqlUtil.CreateConnectionString(server, database));

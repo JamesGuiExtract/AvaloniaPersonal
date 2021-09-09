@@ -1,7 +1,6 @@
 ﻿using Extract.Database;
 using System;
 using System.Data.Common;
-using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
 using UCLID_AFCORELib;
@@ -94,35 +93,6 @@ namespace Extract.DataEntry.LabDE
             }
         }
 
-        /// <summary>
-        /// Gets a <see cref="DbConnection"/> for the URS database.
-        /// <para><b>Note</b></para>
-        /// This <see cref="DbConnection"/> is actively managed by this class. Callers should not be
-        /// store a reference or call close or dispose on this connection.
-        /// </summary>
-        public DbConnection ManagedURSDBConnection
-        {
-            get
-            {
-                try
-                {
-                    if (_ursDbConnectionInfo == null)
-                    {
-                        _ursDbConnectionInfo = new DatabaseConnectionInfo(
-                            typeof(SqlCeConnection).AssemblyQualifiedName,
-                            SqlCompactMethods.BuildDBConnectionString(UrsDBPath));
-                        _ursDbConnectionInfo.UseLocalSqlCeCopy = true;
-                    }
-
-                    return _ursDbConnectionInfo.ManagedDbConnection;
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI39312");
-                }
-            }
-        }
-
         #endregion Properties
 
         #region IDisposable Members
@@ -190,9 +160,7 @@ namespace Extract.DataEntry.LabDE
         /// <returns>The path of the URS Folder for.</returns>
         string GetComponentDataDir()
         {
-            if (DBMethods.GetQueryResultsAsStringArray(_customerDBConnection,
-                "SELECT COUNT(*) FROM [INFORMATION_SCHEMA].[TABLES] WHERE [TABLE_NAME] = 'Settings'")
-                .Single() != "1")
+            if (DBMethods.GetTableNames(_customerDBConnection).Count(name => name == "Settings") == 1)
             {
                 ExtractException ee = new ExtractException("ELI39307", "Settings table not found");
                 ee.AddDebugData("Database", _customerDBConnection.ConnectionString, false);

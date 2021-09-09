@@ -29,7 +29,7 @@ namespace Extract.SQLCDBEditor
 {
     /// <summary>
     /// This is the main form used by the SQLCDBEditor application. It will open a 
-    /// SQL Compact Database and display the tables and query lists in SandDock panes and will
+    /// SQLite database and display the tables and query lists in SandDock panes and will
     /// display records from the currently selected table in the pane on the right. Changes
     /// can be made to the data in the displayed records and can be saved when the save button
     /// is clicked or when prompted before closing or opening another database.
@@ -1994,7 +1994,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// Method opens a connection to the database.
         /// </summary>
-        /// <param name="databaseToOpen">SQL CE Database file to open.</param>
+        /// <param name="databaseToOpen">The database file to open.</param>
         void OpenDatabase(string databaseToOpen)
         {
             try
@@ -2170,7 +2170,7 @@ namespace Extract.SQLCDBEditor
                         StandardIcon = MessageBoxIcon.Warning
                     };
                     messageBox.AddStandardButtons(MessageBoxButtons.OKCancel);
-                    ExtractException.Assert("ELI0", "SQL Compact database conversion aborted",
+                    ExtractException.Assert("ELI51883", "SQL Compact database conversion aborted",
                         messageBox.Show() == "Ok",
                         "Database", _databaseFileName);
 
@@ -2188,7 +2188,7 @@ namespace Extract.SQLCDBEditor
                         StandardIcon = MessageBoxIcon.Warning
                     };
                     messageBox.AddStandardButtons(MessageBoxButtons.OKCancel);
-                    ExtractException.Assert("ELI0", "Unsupported SQL Compact database format",
+                    ExtractException.Assert("ELI51884", "Unsupported SQL Compact database format",
                         messageBox.Show() == "Ok",
                         "Database", _databaseFileName);
                     OpenDatabase(convertedDatabaseFileName);

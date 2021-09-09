@@ -73,9 +73,16 @@ module DEPInfo =
 
   let getDEPInfoFromQueryInfo (path: string) (queries: QueryInfo list) =
     let badQueryErrors =
-      queries
-      |> List.filter (fun queryInfo -> queryInfo.queryText |> Utils.Regex.isMatch """(?inx) \bLEN\s*\(""")
-      |> List.map (fun q -> Error ("Query not compatible with SQLite; change LEN function to LENGTH", q))
+      [
+        yield!
+          queries
+          |> List.filter (fun queryInfo -> queryInfo.queryText |> Utils.Regex.isMatch """(?inx) \bLEN\s*\(""")
+          |> List.map (fun q -> Error ("Query not compatible with SQLite; change LEN function to LENGTH", q))
+        yield!
+          queries
+          |> List.filter (fun queryInfo -> queryInfo.queryText.Contains("+"))
+          |> List.map (fun q -> Error ("Query not compatible with SQLite; change + to || for string concatenation", q))
+      ]
 
     let inefficientQueryWarnings =
       queries

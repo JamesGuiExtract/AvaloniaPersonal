@@ -4,7 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Data.SqlServerCe;
+using System.Data.SQLite;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
@@ -31,7 +31,7 @@ namespace Extract.DataEntry.Test
         /// <summary>
         /// The name of an embedded resource test LabDE data entry database file.
         /// </summary>
-        static readonly string _LABDE_DATABASE = "Resources.OrderMappingDB.sdf";
+        static readonly string _LABDE_DATABASE = "Resources.OrderMappingDB.sqlite";
 
         /// <summary>
         /// The name of an embedded resource test FLEX Index VOA file.
@@ -41,7 +41,7 @@ namespace Extract.DataEntry.Test
         /// <summary>
         /// The name of an embedded resource test FLEX Index data entry database file.
         /// </summary>
-        static readonly string _FLEX_INDEX_DATABASE = "Resources.DemoFlexIndex.sdf";
+        static readonly string _FLEX_INDEX_DATABASE = "Resources.DemoFlexIndex.sqlite";
 
         /// <summary>
         /// Manages the test images needed for testing.
@@ -495,7 +495,7 @@ namespace Extract.DataEntry.Test
         [Test, Category("TestSqlQuery")]
         public static void TestSplitCsvFalseSqlQuery()
         {
-            string xml = @"<Query><SQL>SELECT [Name] + ', and so forth' FROM [DocumentType] WHERE [ID] = 1</SQL></Query>";
+            string xml = @"<Query><SQL>SELECT [Name] || ', and so forth' FROM [DocumentType] WHERE [ID] = 1</SQL></Query>";
 
             using (DbConnection dbConnection =
                     GetDatabaseConnection(_testImages.GetFile(_FLEX_INDEX_DATABASE)))
@@ -1250,7 +1250,7 @@ namespace Extract.DataEntry.Test
         {
             string connectionString = "Data Source='" + databaseFileName + "';";
 
-            return new SqlCeConnection(connectionString);
+            return new SQLiteConnection(connectionString);
         }
 
         /// <summary>

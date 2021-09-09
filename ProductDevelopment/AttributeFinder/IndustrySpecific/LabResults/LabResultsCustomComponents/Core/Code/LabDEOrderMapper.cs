@@ -4,8 +4,7 @@ using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.SqlServerCe;
+using System.Data.SQLite;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
@@ -90,7 +89,7 @@ namespace Extract.LabResultsCustomComponents
     [Guid("ABC13C14-B6C6-4679-A69B-5083D3B4B60C")]
     [ProgId("Extract.DataEntry.LabDE.LabDEOrderMapper")]
     [ComVisible(true)]
-    public class LabDEOrderMapper : IdentifiableObject, ILabDEOrderMapper, IDisposable
+    public class LabDEOrderMapper : IdentifiableObject, ILabDEOrderMapper
     {
         #region Constants
 
@@ -224,11 +223,6 @@ namespace Extract.LabResultsCustomComponents
         #region Fields
 
         /// <summary>
-        /// For each order mapper instance, keeps track of the local database copy to use.
-        /// </summary>
-        TemporaryFileCopyManager _localDatabaseCopyManager;
-
-        /// <summary>
         /// The name of the database file to use for order mapping.
         /// </summary>
         string _databaseFile;
@@ -338,7 +332,6 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 _databaseFile = databaseFile;
-                _localDatabaseCopyManager = new TemporaryFileCopyManager();
                 _requireMandatory = requireMandatory;
                 _useFilledRequirement = useFilledRequirement;
                 _useOutstandingOrders = useOutstandingOrders;
@@ -1097,8 +1090,8 @@ namespace Extract.LabResultsCustomComponents
             string query = "SELECT [Code], [Name], [TieBreaker], [FilledRequirement]"
                     + " FROM [LabOrder] WHERE [Code] IS NOT NULL";
 
-            using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
-            using (SqlCeDataReader reader = command.ExecuteReader())
+            using (SQLiteCommand command = new(query, dbCache.DBConnection))
+            using (SQLiteDataReader reader = command.ExecuteReader())
             {
                 while (reader.Read())
                 {
@@ -1949,9 +1942,9 @@ namespace Extract.LabResultsCustomComponents
             string query = "SELECT [OfficialName] FROM [LabTest] WHERE [TestCode] = '"
                 + testCodeEscaped + "'";
 
-            using (SqlCeCommand command = new SqlCeCommand(query, dbCache.DBConnection))
+            using (SQLiteCommand command = new(query, dbCache.DBConnection))
             {
-                using (SqlCeDataReader reader = command.ExecuteReader())
+                using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     if (reader.Read())
                     {
@@ -2072,34 +2065,5 @@ namespace Extract.LabResultsCustomComponents
         }
 
         #endregion Private Methods
-
-        #region IDisposable Members
-
-        /// <summary>
-        /// Releases all resources used by the <see cref="LabDEOrderMapper"/>.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <overloads>Releases resources used by the <see cref="LabDEOrderMapper"/>.</overloads>
-        /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="LabDEOrderMapper"/>.
-        /// </summary>
-        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
-        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _localDatabaseCopyManager.Dispose();
-            }
-
-            // Dispose of unmanaged resources
-        }
-
-        #endregion IDisposable Members
     }
 }

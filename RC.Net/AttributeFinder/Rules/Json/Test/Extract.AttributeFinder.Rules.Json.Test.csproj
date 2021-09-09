@@ -577,6 +577,7 @@
     <EmbeddedResource Include="Resources\RuleObjects\CreateValue.json" />
     <EmbeddedResource Include="Resources\RuleObjects\DataEntryPreloader.json" />
     <EmbeddedResource Include="Resources\RuleObjects\DataQueryRuleObject.json" />
+    <EmbeddedResource Include="Resources\RuleObjects\DataQueryRuleObjectV1.1.json" />
     <EmbeddedResource Include="Resources\RuleObjects\DataScorerBasedAS.json" />
     <EmbeddedResource Include="Resources\RuleObjects\DateInputValidator.json" />
     <EmbeddedResource Include="Resources\RuleObjects\DateTimeSplitter.json" />

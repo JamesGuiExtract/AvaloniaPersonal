@@ -61,6 +61,7 @@
     <ProjectReference Include="..\..\..\Interfaces\Core\Code\Extract.Interfaces.csproj" />
     <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj" />
     <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj" />
   </ItemGroup>
@@ -84,9 +85,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="DatabaseConnectionControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Update="DatabaseConnectionControl.cs" />
     <Compile Update="DatabaseConnectionControl.Designer.cs">
       <DependentUpon>DatabaseConnectionControl.cs</DependentUpon>
     </Compile>

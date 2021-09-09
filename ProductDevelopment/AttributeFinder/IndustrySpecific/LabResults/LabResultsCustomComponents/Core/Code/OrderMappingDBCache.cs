@@ -1,4 +1,5 @@
-﻿using Extract.DataEntry;
+﻿using Extract.Database;
+using Extract.DataEntry;
 using Extract.Utilities;
 using Extract.Utilities.Parsers;
 using Spring.Core.TypeResolution;
@@ -6,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Data.SqlServerCe;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -31,7 +32,7 @@ namespace Extract.LabResultsCustomComponents
         const string _IGNORE_PATTERN = @"[_\W-[%#]]+";
 
         const string _COMPONENT_DATA_DATABASE_PATH
-            = @"<ComponentDataDir>\LabDE\TestResults\OrderMapper\OrderMappingDB.sdf";
+            = @"<ComponentDataDir>\LabDE\TestResults\OrderMapper\OrderMappingDB.sqlite";
 
         const RegexOptions _CASE_SENSITIVE = RegexOptions.ExplicitCapture
             | RegexOptions.IgnorePatternWhitespace;
@@ -45,13 +46,8 @@ namespace Extract.LabResultsCustomComponents
 
         #region Fields
 
-        SqlCeConnection _customerDBConnection;
-        SqlCeConnection _componentDataDBConnection;
-
-        /// <summary>
-        /// For each db cache instance, keeps track of the local database copy to use.
-        /// </summary>
-        private TemporaryFileCopyManager _localDatabaseCopyManager;
+        SQLiteConnection _customerDBConnection;
+        SQLiteConnection _componentDataDBConnection;
 
         /// <summary>
         /// The name of the database file to use for order mapping.
@@ -128,7 +124,7 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// The underlying connection to the order mapping database
         /// </summary>
-        public SqlCeConnection DBConnection
+        public SQLiteConnection DBConnection
         {
             get
             {
@@ -153,13 +149,9 @@ namespace Extract.LabResultsCustomComponents
 
             _customerDatabaseFile = databaseFile;
 
-            _localDatabaseCopyManager = new TemporaryFileCopyManager();
-
-            // Get a database connection for processing (creating a local copy of the database).
             _customerDBConnection = GetDatabaseConnection(_customerDatabaseFile, pDoc);
             _componentDataDBConnection = GetDatabaseConnection(_COMPONENT_DATA_DATABASE_PATH, pDoc);
 
-            // Open the customer database connection
             _customerDBConnection.Open();
             _componentDataDBConnection.Open();
 
@@ -303,9 +295,9 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 string query = "SELECT COUNT(*) FROM [LabOrder] WHERE [FilledRequirement] > 0";
-                using (SqlCeCommand command = new SqlCeCommand(query, DBConnection))
+                using (SQLiteCommand command = new(query, DBConnection))
                 {
-                    return (int)command.ExecuteScalar() > 0;
+                    return (long)command.ExecuteScalar() > 0;
                 }
             }
             catch (Exception ex)
@@ -325,9 +317,9 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 string query = "SELECT COUNT(*) FROM [LabOrderTest] WHERE [Mandatory] = 1";
-                using (SqlCeCommand command = new SqlCeCommand(query, DBConnection))
+                using (SQLiteCommand command = new(query, DBConnection))
                 {
-                    return (int)command.ExecuteScalar() > 0;
+                    return (long)command.ExecuteScalar() > 0;
                 }
             }
             catch (Exception ex)
@@ -373,12 +365,12 @@ namespace Extract.LabResultsCustomComponents
         #region Private Methods
 
         /// <summary>
-        /// Gets the database connection to use for processing, creating a local copy if necessary.
+        /// Gets the database connection to use for processing
         /// </summary>
         /// <param name="databasePath">The path to the database file</param>
         /// <param name="pDoc">The document object.</param>
-        /// <returns>The <see cref="SqlCeConnection"/> to use for processing.</returns>
-        private SqlCeConnection GetDatabaseConnection(string databasePath, AFDocument pDoc)
+        /// <returns>The <see cref="SQLiteConnection"/> to use for processing.</returns>
+        static SQLiteConnection GetDatabaseConnection(string databasePath, AFDocument pDoc)
         {
             try
             {
@@ -395,26 +387,19 @@ namespace Extract.LabResultsCustomComponents
                     throw ee;
                 }
 
-                // [DataEntry:399, 688, 986]
-                // Whether or not the file is accessed via a network share, retrieve and use a local
-                // temp copy of the reference database file. Though multiple connections are allowed
-                // to a local file, the connections cannot see each other's changes.
-                string connectionString = "Data Source='" +
-                    _localDatabaseCopyManager.GetCurrentTemporaryFileName(
-                        expandedDatabasePath, this, true, true) + "';";
-
-                // Try to open the database connection, if there is a sqlce exception,
+                // Try to open the database connection, if there is a SQLite exception,
                 // just increment retry count, sleep, and try again
                 int retryCount = 0;
                 Exception tempEx = null;
-                SqlCeConnection dbConnection = null;
+                SQLiteConnection dbConnection = null;
                 while (dbConnection == null && retryCount < _DB_CONNECTION_RETRIES)
                 {
                     try
                     {
-                        dbConnection = new SqlCeConnection(connectionString);
+                        dbConnection = new SQLiteConnection(
+                            SqliteMethods.BuildConnectionString(expandedDatabasePath));
                     }
-                    catch (SqlCeException ex)
+                    catch (SQLiteException ex)
                     {
                         tempEx = ex;
                         retryCount++;
@@ -591,8 +576,8 @@ namespace Extract.LabResultsCustomComponents
                         + " WHERE [Code] IN (SELECT [OrderCode] FROM [LabOrderTest]"
                         + " WHERE [TestCode] IN (" + String.Join(",", testCodes) + "))"
                         + " ORDER BY [TieBreaker]";
-                    using (SqlCeCommand command = new SqlCeCommand(query, _customerDBConnection))
-                    using (SqlCeDataReader reader = command.ExecuteReader())
+                    using (SQLiteCommand command = new(query, _customerDBConnection))
+                    using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -656,8 +641,8 @@ namespace Extract.LabResultsCustomComponents
         {
             // Build the common words pattern
             string query = "SELECT [Word] FROM [ESCommonWords]";
-            using (SqlCeCommand command = new SqlCeCommand(query, _componentDataDBConnection))
-            using (SqlCeDataReader reader = command.ExecuteReader())
+            using (SQLiteCommand command = new(query, _componentDataDBConnection))
+            using (SQLiteDataReader reader = command.ExecuteReader())
             {
                 _commonWordsPattern = @"(\b|(?=\W))(" + String.Join("|", reader.Cast<IDataRecord>()
                     .Select(r => r.GetString(0))) + @")(\b|(?<=\W))";
@@ -670,8 +655,8 @@ namespace Extract.LabResultsCustomComponents
                 + "WHERE [StatusCode] = 'A') [Tests] "
                 + "LEFT JOIN [ComponentToESComponentMap] ON [TestCode] = [ComponentCode]";
 
-            using (SqlCeCommand command = new SqlCeCommand(query, _customerDBConnection))
-            using (SqlCeDataReader reader = command.ExecuteReader())
+            using (SQLiteCommand command = new(query, _customerDBConnection))
+            using (SQLiteDataReader reader = command.ExecuteReader())
             foreach(var r in reader.Cast<IDataRecord>())
             {
                 string code = r.GetString(0);
@@ -696,8 +681,8 @@ namespace Extract.LabResultsCustomComponents
             // Get set of disabled ESComponentAKAs
             var disabledESComponentAKAs = new HashSet<Tuple<string, string>>();
             query = "SELECT [ESComponentCode], [ESComponentAKA] FROM [DisabledESComponentAKA]";
-            using (SqlCeCommand command = new SqlCeCommand(query, _customerDBConnection))
-            using (SqlCeDataReader reader = command.ExecuteReader())
+            using (SQLiteCommand command = new(query, _customerDBConnection))
+            using (SQLiteDataReader reader = command.ExecuteReader())
             foreach(var r in reader.Cast<IDataRecord>())
             {
                 string code = r.GetString(0).ToUpperInvariant();
@@ -709,12 +694,12 @@ namespace Extract.LabResultsCustomComponents
             // Add additional mappings using the component data (URS) database
             query = "SELECT [ESComponent].[Code], [ESComponent].[Name], [ESComponentAKA].[Name], [SampleType]"
                     + ", [MatchScoringQuery], [Frequency]"
-                    + " FROM [ESComponent] JOIN [ESComponentAKA] ON [ESComponent].[Code] = [ESComponentCode]"
+                    + " FROM [ESComponent] JOIN [ESComponentAKA] ON [ESComponent].[Code] = [ESComponentAKA].[ESComponentCode]"
                     + " LEFT JOIN [AKAFrequency]"
                     + " ON [ESComponent].[Code] = [AKAFrequency].[ESComponentCode]"
                     + " AND [ESComponentAKA].[Name] = [AKAFrequency].[Name]";
-            using (SqlCeCommand command = new SqlCeCommand(query, _componentDataDBConnection))
-            using (SqlCeDataReader reader = command.ExecuteReader())
+            using (SQLiteCommand command = new(query, _componentDataDBConnection))
+            using (SQLiteDataReader reader = command.ExecuteReader())
             foreach (var record in reader.Cast<IDataRecord>())
             {
                 string testCode = record.GetString(0);
@@ -812,12 +797,6 @@ namespace Extract.LabResultsCustomComponents
                 {
                     _componentDataDBConnection.Dispose();
                     _componentDataDBConnection = null;
-                }
-
-                if (_localDatabaseCopyManager != null)
-                {
-                    _localDatabaseCopyManager.Dispose();
-                    _localDatabaseCopyManager = null;
                 }
             }
 

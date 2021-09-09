@@ -5956,9 +5956,7 @@ namespace Extract.DataEntry
                 }
 
                 // DataEntry SmartTags require a 'SmartTag' table.
-                string[] queryResults = DBMethods.GetQueryResultsAsStringArray(_defaultDbConnection,
-                    "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SmartTag'");
-                if (queryResults.Length == 0)
+                if (!DBMethods.GetTableNames(_defaultDbConnection).Any(name => name == "SmartTag"))
                 {
                     if (_smartTagManager != null)
                     {
@@ -5970,7 +5968,7 @@ namespace Extract.DataEntry
                 }
 
                 // Retrieve the smart tags...
-                queryResults = DBMethods.GetQueryResultsAsStringArray(_defaultDbConnection,
+                var queryResults = DBMethods.GetQueryResultsAsStringArray(_defaultDbConnection,
                     "SELECT TagName, TagValue FROM [SmartTag]");
 
                 // And put them into a dictionary that the SmartTagManager can use

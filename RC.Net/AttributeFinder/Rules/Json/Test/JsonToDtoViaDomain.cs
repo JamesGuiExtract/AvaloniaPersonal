@@ -162,7 +162,7 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         [TestCase("Resources.RuleObjects.CreateAttribute.json", TestName = "CreateAttribute")]
         [TestCase("Resources.RuleObjects.CreateValue.json", TestName = "CreateValue")]
         [TestCase("Resources.RuleObjects.DataEntryPreloader.json", TestName = "DataEntryPreloader")]
-        [TestCase("Resources.RuleObjects.DataQueryRuleObject.json", TestName = "DataQueryRuleObject")]
+        [TestCase("Resources.RuleObjects.DataQueryRuleObjectV1.1.json", TestName = "DataQueryRuleObjectV1_1")]
         [TestCase("Resources.RuleObjects.DataScorerBasedAS.json", TestName = "DataScorerBasedAS")]
         [TestCase("Resources.RuleObjects.DateInputValidator.json", TestName = "DateInputValidator")]
         [TestCase("Resources.RuleObjects.DateTimeSplitter.json", TestName = "DateTimeSplitter")]
@@ -281,6 +281,7 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         [Category("LegacyRulesJsonDeserialization")]
         [TestCase("Resources.RuleObjects.FSharpPreprocessor.json", "Resources.RuleObjects.FSharpPreprocessorV2.json", TestName = "LegacyFSharpPreprocessor")]
         [TestCase("Resources.RuleObjects.MicrFinderV2.json", "Resources.RuleObjects.MicrFinderV2.1.json", TestName = "LegacyMICRFinder")]
+        [TestCase("Resources.RuleObjects.DataQueryRuleObject.json", "Resources.RuleObjects.DataQueryRuleObjectV1.1.json", TestName = "LegacyDataQueryRuleObject")]
         public static void LegacyVersionRuleObjects(string legacyResourceName, string currentVersionResourceName)
         {
             var legacyJsonFile = _testFiles.GetFile(legacyResourceName);

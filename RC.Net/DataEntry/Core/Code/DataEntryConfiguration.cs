@@ -334,7 +334,6 @@ namespace Extract.DataEntry
                                     bool isDefaultConnection = false;
                                     var connectionInfo =
                                         LoadDatabaseConnection(databaseConnectionsNode, out isDefaultConnection);
-                                    connectionInfo.ShareLocalDBCopy = _isBackgroundConfig;
 
                                     ExtractException.Assert("ELI37781",
                                         "Multiple default connections are defined.",
@@ -554,7 +553,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="name">The name of the connection ("" for the default connection)</param>
         /// <param name="databaseType">The qualified type name of the database connection.</param>
-        /// <param name="localDataSource">If using an SQL CE DB, the name of the DB file can be
+        /// <param name="localDataSource">If using an SQLite DB, the name of the DB file can be
         /// specified here in lieu of the <see paramref="connectionString"/>.</param>
         /// <param name="connectionString">The connection string to use when connecting to the DB.
         /// </param>
@@ -568,7 +567,7 @@ namespace Extract.DataEntry
                     string.IsNullOrEmpty(connectionString), "Local data source", localDataSource,
                     "Connection string", connectionString);
 
-                connectionString = SqlCompactMethods.BuildDBConnectionString(
+                connectionString = SqliteMethods.BuildConnectionString(
                     DataEntryMethods.ResolvePath(localDataSource).ToLower(CultureInfo.CurrentCulture));
             }
 
@@ -597,7 +596,6 @@ namespace Extract.DataEntry
                 if (dbConnInfo == null && !string.IsNullOrWhiteSpace(connectionString))
                 {
                     dbConnInfo = new DatabaseConnectionInfo(databaseType, connectionString);
-                    dbConnInfo.UseLocalSqlCeCopy = true;
                     _dbConnections[name] = dbConnInfo;
                 }
             }
@@ -634,9 +632,8 @@ namespace Extract.DataEntry
             {
                 bool addedTag = false;
 
-                if (DBMethods.GetQueryResultsAsStringArray(connectionInfo.ManagedDbConnection,
-                    "SELECT COUNT(*) FROM [INFORMATION_SCHEMA].[TABLES] WHERE [TABLE_NAME] = 'Settings'")
-                    .Single() == "1")
+                if (DBMethods.GetTableNames(connectionInfo.ManagedDbConnection)
+                    .Count(name => name == "Settings") == 1)
                 {
                     string FKBVersion = DBMethods.GetQueryResultsAsStringArray(
                         connectionInfo.ManagedDbConnection,
