@@ -1324,6 +1324,9 @@ EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DEPChecker", "..\..\..\..\..\RC.Net\UtilityApplications\DEPChecker\DEPChecker.fsproj", "{593864ED-C9FF-44D8-9E08-8F1FD923286A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Authentication", "..\..\..\..\..\RC.Net\Utilities\Authentication\Extract.Utilities.Authentication.csproj", "{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
