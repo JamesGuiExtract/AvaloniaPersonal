@@ -2267,7 +2267,7 @@ namespace Extract.SQLCDBEditor
             // Determine whether there is a primary key or not so rowid can be used otherwise
             using DbCommand command = connection.CreateCommand();
             command.CommandText = UtilityMethods.FormatInvariant(
-                @$"SELECT pk FROM pragma_table_info(""{tableName}"") WHERE pk > 0");
+                $"SELECT pk FROM pragma_table_info('{tableName}') WHERE pk > 0");
             bool hasPK = command.ExecuteScalar() != null;
 
             if (hasPK)
