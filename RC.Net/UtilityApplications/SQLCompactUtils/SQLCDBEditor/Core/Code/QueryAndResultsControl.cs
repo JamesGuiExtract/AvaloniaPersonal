@@ -605,6 +605,16 @@ namespace Extract.SQLCDBEditor
 
                 _resultsGrid.DataSource = _resultsTable;
 
+                // Hide the rowid column from view
+                // (_rowid_ is one of the names for a built-in column that exists in sqlite tables unless the table was created WITHOUT ROWID)
+                if (_resultsGrid.Columns
+                    .Cast<DataGridViewColumn>()
+                    .Where(c => c.Name == "_rowid_")
+                    .SingleOrDefault() is DataGridViewColumn rowIDColumn)
+                {
+                    rowIDColumn.Visible = false;
+                }
+
                 IsLoaded = true;
             }
             catch (Exception ex)
@@ -2253,8 +2263,25 @@ namespace Extract.SQLCDBEditor
             // Setup dataAdapter to get the data
             DbProviderFactory providerFactory = DBMethods.GetDBProvider(connection);
             _adapter = providerFactory.CreateDataAdapter();
-            _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection,
-                Invariant($"SELECT * FROM [{tableName}]"), null);
+
+            // Determine whether there is a primary key or not so rowid can be used otherwise
+            using DbCommand command = connection.CreateCommand();
+            command.CommandText = UtilityMethods.FormatInvariant(
+                @$"SELECT pk FROM pragma_table_info(""{tableName}"") WHERE pk > 0");
+            bool hasPK = command.ExecuteScalar() != null;
+
+            if (hasPK)
+            {
+                _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection,
+                    Invariant($"SELECT * FROM [{tableName}]"), null);
+            }
+            else
+            {
+                // _rowid_ is one of the names for a built-in column that exists in sqlite tables
+                // unless the table was created WITHOUT ROWID (in which case it would have an explicit PK)
+                _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection,
+                    Invariant($"SELECT _rowid_ AS _rowid_, * FROM [{tableName}]"), null);
+            }
 
             // Create a command builder for the adapter that allow edits made in the _resultsGrid
             // to be applied back to the database.
