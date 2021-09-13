@@ -118,7 +118,7 @@ namespace DatabaseMigrationWizard.Database.Output
             }
             catch(Exception e)
             {
-                ExtractException.Display("ELI49698", e);
+                throw e.AsExtract("ELI49698");
             }
         }
 
