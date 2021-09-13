@@ -24,8 +24,8 @@
     <PackageReference Update="System.Threading.Tasks.Extensions" Version="4.5.4" /> <!--Match the Web API projects dependency-->
     <PackageReference Update="Microsoft.Bcl.AsyncInterfaces" Version="5.0.0" />  <!--Match the Web API projects-->
     <PackageReference Update="System.Runtime.CompilerServices.Unsafe" Version="4.7.1" />  <!--Match the Web API projects-->
-    <PackageReference Update="Moq" Version="4.16.*" />
-    <PackageReference Update="linq2db.SQLite" Version="3.4.*" />
+    <PackageReference Update="Moq" Version="4.16.1" />
+    <PackageReference Update="linq2db.SQLite" Version="3.4.4" />
     <PackageReference Update="FSharp.Core" Version="4.6.2" />
   </ItemGroup>
 
