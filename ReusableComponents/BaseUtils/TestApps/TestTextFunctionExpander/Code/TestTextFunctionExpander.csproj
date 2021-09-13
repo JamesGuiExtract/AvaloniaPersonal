@@ -66,7 +66,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Extract.Drawing, Version=1.0.0.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -112,6 +111,10 @@
     <ProjectReference Include="..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj">
+      <Project>{865b9a25-1d27-4445-9cc7-7bf88d736ba8}</Project>
+      <Name>Extract.Drawing</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\RC.Net\FileActionManager\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
       <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
