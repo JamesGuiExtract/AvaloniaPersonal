@@ -226,8 +226,10 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
 
             // Let the async Convert function finish
             await Task.Yield();
-
-            Assert.IsFalse(_viewModel.IsExecuting);
+            for (int i = 0; i < 10 && !_viewModel.IsExecuting; i++)
+            {
+                await Task.Delay(100);
+            }
 
             // Verify the status message on the view model
             Assert.AreEqual("message1\nmessage2", _viewModel.StatusMessage);
