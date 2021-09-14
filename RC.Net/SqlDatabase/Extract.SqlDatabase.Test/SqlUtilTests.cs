@@ -5,7 +5,7 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 
-namespace Extract.SqlDatabase.Tests
+namespace Extract.SqlDatabase.Test
 {
     [TestFixture()]
     public class SqlUtilTests

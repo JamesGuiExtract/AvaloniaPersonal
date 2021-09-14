@@ -4,7 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Data.SqlClient;
 
-namespace Extract.SqlDatabase.Tests
+namespace Extract.SqlDatabase.Test
 {
     [TestFixture()]
     public class SqlApplicationRoleTest

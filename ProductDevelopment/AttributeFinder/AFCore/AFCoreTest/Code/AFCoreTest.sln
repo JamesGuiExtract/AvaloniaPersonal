@@ -1311,7 +1311,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileConverter.Test"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase", "..\..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj", "{A75275DE-A979-41E6-8E46-546270D51E55}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase.Tests", "..\..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase.Tests\Extract.SqlDatabase.Tests.csproj", "{7D30388F-6C42-4055-BBCB-3F4AEAD97382}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.SqlDatabase.Test", "..\..\..\..\..\RC.Net\SqlDatabase\Extract.SqlDatabase.Test\Extract.SqlDatabase.Test.csproj", "{7D30388F-6C42-4055-BBCB-3F4AEAD97382}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FAMUtils.Test", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\FAMUtils\FAMUtils.Test\FAMUtils.Test.vcxproj", "{45AC2D3B-53FC-423D-AA85-5CDC0F2E6140}"
 EndProject

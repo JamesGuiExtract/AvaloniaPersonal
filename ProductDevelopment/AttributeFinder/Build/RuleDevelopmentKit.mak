@@ -104,7 +104,6 @@ CopyFilesToInstallFolder: CreateDestinationFolders
  	@COPY /V /Y  "$(BinariesFolder)\LearningMachineEditor.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
 	@COPY /V /Y  "$(BinariesFolder)\ExpressionAndQueryTester.exe" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@XCOPY "$(BinariesFolder)\E*test.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I /EXCLUDE:$(AFRootDirectory)\Build\ExcludeFilesFromRDT.txt
-	@XCOPY "$(BinariesFolder)\Extract.*.Tests.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents" /Y /I
 	@COPY /V /Y  "$(BinariesFolder)\Extract.Testing.Utilities.dll" "$(RDTInstallFilesRootDir)\SelfRegRDTNetCommon"
 	@COPY /V /Y  "$(BinariesFolder)\Extract.DataEntry.DEP.*.dll" "$(RDTInstallFilesRootDir)\NonSelfRegCommonComponents"
  	@COPY /V /Y  "$(BinariesFolder)\NERAnnotator.exe" "$(RDTInstallFilesRootDir)\NonSelfRegRDTComponents"	
