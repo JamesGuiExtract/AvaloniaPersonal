@@ -909,24 +909,16 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 	{
 		ASSERT_ARGUMENT("ELI20471", pbLoginCancelled != __nullptr);
 		ASSERT_ARGUMENT("ELI20472", pbLoginValid != __nullptr);
-
-		// Convert bShowAdmin parameter to cpp bool for later use
-		bool bUseAdmin  = asCppBool(bShowAdmin);
-		string strUser = (bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName;
 		
-		// Set the user password
-		string strCaption = "Set " + strUser + "'s Password";
-
 		// Set login valid and cancelled to false
 		*pbLoginValid = VARIANT_FALSE;
 		*pbLoginCancelled = VARIANT_FALSE;
+		bool bUseAdmin = asCppBool(bShowAdmin);
 
-		// [LegacyRCAndUtils:6168]
 		// Initialize the DB if it is blank
 		if (isBlankDB() && !initializeDB(false, ""))
 		{
 			// If the user chose not to initialize an empty database, treat as a cancelled login.
-			*pbLoginValid = VARIANT_FALSE;
 			*pbLoginCancelled = VARIANT_TRUE;
 			return S_OK;
 		}
@@ -960,7 +952,6 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 
 			::MessageBox(hParent, "The system is not configured to allow you to perform this operation.\r\n"
 				"Please contact the administrator of this product for further assistance.", "Unable to Login", MB_OK);
-			*pbLoginValid = VARIANT_FALSE;
 			*pbLoginCancelled = VARIANT_TRUE;
 			return S_OK;
 		}
@@ -968,29 +959,7 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 		// If no password set then set a password
 		if (strStoredEncryptedCombined == "")
 		{
-			PasswordDlg dlgPW(strCaption);
-			if (dlgPW.DoModal() != IDOK)
-			{
-				// Did not fill in and ok dlg so there is no login
-				// Set Cancelled flag
-				*pbLoginCancelled = VARIANT_TRUE;
-				return S_OK;
-			}
-
-			// Update password in database Login table (fail if not the admin user
-			// and the user doesn't exist)
-			string strPassword = dlgPW.m_zNewPassword;
-			encryptAndStoreUserNamePassword(strUser, strPassword, !bUseAdmin);
-
-			// Consider the user now logged-in as strUser.
-			m_strFAMUserName = strUser;
-			if (bUseAdmin)
-			{
-				m_bLoggedInAsAdmin = true;
-			}
-
-			// Just added password to the db so it is valid
-			*pbLoginValid = VARIANT_TRUE;
+			promptForNewPassword(bShowAdmin, pbLoginCancelled, pbLoginValid);
 			return S_OK;
 		}
 
@@ -1006,18 +975,64 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 
 		bool bLoginValid = isPasswordValid(string(dlgLogin.m_zPassword), bUseAdmin);
 
-		// If login was successful, set m_bLoggedInAsAdmin as appropriate.
-		if (bLoginValid)
-		{
-			m_bLoggedInAsAdmin = bUseAdmin;
-		}
+		m_bLoggedInAsAdmin = bLoginValid ? bUseAdmin : m_bLoggedInAsAdmin;
 
 		// Validate password
 		*pbLoginValid = asVariantBool(bLoginValid);
+
+		if (bLoginValid)
+		{
+			try
+			{
+				std::string newPassword = dlgLogin.m_zPassword;
+
+				CheckPasswordComplexity(newPassword, PasswordComplexityRequirements);
+			}
+			catch (UCLIDException ue)
+			{
+				// default to using the desktop as the parent for the messagebox below
+				::MessageBox(getAppMainWndHandle(), "Your password no longer meets our complexity requirements. Please change it on the next screen.", "Password Update", MB_OK);
+
+				promptForNewPassword(bShowAdmin, pbLoginCancelled, pbLoginValid);
+			}
+		}
 	
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15099");
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::promptForNewPassword(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, VARIANT_BOOL* pbLoginValid)
+{
+	bool bUseAdmin = asCppBool(bShowAdmin);
+	string strUser = (bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName;
+	string strCaption = "Set " + strUser + "'s Password";
+
+	PasswordDlg dlgPW(strCaption);
+	if (dlgPW.DoModal() != IDOK)
+	{
+		// The user hit cancel on the password dialog. Do NOT update the pw.
+		// Set Cancelled flag
+		*pbLoginCancelled = VARIANT_TRUE;
+		*pbLoginValid = VARIANT_FALSE;
+	}
+	else
+	{
+		// Update password in database Login table (fail if not the admin user
+			// and the user doesn't exist)
+		string strPassword = dlgPW.m_zNewPassword;
+		encryptAndStoreUserNamePassword(strUser, strPassword, !bUseAdmin);
+
+		// Consider the user now logged-in as strUser.
+		m_strFAMUserName = strUser;
+		if (bUseAdmin)
+		{
+			m_bLoggedInAsAdmin = true;
+		}
+
+		// Just added password to the db so it is valid
+		*pbLoginValid = VARIANT_TRUE;
+	}
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::get_DBSchemaVersion(LONG* pVal)

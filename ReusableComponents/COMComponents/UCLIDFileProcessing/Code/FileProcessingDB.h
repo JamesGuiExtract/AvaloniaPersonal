@@ -1615,6 +1615,7 @@ private:
 
 	void InvalidatePreviousCachedInfoIfNecessary();
 	void setDefaultSessionMemberValues();
+	void promptForNewPassword(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, VARIANT_BOOL* pbLoginValid);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileProcessingDB), CFileProcessingDB)

@@ -5,6 +5,7 @@
 #include "PasswordDlg.h"
 #include "TemporaryResourceOverride.h"
 #include "UCLIDException.h"
+#include <regex>
 
 extern AFX_EXTENSION_MODULE BaseUtilsDLL;
 
@@ -97,9 +98,7 @@ void PasswordDlg::OnBnClickedOk()
 		}
 		catch(...)
 		{
-			m_editNewPwd.SetWindowTextA("");
 			m_editNewPwd.SetFocus();
-			m_editRetypePwd.SetWindowTextA("");
 
 			// update the data members
 			UpdateData();
@@ -113,7 +112,6 @@ void PasswordDlg::OnBnClickedOk()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15190");
 }
-
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
@@ -122,11 +120,9 @@ void PasswordDlg::validatePasswords()
 	// Update the data in the member vars
 	UpdateData();
 
-	if ( m_zNewPassword.IsEmpty() )
-	{
-		UCLIDException ue("ELI15191", "Password must not be blank!" );
-		throw ue;
-	}
+	std::string newPassword = m_zNewPassword;
+
+	CheckPasswordComplexity(newPassword, PasswordComplexityRequirements);
 
 	// if passwords don't match throw an exception
 	if ( strcmp( m_zNewPassword, m_zRetypePwd ) != 0 )
@@ -135,4 +131,3 @@ void PasswordDlg::validatePasswords()
 		throw ue;
 	}
 }
-//-------------------------------------------------------------------------------------------------

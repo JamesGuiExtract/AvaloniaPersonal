@@ -31,6 +31,7 @@
 #include <sstream>
 #include <functional>
 #include <random>
+#include <regex>
 
 using namespace std;
 
@@ -57,6 +58,15 @@ enum EFileType
     kCSVFile,
 	kRichTextFile
 };
+//-------------------------------------------------------------------------------------------------
+// Structs
+//-------------------------------------------------------------------------------------------------
+struct passwordCondition {
+    std::string failureMessage;
+    regex condition;
+
+    passwordCondition(std::string failure, regex conditionalRegex) : failureMessage(failure), condition(conditionalRegex) {}
+};
 
 //--------------------------------------------------------------------------------------------------
 // Constants
@@ -76,6 +86,14 @@ const string gstrALPHA_NUMERIC = gstrALPHA + gstrNUMBERS;
 
 // Valid identifier characters
 const string gstrVALID_IDENTIFIER_CHARS = gstrALPHA_NUMERIC + "_";
+
+// Standard password complexity conditions.
+const vector<passwordCondition> PasswordComplexityRequirements{
+                    { std::string("Insufficient password complexity: You need at least 8 characters"), regex(".{8,}") },
+                    { std::string("Insufficient password complexity: You need at least one capital letter"), regex("[A-Z]") },
+                    { std::string("Insufficient password complexity: You need at least one lowercase letter"), regex("[a-z]") },
+                    { std::string("Insufficient password complexity: You need at least one digit"), regex("[0-9]") }
+};
 
 //-------------------------------------------------------------------------------------------------
 // ********* Operating System - Misc **********
@@ -1131,3 +1149,6 @@ vector<T>& shuffleVector(vector<T>& vectorToShuffle)
     std::shuffle(vectorToShuffle.begin(), vectorToShuffle.end(), g);
     return vectorToShuffle;
 }
+
+// This method will check the password complexity of a given string.
+EXPORT_BaseUtils void CheckPasswordComplexity(const string& password, const vector<passwordCondition>& conditions);
