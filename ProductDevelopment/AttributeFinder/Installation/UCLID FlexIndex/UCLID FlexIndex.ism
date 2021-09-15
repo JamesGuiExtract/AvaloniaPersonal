@@ -128,6 +128,7 @@
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
 		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\ISLockPermissions.dll</td></row>
+		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\isregsvr.dll</td></row>
 		<row><td>ISXMLCFG.DLL</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\isxmlcfg.dll</td></row>
 	</table>
 
@@ -253,9 +254,6 @@
 		<row><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{1E5E5239-02B6-4E2C-B851-20765ECFFDBC}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>ifcore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{0B73E0FB-D84C-41CA-8A48-E17AE8F6CF0E}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>imageedit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a custom control.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>LogicNP.EZShellExtensions.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{594DA2B8-ED9B-4E4E-95C1-45CA5DA19172}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>logicnp.ezshellextensions.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Microsoft.Data.ConnectionUI..CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{992A5714-5854-4BF0-9EF2-151964471713}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>microsoft.data.connectionui.3.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Microsoft.Data.ConnectionUI.1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{501CA676-CC8E-47A4-B0A2-BF3E71D37E72}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>microsoft.data.connectionui..CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Microsoft.Data.ConnectionUI.2.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{4E5E6808-FEA9-457C-84F2-BA6460B5627A}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>microsoft.data.connectionui.1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ModifyPdfFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{D99E7392-2ECB-45B4-A22F-22C24566776C}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>modifypdffile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{27F1FF87-EB92-48B3-BB63-36A63BBD1DDC}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>AFCommon.rl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{09CCFE5F-EAC9-4077-B120-9E6C533F4708}</td><td>FDRS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>detectandreportfailure.ini.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -347,6 +345,10 @@
 		<col def="S255">ISComments</col>
 		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
+		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
+		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
+		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
+		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISXmlCosting</td><td>1</td><td>ISXMLCFG.DLL</td><td>ISXmlCosting</td><td/><td/></row>
 		<row><td>ISXmlFinalize</td><td>1</td><td>ISXMLCFG.DLL</td><td>ISXmlFinalize</td><td/><td/></row>
 		<row><td>ISXmlInstall</td><td>3073</td><td>ISXMLCFG.DLL</td><td>ISXmlInstall</td><td/><td/></row>
@@ -589,9 +591,6 @@
 		<row><td>ifcore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>IFCore.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\IFCore.dll</td><td>1</td><td/></row>
 		<row><td>imageedit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>IMAGEE~1.OCX|ImageEdit.ocx</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\ImageEdit.ocx</td><td>1</td><td/></row>
 		<row><td>logicnp.ezshellextensions.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>LogicNP.EZShellExtensions.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>LOGICN~1.DLL|LogicNP.EZShellExtensions.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\LogicNP.EZShellExtensions.dll</td><td>1</td><td/></row>
-		<row><td>microsoft.data.connectionui..CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Microsoft.Data.ConnectionUI.1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>MICROS~1.DLL|Microsoft.Data.ConnectionUI.local.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Microsoft.Data.ConnectionUI.local.dll</td><td>1</td><td/></row>
-		<row><td>microsoft.data.connectionui.1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Microsoft.Data.ConnectionUI.2.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>MICROS~1.DLL|Microsoft.Data.ConnectionUI.SqlCeDataProvider.local.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Microsoft.Data.ConnectionUI.SqlCeDataProvider.local.dll</td><td>1</td><td/></row>
-		<row><td>microsoft.data.connectionui.3.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Microsoft.Data.ConnectionUI..CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>MICROS~1.DLL|Microsoft.Data.ConnectionUI.Dialog.local.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Microsoft.Data.ConnectionUI.Dialog.local.dll</td><td>1</td><td/></row>
 		<row><td>modifypdffile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ModifyPdfFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>MODIFY~1.EXE|ModifyPdfFile.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\ModifyPdfFile.exe</td><td>1</td><td/></row>
 		<row><td>murmurhash.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>MurmurHash.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\MurmurHash.dll</td><td>1</td><td/></row>
 		<row><td>regexpriv.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>RegExprIV.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>REGEXP~1.DLL|RegExprIV.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\RegExprIV.dll</td><td>1</td><td/></row>
@@ -797,9 +796,6 @@
 		<row><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_7035D66A_B4E9_4F9A_9A2B_D6A8AE68A29C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_65EDB86F_F3B8_4165_9FD3_C32B2C762F19_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>LogicNP.EZShellExtensions.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_9C2240FB_F1F1_4BB3_B0F0_2AD54F9868E5_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Microsoft.Data.ConnectionUI..CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_727C0A46_B36C_437F_B4D2_6D900CE7D5DA_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Microsoft.Data.ConnectionUI.1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_AFAA60A1_FB4C_455F_A99F_EFD01F2886FA_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>Microsoft.Data.ConnectionUI.2.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_5CF4FE3B_D0E9_4E6A_96D7_5151EF9E112B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ModifyPdfFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_CB575F94_1D8C_42BB_B433_2E9DC535F005_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_58B22BFE_2B7B_41E1_91C4_FA3CC232A1D6_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_8C152301_FE79_4E43_BAF3_6536DAE57B5D_FILTER</td><td/><td/><td/><td/></row>
@@ -1770,9 +1766,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>IFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ImageEdit.ocx.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>LogicNP.EZShellExtensions.dl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
-		<row><td>Microsoft.Data.ConnectionUI..CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
-		<row><td>Microsoft.Data.ConnectionUI.1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
-		<row><td>Microsoft.Data.ConnectionUI.2.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ModifyPdfFile.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>ProgramDataFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
@@ -1852,6 +1845,10 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">Condition</col>
 		<row><td>ISLockPermissionsCost</td><td/><td>InstallValidate</td><td>1</td><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td/><td>StartServices</td><td>1</td><td/></row>
+		<row><td>ISSelfRegisterCosting</td><td/><td>SelfUnregModules</td><td>1</td><td/></row>
+		<row><td>ISSelfRegisterFiles</td><td/><td>SelfRegModules</td><td>1</td><td/></row>
+		<row><td>ISSelfRegisterFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
+		<row><td>ISUnSelfRegisterFiles</td><td/><td>ISSelfRegisterCosting</td><td>1</td><td/></row>
 		<row><td>ISXmlCosting</td><td/><td>InstallInitialize</td><td>1</td><td/></row>
 		<row><td>ISXmlFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
 		<row><td>ISXmlInstall</td><td/><td>InstallFiles</td><td>1</td><td/></row>
@@ -1862,6 +1859,8 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>InstallInitialize</td><td>1500</td><td/><td/><td/></row>
 		<row><td>InstallValidate</td><td>1400</td><td/><td/><td/></row>
 		<row><td>RemoveFiles</td><td>3500</td><td/><td/><td/></row>
+		<row><td>SelfRegModules</td><td>2850</td><td/><td/><td/></row>
+		<row><td>SelfUnregModules</td><td>1100</td><td/><td/><td/></row>
 		<row><td>StartServices</td><td>5900</td><td/><td/><td/></row>
 	</table>
 
