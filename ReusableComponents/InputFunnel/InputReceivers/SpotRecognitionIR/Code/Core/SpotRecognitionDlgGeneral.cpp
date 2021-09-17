@@ -2242,8 +2242,9 @@ string SpotRecognitionDlg::createSubImage(const std::string& strOriginalImageFil
 		throwExceptionIfNotSuccess(nRet, "ELI16870", "Could not retrieve PDF load options.");
 
 		// Get initialized LOADFILEOPTION struct. 
-		// IgnoreViewPerspective to avoid a black region at the bottom of the image
-		LOADFILEOPTION loadOptions = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+		// ELO_ROTATED means that the image will not be auto-rotated if there is a non-standard
+		// view perspective. The image will still display correctly.
+		LOADFILEOPTION loadOptions = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 
 		// Add Page, Image Resolution and IgnoreViewPerspective to default load options
 		nRet = L_GetDefaultLoadFileOption(&loadOptions, sizeof(LOADFILEOPTION));

@@ -29,7 +29,9 @@ LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ul
 		// Initialize FILEINFO and LOADFILEOPTION for L_LoadBitmap call
 		L_INT nRet;
 		m_FileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+		// Do not ignore view perspective because this could cause the image to be misinterpreted
+		// https://extract.atlassian.net/browse/ISSUE-7220
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 		lfo.PageNumber = ulPage;
 
 		// Load the image using the original bits per pixel and then convert so as to not be affected by currently

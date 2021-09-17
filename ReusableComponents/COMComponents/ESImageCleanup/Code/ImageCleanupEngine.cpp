@@ -139,9 +139,11 @@ STDMETHODIMP CImageCleanupEngine::CleanupImageInternalUseOnly(BSTR bstrInputFile
 		getSetOfPages(setPagesToClean, ipImageCleanupSettings, nPageCount);
 		_lastCodePos = "30";
 
-		// Get the load file options
-		LOADFILEOPTION lfo =
-			GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE | ELO_ROTATED);
+		// Get the load file options. ELO_ROTATED means that the image will not be auto-rotated
+		// Don't ignore the view perspective because then the output image will be interpreted differently
+		// than the input for non-standard view perspectives
+		// https://extract.atlassian.net/browse/ISSUE-7220
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 
 		// Get the save file options
 		SAVEFILEOPTION sfo =

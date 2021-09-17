@@ -899,11 +899,12 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 			}
 
 			// Get initialized LOADFILEOPTION struct. 
-			// IgnoreViewPerspective to avoid a black region at the bottom of the image except if
-			// the user wants to manually specify the view perspective in which case we should load
-			// with the original perspective, then convert to the desired perspective.
-			LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(
-				(nViewPerspective > 0) ? 0 : ELO_IGNOREVIEWPERSPECTIVE);
+			// Use ELO_ROTATED so that width/height values are correct for view perspectives 5-8 (rotated images)
+			// without needing to use macros
+			// Do not ignore view perspectives because that would cause the output image to be interpreted differently than
+			// the input image by good image viewers
+			// https://extract.atlassian.net/browse/ISSUE-7220
+			LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 
 			// Get the input file name as a char*
 			char* pszInputFile = (char*) strInputFileName.c_str();

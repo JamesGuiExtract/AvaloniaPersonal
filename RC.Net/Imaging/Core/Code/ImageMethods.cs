@@ -1444,7 +1444,7 @@ namespace Extract.Imaging
             try
             {
                 using (var codecs = new ImageCodecs())
-                using (var imageReader = codecs.CreateReader(imagePath, ignoreViewPerspective: false))
+                using (var imageReader = codecs.CreateReader(imagePath))
                 {
                     if (imageReader.IsPdf)
                     {

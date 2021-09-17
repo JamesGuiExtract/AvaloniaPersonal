@@ -12,7 +12,6 @@
 #include <RegConstants.h>
 #include <RegistryPersistenceMgr.h>
 #include <UCLIDException.h>
-#include <MiscLeadUtils.h>
 #include <MutexUtils.h>
 
 #include <memory>
@@ -805,27 +804,6 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 	VARIANT_BOOL vbReturnUnrecognized, VARIANT_BOOL bReturnSpatialInfo, 
 	IProgressStatus* pProgressStatus, IOCRParameters* pOCRParameters)
 {
-	// [FlexIDSCore:4906]
-	// Since we did not get a fix from Nuance to address the issue that arose in v18 of their engine
-	// regarding view perspective, we are temporarily handling this situation by failing OCR on
-	// pages with non-standar view perspectives.
-	long nSize = ipPageNumbers->Size;
-	for (int i = 0; i < nSize; i++)
-	{
-		long nPage = ipPageNumbers->GetItem(i).lVal;
-		int nViewPerspective = getImageViewPerspective(asString(strImageFileName), nPage);
-		if (nViewPerspective != TOP_LEFT && nViewPerspective != BOTTOM_LEFT)
-		{
-			UCLIDException ue("ELI34135",
-				"Cannot OCR document pages with non-standard view perspective; "
-				"use ImageFormatConverter <strInput> <strOutput> <out_type> /vp to set the view "
-				"perspective to the standard setting.");
-			ue.addDebugInfo("Filename", asString(strImageFileName));
-			ue.addDebugInfo("Page", asString(nPage));
-			throw ue;
-		}
-	}
-
 	// increment # of images processed
 	InterlockedIncrement(&m_ulNumImagesProcessed);
 
@@ -1021,25 +999,6 @@ ISpatialStringPtr CScansoftOCR::recognizePrintedTextInImageZone(BSTR strImageFil
 	EFilterCharacters eFilter, BSTR bstrCustomFilterCharacters, VARIANT_BOOL bReturnUnrecognized, 
 	VARIANT_BOOL bReturnSpatialInfo, IProgressStatus* pProgressStatus, IOCRParameters* pOCRParameters)
 {
-	// [FlexIDSCore:4906]
-	// Since we did not get a fix from Nuance to address the issue that arose in v18 of their engine
-	// regarding view perspective, we are temporarily handling this situation by failing OCR on
-	// pages with non-standar view perspectives.
-	for (int nPage = lStartPage; nPage <= lEndPage; nPage++)
-	{
-		int nViewPerspective = getImageViewPerspective(asString(strImageFileName), nPage);
-		if (nViewPerspective != TOP_LEFT && nViewPerspective != BOTTOM_LEFT)
-		{
-			UCLIDException ue("ELI34156",
-				"Cannot OCR document pages with non-standard view perspective; "
-				"use ImageFormatConverter <strInput> <strOutput> <out_type> /vp to set the view "
-				"perspective to the standard setting.");
-			ue.addDebugInfo("Filename", asString(strImageFileName));
-			ue.addDebugInfo("Page", asString(nPage));
-			throw ue;
-		}
-	}
-
 	// increment # of images processed
 	InterlockedIncrement(&m_ulNumImagesProcessed);
 

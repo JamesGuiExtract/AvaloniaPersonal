@@ -320,7 +320,9 @@ void CImageEditCtrl::Display()
 		// Provide page number and IgnoreViewPerspective flag via LOADFILEOPTIONS
 		// per suggestion from LeadTools support to fix problem with display of 
 		// black or negative region - 09/18/07.
-		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+		// Replace ELO_IGNOREVIEWPERSPECTIVE with ELO_ROTATED because this works well on
+		// images with non-standard view perspectives (displays pages how they are meant to be viewed)
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 
 		lfo.PageNumber = m_dCurPageNumber;
 		nRetCode = m_LeadWnd.Load( (LPSTR)(LPCTSTR)m_zImageName, nBitsPerPixel, 
@@ -347,7 +349,9 @@ void CImageEditCtrl::Display()
 		// Provide page number and IgnoreViewPerspective flag via LOADFILEOPTIONS
 		// per suggestion from LeadTools support to fix problem with display of 
 		// black or negative region - 09/18/07.
-		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+		// Replace ELO_IGNOREVIEWPERSPECTIVE with ELO_ROTATED because this works well on
+		// images with non-standard view perspectives (displays pages how they are meant to be viewed)
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 
 		nRetCode = m_LeadWnd.Load( nBitsPerPixel, 4, &lfo );
 		throwOnLeadToolsError("ELI19813", nRetCode);

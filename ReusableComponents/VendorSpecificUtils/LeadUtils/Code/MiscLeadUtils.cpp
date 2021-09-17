@@ -485,9 +485,9 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		}
 
 		// Get initialized LOADFILEOPTION struct.
-		// IgnoreViewPerspective to avoid a black region at the bottom of the image
-		LOADFILEOPTION lfo =
-			GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+		// Do not ignore view perspective because this could cause the image to be misinterpreted
+		// https://extract.atlassian.net/browse/ISSUE-7220
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 
 		// Validate each zone
 		validateRedactionZones(rvecZones, nNumberOfPages);
@@ -1064,9 +1064,9 @@ void confirmImageAreas(const string& strImageFileName,
 		int iFormat = fileInfo.Format;
 
 		// Get initialized LOADFILEOPTION struct.
-		// IgnoreViewPerspective to avoid a black region at the bottom of the image
-		LOADFILEOPTION lfo =
-			GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+		// Do not ignore view perspective because this could cause the image to be misinterpreted
+		// https://extract.atlassian.net/browse/ISSUE-7220
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 
 		// Validate each zone
 		validateRedactionZones(rvecZones, nNumberOfPages);
@@ -2039,7 +2039,9 @@ bool hasAnnotations(const string& strFilename, int iPageNumber)
 	LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
 	// create the load file options
-	LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+	// Do not ignore view perspective because this could cause the image to be misinterpreted
+	// https://extract.atlassian.net/browse/ISSUE-7220
+	LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 	lfo.PageNumber = iPageNumber;
 
 	// get file info
@@ -2169,8 +2171,9 @@ void loadImagePage(const string& strImageFileName, unsigned long ulPage, BITMAPH
 	try
 	{
 		// Get initialized LOADFILEOPTION struct. 
-		// IgnoreViewPerspective to avoid a black region at the bottom of the image
-		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+		// Do not ignore view perspective because this could cause the image to be misinterpreted
+		// https://extract.atlassian.net/browse/ISSUE-7220
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 
 		// Get the default load options and set the page
 		{

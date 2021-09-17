@@ -1709,7 +1709,7 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 	BITMAPHANDLE hBitmap;
 	LeadToolsBitmapFreeer bitmapFreeer(hBitmap, true);
 	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-	LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+	LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 	lfo.PageNumber = nPageNum;
 
 	// Load the image in its original bits-per-pixel color depth so that current default-dithering
@@ -1728,18 +1728,6 @@ void CImageLineUtility::findLines(string strImageFileName, long nPageNum, double
 			NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
 		throwExceptionIfNotSuccess(nRet, "ELI38459",
 			"Internal error: Unable to convert image to bi-tonal!", strImageFileName);
-
-		// ViewPerspective appears to be valid in situations where ELO_IGNOREVIEWPERSPECTIVE
-		// does not work.  (For instance BMPs can be loaded with a valid BOTTOM_LEFT view perspective,
-		// but ELO_IGNOREVIEWPERSPECTIVE will not ignore that view perspective).  For that reason, 
-		// compensate for view perspective.  Its important to use fileInfo's ViewPerspective here
-		// rather than hBitmap's.  
-		if (fileInfo.ViewPerspective != TOP_LEFT)
-		{
-			nRet = L_ChangeBitmapViewPerspective(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), TOP_LEFT);
-			throwExceptionIfNotSuccess(nRet, "ELI20623",
-				"Internal error: ChangeBitmapViewPerspective operation failed!", strImageFileName);
-		}
 	}
 
 	// L_RotateBitmap takes the rotation degrees in hundredths of a degree.  Convert

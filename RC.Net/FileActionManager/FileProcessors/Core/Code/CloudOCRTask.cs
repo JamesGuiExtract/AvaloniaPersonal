@@ -381,11 +381,6 @@ namespace Extract.FileActionManager.FileProcessors
             try
             {
                 string inputPath = pFileRecord.Name;
-
-                ExtractException.Assert("ELI47189", "Cannot OCR image page with non-standard view perspective. " +
-                "use ImageFormatConverter <strInput> <strOutput> <out_type> /vp to set the view " +
-                "perspective to the standard setting.", !ImageMethods.DoesImageHavePageWithNonstandardViewPerspective(inputPath));
-
                 string outputPath = inputPath + ".uss";
                 GoogleCloudOCR.ProcessFile(inputPath, outputPath, pFileRecord.FileID, pProgressStatus);
 

@@ -65,8 +65,9 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 			set<int> setPages = getPageNumbersAsSet(nPageCount, strPagesToStamp, true);
 
 			// create a load files option
-			LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(
-				ELO_IGNOREVIEWPERSPECTIVE | ELO_ROTATED);
+			// Do not ignore view perspective because this could cause the image to be misinterpreted
+			// https://extract.atlassian.net/browse/ISSUE-7220
+			LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 
 			// Create the save options
 			SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
@@ -166,8 +167,9 @@ void loadStampBitmap(const string& strPasteImage, const FILEINFO& flInInfo,
 		ASSERT_ARGUMENT("ELI20061", !(rhPasteBitmap.Flags.Allocated));
 
 		// create a load files option
-		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(
-			ELO_IGNOREVIEWPERSPECTIVE | ELO_ROTATED);
+		// Do not ignore view perspective because this could cause the image to be misinterpreted
+		// https://extract.atlassian.net/browse/ISSUE-7220
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_ROTATED);
 
 		// get the file info for the stamp image
 		getFileInformation(strPasteImage, true, rflPasteInfo);

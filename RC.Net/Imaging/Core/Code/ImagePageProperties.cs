@@ -17,8 +17,8 @@ namespace Extract.Imaging
         /// </summary>
         internal ImagePageProperties(CodecsImageInfo imageInfo)
         {
-            Width = imageInfo.Width;
-            Height = imageInfo.Height;
+            Width = imageInfo.ImageWidth;
+            Height = imageInfo.ImageHeight;
             XResolution = imageInfo.XResolution;
             YResolution = imageInfo.YResolution;
             ViewPerspective = imageInfo.ViewPerspective;

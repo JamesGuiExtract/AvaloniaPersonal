@@ -422,7 +422,7 @@ namespace Extract.Imaging
         /// <paramref name="pageNumber"/>.</returns>
         ImagePageProperties GetPageProperties(int pageNumber)
         {
-            // Chache info so that correcting spatial data on large images works well
+            // Cache info so that correcting spatial data on large images works well
             // https://extract.atlassian.net/projects/ISSUE/issues/ISSUE-15299
             var key = Invariant($"ImagePageProperties{_fileName}:{pageNumber}");
             var cache = MemoryCache.Default;
