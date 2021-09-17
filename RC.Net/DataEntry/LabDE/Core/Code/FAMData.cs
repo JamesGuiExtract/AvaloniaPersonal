@@ -742,6 +742,7 @@ namespace Extract.DataEntry.LabDE
                     string database = (string)oleDbConnectionStringBuilder["Database"];
 
                     _extractRole = new ExtractRoleConnection(SqlUtil.CreateConnectionString(server, database));
+                    _extractRole.Open();
                 }
 
                 return _extractRole;

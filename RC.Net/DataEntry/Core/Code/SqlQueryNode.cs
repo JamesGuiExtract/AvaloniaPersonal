@@ -186,7 +186,7 @@ namespace Extract.DataEntry
                     _parameterMarker = ":";  // Oracle
                     _useNamedParameters = true;
                 }
-                else if (dbType.IndexOf("Ole", StringComparison.OrdinalIgnoreCase) >= 0)
+                else if (dbType.IndexOf("OleDb", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     _parameterMarker = "?";  // MS Ole
                     _useNamedParameters = false;

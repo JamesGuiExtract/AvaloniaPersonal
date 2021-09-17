@@ -973,6 +973,7 @@ namespace Extract.AttributeFinder.Rules
                         string server = oleDbConnectionStringBuilder.DataSource;
                         string database = (string)oleDbConnectionStringBuilder["Database"];
                         dbConnection = new ExtractRoleConnection(SqlUtil.CreateConnectionString(server, database));
+                        dbConnection.Open();
                     }
                     else if (UseSpecifiedDBConnection)
                     {
