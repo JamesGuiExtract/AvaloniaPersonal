@@ -30,7 +30,7 @@ using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
 namespace Extract.Web.WebAPI.Test
 {
     [TestFixture]
-    [NUnit.Framework.Category("AppBackendAPI")]
+    [Category("AppBackendAPI")]
     public class TestBackendAPI
     {
         #region Constants
@@ -113,7 +113,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void LoginLogout()
         {
             string dbName = "Test_AppBackendAPI_LoginLogout";
@@ -145,7 +144,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void LoginBlankUserName()
         {
             string dbName = "Test_AppBackendAPI_LoginBlankUserName";
@@ -165,7 +163,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void SetMetadataValue()
         {
             string dbName = "Test_AppBackendAPI_SetMetadataValue";
@@ -193,7 +190,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void ChangePassword()
         {
             string dbName = "Test_AppBackendAPI_ChangePassword";
@@ -220,7 +216,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void ChangePasswordNoSessionToken()
         {
             string dbName = "Test_AppBackendAPI_ChangePassword";
@@ -244,7 +239,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void ChangePasswordInvalidPassword()
         {
             string dbName = "Test_AppBackendAPI_ChangePasswordInvalidPassword";
@@ -267,7 +261,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void GetNullMetadataValue()
         {
             string dbName = "Test_AppBackendAPI_GetNullMetadataValue";
@@ -292,7 +285,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void LoginBlankPassword()
         {
             string dbName = "Test_AppBackendAPI_LoginBlankUserName";
@@ -312,7 +304,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void SessionLoginLogout()
         {
             string dbName = "Test_AppBackendAPI_SessionLoginLogout";
@@ -365,7 +356,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void GetSettings()
         {
             string dbName = "Test_AppBackendAPI_GetSettings";
@@ -411,7 +401,37 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
+        public static void GetSettings_PasswordComplexityRequirements()
+        {
+            string dbName = "Test_AppBackendAPI_GetSettings_PasswordComplexityRequirements";
+            try
+            {
+                var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
+
+                // Get the settings from upgraded database
+                var settings = controller.GetSettings().AssertGoodResult<WebAppSettingsResult>();
+
+                // Requirements on old databases are just that the length isn't zero
+                Assert.AreEqual("1", settings.PasswordComplexityRequirements.EncodeRequirements());
+
+                // Set the password requirements to be more strict
+                fileProcessingDb.SetDBInfoSetting("PasswordComplexityRequirements", "5ULD", true, false);
+
+                // Get the updated requirements and verify they match
+                settings = controller.GetSettings().AssertGoodResult<WebAppSettingsResult>();
+                Assert.AreEqual("5ULD", settings.PasswordComplexityRequirements.EncodeRequirements());
+
+                controller.Logout().AssertGoodResult<NoContentResult>();
+            }
+            finally
+            {
+                FileApiMgr.ReleaseAll();
+                _testDbManager.RemoveDatabase(dbName);
+            }
+        }
+
+        [Test]
+        [Category("Automated")]
         public static void OpenDocument_NoID()
         {
             string dbName = "Test_AppBackendAPI_OpenDocument_NoID";
@@ -465,7 +485,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void OpenDocument_WithID()
         {
             string dbName = "Test_AppBackendAPI_OpenDocument_WithID";
@@ -524,7 +543,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void OpenDocument_ConcurrentSessions()
         {
             string dbName = "Test_AppBackendAPI_OpenDocument_ConcurrentSessions";
@@ -598,7 +616,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void GetQueueStatus()
         {
             string dbName = "Test_AppBackendAPI_GetQueueStatus";
@@ -695,7 +712,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void ReOpenDocument()
         {
             string dbName = "Test_AppBackendAPI_ReOpenDocument";
@@ -747,7 +763,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void LogoutClosesDocument()
         {
             string dbName = "Test_AppBackendAPI_LogoutClosesDocument";
@@ -775,7 +790,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void AbandonedSession()
         {
             string dbName = "Test_AppBackendAPI_AbandonedSession";
@@ -846,7 +860,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void GetPageInfo_NoUSS()
         {
             string dbName = "Test_AppBackendAPI_GetPageInfo_NoUSS";
@@ -888,7 +901,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void ProcessAnnotation()
         {
             string dbName = "Test_AppBackendAPI_ProcessAnnotation";
@@ -922,7 +934,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         [TestCaseSource("_attributeNames")]
         public static void ProcessAnnotationConfirmShrink(string attributeName)
         {
@@ -967,7 +978,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void GetPageInfo_WithUSS()
         {
             string dbName = "Test_AppBackendAPI_GetPageInfo_WithUSS";
@@ -1010,7 +1020,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void GetPageImage()
         {
             string dbName = "Test_AppBackendAPI_GetPageImage";
@@ -1069,7 +1078,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void GetDocumentData()
         {
             string dbName = "Test_AppBackendAPI_GetDocumentData";
@@ -1103,7 +1111,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void UpdateDocumentData()
         {
             string dbName = "Test_AppBackendAPI_GetDocumentData";
@@ -1221,7 +1228,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void UncommittedData()
         {
             string dbName = "Test_AppBackendAPI_UncommittedData";
@@ -1378,7 +1384,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void UncommittedDataWhenRefreshed()
         {
             string dbName = "Test_AppBackendAPI_UncommittedDataWhenRefreshed";
@@ -1465,7 +1470,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void GetDocumentWordZones()
         {
             string dbName = "Test_AppBackendAPI_GetDocumentWordZones";
@@ -1526,7 +1530,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void AddGetComment()
         {
             string dbName = "Test_AppBackendAPI_AddGetComment";
@@ -1562,7 +1565,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void SkipDocument()
         {
             string dbName = "Test_AppBackendAPI_SkipDocument";
@@ -1650,7 +1652,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void PostSearch()
         {
             string dbName = "Test_AppBackendAPI_PostSearch";
@@ -1710,7 +1711,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void PostSearchNoUSS()
         {
             string dbName = "Test_AppBackendAPI_PostSearch";
@@ -1739,7 +1739,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void PostSearchBadPage()
         {
             string dbName = "Test_AppBackendAPI_PostSearch_BadPage";
@@ -1775,7 +1774,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void PostSearchBadResultType()
         {
             string dbName = "Test_AppBackendAPI_PostSearch_BadResultType";
@@ -1805,7 +1803,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void PostSearchBadQuery()
         {
             string dbName = "Test_AppBackendAPI_PostSearch_BadQuery";
@@ -1845,7 +1842,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void PostSearch1kPage()
         {
             string dbName = "Test_AppBackendAPI_PostSearch_1k";
@@ -1890,7 +1886,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void CachePageData()
         {
             CachePageDataAsync().ConfigureAwait(false).GetAwaiter().GetResult();
@@ -1966,7 +1961,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void CacheNonExistentPage()
         {
             CacheNonExistentPageAsync().ConfigureAwait(false).GetAwaiter().GetResult();
@@ -2002,7 +1996,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void CacheCorruptUssFile()
         {
             CacheCorruptUssFileAsync().ConfigureAwait(false).GetAwaiter().GetResult();
@@ -2047,7 +2040,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void AutoPageCache()
         {
             string dbName = "Test_AppBackendAPI_AutoPageCache";
@@ -2112,7 +2104,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void CacheSessionCloseWhileInProgress()
         {
             string dbName = "Test_AppBackendAPI_CacheSessionCloseWhileInProgress";
@@ -2176,7 +2167,6 @@ namespace Extract.Web.WebAPI.Test
         /// </summary>
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void CacheSimultaneousOperations()
         {
             string dbName = "Test_AppBackendAPI_CacheSimultaneousOperations";
@@ -2436,7 +2426,6 @@ namespace Extract.Web.WebAPI.Test
 
         [Test]
         [Category("Automated")]
-        [Category("WebAPIBackend")]
         public static void GetQueuedFiles()
         {
             string dbName = "Test_AppBackendAPI_GetQueuedFiles";

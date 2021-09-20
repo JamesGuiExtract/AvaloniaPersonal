@@ -13,7 +13,8 @@ class EXPORT_BaseUtils PasswordDlg : public CDialog
 	DECLARE_DYNAMIC(PasswordDlg)
 
 public:
-	PasswordDlg(const std::string strTitle = "Change Password", CWnd* pParent = NULL);   // standard constructor
+	PasswordDlg(const std::string strTitle = "Change Password", std::string strComplexityRequirements = "",
+		CWnd* pParent = NULL);
 	virtual ~PasswordDlg();
 	
 	// Override needed to override resource to use BaseUtils.dll
@@ -41,6 +42,9 @@ private:
 
 	// Caption for the dialog
 	std::string m_strTitle;
+
+	// Encoded complexity requirements
+	std::string m_strComplexityRequirements;
 
 	// PROMISE: To check the passwords and thow exception if passwords don't match or are empty string
 	void validatePasswords();

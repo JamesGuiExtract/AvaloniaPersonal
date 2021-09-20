@@ -1,4 +1,5 @@
-﻿using Extract.Licensing;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Email;
 using Extract.Utilities.Forms;
@@ -71,6 +72,8 @@ namespace Extract.FileActionManager.Database
         const string _DASHBOARD_INCLUDE_FILTER = "DashboardIncludeFilter";
         const string _DASHBOARD_EXCLUDE_FILTER = "DashboardExcludeFilter";
 
+        const string _PASSWORD_COMPLEXITY_REQUIREMENTS = "PasswordComplexityRequirements";
+
         #endregion Constants
 
         #region Fields
@@ -105,6 +108,9 @@ namespace Extract.FileActionManager.Database
         /// the dialog closed.
         /// </summary>
         public bool SettingsUpdated { get; private set; }
+
+        /// Encoded password complexity requirements
+        string _passwordComplexityRequirements;
 
         #endregion Fields
 
@@ -265,6 +271,10 @@ namespace Extract.FileActionManager.Database
                 textBoxDashboardIncludeFilter.Text = settings.GetValue(_DASHBOARD_INCLUDE_FILTER);
                 textBoxDashboardExcludeFilter.Text = settings.GetValue(_DASHBOARD_EXCLUDE_FILTER);
 
+                _passwordComplexityRequirements = settings.Contains(_PASSWORD_COMPLEXITY_REQUIREMENTS)
+                    ? settings.GetValue(_PASSWORD_COMPLEXITY_REQUIREMENTS)
+                    : "";
+
                 UpdateEnabledStates();
             }
             catch (Exception ex)
@@ -273,7 +283,7 @@ namespace Extract.FileActionManager.Database
             }
         }
 
-       static bool AddMissingSettings(FileProcessingDB db, StrToStrMap settings)
+        static bool AddMissingSettings(FileProcessingDB db, StrToStrMap settings)
         {
             bool added = false;
             // Check for the DashboardSettings
@@ -564,6 +574,8 @@ namespace Extract.FileActionManager.Database
                     map.Set(_ENABLE_DATA_ENTRY_COUNTERS,
                         _checkDataEntryEnableCounters.Checked ? "1" : "0");
                 }
+
+                map.Set(_PASSWORD_COMPLEXITY_REQUIREMENTS, _passwordComplexityRequirements);
 
                 // Connect to the database and update the settings
                 FAMDBUtils dbUtils = new FAMDBUtils();
@@ -1024,6 +1036,25 @@ namespace Extract.FileActionManager.Database
             catch (Exception ex)
             {
                 ex.ExtractDisplay("ELI35944");
+            }
+        }
+
+        void HandleConfigurePasswordRequirementsButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using PasswordComplexityRequirementsDialog config = new(new(_passwordComplexityRequirements));
+
+                DialogResult result = config.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    // Set the field to the encoded requirements (the DB will be updated with this when this dialog closes)
+                    _passwordComplexityRequirements = config.Settings.EncodeRequirements();
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractDisplay("ELI51873");
             }
         }
 

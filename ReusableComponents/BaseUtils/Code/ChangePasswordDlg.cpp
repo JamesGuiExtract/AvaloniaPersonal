@@ -13,11 +13,13 @@ extern AFX_EXTENSION_MODULE BaseUtilsDLL;
 //-------------------------------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC(ChangePasswordDlg, CDialog)
 
-ChangePasswordDlg::ChangePasswordDlg(const std::string strTitle, CWnd* pParent /*=NULL*/)
+ChangePasswordDlg::ChangePasswordDlg(const std::string strTitle, const std::string strComplexityRequirements,
+	CWnd* pParent /*=NULL*/)
 	: CDialog(ChangePasswordDlg::IDD, pParent)
 	, m_zNewPassword(_T(""))
 	, m_zRetypePwd(_T(""))
 	, m_strTitle(strTitle)
+	, m_strComplexityRequirements(strComplexityRequirements)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -100,10 +102,8 @@ void ChangePasswordDlg::OnBnClickedOk()
 		catch(...)
 		{
 			// An exception here means there was a problem with the new passwords
-			// so reset their values and set focus to the new password edit box.
-			m_editNewPwd.SetWindowTextA("");
+			// so set focus to the new password edit box.
 			m_editNewPwd.SetFocus();
-			m_editRetypePwd.SetWindowTextA("");
 
 			// update the data members
 			UpdateData();
@@ -126,23 +126,25 @@ void ChangePasswordDlg::validatePasswords()
 	// Update the data in the member vars
 	UpdateData();
 
-	if ( m_zNewPassword.IsEmpty() )
+	if (m_zNewPassword.IsEmpty() )
 	{
-		UCLIDException ue("ELI17712", "Password must not be blank!" );
-		throw ue;
+		throw UCLIDException("ELI17712", "Password must not be blank!" );
 	}
 	else if (m_zNewPassword == m_zOldPassword)
 	{
 		// new password cannot be the same as the old password
-		UCLIDException ue("ELI17713", "New password must be different from old password!");
-		throw ue;
+		throw UCLIDException("ELI17713", "New password must be different from old password!");
 	}
 
-	// if passwords don't match throw an exception
-	if ( strcmp( m_zNewPassword, m_zRetypePwd ) != 0 )
+	// if passwords don't match, clear and throw an exception
+	if (strcmp( m_zNewPassword, m_zRetypePwd ) != 0 )
 	{
-		UCLIDException ue ("ELI17714", "Passwords must match!" );
-		throw ue;
+		m_editNewPwd.SetWindowTextA("");
+		m_editRetypePwd.SetWindowTextA("");
+		throw UCLIDException("ELI17714", "Passwords must match!" );
 	}
+
+	// Throw exception if the password doesn't meet defined requirements
+	Util::checkPasswordComplexity(string(m_zNewPassword), m_strComplexityRequirements);
 }
 //-------------------------------------------------------------------------------------------------

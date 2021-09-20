@@ -31,7 +31,6 @@
 #include <sstream>
 #include <functional>
 #include <random>
-#include <regex>
 
 using namespace std;
 
@@ -58,15 +57,6 @@ enum EFileType
     kCSVFile,
 	kRichTextFile
 };
-//-------------------------------------------------------------------------------------------------
-// Structs
-//-------------------------------------------------------------------------------------------------
-struct passwordCondition {
-    std::string failureMessage;
-    regex condition;
-
-    passwordCondition(std::string failure, regex conditionalRegex) : failureMessage(failure), condition(conditionalRegex) {}
-};
 
 //--------------------------------------------------------------------------------------------------
 // Constants
@@ -86,14 +76,6 @@ const string gstrALPHA_NUMERIC = gstrALPHA + gstrNUMBERS;
 
 // Valid identifier characters
 const string gstrVALID_IDENTIFIER_CHARS = gstrALPHA_NUMERIC + "_";
-
-// Standard password complexity conditions.
-const vector<passwordCondition> PasswordComplexityRequirements{
-                    { std::string("Insufficient password complexity: You need at least 8 characters"), regex(".{8,}") },
-                    { std::string("Insufficient password complexity: You need at least one capital letter"), regex("[A-Z]") },
-                    { std::string("Insufficient password complexity: You need at least one lowercase letter"), regex("[a-z]") },
-                    { std::string("Insufficient password complexity: You need at least one digit"), regex("[0-9]") }
-};
 
 //-------------------------------------------------------------------------------------------------
 // ********* Operating System - Misc **********
@@ -1131,6 +1113,22 @@ namespace Util
 
     // Try boolean function until it returns true, up to maxTries times. Runs retryCallback(tries) for each failure and failureCallback() when maxTries have failed
 	EXPORT_BaseUtils void retry(int maxTries, std::function<bool()> func, std::function<void(int)> retryCallback, std::function<void()> failureCallback);
+
+	// Check the password complexity using requirements encoded as #+[U|L|D|P]+
+	//	i.e., one or more digits specifying the minimum length followed by letters denoting the required character categories
+	//	where U = Uppercase, L = Lowercase, D = Digit and P = Punctuation
+    // If complexityRequirements is empty then the only requirement is length > 0
+    // If complexityRequirements is invalid then 8ULDP will be used (require length >= 8 and at least one of each category)
+    // Throws an exception if the password fails validation
+	EXPORT_BaseUtils void checkPasswordComplexity(const string& password, const string& complexityRequirements);
+
+	// Decode requirements encoded as #+[U|L|D|P]+
+	//	i.e., one or more digits specifying the minimum length followed by letters denoting the required character categories
+	//	where U = Uppercase, L = Lowercase, D = Digit and P = Punctuation
+	// If encodedRequirements is empty then the only requirement is length > 0
+	// If encodedRequirements is invalid then 8ULDP will be used (require length >= 8 and at least one of each category)
+	EXPORT_BaseUtils void decodePasswordComplexityRequirements(const char* szComplexityRequirements,
+        long& lengthRequirement, bool& requireUppercase, bool& requireLowercase, bool& requireDigit, bool& requirePunctuation);
 }
 // end of namespace Util
 //-------------------------------------------------------------------------------------------------
@@ -1149,6 +1147,3 @@ vector<T>& shuffleVector(vector<T>& vectorToShuffle)
     std::shuffle(vectorToShuffle.begin(), vectorToShuffle.end(), g);
     return vectorToShuffle;
 }
-
-// This method will check the password complexity of a given string.
-EXPORT_BaseUtils void CheckPasswordComplexity(const string& password, const vector<passwordCondition>& conditions);

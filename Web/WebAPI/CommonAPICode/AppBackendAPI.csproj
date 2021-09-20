@@ -142,6 +142,7 @@
     <ProjectReference Include="..\..\..\RC.Net\Core\Code\Extract.csproj">
     </ProjectReference>
     <ProjectReference Include="..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="app.config">

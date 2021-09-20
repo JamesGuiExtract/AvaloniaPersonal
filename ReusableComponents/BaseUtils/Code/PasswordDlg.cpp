@@ -14,11 +14,13 @@ extern AFX_EXTENSION_MODULE BaseUtilsDLL;
 //-------------------------------------------------------------------------------------------------
 IMPLEMENT_DYNAMIC(PasswordDlg, CDialog)
 
-PasswordDlg::PasswordDlg(const std::string strTitle, CWnd* pParent /*=NULL*/)
+PasswordDlg::PasswordDlg(const std::string strTitle, const std::string strComplexityRequirements,
+	CWnd* pParent /*=NULL*/)
 	: CDialog(PasswordDlg::IDD, pParent)
 	, m_zNewPassword(_T(""))
 	, m_zRetypePwd(_T(""))
 	, m_strTitle(strTitle)
+	, m_strComplexityRequirements(strComplexityRequirements)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -120,14 +122,14 @@ void PasswordDlg::validatePasswords()
 	// Update the data in the member vars
 	UpdateData();
 
-	std::string newPassword = m_zNewPassword;
-
-	CheckPasswordComplexity(newPassword, PasswordComplexityRequirements);
-
-	// if passwords don't match throw an exception
-	if ( strcmp( m_zNewPassword, m_zRetypePwd ) != 0 )
+	// if passwords don't match clear and throw an exception
+	if (strcmp( m_zNewPassword, m_zRetypePwd ) != 0 )
 	{
-		UCLIDException ue ("ELI15193", "Passwords must match!" );
-		throw ue;
+		m_editNewPwd.SetWindowTextA("");
+		m_editRetypePwd.SetWindowTextA("");
+		throw UCLIDException("ELI15193", "Passwords must match!" );
 	}
+
+	// Throw exception if the password doesn't meet defined requirements
+	Util::checkPasswordComplexity(string(m_zNewPassword), m_strComplexityRequirements);
 }

@@ -2348,6 +2348,7 @@ namespace Extract.FileActionManager.Database.Test
         /// Verify that stats are correctly recorded by various SetFileStatusTo... and NotifyFile... methods
         /// </summary>
         [Parallelizable(ParallelScope.All)]
+        [Category("Automated")]
         [TestCase(false, TestName = "SetFileStatusTo, Visible files")]
         [TestCase(true, TestName = "SetFileStatusTo, Invisible files")]
         public static void SetFileStatusTo(bool invisibleStats)
@@ -2417,6 +2418,22 @@ namespace Extract.FileActionManager.Database.Test
             dbWrapper.fpDB.NotifyFileFailed(1, dbWrapper.action1, 1, null, false);
             AssertStats(new ActionStatus { S = new[] { 2 }, F = new[] { 1 } },
                         new ActionStatus { P = new[] { 1 }, C = new[] { 2 } });
+        }
+
+        [Test, Category("Automated")]
+        /// Confirm that a new database has the expected password complexity requirements
+        public static void DefaultPasswordComplexityRequirements()
+        {
+            // Defaults are different if the database is created at Extract (with mapped drive to correct server for \\extract.local\All)
+            string expected = SystemMethods.IsExtractInternal()
+                ? "1"
+                : "8ULD";
+
+            string testDBName = "Test_DefaultPasswordComplexityRequirements";
+            using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDBName, false);
+            string actual = dbWrapper.fpDB.GetDBInfoSetting("PasswordComplexityRequirements", false);
+
+            Assert.AreEqual(expected, actual);
         }
 
         #endregion Test Methods

@@ -28,5 +28,8 @@ namespace WebAPI.Models
         /// An array of all of the document types from the document types file.
         /// </summary>
         public string[] ParsedDocumentTypes;
+
+        /// The complexity rules for user login passwords
+        public Extract.Utilities.PasswordComplexityRequirements PasswordComplexityRequirements;
     }
 }

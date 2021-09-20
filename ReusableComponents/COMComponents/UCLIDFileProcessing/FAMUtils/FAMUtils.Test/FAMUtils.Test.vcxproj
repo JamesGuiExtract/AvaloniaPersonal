@@ -134,12 +134,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CppSqlApplicationRoleTest.h" />
+    <ClInclude Include="PasswordComplexityTest.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="CppSqlApplicationRoleTest.cpp" />
+    <ClCompile Include="PasswordComplexityTest.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -178,6 +180,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
       <Project>{f3314bbe-b008-488d-a2e0-351c49d914d7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0d4ad6d3-b177-4e6d-ba6d-d8e0f42fc653}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\BaseUtils\Code\BaseUtils.vcxproj">
       <Project>{91b17d62-305c-4ea4-add2-72ac7fe8d0af}</Project>

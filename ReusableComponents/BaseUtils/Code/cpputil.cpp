@@ -1400,18 +1400,7 @@ void shellOpenDocument(const string& strFilename)
 
 	WaitForSingleObject(pThread->m_hThread, INFINITE);
 }
-//-------------------------------------------------------------------------------------------------
-void CheckPasswordComplexity(const string& password, const vector<passwordCondition>& conditions)
-{
-	for each (const auto& item in conditions)
-	{
-		if (!regex_search(password, item.condition))
-		{
-			UCLIDException ue("ELI51867", item.failureMessage);
-				throw ue;
-		}
-	}
-}
+
 //-------------------------------------------------------------------------------------------------
 namespace Util
 {

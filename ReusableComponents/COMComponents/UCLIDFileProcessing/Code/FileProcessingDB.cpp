@@ -892,6 +892,9 @@ STDMETHODIMP CFileProcessingDB::ChangePassword(BSTR userName, BSTR oldPassword, 
 			uex.addDebugInfo("User Name", userName);
 			throw uex;
 		}
+
+		string pwdReq = getThisAsCOMPtr()->GetDBInfoSetting(gstrPASSWORD_COMPLEXITY_REQUIREMENTS.c_str(), VARIANT_FALSE);
+		Util::checkPasswordComplexity(asString(newPassword), pwdReq);
 		
 		encryptAndStoreUserNamePassword(asString(userName), asString(newPassword), false);
 
@@ -956,10 +959,17 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 			return S_OK;
 		}
 
+		// Get the complexity requirements from the database unless the schema needs updating first
+		string strComplexityReq = "";
+		if (getDBSchemaVersion() == ms_lFAMDBSchemaVersion)
+		{
+			strComplexityReq = getThisAsCOMPtr()->GetDBInfoSetting(gstrPASSWORD_COMPLEXITY_REQUIREMENTS.c_str(), VARIANT_FALSE);
+		}
+
 		// If no password set then set a password
 		if (strStoredEncryptedCombined == "")
 		{
-			promptForNewPassword(bShowAdmin, pbLoginCancelled, pbLoginValid);
+			promptForNewPassword(bShowAdmin, strComplexityReq, pbLoginCancelled, pbLoginValid);
 			return S_OK;
 		}
 
@@ -973,12 +983,10 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 			return S_OK;
 		}
 
+		// Validate password
 		bool bLoginValid = isPasswordValid(string(dlgLogin.m_zPassword), bUseAdmin);
 
 		m_bLoggedInAsAdmin = bLoginValid ? bUseAdmin : m_bLoggedInAsAdmin;
-
-		// Validate password
-		*pbLoginValid = asVariantBool(bLoginValid);
 
 		if (bLoginValid)
 		{
@@ -986,14 +994,14 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 			{
 				std::string newPassword = dlgLogin.m_zPassword;
 
-				CheckPasswordComplexity(newPassword, PasswordComplexityRequirements);
+				Util::checkPasswordComplexity(newPassword, strComplexityReq);
+
+				*pbLoginValid = asVariantBool(bLoginValid);
 			}
 			catch (UCLIDException ue)
 			{
-				// default to using the desktop as the parent for the messagebox below
-				::MessageBox(getAppMainWndHandle(), "Your password no longer meets our complexity requirements. Please change it on the next screen.", "Password Update", MB_OK);
-
-				promptForNewPassword(bShowAdmin, pbLoginCancelled, pbLoginValid);
+				ue.display();
+				promptForNewPassword(bShowAdmin, strComplexityReq, pbLoginCancelled, pbLoginValid);
 			}
 		}
 	
@@ -1002,13 +1010,14 @@ STDMETHODIMP CFileProcessingDB::ShowLogin(VARIANT_BOOL bShowAdmin, VARIANT_BOOL*
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15099");
 }
 //-------------------------------------------------------------------------------------------------
-void CFileProcessingDB::promptForNewPassword(VARIANT_BOOL bShowAdmin, VARIANT_BOOL* pbLoginCancelled, VARIANT_BOOL* pbLoginValid)
+void CFileProcessingDB::promptForNewPassword(VARIANT_BOOL bShowAdmin, const string& strComplexityRequirements,
+	VARIANT_BOOL* pbLoginCancelled, VARIANT_BOOL* pbLoginValid)
 {
 	bool bUseAdmin = asCppBool(bShowAdmin);
 	string strUser = (bUseAdmin) ? gstrADMIN_USER : m_strFAMUserName;
 	string strCaption = "Set " + strUser + "'s Password";
 
-	PasswordDlg dlgPW(strCaption);
+	PasswordDlg dlgPW(strCaption, strComplexityRequirements);
 	if (dlgPW.DoModal() != IDOK)
 	{
 		// The user hit cancel on the password dialog. Do NOT update the pw.
@@ -1019,7 +1028,7 @@ void CFileProcessingDB::promptForNewPassword(VARIANT_BOOL bShowAdmin, VARIANT_BO
 	else
 	{
 		// Update password in database Login table (fail if not the admin user
-			// and the user doesn't exist)
+		// and the user doesn't exist)
 		string strPassword = dlgPW.m_zNewPassword;
 		encryptAndStoreUserNamePassword(strUser, strPassword, !bUseAdmin);
 
@@ -1092,10 +1101,11 @@ STDMETHODIMP CFileProcessingDB::ChangeLogin(VARIANT_BOOL bChangeAdmin, VARIANT_B
 		bool bPasswordValid = false;
 		string strUser = bUseAdmin ? gstrADMIN_USER : m_strFAMUserName;
 		string strPasswordDlgCaption = "Change " + strUser + " Password";
+		string strComplexityReq = getThisAsCOMPtr()->GetDBInfoSetting(gstrPASSWORD_COMPLEXITY_REQUIREMENTS.c_str(), VARIANT_FALSE);
 		
 		// Display Change Password dialog
 
-		ChangePasswordDlg dlgPW(strPasswordDlgCaption);
+		ChangePasswordDlg dlgPW(strPasswordDlgCaption, strComplexityReq);
 		do
 		{
 			if (dlgPW.DoModal() != IDOK)
@@ -4692,9 +4702,10 @@ STDMETHODIMP CFileProcessingDB::SetNewPassword(BSTR bstrUserName, VARIANT_BOOL* 
 
 		string strUser = asString(bstrUserName);
 		string strCaption = "Set new password for " + strUser;
+		string strComplexityReq = getThisAsCOMPtr()->GetDBInfoSetting(gstrPASSWORD_COMPLEXITY_REQUIREMENTS.c_str(), VARIANT_FALSE);
 
 		// Display Change Password dialog
-		PasswordDlg dlgPW(strCaption);
+		PasswordDlg dlgPW(strCaption, strComplexityReq);
 		if (dlgPW.DoModal() != IDOK)
 		{
 			return S_OK;

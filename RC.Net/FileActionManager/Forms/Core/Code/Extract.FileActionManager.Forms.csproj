@@ -81,6 +81,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PasswordComplexityRequirementsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PasswordComplexityRequirementsDialog.Designer.cs">
+      <DependentUpon>PasswordComplexityRequirementsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="EventArgs.cs" />
     <Compile Include="FileActionManagerPathTagButton.cs">
       <SubType>Component</SubType>
@@ -253,6 +259,9 @@
     <EmbeddedResource Include="AddMLModel.resx">
       <DependentUpon>AddMLModel.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PasswordComplexityRequirementsDialog.resx">
+      <DependentUpon>PasswordComplexityRequirementsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FileTagDialog.resx">
       <DependentUpon>FileTagDialog.cs</DependentUpon>

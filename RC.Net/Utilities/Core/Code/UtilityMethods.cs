@@ -1240,18 +1240,25 @@ namespace Extract.Utilities
         /// <param name="defaultEncoding">Encoding to use if the encoding can't be detected from the input</param>
         public static StreamReader GetXmlStreamReader(Stream input, Encoding defaultEncoding)
         {
-            var inputEncoding = defaultEncoding;
-
-            if (TryGetEncodingFromXmlAttribute(input, out var encoding))
+            try
             {
-                inputEncoding = encoding;
-            }
+                var inputEncoding = defaultEncoding;
 
-            return new StreamReader(input,
-                encoding: inputEncoding,
-                detectEncodingFromByteOrderMarks: true,
-                bufferSize: 1024,
-                leaveOpen: true);
+                if (TryGetEncodingFromXmlAttribute(input, out var encoding))
+                {
+                    inputEncoding = encoding;
+                }
+
+                return new StreamReader(input,
+                    encoding: inputEncoding,
+                    detectEncodingFromByteOrderMarks: true,
+                    bufferSize: 1024,
+                    leaveOpen: true);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI51882");
+            }
         }
     }
 

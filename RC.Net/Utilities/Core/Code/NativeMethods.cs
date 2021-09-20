@@ -840,6 +840,22 @@ namespace Extract.Utilities
         [return: MarshalAs(UnmanagedType.I1)]
         internal static extern bool isInternalToolsLicensed();
 
+        // Decode requirements encoded as #+[U|L|D|P]+
+        //  i.e., one or more digits specifying the minimum length followed by letters denoting the required character categories
+        //  where U = Uppercase, L = Lowercase, D = Digit and P = Punctuation
+        // If encodedRequirements is empty then the only requirement is length > 0
+        // If encodedRequirements is invalid then 8ULDP will be used (require length >= 8 and at least one of each category)
+        [DllImport("BaseUtils.dll", EntryPoint = "?decodePasswordComplexityRequirements@Util@@YAXPBDAAJAA_N222@Z",
+            CharSet = CharSet.Ansi, BestFitMapping = false, ThrowOnUnmappableChar = true,
+            CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void decodePasswordComplexityRequirements(
+            string complexityRequirements,
+            out int lengthRequirement,
+            [MarshalAs(UnmanagedType.U1)] out bool requireUppercase,
+            [MarshalAs(UnmanagedType.U1)] out bool requireLowercase,
+            [MarshalAs(UnmanagedType.U1)] out bool requireDigit,
+            [MarshalAs(UnmanagedType.U1)] out bool requirePunctuation);
+
         /// <summary>
         /// Converts a command-line string into an array of args, including the program name
         /// </summary>

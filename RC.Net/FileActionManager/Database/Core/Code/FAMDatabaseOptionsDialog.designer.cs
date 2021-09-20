@@ -57,6 +57,7 @@
             this._checkStoreFASTHistory = new System.Windows.Forms.CheckBox();
             this._checkStoreSourceDocChangeHistory = new System.Windows.Forms.CheckBox();
             this._tabSecurity = new System.Windows.Forms.TabPage();
+            this._configurePasswordRequirementsButton = new System.Windows.Forms.Button();
             this._azureInstance = new Extract.Utilities.Forms.BetterTextBox();
             this._azureTenant = new Extract.Utilities.Forms.BetterTextBox();
             this.betterLabel3 = new Extract.Utilities.Forms.BetterLabel();
@@ -107,7 +108,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(6, 156);
+            label2.Location = new System.Drawing.Point(6, 192);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(353, 13);
             label2.TabIndex = 2;
@@ -418,6 +419,7 @@
             // 
             // _tabSecurity
             // 
+            this._tabSecurity.Controls.Add(this._configurePasswordRequirementsButton);
             this._tabSecurity.Controls.Add(this._azureInstance);
             this._tabSecurity.Controls.Add(this._azureTenant);
             this._tabSecurity.Controls.Add(this.betterLabel3);
@@ -440,16 +442,27 @@
             this._tabSecurity.ToolTipText = "FAM security settings";
             this._tabSecurity.UseVisualStyleBackColor = true;
             // 
+            // _configurePasswordRequirementsButton
+            // 
+            this._configurePasswordRequirementsButton.AutoSize = true;
+            this._configurePasswordRequirementsButton.Location = new System.Drawing.Point(6, 30);
+            this._configurePasswordRequirementsButton.Name = "_configurePasswordRequirementsButton";
+            this._configurePasswordRequirementsButton.Size = new System.Drawing.Size(182, 23);
+            this._configurePasswordRequirementsButton.TabIndex = 12;
+            this._configurePasswordRequirementsButton.Text = "Configure password requirements...";
+            this._configurePasswordRequirementsButton.UseVisualStyleBackColor = true;
+            this._configurePasswordRequirementsButton.Click += new System.EventHandler(this.HandleConfigurePasswordRequirementsButton_Click);
+            // 
             // _azureInstance
             // 
-            this._azureInstance.Location = new System.Drawing.Point(88, 103);
+            this._azureInstance.Location = new System.Drawing.Point(88, 139);
             this._azureInstance.Name = "_azureInstance";
             this._azureInstance.Size = new System.Drawing.Size(364, 20);
             this._azureInstance.TabIndex = 11;
             // 
             // _azureTenant
             // 
-            this._azureTenant.Location = new System.Drawing.Point(88, 78);
+            this._azureTenant.Location = new System.Drawing.Point(88, 114);
             this._azureTenant.Name = "_azureTenant";
             this._azureTenant.Size = new System.Drawing.Size(364, 20);
             this._azureTenant.TabIndex = 10;
@@ -457,7 +470,7 @@
             // betterLabel3
             // 
             this.betterLabel3.AutoSize = true;
-            this.betterLabel3.Location = new System.Drawing.Point(7, 106);
+            this.betterLabel3.Location = new System.Drawing.Point(7, 142);
             this.betterLabel3.Name = "betterLabel3";
             this.betterLabel3.Size = new System.Drawing.Size(78, 13);
             this.betterLabel3.TabIndex = 9;
@@ -466,7 +479,7 @@
             // betterLabel2
             // 
             this.betterLabel2.AutoSize = true;
-            this.betterLabel2.Location = new System.Drawing.Point(7, 82);
+            this.betterLabel2.Location = new System.Drawing.Point(7, 118);
             this.betterLabel2.Name = "betterLabel2";
             this.betterLabel2.Size = new System.Drawing.Size(71, 13);
             this.betterLabel2.TabIndex = 8;
@@ -475,7 +488,7 @@
             // betterLabel1
             // 
             this.betterLabel1.AutoSize = true;
-            this.betterLabel1.Location = new System.Drawing.Point(7, 56);
+            this.betterLabel1.Location = new System.Drawing.Point(7, 92);
             this.betterLabel1.Name = "betterLabel1";
             this.betterLabel1.Size = new System.Drawing.Size(77, 13);
             this.betterLabel1.TabIndex = 7;
@@ -483,7 +496,7 @@
             // 
             // _azureClientID
             // 
-            this._azureClientID.Location = new System.Drawing.Point(88, 53);
+            this._azureClientID.Location = new System.Drawing.Point(88, 89);
             this._azureClientID.Name = "_azureClientID";
             this._azureClientID.Size = new System.Drawing.Size(364, 20);
             this._azureClientID.TabIndex = 6;
@@ -491,7 +504,7 @@
             // _buttonRemoveMachine
             // 
             this._buttonRemoveMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonRemoveMachine.Location = new System.Drawing.Point(377, 230);
+            this._buttonRemoveMachine.Location = new System.Drawing.Point(377, 266);
             this._buttonRemoveMachine.Name = "_buttonRemoveMachine";
             this._buttonRemoveMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonRemoveMachine.TabIndex = 5;
@@ -502,7 +515,7 @@
             // _buttonModifyMachine
             // 
             this._buttonModifyMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonModifyMachine.Location = new System.Drawing.Point(377, 201);
+            this._buttonModifyMachine.Location = new System.Drawing.Point(377, 237);
             this._buttonModifyMachine.Name = "_buttonModifyMachine";
             this._buttonModifyMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonModifyMachine.TabIndex = 4;
@@ -513,7 +526,7 @@
             // _buttonAddMachine
             // 
             this._buttonAddMachine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this._buttonAddMachine.Location = new System.Drawing.Point(377, 172);
+            this._buttonAddMachine.Location = new System.Drawing.Point(377, 208);
             this._buttonAddMachine.Name = "_buttonAddMachine";
             this._buttonAddMachine.Size = new System.Drawing.Size(75, 23);
             this._buttonAddMachine.TabIndex = 3;
@@ -526,7 +539,7 @@
             this._listMachinesToAuthenticate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this._listMachinesToAuthenticate.FormattingEnabled = true;
-            this._listMachinesToAuthenticate.Location = new System.Drawing.Point(9, 172);
+            this._listMachinesToAuthenticate.Location = new System.Drawing.Point(9, 208);
             this._listMachinesToAuthenticate.Name = "_listMachinesToAuthenticate";
             this._listMachinesToAuthenticate.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this._listMachinesToAuthenticate.Size = new System.Drawing.Size(362, 95);
@@ -536,7 +549,7 @@
             // _checkRequireAuthenticationToRun
             // 
             this._checkRequireAuthenticationToRun.AutoSize = true;
-            this._checkRequireAuthenticationToRun.Location = new System.Drawing.Point(7, 30);
+            this._checkRequireAuthenticationToRun.Location = new System.Drawing.Point(7, 66);
             this._checkRequireAuthenticationToRun.Name = "_checkRequireAuthenticationToRun";
             this._checkRequireAuthenticationToRun.Size = new System.Drawing.Size(163, 17);
             this._checkRequireAuthenticationToRun.TabIndex = 1;
@@ -724,6 +737,7 @@
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.CancelButton = this._buttonCancel;
             this.ClientSize = new System.Drawing.Size(491, 428);
             this.Controls.Add(this.label10);
             this.Controls.Add(this._emailTestButton);
@@ -810,6 +824,7 @@
         private Utilities.Forms.BetterLabel betterLabel2;
         private Utilities.Forms.BetterLabel betterLabel1;
         private Utilities.Forms.BetterTextBox _azureClientID;
+        private System.Windows.Forms.Button _configurePasswordRequirementsButton;
     }
 }
 

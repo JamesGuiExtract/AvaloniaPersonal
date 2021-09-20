@@ -21,6 +21,7 @@
 #include <locale>
 #include <codecvt>
 #include <string>
+#include <regex>
 
 using namespace std;
 
@@ -1704,3 +1705,107 @@ EXPORT_BaseUtils string normalizeNewlines(const string& strInput)
 
 	return dest.str();
 }
+//-----------------------------------------------------------------------------------------------------
+namespace Util
+{
+	void checkPasswordComplexity(const string& password, const string& complexityRequirements)
+	{
+		static const regex upper("[A-Z]");
+		static const regex lower("[a-z]");
+		static const regex digit("[0-9]");
+		static const regex punct("[[:punct:]]");
+
+        long lengthRequirement;
+        bool requireUppercase, requireLowercase, requireDigit, requirePunctuation;
+
+        decodePasswordComplexityRequirements(complexityRequirements.c_str(),
+            lengthRequirement, requireUppercase, requireLowercase, requireDigit, requirePunctuation);
+
+		// Validate the password, add info for any rule failure
+		UCLIDException ue("ELI51867", "This password does not meet the complexity requirements");
+		bool isValid = true;
+		if ((long)password.length() < lengthRequirement)
+		{
+			isValid = false;
+			ue.addDebugInfo("Failed requirement", Format("Password must be at least %d characters long", lengthRequirement));
+		}
+		if (requireUppercase && !regex_search(password, upper))
+		{
+			isValid = false;
+			ue.addDebugInfo("Failed requirement", "Password must contain at least one upper case letter (A-Z)");
+		}
+		if (requireLowercase && !regex_search(password, lower))
+		{
+			isValid = false;
+			ue.addDebugInfo("Failed requirement", "Password must contain at least one lower case letter (a-z)");
+		}
+		if (requireDigit && !regex_search(password, digit))
+		{
+			isValid = false;
+			ue.addDebugInfo("Failed requirement", "Password must contain at least one digit (0-9)");
+		}
+		if (requirePunctuation && !regex_search(password, punct))
+		{
+			isValid = false;
+			ue.addDebugInfo("Failed requirement", "Password must contain at least one punctuation character (!\"#$...)");
+		}
+		if (!isValid)
+		{
+			throw ue;
+		}
+	}
+	//-------------------------------------------------------------------------------------------------
+	void decodePasswordComplexityRequirements(const char* szComplexityRequirements,
+        long& lengthRequirement, bool& requireUppercase, bool& requireLowercase, bool& requireDigit, bool& requirePunctuation)
+	{
+		static const regex complexityPattern("(\\d+)[ULDP]*");
+
+		// Default to minimum 1 char with no other requirements if the complexity string is empty
+		lengthRequirement = 1;
+		requireUppercase = false;
+		requireLowercase = false;
+		requireDigit = false;
+		requirePunctuation = false;
+
+        string complexityRequirements = szComplexityRequirements == __nullptr ? "" : szComplexityRequirements;
+
+		// Parse the complexity requirements if provided
+		if (!complexityRequirements.empty())
+		{
+			smatch subMatches;
+			bool isValid = regex_match(complexityRequirements, subMatches, complexityPattern);
+			if (isValid)
+			{
+				// Get the length and make sure it is > 0
+				string lengthPart = subMatches[1];
+				try
+				{
+					lengthRequirement = asLong(lengthPart);
+					isValid = lengthRequirement > 0;
+				}
+				catch (...)
+				{
+					isValid = false;
+				}
+			}
+
+			// Get the categories if the encoding is valid
+			if (isValid)
+			{
+				requireUppercase = complexityRequirements.find('U') != string::npos;
+				requireLowercase = complexityRequirements.find('L') != string::npos;
+				requireDigit = complexityRequirements.find('D') != string::npos;
+				requirePunctuation = complexityRequirements.find('P') != string::npos;
+			}
+			// Use strict requirements, length of 8 and all categories required, if the encoded string isn't valid
+			else
+			{
+				lengthRequirement = 8;
+				requireUppercase = true;
+				requireLowercase = true;
+				requireDigit = true;
+				requirePunctuation = true;
+			}
+		}
+	}
+} // end of namespace Util

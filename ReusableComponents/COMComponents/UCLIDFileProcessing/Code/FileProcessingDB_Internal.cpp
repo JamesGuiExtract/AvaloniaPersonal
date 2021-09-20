@@ -25,6 +25,7 @@
 #include <VectorOperations.h>
 #include <FAMDBSemaphore.h>
 #include <CppApplicationRoleConnection.h>
+#include <LicenseUtils.h>
 
 #include <string>
 #include <memory>
@@ -2418,6 +2419,10 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrAZURE_TENNANT] = "";
 	mapDefaultValues[gstrAZURE_CLIENT_ID] = "";
 	mapDefaultValues[gstrAZURE_INSTANCE] = "https://login.microsoftonline.com/";
+
+	// Require 8 char password with upper, lower, and digits for new databases
+	mapDefaultValues[gstrPASSWORD_COMPLEXITY_REQUIREMENTS] =
+		isInternalToolsLicensed() ? "1" :"8ULD";
 
 	// Create a new database ID  or use existing if it has been set
 	ByteStream bsDatabaseID;

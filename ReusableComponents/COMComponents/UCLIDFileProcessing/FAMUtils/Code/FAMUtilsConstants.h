@@ -73,6 +73,7 @@ static const string gstrDASHBOARD_EXCLUDE_FILTER = "DashboardExcludeFilter";
 static const string gstrAZURE_TENNANT = "AzureTenant";
 static const string gstrAZURE_CLIENT_ID = "AzureClientId";
 static const string gstrAZURE_INSTANCE = "AzureInstance";
+static const string gstrPASSWORD_COMPLEXITY_REQUIREMENTS = "PasswordComplexityRequirements";
 
 // Feature names
 static const string gstrFEATURE_FILE_HANDLER_COPY_NAMES = "Files: Copy filenames";

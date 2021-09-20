@@ -219,12 +219,23 @@ namespace WebAPI.Models
             {
                 var json = FileApi.FileProcessingDB.LoadWebAppSettings(-1, "RedactionVerificationSettings");
 
-                var result = JsonConvert.DeserializeObject<WebAppSettingsResult>(json);
+                WebAppSettingsResult result;
+                if (string.IsNullOrEmpty(json))
+                {
+                    result = new();
+                }
+                else
+                {
+                    result = JsonConvert.DeserializeObject<WebAppSettingsResult>(json);
+                }
 
                 if (!string.IsNullOrEmpty(result.DocumentTypes))
                 {
                     result.ParsedDocumentTypes = File.ReadAllLines(result.DocumentTypes);
                 }
+
+                result.PasswordComplexityRequirements =
+                    new(FileApi.FileProcessingDB.GetDBInfoSetting("PasswordComplexityRequirements", false));
 
                 return result;
             }
