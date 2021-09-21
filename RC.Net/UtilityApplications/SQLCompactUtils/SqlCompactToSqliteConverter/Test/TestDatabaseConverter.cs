@@ -171,7 +171,7 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
             DatabaseConverter converter = new(_schemaManagerProviderMock.Object);
             var exn = Assert.ThrowsAsync<ExtractException>(async delegate
             {
-                await converter.Convert("input.sdf", "output.sdf");
+                await converter.Convert(@"C:\input.sdf", "output.sdf");
             });
 
             StringAssert.Contains("outputPath cannot be a relative path", exn.Message);

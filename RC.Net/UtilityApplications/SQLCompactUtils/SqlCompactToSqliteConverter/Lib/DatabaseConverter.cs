@@ -44,7 +44,7 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
                 _ = inputPath ?? throw new ArgumentNullException(nameof(inputPath));
                 _ = outputPath ?? throw new ArgumentNullException(nameof(outputPath));
 
-                if (!Path.IsPathRooted(inputPath))
+                if (!Path.IsPathRooted(outputPath))
                 {
                     throw new ArgumentException($"{nameof(outputPath)} cannot be a relative path");
                 }
