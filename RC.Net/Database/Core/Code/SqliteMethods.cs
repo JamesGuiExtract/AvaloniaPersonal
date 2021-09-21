@@ -40,7 +40,7 @@ namespace Extract.Database
         /// <param name="databasePath">The path to a sqlite database file</param>
         public static string BuildConnectionString(string databasePath)
         {
-            return BuildConnectionOptions(databasePath).ConfigurationString;
+            return BuildConnectionOptions(databasePath).ConnectionString;
         }
     }
 }
