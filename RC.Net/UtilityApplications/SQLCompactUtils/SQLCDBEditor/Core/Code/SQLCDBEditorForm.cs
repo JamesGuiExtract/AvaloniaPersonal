@@ -2065,7 +2065,7 @@ namespace Extract.SQLCDBEditor
                 try
                 {
                     _connection = new SQLiteConnection(
-                        SqlCompactMethods.BuildDBConnectionString(_databaseWorkingCopyFileName, false, 0, 0, false));
+                        SqliteMethods.BuildConnectionString(_databaseWorkingCopyFileName));
 
                     // Open the connection.
                     _connection.Open();
@@ -2208,7 +2208,7 @@ namespace Extract.SQLCDBEditor
             int customerSchemaVersion = 0;
 
             using SQLiteConnection connection = new(
-                SqlCompactMethods.BuildDBConnectionString(databaseFileName, false, 0, 0, false));
+                SqliteMethods.BuildConnectionString(databaseFileName));
             connection.Open();
             
             var command = connection.CreateCommand();
@@ -2239,7 +2239,7 @@ namespace Extract.SQLCDBEditor
         {
             File.Copy(databaseFile, databaseFile + $"{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss", CultureInfo.InvariantCulture)}.backup");
             using SQLiteConnection connection = new(
-                SqlCompactMethods.BuildDBConnectionString(databaseFile, false, 0, 0, false));
+                SqliteMethods.BuildConnectionString(databaseFile));
             connection.Open();
             try
             {
@@ -2342,7 +2342,7 @@ namespace Extract.SQLCDBEditor
                 File.Copy(_databaseFileName, _databaseFileName + $"{DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss", CultureInfo.InvariantCulture)}.backup");
 
                 using SQLiteConnection connection = new(
-                    SqlCompactMethods.BuildDBConnectionString(_databaseFileName, false, 0, 0, false));
+                    SqliteMethods.BuildConnectionString(_databaseFileName));
                 connection.Open();
 
                 var command = connection.CreateCommand();
