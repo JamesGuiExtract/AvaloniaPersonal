@@ -1,5 +1,6 @@
 ﻿using Extract.Testing.Utilities;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System.IO;
 using UCLID_AFCORELib;
@@ -140,6 +141,9 @@ namespace Extract.AttributeFinder.Rules.Json.Test
         /// <summary>
         /// Up to 100 distinct examples of each rule object taken from the customer rules git repo.
         /// Sequence objects (select multiple preprocessor/output handler) were limited to a single example.
+        /// Compare JSON from a file to JSON after doing a round-trip through the domain object and back to JSON text.
+        /// Rule objects with multiple DTO versions need to be tested separately to verify that legacy versions can be loaded
+        /// (see LegacyVersionRuleObjects test below)
         /// </summary>
         [Test, Category("RulesJsonSerialization")]
         [TestCase("Resources.RuleObjects.AdvancedReplaceString.json", TestName = "AdvancedReplaceString")]
@@ -257,11 +261,12 @@ namespace Extract.AttributeFinder.Rules.Json.Test
                 {
                     if (jsonReader.TokenType == JsonToken.StartObject)
                     {
-                        var dtoFromJson = serializer.Deserialize<Dto.ObjectWithDescription>(jsonReader);
+                        var objectFromReader = JObject.Load(jsonReader);
+                        var dtoFromJson = objectFromReader.ToObject<Dto.ObjectWithDescription>(serializer);
                         var domain = (IObjectWithDescription)Domain.RuleObjectConverter.ConvertFromDto(dtoFromJson);
-                        var (json, dtoFromDomain) = RuleObjectJsonSerializer.Serialize<IObjectWithDescription, Dto.ObjectWithDescription>(domain);
+                        var (roundTripJson, _) = RuleObjectJsonSerializer.Serialize<IObjectWithDescription, Dto.ObjectWithDescription>(domain);
 
-                        Assert.AreEqual(dtoFromJson, dtoFromDomain);
+                        Assert.AreEqual(objectFromReader.ToString(), roundTripJson);
 
                         objectsCompared++;
                     }
