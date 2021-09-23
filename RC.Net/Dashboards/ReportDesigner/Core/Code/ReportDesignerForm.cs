@@ -33,10 +33,9 @@ namespace ReportDesigner
         /// Constructor that creates the ReportDesigner form by opening the <paramref name="reportFile"/>
         /// </summary>
         /// <param name="reportFile">FileName for the report to open.</param>
-        /// <param name="reportName">Name of the report to open from <paramref name="databaseName"/></param>
         /// <param name="serverName">Server name to open <paramref name="databaseName"/></param>
         /// <param name="databaseName">Database to open on <paramref name="serverName"/></param>
-        public ReportDesignerForm(string reportFile, string reportName, string serverName, string databaseName)
+        public ReportDesignerForm(string reportFile, string serverName, string databaseName)
         {
             try
             {
@@ -108,13 +107,13 @@ namespace ReportDesigner
                     }
                     else
                     {
-                        Text = string.Format("{0} - Report designer", designController.ActiveDesignPanel.FileName);
+                        Text = $"{designController.ActiveDesignPanel.FileName} - Report designer";
                     }
                 }
             }
             catch (Exception ex)
             {
-                ex.AsExtract("ELI50330");
+                ex.ExtractDisplay("ELI50330");
             }
         }
 
@@ -128,7 +127,7 @@ namespace ReportDesigner
             }
             catch(Exception ex)
             {
-                ex.AsExtract("ELI50331");
+                ex.ExtractDisplay("ELI50331");
             }
         }
 
@@ -144,7 +143,7 @@ namespace ReportDesigner
             }
             catch (Exception ex)
             {
-                ex.AsExtract("ELI50332");
+                ex.ExtractDisplay("ELI50332");
             }
         }
 

@@ -75,7 +75,7 @@ namespace Extract.Dashboard.Forms
         public int FAMUserID { get; set; }
 
         /// <summary>
-        /// Root folder for extracted data files (this is for the cacheing of data
+        /// Root folder for extracted data files (this is for the caching of data
         /// </summary>
         public string RootFolderForExtractedDataFiles { get; set; }
 

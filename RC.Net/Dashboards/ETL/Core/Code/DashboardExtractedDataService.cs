@@ -121,6 +121,7 @@ namespace Extract.Dashboard.ETL
                     var xdoc = XDocument.Load(reader.GetXmlReader(0), LoadOptions.None);
                     using var dashboard = new DevExpress.DashboardCommon.Dashboard();
                     dashboard.LoadFromXDocument(xdoc);
+                    DashboardHelpers.AddAppRoleQuery(dashboard);
 
                     string dashboardName = reader.GetString(1);
 

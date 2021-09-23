@@ -156,6 +156,8 @@ namespace Extract.DashboardViewer
 
         #region IExtractDashboardCommon Implementation
 
+        public string ApplicationName { get; } = "Extract Dashboard Viewer";
+
         /// <summary>
         /// Gets the active dashboard from the underlying control
         /// </summary>
@@ -349,6 +351,7 @@ namespace Extract.DashboardViewer
             InitializeComponent();
             SetupBackgroundWorkerForCacheUpdate();
             _dashboardShared = new DashboardShared<DashboardViewerForm>(this, true);
+            this.Viewer.ValidateCustomSqlQuery += DashboardHelpers.HandleDashboardCustomSqlQuery;
         }
 
         /// <summary>
@@ -514,7 +517,7 @@ namespace Extract.DashboardViewer
         {
             try
             {
-                if (CurrentDashboard != null)
+                if (CurrentDashboard != null) 
                 {
                     bool reloadData = !_usingCachedData || _dictionaryDataSourceToFileName
                         .Any(entry => _temporaryDatasourceFileCopyManager.HasFileBeenModified(entry.Value));
@@ -560,16 +563,15 @@ namespace Extract.DashboardViewer
                     if (string.IsNullOrWhiteSpace(selected))
                         return;
 
+                    // Set empty dashboard to clear previous parameters 
+                    // https://extract.atlassian.net/browse/ISSUE-17169
+                    DisposeOfDashboardsAndDereferenceTempFiles();
+
                     if (Path.GetExtension(selected).Equals(".esdx", StringComparison.OrdinalIgnoreCase))
                     {
-                        dashboardViewerMain.DashboardSource = string.Empty;
                         _dashboardName = selected;
                         var xdoc = XDocument.Load(_dashboardName);
 
-                        // Set empty dashboard to clear previous parameters 
-                        // https://extract.atlassian.net/browse/ISSUE-17169
-                        dashboardViewerMain.Dashboard?.Dispose();
-                        dashboardViewerMain.Dashboard = new DevExpress.DashboardCommon.Dashboard();
                         dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
                         UpdateMainTitle();
                     }
@@ -637,15 +639,11 @@ namespace Extract.DashboardViewer
                 string selectedFile = fileBrowser.BrowseForFile("ESDX|*.esdx|XML|*.xml|All|*.*", string.Empty);
                 if (!string.IsNullOrWhiteSpace(selectedFile) && File.Exists(selectedFile))
                 {
-                    // Clear the existing dashboard
-                    dashboardViewerMain.DashboardSource = string.Empty;
+                    DisposeOfDashboardsAndDereferenceTempFiles();
+                    
                     _dashboardName = selectedFile;
                     var xdoc = XDocument.Load(_dashboardName);
                     
-                    // Set empty dashboard to clear previous parameters 
-                    // https://extract.atlassian.net/browse/ISSUE-17169
-                    dashboardViewerMain.Dashboard?.Dispose();
-                    dashboardViewerMain.Dashboard = new DevExpress.DashboardCommon.Dashboard();
                     dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
                     UpdateMainTitle();
                 }
@@ -671,6 +669,24 @@ namespace Extract.DashboardViewer
         #endregion
 
         #region DashboardViewer event handlers
+
+        private void HandleDashboardView_CustomParameters(object sender, CustomParametersEventArgs e)
+        {
+            try
+            {
+                var dataSources = dashboardViewerMain.Dashboard.DataSources.OfType<DashboardSqlDataSource>();
+                foreach (var ds in dataSources)
+                {
+                    ds.Connection.Close();
+                    ds.Fill(ds.AppRoleQueryName());
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI51915");
+            }
+
+        }
 
         void HandleDashboardViewerMainMasterFilterCleared(object sender, MasterFilterClearedEventArgs e)
         {
@@ -816,11 +832,7 @@ namespace Extract.DashboardViewer
                 fileToolStripMenuItem.Visible = !_inDatabase || !AllowDatabaseDashboardSelection;
 
                 UpdateMainTitle();
-                if (_inDatabase && string.IsNullOrEmpty(_dashboardName))
-                {
-                    LoadDashboardList();
-                    dashboardFlyoutPanel.ShowPopup();
-                }
+
                 this.Focus();
             }
             catch (Exception ex)
@@ -849,13 +861,6 @@ namespace Extract.DashboardViewer
             // Clear the filtered items since they will no longer be filtered
             _filteredItems.Clear();
 
-            _dashboardName = dashboardName;
-
-            if (_dictionaryDataSourceToFileName.Count > 0)
-            {
-                DisposeOfDashboardsAndDereferenceTempFiles();
-            }
-
             using var connection = new ExtractRoleConnection(ServerName, DatabaseName);
             connection.Open();
             using var cmd = connection.CreateCommand();
@@ -878,7 +883,7 @@ namespace Extract.DashboardViewer
                 FROM [dbo].[Dashboard]
                 WHERE [DashboardName] = @DashboardName";
             cmd.Parameters.AddWithValue("@DashboardName", dashboardName);
-            var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 UpdateMainTitle();
@@ -887,9 +892,9 @@ namespace Extract.DashboardViewer
 
                 // Set empty dashboard to clear previous parameters 
                 // https://extract.atlassian.net/browse/ISSUE-17169
-                dashboardViewerMain.Dashboard?.Dispose();
-                dashboardViewerMain.Dashboard = new DevExpress.DashboardCommon.Dashboard();
+                DisposeOfDashboardsAndDereferenceTempFiles();
                 dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(xdoc);
+                _dashboardName = dashboardName;
             }
             UpdateMainTitle();
         }
@@ -901,8 +906,6 @@ namespace Extract.DashboardViewer
         /// <returns>The new dashboard object loaded from the <paramref name="xdoc"/></returns>
         DevExpress.DashboardCommon.Dashboard LoadDashboardFromXDocument(XDocument xdoc)
         {
-            DisposeOfDashboardsAndDereferenceTempFiles();
-
             _dashboardShared.CustomData.AssignDataFromDashboardDefinition(xdoc);
 
             LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
@@ -916,6 +919,7 @@ namespace Extract.DashboardViewer
 
             var dashboard = new DevExpress.DashboardCommon.Dashboard();
             dashboard.LoadFromXDocument(xdoc);
+            DashboardHelpers.AddAppRoleQuery(dashboard);
 
             ApplyParameterValues(dashboard);
             ReplaceExtractDataSourceFileWithTemporary(dashboard);
@@ -923,8 +927,10 @@ namespace Extract.DashboardViewer
             {
                 _dashboardForExtractedFileUpdate = new DevExpress.DashboardCommon.Dashboard();
                 _dashboardForExtractedFileUpdate.LoadFromXDocument(xdoc);
+                DashboardHelpers.AddAppRoleQuery(_dashboardForExtractedFileUpdate);
                 _usingCachedData = true;
             }
+
             return dashboard;
         }
 
@@ -1041,17 +1047,31 @@ namespace Extract.DashboardViewer
         {
             try
             {
-                // If there is cached data load the dashboard from the saved _dashboardForExtractedFileUpdate which
-                // is the original definition
-                if (_dashboardForExtractedFileUpdate != null)
-                {
-                    dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(_dashboardForExtractedFileUpdate.SaveToXDocument());
-                }
-                else
-                {
-                    // Just reload the data
-                    dashboardViewerMain.ReloadData(false);
-                }
+	             // If there is cached data load the dashboard from the saved _dashboardForExtractedFileUpdate which
+	             // is the original definition
+	             if (_dashboardForExtractedFileUpdate != null)
+	             {
+	                 dashboardViewerMain.Dashboard = LoadDashboardFromXDocument(_dashboardForExtractedFileUpdate.SaveToXDocument());
+	             }
+	             else
+	             {
+	                 var sources = dashboardViewerMain.Dashboard?
+	                     .DataSources?
+	                     .OfType<DashboardSqlDataSource>();
+	
+	                 foreach (var ds in sources)
+	                 {
+	                     ds.Connection.Close();
+	                     var approleQuery = ds.Queries.FirstOrDefault(q => q.Name == ds.AppRoleQueryName());
+	                     if (approleQuery is null)
+	                     {
+	                         DashboardHelpers.AddAppRoleQuery(ds);
+	                     }
+	                 }
+	
+	                 // Just reload the data
+	                 dashboardViewerMain.ReloadData(false);
+	             }
             }
             catch (Exception ex)
             {
@@ -1064,10 +1084,19 @@ namespace Extract.DashboardViewer
         /// </summary>
         void DisposeOfDashboardsAndDereferenceTempFiles()
         {
-            dashboardViewerMain.Dashboard?.Dispose();
-            dashboardViewerMain.Dashboard = null;
-            _dashboardForExtractedFileUpdate?.Dispose();
-            _dashboardForExtractedFileUpdate = null;
+            if (dashboardViewerMain != null)
+            {
+                dashboardViewerMain.Dashboard?.Parameters.Clear();
+                dashboardViewerMain.DashboardSource = string.Empty;
+                dashboardViewerMain.Dashboard?.Dispose();
+                dashboardViewerMain.Dashboard = null;
+            }
+            if (_dashboardForExtractedFileUpdate != null)
+            {
+                _dashboardForExtractedFileUpdate.Parameters.Clear();
+                _dashboardForExtractedFileUpdate.Dispose();
+                _dashboardForExtractedFileUpdate = null;
+            }
 
             foreach (var entry in _dictionaryDataSourceToFileName)
             {
@@ -1152,6 +1181,7 @@ namespace Extract.DashboardViewer
             }
         }
 
-    #endregion
-}
+        #endregion
+
+    }
 }

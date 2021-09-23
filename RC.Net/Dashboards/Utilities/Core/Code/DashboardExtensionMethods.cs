@@ -52,27 +52,34 @@ namespace Extract.Dashboard.Utilities
         /// </summary>
         /// <param name="parameters">Parameters for a data connection</param>
         /// <returns>Returns a builder populated with the settings in parameters</returns>
-        public static SqlConnectionStringBuilder CreateSQLConnectionBuilderFromParameters(this DataConnectionParametersBase parameters)
+        public static SqlConnectionStringBuilder CreateSqlConnectionBuilderFromParameters(this DataConnectionParametersBase parameters)
         {
-            var sqlParameters = parameters as SqlServerConnectionParametersBase;
-            var customParameters = parameters as CustomStringConnectionParameters;
-
-            SqlConnectionStringBuilder builder = null;
-
-            if (customParameters != null)
+            try
             {
-                var settings = customParameters.ConnectionString.Split(new char[] { ';' }).ToList();
-                var provider = settings.Where(s => s.StartsWith("XpoProvider", StringComparison.OrdinalIgnoreCase));
-                builder = new SqlConnectionStringBuilder(string.Join(";", settings.Except(provider).ToArray()));
-            }
-            else if (sqlParameters != null)
-            {
-                builder = new SqlConnectionStringBuilder();
-                builder.InitialCatalog = sqlParameters.DatabaseName;
-                builder.DataSource = sqlParameters.ServerName;
-            }
+                var sqlParameters = parameters as SqlServerConnectionParametersBase;
+                var customParameters = parameters as CustomStringConnectionParameters;
 
-            return builder;
+                SqlConnectionStringBuilder builder = null;
+
+                if (customParameters != null)
+                {
+                    var settings = customParameters.ConnectionString.Split(new char[] { ';' }).ToList();
+                    var provider = settings.Where(s => s.StartsWith("XpoProvider", StringComparison.OrdinalIgnoreCase));
+                    builder = new SqlConnectionStringBuilder(string.Join(";", settings.Except(provider).ToArray()));
+                }
+                else if (sqlParameters != null)
+                {
+                    builder = new SqlConnectionStringBuilder();
+                    builder.InitialCatalog = sqlParameters.DatabaseName;
+                    builder.DataSource = sqlParameters.ServerName;
+                }
+
+                return builder;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI51905");
+            }
         }
 
         /// <summary>
@@ -86,23 +93,32 @@ namespace Extract.Dashboard.Utilities
         /// were not for SQL database </returns>
         public static CustomStringConnectionParameters CreateConnectionParametersForReadOnly(this DataConnectionParametersBase parameters,
                                                                                              string serverName,
-                                                                                             string databaseName)
+                                                                                             string databaseName,
+                                                                                             string applicationName)
         {
-            SqlConnectionStringBuilder builder = parameters.CreateSQLConnectionBuilderFromParameters();
-            if (builder is null)
-                return null;
-
-            if (!string.IsNullOrWhiteSpace(serverName) && !string.IsNullOrWhiteSpace(databaseName))
+            try
             {
-                builder.DataSource = serverName;
-                builder.InitialCatalog = databaseName;
-            }
+                SqlConnectionStringBuilder builder = parameters.CreateSqlConnectionBuilderFromParameters();
+                if (builder is null)
+                    return null;
 
-            builder.ApplicationIntent = ApplicationIntent.ReadOnly;
-            builder.IntegratedSecurity = true;
-            builder.MultiSubnetFailover = true;
-            var connectionString = "XpoProvider=MSSqlServer;" + builder.ConnectionString;
-            return new CustomStringConnectionParameters(connectionString);
+                if (!string.IsNullOrWhiteSpace(serverName) && !string.IsNullOrWhiteSpace(databaseName))
+                {
+                    builder.DataSource = serverName;
+                    builder.InitialCatalog = databaseName;
+                }
+
+                builder.ApplicationIntent = ApplicationIntent.ReadOnly;
+                builder.ApplicationName = applicationName;
+                builder.IntegratedSecurity = true;
+                builder.MultiSubnetFailover = true;
+                var connectionString = "XpoProvider=MSSqlServer;" + builder.ConnectionString;
+                return new CustomStringConnectionParameters(connectionString);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI51904");
+            }
         }
     }
 }

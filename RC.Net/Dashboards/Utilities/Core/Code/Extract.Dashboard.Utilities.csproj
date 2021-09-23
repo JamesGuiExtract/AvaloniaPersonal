@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DashboardHelpers.cs" />
     <Compile Include="DashboardDataConverter.cs" />
     <Compile Include="DashboardExtensionMethods.cs" />
     <Compile Include="DashboardShared.cs" />

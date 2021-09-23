@@ -295,16 +295,14 @@ namespace Extract.ReportViewer
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI23510", ex);
-
                 // Check if logging or displaying exceptions
                 if (logException)
                 {
-                    ee.Log(exceptionLogFile);
+                    ex.AsExtract("ELI23510").Log(exceptionLogFile);
                 }
                 else
                 {
-                    ee.Display();
+                    ex.ExtractDisplay("ELI51908");
                 }
             }
             finally

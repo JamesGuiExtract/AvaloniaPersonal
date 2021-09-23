@@ -230,22 +230,13 @@ namespace Extract.Dashboard.Utilities
             {
                 // Since the database connection is changing the custom context menu items should be removed
                 _menuNeedsUpdating = true;
-
                 UpdateConfiguredDatabase(e.ConnectionParameters);
 
                 string server = _dashboardForm.IsDatabaseOverridden ? _dashboardForm.ServerName : string.Empty;
                 string database = _dashboardForm.IsDatabaseOverridden ? _dashboardForm.DatabaseName : string.Empty;
-                e.ConnectionParameters = e.ConnectionParameters.CreateConnectionParametersForReadOnly(server, database) ?? e.ConnectionParameters;
+                e.ConnectionParameters = e.ConnectionParameters.CreateConnectionParametersForReadOnly(server, database, _dashboardForm.ApplicationName)
+                    ?? e.ConnectionParameters;
 
-                // Set timeout to 0 (infinite) for all DataSources
-                foreach (var ds in _dashboardForm.CurrentDashboard.DataSources)
-                {
-                    var sqlDataSource = ds as DashboardSqlDataSource;
-                    if (sqlDataSource != null)
-                    {
-                        sqlDataSource.ConnectionOptions.DbCommandTimeout = 0;
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -1280,7 +1271,7 @@ namespace Extract.Dashboard.Utilities
         /// cref="GridDetailConfiguration.DataMemberUsedForFileName"/> as the column containing the filenames
         /// </summary>
         /// <param name="gridName">The ComponentName of the grid to get the selected files</param>
-        /// <returns><see cref="IEnumerable{String}"/> that containsthe selected files</returns>
+        /// <returns><see cref="IEnumerable{String}"/> that contains the selected files</returns>
         private IEnumerable<string> GetSelectedFiles(string gridName)
         {
             string dataMember = "FileName";
@@ -1320,7 +1311,7 @@ namespace Extract.Dashboard.Utilities
             }
             else if (customParameters != null)
             {
-                var builder = customParameters.CreateSQLConnectionBuilderFromParameters();
+                var builder = customParameters.CreateSqlConnectionBuilderFromParameters();
                 _dashboardForm.ConfiguredServerName = builder.DataSource;
                 _dashboardForm.ConfiguredDatabaseName = builder.InitialCatalog;
             }

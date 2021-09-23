@@ -1,4 +1,5 @@
-﻿using DevExpress.Skins;
+﻿using DevExpress.DashboardCommon;
+using DevExpress.Skins;
 using DevExpress.UserSkins;
 using Extract;
 using Extract.Licensing;
@@ -38,6 +39,8 @@ namespace DashboardCreator
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+
+                DashboardSqlDataSource.AllowCustomSqlQueries = true;
 
                 BonusSkins.Register();
                 SkinManager.EnableFormSkins();

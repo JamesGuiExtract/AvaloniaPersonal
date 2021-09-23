@@ -54,17 +54,7 @@ namespace ReportDesigner
                         }
                         serverName = args[a];
                     }
-                    //else if (args[a].Equals("/r", StringComparison.OrdinalIgnoreCase) ||
-                    //         args[a].Equals("/Report", StringComparison.OrdinalIgnoreCase))
-                    //{
-                    //    ++a;
-                    //    if (a >= args.Length)
-                    //    {
-                    //        Usage();
-                    //        return;
-                    //    }
-                    //    reportName = args[a];
-                    //}
+
                     else if (string.IsNullOrEmpty(reportFile))
                     {
                         reportFile = args[a];
@@ -85,7 +75,7 @@ namespace ReportDesigner
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new ReportDesignerForm(reportFile, reportName, serverName, databaseName));
+                Application.Run(new ReportDesignerForm(reportFile, serverName, databaseName));
             }
             catch (Exception ex)
             {
@@ -97,12 +87,9 @@ namespace ReportDesigner
         {
             UtilityMethods.ShowMessageBox("Usage: " +
                 "\r\nReportDesigner [<ReportFileName>]  [(/Server | /s) <ServerName> (/Database | /d) <DatabaseName> " +
-                //"(/Report | /r) <ReportName> ] " +
                 "\r\n\r\n<ReportFileName> -Report to open. " +
                 "\r\n\r\n/Server or /s <ServerName> - Server name. Requires /Database." +
                 "\r\n\r\n/Database or /d <DatabaseName> - Database name. Requires /Server." +
-                //"\r\n\r\n/Report or /r <ReportName> - *NOT IMPLEMENTED* - specifies report in " +
-                //"given database. Requires Server and database parameters. Only valid if <ReportFileName> is not specified." +
                 "\r\n\r\nNote: When Server and database are specified on the command line any report files opened will use the " +
                 "Server and Database specified on the command line. ",
                                           "Report designer usage",

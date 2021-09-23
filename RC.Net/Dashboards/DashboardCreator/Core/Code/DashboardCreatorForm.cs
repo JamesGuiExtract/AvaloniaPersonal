@@ -54,6 +54,8 @@ namespace DashboardCreator
 
         #region IExtractDashboardCommon Implementation
 
+        public string ApplicationName { get; } = "Extract Dashboard Designer";
+
         /// <summary>
         /// Gets the active dashboard from the underlying control
         /// </summary>
@@ -190,9 +192,17 @@ namespace DashboardCreator
         /// </summary>
         public DashboardCreatorForm()
         {
-            _dashboardShared = new DashboardShared<DashboardCreatorForm>(this);
-            InitializeComponent();
-            ExtractSettingsRibbonPage.Visible = SystemMethods.IsExtractInternal();
+            try
+            {
+                _dashboardShared = new DashboardShared<DashboardCreatorForm>(this);
+                InitializeComponent();
+                ExtractSettingsRibbonPage.Visible = SystemMethods.IsExtractInternal();
+                this.Designer.ValidateCustomSqlQuery += DashboardHelpers.HandleDashboardCustomSqlQuery;
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI51929");
+            }
         }
 
         /// <summary>
@@ -200,14 +210,10 @@ namespace DashboardCreator
         /// </summary>
         /// <param name="fileName">File containing the dashboard to open</param>
         public DashboardCreatorForm(string fileName)
+            :  this()
         {
             try
             {
-                _dashboardShared = new DashboardShared<DashboardCreatorForm>(this);
-
-                InitializeComponent();
-                ExtractSettingsRibbonPage.Visible = SystemMethods.IsExtractInternal();
-
                 _dashboardFileName = fileName;
                 if (!string.IsNullOrWhiteSpace(_dashboardFileName))
                 {

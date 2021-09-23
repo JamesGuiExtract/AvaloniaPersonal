@@ -33,6 +33,7 @@ namespace Extract.Dashboard.Utilities
                 using (var dashboard = new DevExpress.DashboardCommon.Dashboard())
                 {
                     dashboard.LoadFromXDocument(original);
+                    DashboardHelpers.AddAppRoleQuery(dashboard);
                     ExtractCustomData originalCustomData = new ExtractCustomData(original);
 
                     // Get all the SQL Data sources
@@ -41,7 +42,7 @@ namespace Extract.Dashboard.Utilities
                     foreach (var ds in sqlDataSources)
                     {
                         ds.ConnectionParameters = ds.ConnectionParameters?
-                            .CreateConnectionParametersForReadOnly(serverName, databaseName) ?? ds.ConnectionParameters;
+                            .CreateConnectionParametersForReadOnly(serverName, databaseName, "Extract datasource converter") ?? ds.ConnectionParameters;
 
                         if (ds.Queries.Any(q => q.Parameters.Count() > 0))
                         {
@@ -119,13 +120,21 @@ namespace Extract.Dashboard.Utilities
 
                     try
                     {
-                        using (var tempDS = new DashboardExtractDataSource())
+                        Retry<Exception> retry = new Retry<Exception>(1, 1);
+
+                        retry.DoRetry(() =>
                         {
+                            using var tempDS = new DashboardExtractDataSource();
                             // this is a clone of the datasource
                             tempDS.LoadFromXml(ds.SaveToXml());
                             tempDS.FileName = tempFileName;
+                            var sqlDataSource = tempDS.ExtractSourceOptions.DataSource as DashboardSqlDataSource;
+                            DashboardHelpers.AddAppRoleQuery(sqlDataSource);
+                            sqlDataSource.Connection.Open();
+                            sqlDataSource.Fill(sqlDataSource.Queries[0].Name);
                             tempDS.UpdateExtractFile(cancelToken);
-                        }
+                        });
+
                         // Copy the newly extracted file to extracted file
                         File.Copy(tempFileName, ds.FileName, true);
                     }
@@ -161,7 +170,7 @@ namespace Extract.Dashboard.Utilities
 
             foreach (var query in ds.Queries)
             {
-                var builder = ds.ConnectionParameters.CreateSQLConnectionBuilderFromParameters();
+                var builder = ds.ConnectionParameters.CreateSqlConnectionBuilderFromParameters();
                 if (builder is null)
                     return;
                 
@@ -179,7 +188,7 @@ namespace Extract.Dashboard.Utilities
                 }
 
                 ds.ConnectionParameters = ds.ConnectionParameters
-                    .CreateConnectionParametersForReadOnly(string.Empty, string.Empty);
+                    .CreateConnectionParametersForReadOnly(string.Empty, string.Empty, string.Empty);
 
                 DashboardExtractDataSource extractDataSource =
                     CreateExtractedDataSource(extractDataSourceDir, ds, query.Name, extractDataSourceName);

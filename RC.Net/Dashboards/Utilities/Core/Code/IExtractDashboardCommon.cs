@@ -11,6 +11,10 @@ namespace Extract.Dashboard.Utilities
     public interface IExtractDashboardCommon : IWin32Window, ISynchronizeInvoke, IDisposable
     {
         /// <summary>
+        /// Name of the application that this is for
+        /// </summary>
+        string ApplicationName { get; }
+        /// <summary>
         /// Gets the active dashboard from the underlying control
         /// </summary>
         DevExpress.DashboardCommon.Dashboard CurrentDashboard { get; }

@@ -1,7 +1,9 @@
+using DevExpress.DataAccess.Sql;
 using DevExpress.XtraBars.Ribbon;
 using DevExpress.XtraPrinting;
 using DevExpress.XtraReports.Parameters;
 using DevExpress.XtraReports.UI;
+using Extract.Dashboard.Utilities;
 using Extract.Licensing;
 using Extract.Reporting;
 using Extract.ReportingDevExpress.Properties;
@@ -730,6 +732,9 @@ namespace Extract.ReportingDevExpress
 
                     ReportGenerationTask = new Task(() =>
                     {
+                        SqlDataSource sqlSource = reportAsXtraReport.DataSource as SqlDataSource;
+                        DashboardHelpers.AddAppRoleQuery(sqlSource);
+                        sqlSource.Fill(DashboardHelpers.AppRoleQueryName(sqlSource));
                         reportAsXtraReport.CreateDocument();
                     },
                                                          TaskCreationOptions.LongRunning);

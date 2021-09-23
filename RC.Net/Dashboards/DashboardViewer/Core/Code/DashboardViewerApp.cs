@@ -1,9 +1,9 @@
-﻿using DevExpress.LookAndFeel;
+﻿using DevExpress.DashboardCommon;
+using DevExpress.LookAndFeel;
 using DevExpress.Skins;
 using DevExpress.UserSkins;
 using Extract;
 using Extract.Licensing;
-//using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Linq;
@@ -102,6 +102,7 @@ namespace Extract.DashboardViewer
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
+                DashboardSqlDataSource.AllowCustomSqlQueries = true;
 
                 BonusSkins.Register();
                 SkinManager.EnableFormSkins();
