@@ -1,1 +1,1 @@
-FlexIndexVersion=FlexIndex Ver. 11.8.0.25
+FlexIndexVersion=FlexIndex Ver. 11.8.0.26
