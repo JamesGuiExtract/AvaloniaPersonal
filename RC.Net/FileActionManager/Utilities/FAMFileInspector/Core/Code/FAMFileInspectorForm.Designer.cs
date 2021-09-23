@@ -78,6 +78,7 @@
             this._fileListPanel = new System.Windows.Forms.Panel();
             this._fileListDataGridView = new System.Windows.Forms.DataGridView();
             this._fileListFlagColumn = new System.Windows.Forms.DataGridViewImageColumn();
+            this._fileListIDColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._fileListNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._fileListPagesColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._fileListMatchesColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -775,6 +776,7 @@
             this._fileListDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this._fileListDataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this._fileListFlagColumn,
+            this._fileListIDColumn,
             this._fileListNameColumn,
             this._fileListPagesColumn,
             this._fileListMatchesColumn,
@@ -822,6 +824,14 @@
             this._fileListFlagColumn.ReadOnly = true;
             this._fileListFlagColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
             this._fileListFlagColumn.Width = 20;
+            // 
+            // _fileListIDColumn
+            // 
+            this._fileListIDColumn.FillWeight = 50F;
+            this._fileListIDColumn.HeaderText = "ID";
+            this._fileListIDColumn.Name = "_fileListIDColumn";
+            this._fileListIDColumn.ReadOnly = true;
+            this._fileListIDColumn.Width = 50;
             // 
             // _fileListNameColumn
             // 
@@ -1390,6 +1400,7 @@
         private Imaging.Forms.ThumbnailViewer _thumbnailViewer;
         private Imaging.Forms.ThumbnailViewerToolStripButton _thumbnailViewerToolStripButton;
         private System.Windows.Forms.DataGridViewImageColumn _fileListFlagColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn _fileListIDColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _fileListNameColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _fileListPagesColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn _fileListMatchesColumn;

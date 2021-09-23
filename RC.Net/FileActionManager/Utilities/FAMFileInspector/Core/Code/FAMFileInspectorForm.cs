@@ -109,7 +109,7 @@ namespace Extract.FileActionManager.Utilities
         /// The column from <see cref="_fileListDataGridView"/> that represents the results of the
         /// most recent search.
         /// </summary>
-        internal static int _FILE_LIST_MATCH_COLUMN_INDEX = 3;
+        internal static int _FILE_LIST_MATCH_COLUMN_INDEX = 4;
 
         /// <summary>
         /// The color of highlights to show found search terms in documents.
@@ -3956,7 +3956,7 @@ namespace Extract.FileActionManager.Utilities
                             fileData.PageCount = (int)row["Pages"];
 
                             var rowValues = new List<object>(new object[] 
-                                { flagValue, fileName, fileData.PageCount, fileData });
+                                { flagValue, fileData.FileID, fileName, fileData.PageCount, fileData });
 
                             // Add any the row values for any custom columns.
                             foreach (int index in _customColumns.Keys)
