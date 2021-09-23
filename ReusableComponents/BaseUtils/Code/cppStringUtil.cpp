@@ -745,6 +745,25 @@ void replaceExprStrsWithEnvValues(string& strForReplace)
         }
     }
 }
+//-------------------------------------------------------------------------------------------------
+string trim(string s)
+{
+    ltrim(s);
+    rtrim(s);
+    return s;
+}
+//-------------------------------------------------------------------------------------------------
+string trimStart(string s)
+{
+    ltrim(s);
+    return s;
+}
+//-------------------------------------------------------------------------------------------------
+string trimEnd(string s)
+{
+    rtrim(s);
+    return s;
+}
 //--------------------------------------------------------------------------------------------------
 string trim(const string& s, const string& strBefore, const string& strAfter) 
 {

@@ -165,7 +165,16 @@ STDMETHODIMP CFolderFS::raw_Start(IFileSupplierTarget * pTarget, IFAMTagManager 
 			{
 				// Pass an empty string as the second parameter because file supplier doesn't support <SourceDocName> tag 
 				// and we also don't have a source doc name to expand it [P13: 3901]
-				m_strExpandFolderName = CFileSupplierUtils::ExpandTagsAndTFE(pFAMTM, m_strFolderName, "");
+				// Trim trailing space characters since these are not valid for a windows file/folder name
+				m_strExpandFolderName = trimEnd(CFileSupplierUtils::ExpandTagsAndTFE(pFAMTM, m_strFolderName, ""));
+
+				// If the folder doesn't exist, trim leading space characters from the path
+				// https://extract.atlassian.net/browse/ISSUE-17695
+				if (!isValidFolder(m_strExpandFolderName))
+				{
+					m_strExpandFolderName = trimStart(m_strExpandFolderName);
+				}
+
 
 				// Check if the folder exists [P13: 4121, 4132]
 				if (!isFileOrFolderValid(m_strExpandFolderName))

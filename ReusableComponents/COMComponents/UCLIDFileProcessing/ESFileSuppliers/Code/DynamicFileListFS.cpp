@@ -348,7 +348,15 @@ STDMETHODIMP CDynamicFileListFS::raw_Start( IFileSupplierTarget *pTarget, IFAMTa
 				// Call ExpandTagsAndTFE() to expand tags and functions
 				// Pass an empty string as the second parameter because file supplier doesn't support <SourceDocName> tag 
 				// and we also don't have a source doc name to expand it [P13: 3901]
-				string strFileName = CFileSupplierUtils::ExpandTagsAndTFE(pFAMTM, m_strFileName, "");
+				// Trim trailing space characters since these are not valid for a windows file/folder name
+				string strFileName = trimEnd(CFileSupplierUtils::ExpandTagsAndTFE(pFAMTM, m_strFileName, ""));
+
+				// If the folder doesn't exist, trim leading space characters from the path
+				// https://extract.atlassian.net/browse/ISSUE-17695
+				if (!isValidFile(strFileName))
+				{
+					strFileName = trimStart(strFileName);
+				}
 
 				// Read each line of the input file
 				ifstream ifs( strFileName.c_str() );

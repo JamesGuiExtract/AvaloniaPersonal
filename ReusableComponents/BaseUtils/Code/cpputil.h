@@ -31,6 +31,8 @@
 #include <sstream>
 #include <functional>
 #include <random>
+#include <locale>
+#include <cctype>
 
 using namespace std;
 
@@ -707,6 +709,15 @@ EXPORT_BaseUtils LONGLONG asLongLong(const string& strValue);
 // PROMISE: return unsigned longlong quantity if valid string, else throw UCLID Exception
 EXPORT_BaseUtils ULONGLONG asUnsignedLongLong(const string& strValue);
 //-------------------------------------------------------------------------------------------------
+// Trim leading/trailing whitespace from a string
+EXPORT_BaseUtils string trim(string s);
+//-------------------------------------------------------------------------------------------------
+// Trim leading/trailing whitespace from a string
+EXPORT_BaseUtils string trimStart(string s);
+//-------------------------------------------------------------------------------------------------
+// Trim leading/trailing whitespace from a string
+EXPORT_BaseUtils string trimEnd(string s);
+//-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils string trim(const string& s, 
                              const string& strBefore, 
                              const string& strAfter);
@@ -1147,3 +1158,19 @@ vector<T>& shuffleVector(vector<T>& vectorToShuffle)
     std::shuffle(vectorToShuffle.begin(), vectorToShuffle.end(), g);
     return vectorToShuffle;
 }
+//-------------------------------------------------------------------------------------------------
+namespace {
+    // Trim whitespace from start of string (in place)
+    inline void ltrim(std::string& s) {
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+            return !std::isspace(ch);
+            }));
+    }
+    // Trim whitespace from end of string (in place)
+    inline void rtrim(std::string& s) {
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+            return !std::isspace(ch);
+            }).base(), s.end());
+    }
+}
+//-------------------------------------------------------------------------------------------------
