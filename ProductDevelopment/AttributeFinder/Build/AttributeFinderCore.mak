@@ -368,7 +368,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\LearningMachineTrainer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\MLModelTrainer.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Extract.SqlDatabase.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Microsoft.Data.ConnectionUI.SQLiteDataProvider.local.dll"" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Microsoft.Data.ConnectionUI.SQLiteDataProvider.local.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Microsoft.Data.ConnectionUI.SqlCeDataProvider.local.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Obfuscated\Microsoft.Data.ConnectionUI.Dialog.local.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y  "$(BinariesFolder)\Microsoft.Data.ConnectionUI.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
