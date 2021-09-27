@@ -68,6 +68,10 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\Utilities\Authentication\Extract.Utilities.Authentication.csproj">
+      <Project>{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}</Project>
+      <Name>Extract.Utilities.Authentication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>

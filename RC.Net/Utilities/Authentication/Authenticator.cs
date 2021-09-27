@@ -42,6 +42,19 @@ namespace Extract.Utilities.Authentication
             ClientId = _fileProcessingDB.GetDBInfoSetting("AzureClientId", false);
             Tenant = _fileProcessingDB.GetDBInfoSetting("AzureTenant", false);
             Instance = _fileProcessingDB.GetDBInfoSetting("AzureInstance", false);
+
+            if (string.IsNullOrEmpty(ClientId))
+            {
+                throw new ExtractException("ELI51888", "You need to specify a ClientId in the database administration tool (azure settings).");
+            }
+            if (string.IsNullOrEmpty(Tenant))
+            {
+                throw new ExtractException("ELI51889", "You need to specify a tennant in the database administration tool (azure settings).");
+            }
+            if (string.IsNullOrEmpty(Instance))
+            {
+                throw new ExtractException("ELI51890", "You need to specify a instance in the database administration tool (azure settings).");
+            }
         }
 
         /// <summary>
@@ -51,7 +64,7 @@ namespace Extract.Utilities.Authentication
         {
             if (PublicClientApp != null)
             {
-                SignOut();
+                await SignOut();
             }
 
             AuthenticationResult authResult;
@@ -116,7 +129,7 @@ namespace Extract.Utilities.Authentication
         /// <summary>
         /// Sign out the current user
         /// </summary>
-        private async void SignOut()
+        private async Task SignOut()
         {
             var accounts = await PublicClientApp.GetAccountsAsync();
             if (accounts.Any())
@@ -124,13 +137,13 @@ namespace Extract.Utilities.Authentication
                 try
                 {
                     await PublicClientApp.RemoveAsync(accounts.FirstOrDefault());
-
                 }
                 catch (MsalException ex)
                 {
                     throw new ExtractException("ELI51785", $"Error signing-out user: {ex.Message}");
                 }
             }
+            return;
         }
 
         public void CreateApplication(bool useWam)

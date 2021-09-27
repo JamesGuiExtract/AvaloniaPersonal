@@ -1,4 +1,5 @@
 ﻿using Extract.Licensing;
+using Extract.Utilities.Authentication;
 using System;
 using System.IO;
 using System.Text;
@@ -86,6 +87,11 @@ namespace Extract.FileActionManager.Utilities
         /// https://extract.atlassian.net/browse/ISSUE-12702
         /// </summary>
         static string _voaPathExpression = "<SourceDocName>.voa";
+        
+        /// <summary>
+        /// A one time password that can bypass authentication (it makes the assumption something else authenticated the user).
+        /// </summary>
+        static string _oneTimePassword;
 
         #endregion Fields
 
@@ -116,7 +122,7 @@ namespace Extract.FileActionManager.Utilities
                 }
 
                 var famFileInspectorForm = new FAMFileInspectorForm();
-
+                    
                 if (!string.IsNullOrWhiteSpace(_databaseServer))
                 {
                     famFileInspectorForm.DatabaseServer = _databaseServer;
@@ -140,23 +146,19 @@ namespace Extract.FileActionManager.Utilities
                     famFileInspectorForm.FileListFileName = _fileListFileName;
                 }
 
-                if (_fileCount.HasValue)
-                {
-                    famFileInspectorForm.MaxFilesToDisplay = _fileCount.Value;
-                }
-                if (_subsetType.HasValue)
-                {
-                    famFileInspectorForm.SubsetType = _subsetType.Value;
-                }
+                famFileInspectorForm.MaxFilesToDisplay = _fileCount.HasValue ? _fileCount.Value : famFileInspectorForm.MaxFilesToDisplay;
+                famFileInspectorForm.SubsetType = _subsetType.HasValue ? _subsetType.Value : famFileInspectorForm.SubsetType;
                 famFileInspectorForm.VOAPathExpression = _voaPathExpression;
 
-                if (!string.IsNullOrWhiteSpace(famFileInspectorForm.SourceDirectory))
+                // Both of the conditions below will start the application.
+                if(!string.IsNullOrWhiteSpace(famFileInspectorForm.SourceDirectory) || !string.IsNullOrWhiteSpace(famFileInspectorForm.FileListFileName))
                 {
-                    Application.Run(famFileInspectorForm);
-                    return;
-                }
-                else if (!string.IsNullOrWhiteSpace(famFileInspectorForm.FileListFileName))
-                {
+                    AuthenticationProvider authenticationProvider = new();
+                    if (authenticationProvider.IsAuthenticationRequired(famFileInspectorForm.DatabaseName, famFileInspectorForm.DatabaseServer, _oneTimePassword))
+                    {
+                        authenticationProvider.PromptForAndValidateWindowsCredentialsWinForms(famFileInspectorForm.DatabaseName, famFileInspectorForm.DatabaseServer);
+                    }
+
                     Application.Run(famFileInspectorForm);
                     return;
                 }
@@ -181,6 +183,12 @@ namespace Extract.FileActionManager.Utilities
                             ApplyConditions(famFileInspectorForm);
 
                             famFileInspectorForm.ResetSearch();
+
+                            AuthenticationProvider authenticationProvider = new();
+                            if (authenticationProvider.IsAuthenticationRequired(famFileInspectorForm.DatabaseName, famFileInspectorForm.DatabaseServer, _oneTimePassword))
+                            {
+                                authenticationProvider.PromptForAndValidateWindowsCredentialsWinForms(famFileInspectorForm.DatabaseName, famFileInspectorForm.DatabaseServer);
+                            }
 
                             Application.Run(famFileInspectorForm);
                         }
@@ -497,6 +505,16 @@ namespace Extract.FileActionManager.Utilities
                 else if (argument.Equals("/r", StringComparison.OrdinalIgnoreCase))
                 {
                     _recursive = true;
+                }
+                else if(argument.Equals("/onetimepassword", StringComparison.OrdinalIgnoreCase))
+                {
+                    i++;
+                    if(i == args.Length)
+                    {
+                        ShowUsage("One time password expected.");
+                        return false;
+                    }
+                    _oneTimePassword = args[i];
                 }
                 else if (i == 0)
                 {

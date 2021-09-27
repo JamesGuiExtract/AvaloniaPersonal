@@ -310,7 +310,7 @@ void CFAMDBAdminDlg::OnInspectFiles()
 	
 	try
 	{
-		m_ipFAMFileInspector->OpenFAMFileInspector(m_ipFAMDB, __nullptr, false, "", __nullptr, 0);
+		m_ipFAMFileInspector->OpenFAMFileInspector(m_ipFAMDB, __nullptr, false, "", __nullptr, 0, m_ipFAMDB->GetOneTimePassword());
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI35799");
 }
