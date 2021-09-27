@@ -513,7 +513,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\System.Drawing.Common.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\System.IO.FileSystem.AccessControl.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\System.Threading.Channels.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V /Y "$(BinariesFolder)\System.Task.Extensions.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(BinariesFolder)\System.Threading.Tasks.Extensions.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\System.Runtime.CompilerServices.Unsafe.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Microsoft.Bcl.AsyncInterfaces.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\TensorFlow.NET.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
