@@ -431,6 +431,9 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\Tabula.IKVM.exe" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(LEADTOOLS_API_DOTNET)\*.*"  "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(BinariesFolder)\linq2db.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\System.Threading.Tasks.Extensions.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\System.Runtime.CompilerServices.Unsafe.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /V /Y "$(BinariesFolder)\Microsoft.Bcl.AsyncInterfaces.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	
 # Copy all the FOSS license files
 	@COPY /V /Y "$(RCNETDir)\APIs\Licenses\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"	
