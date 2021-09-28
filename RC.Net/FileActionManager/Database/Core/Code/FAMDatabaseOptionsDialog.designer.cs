@@ -111,7 +111,7 @@
             label2.Location = new System.Drawing.Point(6, 192);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(353, 13);
-            label2.TabIndex = 2;
+            label2.TabIndex = 9;
             label2.Text = "Skip authentication when running as a service on the following machines:";
             // 
             // label4
@@ -445,10 +445,10 @@
             // _configurePasswordRequirementsButton
             // 
             this._configurePasswordRequirementsButton.AutoSize = true;
-            this._configurePasswordRequirementsButton.Location = new System.Drawing.Point(6, 30);
+            this._configurePasswordRequirementsButton.Location = new System.Drawing.Point(6, 6);
             this._configurePasswordRequirementsButton.Name = "_configurePasswordRequirementsButton";
             this._configurePasswordRequirementsButton.Size = new System.Drawing.Size(182, 23);
-            this._configurePasswordRequirementsButton.TabIndex = 12;
+            this._configurePasswordRequirementsButton.TabIndex = 0;
             this._configurePasswordRequirementsButton.Text = "Configure password requirements...";
             this._configurePasswordRequirementsButton.UseVisualStyleBackColor = true;
             this._configurePasswordRequirementsButton.Click += new System.EventHandler(this.HandleConfigurePasswordRequirementsButton_Click);
@@ -458,14 +458,14 @@
             this._azureInstance.Location = new System.Drawing.Point(88, 139);
             this._azureInstance.Name = "_azureInstance";
             this._azureInstance.Size = new System.Drawing.Size(364, 20);
-            this._azureInstance.TabIndex = 11;
+            this._azureInstance.TabIndex = 8;
             // 
             // _azureTenant
             // 
             this._azureTenant.Location = new System.Drawing.Point(88, 114);
             this._azureTenant.Name = "_azureTenant";
             this._azureTenant.Size = new System.Drawing.Size(364, 20);
-            this._azureTenant.TabIndex = 10;
+            this._azureTenant.TabIndex = 6;
             // 
             // betterLabel3
             // 
@@ -473,7 +473,7 @@
             this.betterLabel3.Location = new System.Drawing.Point(7, 142);
             this.betterLabel3.Name = "betterLabel3";
             this.betterLabel3.Size = new System.Drawing.Size(78, 13);
-            this.betterLabel3.TabIndex = 9;
+            this.betterLabel3.TabIndex = 7;
             this.betterLabel3.Text = "Azure Instance";
             // 
             // betterLabel2
@@ -482,7 +482,7 @@
             this.betterLabel2.Location = new System.Drawing.Point(7, 118);
             this.betterLabel2.Name = "betterLabel2";
             this.betterLabel2.Size = new System.Drawing.Size(71, 13);
-            this.betterLabel2.TabIndex = 8;
+            this.betterLabel2.TabIndex = 5;
             this.betterLabel2.Text = "Azure Tenant";
             // 
             // betterLabel1
@@ -491,7 +491,7 @@
             this.betterLabel1.Location = new System.Drawing.Point(7, 92);
             this.betterLabel1.Name = "betterLabel1";
             this.betterLabel1.Size = new System.Drawing.Size(77, 13);
-            this.betterLabel1.TabIndex = 7;
+            this.betterLabel1.TabIndex = 3;
             this.betterLabel1.Text = "Azure Client ID";
             // 
             // _azureClientID
@@ -499,7 +499,7 @@
             this._azureClientID.Location = new System.Drawing.Point(88, 89);
             this._azureClientID.Name = "_azureClientID";
             this._azureClientID.Size = new System.Drawing.Size(364, 20);
-            this._azureClientID.TabIndex = 6;
+            this._azureClientID.TabIndex = 4;
             // 
             // _buttonRemoveMachine
             // 
@@ -507,7 +507,7 @@
             this._buttonRemoveMachine.Location = new System.Drawing.Point(377, 266);
             this._buttonRemoveMachine.Name = "_buttonRemoveMachine";
             this._buttonRemoveMachine.Size = new System.Drawing.Size(75, 23);
-            this._buttonRemoveMachine.TabIndex = 5;
+            this._buttonRemoveMachine.TabIndex = 13;
             this._buttonRemoveMachine.Text = "Remove";
             this._buttonRemoveMachine.UseVisualStyleBackColor = true;
             this._buttonRemoveMachine.Click += new System.EventHandler(this.HandleRemoveMachineNamesClicked);
@@ -518,7 +518,7 @@
             this._buttonModifyMachine.Location = new System.Drawing.Point(377, 237);
             this._buttonModifyMachine.Name = "_buttonModifyMachine";
             this._buttonModifyMachine.Size = new System.Drawing.Size(75, 23);
-            this._buttonModifyMachine.TabIndex = 4;
+            this._buttonModifyMachine.TabIndex = 12;
             this._buttonModifyMachine.Text = "Modify...";
             this._buttonModifyMachine.UseVisualStyleBackColor = true;
             this._buttonModifyMachine.Click += new System.EventHandler(this.HandleModifyMachineNameClick);
@@ -529,7 +529,7 @@
             this._buttonAddMachine.Location = new System.Drawing.Point(377, 208);
             this._buttonAddMachine.Name = "_buttonAddMachine";
             this._buttonAddMachine.Size = new System.Drawing.Size(75, 23);
-            this._buttonAddMachine.TabIndex = 3;
+            this._buttonAddMachine.TabIndex = 11;
             this._buttonAddMachine.Text = "Add...";
             this._buttonAddMachine.UseVisualStyleBackColor = true;
             this._buttonAddMachine.Click += new System.EventHandler(this.HandleAddMachineNameButtonClicked);
@@ -543,7 +543,7 @@
             this._listMachinesToAuthenticate.Name = "_listMachinesToAuthenticate";
             this._listMachinesToAuthenticate.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this._listMachinesToAuthenticate.Size = new System.Drawing.Size(362, 95);
-            this._listMachinesToAuthenticate.TabIndex = 2;
+            this._listMachinesToAuthenticate.TabIndex = 10;
             this._listMachinesToAuthenticate.SelectedIndexChanged += new System.EventHandler(this.HandleMachineToSkipSelectionChanged);
             // 
             // _checkRequireAuthenticationToRun
@@ -552,17 +552,17 @@
             this._checkRequireAuthenticationToRun.Location = new System.Drawing.Point(7, 66);
             this._checkRequireAuthenticationToRun.Name = "_checkRequireAuthenticationToRun";
             this._checkRequireAuthenticationToRun.Size = new System.Drawing.Size(163, 17);
-            this._checkRequireAuthenticationToRun.TabIndex = 1;
+            this._checkRequireAuthenticationToRun.TabIndex = 2;
             this._checkRequireAuthenticationToRun.Text = "Require authentication to run";
             this._checkRequireAuthenticationToRun.UseVisualStyleBackColor = true;
             // 
             // _checkRequirePasswordForSkipped
             // 
             this._checkRequirePasswordForSkipped.AutoSize = true;
-            this._checkRequirePasswordForSkipped.Location = new System.Drawing.Point(7, 7);
+            this._checkRequirePasswordForSkipped.Location = new System.Drawing.Point(7, 38);
             this._checkRequirePasswordForSkipped.Name = "_checkRequirePasswordForSkipped";
             this._checkRequirePasswordForSkipped.Size = new System.Drawing.Size(371, 17);
-            this._checkRequirePasswordForSkipped.TabIndex = 0;
+            this._checkRequirePasswordForSkipped.TabIndex = 1;
             this._checkRequirePasswordForSkipped.Text = "Require FAM database administrator password to process all skipped files";
             this._checkRequirePasswordForSkipped.UseVisualStyleBackColor = true;
             // 
