@@ -160,10 +160,6 @@
       <Project>{3a0fa1ac-f8aa-477a-b0b0-3630091e520b}</Project>
       <Name>Extract.Reporting</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\Utilities\Authentication\Extract.Utilities.Authentication.csproj">
-      <Project>{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}</Project>
-      <Name>Extract.Utilities.Authentication</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj">
       <Project>{DC72C952-D6ED-42F6-893D-8262BC9D183E}</Project>
       <Name>Extract.Utilities.Parsers</Name>

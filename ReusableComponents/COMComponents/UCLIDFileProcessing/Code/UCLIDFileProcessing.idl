@@ -2993,6 +2993,28 @@ library UCLID_FILEPROCESSINGLib
 		[propget, id(3), helpstring("property AlertMultiple")] HRESULT AlertMultiple([out, retval] long* pnAlertMultiple);
 	}
 
+	//-----------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(96A5FF2E-0EAC-4792-BCE5-C184F8F43871),
+		dual,
+		helpstring("IAuthenticationProvider Interface"),
+		pointer_default(unique)
+	]
+	interface IAuthenticationProvider : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+        // Display a login window and validate the input credentials against the Azure Active Directory
+        // per the app registration configured in the specified file processing database.
+		[id(1), helpstring("method PromptForAndValidateWindowsCredentials")]
+			HRESULT PromptForAndValidateWindowsCredentials ([in] IFileProcessingDB *database);
+		//-----------------------------------------------------------------------------------------
+        // Check to see if it is necessary to have a user authenticate against a domain acccount
+		[id(2), helpstring("method IsAuthenticationRequired")]
+			HRESULT IsAuthenticationRequired ([in] IFileProcessingDB *database, [in] BSTR onetimePassword,
+				[out, retval] VARIANT_BOOL* pbResult);
+	}
+
 	//----------------------------------------------------------------------------------------------
 	//-C O C L A S S E S ---------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------

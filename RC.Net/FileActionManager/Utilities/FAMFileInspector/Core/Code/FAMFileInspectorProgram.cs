@@ -1,8 +1,9 @@
-﻿using Extract.Licensing;
-using Extract.Utilities.Authentication;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Licensing;
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using UCLID_FILEPROCESSINGLib;
 
@@ -151,13 +152,11 @@ namespace Extract.FileActionManager.Utilities
                 famFileInspectorForm.VOAPathExpression = _voaPathExpression;
 
                 // Both of the conditions below will start the application.
-                if(!string.IsNullOrWhiteSpace(famFileInspectorForm.SourceDirectory) || !string.IsNullOrWhiteSpace(famFileInspectorForm.FileListFileName))
+                if (!string.IsNullOrWhiteSpace(famFileInspectorForm.SourceDirectory)
+                    || !string.IsNullOrWhiteSpace(famFileInspectorForm.FileListFileName))
                 {
-                    AuthenticationProvider authenticationProvider = new();
-                    if (authenticationProvider.IsAuthenticationRequired(famFileInspectorForm.DatabaseName, famFileInspectorForm.DatabaseServer, _oneTimePassword))
-                    {
-                        authenticationProvider.PromptForAndValidateWindowsCredentialsWinForms(famFileInspectorForm.DatabaseName, famFileInspectorForm.DatabaseServer);
-                    }
+                    FAMAuthentication.PromptForAndValidateWindowsCredentialsIfRequired
+                        (famFileInspectorForm.DatabaseServer, famFileInspectorForm.DatabaseName, _oneTimePassword);
 
                     Application.Run(famFileInspectorForm);
                     return;
@@ -184,11 +183,8 @@ namespace Extract.FileActionManager.Utilities
 
                             famFileInspectorForm.ResetSearch();
 
-                            AuthenticationProvider authenticationProvider = new();
-                            if (authenticationProvider.IsAuthenticationRequired(famFileInspectorForm.DatabaseName, famFileInspectorForm.DatabaseServer, _oneTimePassword))
-                            {
-                                authenticationProvider.PromptForAndValidateWindowsCredentialsWinForms(famFileInspectorForm.DatabaseName, famFileInspectorForm.DatabaseServer);
-                            }
+                            FAMAuthentication.PromptForAndValidateWindowsCredentialsIfRequired
+                                (famFileInspectorForm.DatabaseServer, famFileInspectorForm.DatabaseName, _oneTimePassword);
 
                             Application.Run(famFileInspectorForm);
                         }

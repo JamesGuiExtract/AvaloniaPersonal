@@ -1,5 +1,5 @@
-﻿using Extract.Utilities;
-using Extract.Utilities.Authentication;
+﻿using Extract.FileActionManager.Forms;
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Linq;
@@ -110,11 +110,7 @@ namespace Extract.FileActionManager.Utilities
         {
             try
             {
-                AuthenticationProvider authenticationProvider = new();
-                if(authenticationProvider.IsAuthenticationRequired(fileProcessingDB.DatabaseName, fileProcessingDB.DatabaseServer,oneTimePassword))
-                {
-                    authenticationProvider.PromptForAndValidateWindowsCredentialsWinForms(fileProcessingDB.DatabaseName, fileProcessingDB.DatabaseServer);
-                }
+                FAMAuthentication.PromptForAndValidateWindowsCredentialsIfRequired(fileProcessingDB, oneTimePassword);
 
                 lock (_lock)
                 {

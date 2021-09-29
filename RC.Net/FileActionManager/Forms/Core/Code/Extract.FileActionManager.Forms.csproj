@@ -74,6 +74,7 @@
     <Reference Include="edtFTPnetPRO, Version=7.3.1.20, Culture=neutral, PublicKeyToken=0dce1ad63760d80b, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\APIs\EnterpriseDT\Bin\edtFTPnetPRO.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -164,6 +165,7 @@
     <Compile Include="TagFileToolStripButton.Designer.cs">
       <DependentUpon>TagFileToolStripButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="FAMAuthentication.cs" />
     <Compile Include="VerificationForm.cs" />
   </ItemGroup>
   <ItemGroup>

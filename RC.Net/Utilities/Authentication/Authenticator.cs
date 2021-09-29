@@ -17,43 +17,38 @@ namespace Extract.Utilities.Authentication
         //   - for any Work or School accounts, use organizations
         //   - for any Work or School accounts, or Microsoft personal account, use bd07e2c0-7f9a-478c-a4f2-0d3865717565
         //   - for Microsoft Personal account, use consumers
-        private readonly string ClientId;// = "190b65ca-620a-4979-95eb-f79c4b0da944";
+        private readonly string _clientId;// = "190b65ca-620a-4979-95eb-f79c4b0da944";
 
         // Note: Tenant is important for the quickstart.
-        private readonly string Tenant;// = "bd07e2c0-7f9a-478c-a4f2-0d3865717565";
-        private readonly string Instance;// = "https://login.microsoftonline.com/";
+        private readonly string _tenant;// = "bd07e2c0-7f9a-478c-a4f2-0d3865717565";
+        private readonly string _instance;// = "https://login.microsoftonline.com/";
         private IPublicClientApplication _clientApp;
-
-        public IPublicClientApplication PublicClientApp { get { return _clientApp; } }
 
         //Set the scope for API call to user.read
         readonly string[] scopes = new string[] { "user.read" };
 
         private readonly FileProcessingDB _fileProcessingDB;
 
-        public Authenticator(string databaseName, string databaseServer)
+        [CLSCompliant(false)]
+        public Authenticator(FileProcessingDB fileProcessingDB)
         {
-            _fileProcessingDB = new FileProcessingDB()
-            {
-                DatabaseServer = databaseServer,
-                DatabaseName = databaseName
-            };
+            _fileProcessingDB = fileProcessingDB;
 
-            ClientId = _fileProcessingDB.GetDBInfoSetting("AzureClientId", false);
-            Tenant = _fileProcessingDB.GetDBInfoSetting("AzureTenant", false);
-            Instance = _fileProcessingDB.GetDBInfoSetting("AzureInstance", false);
+            _clientId = _fileProcessingDB.GetDBInfoSetting("AzureClientId", false);
+            _tenant = _fileProcessingDB.GetDBInfoSetting("AzureTenant", false);
+            _instance = _fileProcessingDB.GetDBInfoSetting("AzureInstance", false);
 
-            if (string.IsNullOrEmpty(ClientId))
+            if (string.IsNullOrWhiteSpace(_clientId))
             {
                 throw new ExtractException("ELI51888", "You need to specify a ClientId in the database administration tool (azure settings).");
             }
-            if (string.IsNullOrEmpty(Tenant))
+            if (string.IsNullOrWhiteSpace(_tenant))
             {
-                throw new ExtractException("ELI51889", "You need to specify a tennant in the database administration tool (azure settings).");
+                throw new ExtractException("ELI51889", "You need to specify a Tenant in the database administration tool (azure settings).");
             }
-            if (string.IsNullOrEmpty(Instance))
+            if (string.IsNullOrWhiteSpace(_instance))
             {
-                throw new ExtractException("ELI51890", "You need to specify a instance in the database administration tool (azure settings).");
+                throw new ExtractException("ELI51890", "You need to specify an Instance in the database administration tool (azure settings).");
             }
         }
 
@@ -62,7 +57,7 @@ namespace Extract.Utilities.Authentication
         /// </summary>
         public async Task<AuthenticationResult> SignInMicrosoftGraph(bool forceMFA)
         {
-            if (PublicClientApp != null)
+            if (_clientApp != null)
             {
                 await SignOut();
             }
@@ -75,7 +70,7 @@ namespace Extract.Utilities.Authentication
             if(forceMFA)
             {
                 //  Use any account(Azure AD). It's not using WAM
-                var accounts = await PublicClientApp.GetAccountsAsync();
+                var accounts = await _clientApp.GetAccountsAsync();
                 firstAccount = accounts.FirstOrDefault();
             }
             else
@@ -88,42 +83,17 @@ namespace Extract.Utilities.Authentication
 
             try
             {
-                authResult = await PublicClientApp.AcquireTokenInteractive(scopes)
+                authResult = await _clientApp.AcquireTokenInteractive(scopes)
                        .WithAccount(firstAccount)
                        .WithPrompt(Prompt.ForceLogin)
                        .ExecuteAsync();
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI51784", $"Error Acquiring Token:{Environment.NewLine}{ex}");
+                throw new ExtractException("ELI51784", "Error Acquiring Token", ex);
             }
 
             return authResult;
-        }
-
-        /// <summary>
-        /// Perform an HTTP GET request to a URL using an HTTP Authorization header
-        /// </summary>
-        /// <param name="url">The URL</param>
-        /// <param name="token">The token</param>
-        /// <returns>String containing the results of the GET operation</returns>
-        public async Task<string> GetHttpContentWithToken(string url, string token)
-        {
-            var httpClient = new System.Net.Http.HttpClient();
-            System.Net.Http.HttpResponseMessage response;
-            try
-            {
-                var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, url);
-                //Add the token in Authorization header
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                response = await httpClient.SendAsync(request);
-                var content = await response.Content.ReadAsStringAsync();
-                return content;
-            }
-            catch (Exception ex)
-            {
-                return ex.ToString();
-            }
         }
 
         /// <summary>
@@ -131,25 +101,24 @@ namespace Extract.Utilities.Authentication
         /// </summary>
         private async Task SignOut()
         {
-            var accounts = await PublicClientApp.GetAccountsAsync();
+            var accounts = await _clientApp.GetAccountsAsync();
             if (accounts.Any())
             {
                 try
                 {
-                    await PublicClientApp.RemoveAsync(accounts.FirstOrDefault());
+                    await _clientApp.RemoveAsync(accounts.FirstOrDefault());
                 }
                 catch (MsalException ex)
                 {
-                    throw new ExtractException("ELI51785", $"Error signing-out user: {ex.Message}");
+                    throw new ExtractException("ELI51785", "Error signing-out user", ex);
                 }
             }
-            return;
         }
 
         public void CreateApplication(bool useWam)
         {
-            var builder = PublicClientApplicationBuilder.Create(ClientId)
-                .WithAuthority($"{Instance}{Tenant}")
+            var builder = PublicClientApplicationBuilder.Create(_clientId)
+                .WithAuthority($"{_instance}{_tenant}")
                 .WithDefaultRedirectUri();
 
             if (useWam)

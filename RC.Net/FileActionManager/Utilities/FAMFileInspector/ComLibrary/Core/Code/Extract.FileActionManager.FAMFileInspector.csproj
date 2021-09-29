@@ -68,10 +68,6 @@
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\..\Utilities\Authentication\Extract.Utilities.Authentication.csproj">
-      <Project>{0C7AD172-7B54-4E9B-B7BD-46CF68B977E2}</Project>
-      <Name>Extract.Utilities.Authentication</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
@@ -79,6 +75,10 @@
     <ProjectReference Include="..\..\..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
       <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Forms\Core\Code\Extract.FileActionManager.Forms.csproj">
+      <Project>{05449E7C-D300-4A2A-AD14-57CE9630B49B}</Project>
+      <Name>Extract.FileActionManager.Forms</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Core\Code\FAMFileInspector.csproj">
       <Project>{2189A8DE-A35D-4969-9E88-371A87418785}</Project>

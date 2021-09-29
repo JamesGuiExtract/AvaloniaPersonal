@@ -1893,7 +1893,7 @@ bool CFileProcessingManager::authenticateForProcessing()
 	{
 		VARIANT_BOOL vbCancelled;
 		
-		IAuthenticationProviderPtr ipAuthenticationProvider(__nullptr);
+		UCLID_FILEPROCESSINGLib::IAuthenticationProviderPtr ipAuthenticationProvider(__nullptr);
 		SECURE_CREATE_OBJECT("ELI49621",
 			ipAuthenticationProvider, "Extract.Utilities.AuthenticationProvider");
 
@@ -1906,15 +1906,11 @@ bool CFileProcessingManager::authenticateForProcessing()
 
 		try
 		{
-			auto fileProcessingDB = getFPMDB();
-
-			_bstr_t databaseName = fileProcessingDB->DatabaseName;
-			_bstr_t databaseServer = fileProcessingDB->DatabaseServer;
-			ipAuthenticationProvider->PromptForAndValidateWindowsCredentials(databaseName, databaseServer);
+			ipAuthenticationProvider->PromptForAndValidateWindowsCredentials(getFPMDB());
 		}
 		catch (...)
 		{
-			MessageBox(hParent, "Unable to validate your domain credentials.", "Invalid creditials", MB_OK);
+			MessageBox(hParent, "Unable to validate your domain credentials.", "Invalid credentials", MB_OK);
 			return false;
 		}
 	}
