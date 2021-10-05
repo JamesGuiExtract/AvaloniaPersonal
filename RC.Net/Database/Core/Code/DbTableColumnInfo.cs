@@ -195,7 +195,7 @@ namespace Extract.Database
             var query = String.Format(CultureInfo.InvariantCulture, "SELECT TOP (1) * FROM [{0}];", TableName);
             using (DbCommand cmd = DBMethods.CreateDBCommand(connection, query, null))
             {
-                var reader = cmd.ExecuteReader();
+                using var reader = cmd.ExecuteReader();
                 using (DataTable dt = reader.GetSchemaTable())
                 {
                     foreach (DataRow dr in dt.Rows)

@@ -212,10 +212,11 @@ namespace Extract.ETL.Management
                 connection.Open();
 
                 using var command = connection.CreateCommand();
+                using var reader = command.ExecuteReader();
 
                 command.CommandText = _DatabaseServiceSql;
 
-                table.Load(command.ExecuteReader());
+                table.Load(reader);
 
                 var dataToDisplay = table.AsEnumerable()
                     .Select(r =>
@@ -291,7 +292,7 @@ namespace Extract.ETL.Management
             command.CommandText = _DatabaseServiceSql + " WHERE ID = @DatabaseServiceID";
             command.Parameters.AddWithValue("@DatabaseServiceID", currentData.ID);
 
-            var data = command.ExecuteReader();
+            using var data = command.ExecuteReader();
             if (!data.Read())
             {
                 MessageBox.Show("Database Service no longer exists.");

@@ -311,7 +311,8 @@ namespace Extract.ETL.Test
                 {
                     statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
                     statusCmd.Parameters.AddWithValue("@DatabaseServiceID", dataCaptureAccuracy.DatabaseServiceID);
-                    var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                    using var reader = statusCmd.ExecuteReader();
+                    var result = reader.Cast<IDataRecord>().SingleOrDefault();
                     Assert.AreNotEqual(null, result, "A single record should be returned");
                     Assert.AreNotEqual(DBNull.Value, result["Status"], "Status should not be null");
                     Assert.AreNotEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should not be null");
@@ -322,7 +323,8 @@ namespace Extract.ETL.Test
                 {
                     statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
                     statusCmd.Parameters.AddWithValue("@DatabaseServiceID", dataCaptureAccuracy.DatabaseServiceID);
-                    var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                    using var reader = statusCmd.ExecuteReader();
+                    var result = reader.Cast<IDataRecord>().SingleOrDefault();
                     Assert.AreNotEqual(null, result, "A single record should be returned");
                     Assert.AreEqual(DBNull.Value, result["Status"], "Status should not be null");
                     Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should not be null");
@@ -389,6 +391,7 @@ namespace Extract.ETL.Test
         /// <param name="expected">The Expected results</param>
         static void CheckResults(SqlDataReader foundResults, DataEntryAccuracyList expected)
         {
+            using foundResults;
             // Convert reader to IEnummerable 
             var results = foundResults.Cast<IDataRecord>();
 

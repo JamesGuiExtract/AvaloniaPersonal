@@ -476,7 +476,8 @@ namespace Extract.Dashboard.Forms
 
                 DataTable dataTable = new DataTable();
                 dataTable.Locale = CultureInfo.CurrentCulture;
-                dataTable.Load(command.ExecuteReader());
+                using var reader = command.ExecuteReader();
+                dataTable.Load(reader);
                 dashboardDataGridView.DataSource = dataTable;
                 dashboardDataGridView.Columns["DashboardName"].HeaderText = "Dashboard Name";
                 dashboardDataGridView.Columns["DashboardName"].FillWeight = 400;

@@ -260,7 +260,8 @@ namespace Extract.Dashboard.Forms
                         }
                         var gridDataTable = new DataTable();
                         gridDataTable.Locale = CultureInfo.CurrentCulture;
-                        gridDataTable.Load(command.ExecuteReader());
+                        using var reader = command.ExecuteReader();
+                        gridDataTable.Load(reader);
                         return gridDataTable;
                     });
 

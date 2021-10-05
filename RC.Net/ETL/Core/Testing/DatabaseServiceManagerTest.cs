@@ -137,7 +137,8 @@ namespace Extract.ETL.Test
                 using (var serviceCmd = connection.CreateCommand())
                 {
                     serviceCmd.CommandText = databaseServiceQuery;
-                    first = serviceCmd.ExecuteReader().Cast<IDataRecord>().Single();
+                    using var reader = serviceCmd.ExecuteReader();
+                    first = reader.Cast<IDataRecord>().Single();
                 }
 
 
@@ -161,7 +162,8 @@ namespace Extract.ETL.Test
                 using (var afterCmd = connection.CreateCommand())
                 {
                     afterCmd.CommandText = databaseServiceQuery;
-                    whileRunning = afterCmd.ExecuteReader().Cast<IDataRecord>().Single();
+                    using var reader = afterCmd.ExecuteReader();
+                    whileRunning = reader.Cast<IDataRecord>().Single();
                 }
                 nextScheduled = whileRunning["NextScheduledRunTime"];
                 Assert.That(nextScheduled != DBNull.Value, "NextScheduledRunTime should be set.");
@@ -190,7 +192,8 @@ namespace Extract.ETL.Test
                 using (var afterFinishedCmd = connection.CreateCommand())
                 {
                     afterFinishedCmd.CommandText = databaseServiceQuery;
-                    afterFinishedData = afterFinishedCmd.ExecuteReader().Cast<IDataRecord>().Single();
+                    using var reader = afterFinishedCmd.ExecuteReader();
+                    afterFinishedData = reader.Cast<IDataRecord>().Single();
                 }
 
                 Assert.AreEqual(whileRunning["StartTime"], afterFinishedData["StartTime"], "StartTime while running should be the same after running");
@@ -222,7 +225,8 @@ namespace Extract.ETL.Test
                 using (var afterDeleteActiveCmd = connection.CreateCommand())
                 {
                     afterDeleteActiveCmd.CommandText = databaseServiceQuery;
-                    afterDeleteActive = afterDeleteActiveCmd.ExecuteReader().Cast<IDataRecord>().Single();
+                    using var reader = afterDeleteActiveCmd.ExecuteReader();
+                    afterDeleteActive = reader.Cast<IDataRecord>().Single();
                 }
 
                 Assert.AreNotEqual(DBNull.Value, afterDeleteActive["ActiveFAMID"], "ActiveFAMID is not null");
@@ -237,7 +241,8 @@ namespace Extract.ETL.Test
                 using (var afterStopCmd = connection.CreateCommand())
                 {
                     afterStopCmd.CommandText = databaseServiceQuery;
-                    afterStop = afterStopCmd.ExecuteReader().Cast<IDataRecord>().Single();
+                    using reader = afterStopCmd.ExecuteReader();
+                    afterStop = reader.Cast<IDataRecord>().Single();
                 }
 
                 Assert.AreEqual(DBNull.Value, afterStop["ActiveFAMID"], "ActiveFAMID should be null after stop");
@@ -306,7 +311,7 @@ namespace Extract.ETL.Test
                 Assert.DoesNotThrow(() => testDatabaseService.StartActiveSchedule(fileProcessingDb.ActiveFAMID),
                     "Start active Schedule should not throw exception.");
 
-                var reader = cmd.ExecuteReader();
+                using var reader = cmd.ExecuteReader();
                 var result = reader.Cast<IDataRecord>().Single();
 
                 Assert.AreEqual(DBNull.Value, result["StartTime"], "StartTime should be null");
@@ -330,6 +335,7 @@ namespace Extract.ETL.Test
                 DateTime start = DateTime.Now;
 
                 reader.Close();
+                reader.Dispose();
                 reader = cmd.ExecuteReader();
                 result = reader.Cast<IDataRecord>().Single();
 
@@ -358,6 +364,7 @@ namespace Extract.ETL.Test
                 DateTime endTime = DateTime.Now;
 
                 reader.Close();
+                reader.Dispose();
                 reader = cmd.ExecuteReader();
                 result = reader.Cast<IDataRecord>().Single();
 
@@ -392,7 +399,9 @@ namespace Extract.ETL.Test
 
 
                 reader.Close();
-                reader = cmd.ExecuteReader();
+                reader.Dispose();
+                
+                using reader = cmd.ExecuteReader();
                 result = reader.Cast<IDataRecord>().Single();
 
                 Assert.AreNotEqual(DBNull.Value, result["StartTime"], "Start time should not be null");
@@ -406,7 +415,6 @@ namespace Extract.ETL.Test
 
                 Assert.AreEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should be null");
                 Assert.AreEqual(DBNull.Value, result["ActiveFAMID"], "ActiveFAMID should be null");
-
 
             }
             finally

@@ -179,7 +179,8 @@ namespace DatabaseMigrationWizard.Database.Input.SQLSequence
             {
                 dbCommand.Transaction = importOptions.Transaction;
                 dbCommand.CommandText = CheckForJsonSQL;
-                dataTable.Load(dbCommand.ExecuteReader());
+                using var reader = dbCommand.ExecuteReader();
+                dataTable.Load(reader);
                 foreach (DataRow row in dataTable.Rows)
                 {
                     string description = row["Description"].ToString();

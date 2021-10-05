@@ -266,7 +266,8 @@ namespace Extract.ETL.Test
 
             statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
             statusCmd.Parameters.AddWithValue("@DatabaseServiceID", redactionAccuracy.DatabaseServiceID);
-            var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+            using var reader = statusCmd.ExecuteReader();
+            var result = reader.Cast<IDataRecord>().SingleOrDefault();
             Assert.AreNotEqual(null, result, "A single record should be returned");
             return result;
 
@@ -414,6 +415,7 @@ namespace Extract.ETL.Test
         /// <param name="expected">The Expected results</param>
         static void CheckResults(SqlDataReader foundResults, RedactionAccuracyList expected)
         {
+            using foundResults;
             // Convert reader to IEnummerable 
             var results = foundResults.Cast<IDataRecord>();
 

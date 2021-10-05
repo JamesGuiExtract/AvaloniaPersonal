@@ -579,7 +579,8 @@ namespace Extract.Dashboard.Utilities
                       FROM [FileHandler] WHERE [Enabled] = 1 AND [AdminOnly] = 0 
                       ORDER BY [AppName]";
 
-                var results = cmd.ExecuteReader().Cast<IDataRecord>();
+                using var reader = cmd.ExecuteReader();
+                var results = reader.Cast<IDataRecord>();
 
                 var fileHandlers = results.Select(row => new FileHandlerItem
                 {

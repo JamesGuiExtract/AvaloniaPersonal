@@ -157,6 +157,7 @@ namespace Extract.ETL.Test
                         "LastFileTaskSessionIDProcessed from database should be same as that in status");
 
                     reader.Close();
+                    reader.Dispose();
 
                     // Process with cancel
                     Assert.Throws<ExtractException>(() => himStats.Process(_cancel), "Process with cancel should throw an ExtractException");
@@ -173,6 +174,7 @@ namespace Extract.ETL.Test
                         "LastFileTaskSessionIDProcessed from database should be same as that in status");
 
                     reader.Close();
+                    reader.Dispose();
 
                     Assert.DoesNotThrow(() => himStats.Process(_noCancel), "Process without cancel should not throw exception");
 
@@ -193,10 +195,11 @@ namespace Extract.ETL.Test
                     Assert.AreEqual(6, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 6");
 
                     reader.Close();
+                    reader.Dispose();
 
                     // Check that ReportingHIMStats contains expected data
                     cmd.CommandText = "SELECT * FROM ReportingHIMStats";
-                    reader = cmd.ExecuteReader();
+                    using reader = cmd.ExecuteReader();
                     var results = reader.Cast<IDataRecord>().ToList();
                     for (int i = 0; i < results.Count; i++)
                     {
@@ -268,14 +271,14 @@ namespace Extract.ETL.Test
                 using var cmd1 = connection1.CreateCommand();
                 connection1.Open();
                 cmd1.CommandText = _REPORT_HIMSTATS_DATA;
-                var reader1 = cmd1.ExecuteReader();
+                using var reader1 = cmd1.ExecuteReader();
 
                 using var connection2 = NewSqlConnection(famDB2.DatabaseServer, famDB2.DatabaseName);
                 connection2.Open();
                 using var cmd2 = connection2.CreateCommand();
                 cmd2.CommandText = _REPORT_HIMSTATS_DATA;
 
-                var reader2 = cmd2.ExecuteReader();
+                using var reader2 = cmd2.ExecuteReader();
 
                 CheckResults(reader1, reader2);
 

@@ -248,7 +248,8 @@ namespace Extract.ETL.Test
 
                 statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
                 statusCmd.Parameters.AddWithValue("@DatabaseServiceID", rates.DatabaseServiceID);
-                var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                using var reader = statusCmd.ExecuteReader();
+                var result = reader.Cast<IDataRecord>().SingleOrDefault();
                 Assert.AreNotEqual(null, result, "A single record was returned");
                 Assert.AreEqual(DBNull.Value, result["Status"], "Status is null");
                 Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed is null");

@@ -83,8 +83,8 @@ namespace Extract.Dashboard.Forms
 
                 DataTable dataTable = new DataTable();
                 dataTable.Locale = CultureInfo.CurrentCulture;
-                dataTable.Load(command.ExecuteReader());
-
+                using var reader = command.ExecuteReader();
+                dataTable.Load(reader);
 
                 foreach (var row in dataTable.Rows.OfType<DataRow>())
                 {

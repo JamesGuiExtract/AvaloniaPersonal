@@ -330,7 +330,7 @@ namespace Extract.UtilityApplications.MachineLearning
             cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
             cmd.CommandTimeout = 0;
 
-            var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 availableIDs.Add(reader.GetInt64(0));

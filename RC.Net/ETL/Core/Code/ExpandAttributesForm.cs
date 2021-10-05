@@ -119,7 +119,8 @@ namespace Extract.ETL
             cmd.CommandText = "Select ID, Description FROM AttributeSetName";
             DataTable attributeSets = new DataTable();
             attributeSets.Locale = CultureInfo.CurrentCulture;
-            attributeSets.Load(cmd.ExecuteReader());
+            using var reader = cmd.ExecuteReader();
+            attributeSets.Load(reader);
             if (attributeSets.Rows.Count < 1)
             {
                 ExtractException ex = new ExtractException("ELI46108", "No AttributeSets are defined.");

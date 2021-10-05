@@ -296,7 +296,8 @@ namespace Extract.ETL.Test
 
                 statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
                 statusCmd.Parameters.AddWithValue("@DatabaseServiceID", expandAttributes.DatabaseServiceID);
-                var result = statusCmd.ExecuteReader().Cast<IDataRecord>().SingleOrDefault();
+                using var reader = statusCmd.ExecuteReader();
+                var result = reader.Cast<IDataRecord>().SingleOrDefault();
                 Assert.AreNotEqual(null, result, "A single record should be returned");
                 Assert.AreEqual(DBNull.Value, result["Status"], "Status should be null");
                 Assert.AreEqual(DBNull.Value, result["LastFileTaskSessionIDProcessed"], "LastFileTaskSessionIDProcessed should be null");
@@ -385,7 +386,8 @@ namespace Extract.ETL.Test
                 using (var cmd = connection.CreateCommand())
                 {
                     cmd.CommandText = "SELECT AttributeSetForFileID FROM DashboardAttributeFields";
-                    var IDs = cmd.ExecuteReader().Cast<IDataRecord>().Select(r => r.GetInt64(0)).ToList();
+                    using reader = cmd.ExecuteReader();
+                    var IDs = reader.Cast<IDataRecord>().Select(r => r.GetInt64(0)).ToList();
 
                     Assert.AreEqual(2, IDs.Count(), "DashboardAttributeFields table should contain 2 records.");
 
@@ -425,14 +427,16 @@ namespace Extract.ETL.Test
 
             // Get the results
             cmd.CommandText = _QUERY_ATTRIBUTE_RESULTS;
-            var results = cmd.ExecuteReader().Cast<IDataRecord>().ToList();
+            using var reader = cmd.ExecuteReader();
+            var results = reader.Cast<IDataRecord>().ToList();
             
             // Expected results is NOT a FileProcessing DB and should be opened as a normal connection
             using var expectedResultsConnection = SqlUtil.NewSqlDBConnection(expandAttributes.DatabaseServer, resultsDbName);
             expectedResultsConnection.Open();
             using SqlCommand expectedCmd = expectedResultsConnection.CreateCommand();
             expectedCmd.CommandText = expectedResultsSQL;
-            var expected = expectedCmd.ExecuteReader().Cast<IDataRecord>().ToList();
+            using expectedReader = expectedCmd.ExecuteReader();
+            var expected = expectedReader.Cast<IDataRecord>().ToList();
 
             bool matches = results.Count == expected.Count;
             for (int i = 0; matches && i < results.Count && i < expected.Count; i++)

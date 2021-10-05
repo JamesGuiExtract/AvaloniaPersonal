@@ -117,7 +117,7 @@ namespace Extract.Process.Logger
 
                                     AddParameters(cmd);
 
-                                    var reader = cmd.ExecuteReader();
+                                    using var reader = cmd.ExecuteReader();
                                     if (!headersAdded)
                                     {
                                         var columnNames = Enumerable.Range(0, reader.FieldCount).Select(reader.GetName);

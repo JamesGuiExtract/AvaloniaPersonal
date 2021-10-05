@@ -2225,7 +2225,7 @@ namespace Extract.SQLCDBEditor
             
             using var command = connection.CreateCommand();
             command.CommandText = "SELECT Value FROM Settings WHERE Name = 'CustomerSchemaVersion'";
-            var dataReader = command.ExecuteReader();
+            using var dataReader = command.ExecuteReader();
             if (dataReader.Read())
             {
                 bool success = int.TryParse(dataReader.GetString(0), out customerSchemaVersion);

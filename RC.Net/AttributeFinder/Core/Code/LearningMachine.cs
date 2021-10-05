@@ -1267,7 +1267,7 @@ namespace Extract.AttributeFinder
 
                 // Set the timeout so that it waits indefinitely
                 cmd.CommandTimeout = 0;
-                var reader = cmd.ExecuteReader();
+                using var reader = cmd.ExecuteReader();
                 var imagePaths = new List<string>();
                 var answers = getDocTypeFromVoa
                     ? new List<string>()

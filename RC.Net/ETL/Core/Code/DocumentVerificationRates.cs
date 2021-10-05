@@ -100,7 +100,7 @@ namespace Extract.ETL
         ///     @EndOfBatch INT
         ///     
         /// This string is to be used in a string.Format statement with {0} either (0) if no previous ID's 
-        ///     or (<comma separated list of previously active id's>)
+        ///     or (<comma separated list of previously active id''s>)
         /// </summary>
         static readonly string _QUERY_FOR_SOURCE_RECORDS = Invariant($@"
             SELECT [FileTaskSession].[ID]

@@ -36,7 +36,7 @@ namespace Extract.SqlDatabase
             sqlConnectionBuild.InitialCatalog = databaseName;
             sqlConnectionBuild.IntegratedSecurity = true;
             sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
+            sqlConnectionBuild.MultipleActiveResultSets = false;
             sqlConnectionBuild.Enlist = enlist;
             sqlConnectionBuild.Pooling = false;
             return sqlConnectionBuild.ConnectionString;

@@ -40,7 +40,7 @@ namespace AttributeDBMgrTest
                 SqlCommand cmd = new SqlCommand(query, connection);
 
                 connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = cmd.ExecuteReader();
                 int index = 0;
                 while (reader.Read())
                 {
@@ -107,7 +107,7 @@ namespace AttributeDBMgrTest
                 SqlCommand cmd = new SqlCommand(query, connection);
 
                 connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = cmd.ExecuteReader();
 
                 while (reader.Read())
                 {
@@ -150,7 +150,7 @@ namespace AttributeDBMgrTest
                 SqlCommand cmd = new SqlCommand(query, connection);
 
                 connection.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
+                using SqlDataReader reader = cmd.ExecuteReader();
                 Contract.Assert(reader.Read(), "Could not get the filename associated with ASFF ID: {0}", asffID);
                 filename = reader[0].ToString();
             }

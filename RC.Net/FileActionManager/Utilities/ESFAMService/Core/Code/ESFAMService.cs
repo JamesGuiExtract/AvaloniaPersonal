@@ -1293,7 +1293,8 @@ namespace Extract.FileActionManager.Utilities
             using var cmd = connection.CreateCommand();
 
             cmd.CommandText = "SELECT Settings FROM DatabaseService WHERE Enabled = 1";
-            var result = cmd.ExecuteReader().Cast<IDataRecord>()
+            using var reader = cmd.ExecuteReader();
+            var result = reader.Cast<IDataRecord>()
                 .Select(r => r.GetString(r.GetOrdinal("Settings"))).ToList();
             result.Sort();
 

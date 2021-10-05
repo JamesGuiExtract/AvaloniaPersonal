@@ -77,7 +77,8 @@ namespace Extract.ETL
             connection.Open();
             using var cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT [Description] FROM [dbo].[AttributeSetName]";
-            var results = cmd.ExecuteReader()
+            using var reader = cmd.ExecuteReader();
+            var results = reader
                 .Cast<IDataRecord>()
                 .Select(r => r.GetString(r.GetOrdinal("Description"))).ToArray();
 
