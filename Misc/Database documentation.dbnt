@@ -20,7 +20,7 @@
 	<Model Name="Core Database">
 		<Group Type="Table">
 			<Object Name="dbo.Action" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>An action is a collection of tasks (defined outside of the database in .fps files).</Comment>
+				<Comment>An action represents one or more tasks to be executed as one step in a workflow (defined outside of the database in .fps files).</Comment>
 				<Attributes>
 					<Attribute commentModified="9/30/2021 5:19:14 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ASCName" null="not null" sortOrder="2" type="nvarchar(50)">
 						<Comment>The name of the action.</Comment>
@@ -28,15 +28,17 @@
 					<Attribute commentModified="9/30/2021 5:19:14 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Description" null="null" sortOrder="3" type="nvarchar(255)">
 						<Comment>An explanation of what the action is used for.</Comment>
 					</Attribute>
-					<Attribute commentModified="9/30/2021 5:34:46 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="6" type="uniqueidentifier">
-						<Comment>A unique identifier different across all databases</Comment>
+					<Attribute commentModified="10/6/2021 3:24:17 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="6" type="uniqueidentifier">
+						<Comment>A unique identifier different across all databases; used for configuration migrations/merging.</Comment>
 					</Attribute>
 					<Attribute commentModified="9/30/2021 5:19:14 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A incrementing generated identifier.</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="MainSequence" null="null" sortOrder="5" type="bit" />
-					<Attribute commentModified="9/30/2021 5:19:14 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="WorkflowID" null="null" sortOrder="4" type="int">
-						<Comment>The workflow this particular action is tied to.</Comment>
+					<Attribute commentModified="10/6/2021 12:58:41 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="MainSequence" null="null" sortOrder="5" type="bit">
+						<Comment>Indicates if the action is desginated to be part of the main sequence of actions used for processing in a workflow. Workflow status reported by the API will consider only main sequence actions when reporting statistics</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:07:41 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="WorkflowID" null="null" sortOrder="4" type="int">
+						<Comment>The workflow this particular action is tied to or NULL to represent the action regardless of workflow</Comment>
 					</Attribute>
 				</Attributes>
 				<History>
@@ -48,6 +50,10 @@
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Guid comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="WorkflowID comment changed" />
+					<Record When="2021-10-06T13:07:41" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Guid comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="MainSequence comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="WorkflowID comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.ActionState" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
@@ -56,8 +62,8 @@
 					<Attribute commentModified="9/30/2021 5:20:37 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Code" null="not null" pk="true" sortOrder="1" type="nvarchar(1)">
 						<Comment>A single character, representing a state of an action.</Comment>
 					</Attribute>
-					<Attribute commentModified="9/30/2021 5:20:37 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Meaning" null="null" sortOrder="2" type="nvarchar(255)">
-						<Comment>An explanation for the code, wand what its full meaning represents.</Comment>
+					<Attribute commentModified="10/6/2021 1:08:04 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Meaning" null="null" sortOrder="2" type="nvarchar(255)">
+						<Comment>An explanation for the code, and what its full meaning represents.</Comment>
 					</Attribute>
 				</Attributes>
 				<History>
@@ -66,15 +72,20 @@
 					<Record When="2021-09-30T17:20:37" Who="Trever_Gannon" Description="Changed object comment" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Code comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Meaning comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Meaning comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.ActionStatistics" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table tracks the number of files that have gone through each action, and the current count of them in that action. This table is displayed on the summary page of the database administration tool.</Comment>
+				<Comment>This table tracks the number of files that have gone through each action, and the current count of them in that action. This allows overal state of the database/workflow to be reported without a long-running query to aggregate the stats of all files. This data is displayed on the summary page of the database administration tool and in the toolbars of various Extract applications.
+
+Note: The data in this table will generally not be entirely up-to-date while processing is active as updates to the rows here will be done in batches. Up-to-date stats can be calculated by aggregating file status changes from the ActionStatisticsDelta table with the data here.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 1:40:52 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>Forigen key to Action.</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Invisible" null="not null" pk="true" sortOrder="2" type="bit" />
+					<Attribute commentModified="10/6/2021 12:26:35 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Invisible" null="not null" pk="true" sortOrder="2" type="bit">
+						<Comment>Indicates whether the counts in this row are visible to Extract APIs. Invisible files represent files for which deletion was requested via API.</Comment>
+					</Attribute>
 					<Attribute commentModified="10/4/2021 1:40:52 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="LastUpdateTimeStamp" null="null" sortOrder="3" type="datetime">
 						<Comment>The last time these stats were updated.</Comment>
 					</Attribute>
@@ -145,36 +156,94 @@
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="NumPagesFailed comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="NumPagesPending comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="NumPagesSkipped comment changed" />
+					<Record When="2021-10-06T12:44:56" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Invisible comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.ActionStatisticsDelta" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
+				<Comment>In order to allow ActionsStatistics to be updated when the database is under a heavy processing load without causing contention updating the data in ActionStatistics rows, changes made to file action statuses are collected here where each change will be a separate row (preventing the need to lock any rows for most action status changes here). Periodically, the action status changes collected here are aggregated into the corresponding rows of the ActionStatistics table.</Comment>
 				<Attributes>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="not null" sortOrder="2" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="bigint" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Invisible" null="not null" sortOrder="3" type="bit" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumBytes" null="not null" sortOrder="14" type="bigint" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumBytesComplete" null="not null" sortOrder="16" type="bigint" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumBytesFailed" null="not null" sortOrder="17" type="bigint" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumBytesPending" null="not null" sortOrder="15" type="bigint" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumBytesSkipped" null="not null" sortOrder="18" type="bigint" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumDocuments" null="not null" sortOrder="4" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumDocumentsComplete" null="not null" sortOrder="6" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumDocumentsFailed" null="not null" sortOrder="7" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumDocumentsPending" null="not null" sortOrder="5" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumDocumentsSkipped" null="not null" sortOrder="8" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPages" null="not null" sortOrder="9" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPagesComplete" null="not null" sortOrder="11" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPagesFailed" null="not null" sortOrder="12" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPagesPending" null="not null" sortOrder="10" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPagesSkipped" null="not null" sortOrder="13" type="int" />
+					<Attribute commentModified="10/6/2021 1:04:57 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="not null" sortOrder="2" type="int">
+						<Comment>Forigen key to Action.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 12:52:53 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="bigint">
+						<Comment>A unique identifier</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 12:52:53 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Invisible" null="not null" sortOrder="3" type="bit">
+						<Comment>Indicates whether the counts in this row are visible to Extract APIs. Invisible files represent files for which deletion was requested via API.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumBytes" null="not null" sortOrder="14" type="bigint">
+						<Comment>Number of new bytes in the current action/visibility state as a result of the file action state change; will reflect the number of bytes in the affected document</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumBytesComplete" null="not null" sortOrder="16" type="bigint">
+						<Comment>Number of new completed bytes in the current action/visibility state as a result of the file action state change; will reflect the number of bytes in the affected document</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumBytesFailed" null="not null" sortOrder="17" type="bigint">
+						<Comment>Number of new failed bytes in the current action/visibility state as a result of the file action state change; will reflect the number of bytes in the affected document</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumBytesPending" null="not null" sortOrder="15" type="bigint">
+						<Comment>Number of new pending bytes in the current action/visibility state as a result of the file action state change; will reflect the number of bytes in the affected document</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumBytesSkipped" null="not null" sortOrder="18" type="bigint">
+						<Comment>Number of new skipped bytes in the current action/visibility state as a result of the file action state change; will reflect the number of bytes in the affected document</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumDocuments" null="not null" sortOrder="4" type="int">
+						<Comment>Number of new documents in the current action/visibility state as a result of the file action state change; will be 0, 1 or -1</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumDocumentsComplete" null="not null" sortOrder="6" type="int">
+						<Comment>Number of new completed documents in the current action/visibility state as a result of the file action state change; will be 0, 1 or -1</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumDocumentsFailed" null="not null" sortOrder="7" type="int">
+						<Comment>Number of new failed documents in the current action/visibility state as a result of the file action state change; will be 0, 1 or -1</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumDocumentsPending" null="not null" sortOrder="5" type="int">
+						<Comment>Number of new pending documents in the current action/visibility state as a result of the file action state change; will be 0, 1 or -1</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumDocumentsSkipped" null="not null" sortOrder="8" type="int">
+						<Comment>Number of new skipped documents in the current action/visibility state as a result of the file action state change; will be 0, 1 or -1</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPages" null="not null" sortOrder="9" type="int">
+						<Comment>Number of new pages in the current action/visibility state as a result of the file action state change; will reflect the number of pages in the affected document</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPagesComplete" null="not null" sortOrder="11" type="int">
+						<Comment>Number of new completed pages in the current action/visibility state as a result of the file action state change; will reflect the number of pages in the affected document</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPagesFailed" null="not null" sortOrder="12" type="int">
+						<Comment>Number of new failed pages in the current action/visibility state as a result of the file action state change; will reflect the number of pages in the affected document</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPagesPending" null="not null" sortOrder="10" type="int">
+						<Comment>Number of new pending pages in the current action/visibility state as a result of the file action state change; will reflect the number of pages in the affected document</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:04:33 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPagesSkipped" null="not null" sortOrder="13" type="int">
+						<Comment>Number of new skipped pages in the current action/visibility state as a result of the file action state change; will reflect the number of pages in the affected document</Comment>
+					</Attribute>
 				</Attributes>
 				<History>
 					<Record When="2021-09-30T15:16:47" Who="Trever_Gannon" Description="Loaded" />
 					<Record When="2021-09-30T15:16:47" Who="Trever_Gannon" Description="Loaded 18 attributes" />
+					<Record When="2021-10-06T12:52:53" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ActionID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Invisible comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumBytes comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumBytesComplete comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumBytesFailed comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumBytesPending comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumBytesSkipped comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumDocuments comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumDocumentsComplete comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumDocumentsFailed comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumDocumentsPending comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumDocumentsSkipped comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumPages comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumPagesComplete comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumPagesFailed comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumPagesPending comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumPagesSkipped comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.ActiveFAM" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>A table for tracking activity in the database. If any files are being actively processed they will show up here. The purpose of this table is to prevent database upgrades if users are processing in a database, and for reporting on active users in our database. After a session is no longer active, the record is deleted from this table.</Comment>
+				<Comment>A table for tracking active processing in the database. This data is used to prevent recognize when a file has been orphaned by a lost process and to prevent database operations that should not be executed database in the midst of active processing.</Comment>
 				<Attributes>
 					<Attribute commentModified="9/30/2021 5:23:38 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FAMSessionID" null="not null" sortOrder="3" type="int">
 						<Comment>A forigen key to the FAMSession table.</Comment>
@@ -182,8 +251,8 @@
 					<Attribute commentModified="9/30/2021 5:23:38 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A unique identifier.</Comment>
 					</Attribute>
-					<Attribute commentModified="9/30/2021 5:23:38 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="LastPingTime" null="not null" sortOrder="2" type="datetime">
-						<Comment>The last time the session saw the user processing.</Comment>
+					<Attribute commentModified="10/6/2021 1:14:54 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="LastPingTime" null="not null" sortOrder="2" type="datetime">
+						<Comment>Active processing sessions will ping the database to indicate the process is alive and healthy periodically; this records the last ping registered</Comment>
 					</Attribute>
 				</Attributes>
 				<History>
@@ -193,10 +262,12 @@
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FAMSessionID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="LastPingTime comment changed" />
+					<Record When="2021-10-06T13:14:54" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="LastPingTime comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.Attribute" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table repersents attributes from our VOA file type. An attribute is a piece of information tied directly to a document. An example of an attribute may be "document type", where the document type can be "xray", "general checkup", or "surgery". A document may have several attributes, because information is gathered at different points in a workflow.</Comment>
+				<Comment>This table repersents attributes, or data fields, corresponding with documents in our workflow. These attributes correspond to attributes in Extract data files (VOA file type). An attribute is a piece of information tied directly to a document. An example of an attribute may be "document type", where the document type can be "xray", "general checkup", or "surgery".</Comment>
 				<Attributes>
 					<Attribute commentModified="9/30/2021 5:30:23 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeNameID" null="not null" sortOrder="3" type="bigint">
 						<Comment>A forigen key to AttributeName.</Comment>
@@ -227,6 +298,7 @@
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ParentAttributeID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Value comment changed" />
+					<Record When="2021-10-06T13:17:35" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.AttributeInstanceType" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
@@ -270,7 +342,7 @@
 				</History>
 			</Object>
 			<Object Name="dbo.AttributeSetForFile" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table stores the attribute set in the database as a binary representation. An attribute set, is essentially a VOA file, and contains information about a particular document Extract extracted.</Comment>
+				<Comment>This table stores the attribute set in the database as a binary representation and ties discretely stored data in the Attribute table into a data set. An attribute set, is essentially an Extract data file (VOA file type) stored in the databse, and contains information about a particular document Extract extracted.</Comment>
 				<Attributes>
 					<Attribute commentModified="9/30/2021 5:38:23 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeSetNameID" null="not null" sortOrder="3" type="bigint">
 						<Comment>A forigen key to AttributeSetname.</Comment>
@@ -293,6 +365,7 @@
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FileTaskSessionID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="VOA comment changed" />
+					<Record When="2021-10-06T13:36:43" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.AttributeSetName" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
@@ -339,7 +412,7 @@ FoundPagination</Comment>
 				</History>
 			</Object>
 			<Object Name="dbo.Dashboard" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table stores dashboards created by dev express in xml format. A dashboard is Extracts way of reporting on data in the database.</Comment>
+				<Comment>This table stores dashboards created by dev express in xml format. Dashboard allow interactive exploration reporting on data in the database.</Comment>
 				<Attributes>
 					<Attribute commentModified="9/30/2021 5:42:00 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="DashboardName" null="not null" sortOrder="1" type="nvarchar(100)">
 						<Comment>The name of the dashboard</Comment>
@@ -353,13 +426,13 @@ FoundPagination</Comment>
 					<Attribute commentModified="9/30/2021 5:42:00 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FAMUserID" null="not null" sortOrder="3" type="int">
 						<Comment>The user who LAST imported the database.</Comment>
 					</Attribute>
-					<Attribute commentModified="9/30/2021 5:42:00 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" pk="true" sortOrder="7" type="uniqueidentifier">
-						<Comment>A unique identifier across all databases</Comment>
+					<Attribute commentModified="10/6/2021 3:23:56 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" pk="true" sortOrder="7" type="uniqueidentifier">
+						<Comment>A unique identifier across all databases; used for configuration migrations/merging.</Comment>
 					</Attribute>
 					<Attribute commentModified="9/30/2021 5:42:00 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="LastImportedDate" null="not null" sortOrder="4" type="datetime">
 						<Comment>A datetime respresenting when the last import occured</Comment>
 					</Attribute>
-					<Attribute commentModified="10/4/2021 1:35:38 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="UseExtractedData" null="null" sortOrder="5" type="bit">
+					<Attribute commentModified="10/4/2021 1:35:38 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="UseExtractedData" null="not null" sortOrder="5" type="bit">
 						<Comment>A flag determining if extracted data source should be used.</Comment>
 					</Attribute>
 				</Attributes>
@@ -374,10 +447,12 @@ FoundPagination</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Guid comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="LastImportedDate comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="UseExtractedData comment changed" />
+					<Record When="2021-10-06T13:42:36" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Guid comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.DashboardAttributeFields" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Basically a cut down version of the attribute, and attribute name table. This table is populated by the "Expand Attributes" service. There is potential this table contains data not found in the other tables depending on the enviornment.</Comment>
+				<Comment>Attribute data optimized for filterting via dashboards. This table is populated by the "Expand Attributes" service.</Comment>
 				<Attributes>
 					<Attribute commentModified="9/30/2021 5:45:57 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeSetForFileID" null="not null" pk="true" sortOrder="1" type="bigint">
 						<Comment>A forigen key to attribute set.</Comment>
@@ -396,6 +471,7 @@ FoundPagination</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="AttributeSetForFileID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Name comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Value comment changed" />
+					<Record When="2021-10-06T13:44:45" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.DatabaseService" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
@@ -419,8 +495,8 @@ FoundPagination</Comment>
 					<Attribute commentModified="9/30/2021 5:55:38 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Exception" null="null" sortOrder="11" type="nvarchar(-1)">
 						<Comment>Any exceptions that occured during the last exectuion.</Comment>
 					</Attribute>
-					<Attribute commentModified="9/30/2021 5:55:38 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="15" type="uniqueidentifier">
-						<Comment>A unique identifier across all databaes for this particular service.</Comment>
+					<Attribute commentModified="10/6/2021 3:23:51 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="15" type="uniqueidentifier">
+						<Comment>A unique identifier across all databaes for this particular service; used for configuration migrations/merging.</Comment>
 					</Attribute>
 					<Attribute commentModified="9/30/2021 5:55:38 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A unique identifier for this particular database.</Comment>
@@ -467,14 +543,17 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Settings comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="StartTime comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Status comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Guid comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.DataEntryCounterDefinition" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table defines everything about a data entry counter. A counter is something we use to count how many pages have been processed by our software. Typically we license a set number of pages or documents.</Comment>
+				<Comment>This table defines a counter used to track the number of specific attributes in a data entry workflow for reporting/analytics purposes.</Comment>
 				<Attributes>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeQuery" null="not null" sortOrder="3" type="nvarchar(255)" />
-					<Attribute commentModified="10/4/2021 7:34:01 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="6" type="uniqueidentifier">
-						<Comment>A unique identifier across all databases.</Comment>
+					<Attribute commentModified="10/6/2021 1:49:37 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeQuery" null="not null" sortOrder="3" type="nvarchar(255)">
+						<Comment>Specifies the attributes to be counted in a document's data</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 3:23:42 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="6" type="uniqueidentifier">
+						<Comment>A unique identifier across all databases; used for configuration migrations/merging.</Comment>
 					</Attribute>
 					<Attribute commentModified="10/4/2021 7:34:01 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A unique identifier.</Comment>
@@ -498,6 +577,9 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Name comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="RecordOnLoad comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="RecordOnSave comment changed" />
+					<Record When="2021-10-06T13:47:29" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="AttributeQuery comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Guid comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.DataEntryCounterType" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
@@ -519,7 +601,7 @@ Both of the columns contain json data.</Comment>
 				</History>
 			</Object>
 			<Object Name="dbo.DataEntryCounterValue" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>A table that keeps track of data entry counters.</Comment>
+				<Comment>A table to track counter values defined in the DataEntryCounterDefinition table</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 6:36:00 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="CounterID" null="not null" sortOrder="2" type="int">
 						<Comment>Forigen key to DataEntryCounterDefinition (ID).</Comment>
@@ -542,18 +624,19 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="InstanceID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Type comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Value comment changed" />
+					<Record When="2021-10-06T13:48:12" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.DBInfo" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
 				<Comment>This table contains all of the general settings used by our software. These settings are configured in the database administration tool under various windows.</Comment>
 				<Attributes>
-					<Attribute commentModified="9/30/2021 6:01:50 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" sortOrder="1" type="int">
+					<Attribute commentModified="9/30/2021 6:01:50 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="ID" null="not null" sortOrder="3" type="int">
 						<Comment>A unique identifier</Comment>
 					</Attribute>
-					<Attribute commentModified="9/30/2021 6:01:50 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Name" null="not null" pk="true" sortOrder="2" type="nvarchar(50)">
+					<Attribute commentModified="9/30/2021 6:01:50 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="Name" null="not null" pk="true" sortOrder="1" type="nvarchar(50)">
 						<Comment>The name of the setting you are configuring</Comment>
 					</Attribute>
-					<Attribute commentModified="9/30/2021 6:01:50 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Value" null="null" sortOrder="3" type="nvarchar(-1)">
+					<Attribute commentModified="9/30/2021 6:01:50 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="Value" null="null" sortOrder="2" type="nvarchar(-1)">
 						<Comment>The value of the setting you are configuring</Comment>
 					</Attribute>
 				</Attributes>
@@ -677,7 +760,7 @@ Both of the columns contain json data.</Comment>
 				</History>
 			</Object>
 			<Object Name="dbo.FAMSession" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>A session is a timeperoid in which an action is occuring. Typically you can look at this as when the user hits "start", and "stop" in a "FAM". There are other occurances where this can take place though such as a database service starting and stopping.</Comment>
+				<Comment>Represents a processing session in which files are processed in a given action either as a service process or foreground application. While processing is active, there will be a corresponding entry in the ActiveFAM table. Unlike the ActiveFAM table, FAMSession rows will remain and provice audit trail for when processsing sessions were started/stopped.</Comment>
 				<Attributes>
 					<Attribute commentModified="9/30/2021 6:24:44 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="null" sortOrder="8" type="int">
 						<Comment>A forigen key to the action table.</Comment>
@@ -694,15 +777,21 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="9/30/2021 6:24:44 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="MachineID" null="not null" sortOrder="2" type="int">
 						<Comment>A forigen key to the machine table. Used to identify what machine had the session occuring on.</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Processing" null="null" sortOrder="10" type="bit" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Queuing" null="null" sortOrder="9" type="bit" />
+					<Attribute commentModified="10/6/2021 1:56:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Processing" null="null" sortOrder="10" type="bit">
+						<Comment>Indicates if the process is configured to process documents.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 1:56:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Queuing" null="null" sortOrder="9" type="bit">
+						<Comment>Indicates if the process is configured to queue documents.</Comment>
+					</Attribute>
 					<Attribute commentModified="9/30/2021 6:24:44 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="StartTime" null="not null" sortOrder="5" type="datetime">
 						<Comment>When the session started</Comment>
 					</Attribute>
 					<Attribute commentModified="9/30/2021 6:24:44 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="StopTime" null="null" sortOrder="6" type="datetime">
 						<Comment>When the session stopped</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="UPI" null="null" sortOrder="4" type="nvarchar(450)" />
+					<Attribute commentModified="10/6/2021 1:55:11 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="UPI" null="null" sortOrder="4" type="nvarchar(450)">
+						<Comment>A Universal Process Identifier; a code that will uniquely identify the process vs any other process.</Comment>
+					</Attribute>
 				</Attributes>
 				<History>
 					<Record When="2021-09-30T15:16:47" Who="Trever_Gannon" Description="Loaded" />
@@ -715,10 +804,14 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="MachineID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="StartTime comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="StopTime comment changed" />
+					<Record When="2021-10-06T13:55:11" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Processing comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Queuing comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="UPI comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.FAMUser" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>A table containing all of the users using our software. This is automatically populated when a user starts using our software.</Comment>
+				<Comment>A table containing all usernames associate with processing that has occurred in the database.. This is automatically populated as FAMSessions are started.</Comment>
 				<Attributes>
 					<Attribute commentModified="9/30/2021 6:30:28 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FullUserName" null="null" sortOrder="3" type="nvarchar(128)">
 						<Comment>This is almost always the users name, however this is also dependant on how the organization has active directory setup.</Comment>
@@ -741,10 +834,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="LoginID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="UserName comment changed" />
+					<Record When="2021-10-06T15:09:33" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.Feature" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Enables/disables different functions in our software. Typically this is used int he FAMFile inspector.</Comment>
+				<Comment>Enables/disables availability of specific features in our software.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:25:49 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AdminOnly" null="not null" sortOrder="5" type="bit">
 						<Comment>Can only admins run this.</Comment>
@@ -771,10 +865,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FeatureDescription comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FeatureName comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
+					<Record When="2021-10-06T15:10:34" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.FieldSearch" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This provides a way to search for specific attributes in a voa file, by providing the voa file path.</Comment>
+				<Comment>Allows for configuration of commonly used document searches. The searches configured here are typically available in our FAM File Inspector application.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/1/2021 5:16:53 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeQuery" null="not null" sortOrder="4" type="nvarchar(256)">
 						<Comment>The attribute query representing a structure of a voa file to the particular attribute.</Comment>
@@ -785,8 +880,8 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="10/1/2021 5:16:53 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FieldName" null="not null" sortOrder="3" type="nvarchar(64)">
 						<Comment>The attribute field to search for.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/1/2021 5:16:53 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="5" type="uniqueidentifier">
-						<Comment>A unique identifier across all databases.</Comment>
+					<Attribute commentModified="10/6/2021 3:23:21 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="5" type="uniqueidentifier">
+						<Comment>A unique identifier across all databases; used for configuration migrations/merging.</Comment>
 					</Attribute>
 					<Attribute commentModified="10/1/2021 5:16:53 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A unique identifier.</Comment>
@@ -801,10 +896,12 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FieldName comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Guid comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
+					<Record When="2021-10-06T15:12:50" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Guid comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.FileActionComment" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Allows for a comment to be added to a file, and tie it back to an action.</Comment>
+				<Comment>Allows for a comment to be associated with a specific file and action. Use is generally limited to specific redation workflows.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 8:04:44 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="null" sortOrder="4" type="int">
 						<Comment>Forigen key to Action.</Comment>
@@ -835,10 +932,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FileID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="UserName comment changed" />
+					<Record When="2021-10-06T15:14:03" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.FileActionStateTransition" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table records every time a file changes state in an action. An example of this is when a file goes from pending in verify, to processing in pending.</Comment>
+				<Comment>This table represents an audit trail of all changes to the FileActionState changes to record every time a file changes state in an action. An example of this is when a file goes from pending in verify, to processing in pending.</Comment>
 				<Attributes>
 					<Attribute commentModified="9/30/2021 6:36:02 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="null" sortOrder="3" type="int">
 						<Comment>A forigen key to the Action table.</Comment>
@@ -889,10 +987,13 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="MachineID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="QueueID comment changed" />
+					<Record When="2021-10-06T15:17:55" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.FileActionStatus" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This will give you the current status of a file for each action. This can also be obtained by looking at the FileActionStateTransition table, but since that table logs every change, it is much larger.</Comment>
+				<Comment>Provides the current status of a file for each action. The FileActionStateTransition table provide an audit trail of all state changes made.
+
+Note: Files in the "unattempted" state for a given action are represented by the absence of a corresponding row in this table (rather than a row with an ActionStatus of 'U')</Comment>
 				<Attributes>
 					<Attribute commentModified="9/30/2021 6:39:09 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A forigen key to the action table.</Comment>
@@ -915,16 +1016,17 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ActionStatus comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FileID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Priority comment changed" />
+					<Record When="2021-10-06T15:17:15" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.FileHandler" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table allows for different verifications to be run in the fam file inspector depending on different workflows.</Comment>
+				<Comment>This table allows allows for the definition of document specific operations. Typically the handlers defined here are used to provide context menu options in dashboards or the FAM File Inspector.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AdminOnly" null="not null" sortOrder="7" type="bit">
 						<Comment>Can only admins run/see this.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AllowMultipleFiles" null="not null" sortOrder="8" type="bit">
-						<Comment>Can multiple files be passed.</Comment>
+					<Attribute commentModified="10/6/2021 3:22:23 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AllowMultipleFiles" null="not null" sortOrder="8" type="bit">
+						<Comment>Can multiple files be processed by the same operation</Comment>
 					</Attribute>
 					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ApplicationPath" null="not null" sortOrder="5" type="nvarchar(260)">
 						<Comment>The path to run the fps file.</Comment>
@@ -935,14 +1037,14 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Arguments" null="null" sortOrder="6" type="ntext">
 						<Comment>Arguments to pass the fps file.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Blocking" null="not null" sortOrder="10" type="bit">
-						<Comment>Does this block the parent application.</Comment>
+					<Attribute commentModified="10/6/2021 3:22:23 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Blocking" null="not null" sortOrder="10" type="bit">
+						<Comment>Should processing block the parent application.</Comment>
 					</Attribute>
 					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Enabled" null="not null" sortOrder="2" type="bit">
 						<Comment>Is this enabled.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="12" type="uniqueidentifier">
-						<Comment>A globally unique identifier.</Comment>
+					<Attribute commentModified="10/6/2021 3:23:29 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="12" type="uniqueidentifier">
+						<Comment>A globally unique identifier; used for configuration migrations/merging.</Comment>
 					</Attribute>
 					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="IconPath" null="null" sortOrder="4" type="nvarchar(260)">
 						<Comment>An icon to use for the verification. Typically is un-used.</Comment>
@@ -950,11 +1052,11 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A unique identifier.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="SupportsErrorHandling" null="not null" sortOrder="9" type="bit">
-						<Comment>Can this support error handling.</Comment>
+					<Attribute commentModified="10/6/2021 3:22:23 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="SupportsErrorHandling" null="not null" sortOrder="9" type="bit">
+						<Comment>Indicates whether the specified application implements Extract error handling to be able to receive error details back from failed operations.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:28:03 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="WorkflowName" null="null" sortOrder="11" type="nvarchar(100)">
-						<Comment>What workflow this is associated with.</Comment>
+					<Attribute commentModified="10/6/2021 3:22:23 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="WorkflowName" null="null" sortOrder="11" type="nvarchar(100)">
+						<Comment>The workflow with which this handler is to be assossiated.</Comment>
 					</Attribute>
 				</Attributes>
 				<History>
@@ -973,10 +1075,16 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="SupportsErrorHandling comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="WorkflowName comment changed" />
+					<Record When="2021-10-06T15:20:00" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="AllowMultipleFiles comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Blocking comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Guid comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="SupportsErrorHandling comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="WorkflowName comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.FileMetadataFieldValue" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table links a metadata value to a particular file. Metadata is simply a piece of information that is relevant to a file.</Comment>
+				<Comment>This table links a metadata value, such as document type, to a particular file.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/1/2021 5:18:37 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FileID" null="not null" sortOrder="2" type="int">
 						<Comment>The file the value is tied to. Forigen key to FAMFile.</Comment>
@@ -999,6 +1107,7 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="MetadataFieldID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Value comment changed" />
+					<Record When="2021-10-06T15:25:35" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.FileTag" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
@@ -1020,7 +1129,7 @@ Both of the columns contain json data.</Comment>
 				</History>
 			</Object>
 			<Object Name="dbo.FileTaskSession" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Represents a set time that a file is open in a session. A Session can have multiple files go through it, but the file task session is tied to a particular file in a point in time.</Comment>
+				<Comment>Represents a specific task executed against a specific file. Any given task may be one of several configured to execute for a given action, but not all tasks will record sessions here. Note a FAMSession will represent a process running against an action that may process 0. 1 or more files, there may be many FileTaskSessions rows recorded here for a given FAMSession, action and file.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/1/2021 5:22:57 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="null" sortOrder="3" type="int">
 						<Comment>Forigen key to Action.</Comment>
@@ -1063,28 +1172,61 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="OverheadTime comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="TaskClassID comment changed" />
+					<Record When="2021-10-06T15:42:12" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.FileTaskSessionCache" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
+				<Comment>Provides a location to cache data associate with specific pages of a document open for verification for better responsiveness in the verification application. Caching functionality is made available via Extract application backend API which is utilitized by some Extract verification applications.</Comment>
 				<Attributes>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeData" null="null" sortOrder="8" type="nvarchar(-1)" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeDataModifiedTime" null="null" sortOrder="9" type="datetime" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AutoDeleteWithActiveFAMID" null="null" sortOrder="2" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Exception" null="null" sortOrder="10" type="nvarchar(-1)" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FileTaskSessionID" null="not null" sortOrder="3" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="bigint" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ImageData" null="null" sortOrder="5" type="varbinary(-1)" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Page" null="not null" sortOrder="4" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="USSData" null="null" sortOrder="6" type="nvarchar(-1)" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="WordZoneData" null="null" sortOrder="7" type="nvarchar(-1)" />
+					<Attribute commentModified="10/6/2021 4:34:05 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeData" null="null" sortOrder="8" type="nvarchar(-1)">
+						<Comment>Attribute (field) data</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:34:05 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeDataModifiedTime" null="null" sortOrder="9" type="datetime">
+						<Comment>The time AttributeData was last updated (NULL if it is unmodified from since loaded)</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 3:49:57 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AutoDeleteWithActiveFAMID" null="null" sortOrder="2" type="int">
+						<Comment>Ties the lifecycle of the cached data to a ActiveFAM entry to guarantee the cached data is cleaned up when the associated session is closed or lost</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:34:05 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Exception" null="null" sortOrder="10" type="nvarchar(-1)">
+						<Comment>Represents any error encountered populating cached data</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:34:05 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FileTaskSessionID" null="not null" sortOrder="3" type="int">
+						<Comment>Forigen key to FileTaskSession</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 3:49:57 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="bigint">
+						<Comment>A unique identifier.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:34:05 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ImageData" null="null" sortOrder="5" type="varbinary(-1)">
+						<Comment>The binary page image data</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:34:05 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Page" null="not null" sortOrder="4" type="int">
+						<Comment>The page number to which the data in this row pertains.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:34:05 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="USSData" null="null" sortOrder="6" type="nvarchar(-1)">
+						<Comment>OCR data</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:34:05 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="WordZoneData" null="null" sortOrder="7" type="nvarchar(-1)">
+						<Comment>Spatial data for all words on the page</Comment>
+					</Attribute>
 				</Attributes>
 				<History>
 					<Record When="2021-09-30T15:16:47" Who="Trever_Gannon" Description="Loaded" />
 					<Record When="2021-09-30T15:16:47" Who="Trever_Gannon" Description="Loaded 10 attributes" />
+					<Record When="2021-10-06T15:48:14" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="AttributeData comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="AttributeDataModifiedTime comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="AutoDeleteWithActiveFAMID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Exception comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="FileTaskSessionID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ImageData comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Page comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="USSData comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="WordZoneData comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.FPSFile" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table tracks all fps files that are used within our software, that connected to this particular database.</Comment>
+				<Comment>This table tracks all fps files that are processed within our software, against this particular database.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/1/2021 5:24:27 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FPSFileName" null="not null" sortOrder="2" type="nvarchar(512)">
 						<Comment>The full path to the FPS file. This can also track ETL processes that were run on the database.</Comment>
@@ -1099,6 +1241,7 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-01T17:24:27" Who="Trever_Gannon" Description="Changed object comment" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FPSFileName comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
+					<Record When="2021-10-06T16:34:42" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.FTPAccount" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
@@ -1150,7 +1293,9 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="10/4/2021 1:55:14 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FTPAccountID" null="not null" sortOrder="7" type="int">
 						<Comment>Forigen key to FTPAccount.</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FTPAction" null="not null" sortOrder="6" type="nvarchar(1)" />
+					<Attribute commentModified="10/6/2021 4:38:17 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FTPAction" null="not null" sortOrder="6" type="nvarchar(1)">
+						<Comment>Specifies the operation type</Comment>
+					</Attribute>
 					<Attribute commentModified="10/4/2021 1:54:32 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A unique identifier.</Comment>
 					</Attribute>
@@ -1180,10 +1325,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="MachineID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="QueueOrProcess comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Retries comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="FTPAction comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.IDShieldData" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Stores metrics relating to IDShield.</Comment>
+				<Comment>Stores metrics for reporting in IDShield (redaction) workflows.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:29:19 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FileTaskSessionID" null="not null" sortOrder="9" type="int">
 						<Comment>Forigen key to FileTaskSession.</Comment>
@@ -1191,16 +1337,26 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="10/5/2021 1:29:19 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A unique identifier.</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumCluesFound" null="null" sortOrder="5" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumHCDataFound" null="null" sortOrder="2" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumLCDataFound" null="null" sortOrder="4" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumMCDataFound" null="null" sortOrder="3" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPagesAutoAdvanced" null="null" sortOrder="8" type="int" />
-					<Attribute commentModified="10/5/2021 1:29:19 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="TotalManualRedactions" null="null" sortOrder="6" type="int">
-						<Comment>The number of manual redactions occured.</Comment>
+					<Attribute commentModified="10/6/2021 4:40:45 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumCluesFound" null="null" sortOrder="5" type="int">
+						<Comment>Count of clues added by the software</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:29:19 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="TotalRedactions" null="null" sortOrder="7" type="int">
-						<Comment>How many total redactions were made.</Comment>
+					<Attribute commentModified="10/6/2021 4:40:45 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumHCDataFound" null="null" sortOrder="2" type="int">
+						<Comment>Count of high confidence zone identified by the software</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:40:45 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumLCDataFound" null="null" sortOrder="4" type="int">
+						<Comment>Count of low confidence zone identified by the software</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:40:45 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumMCDataFound" null="null" sortOrder="3" type="int">
+						<Comment>Count of medium confidence zone identified by the software</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:40:45 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="NumPagesAutoAdvanced" null="null" sortOrder="8" type="int">
+						<Comment>The number of pages that were automatically displayed via the slideshow feature</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:40:45 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="TotalManualRedactions" null="null" sortOrder="6" type="int">
+						<Comment>The number of manual redactions added.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 4:40:45 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="TotalRedactions" null="null" sortOrder="7" type="int">
+						<Comment>How many total redactions exist</Comment>
 					</Attribute>
 				</Attributes>
 				<History>
@@ -1211,10 +1367,18 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="TotalManualRedactions comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="TotalRedactions comment changed" />
+					<Record When="2021-10-06T16:40:45" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumCluesFound comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumHCDataFound comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumLCDataFound comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumMCDataFound comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumPagesAutoAdvanced comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="TotalManualRedactions comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="TotalRedactions comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.InputEvent" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Tracks input being made in our software.</Comment>
+				<Comment>Tracks user input activity in verification applications; allows for reporting on time users have been actively interacting with our software.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:30:51 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="not null" sortOrder="3" type="int">
 						<Comment>Forigen key to action.</Comment>
@@ -1249,15 +1413,18 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="PID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="SecondsWithInputEvents comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="TimeStamp comment changed" />
+					<Record When="2021-10-06T16:42:39" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.LabDEEncounter" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>An encounter is when a patient visits a hospital.</Comment>
+				<Comment>Represents data from a medical record system related to a specific patient encounter</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:06:23 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AdmissionDate" null="null" sortOrder="8" type="datetime">
 						<Comment>When the encounter started.</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ADTMessage" null="null" sortOrder="9" type="xml(-1)" />
+					<Attribute commentModified="10/6/2021 4:51:32 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ADTMessage" null="null" sortOrder="9" type="xml(-1)">
+						<Comment>An XML representation of the ADT HL7 message used to generate this record.</Comment>
+					</Attribute>
 					<Attribute commentModified="10/4/2021 8:40:59 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="CSN" null="not null" pk="true" sortOrder="1" type="nvarchar(20)">
 						<Comment>Customer service number. A unique identifier.</Comment>
 					</Attribute>
@@ -1296,10 +1463,12 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="EncounterType comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Guid comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="PatientMRN comment changed" />
+					<Record When="2021-10-06T16:59:29" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ADTMessage comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.LabDEEncounterFile" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Links a file to encounter.</Comment>
+				<Comment>Associates a document having been processed in association with the specified encounter</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:07:10 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="DateTime" null="null" sortOrder="3" type="datetime">
 						<Comment>When this file was linked.</Comment>
@@ -1318,12 +1487,15 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="DateTime comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="EncounterID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FileID comment changed" />
+					<Record When="2021-10-06T16:56:22" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.LabDEOrder" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table is populated by our customers in typical workflows. An order can be anything that a hospital puts in for the patient.</Comment>
+				<Comment>Represents a specific order in a medical record system.</Comment>
 				<Attributes>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AccessionNumber" null="null" sortOrder="9" type="nvarchar(50)" />
+					<Attribute commentModified="10/6/2021 4:55:00 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AccessionNumber" null="null" sortOrder="9" type="nvarchar(50)">
+						<Comment>The accession number</Comment>
+					</Attribute>
 					<Attribute commentModified="10/4/2021 1:14:29 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="EncounterID" null="null" sortOrder="8" type="nvarchar(20)">
 						<Comment>A forigen key to LabDEEncounter.</Comment>
 					</Attribute>
@@ -1339,14 +1511,18 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="10/4/2021 1:17:00 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="OrderStatus" null="not null" sortOrder="5" type="nchar(1)">
 						<Comment>The current status of the order. Forigen key to LabDEOrderStatus.</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ORMMessage" null="null" sortOrder="7" type="xml(-1)" />
+					<Attribute commentModified="10/6/2021 4:55:00 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ORMMessage" null="null" sortOrder="7" type="xml(-1)">
+						<Comment>An XML representation of the ORM HL7 message used to generate this record.</Comment>
+					</Attribute>
 					<Attribute commentModified="10/4/2021 1:14:29 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="PatientMRN" null="null" sortOrder="3" type="nvarchar(20)">
 						<Comment>The patient medical record number.</Comment>
 					</Attribute>
 					<Attribute commentModified="10/4/2021 1:14:29 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ReceivedDateTime" null="not null" sortOrder="4" type="datetime">
 						<Comment>When the order was recieved.</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ReferenceDateTime" null="null" sortOrder="6" type="datetime" />
+					<Attribute commentModified="10/6/2021 4:55:00 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ReferenceDateTime" null="null" sortOrder="6" type="datetime">
+						<Comment>The date/time against which this order is to be compared against in Extract software. Requested Date/Time (OBR-6) is a typical source of this value</Comment>
+					</Attribute>
 				</Attributes>
 				<History>
 					<Record When="2021-09-30T15:16:47" Who="Trever_Gannon" Description="Loaded" />
@@ -1359,10 +1535,14 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="OrderStatus comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="PatientMRN comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ReceivedDateTime comment changed" />
+					<Record When="2021-10-06T16:57:41" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="AccessionNumber comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ORMMessage comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ReferenceDateTime comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.LabDEOrderFile" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table links a FAMFile to an order.</Comment>
+				<Comment>Associates a document having been processed in association with the specified order</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:08:49 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="CollectionDate" null="null" sortOrder="3" type="datetime">
 						<Comment>The date the file was collected.</Comment>
@@ -1381,10 +1561,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="CollectionDate comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FileID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="OrderNumber comment changed" />
+					<Record When="2021-10-06T16:56:30" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.LabDEOrderStatus" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table maps lab de order codes to a meaning.</Comment>
+				<Comment>This table maps LabDE order codes to a meaning.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 1:17:29 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Code" null="not null" pk="true" sortOrder="1" type="nchar(1)">
 						<Comment>The order status code.</Comment>
@@ -1399,10 +1580,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-04T13:17:29" Who="Trever_Gannon" Description="Changed object comment" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Code comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Meaning comment changed" />
+					<Record When="2021-10-06T16:57:51" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.LabDEPatient" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>A LabDEPatient, is a patient at the hopsital.</Comment>
+				<Comment>Patient information from a medical record system</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 1:19:57 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="CurrentMRN" null="not null" sortOrder="9" type="nvarchar(20)">
 						<Comment>The current MRN for the patient. Typically this is identical to MRN.</Comment>
@@ -1449,10 +1631,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="MiddleName comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="MRN comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Suffix comment changed" />
+					<Record When="2021-10-06T16:58:19" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.LabDEPatientFile" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>A table that ties a file to a particular patient.</Comment>
+				<Comment>Associates a document having been processed in association with the specified patient</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 1:43:13 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="DateTime" null="null" sortOrder="3" type="datetime">
 						<Comment>The date that this link was made.</Comment>
@@ -1471,10 +1654,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="DateTime comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FileID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="PatientMRN comment changed" />
+					<Record When="2021-10-06T16:59:56" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.LabDEProvider" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>A provider is typically a doctor.</Comment>
+				<Comment>Provider information from a medical record system</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 7:49:28 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Address" null="null" sortOrder="12" type="nvarchar(1000)">
 						<Comment>Hospital address.</Comment>
@@ -1545,10 +1729,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ProviderType comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Specialties comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Title comment changed" />
+					<Record When="2021-10-06T17:00:12" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.LockedFile" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table tracks all of the files that are locked in our database. A locked file is typically one that is being processed. Records are removed from this table if they are locked.</Comment>
+				<Comment>This table tracks all of the files that are locked for processing in our database to synchronize access to the file amongst all active processes.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 1:35:05 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="not null" sortOrder="2" type="int">
 						<Comment>Forigen key to Action.</Comment>
@@ -1575,10 +1760,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ActiveFAMID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FileID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="StatusBeforeLock comment changed" />
+					<Record When="2021-10-06T19:14:33" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.LockTable" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>A table keeping track of all locked tables.</Comment>
+				<Comment>Used to implement a scheme to resolve conflicting database operations. Each lock will guard against other Extract processes from accessing specific database operations while the lock is in place.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 7:50:05 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="LockName" null="not null" pk="true" sortOrder="1" type="nvarchar(50)">
 						<Comment>The name of the lock.</Comment>
@@ -1597,15 +1783,16 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="LockName comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="LockTime comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="UPI comment changed" />
+					<Record When="2021-10-06T19:17:07" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.Login" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
 				<Comment>This table tracks all of the logins for our database. The current use case is primarly tied to our web application.</Comment>
 				<Attributes>
-					<Attribute commentModified="10/4/2021 1:32:24 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActiveDirectorySID" null="null" sortOrder="4" type="nvarchar(256)">
+					<Attribute commentModified="10/4/2021 1:32:24 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="ActiveDirectorySID" null="null" sortOrder="5" type="nvarchar(256)">
 						<Comment>The users active directory SID.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/4/2021 1:32:24 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="5" type="uniqueidentifier">
+					<Attribute commentModified="10/4/2021 1:32:24 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="Guid" null="not null" sortOrder="4" type="uniqueidentifier">
 						<Comment>A unique identifier across all databases.</Comment>
 					</Attribute>
 					<Attribute commentModified="10/4/2021 1:32:24 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
@@ -1630,7 +1817,7 @@ Both of the columns contain json data.</Comment>
 				</History>
 			</Object>
 			<Object Name="dbo.Machine" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table is for tracking the machine name of all computers that interact with the database.</Comment>
+				<Comment>This table is for tracking the machine name of all computers on which processing against this database has occurred.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/1/2021 5:52:42 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A unique identifier.</Comment>
@@ -1645,10 +1832,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-01T17:52:42" Who="Trever_Gannon" Description="Changed object comment" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="MachineName comment changed" />
+					<Record When="2021-10-06T19:18:02" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.MetadataField" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table tracks all of the metadata fields we have in our database. These are configured in the database administration tool.</Comment>
+				<Comment>This table tracks all of the metadata fields configured in the database. These are configured in the database administration tool.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 1:30:57 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="3" type="uniqueidentifier">
 						<Comment>A unique identifier across all databases.</Comment>
@@ -1667,10 +1855,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Guid comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Name comment changed" />
+					<Record When="2021-10-06T19:18:26" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.MLData" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Stores machine learning data.</Comment>
+				<Comment>Stores data used for machine learning training.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:19:02 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="CanBeDeleted" null="not null" sortOrder="7" type="bit">
 						<Comment>A bit representing if this can be deleted.</Comment>
@@ -1705,10 +1894,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="IsTrainingData comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="MLModelID comment changed" />
+					<Record When="2021-10-06T19:18:45" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.MLModel" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Creates a name for various types of machine learning being run.</Comment>
+				<Comment>Defines the machine learning models available for training.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:17:21 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Guid" null="not null" sortOrder="3" type="uniqueidentifier">
 						<Comment>A unique identifier across all databases.</Comment>
@@ -1727,6 +1917,7 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Guid comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Name comment changed" />
+					<Record When="2021-10-06T19:19:11" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.Pagination" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
@@ -1772,7 +1963,7 @@ Both of the columns contain json data.</Comment>
 				</History>
 			</Object>
 			<Object Name="dbo.QueuedActionStatusChange" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Tracks when a user manually changes the status of a file.</Comment>
+				<Comment>Schedules an action status change that could not be immediately executed, typically because the document was in the processing state when the status change was requested.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:39:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="null" sortOrder="3" type="int">
 						<Comment>Forigen key to action.</Comment>
@@ -1815,6 +2006,7 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FileID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="MachineID comment changed" />
+					<Record When="2021-10-06T19:21:13" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.QueueEvent" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
@@ -1882,35 +2074,43 @@ Both of the columns contain json data.</Comment>
 				</History>
 			</Object>
 			<Object Name="dbo.RasterZone" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table keeps track of all raster zones. A raster zone is where a piece of information was found on a document.</Comment>
+				<Comment>Defines the spatial location of an Attribute in the document.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:50:12 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AttributeID" null="not null" sortOrder="2" type="bigint">
 						<Comment>Forigen key to Attribute.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:50:12 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Bottom" null="not null" sortOrder="5" type="int">
-						<Comment>Length of the bottom side.</Comment>
+					<Attribute commentModified="10/6/2021 7:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Bottom" null="not null" sortOrder="5" type="int">
+						<Comment>Y coordinate of the bottom side of the bounding box.</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="EndX" null="not null" sortOrder="9" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="EndY" null="not null" sortOrder="10" type="int" />
-					<Attribute commentModified="10/5/2021 1:50:12 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Height" null="not null" sortOrder="12" type="int">
-						<Comment>How tall this raster zone is.</Comment>
+					<Attribute commentModified="10/6/2021 7:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="EndX" null="not null" sortOrder="9" type="int">
+						<Comment>X coordinate for the ending point of a line that extends along the middle of a potentially skewed zone.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="EndY" null="not null" sortOrder="10" type="int">
+						<Comment>Y coordinate for the ending point of a line that extends along the middle of a potentially skewed zone.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Height" null="not null" sortOrder="12" type="int">
+						<Comment>Distance from one size of zone to the other perpendicular to the line defined by Start/End X/Y.</Comment>
 					</Attribute>
 					<Attribute commentModified="10/5/2021 1:50:12 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="bigint">
 						<Comment>A unique identifier.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:50:12 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Left" null="not null" sortOrder="4" type="int">
-						<Comment>Length of the left side.</Comment>
+					<Attribute commentModified="10/6/2021 7:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Left" null="not null" sortOrder="4" type="int">
+						<Comment>X coordinate of the left side of the bounding box.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:50:12 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="PageNumber" null="not null" sortOrder="11" type="int">
-						<Comment>The page number this raster zone was found.</Comment>
+					<Attribute commentModified="10/6/2021 7:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="PageNumber" null="not null" sortOrder="11" type="int">
+						<Comment>The page number to which the raster zone pertains</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:50:12 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Right" null="not null" sortOrder="6" type="int">
-						<Comment>Length of the right side.</Comment>
+					<Attribute commentModified="10/6/2021 7:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Right" null="not null" sortOrder="6" type="int">
+						<Comment>X coordinate of the right side of the bounding box.</Comment>
 					</Attribute>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="StartX" null="not null" sortOrder="7" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="StartY" null="not null" sortOrder="8" type="int" />
-					<Attribute commentModified="10/5/2021 1:50:12 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Top" null="not null" sortOrder="3" type="int">
-						<Comment>Length of the top side.</Comment>
+					<Attribute commentModified="10/6/2021 7:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="StartX" null="not null" sortOrder="7" type="int">
+						<Comment>X coordinate for the starting point of a line that extends along the middle of a potentially skewed zone.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="StartY" null="not null" sortOrder="8" type="int">
+						<Comment>Y coordinate for the starting point of a line that extends along the middle of a potentially skewed zone.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Top" null="not null" sortOrder="3" type="int">
+						<Comment>Y coordinate of the top side of the bounding box.</Comment>
 					</Attribute>
 				</Attributes>
 				<History>
@@ -1925,6 +2125,17 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="PageNumber comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Right comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Top comment changed" />
+					<Record When="2021-10-06T19:28:16" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Bottom comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="EndX comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="EndY comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Height comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Left comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="PageNumber comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Right comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="StartX comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="StartY comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Top comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.ReportingDatabaseMigrationWizard" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
@@ -1970,7 +2181,7 @@ Both of the columns contain json data.</Comment>
 				</History>
 			</Object>
 			<Object Name="dbo.ReportingDataCaptureAccuracy" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Reports on how accurate our rules were, compared to the output after verification.</Comment>
+				<Comment>Provides data transformed for reporting on data capture accuracy of data given a found and expected attribute set.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:33:35 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Attribute" null="not null" sortOrder="12" type="nvarchar(-1)">
 						<Comment>The attribute that was processed.</Comment>
@@ -2037,39 +2248,40 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FoundFAMUserID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Incorrect comment changed" />
+					<Record When="2021-10-06T19:30:32" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.ReportingHIMStats" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>Tracks files that when through pagination.</Comment>
+				<Comment>Provides data transformed for reporting on documents that when thru pagination</Comment>
 				<Attributes>
-					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="null" sortOrder="8" type="int">
+					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="ActionID" null="null" sortOrder="7" type="int">
 						<Comment>Forigen key to action.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionName" null="not null" sortOrder="10" type="nvarchar(50)">
+					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="ActionName" null="not null" sortOrder="9" type="nvarchar(50)">
 						<Comment>The action name that processed this file.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="DateProcessed" null="null" sortOrder="7" type="date">
+					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="DateProcessed" null="null" sortOrder="6" type="date">
 						<Comment>When this file went through pagination.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="DestFileID" null="null" sortOrder="5" type="int">
+					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="DestFileID" null="null" sortOrder="4" type="int">
 						<Comment>Forigen key to FAMFile.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FAMUserID" null="not null" sortOrder="3" type="int">
+					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="FAMUserID" null="not null" sortOrder="2" type="int">
 						<Comment>Forigen key to FAMUser.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FileTaskSessionID" null="not null" sortOrder="9" type="int">
+					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="FileTaskSessionID" null="not null" sortOrder="8" type="int">
 						<Comment>Forigen key to FileTaskSession.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
+					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="ID" null="not null" pk="true" sortOrder="10" type="int">
 						<Comment>A unique identifier.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="OriginalFileID" null="not null" sortOrder="6" type="int">
+					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="OriginalFileID" null="not null" sortOrder="5" type="int">
 						<Comment>Forigen key to FAMFile.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="PaginationID" null="null" sortOrder="2" type="int">
+					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="PaginationID" null="null" sortOrder="1" type="int">
 						<Comment>Forigen key to Pagination.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="SourceFileID" null="not null" sortOrder="4" type="int">
+					<Attribute commentModified="10/5/2021 1:34:48 PM" created="2021-09-30T15:16:47" modified="2021-10-06T12:26:49" name="SourceFileID" null="not null" sortOrder="3" type="int">
 						<Comment>Forigen key to FAMFile.</Comment>
 					</Attribute>
 				</Attributes>
@@ -2087,10 +2299,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="OriginalFileID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="PaginationID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="SourceFileID comment changed" />
+					<Record When="2021-10-06T19:29:44" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.ReportingRedactionAccuracy" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table tracks how accurate we were with redactions.</Comment>
+				<Comment>Provides data transformed for reporting on redaction accuracy of data given a found and expected attribute set.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:37:13 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Attribute" null="not null" sortOrder="13" type="nvarchar(-1)">
 						<Comment>The attribute that was processed.</Comment>
@@ -2177,10 +2390,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="OverRedacted comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Page comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="UnderRedacted comment changed" />
+					<Record When="2021-10-06T19:30:43" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.ReportingVerificationRates" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>A table that tracks verification in our database.</Comment>
+				<Comment>Provides data transformed for reporting on end user verification rates</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:47:24 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="null" sortOrder="4" type="int">
 						<Comment>Forigen key to Action.</Comment>
@@ -2223,40 +2437,87 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="LastFileTaskSessionID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="OverheadTime comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="TaskClassID comment changed" />
+					<Record When="2021-10-06T19:31:41" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.SecureCounter" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
+				<Comment>Counters whose values can be validated, typically used for the purpose of tracking specific processing performed on documents in an Extract workflow</Comment>
 				<Attributes>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AlertLevel" null="not null" sortOrder="4" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AlertMultiple" null="not null" sortOrder="5" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="CounterName" null="not null" sortOrder="2" type="nvarchar(100)" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="SecureCounterValue" null="not null" sortOrder="3" type="nvarchar(-1)" />
+					<Attribute commentModified="10/6/2021 7:37:17 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AlertLevel" null="not null" sortOrder="4" type="int">
+						<Comment>The counter value at which alerts should be generated</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:37:17 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="AlertMultiple" null="not null" sortOrder="5" type="int">
+						<Comment>The frequency at which alerts should be repeated after reaching the AlertLevel</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:37:17 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="CounterName" null="not null" sortOrder="2" type="nvarchar(100)">
+						<Comment>The name of what is being counted</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:37:34 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
+						<Comment>A unique identifier.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:37:17 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="SecureCounterValue" null="not null" sortOrder="3" type="nvarchar(-1)">
+						<Comment>The encrypted counter value</Comment>
+					</Attribute>
 				</Attributes>
 				<History>
 					<Record When="2021-09-30T15:16:47" Who="Trever_Gannon" Description="Loaded" />
 					<Record When="2021-09-30T15:16:47" Who="Trever_Gannon" Description="Loaded 5 attributes" />
+					<Record When="2021-10-06T19:37:17" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="AlertLevel comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="AlertMultiple comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="CounterName comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="SecureCounterValue comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.SecureCounterValueChange" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
+				<Comment>Provides an audit trail of the changes to counter values in the SecureCounter table</Comment>
 				<Attributes>
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Comment" null="null" sortOrder="9" type="nvarchar(-1)" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="CounterID" null="not null" sortOrder="2" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FromValue" null="not null" sortOrder="3" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="HashValue" null="not null" sortOrder="8" type="bigint" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="LastUpdatedByFAMSessionID" null="null" sortOrder="6" type="int" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="LastUpdatedTime" null="not null" sortOrder="5" type="datetime" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="MinFAMFileCount" null="not null" sortOrder="7" type="bigint" />
-					<Attribute created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ToValue" null="not null" sortOrder="4" type="int" />
+					<Attribute commentModified="10/6/2021 7:43:36 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="Comment" null="null" sortOrder="9" type="nvarchar(-1)">
+						<Comment>Describes the certain counter value change operations</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:43:36 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="CounterID" null="not null" sortOrder="2" type="int">
+						<Comment>A foreign key to SecureCounter</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:43:36 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FromValue" null="not null" sortOrder="3" type="int">
+						<Comment>The counter value prior to the change</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:43:36 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="HashValue" null="not null" sortOrder="8" type="bigint">
+						<Comment>Hash used for counter data validation</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:43:36 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ID" null="not null" pk="true" sortOrder="1" type="int">
+						<Comment>A unique identifier.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:43:36 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="LastUpdatedByFAMSessionID" null="null" sortOrder="6" type="int">
+						<Comment>A foreign key to FAMSession</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:43:36 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="LastUpdatedTime" null="not null" sortOrder="5" type="datetime">
+						<Comment>The date/time associated with the change</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:43:36 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="MinFAMFileCount" null="not null" sortOrder="7" type="bigint">
+						<Comment>Number of files in the database at time of change</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 7:43:36 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ToValue" null="not null" sortOrder="4" type="int">
+						<Comment>The counter value after the change</Comment>
+					</Attribute>
 				</Attributes>
 				<History>
 					<Record When="2021-09-30T15:16:47" Who="Trever_Gannon" Description="Loaded" />
 					<Record When="2021-09-30T15:16:47" Who="Trever_Gannon" Description="Loaded 9 attributes" />
+					<Record When="2021-10-06T19:43:36" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Comment comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="CounterID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="FromValue comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="HashValue comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="LastUpdatedByFAMSessionID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="LastUpdatedTime comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="MinFAMFileCount comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ToValue comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.SkippedFile" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table contains all of the files a user may have skipped in our software. Files are removed from this table when they have been processed.</Comment>
+				<Comment>This table contains all of the files a user may have skipped in our software.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 1:28:16 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="ActionID" null="null" sortOrder="4" type="int">
 						<Comment>Forigen key to ActionID.</Comment>
@@ -2291,10 +2552,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="TimeSinceSkipped comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="UserName comment changed" />
+					<Record When="2021-10-06T19:43:58" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.SourceDocChangeHistory" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table tracks all of the times a document has been re-named.</Comment>
+				<Comment>Tracks name changes for a document (FAMFile)</Comment>
 				<Attributes>
 					<Attribute commentModified="10/4/2021 1:29:57 PM" created="2021-09-30T15:16:47" modified="2021-09-30T15:16:47" name="FAMUserID" null="not null" sortOrder="6" type="int">
 						<Comment>Forigen key to FAMUser.</Comment>
@@ -2329,10 +2591,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="MachineID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="TimeStamp comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ToFileName comment changed" />
+					<Record When="2021-10-06T19:52:04" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.Tag" Created="2021-09-30T15:16:47" CommentModified="2021-09-30T15:16:47" CommentModifiedBy="">
-				<Comment>This table creates all of the different tags that can be tied to a file. It is possible for multiple tags to be applied to a file. Typically tags are used in a workflow configuration, where you only need to check a true/false condition on a file.</Comment>
+				<Comment>This table defines all of the tags available to be applied to a file. It is possible for multiple tags to be applied to a file. Typically tags are used in a workflow configuration, where you only need to check a true/false condition on a file.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/1/2021 5:44:28 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Guid" null="not null" sortOrder="4" type="uniqueidentifier">
 						<Comment>A unique identifier across all databases.</Comment>
@@ -2355,6 +2618,7 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="TagDescription comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="TagName comment changed" />
+					<Record When="2021-10-06T19:52:36" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.TaskClass" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
@@ -2402,7 +2666,7 @@ Both of the columns contain json data.</Comment>
 				</History>
 			</Object>
 			<Object Name="dbo.WebAppConfig" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
-				<Comment>This table contains the configuration for our web application.</Comment>
+				<Comment>This table contains the configuration for Extract's web-based redaction verication application.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/1/2021 5:39:10 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Guid" null="not null" sortOrder="5" type="uniqueidentifier">
 						<Comment>A unique identifier across all databases.</Comment>
@@ -2429,10 +2693,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Settings comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Type comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="WorkflowID comment changed" />
+					<Record When="2021-10-06T19:53:34" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.Workflow" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
-				<Comment>Handles the flow of documents throughout our software.</Comment>
+				<Comment>Defines a workflow; workflows allow for documents to run through a different configurations in the same database.</Comment>
 				<Attributes>
 					<Attribute commentModified="10/1/2021 5:36:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Description" null="null" sortOrder="4" type="nvarchar(-1)">
 						<Comment>Provides a brief description of what this workflow is for.</Comment>
@@ -2461,10 +2726,10 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="10/5/2021 1:22:43 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="OutputAttributeSetID" null="null" sortOrder="9" type="bigint">
 						<Comment>The attribute set name used by the API to provide or accept updates to document data. Note that this shouldn't be DataFoundByRules for workflows when edits are accepted because those edits will be stored under this attribute set name. Forigen key to AttributeSet.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:22:43 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="OutputFileMetadataFieldID" null="null" sortOrder="10" type="int">
+					<Attribute commentModified="10/5/2021 1:22:43 PM" created="2021-09-30T15:16:48" modified="2021-10-06T12:26:50" name="OutputFileMetadataFieldID" null="null" sortOrder="11" type="int">
 						<Comment>If a file is to be made available as output (redacted copy, searchable PDF, etc.) this is the metadata field that will point to the output file. This metadata field can either be set at the time the output file is created, or the Initial value function can specify a &lt;SourceDocName&gt; -based path tag that will resolve to the output filename.  Forigen key to MetadatField.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:24:44 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="OutputFilePathInitializationFunction" null="null" sortOrder="11" type="nvarchar(255)">
+					<Attribute commentModified="10/5/2021 1:24:44 PM" created="2021-09-30T15:16:48" modified="2021-10-06T12:26:50" name="OutputFilePathInitializationFunction" null="null" sortOrder="10" type="nvarchar(255)">
 						<Comment>this function constructs the a default file name for the output files created in the workflow. The metadata field value can always be overwritten per file later via the Set Metadata task. You may also wish to not provide a default at all and set the metadata value only once the file is created.</Comment>
 					</Attribute>
 					<Attribute commentModified="10/5/2021 1:24:44 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="PostEditActionID" null="null" sortOrder="14" type="int">
@@ -2499,10 +2764,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="PostWorkflowActionID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="StartActionID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="WorkflowTypeCode comment changed" />
+					<Record When="2021-10-06T19:55:30" Who="steve_kurth" Description="Changed object comment" />
 				</History>
 			</Object>
 			<Object Name="dbo.WorkflowChange" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
-				<Comment>Tracks when a workflow is re-maped.</Comment>
+				<Comment>Tracks operations that add documents to a workflow</Comment>
 				<Attributes>
 					<Attribute commentModified="10/5/2021 1:43:56 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="DestWorkflowID" null="not null" sortOrder="3" type="int">
 						<Comment>Forigen key to Workflow.</Comment>
@@ -2510,8 +2776,8 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="10/5/2021 1:43:56 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A unique identifier.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:43:56 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="WorkflowChangeDate" null="not null" sortOrder="2" type="datetimeoffset">
-						<Comment>When the workflow was changed.</Comment>
+					<Attribute commentModified="10/6/2021 8:02:13 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="WorkflowChangeDate" null="not null" sortOrder="2" type="datetimeoffset">
+						<Comment>Date/time of the operation</Comment>
 					</Attribute>
 				</Attributes>
 				<History>
@@ -2521,16 +2787,18 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="DestWorkflowID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="ID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="WorkflowChangeDate comment changed" />
+					<Record When="2021-10-06T20:02:13" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="WorkflowChangeDate comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.WorkflowChangeFile" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
-				<Comment>Tracks when a file changes workflows.</Comment>
+				<Comment>Tracks file added to a new workflow</Comment>
 				<Attributes>
-					<Attribute commentModified="10/5/2021 1:42:36 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="DestActionID" null="null" sortOrder="5" type="int">
-						<Comment>Forigen key to Action.</Comment>
+					<Attribute commentModified="10/6/2021 8:51:03 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="DestActionID" null="null" sortOrder="5" type="int">
+						<Comment>The ID of the action the files were added to in the destination workflow</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:42:36 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="DestWorkflowID" null="not null" sortOrder="7" type="int">
-						<Comment>Forigen key to Workflow.</Comment>
+					<Attribute commentModified="10/6/2021 8:51:03 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="DestWorkflowID" null="not null" sortOrder="7" type="int">
+						<Comment>The ID of the workflow to which the files were added.</Comment>
 					</Attribute>
 					<Attribute commentModified="10/5/2021 1:42:36 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FileID" null="not null" sortOrder="2" type="int">
 						<Comment>Forigen key to FAMFile.</Comment>
@@ -2538,11 +2806,11 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="10/5/2021 1:42:36 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>A unique identifier.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:42:36 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="SourceActionID" null="null" sortOrder="4" type="int">
-						<Comment>Forigen key to Action.</Comment>
+					<Attribute commentModified="10/6/2021 8:51:03 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="SourceActionID" null="null" sortOrder="4" type="int">
+						<Comment>The ID of the action the files existed in prior to the change</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:42:36 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="SourceWorkflowID" null="null" sortOrder="6" type="int">
-						<Comment>Forigen key to Workflow.</Comment>
+					<Attribute commentModified="10/6/2021 8:51:03 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="SourceWorkflowID" null="null" sortOrder="6" type="int">
+						<Comment>The ID of the workflow the files existed in prior to the change.</Comment>
 					</Attribute>
 					<Attribute commentModified="10/5/2021 1:42:36 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="WorkflowChangeID" null="not null" sortOrder="3" type="int">
 						<Comment>The workflow that this change occured in. Forigen key to workflow.</Comment>
@@ -2559,6 +2827,11 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="SourceActionID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="SourceWorkflowID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="WorkflowChangeID comment changed" />
+					<Record When="2021-10-06T20:51:03" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="DestActionID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="DestWorkflowID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="SourceActionID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="SourceWorkflowID comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.WorkflowFile" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
@@ -2570,8 +2843,8 @@ Both of the columns contain json data.</Comment>
 					<Attribute commentModified="10/5/2021 1:41:25 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FileID" null="not null" pk="true" sortOrder="2" type="int">
 						<Comment>Forigen key to FAMFile.</Comment>
 					</Attribute>
-					<Attribute commentModified="10/5/2021 1:41:25 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Invisible" null="not null" sortOrder="3" type="bit">
-						<Comment>Is the file invisible in the workflow.</Comment>
+					<Attribute commentModified="10/6/2021 8:52:12 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Invisible" null="not null" sortOrder="3" type="bit">
+						<Comment>Indicates whether files are visible via API calls; When files are "deleted" via that API, they are marked invisible in the corresponding workflow</Comment>
 					</Attribute>
 					<Attribute commentModified="10/5/2021 1:41:25 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="WorkflowID" null="not null" pk="true" sortOrder="1" type="int">
 						<Comment>Forigen key to Workflow.</Comment>
@@ -2585,6 +2858,7 @@ Both of the columns contain json data.</Comment>
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="FileID comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="Invisible comment changed" />
 					<Record When="2021-10-05T18:52:02" Who="Trever_Gannon" Description="WorkflowID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Invisible comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.WorkflowType" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
@@ -2606,36 +2880,91 @@ Both of the columns contain json data.</Comment>
 				</History>
 			</Object>
 			<Object Name="dbo.WorkItem" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
+				<Comment>Provides ability for a processing ask to divide a processing task into mulitple work items that may be processing in separate threads/processes/machines.</Comment>
 				<Attributes>
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="BinaryInput" null="null" sortOrder="5" type="varbinary(-1)" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="BinaryOutput" null="null" sortOrder="7" type="varbinary(-1)" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FAMSessionID" null="null" sortOrder="10" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ID" null="not null" pk="true" sortOrder="1" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Input" null="null" sortOrder="4" type="nvarchar(-1)" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Output" null="null" sortOrder="6" type="nvarchar(-1)" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Sequence" null="not null" sortOrder="8" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Status" null="not null" sortOrder="3" type="nchar(1)" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="StringizedException" null="null" sortOrder="9" type="nvarchar(-1)" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="WorkItemGroupID" null="not null" sortOrder="2" type="int" />
+					<Attribute commentModified="10/6/2021 9:00:11 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="BinaryInput" null="null" sortOrder="5" type="varbinary(-1)">
+						<Comment>Binary input for the work item</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:00:11 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="BinaryOutput" null="null" sortOrder="7" type="varbinary(-1)">
+						<Comment>Binary output for a completed work item</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:00:11 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FAMSessionID" null="null" sortOrder="10" type="int">
+						<Comment>The ID of the FAMSession that created the work item.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:00:11 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ID" null="not null" pk="true" sortOrder="1" type="int">
+						<Comment>A unique identifier.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:00:11 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Input" null="null" sortOrder="4" type="nvarchar(-1)">
+						<Comment>Text input for the work item</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:00:11 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Output" null="null" sortOrder="6" type="nvarchar(-1)">
+						<Comment>Text output for a completed work item</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:00:11 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Sequence" null="not null" sortOrder="8" type="int">
+						<Comment>Defines the sequence of work items for a given work item group</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:00:11 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="Status" null="not null" sortOrder="3" type="nchar(1)">
+						<Comment>Indicates whether the work item is pending (P), processing (R), complete (C) or failed (F)</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:00:11 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="StringizedException" null="null" sortOrder="9" type="nvarchar(-1)">
+						<Comment>Exception data to be provided back to the source task</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:00:11 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="WorkItemGroupID" null="not null" sortOrder="2" type="int">
+						<Comment>Foreign key to WorkItemGroup</Comment>
+					</Attribute>
 				</Attributes>
 				<History>
 					<Record When="2021-09-30T15:16:48" Who="Trever_Gannon" Description="Loaded" />
 					<Record When="2021-09-30T15:16:48" Who="Trever_Gannon" Description="Loaded 10 attributes" />
+					<Record When="2021-10-06T20:53:41" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="BinaryInput comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="BinaryOutput comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="FAMSessionID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Input comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Output comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Sequence comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="Status comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="StringizedException comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="WorkItemGroupID comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.WorkItemGroup" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
+				<Comment>Represents a batch of work items created to allow parallel execution of a processing task across multiple threads/processes/machines.</Comment>
 				<Attributes>
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ActionID" null="not null" sortOrder="3" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FAMSessionID" null="null" sortOrder="7" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FileID" null="not null" sortOrder="2" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ID" null="not null" pk="true" sortOrder="1" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="NumberOfWorkItems" null="not null" sortOrder="5" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="RunningTaskDescription" null="null" sortOrder="6" type="nvarchar(256)" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="StringizedSettings" null="null" sortOrder="4" type="nvarchar(-1)" />
+					<Attribute commentModified="10/6/2021 9:02:53 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ActionID" null="not null" sortOrder="3" type="int">
+						<Comment>Foreign key to Action</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:02:53 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FAMSessionID" null="null" sortOrder="7" type="int">
+						<Comment>The ID of the FAMSession that created the group</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:02:53 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FileID" null="not null" sortOrder="2" type="int">
+						<Comment>Foreign key to FAMFile</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:01:17 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ID" null="not null" pk="true" sortOrder="1" type="int">
+						<Comment>A unique identifier.</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:02:53 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="NumberOfWorkItems" null="not null" sortOrder="5" type="int">
+						<Comment>The number of work items created for this group</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:02:53 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="RunningTaskDescription" null="null" sortOrder="6" type="nvarchar(256)">
+						<Comment>A description of the task</Comment>
+					</Attribute>
+					<Attribute commentModified="10/6/2021 9:02:53 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="StringizedSettings" null="null" sortOrder="4" type="nvarchar(-1)">
+						<Comment>Settings needed to perform processing of the work items.</Comment>
+					</Attribute>
 				</Attributes>
 				<History>
 					<Record When="2021-09-30T15:16:48" Who="Trever_Gannon" Description="Loaded" />
 					<Record When="2021-09-30T15:16:48" Who="Trever_Gannon" Description="Loaded 7 attributes" />
+					<Record When="2021-10-06T21:01:03" Who="steve_kurth" Description="Changed object comment" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ActionID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="FAMSessionID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="FileID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="ID comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="NumberOfWorkItems comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="RunningTaskDescription comment changed" />
+					<Record When="2021-10-06T21:03:55" Who="steve_kurth" Description="StringizedSettings comment changed" />
 				</History>
 			</Object>
 			<Object Name="Security.Group" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
