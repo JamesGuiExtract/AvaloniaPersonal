@@ -208,7 +208,7 @@ namespace Extract.ETL.Test
         [Category("ETL")]
         public static void TestRedactionAccuracyServiceStatus()
         {
-            string testDBName = "RedactionAccuracyServiceStatus_Test";
+            string testDBName = "Test_RedactionAccuracyServiceStatus";
             try
             {
                 // This is only used to initialize the database used for calculating the stats
@@ -281,7 +281,7 @@ namespace Extract.ETL.Test
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA2100:Review SQL queries for security vulnerabilities", Justification = "<Pending>")]
         public static void TestRedactionAccuracyServiceProcessNoExistingData()
         {
-            string testDBName = "RedactionAccuracyService_Test";
+            string testDBName = "Test_RedactionAccuracyService";
             try
             {
                 // This is only used to initialize the database used for calculating the stats
@@ -332,7 +332,7 @@ namespace Extract.ETL.Test
         [Category("ETL")]
         public static void TestRedactionAccuracyServiceProcessExistingData()
         {
-            string testDBName = "RedactionAccuracyService_Test";
+            string testDBName = "Test_RedactionAccuracyService";
             try
             {
                 // This is only used to initialize the database used for calculating the stats

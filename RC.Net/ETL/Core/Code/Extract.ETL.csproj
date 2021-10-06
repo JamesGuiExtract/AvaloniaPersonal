@@ -66,6 +66,13 @@
     <Compile Include="ChangeAnswerForm.Designer.cs">
       <DependentUpon>ChangeAnswerForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="DatabaseCleanup.cs" />
+    <Compile Include="DatabaseCleanupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DatabaseCleanupForm.Designer.cs">
+      <DependentUpon>DatabaseCleanupForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DatabaseService.cs" />
     <Compile Include="DatabaseServiceStatus.cs" />
     <Compile Include="DataCaptureAccuracy.cs" />
@@ -157,6 +164,10 @@
       <Project>{212e31d9-5f02-43aa-8625-bcb86b15cf8f}</Project>
       <Name>Extract.Licensing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Reporting\Core\Code\Extract.Reporting.csproj">
+      <Project>{3A0FA1AC-F8AA-477A-B0B0-3630091E520B}</Project>
+      <Name>Extract.Reporting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj">
       <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
       <Name>Extract.SqlDatabase</Name>
@@ -239,6 +250,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ChangeAnswerForm.resx">
       <DependentUpon>ChangeAnswerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DatabaseCleanupForm.resx">
+      <DependentUpon>DatabaseCleanupForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DataCaptureAccuracyForm.resx">
       <DependentUpon>DataCaptureAccuracyForm.cs</DependentUpon>

@@ -179,7 +179,7 @@ namespace Extract.ETL.Test
         [TestCase(Constants.TaskClassRedactionVerification, TestName = "Redaction: Verify sensitive data")]
         public static void TestDocumentVerificationRatesServiceProcess(string taskGuid)
         {
-            string testDBName = "TestDocumentVerificationRatesServiceProcess_" + taskGuid + "_Test";
+            string testDBName = "Test_DocumentVerificationRatesServiceProcess_" + taskGuid;
             try
             {
                 var setupData = SetupDatabase(testDBName);
@@ -292,7 +292,7 @@ namespace Extract.ETL.Test
         public static void TestDocumentVerificationRatesZeroTimes(string taskGuid, double duration,
             double overheadTime, double activityTime)
         {
-            string testDBName = "TestDocumentVerificationRatesZeroTimes_" + taskGuid + "_Test";
+            string testDBName = "Test_DocumentVerificationRatesZeroTimes_" + taskGuid;
             try
             {
                 var setupData = SetupDatabase(testDBName);
@@ -331,7 +331,7 @@ namespace Extract.ETL.Test
         // Added for https://extract.atlassian.net/browse/ISSUE-16932
         public static void TestDocumentVerificationRatesNullActionID(string taskGuid)
         {
-            string testDBName = "TestDocumentVerificationRatesNullActionID_" + taskGuid + "_Test";
+            string testDBName = "Test_DocumentVerificationRatesNullActionID_" + taskGuid;
             try
             {
                 var setupData = SetupDatabase(testDBName);

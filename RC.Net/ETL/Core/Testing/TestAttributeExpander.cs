@@ -150,8 +150,8 @@ namespace Extract.ETL.Test
         [TestCase(false, true, _ExpectedNoRasterZones, TestName = "ExpandAttribute no spatial with empty")]
         public static void TestExpandAttributes(bool storeSpatialInfo, bool storeEmptyAttributes, string expectedQuery)
         {
-            string testDBName = "ExpandAttribute_Test";
-            string resultDBName = "ExpandAttribute_Results_Test";
+            string testDBName = "Test_ExpandAttribute";
+            string resultDBName = "Test_ExpandAttribute_Results";
             try
             {
                 // This is only used to initialize the database used for calculating the stats
@@ -213,7 +213,7 @@ namespace Extract.ETL.Test
         [Category("ETL")]
         public static void TestStatus()
         {
-            string testDBName = "TestStatus_Test";
+            string testDBName = "Test_TestStatus";
             try
             {
                 // This is only used to initialize the database used for calculating the stats
@@ -321,7 +321,7 @@ namespace Extract.ETL.Test
         [Category("ETL")]
         public static void Test1000RasterZones()
         {
-            string testDBName = "Test1000RasterZones_Test";
+            string testDBName = "Test_Test1000RasterZones";
             try
             {
                 // This is only used to initialize the database used for calculating the stats
@@ -357,7 +357,7 @@ namespace Extract.ETL.Test
         [Description("This test the fix for https://extract.atlassian.net/browse/ISSUE-16038")]
         public static void TestIssue_16038()
         {
-            string testDBName = "TestISSUE_16038";
+            string testDBName = "Test_TestISSUE_16038";
             try
             {
                 var fileProcessingDb = _testDbManager.GetDatabase(_ISSUE_16038_DB, testDBName);

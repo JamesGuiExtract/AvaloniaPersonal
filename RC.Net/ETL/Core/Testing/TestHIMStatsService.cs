@@ -128,7 +128,7 @@ namespace Extract.ETL.Test
         {
             using (var testManager = new FAMTestDBManager<TestHIMStatsService>())
             {
-                string testDBName = "ProcessPaginationAndOtherVerify_Test";
+                string testDBName = "Test_ProcessPaginationAndOtherVerify";
                 try
                 {
                     var fileProcessingDb = testManager.GetDatabase(_DATABASE, testDBName);
@@ -227,8 +227,8 @@ namespace Extract.ETL.Test
             using var testFileManager = new TestFileManager<TestHIMStatsService>();
             using var testManager = new FAMTestDBManager<TestHIMStatsService>();
 
-            string testDBName1 = "MultipleBatch1_Test";
-            string testDBName2 = "MultipleBatch2_Test";
+            string testDBName1 = "Test_MultipleBatch1";
+            string testDBName2 = "Test_MultipleBatch2";
             try
             {
                 var famDB1 = testManager.GetNewDatabase(testDBName1);

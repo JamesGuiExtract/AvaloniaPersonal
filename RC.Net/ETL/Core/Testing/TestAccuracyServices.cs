@@ -178,7 +178,7 @@ namespace Extract.ETL.Test
         [Category("ETL")]
         public static void TestDataCaptureAccuracyServiceProcessNoExistingData()
         {
-            string testDBName = "DataCaptureAccuracyService_Test";
+            string testDBName = "Test_DataCaptureAccuracyService";
             try
             {
                 // This is only used to initialize the database used for calculating the stats
@@ -227,7 +227,7 @@ namespace Extract.ETL.Test
         [Category("ETL")]
         public static void TestDataCaptureAccuracyServiceProcessExistingData()
         {
-            string testDBName = "DataCaptureAccuracyService_Test";
+            string testDBName = "Test_DataCaptureAccuracyService";
             try
             {
                 // This is only used to initialize the database used for calculating the stats
@@ -269,7 +269,7 @@ namespace Extract.ETL.Test
         [Category("ETL")]
         public static void TestDataCaptureAccuracyStatus()
         {
-            string testDBName = "DataCaptureAccuracyServiceStatus_Test";
+            string testDBName = "Test_DataCaptureAccuracyServiceStatus";
             try
             {
                 // This is only used to initialize the database used for calculating the stats

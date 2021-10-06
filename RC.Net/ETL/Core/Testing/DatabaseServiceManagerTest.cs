@@ -87,7 +87,7 @@ namespace Extract.ETL.Test
         [Category("DatabaseService")]
         public static void DatabaseServiceTest()
         {
-            string testDBName = "DatabaseService_test";
+            string testDBName = "Test_DatabaseService";
             try
             {
                 // This is only used to initialize the database used for calculating the stats
@@ -268,7 +268,7 @@ namespace Extract.ETL.Test
         [TestCase(10, false, TestName = "Schedule start time in future no exception")]
         public static void DatabaseServiceTestNonrecurringSchedule(int minutes, bool completeWithException)
         {
-            string testDBName = "DatabaseServiceTestFutureSchedule_test";
+            string testDBName = "Test_DatabaseServiceTestFutureSchedule";
             UCLID_FILEPROCESSINGLib.FileProcessingDB fileProcessingDb = null;
             try
             {
