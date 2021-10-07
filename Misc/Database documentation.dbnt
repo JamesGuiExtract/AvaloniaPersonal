@@ -3552,16 +3552,35 @@ Note: Files in the "unattempted" state for a given action are represented by the
 				</History>
 			</Object>
 			<Object Name="dbo.sp_UserCounts" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
+				<Comment>Used for data for the LabDE Data Entry Rates per User report
+returns rows of
+UserName, NumDocs, NumPages, NumOrder, NumTests, TotalTime, DocsPerHour, PagesPerHour, OrdersPerHour, TestPerHour</Comment>
 				<Attributes>
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="@ExclusionTags" sortOrder="2" type="nvarchar" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="@InclusionActions" sortOrder="1" type="nvarchar" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="@ReportingPeriod_Max" sortOrder="5" type="datetime" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="@ReportingPeriod_Min" sortOrder="4" type="datetime" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="@WorkflowName" sortOrder="3" type="nvarchar" />
+					<Attribute commentModified="10/7/2021 8:48:10 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="@ExclusionTags" sortOrder="2" type="nvarchar">
+						<Comment>Comma separated list of Tags that should be excluded from the data</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 8:48:10 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="@InclusionActions" sortOrder="1" type="nvarchar">
+						<Comment>Comma separated list of Action names to include in the output - list cannot be empty</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 8:48:10 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="@ReportingPeriod_Max" sortOrder="5" type="datetime">
+						<Comment>End date and time of the data</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 8:48:10 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="@ReportingPeriod_Min" sortOrder="4" type="datetime">
+						<Comment>Start date and time of the data</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 8:48:10 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="@WorkflowName" sortOrder="3" type="nvarchar">
+						<Comment>Workflow name the data return should be associated with - to include all records regardless of Workflow this can be Null or ''</Comment>
+					</Attribute>
 				</Attributes>
 				<History>
 					<Record When="2021-09-30T15:16:48" Who="Trever_Gannon" Description="Loaded" />
 					<Record When="2021-09-30T15:16:48" Who="Trever_Gannon" Description="Loaded 5 attributes" />
+					<Record When="2021-10-07T20:48:10" Who="william_parr" Description="Changed object comment" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="@ExclusionTags comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="@InclusionActions comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="@ReportingPeriod_Max comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="@ReportingPeriod_Min comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="@WorkflowName comment changed" />
 				</History>
 			</Object>
 		</Group>
@@ -3667,21 +3686,53 @@ Note: Files in the "unattempted" state for a given action are represented by the
 				</History>
 			</Object>
 			<Object Name="dbo.vPaginationDataWithRank" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
+				<Comment>View used in productivity dashboards in workflows that use pagination</Comment>
 				<Attributes>
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ActionID" null="null" sortOrder="7" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ASCName" null="not null" sortOrder="8" type="nvarchar(50)" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="DateTimeStamp" null="null" sortOrder="6" type="datetime" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="DestFileID" null="null" sortOrder="4" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FAMUserID" null="not null" sortOrder="2" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FileTaskSessionID" null="not null" sortOrder="9" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="OriginalFileID" null="not null" sortOrder="5" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="PaginationID" null="not null" sortOrder="1" type="int" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="RankDesc" null="null" sortOrder="10" type="bigint" />
-					<Attribute created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="SourceFileID" null="not null" sortOrder="3" type="int" />
+					<Attribute commentModified="10/7/2021 9:07:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ActionID" null="null" sortOrder="7" type="int">
+						<Comment>ID of the Action the Source file was paginated</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 9:07:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="ASCName" null="not null" sortOrder="8" type="nvarchar(50)">
+						<Comment>Name of the Action the Source file was paginated</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 9:07:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="DateTimeStamp" null="null" sortOrder="6" type="datetime">
+						<Comment>Date and time the pagination was done</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 9:07:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="DestFileID" null="null" sortOrder="4" type="int">
+						<Comment>FAMFile ID of a file created by the pagination</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 9:07:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FAMUserID" null="not null" sortOrder="2" type="int">
+						<Comment>FAMUser ID that performed the pagination</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 9:07:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="FileTaskSessionID" null="not null" sortOrder="9" type="int">
+						<Comment>ID of the FileTaskSession that the pagination was performed</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 9:07:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="OriginalFileID" null="not null" sortOrder="5" type="int">
+						<Comment>FAMFile ID of the Orginal file that was paginated</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 9:07:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="PaginationID" null="not null" sortOrder="1" type="int">
+						<Comment>ID from the Pagination table</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 9:07:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="RankDesc" null="null" sortOrder="10" type="bigint">
+						<Comment>Rank by DateTimeStamp partitioned by SourceFileID, AscName, FileTaskSessionID</Comment>
+					</Attribute>
+					<Attribute commentModified="10/7/2021 9:07:47 PM" created="2021-09-30T15:16:48" modified="2021-09-30T15:16:48" name="SourceFileID" null="not null" sortOrder="3" type="int">
+						<Comment>FAMFile ID of the file that was paginated</Comment>
+					</Attribute>
 				</Attributes>
 				<History>
 					<Record When="2021-09-30T15:16:48" Who="Trever_Gannon" Description="Loaded" />
 					<Record When="2021-09-30T15:16:48" Who="Trever_Gannon" Description="Loaded 10 attributes" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="Changed object comment" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="ActionID comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="ASCName comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="DateTimeStamp comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="DestFileID comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="FAMUserID comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="FileTaskSessionID comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="OriginalFileID comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="PaginationID comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="RankDesc comment changed" />
+					<Record When="2021-10-07T21:07:47" Who="william_parr" Description="SourceFileID comment changed" />
 				</History>
 			</Object>
 			<Object Name="dbo.vProcessingData" Created="2021-09-30T15:16:48" CommentModified="2021-09-30T15:16:48" CommentModifiedBy="">
