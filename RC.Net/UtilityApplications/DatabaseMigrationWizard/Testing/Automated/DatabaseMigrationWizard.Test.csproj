@@ -141,6 +141,10 @@
       <Project>{a75275de-a979-41e6-8e46-546270d51e55}</Project>
       <Name>Extract.SqlDatabase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DatabaseMigrationWizard.csproj">
       <Project>{481D8253-54B0-41CA-B667-9E2CB0A6968E}</Project>
       <Name>DatabaseMigrationWizard</Name>

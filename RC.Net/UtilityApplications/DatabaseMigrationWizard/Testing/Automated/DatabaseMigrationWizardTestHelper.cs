@@ -1,5 +1,6 @@
 ﻿using DatabaseMigrationWizard.Database.Input.DataTransformObject;
 using DatabaseMigrationWizard.Database.Input.SQLSequence;
+using Extract.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using NUnit.Framework;
@@ -200,6 +201,7 @@ namespace DatabaseMigrationWizard.Test
             DBInfos.Add(new DBInfo() { Name = "AzureInstance", Value = "" });
             DBInfos.Add(new DBInfo() { Name = "AzureTenant", Value = "" });
             DBInfos.Add(new DBInfo() { Name = "AzureClientId", Value = "" });
+            DBInfos.Add(new DBInfo() { Name = "PasswordComplexityRequirements", Value = SystemMethods.IsExtractInternal() ? "" : "8ULD" });
 
             FAMUsers.Add(new FAMUser() { UserName = "Trever_Gannon", FullUserName = "DataMaster"});
             FAMUsers.Add(new FAMUser() { UserName = "Reassign", FullUserName = "ToReassign" });
