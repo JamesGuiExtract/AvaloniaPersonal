@@ -154,7 +154,7 @@ Test|N/A
 ..Units|K
 ..Value|12.70
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|MPV
 ..Flag|L
 ..Range|9.0-13.0

@@ -64,7 +64,7 @@ Test|N/A
 ..Units|FL
 ..Value|71.3
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|SEGS
 ..Flag|L
 ..Range|42-70

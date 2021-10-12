@@ -447,7 +447,7 @@ namespace Extract.LabResultsCustomComponents
                             IAttribute esNamesAttribute = new AttributeClass();
                             esNamesAttribute.Name = "ESNames";
                             esNamesAttribute.Value.CreateNonSpatialString
-                                (String.Join(";", esNames), attribute.Value.SourceDocName);
+                                (String.Join(";", esNames.OrderBy(x => x)), attribute.Value.SourceDocName);
 
                             // Add the ESName subattribute
                             attribute.SubAttributes.PushBack(esNamesAttribute);
@@ -464,7 +464,7 @@ namespace Extract.LabResultsCustomComponents
                         IAttribute esCodesAttribute = new AttributeClass();
                         esCodesAttribute.Name = "ESTestCodes";
                         esCodesAttribute.Value.CreateNonSpatialString
-                            (String.Join(";", esTestCodes), attribute.Value.SourceDocName);
+                            (String.Join(";", esTestCodes.OrderBy(x => x)), attribute.Value.SourceDocName);
 
                         // Add the ESTestCodes subattribute
                         attribute.SubAttributes.PushBack(esCodesAttribute);

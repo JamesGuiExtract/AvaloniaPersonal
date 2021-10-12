@@ -3,6 +3,6 @@ Test|N/A
 ..Units|mg/dl
 ..Value|50
 ..TestCode|Urine Protein
-..ESNames|Protein Urine Quant;Protein 24HR Urine
+..ESNames|Protein 24HR Urine;Protein Urine Quant
 .Name|OUTSIDE LABS
 .OrderCode|OUTSIDE_LABS

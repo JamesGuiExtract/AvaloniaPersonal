@@ -58,14 +58,14 @@ Test|N/A
 ..Units|FL
 ..Value|71.3
 ..TestCode|80348
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|% Neutrophils (External)
 ..Flag|L
 ..Range|42-70
 ..Units|%
 ..Value|23
 ..TestCode|80007
-..ESNames|Neutrophils %;Band Neutrophils %;Segmented Neutrophils %
+..ESNames|Band Neutrophils %;Neutrophils %;Segmented Neutrophils %
 .Component|% Lymphocytes (External)
 ..Flag|H
 ..Range|15-45
@@ -96,7 +96,7 @@ Test|N/A
 ..Units|K/UL
 ..Value|3.2
 ..TestCode|80014
-..ESNames|Segmented Neutrophils #;Absolute Neutrophil Count;Neutrophils #
+..ESNames|Absolute Neutrophil Count;Neutrophils #;Segmented Neutrophils #
 .Component|Absolute Lymphocytes (External)
 ..Flag|H
 ..Range|1.1-4.0

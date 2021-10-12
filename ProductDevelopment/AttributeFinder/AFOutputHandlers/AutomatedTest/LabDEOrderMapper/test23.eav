@@ -5,7 +5,7 @@ Test|N/A
 ..Units|mg/dl
 ..Value|184
 ..TestCode|1510655
-..ESNames|Glucose Blood;Glucose Average;Glucose Fasting
+..ESNames|Glucose Average;Glucose Blood;Glucose Fasting
 .Component|BUN
 ..Range|8-24
 ..Units|mg/dL
@@ -127,7 +127,7 @@ Test|N/A
 ..Units|mg/dL
 ..Value|< 0.1
 ..TestCode|1558221
-..ESNames|Bilirubin Direct Blood;Bilirubin Conjugated
+..ESNames|Bilirubin Conjugated;Bilirubin Direct Blood
 .CollectionDate|07/17/2014
 .CollectionTime|10:09
 .Name|BILIRUBIN, CONJUGATED

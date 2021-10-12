@@ -45,7 +45,7 @@ Test|N/A
 ..Units|%
 ..Value|17.9
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|PLT
 ..Range|150-400
 ..Units|Thou/uL
@@ -162,7 +162,7 @@ Test|N/A
 ..Units|%
 ..Value|18.3
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|PLT
 ..Range|150-400
 ..Units|Thou/uL

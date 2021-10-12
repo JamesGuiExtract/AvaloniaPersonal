@@ -50,7 +50,7 @@ Test|N/A
 ..Units|mg/dL
 ..Value|0.4
 ..TestCode|67472
-..ESNames|Bilirubin Urine;Bilirubin Total Blood
+..ESNames|Bilirubin Total Blood;Bilirubin Urine
 .CollectionDate|07/17/2014
 .CollectionTime|10:09
 .Name|EXTERNAL BILIRUBIN, TOTAL

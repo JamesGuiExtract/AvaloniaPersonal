@@ -61,7 +61,7 @@ Test|N/A
 ..Units|FL
 ..Value|49.3
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -324,7 +324,7 @@ Test|N/A
 ..Units|FL
 ..Value|49.3
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -528,7 +528,7 @@ Test|N/A
 ..Units|FL
 ..Value|48.3
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -732,7 +732,7 @@ Test|N/A
 ..Units|FL
 ..Value|47.7
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|SEG
 ..Flag|H
 ..Range|42.0-76.0
@@ -1031,7 +1031,7 @@ Test|N/A
 ..Units|FL
 ..Value|48.2
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -1235,7 +1235,7 @@ Test|N/A
 ..Units|FL
 ..Value|48.7
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -1440,7 +1440,7 @@ Test|N/A
 ..Units|FL
 ..Value|49.4
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|SEG
 ..Range|42.0-76.0
 ..Units|%
@@ -1737,7 +1737,7 @@ Test|N/A
 ..Units|FL
 ..Value|47.3
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|BAND
 ..Range|%
 ..Value|4
@@ -2001,7 +2001,7 @@ Test|N/A
 ..Units|FL
 ..Value|51.0
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|BAND
 ..Flag|H
 ..Range|0-6
@@ -2129,7 +2129,7 @@ Test|N/A
 ..Units|FL
 ..Value|49.4
 ..TestCode|RDW
-..ESNames|RDW-SD;RDW-CV
+..ESNames|RDW-CV;RDW-SD
 .Component|SEGS
 ..Flag|H
 ..Range|42-70
