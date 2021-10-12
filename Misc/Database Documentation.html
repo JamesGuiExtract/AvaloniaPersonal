@@ -1,0 +1,3508 @@
+﻿<html>
+  <head>
+    <META http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Core Database</title>
+    <style>
+                    /* simple reset */
+                    html, body, ul, ol, li, form, fieldset, h1, h2, h3, h4, h5, h6, p { margin: 0; font-family:Sans-Serif; font-size:12px;line-height:1.4em;}
+                    fieldset,img { border: 0; }
+                    li { list-style: circle; }
+                    sup { vertical-align: text-top; }
+                    sub { vertical-align: text-bottom; }
+                    table{border-collapse: collapse;border-spacing: 0;}
+                    caption, th, td{text-align: left;vertical-align: top;font-weight: normal;}
+                    input, textarea, select{line-height: 1.1;}
+                    /*Content*/
+                    body {margin:16px; background-color:#f0f0f0; }
+                    h1 {font-weight:normal;color:#156F89;font-size:300%;margin-bottom:0.5em;}
+                    h2 { clear:both;font-weight:normal;color:#000000;font-size:220%;margin-top:1em;margin-bottom:0.5em;}
+                    h3 { clear:both;font-weight:normal;color:#000000;font-size:160%;margin-top:1em;margin-bottom:0.5em;}
+                    a, a:visited {color:#000000;}
+                    .navBar {}
+                    .object { clear:both; background-color:#ffffff; padding:10px;margin-top:10px;-webkit-border-radius: 5px;-moz-border-radius: 5px;border-radius: 5px;border:1px solid #e9e9e9;}
+                    .object h3 {margin-top:0px;}
+                    .comment {margin-bottom:1em;}
+                    .attributes {}
+                    .attribute {clear:both;border-top:1px solid #e9e9e9;padding-top:6px;padding-bottom:6px;}
+                    .attributeName {float:left;width:200px;}
+                    .attributeComment {margin-left:220px;}
+                    .footer {margin:0.5em;margin-top:1em;}
+                </style>
+  </head>
+  <body>
+    <h1>Core Database</h1>
+    <div class="navBar">Jump to: 
+                <a href="#Table">Table</a> <a href="#StoredProcedure">StoredProcedure</a> <a href="#Function">Function</a> <a href="#View">View</a> <a href="#Schema">Schema</a> </div>
+    <div class="groups">
+      <div class="group"><a name="Table"></a><h2>Table</h2>
+        <div class="objects">
+          <div class="object">
+            <h3>dbo.Action</h3>
+            <div class="comment"><p>An action represents one or more tasks to be executed as one step in a workflow (defined outside of the database in .fps files).</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A incrementing generated identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ASCName</div>
+                <div class="attributeComment">The name of the action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Description</div>
+                <div class="attributeComment">An explanation of what the action is used for.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">WorkflowID</div>
+                <div class="attributeComment">The workflow this particular action is tied to or NULL to represent the action regardless of workflow</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MainSequence</div>
+                <div class="attributeComment">Indicates if the action is desginated to be part of the main sequence of actions used for processing in a workflow. Workflow status reported by the API will consider only main sequence actions when reporting statistics</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier different across all databases; used for configuration migrations/merging.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.ActionState</h3>
+            <div class="comment"><p>Explains the state of each action.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">Code</div>
+                <div class="attributeComment">A single character, representing a state of an action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Meaning</div>
+                <div class="attributeComment">An explanation for the code, and what its full meaning represents.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.ActionStatistics</h3>
+            <div class="comment"><p>This table tracks the number of files that have gone through each action, and the current count of them in that action. This allows overal state of the database/workflow to be reported without a long-running query to aggregate the stats of all files. This data is displayed on the summary page of the database administration tool and in the toolbars of various Extract applications.</p>
+
+<p>Note: The data in this table will generally not be entirely up-to-date while processing is active as updates to the rows here will be done in batches. Up-to-date stats can be calculated by aggregating file status changes from the ActionStatisticsDelta table with the data here.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Invisible</div>
+                <div class="attributeComment">Indicates whether the counts in this row are visible to Extract APIs. Invisible files represent files for which deletion was requested via API.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastUpdateTimeStamp</div>
+                <div class="attributeComment">The last time these stats were updated.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumDocuments</div>
+                <div class="attributeComment">The total number of documents that have gone through this action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumDocumentsPending</div>
+                <div class="attributeComment">The number of documents pending in this action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumDocumentsComplete</div>
+                <div class="attributeComment">The number of documents that have been completed in this action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumDocumentsFailed</div>
+                <div class="attributeComment">The total number of documents that have failed in this action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumDocumentsSkipped</div>
+                <div class="attributeComment">The total number of files that have been skipped.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPages</div>
+                <div class="attributeComment">The total number of pages that have been procesed.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPagesPending</div>
+                <div class="attributeComment">The total number of pages pending in this action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPagesComplete</div>
+                <div class="attributeComment">The total number of pages that have been completed in this action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPagesFailed</div>
+                <div class="attributeComment">The number of pages that have failed in this action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPagesSkipped</div>
+                <div class="attributeComment">The number of pages that have been skpped in this action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumBytes</div>
+                <div class="attributeComment">The number of bytes in this action. A byte is a measurement of size, and we are specifically measuring the file size.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumBytesPending</div>
+                <div class="attributeComment">The number of bytes pending.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumBytesComplete</div>
+                <div class="attributeComment">The number of bytes completed.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumBytesFailed</div>
+                <div class="attributeComment">The number of bytes failed.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumBytesSkipped</div>
+                <div class="attributeComment">The number of bytes skipped.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.ActionStatisticsDelta</h3>
+            <div class="comment"><p>In order to allow ActionsStatistics to be updated when the database is under a heavy processing load without causing contention updating the data in ActionStatistics rows, changes made to file action statuses are collected here where each change will be a separate row (preventing the need to lock any rows for most action status changes here). Periodically, the action status changes collected here are aggregated into the corresponding rows of the ActionStatistics table.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Invisible</div>
+                <div class="attributeComment">Indicates whether the counts in this row are visible to Extract APIs. Invisible files represent files for which deletion was requested via API.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumDocuments</div>
+                <div class="attributeComment">Number of new documents in the current action/visibility state as a result of the file action state change; will be 0, 1 or -1</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumDocumentsPending</div>
+                <div class="attributeComment">Number of new pending documents in the current action/visibility state as a result of the file action state change; will be 0, 1 or -1</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumDocumentsComplete</div>
+                <div class="attributeComment">Number of new completed documents in the current action/visibility state as a result of the file action state change; will be 0, 1 or -1</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumDocumentsFailed</div>
+                <div class="attributeComment">Number of new failed documents in the current action/visibility state as a result of the file action state change; will be 0, 1 or -1</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumDocumentsSkipped</div>
+                <div class="attributeComment">Number of new skipped documents in the current action/visibility state as a result of the file action state change; will be 0, 1 or -1</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPages</div>
+                <div class="attributeComment">Number of new pages in the current action/visibility state as a result of the file action state change; will reflect the number of pages in the affected document</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPagesPending</div>
+                <div class="attributeComment">Number of new pending pages in the current action/visibility state as a result of the file action state change; will reflect the number of pages in the affected document</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPagesComplete</div>
+                <div class="attributeComment">Number of new completed pages in the current action/visibility state as a result of the file action state change; will reflect the number of pages in the affected document</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPagesFailed</div>
+                <div class="attributeComment">Number of new failed pages in the current action/visibility state as a result of the file action state change; will reflect the number of pages in the affected document</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPagesSkipped</div>
+                <div class="attributeComment">Number of new skipped pages in the current action/visibility state as a result of the file action state change; will reflect the number of pages in the affected document</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumBytes</div>
+                <div class="attributeComment">Number of new bytes in the current action/visibility state as a result of the file action state change; will reflect the number of bytes in the affected document</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumBytesPending</div>
+                <div class="attributeComment">Number of new pending bytes in the current action/visibility state as a result of the file action state change; will reflect the number of bytes in the affected document</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumBytesComplete</div>
+                <div class="attributeComment">Number of new completed bytes in the current action/visibility state as a result of the file action state change; will reflect the number of bytes in the affected document</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumBytesFailed</div>
+                <div class="attributeComment">Number of new failed bytes in the current action/visibility state as a result of the file action state change; will reflect the number of bytes in the affected document</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumBytesSkipped</div>
+                <div class="attributeComment">Number of new skipped bytes in the current action/visibility state as a result of the file action state change; will reflect the number of bytes in the affected document</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.ActiveFAM</h3>
+            <div class="comment"><p>A table for tracking active processing in the database. This data is used to prevent recognize when a file has been orphaned by a lost process and to prevent database operations that should not be executed database in the midst of active processing.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastPingTime</div>
+                <div class="attributeComment">Active processing sessions will ping the database to indicate the process is alive and healthy periodically; this records the last ping registered</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMSessionID</div>
+                <div class="attributeComment">A forigen key to the FAMSession table.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.Attribute</h3>
+            <div class="comment"><p>This table repersents attributes, or data fields, corresponding with documents in our workflow. These attributes correspond to attributes in Extract data files (VOA file type). An attribute is a piece of information tied directly to a document. An example of an attribute may be "document type", where the document type can be "xray", "general checkup", or "surgery".</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AttributeSetForFileID</div>
+                <div class="attributeComment">The file ID that the attribute is tied to. This is a forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AttributeNameID</div>
+                <div class="attributeComment">A forigen key to AttributeName.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Value</div>
+                <div class="attributeComment">The value of this particular attribute.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ParentAttributeID</div>
+                <div class="attributeComment">A key referencing this table. This is used to build the entire structure of a VOA file.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">GUID</div>
+                <div class="attributeComment">A unique identifier different across all databases</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.AttributeInstanceType</h3>
+            <div class="comment"><p>This table links an attribute type to the attribute table.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">AttributeID</div>
+                <div class="attributeComment">A forigen key to the attribute table</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AttributeTypeID</div>
+                <div class="attributeComment">A forigen key to the attributeType table</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.AttributeName</h3>
+            <div class="comment"><p>The name of a particular attribute. Since names are common amoung attributes, this table was created as a way to normalize the database and prevent duplication of data.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier to this particular database</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Name</div>
+                <div class="attributeComment">The name of the attribute</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier different across all databases</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.AttributeSetForFile</h3>
+            <div class="comment"><p>This table stores the attribute set in the database as a binary representation and ties discretely stored data in the Attribute table into a data set. An attribute set, is essentially an Extract data file (VOA file type) stored in the databse, and contains information about a particular document Extract extracted.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileTaskSessionID</div>
+                <div class="attributeComment">A forigen key to the FileTaskSession table. This is used to identify what task stored this information.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AttributeSetNameID</div>
+                <div class="attributeComment">A forigen key to AttributeSetname.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">VOA</div>
+                <div class="attributeComment">A binary representation of a VOA file.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.AttributeSetName</h3>
+            <div class="comment"><p>This table gives unique name to each attribute set. Some examples may include:
+DataFoundByRules
+DataFoundByVerifier
+FoundPagination</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unqiue identifier for this particular database</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Description</div>
+                <div class="attributeComment">The name of the attribute set</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.AttributeType</h3>
+            <div class="comment"><p>This data is typical in an IDShield environment. This gives a type classification found in voa's.  The AttributeType would have HCData, MCData, LCData  and Manual.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Type</div>
+                <div class="attributeComment">The name of the type</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.Dashboard</h3>
+            <div class="comment"><p>This table stores dashboards created by dev express in xml format. Dashboard allow interactive exploration reporting on data in the database.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">DashboardName</div>
+                <div class="attributeComment">The name of the dashboard</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Definition</div>
+                <div class="attributeComment">An xml representation of the dashboard used by devexpress</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">The user who LAST imported the database.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastImportedDate</div>
+                <div class="attributeComment">A datetime respresenting when the last import occured</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">UseExtractedData</div>
+                <div class="attributeComment">A flag determining if extracted data source should be used.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ExtractedDataDefinition</div>
+                <div class="attributeComment">This xml gives a location, and definition for where extracted (cached) data is stored.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases; used for configuration migrations/merging.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.DashboardAttributeFields</h3>
+            <div class="comment"><p>Attribute data optimized for filterting via dashboards. This table is populated by the "Expand Attributes" service.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">AttributeSetForFileID</div>
+                <div class="attributeComment">A forigen key to attribute set.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Name</div>
+                <div class="attributeComment">The name of the attribute</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Value</div>
+                <div class="attributeComment">The value of the attribute</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.DatabaseService</h3>
+            <div class="comment"><p>This table contains all of the information about database services setup for our software. Database services are run via our own custom service see confluence for additional documenation: https://extract.atlassian.net/wiki/spaces/TD/pages/128253953/Setting+up+the+FAM+Service .</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier for this particular database.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Description</div>
+                <div class="attributeComment">A name given by the person setting up the service to help identify its purpose.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Settings</div>
+                <div class="attributeComment">Settings are what is set in the FAMDBAdmin when you set it up.  The settings are used to directly create the database service from json.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Status</div>
+                <div class="attributeComment">The Status includes any information that the service saves to keep track of where it is at in the processing. Most of the DatabaseServices don't have a lot in the status - the ExpandAttributes keeps the FileTaskSessionID last processed for each of the Dashboard fields
+Both of the columns contain json data.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Enabled</div>
+                <div class="attributeComment">A flag used by our custom service to determine if this service should be run.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastFileTaskSessionIDProcessed</div>
+                <div class="attributeComment">A forigen key to the FileTaskSession table used to identify what last ran the service</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">StartTime</div>
+                <div class="attributeComment">The time that the service was LAST started.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastWrite</div>
+                <div class="attributeComment">The time that the service last wrote data to the database.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">EndTime</div>
+                <div class="attributeComment">The time when the service finished its execution.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineID</div>
+                <div class="attributeComment">Forigen key to Machine.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Exception</div>
+                <div class="attributeComment">Any exceptions that occured during the last exectuion.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActiveServiceMachineID</div>
+                <div class="attributeComment">Forigen key to Machine.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NextScheduledRunTime</div>
+                <div class="attributeComment">The next time that the service is set to run.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActiveFAMID</div>
+                <div class="attributeComment">A forigen key to the activeFAM table</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databaes for this particular service; used for configuration migrations/merging.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.DataEntryCounterDefinition</h3>
+            <div class="comment"><p>This table defines a counter used to track the number of specific attributes in a data entry workflow for reporting/analytics purposes.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Name</div>
+                <div class="attributeComment">The name of the counter.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AttributeQuery</div>
+                <div class="attributeComment">Specifies the attributes to be counted in a document's data</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">RecordOnLoad</div>
+                <div class="attributeComment">A flag setting if it should be recorded on load.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">RecordOnSave</div>
+                <div class="attributeComment">A flag setting if it should be recorded on save.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases; used for configuration migrations/merging.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.DataEntryCounterType</h3>
+            <div class="comment"><p>This table ties type codes to a meaning.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">Type</div>
+                <div class="attributeComment">The type code.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Description</div>
+                <div class="attributeComment">A descripton of what that type code means.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.DataEntryCounterValue</h3>
+            <div class="comment"><p>A table to track counter values defined in the DataEntryCounterDefinition table</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">InstanceID</div>
+                <div class="attributeComment">Forigen key to FileTaskSession (ID).</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">CounterID</div>
+                <div class="attributeComment">Forigen key to DataEntryCounterDefinition (ID).</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Type</div>
+                <div class="attributeComment">Forigen key to DataEntryCounterType.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Value</div>
+                <div class="attributeComment">An encrypted value holding the counter value.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.DBInfo</h3>
+            <div class="comment"><p>This table contains all of the general settings used by our software. These settings are configured in the database administration tool under various windows.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">Name</div>
+                <div class="attributeComment">The name of the setting you are configuring</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Value</div>
+                <div class="attributeComment">The value of the setting you are configuring</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.DBInfoChangeHistory</h3>
+            <div class="comment"><p>This table logs all changes to the DBInfo table. Logging is enabled by default but can be turned off in the database administration tool.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">A forigen key to the FAMUser table, identifying who changed the setting.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineID</div>
+                <div class="attributeComment">A forigen key to the Machine table identifying what machine changed the setting.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DBInfoID</div>
+                <div class="attributeComment">A forigen key to the dbinfo table used to identify what setting was changed.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OldValue</div>
+                <div class="attributeComment">The previous value of the setting.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NewValue</div>
+                <div class="attributeComment">The new value of the setting.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TimeStamp</div>
+                <div class="attributeComment">When the setting was changed.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.DocTagHistory</h3>
+            <div class="comment"><p>An audit table representing every time a file had its tags changed.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TagID</div>
+                <div class="attributeComment">Forigen key to Tag.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Tagged</div>
+                <div class="attributeComment">Represents if the tag was applied or not.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TimeStamp</div>
+                <div class="attributeComment">The time that this occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineID</div>
+                <div class="attributeComment">Forigen key to Machine.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FAMFile</h3>
+            <div class="comment"><p>This table tracks all of the files that go through our software.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileName</div>
+                <div class="attributeComment">The name of the file (includes filepath).</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileSize</div>
+                <div class="attributeComment">The size of the file.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Pages</div>
+                <div class="attributeComment">The number of pages the file has.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Priority</div>
+                <div class="attributeComment">What priority this file has in our queue. The default is 3, and higher priority items have a lower number (1 being the highest, 5 being the lowest).</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AddedDateTime</div>
+                <div class="attributeComment">When the file was added to the table (was first reconized by Extracts software).</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FAMSession</h3>
+            <div class="comment"><p>Represents a processing session in which files are processed in a given action either as a service process or foreground application. While processing is active, there will be a corresponding entry in the ActiveFAM table. Unlike the ActiveFAM table, FAMSession rows will remain and provice audit trail for when processsing sessions were started/stopped.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineID</div>
+                <div class="attributeComment">A forigen key to the machine table. Used to identify what machine had the session occuring on.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">A forigen key to the user table. Used to identify what user had the session open.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">UPI</div>
+                <div class="attributeComment">A Universal Process Identifier; a code that will uniquely identify the process vs any other process.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">StartTime</div>
+                <div class="attributeComment">When the session started</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">StopTime</div>
+                <div class="attributeComment">When the session stopped</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FPSFileID</div>
+                <div class="attributeComment">A forigen key to the FPSFile table.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">A forigen key to the action table.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Queuing</div>
+                <div class="attributeComment">Indicates if the process is configured to queue documents.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Processing</div>
+                <div class="attributeComment">Indicates if the process is configured to process documents.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FAMUser</h3>
+            <div class="comment"><p>A table containing all usernames associate with processing that has occurred in the database.. This is automatically populated as FAMSessions are started.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">UserName</div>
+                <div class="attributeComment">This will depend on the organization. Many organizations set this username to be the employee badge, or identification number. Others will put a name here.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FullUserName</div>
+                <div class="attributeComment">This is almost always the users name, however this is also dependant on how the organization has active directory setup.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LoginID</div>
+                <div class="attributeComment">A forigen key to the Login table.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.Feature</h3>
+            <div class="comment"><p>Enables/disables availability of specific features in our software.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Enabled</div>
+                <div class="attributeComment">Is this enabled.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FeatureName</div>
+                <div class="attributeComment">The feature name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FeatureDescription</div>
+                <div class="attributeComment">What the feature does.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AdminOnly</div>
+                <div class="attributeComment">Can only admins run this.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FieldSearch</h3>
+            <div class="comment"><p>Allows for configuration of commonly used document searches. The searches configured here are typically available in our FAM File Inspector application.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Enabled</div>
+                <div class="attributeComment">A bit representing if this is enabled or not.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FieldName</div>
+                <div class="attributeComment">The attribute field to search for.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AttributeQuery</div>
+                <div class="attributeComment">The attribute query representing a structure of a voa file to the particular attribute.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases; used for configuration migrations/merging.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FileActionComment</h3>
+            <div class="comment"><p>Allows for a comment to be associated with a specific file and action. Use is generally limited to specific redation workflows.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">UserName</div>
+                <div class="attributeComment">The username of the person who added the comment.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Comment</div>
+                <div class="attributeComment">The comment the user added.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTimeStamp</div>
+                <div class="attributeComment">When this comment was added.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FileActionStateTransition</h3>
+            <div class="comment"><p>This table represents an audit trail of all changes to the FileActionState changes to record every time a file changes state in an action. An example of this is when a file goes from pending in verify, to processing in pending.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">The file that had its action state changed. Forigen key to FAMFile</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">A forigen key to the Action table.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ASC_From</div>
+                <div class="attributeComment">The original state of the action. You can join the ActionState table to get the full meaning of the transition.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ASC_To</div>
+                <div class="attributeComment">The new state of the action. You can join the ActionState table to get the full meaning of the transition.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTimeStamp</div>
+                <div class="attributeComment">The time when this change occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineID</div>
+                <div class="attributeComment">The machine this change occured on. Forigen key to Machine table.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">The user that caused this transition to happen. Forigen key to FAMUser table.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Exception</div>
+                <div class="attributeComment">Any exceptions that may have occured durring this transition.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Comment</div>
+                <div class="attributeComment">Any comments about this transition.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">QueueID</div>
+                <div class="attributeComment">Forigen key to QueueEvent.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FileActionStatus</h3>
+            <div class="comment"><p>Provides the current status of a file for each action. The FileActionStateTransition table provide an audit trail of all state changes made.</p>
+
+<p>Note: Files in the "unattempted" state for a given action are represented by the absence of a corresponding row in this table (rather than a row with an ActionStatus of 'U')</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">A forigen key to the action table.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">A forigen key to the FAMFile table.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionStatus</div>
+                <div class="attributeComment">The current status of a file. Join the ActionState table to see its meaning.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Priority</div>
+                <div class="attributeComment">The priority of this particular file in this action.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FileHandler</h3>
+            <div class="comment"><p>This table allows allows for the definition of document specific operations. Typically the handlers defined here are used to provide context menu options in dashboards or the FAM File Inspector.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Enabled</div>
+                <div class="attributeComment">Is this enabled.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AppName</div>
+                <div class="attributeComment">The name of the application (typically contains the workflow name).</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">IconPath</div>
+                <div class="attributeComment">An icon to use for the verification. Typically is un-used.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ApplicationPath</div>
+                <div class="attributeComment">The path to run the fps file.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Arguments</div>
+                <div class="attributeComment">Arguments to pass the fps file.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AdminOnly</div>
+                <div class="attributeComment">Can only admins run/see this.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AllowMultipleFiles</div>
+                <div class="attributeComment">Can multiple files be processed by the same operation</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">SupportsErrorHandling</div>
+                <div class="attributeComment">Indicates whether the specified application implements Extract error handling to be able to receive error details back from failed operations.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Blocking</div>
+                <div class="attributeComment">Should processing block the parent application.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">WorkflowName</div>
+                <div class="attributeComment">The workflow with which this handler is to be assossiated.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A globally unique identifier; used for configuration migrations/merging.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FileMetadataFieldValue</h3>
+            <div class="comment"><p>This table links a metadata value, such as document type, to a particular file.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">The file the value is tied to. Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MetadataFieldID</div>
+                <div class="attributeComment">The metadata name being assigned. Forigen key to MetadataField.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Value</div>
+                <div class="attributeComment">The value of the metadata.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FileTag</h3>
+            <div class="comment"><p>Links a particular tag to a file. A file can have several tags.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TagID</div>
+                <div class="attributeComment">Forigen key to Tag.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FileTaskSession</h3>
+            <div class="comment"><p>Represents a specific task executed against a specific file. Any given task may be one of several configured to execute for a given action, but not all tasks will record sessions here. Note a FAMSession will represent a process running against an action that may process 0. 1 or more files, there may be many FileTaskSessions rows recorded here for a given FAMSession, action and file.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMSessionID</div>
+                <div class="attributeComment">The parent session this session is apart of. Forigen key to FAMSession</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TaskClassID</div>
+                <div class="attributeComment">Forigen key to TaskClass.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTimeStamp</div>
+                <div class="attributeComment">The date that this session was closed.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Duration</div>
+                <div class="attributeComment">The total amount of time that this file was open in the session.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OverheadTime</div>
+                <div class="attributeComment">The amount of time that this file took to load. This is normally only useful in IDShield workflows.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActivityTime</div>
+                <div class="attributeComment">The amount of time a user was actively interacting with the software.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FileTaskSessionCache</h3>
+            <div class="comment"><p>Provides a location to cache data associate with specific pages of a document open for verification for better responsiveness in the verification application. Caching functionality is made available via Extract application backend API which is utilitized by some Extract verification applications.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AutoDeleteWithActiveFAMID</div>
+                <div class="attributeComment">Ties the lifecycle of the cached data to a ActiveFAM entry to guarantee the cached data is cleaned up when the associated session is closed or lost</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileTaskSessionID</div>
+                <div class="attributeComment">Forigen key to FileTaskSession</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Page</div>
+                <div class="attributeComment">The page number to which the data in this row pertains.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ImageData</div>
+                <div class="attributeComment">The binary page image data</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">USSData</div>
+                <div class="attributeComment">OCR data</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">WordZoneData</div>
+                <div class="attributeComment">Spatial data for all words on the page</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AttributeData</div>
+                <div class="attributeComment">Attribute (field) data</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AttributeDataModifiedTime</div>
+                <div class="attributeComment">The time AttributeData was last updated (NULL if it is unmodified from since loaded)</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Exception</div>
+                <div class="attributeComment">Represents any error encountered populating cached data</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FPSFile</h3>
+            <div class="comment"><p>This table tracks all fps files that are processed within our software, against this particular database.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FPSFileName</div>
+                <div class="attributeComment">The full path to the FPS file. This can also track ETL processes that were run on the database.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FTPAccount</h3>
+            <div class="comment"><p>A table that contrains file transfer protocal data.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ServerAddress</div>
+                <div class="attributeComment">The server to connect to.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">UserName</div>
+                <div class="attributeComment">The username to use in the connection.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.FTPEventHistory</h3>
+            <div class="comment"><p>This table tracks all FTP activity in our database.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTimeStamp</div>
+                <div class="attributeComment">The time that this event occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">QueueOrProcess</div>
+                <div class="attributeComment">A single character representing if the file was queued, or processed.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FTPAction</div>
+                <div class="attributeComment">Specifies the operation type</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FTPAccountID</div>
+                <div class="attributeComment">Forigen key to FTPAccount.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Arg1</div>
+                <div class="attributeComment">The initial arguements passed to the FTP server.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Arg2</div>
+                <div class="attributeComment">Optional arguments passed to the FTP server.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineID</div>
+                <div class="attributeComment">Forigen key to Machine.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Retries</div>
+                <div class="attributeComment">The number of retried.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Exception</div>
+                <div class="attributeComment">Any exceptions that may have occured.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.IDShieldData</h3>
+            <div class="comment"><p>Stores metrics for reporting in IDShield (redaction) workflows.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumHCDataFound</div>
+                <div class="attributeComment">Count of high confidence zone identified by the software</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumMCDataFound</div>
+                <div class="attributeComment">Count of medium confidence zone identified by the software</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumLCDataFound</div>
+                <div class="attributeComment">Count of low confidence zone identified by the software</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumCluesFound</div>
+                <div class="attributeComment">Count of clues added by the software</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TotalManualRedactions</div>
+                <div class="attributeComment">The number of manual redactions added.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TotalRedactions</div>
+                <div class="attributeComment">How many total redactions exist</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumPagesAutoAdvanced</div>
+                <div class="attributeComment">The number of pages that were automatically displayed via the slideshow feature</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileTaskSessionID</div>
+                <div class="attributeComment">Forigen key to FileTaskSession.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.InputEvent</h3>
+            <div class="comment"><p>Tracks user input activity in verification applications; allows for reporting on time users have been actively interacting with our software.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TimeStamp</div>
+                <div class="attributeComment">When the input occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineID</div>
+                <div class="attributeComment">Forigen key to Machine.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">PID</div>
+                <div class="attributeComment">The process ID that triggered the input.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">SecondsWithInputEvents</div>
+                <div class="attributeComment">How long it was processed in the input event.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEEncounter</h3>
+            <div class="comment"><p>Represents data from a medical record system related to a specific patient encounter</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">CSN</div>
+                <div class="attributeComment">Customer service number. A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">PatientMRN</div>
+                <div class="attributeComment">Patient medical record number. Forigen key to LabDEPatient.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">EncounterDateTime</div>
+                <div class="attributeComment">When this encounter occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Department</div>
+                <div class="attributeComment">What department was visited.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">EncounterType</div>
+                <div class="attributeComment">What type of visit it was.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">EncounterProvider</div>
+                <div class="attributeComment">Forigen key to LabDEProvider.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DischargeDate</div>
+                <div class="attributeComment">When the encounter ended.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AdmissionDate</div>
+                <div class="attributeComment">When the encounter started.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ADTMessage</div>
+                <div class="attributeComment">An XML representation of the ADT HL7 message used to generate this record.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEEncounterFile</h3>
+            <div class="comment"><p>Associates a document having been processed in association with the specified encounter</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">EncounterID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTime</div>
+                <div class="attributeComment">When this file was linked.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEOrder</h3>
+            <div class="comment"><p>Represents a specific order in a medical record system.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">OrderNumber</div>
+                <div class="attributeComment">The order number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OrderCode</div>
+                <div class="attributeComment">The order code.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">PatientMRN</div>
+                <div class="attributeComment">The patient medical record number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ReceivedDateTime</div>
+                <div class="attributeComment">When the order was recieved.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OrderStatus</div>
+                <div class="attributeComment">The current status of the order. Forigen key to LabDEOrderStatus.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ReferenceDateTime</div>
+                <div class="attributeComment">The date/time against which this order is to be compared against in Extract software. Requested Date/Time (OBR-6) is a typical source of this value</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ORMMessage</div>
+                <div class="attributeComment">An XML representation of the ORM HL7 message used to generate this record.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">EncounterID</div>
+                <div class="attributeComment">A forigen key to LabDEEncounter.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AccessionNumber</div>
+                <div class="attributeComment">The accession number</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier unqiue to all databases.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEOrderFile</h3>
+            <div class="comment"><p>Associates a document having been processed in association with the specified order</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">OrderNumber</div>
+                <div class="attributeComment">Forigen key to LabDEOrder.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">CollectionDate</div>
+                <div class="attributeComment">The date the file was collected.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEOrderStatus</h3>
+            <div class="comment"><p>This table maps LabDE order codes to a meaning.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">Code</div>
+                <div class="attributeComment">The order status code.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Meaning</div>
+                <div class="attributeComment">What the code represents.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEPatient</h3>
+            <div class="comment"><p>Patient information from a medical record system</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">MRN</div>
+                <div class="attributeComment">Medical record number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FirstName</div>
+                <div class="attributeComment">Patient first name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MiddleName</div>
+                <div class="attributeComment">Patient middle name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastName</div>
+                <div class="attributeComment">Patient last name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Suffix</div>
+                <div class="attributeComment">Patient suffix.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DOB</div>
+                <div class="attributeComment">Patient date of birth.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Gender</div>
+                <div class="attributeComment">Patient gender.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MergedInto</div>
+                <div class="attributeComment">The MRN a patient may have been merged into.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">CurrentMRN</div>
+                <div class="attributeComment">The current MRN for the patient. Typically this is identical to MRN.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEPatientFile</h3>
+            <div class="comment"><p>Associates a document having been processed in association with the specified patient</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">PatientMRN</div>
+                <div class="attributeComment">The patient medical record number. Forigen key to LabDEPatient.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTime</div>
+                <div class="attributeComment">The date that this link was made.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEProvider</h3>
+            <div class="comment"><p>Provider information from a medical record system</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FirstName</div>
+                <div class="attributeComment">Doctor first name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MiddleName</div>
+                <div class="attributeComment">Doctor middle name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastName</div>
+                <div class="attributeComment">Doctor last name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ProviderType</div>
+                <div class="attributeComment">What type of doctor are they. (Physician, technician, Nursing student, etc).</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Title</div>
+                <div class="attributeComment">Their title. (MD, CNP, RRT etc).</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Degree</div>
+                <div class="attributeComment">Their degree (MD, DO, PA-C etc).</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Departments</div>
+                <div class="attributeComment">Departments they work for.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Specialties</div>
+                <div class="attributeComment">Their specialties.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Phone</div>
+                <div class="attributeComment">Phone number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Fax</div>
+                <div class="attributeComment">Fax number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Address</div>
+                <div class="attributeComment">Hospital address.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OtherProviderID</div>
+                <div class="attributeComment">If they have multiple records, this links them.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Inactive</div>
+                <div class="attributeComment">A flag marking them as active or not.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MFNMessage</div>
+                <div class="attributeComment">Payment provider message.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LockedFile</h3>
+            <div class="comment"><p>This table tracks all of the files that are locked for processing in our database to synchronize access to the file amongst all active processes.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">StatusBeforeLock</div>
+                <div class="attributeComment">The status code before a lock.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActiveFAMID</div>
+                <div class="attributeComment">Forigen key to ActiveFAM.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionName</div>
+                <div class="attributeComment">The action name that locked this file.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LockTable</h3>
+            <div class="comment"><p>Used to implement a scheme to resolve conflicting database operations. Each lock will guard against other Extract processes from accessing specific database operations while the lock is in place.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">LockName</div>
+                <div class="attributeComment">The name of the lock.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">UPI</div>
+                <div class="attributeComment">Information about the locked table.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LockTime</div>
+                <div class="attributeComment">The time that it was locked.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.Login</h3>
+            <div class="comment"><p>This table tracks all of the logins for our database. The current use case is primarly tied to our web application.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">UserName</div>
+                <div class="attributeComment">The username of the person logging in.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Password</div>
+                <div class="attributeComment">A hashed password for the person logging in.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActiveDirectorySID</div>
+                <div class="attributeComment">The users active directory SID.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.Machine</h3>
+            <div class="comment"><p>This table is for tracking the machine name of all computers on which processing against this database has occurred.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineName</div>
+                <div class="attributeComment">The name of the machine that connected to the database.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.MetadataField</h3>
+            <div class="comment"><p>This table tracks all of the metadata fields configured in the database. These are configured in the database administration tool.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Name</div>
+                <div class="attributeComment">The name of the metadata field.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.MLData</h3>
+            <div class="comment"><p>Stores data used for machine learning training.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MLModelID</div>
+                <div class="attributeComment">Forigen key to MLModel.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">IsTrainingData</div>
+                <div class="attributeComment">Bit representing if this is training data or not.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTimeStamp</div>
+                <div class="attributeComment">When this record was created.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Data</div>
+                <div class="attributeComment">Machine learning data about this file.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">CanBeDeleted</div>
+                <div class="attributeComment">A bit representing if this can be deleted.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.MLModel</h3>
+            <div class="comment"><p>Defines the machine learning models available for training.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Name</div>
+                <div class="attributeComment">A name for the model.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.Pagination</h3>
+            <div class="comment"><p>This table is for tracking all changes that can happen to a document in Pagination. Every single page in every document has a row.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">SourceFileID</div>
+                <div class="attributeComment">The FileID of the document that came before this. This is applicable when a document goes through multiple layers of pagination. Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">SourcePage</div>
+                <div class="attributeComment">The page number of the source FileID.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DestFileID</div>
+                <div class="attributeComment">The fileID of the document that this page is being output to. Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DestPage</div>
+                <div class="attributeComment">The page number of the destination file this is being written to.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OriginalFileID</div>
+                <div class="attributeComment">The original FileID that this page came from. Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OriginalPage</div>
+                <div class="attributeComment">The original page number that this page came from.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileTaskSessionID</div>
+                <div class="attributeComment">Forigen key to FileTaskSession.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.QueuedActionStatusChange</h3>
+            <div class="comment"><p>Schedules an action status change that could not be immediately executed, typically because the document was in the processing state when the status change was requested.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ASC_To</div>
+                <div class="attributeComment">The action this file was set to.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTimeStamp</div>
+                <div class="attributeComment">When this change occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineID</div>
+                <div class="attributeComment">Forigen key to machine.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ChangeStatus</div>
+                <div class="attributeComment">The new status the file was set to.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMSessionID</div>
+                <div class="attributeComment">Forigen key to FAMSession.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.QueueEvent</h3>
+            <div class="comment"><p>This table tracks all documents that are queued to our software.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTimeStamp</div>
+                <div class="attributeComment">When the file was queued.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">QueueEventCode</div>
+                <div class="attributeComment">Forigen key to QueueEventCode.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileModifyTime</div>
+                <div class="attributeComment">When the file was last modified.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileSizeInBytes</div>
+                <div class="attributeComment">The file size.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineID</div>
+                <div class="attributeComment">Forigen key to Machine.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.QueueEventCode</h3>
+            <div class="comment"><p>Maps and event code, to a descritpon.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">Code</div>
+                <div class="attributeComment">The one character code.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Description</div>
+                <div class="attributeComment">A descripton of that code.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.RasterZone</h3>
+            <div class="comment"><p>Defines the spatial location of an Attribute in the document.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AttributeID</div>
+                <div class="attributeComment">Forigen key to Attribute.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Top</div>
+                <div class="attributeComment">Y coordinate of the top side of the bounding box.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Left</div>
+                <div class="attributeComment">X coordinate of the left side of the bounding box.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Bottom</div>
+                <div class="attributeComment">Y coordinate of the bottom side of the bounding box.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Right</div>
+                <div class="attributeComment">X coordinate of the right side of the bounding box.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">StartX</div>
+                <div class="attributeComment">X coordinate for the starting point of a line that extends along the middle of a potentially skewed zone.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">StartY</div>
+                <div class="attributeComment">Y coordinate for the starting point of a line that extends along the middle of a potentially skewed zone.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">EndX</div>
+                <div class="attributeComment">X coordinate for the ending point of a line that extends along the middle of a potentially skewed zone.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">EndY</div>
+                <div class="attributeComment">Y coordinate for the ending point of a line that extends along the middle of a potentially skewed zone.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">PageNumber</div>
+                <div class="attributeComment">The page number to which the raster zone pertains</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Height</div>
+                <div class="attributeComment">Distance from one size of zone to the other perpendicular to the line defined by Start/End X/Y.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.ReportingDatabaseMigrationWizard</h3>
+            <div class="comment"><p>This table will track all changes that the database migration wizard makes to the database.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier across all databases.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Classification</div>
+                <div class="attributeComment">There are three different classificaitons. Warning, Info, and Error. Info will just log what is going to occur, and no errors are expected, where as warnings are things that you should look a little more closely at.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TableName</div>
+                <div class="attributeComment">The name of the table being modified.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Message</div>
+                <div class="attributeComment">An explantion of what is changing in that table.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTime</div>
+                <div class="attributeComment">The time that this chance occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Old_Value</div>
+                <div class="attributeComment">The old value in the table (if the row is being updated).</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">New_Value</div>
+                <div class="attributeComment">The new value in the table (if the row is being updated).</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Command</div>
+                <div class="attributeComment">The command being executed (Insert/Update/NA), where NA is simply providing additional information.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.ReportingDataCaptureAccuracy</h3>
+            <div class="comment"><p>Provides data transformed for reporting on data capture accuracy of data given a found and expected attribute set.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DatabaseServiceID</div>
+                <div class="attributeComment">Forigen key to database service.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FoundAttributeSetForFileID</div>
+                <div class="attributeComment">Forigen key to AttributeSetForFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FoundDateTimeStamp</div>
+                <div class="attributeComment">When the rules found the attributes.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FoundFAMUserID</div>
+                <div class="attributeComment">What user ran the rules. Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FoundActionID</div>
+                <div class="attributeComment">Forigen key to Action</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ExpectedAttributeSetForFileID</div>
+                <div class="attributeComment">Forigen key to AttributeSetForFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ExpectedDateTimeStamp</div>
+                <div class="attributeComment">When the last verification occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ExpectedFAMUserID</div>
+                <div class="attributeComment">Who performed the last verification.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ExpectedActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Attribute</div>
+                <div class="attributeComment">The attribute that was processed.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Correct</div>
+                <div class="attributeComment">The number of correctly found items by our rules.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Expected</div>
+                <div class="attributeComment">The number of items that should have been found.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Incorrect</div>
+                <div class="attributeComment">The number of incorrect items found.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.ReportingHIMStats</h3>
+            <div class="comment"><p>Provides data transformed for reporting on documents that when thru pagination</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">PaginationID</div>
+                <div class="attributeComment">Forigen key to Pagination.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">SourceFileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DestFileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OriginalFileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateProcessed</div>
+                <div class="attributeComment">When this file went through pagination.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileTaskSessionID</div>
+                <div class="attributeComment">Forigen key to FileTaskSession.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionName</div>
+                <div class="attributeComment">The action name that processed this file.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.ReportingRedactionAccuracy</h3>
+            <div class="comment"><p>Provides data transformed for reporting on redaction accuracy of data given a found and expected attribute set.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DatabaseServiceID</div>
+                <div class="attributeComment">Forigen key to DatabaseService.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FoundAttributeSetForFileID</div>
+                <div class="attributeComment">Forigen key to AttributeSetForFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FoundDateTimeStamp</div>
+                <div class="attributeComment">When this attribute set was found.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FoundFAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FoundActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ExpectedAttributeSetForFileID</div>
+                <div class="attributeComment">Forigen key to AttributeSetForFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ExpectedDateTimeStamp</div>
+                <div class="attributeComment">When the last attribute set was found.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ExpectedFAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ExpectedActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Page</div>
+                <div class="attributeComment">The page number that was processed.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Attribute</div>
+                <div class="attributeComment">The attribute that was processed.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Expected</div>
+                <div class="attributeComment">How many redactions were expected.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Found</div>
+                <div class="attributeComment">How many redactions were found.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Correct</div>
+                <div class="attributeComment">The number of redactions that were correct.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FalsePositives</div>
+                <div class="attributeComment">The number of false positive redactions that were made.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OverRedacted</div>
+                <div class="attributeComment">The number of redactions that were drawn too big.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">UnderRedacted</div>
+                <div class="attributeComment">The number of redactions that were drawn too small.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Missed</div>
+                <div class="attributeComment">The number of redactions we missed.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.ReportingVerificationRates</h3>
+            <div class="comment"><p>Provides data transformed for reporting on end user verification rates</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DatabaseServiceID</div>
+                <div class="attributeComment">Forigen key to DatabaseService.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TaskClassID</div>
+                <div class="attributeComment">Forigen key to TaskClass.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastFileTaskSessionID</div>
+                <div class="attributeComment">Forigen key to FileTaskSession.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Duration</div>
+                <div class="attributeComment">The amount of time this file spent open in verification.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OverheadTime</div>
+                <div class="attributeComment">The amount of time this file took to load.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActivityTime</div>
+                <div class="attributeComment">The amount of time the user was active on this document.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.SecureCounter</h3>
+            <div class="comment"><p>Counters whose values can be validated, typically used for the purpose of tracking specific processing performed on documents in an Extract workflow</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">CounterName</div>
+                <div class="attributeComment">The name of what is being counted</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">SecureCounterValue</div>
+                <div class="attributeComment">The encrypted counter value</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AlertLevel</div>
+                <div class="attributeComment">The counter value at which alerts should be generated</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AlertMultiple</div>
+                <div class="attributeComment">The frequency at which alerts should be repeated after reaching the AlertLevel</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.SecureCounterValueChange</h3>
+            <div class="comment"><p>Provides an audit trail of the changes to counter values in the SecureCounter table</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">CounterID</div>
+                <div class="attributeComment">A foreign key to SecureCounter</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FromValue</div>
+                <div class="attributeComment">The counter value prior to the change</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ToValue</div>
+                <div class="attributeComment">The counter value after the change</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastUpdatedTime</div>
+                <div class="attributeComment">The date/time associated with the change</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastUpdatedByFAMSessionID</div>
+                <div class="attributeComment">A foreign key to FAMSession</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MinFAMFileCount</div>
+                <div class="attributeComment">Number of files in the database at time of change</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">HashValue</div>
+                <div class="attributeComment">Hash used for counter data validation</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Comment</div>
+                <div class="attributeComment">Describes the certain counter value change operations</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.SkippedFile</h3>
+            <div class="comment"><p>This table contains all of the files a user may have skipped in our software.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">UserName</div>
+                <div class="attributeComment">The username of the person who skipped the file.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">The file Id that was skipped. Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to ActionID.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTimeStamp</div>
+                <div class="attributeComment">The date that it was skpped.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TimeSinceSkipped</div>
+                <div class="attributeComment">The amount of time that has passed since it was skipped.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMSessionID</div>
+                <div class="attributeComment">Forigen key to FamSession.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.SourceDocChangeHistory</h3>
+            <div class="comment"><p>Tracks name changes for a document (FAMFile)</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FromFileName</div>
+                <div class="attributeComment">The original file name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ToFileName</div>
+                <div class="attributeComment">The changed file name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TimeStamp</div>
+                <div class="attributeComment">When this change occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">MachineID</div>
+                <div class="attributeComment">Forigen key to Machine.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.Tag</h3>
+            <div class="comment"><p>This table defines all of the tags available to be applied to a file. It is possible for multiple tags to be applied to a file. Typically tags are used in a workflow configuration, where you only need to check a true/false condition on a file.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TagName</div>
+                <div class="attributeComment">The name of the tag.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TagDescription</div>
+                <div class="attributeComment">An explanation of what the tag is for.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.TaskClass</h3>
+            <div class="comment"><p>Assigns a GUID to different tasks in our application. This is to allow for easier tracking/reporting in our database.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">GUID</div>
+                <div class="attributeComment">A globally unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Name</div>
+                <div class="attributeComment">The name of the task.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.UserCreatedCounter</h3>
+            <div class="comment"><p>Allows users to create counters for tracking files that is not tied to licensing.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">CounterName</div>
+                <div class="attributeComment">The name of the counter.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Value</div>
+                <div class="attributeComment">The number of documents that have been processed through this counter.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A globally unique identifier.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.WebAppConfig</h3>
+            <div class="comment"><p>This table contains the configuration for Extract's web-based redaction verication application.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Type</div>
+                <div class="attributeComment">What type of setting is being stored. This is more of an arbitrary name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">WorkflowID</div>
+                <div class="attributeComment">The workflow that this setting is tied to. Forigen key to Workflow.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Settings</div>
+                <div class="attributeComment">The settings for our web application stored in a JSON format. Typically this is retrieved from GetSettings in our API.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier across all databases.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.Workflow</h3>
+            <div class="comment"><p>Defines a workflow; workflows allow for documents to run through a different configurations in the same database.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Name</div>
+                <div class="attributeComment">The workflow Name</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">WorkflowTypeCode</div>
+                <div class="attributeComment">The type of workflow this is. Forigen key to WorkflowType.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Description</div>
+                <div class="attributeComment">Provides a brief description of what this workflow is for.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">StartActionID</div>
+                <div class="attributeComment">Submitted documents will be set to pending in this action. This currently has no use for the appbackend api.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">EndActionID</div>
+                <div class="attributeComment">Workflow status will be based in part on the status of this action. Set this action based on the step that should be completed before the API reports a document as completed in the workflow.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">PostWorkflowActionID</div>
+                <div class="attributeComment">An action that will be set to pending when a document is deleted from the workflow via the API.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DocumentFolder</div>
+                <div class="attributeComment">(required for DocumentAPI) This is where submitted documents will be dropped.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OutputAttributeSetID</div>
+                <div class="attributeComment">The attribute set name used by the API to provide or accept updates to document data. Note that this shouldn't be DataFoundByRules for workflows when edits are accepted because those edits will be stored under this attribute set name. Forigen key to AttributeSet.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OutputFilePathInitializationFunction</div>
+                <div class="attributeComment">this function constructs the a default file name for the output files created in the workflow. The metadata field value can always be overwritten per file later via the Set Metadata task. You may also wish to not provide a default at all and set the metadata value only once the file is created.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OutputFileMetadataFieldID</div>
+                <div class="attributeComment">If a file is to be made available as output (redacted copy, searchable PDF, etc.) this is the metadata field that will point to the output file. This metadata field can either be set at the time the output file is created, or the Initial value function can specify a <SourceDocName> -based path tag that will resolve to the output filename.  Forigen key to MetadatField.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LoadBalanceWeight</div>
+                <div class="attributeComment">How the workflow should be prioritized.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">EditActionID</div>
+                <div class="attributeComment">The action used for verification.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">PostEditActionID</div>
+                <div class="attributeComment">An action that should be set to pending every time document data is edited via the API.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Guid</div>
+                <div class="attributeComment">A unique identifier unique across all databases.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.WorkflowChange</h3>
+            <div class="comment"><p>Tracks operations that add documents to a workflow</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">WorkflowChangeDate</div>
+                <div class="attributeComment">Date/time of the operation</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DestWorkflowID</div>
+                <div class="attributeComment">Forigen key to Workflow.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.WorkflowChangeFile</h3>
+            <div class="comment"><p>Tracks file added to a new workflow</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">WorkflowChangeID</div>
+                <div class="attributeComment">The workflow that this change occured in. Forigen key to workflow.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">SourceActionID</div>
+                <div class="attributeComment">The ID of the action the files existed in prior to the change</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DestActionID</div>
+                <div class="attributeComment">The ID of the action the files were added to in the destination workflow</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">SourceWorkflowID</div>
+                <div class="attributeComment">The ID of the workflow the files existed in prior to the change.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DestWorkflowID</div>
+                <div class="attributeComment">The ID of the workflow to which the files were added.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.WorkflowFile</h3>
+            <div class="comment"><p>Tracks what workflow each file is in.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">WorkflowID</div>
+                <div class="attributeComment">Forigen key to Workflow.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Invisible</div>
+                <div class="attributeComment">Indicates whether files are visible via API calls; When files are "deleted" via that API, they are marked invisible in the corresponding workflow</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AddedDateTime</div>
+                <div class="attributeComment">When the file was added to the workflow.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.WorkflowType</h3>
+            <div class="comment"><p>This table is used to classify a workflow as a Redaction, extraction, or classification project. For the most part this table is un-used.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">Code</div>
+                <div class="attributeComment">A one digit character representing a code for the workflow.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Meaning</div>
+                <div class="attributeComment">What that code means.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.WorkItem</h3>
+            <div class="comment"><p>Provides ability for a processing ask to divide a processing task into mulitple work items that may be processing in separate threads/processes/machines.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">WorkItemGroupID</div>
+                <div class="attributeComment">Foreign key to WorkItemGroup</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Status</div>
+                <div class="attributeComment">Indicates whether the work item is pending (P), processing (R), complete (C) or failed (F)</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Input</div>
+                <div class="attributeComment">Text input for the work item</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">BinaryInput</div>
+                <div class="attributeComment">Binary input for the work item</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Output</div>
+                <div class="attributeComment">Text output for a completed work item</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">BinaryOutput</div>
+                <div class="attributeComment">Binary output for a completed work item</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Sequence</div>
+                <div class="attributeComment">Defines the sequence of work items for a given work item group</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">StringizedException</div>
+                <div class="attributeComment">Exception data to be provided back to the source task</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMSessionID</div>
+                <div class="attributeComment">The ID of the FAMSession that created the work item.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.WorkItemGroup</h3>
+            <div class="comment"><p>Represents a batch of work items created to allow parallel execution of a processing task across multiple threads/processes/machines.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">ID</div>
+                <div class="attributeComment">A unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Foreign key to FAMFile</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Foreign key to Action</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">StringizedSettings</div>
+                <div class="attributeComment">Settings needed to perform processing of the work items.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">NumberOfWorkItems</div>
+                <div class="attributeComment">The number of work items created for this group</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">RunningTaskDescription</div>
+                <div class="attributeComment">A description of the task</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMSessionID</div>
+                <div class="attributeComment">The ID of the FAMSession that created the group</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>Security.Group</h3>
+            <div class="comment"><p>A security group is a collection of permissions a user has.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">GUID</div>
+                <div class="attributeComment">A globally unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Name</div>
+                <div class="attributeComment">The name of the group.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Description</div>
+                <div class="attributeComment">An explantion of the group.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">IsAdmin</div>
+                <div class="attributeComment">Is this group an admin.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActiveDirectorySID</div>
+                <div class="attributeComment">The active directory SID this is tied to.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>Security.GroupAction</h3>
+            <div class="comment"><p>Allows a user to be granted permissions to an action.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">GUID</div>
+                <div class="attributeComment">A globally unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">GroupGUID</div>
+                <div class="attributeComment">Forigen key to Group.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Allow</div>
+                <div class="attributeComment">Allow this permission.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>Security.GroupDashboard</h3>
+            <div class="comment"><p>Allows a group to be given access to a dashbaord.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">GUID</div>
+                <div class="attributeComment">A globally unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">GroupGUID</div>
+                <div class="attributeComment">Forigen key to Group.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DashboardGUID</div>
+                <div class="attributeComment">Forigen key to Dashboard.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Allow</div>
+                <div class="attributeComment">Is this permission allowed.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>Security.GroupReport</h3>
+            <div class="comment"><p>Controlls access to reports.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">GUID</div>
+                <div class="attributeComment">A globally unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">GroupGUID</div>
+                <div class="attributeComment">Forigen key to Group.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">REPORTID</div>
+                <div class="attributeComment">The report id to controll access to.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Allow</div>
+                <div class="attributeComment">Is this permission allowed.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>Security.GroupRole</h3>
+            <div class="comment"><p>Controlls access to differnt roles in our software.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">GUID</div>
+                <div class="attributeComment">A globally unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">GroupGUID</div>
+                <div class="attributeComment">Forigen key to Group.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">RoleGUID</div>
+                <div class="attributeComment">Forigen key to role.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Allow</div>
+                <div class="attributeComment">Is this permission allowed.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>Security.GroupWorkflow</h3>
+            <div class="comment"><p>Controlls access to workflows.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">GUID</div>
+                <div class="attributeComment">A globally unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">GroupGUID</div>
+                <div class="attributeComment">Forigen key to Group.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">WorkflowID</div>
+                <div class="attributeComment">Forigen key to workflow.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Allow</div>
+                <div class="attributeComment">Is this permission allowed.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>Security.LoginGroupMembership</h3>
+            <div class="comment"><p>Links a group to a login.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">GUID</div>
+                <div class="attributeComment">A globally unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LoginID</div>
+                <div class="attributeComment">Forigen key to Login.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">GroupGUID</div>
+                <div class="attributeComment">Forigen key to Group.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">AddedDateTime</div>
+                <div class="attributeComment">When the user was added to the group.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>Security.Role</h3>
+            <div class="comment"><p>Controlls role based access to our software.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">GUID</div>
+                <div class="attributeComment">A globally unique identifier.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Name</div>
+                <div class="attributeComment">The name of the role.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Description</div>
+                <div class="attributeComment">A description of that role.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="group"><a name="StoredProcedure"></a><h2>StoredProcedure</h2>
+        <div class="objects">
+          <div class="object">
+            <h3>dbo.GetFilesToProcessForAction</h3>
+            <div class="comment"><p>This will get files to process for a specific action. This is one of the most run queries in our software.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@ActionID</div>
+                <div class="attributeComment">The action id you want files for.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ActionName</div>
+                <div class="attributeComment">The action name you want files for.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@WorkflowID</div>
+                <div class="attributeComment">The workflow you are operating in.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@BatchSize</div>
+                <div class="attributeComment">How many file you want.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@StatusToQueue</div>
+                <div class="attributeComment">What status to set the files.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@MachineID</div>
+                <div class="attributeComment">What machine made this call.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@UserID</div>
+                <div class="attributeComment">What user made this call.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ActiveFAMID</div>
+                <div class="attributeComment">What row in the ActiveFAM made this call.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@FAMSessionID</div>
+                <div class="attributeComment">What session this call is apart of.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@RecordFASTEntry</div>
+                <div class="attributeComment">Shoud records be written to the file action state transition table.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@SkippedForUser</div>
+                <div class="attributeComment">Look for skipped files.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@CheckDeleted</div>
+                <div class="attributeComment">Look for deleted files.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEAddOrUpdateEncounter</h3>
+            <div class="comment"><p>Adds or updates a labDEEncounter row.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@PatientMRN</div>
+                <div class="attributeComment">The patient medical record number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterID</div>
+                <div class="attributeComment">The encounter ID.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterDateTime</div>
+                <div class="attributeComment">When this encounter occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@Department</div>
+                <div class="attributeComment">What department this was apart of.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterType</div>
+                <div class="attributeComment">What type of encounter was it.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterProvider</div>
+                <div class="attributeComment">Who is the provider for this encounter.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ADTMessage</div>
+                <div class="attributeComment">The ADT message.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEAddOrUpdateEncounterAndIPDates</h3>
+            <div class="comment"><p>Add or update a LabDEEncounter.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@PatientMRN</div>
+                <div class="attributeComment">The patient medical record number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterID</div>
+                <div class="attributeComment">The encounter id to update.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterDateTime</div>
+                <div class="attributeComment">The time the encounter occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@Department</div>
+                <div class="attributeComment">The department that the encounter occured in.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterType</div>
+                <div class="attributeComment">What type of encounter it was.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterProvider</div>
+                <div class="attributeComment">The provider of the encounter.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ADTMessage</div>
+                <div class="attributeComment">The ADT message.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@AdmissionDate</div>
+                <div class="attributeComment">The time they were admitted for this encounter.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@DischargeDate</div>
+                <div class="attributeComment">When they were discarged from the encounter.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEAddOrUpdateOrder</h3>
+            <div class="comment"><p>Allows an order to be added/updated.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@OrderNumber</div>
+                <div class="attributeComment">The order number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@OrderCode</div>
+                <div class="attributeComment">The order code.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@PatientMRN</div>
+                <div class="attributeComment">The patient medical record number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ReferenceDateTime</div>
+                <div class="attributeComment">The reference time this was setup.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@OrderStatus</div>
+                <div class="attributeComment">The order status.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ORMMessage</div>
+                <div class="attributeComment">The orm message.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEAddOrUpdateOrderWithAccession</h3>
+            <div class="comment"><p>Adds/updates a record to LabDEOrder.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@OrderNumber</div>
+                <div class="attributeComment">The order number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@OrderCode</div>
+                <div class="attributeComment">The order code.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@PatientMRN</div>
+                <div class="attributeComment">The patient medical record number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ReferenceDateTime</div>
+                <div class="attributeComment">The reference date time.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@OrderStatus</div>
+                <div class="attributeComment">The order status.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ORMMessage</div>
+                <div class="attributeComment">The ORM message.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@AccessionNumber</div>
+                <div class="attributeComment">The accession number.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEAddOrUpdateOrderWithEncounter</h3>
+            <div class="comment"><p>Adds/Updates a record in LabDEEncounter.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@OrderNumber</div>
+                <div class="attributeComment">The order number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@OrderCode</div>
+                <div class="attributeComment">The order code.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@PatientMRN</div>
+                <div class="attributeComment">The patient medical record number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ReferenceDateTime</div>
+                <div class="attributeComment">The reference date time.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@OrderStatus</div>
+                <div class="attributeComment">The order status.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterID</div>
+                <div class="attributeComment">The encounterID to update.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterDateTime</div>
+                <div class="attributeComment">The time the encounter occured.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@Department</div>
+                <div class="attributeComment">The department the encounter occured in.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterType</div>
+                <div class="attributeComment">The type of encounter.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterProvider</div>
+                <div class="attributeComment">Who was the provider on the encounter.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ADTMessage</div>
+                <div class="attributeComment">The ADT message.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEAddOrUpdateOrderWithEncounterAndIPDates</h3>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@OrderNumber</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@OrderCode</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@PatientMRN</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ReferenceDateTime</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@OrderStatus</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterID</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterDateTime</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@Department</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterType</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EncounterProvider</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ADTMessage</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@AdmissionDate</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@DischargeDate</div>
+                <div class="attributeComment"></div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@AccessionNumber</div>
+                <div class="attributeComment"></div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.LabDEMergePatients</h3>
+            <div class="comment"><p>Merges two patients together.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@SourceMRN</div>
+                <div class="attributeComment">The source medical record number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@TargetMRN</div>
+                <div class="attributeComment">The target medical record number.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@UpdateInfo</div>
+                <div class="attributeComment">Should the source be updated.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@FirstName</div>
+                <div class="attributeComment">The first name of the patient.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@MiddleName</div>
+                <div class="attributeComment">The middle name of the patient.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@LastName</div>
+                <div class="attributeComment">The last name of the patient.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@Suffix</div>
+                <div class="attributeComment">The patients suffix.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@DOB</div>
+                <div class="attributeComment">The patients dob.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@Gender</div>
+                <div class="attributeComment">The patients gender.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@Warning</div>
+                <div class="attributeComment">Any warning that may occur.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.sp_GetClusterName</h3>
+            <div class="comment"><p>Gets the name of the cluster. Important for when databases are setup in a cluster, so that way the database ID can be calculated properly.</p>
+</div>
+            <div class="attributes"></div>
+          </div>
+          <div class="object">
+            <h3>dbo.sp_UsageForSpecificUserSpecificDay</h3>
+            <div class="comment"><p>Gets the usage of a specific user for a day.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@StartHour</div>
+                <div class="attributeComment">The time that you want to start reporting.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@EndHour</div>
+                <div class="attributeComment">The time you want to stop reporting.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ReportDate</div>
+                <div class="attributeComment">What date you want to report on.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@UserName</div>
+                <div class="attributeComment">The user you want to report on.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.sp_UserCounts</h3>
+            <div class="comment"><p>Used for data for the LabDE Data Entry Rates per User report
+returns rows of
+UserName, NumDocs, NumPages, NumOrder, NumTests, TotalTime, DocsPerHour, PagesPerHour, OrdersPerHour, TestPerHour</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@InclusionActions</div>
+                <div class="attributeComment">Comma separated list of Action names to include in the output - list cannot be empty</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ExclusionTags</div>
+                <div class="attributeComment">Comma separated list of Tags that should be excluded from the data</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@WorkflowName</div>
+                <div class="attributeComment">Workflow name the data return should be associated with - to include all records regardless of Workflow this can be Null or ''</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ReportingPeriod_Min</div>
+                <div class="attributeComment">Start date and time of the data</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">@ReportingPeriod_Max</div>
+                <div class="attributeComment">End date and time of the data</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="group"><a name="Function"></a><h2>Function</h2>
+        <div class="objects">
+          <div class="object">
+            <h3>dbo.fn_TableFromCommaSeparatedList</h3>
+            <div class="comment"><p>Turns a comma seperated list into a table.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">@List</div>
+                <div class="attributeComment">The comma seperated list.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="group"><a name="View"></a><h2>View</h2>
+        <div class="objects">
+          <div class="object">
+            <h3>dbo.vFAMUserInputEventsTime</h3>
+            <div class="comment"><p>The primary view for reporting on the input event table.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">InputDate</div>
+                <div class="attributeComment">The date that the user was using the software.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TotalMinutes</div>
+                <div class="attributeComment">The amount of minutes the user was inputting values into the software for.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.vFAMUserInputEventsTimeLegacy</h3>
+            <div class="comment"><p>The old way of reporting on input time.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">InputDate</div>
+                <div class="attributeComment">The date the input was done.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TotalMinutes</div>
+                <div class="attributeComment">The amount of time the user was inputing events into the software.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.vFAMUserInputWithFileID</h3>
+            <div class="comment"><p>Reports on the amount of input based on fileID.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">InputDate</div>
+                <div class="attributeComment">The input date.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TotalMinutes</div>
+                <div class="attributeComment">The amount of time the user was inputing data.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.vPaginatedDestFiles</h3>
+            <div class="comment"><p>Reports on all of the destination files.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">DestFileID</div>
+                <div class="attributeComment">Forigen key to FAMFile.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.vPaginationDataWithRank</h3>
+            <div class="comment"><p>View used in productivity dashboards in workflows that use pagination</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">PaginationID</div>
+                <div class="attributeComment">ID from the Pagination table</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">FAMUser ID that performed the pagination</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">SourceFileID</div>
+                <div class="attributeComment">FAMFile ID of the file that was paginated</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DestFileID</div>
+                <div class="attributeComment">FAMFile ID of a file created by the pagination</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">OriginalFileID</div>
+                <div class="attributeComment">FAMFile ID of the Orginal file that was paginated</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTimeStamp</div>
+                <div class="attributeComment">Date and time the pagination was done</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">ID of the Action the Source file was paginated</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ASCName</div>
+                <div class="attributeComment">Name of the Action the Source file was paginated</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileTaskSessionID</div>
+                <div class="attributeComment">ID of the FileTaskSession that the pagination was performed</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">RankDesc</div>
+                <div class="attributeComment">Rank by DateTimeStamp partitioned by SourceFileID, AscName, FileTaskSessionID</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.vProcessingData</h3>
+            <div class="comment"><p>Returns processing information about a workflow.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">WorkflowName</div>
+                <div class="attributeComment">The workflow name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ASCName</div>
+                <div class="attributeComment">The action name.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">ActionID</div>
+                <div class="attributeComment">Forigen key to Action.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">TotalTime</div>
+                <div class="attributeComment">The amount of time spent processing.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">DateTimeStamp</div>
+                <div class="attributeComment">The date the processing occured on.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FileCount</div>
+                <div class="attributeComment">The number of files that were processed.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">Pages</div>
+                <div class="attributeComment">The number of pages processed.</div>
+              </div>
+            </div>
+          </div>
+          <div class="object">
+            <h3>dbo.vUsersWithActive</h3>
+            <div class="comment"><p>Gets all of the users with active processing time.</p>
+</div>
+            <div class="attributes">
+              <div class="attribute">
+                <div class="attributeName">FAMUserID</div>
+                <div class="attributeComment">Forigen key to FAMUser</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">UserName</div>
+                <div class="attributeComment">The username of the FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">FullUserName</div>
+                <div class="attributeComment">The full user name of the FAMUser.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">LastPingTime</div>
+                <div class="attributeComment">The last time they were seen active.</div>
+              </div>
+              <div class="attribute">
+                <div class="attributeName">CurrentlyActive</div>
+                <div class="attributeComment">Are they currently active (true/false).</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="group"><a name="Schema"></a><h2>Schema</h2>
+        <div class="objects">
+          <div class="object">
+            <h3>db_owner</h3>
+            <div class="comment"><p>A defualt schema.</p>
+</div>
+            <div class="attributes"></div>
+          </div>
+          <div class="object">
+            <h3>dbo</h3>
+            <div class="comment"><p>The default schema.</p>
+</div>
+            <div class="attributes"></div>
+          </div>
+          <div class="object">
+            <h3>Security</h3>
+            <div class="comment"><p>This schema is setup to handle all role role and group based access to our software in 11.9.</p>
+</div>
+            <div class="attributes"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">Generated by Database Note Taker</div>
+  </body>
+</html>
