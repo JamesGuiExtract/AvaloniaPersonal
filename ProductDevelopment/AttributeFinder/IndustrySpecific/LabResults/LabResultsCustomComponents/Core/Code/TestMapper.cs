@@ -393,7 +393,7 @@ namespace Extract.LabResultsCustomComponents
                         .ToList())
                     .Where(candidates => candidates.Count > 0)
                     // First try attributes that have only one possible match
-                    .OrderBy(candidates => candidates.Count())
+                    .OrderBy(candidates => candidates.Count)
                     // ...giving preference to attributes that can be mapped to a mandatory test
                     .ThenBy(candidates => candidates[0].Mandatory ? 0 : 1)
                     // ...and those that did not require using a fuzzy pattern to match

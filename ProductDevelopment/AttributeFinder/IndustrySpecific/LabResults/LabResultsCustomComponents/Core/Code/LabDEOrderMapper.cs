@@ -97,7 +97,7 @@ namespace Extract.LabResultsCustomComponents
         /// The default filename that will appear in the FAM to describe the task the data entry
         /// application is fulfilling
         /// </summary>
-        static readonly string _DEFAULT_OUTPUT_HANDLER_NAME = "LabDE order mapper";
+        const string _DEFAULT_OUTPUT_HANDLER_NAME = "LabDE order mapper";
 
         /// <summary>
         /// The current version for this object.
@@ -111,7 +111,7 @@ namespace Extract.LabResultsCustomComponents
         /// Changed default values of RequireMandatoryTests and EliminateDuplicateTestSubattributes to true
         /// Version 5: Added SkipSecondPass, AddESNamesAttribute, AddESTestCodesAttribute and SetFuzzyType options
         /// </summary>
-        static readonly int _CURRENT_VERSION = 5;
+        const int _CURRENT_VERSION = 5;
 
         /// <summary>
         /// A couple algorithms used in the order mapper to find the best combinations of objects
@@ -119,7 +119,7 @@ namespace Extract.LabResultsCustomComponents
         /// algorithms will be capped at this many possible grouping combinations to be considering
         /// at one time.
         /// </summary>
-        internal static readonly int _COMBINATION_ALGORITHM_SAFETY_CUTOFF = 5000;
+        internal const int _COMBINATION_ALGORITHM_SAFETY_CUTOFF = 5000;
 
         #endregion Constants
 
@@ -260,7 +260,7 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Whether to skip second pass of the order mapping algorithm
         /// </summary>
-        bool _skipSecondPass = false;
+        bool _skipSecondPass;
 
         /// <summary>
         /// Gets or sets whether add an ESNames attribute to mapped components
@@ -591,9 +591,10 @@ namespace Extract.LabResultsCustomComponents
         public void ProcessOutput(IUnknownVector pAttributes, AFDocument pDoc,
             ProgressStatus pProgressStatus)
         {
-            OrderMappingDBCache dbCache = null;
             try
             {
+                _ = pAttributes ?? throw new ArgumentNullException(nameof(pAttributes));
+
                 // Validate the license
                 LicenseUtilities.ValidateLicense(
                     LicenseIdName.LabDECoreObjects, "ELI26889", _DEFAULT_OUTPUT_HANDLER_NAME);
@@ -603,7 +604,7 @@ namespace Extract.LabResultsCustomComponents
                 pAttributes.ReportMemoryUsage();
 
                 // Create the database cache object
-                dbCache = new OrderMappingDBCache(pDoc, _databaseFile);
+                using OrderMappingDBCache dbCache = new(pDoc, _databaseFile);
 
                 // Build a new vector of attributes that have been mapped to orders
                 IUnknownVector newAttributes = new IUnknownVector();
@@ -651,7 +652,7 @@ namespace Extract.LabResultsCustomComponents
                         // Sort the sub attributes spatially
                         newAttribute.SubAttributes.Sort(attributeSorter);
                     }
-                    
+
                     // Sort the orders spatially, using the first component subattribute
                     // and add to the output collection
                     foreach (IAttribute newAttribute in mappedAttributes
@@ -661,10 +662,6 @@ namespace Extract.LabResultsCustomComponents
                         newAttributes.PushBack(newAttribute);
                     }
                 }
-
-                // Finished with database so close connection
-                dbCache.Dispose();
-                dbCache = null;
 
                 // Clear the original attributes and set the attributes to the
                 // newly mapped collection
@@ -678,14 +675,6 @@ namespace Extract.LabResultsCustomComponents
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI26171", "Unable to handle output.", ex);
-            }
-            finally
-            {
-                if (dbCache != null)
-                {
-                    dbCache.Dispose();
-                    dbCache = null;
-                }
             }
         }
 
@@ -750,6 +739,8 @@ namespace Extract.LabResultsCustomComponents
         {
             try
             {
+                _ = orderMapper ?? throw new ArgumentNullException(nameof(orderMapper));
+
                 _databaseFile = orderMapper.DatabaseFileName;
                 _requireMandatory = orderMapper.RequireMandatoryTests;
                 _useFilledRequirement = orderMapper.UseFilledRequirement;
@@ -1242,11 +1233,11 @@ namespace Extract.LabResultsCustomComponents
                 List<IAttribute> nonComponents = new List<IAttribute>();
                 foreach (KeyValuePair<string, List<IAttribute>> pair in nameToAttributes)
                 {
-                    if (pair.Key.Equals("COMPONENT"))
+                    if (pair.Key.Equals("COMPONENT", StringComparison.Ordinal))
                     {
                         components = pair.Value;
                     }
-                    else if (pair.Key.Equals("NAME"))
+                    else if (pair.Key.Equals("NAME", StringComparison.Ordinal))
                     {
                         // Do nothing as a new name will created later
                     }
@@ -1855,7 +1846,7 @@ namespace Extract.LabResultsCustomComponents
         static IEnumerable<string> GetPotentialOrderCodes(IEnumerable<LabTest> labTests,
             OrderMappingDBCache dbCache)
         {
-            if (labTests.Count() == 0)
+            if (!labTests.Any())
             {
                 return Enumerable.Empty<string>();
             }
@@ -1942,22 +1933,20 @@ namespace Extract.LabResultsCustomComponents
             string query = "SELECT [OfficialName] FROM [LabTest] WHERE [TestCode] = '"
                 + testCodeEscaped + "'";
 
-            using (SQLiteCommand command = new(query, dbCache.DBConnection))
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+            using SQLiteCommand command = new(query, dbCache.DBConnection);
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+            using SQLiteDataReader reader = command.ExecuteReader();
+            if (reader.Read())
             {
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        return reader.GetString(0);
-                    }
-                    else
-                    {
-                        ExtractException ee = new ExtractException("ELI26234",
-                            "Could not find test name!");
-                        ee.AddDebugData("TestCode", testCode, false);
-                        throw ee;
-                    }
-                }
+                return reader.GetString(0);
+            }
+            else
+            {
+                ExtractException ee = new ExtractException("ELI26234",
+                    "Could not find test name!");
+                ee.AddDebugData("TestCode", testCode, false);
+                throw ee;
             }
         }
 

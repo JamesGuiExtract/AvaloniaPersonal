@@ -576,14 +576,14 @@ namespace Extract.LabResultsCustomComponents
                         + " WHERE [Code] IN (SELECT [OrderCode] FROM [LabOrderTest]"
                         + " WHERE [TestCode] IN (" + String.Join(",", testCodes) + "))"
                         + " ORDER BY [TieBreaker]";
-                    using (SQLiteCommand command = new(query, _customerDBConnection))
-                    using (SQLiteDataReader reader = command.ExecuteReader())
+#pragma warning disable CA2100 // Review SQL queries for security vulnerabilities
+                    using SQLiteCommand command = new(query, _customerDBConnection);
+#pragma warning restore CA2100 // Review SQL queries for security vulnerabilities
+                    using SQLiteDataReader reader = command.ExecuteReader();
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
-                            string code = reader.GetString(0);
-                            orderCodes.Add(code);
-                        }
+                        string code = reader.GetString(0);
+                        orderCodes.Add(code);
                     }
                 }
 

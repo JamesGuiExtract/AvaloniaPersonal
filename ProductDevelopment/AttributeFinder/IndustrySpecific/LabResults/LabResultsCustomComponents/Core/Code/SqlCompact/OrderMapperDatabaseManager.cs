@@ -13,7 +13,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
 namespace Extract.LabResultsCustomComponents
@@ -888,17 +887,8 @@ namespace Extract.LabResultsCustomComponents
         {
             get
             {
-                try
-                {
-                    using (var db = GetDbConnection<LabDEOrderMapperDatabase>())
-                    {
-                        return db.Settings.ToDictionary(s => s.Name, s => s.Value);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI31233", ex);
-                }
+                using LabDEOrderMapperDatabase db = GetDbConnection<LabDEOrderMapperDatabase>();
+                return db.Settings.ToDictionary(s => s.Name, s => s.Value);
             }
         }
 
@@ -1110,6 +1100,52 @@ namespace Extract.LabResultsCustomComponents
             }
         }
 
+        // Replace the schema manager with OrderMapperSqliteDatabaseManager
+        private void UpdateFromVersion2ToVersion3Schema()
+        {
+            using LabDEOrderMapperDatabase db = GetDbConnection<LabDEOrderMapperDatabase>();
+
+            if (db.Connection.State != System.Data.ConnectionState.Open)
+            {
+                db.Connection.Open();
+            }
+            using DbTransaction trans = db.Connection.BeginTransaction();
+            db.Transaction = trans;
+
+            var schemaManager = db.Settings
+                .Where(s => s.Name == DatabaseHelperMethods.DatabaseSchemaManagerKey)
+                .FirstOrDefault();
+
+            if (schemaManager is null)
+            {
+                db.Settings.InsertOnSubmit(new Settings()
+                {
+                    Name = DatabaseHelperMethods.DatabaseSchemaManagerKey,
+                    Value = typeof(OrderMapperSqliteDatabaseManager).ToString()
+                });
+            }
+            else
+            {
+                schemaManager.Value = typeof(OrderMapperSqliteDatabaseManager).ToString();
+            }
+
+            // Update the schema version to 3
+            var setting = db.Settings
+                .Where(s => s.Name == OrderMapperSchemaVersionKey)
+                .FirstOrDefault();
+            if (setting.Value is null)
+            {
+                var ee = new ExtractException("ELI51918",
+                    "No context tags db schema version key found.");
+                ee.AddDebugData("Database File", _databaseFile, false);
+                throw ee;
+            }
+            setting.Value = "3";
+
+            db.SubmitChanges(ConflictMode.FailOnFirstConflict);
+            trans.Commit();
+        }
+
         #endregion Methods
 
         #region IDatabaseSchemaManager Members
@@ -1123,10 +1159,7 @@ namespace Extract.LabResultsCustomComponents
         {
             try
             {
-                if (connection == null)
-                {
-                    throw new ArgumentNullException("connection");
-                }
+                _ = connection ?? throw new ArgumentNullException(nameof(connection));
 
                 var ceConnection = connection as SqlCeConnection;
                 if (ceConnection == null)
@@ -1155,17 +1188,7 @@ namespace Extract.LabResultsCustomComponents
         {
             get
             {
-                try
-                {
-                    // TODO: Temporary ignore updates until deciding the fate of this schema manager
-                    // https://extract.atlassian.net/browse/ISSUE-17684
-                    return false;
-                    //return GetSchemaVersion() < CurrentSchemaVersion;
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI31239", ex);
-                }
+                return GetSchemaVersion() < CurrentSchemaVersion + 1;
             }
         }
 
@@ -1177,14 +1200,7 @@ namespace Extract.LabResultsCustomComponents
         {
             get
             {
-                try
-                {
-                    return GetSchemaVersion() > CurrentSchemaVersion;
-                }
-                catch (Exception ex)
-                {
-                    throw ExtractException.AsExtractException("ELI31240", ex);
-                }
+                return GetSchemaVersion() > CurrentSchemaVersion;
             }
         }
 
@@ -1209,10 +1225,7 @@ namespace Extract.LabResultsCustomComponents
         {
             try
             {
-                if (cancelTokenSource == null)
-                {
-                    throw new ArgumentNullException("cancelTokenSource");
-                }
+                _ = cancelTokenSource ?? throw new ArgumentNullException(nameof(cancelTokenSource));
 
                 int version = GetSchemaVersion();
                 if (progressStatus != null)
@@ -1222,22 +1235,30 @@ namespace Extract.LabResultsCustomComponents
 
                 CancellationToken ct = cancelTokenSource.Token;
 
-                var task = Task.Factory.StartNew<string>(() =>
+                var task = Task.Run(() =>
                 {
                     // Check if the task has already been cancelled
                     ct.ThrowIfCancellationRequested();
 
                     string backUpFileName = BackupDatabase();
 
-                    switch (version)
+                    while (version < 3)
                     {
-                        case 1:
-                            UpdateFromVersion1ToVersion2Schema();
-                            break;
+                        switch (version)
+                        {
+                            case 1:
+                                UpdateFromVersion1ToVersion2Schema();
+                                break;
+                            case 2:
+                                UpdateFromVersion2ToVersion3Schema();
+                                break;
 
-                        default:
-                            ExtractException.ThrowLogicException("ELI31241");
-                            break;
+                            default:
+                                ExtractException.ThrowLogicException("ELI31241");
+                                break;
+                        }
+                        _versionNumber = 0; // Force an actual query of the DB in GetSchemaVersion
+                        version = GetSchemaVersion();
                     }
 
                     if (progressStatus != null)
@@ -1260,38 +1281,7 @@ namespace Extract.LabResultsCustomComponents
         /// Gets or sets the SQLCDBEditorPlugin implementation(s) that should completely replace the
         /// normal SQLCDBEditor UI (no tables, queries or tabs)
         /// </summary>
-        public IEnumerable<object> UIReplacementPlugins
-        {
-            get
-            {
-                try
-                {
-                    // For testing purposes, use LabDE configuration UI plugins if database is
-                    // opened while the shift key is down.
-                    // NOTE: I am seeing occasional exceptions when opening a database with the
-                    // shift key down that I think result from the shift key being lifted between the
-                    // time UIReplacementPlugins is checked for null and the time it is checked for
-                    // Any(). I am not going to bother addressing this issue since this is only a
-                    // temporary internal issue.
-                    if (SystemMethods.IsExtractInternal() && Control.ModifierKeys.HasFlag(Keys.Shift))
-                    {
-                        return new object[]
-                        {
-                            new OrdersPlugin(),
-                            new ComponentsPlugin()
-                        };
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw ex.AsExtract("ELI39343");
-                }              
-            }
-        }
+        public IEnumerable<object> UIReplacementPlugins => Enumerable.Empty<object>();
 
         #endregion
     }

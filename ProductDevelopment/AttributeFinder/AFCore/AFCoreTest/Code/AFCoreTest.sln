@@ -654,7 +654,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder.Rul
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabResultsCustomComponents", "..\..\..\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj", "{89C9999B-D0EB-4516-A2E2-F6DC87638839}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.LabResultsCustomComponents", "..\..\..\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\Extract.LabResultsCustomComponents.csproj", "{89C9999B-D0EB-4516-A2E2-F6DC87638839}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A2E13543-A708-49E3-BA6E-4FC6DFE31E7C} = {A2E13543-A708-49E3-BA6E-4FC6DFE31E7C}
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
@@ -1329,6 +1329,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Authentic
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.Conditions.Test", "..\..\..\..\..\RC.Net\FileActionManager\Conditions\Core\Testing\Automated\Extract.FileActionManager.Conditions.Test.csproj", "{3E846397-F664-4575-99C8-435C5F085699}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.LabResultsCustomComponents.Test", "..\..\..\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Test\Extract.LabResultsCustomComponents.Test.csproj", "{C4823AF4-5294-4617-A88D-F8011C7F299E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -6908,6 +6910,36 @@ Global
 		{3E846397-F664-4575-99C8-435C5F085699}.Template|x64.Build.0 = Debug|Any CPU
 		{3E846397-F664-4575-99C8-435C5F085699}.Template|x86.ActiveCfg = Debug|Any CPU
 		{3E846397-F664-4575-99C8-435C5F085699}.Template|x86.Build.0 = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Debug|Win32.Build.0 = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Debug|x64.Build.0 = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Debug|x86.Build.0 = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Release|Win32.ActiveCfg = Release|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Release|Win32.Build.0 = Release|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Release|x64.ActiveCfg = Release|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Release|x64.Build.0 = Release|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Release|x86.ActiveCfg = Release|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Release|x86.Build.0 = Release|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Template|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Template|Any CPU.Build.0 = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Template|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Template|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Template|Win32.ActiveCfg = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Template|Win32.Build.0 = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Template|x64.ActiveCfg = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Template|x64.Build.0 = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Template|x86.ActiveCfg = Debug|Any CPU
+		{C4823AF4-5294-4617-A88D-F8011C7F299E}.Template|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

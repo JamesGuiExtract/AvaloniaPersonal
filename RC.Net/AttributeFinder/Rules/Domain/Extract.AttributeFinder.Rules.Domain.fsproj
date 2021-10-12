@@ -323,7 +323,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj">
+    <ProjectReference Include="..\..\..\..\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\Extract.LabResultsCustomComponents.csproj">
       <Name>LabResultsCustomComponents</Name>
       <Project>{89c9999b-d0eb-4516-a2e2-f6dc87638839}</Project>
       <Private>True</Private>

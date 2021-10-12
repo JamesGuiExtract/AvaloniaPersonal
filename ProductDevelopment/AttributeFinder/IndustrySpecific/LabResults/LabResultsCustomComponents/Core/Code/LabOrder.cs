@@ -134,20 +134,18 @@ namespace Extract.LabResultsCustomComponents
             // Use LabTest.TestCode instead of LabOrderTest.TestCode because these two might not be strictly equal
             // because of the way that SQL handles trailing spaces
             // https://extract.atlassian.net/browse/ISSUE-12073
-            string query = "SELECT [LabTest].[TestCode] FROM [LabTest] JOIN [LabOrderTest] ON "
-                + " [LabTest].[TestCode] = [LabOrderTest].[TestCode] WHERE [OrderCode] = '"
-                + _orderCode.Replace("'", "''") + "' AND [Mandatory] = " + (mandatory ? "1" : "0");
+            string query = "SELECT [LabTest].[TestCode] FROM [LabTest]" +
+                "JOIN [LabOrderTest] ON [LabTest].[TestCode] = [LabOrderTest].[TestCode]" +
+                "WHERE [OrderCode] = @OrderCode AND [Mandatory] = @Mandatory";
 
-            List<string> testCodes = new List<string>();
-            using (SQLiteCommand command = new(query, dbCache.DBConnection))
+            List<string> testCodes = new();
+            using SQLiteCommand command = new(query, dbCache.DBConnection);
+            command.Parameters.AddWithValue("@OrderCode", _orderCode);
+            command.Parameters.AddWithValue("@Mandatory", mandatory);
+            using SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
             {
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        testCodes.Add(reader.GetString(0));
-                    }
-                }
+                testCodes.Add(reader.GetString(0));
             }
 
             return testCodes;
