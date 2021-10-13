@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -252,6 +253,91 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter.Test
             // Verify that the output database exists and has the correct content
             var actualSettings = GetSettings(sqliteDatabaseFile.FileName);
             CollectionAssert.AreEqual(expectedSettings, actualSettings);
+        }
+
+        /// Test that a very large database is converted correctly
+        /// https://extract.atlassian.net/browse/ISSUE-17747
+        [Test]
+        [Category("Automated")]
+        public void ConvertLargeDatabase()
+        {
+            var expectedSettings =
+                Enumerable.Range(1, 50_000)
+                .Select(i => new KeyValuePair<string, string>($"Setting{i:D5}", $"{i:D5}_{new String('X', 249)}"))
+                .ToList();
+
+            using TemporaryFile sqlCompactDatabaseFile = new(".sdf", false);
+            File.Delete(sqlCompactDatabaseFile.FileName);
+
+            CreateSqlCompactDatabaseWithData(sqlCompactDatabaseFile.FileName, expectedSettings);
+
+            using TemporaryFile sqliteDatabaseFile = new(".sqlite", false);
+            using TemporaryFile backupFile = new(".sdf", false);
+
+            // Setup to not have a schema manager
+            _schemaManagerProviderMock
+                .Setup(x => x.GetSqlCompactSchemaManager(It.IsAny<string>()))
+                .Returns<IDatabaseSchemaManager>(null);
+
+            string statusMessage = "";
+            void UpdateStatusMessage(string message) { statusMessage += message; }
+
+            // Run the conversion
+            DatabaseConverter converter = new(_schemaManagerProviderMock.Object);
+
+            // Force the result here rather than awaiting it so that test failures will be less confusing
+            converter.Convert(sqlCompactDatabaseFile.FileName, sqliteDatabaseFile.FileName, UpdateStatusMessage)
+                .GetAwaiter()
+                .GetResult();
+
+            // Verify that multiple script files were used
+            Assert.That(Regex.IsMatch(statusMessage, @"Sent script to output file\(s\)(.*\.sql\b){2}"));
+
+            // Verify that the output database exists and has the correct content
+            var actualSettings = GetSettings(sqliteDatabaseFile.FileName);
+            CollectionAssert.AreEqual(expectedSettings, actualSettings);
+        }
+
+        /// Test the split-concatenated files logic for single file case
+        [Test]
+        [Category("Automated")]
+        public void SplitConcatenatedPaths_WorksForSingleFileNoCommas()
+        {
+            string baseName = @"C:\tmp\filename.sql";
+            string concatenatedPaths = baseName;
+            string[] expectedFiles = new[] { baseName };
+
+            string[] actualFiles = DatabaseConverter.SplitConcatenatedPaths(baseName, concatenatedPaths);
+
+            CollectionAssert.AreEqual(expectedFiles, actualFiles);
+        }
+
+        /// Test the split-concatenated files logic for single file with comma in path
+        [Test]
+        [Category("Automated")]
+        public void SplitConcatenatedPaths_WorksForSingleFileWithComma()
+        {
+            string baseName = @"C:\heyer, nat\tmp\filename.sql";
+            string concatenatedPaths = baseName;
+            string[] expectedFiles = new[] { baseName };
+
+            string[] actualFiles = DatabaseConverter.SplitConcatenatedPaths(baseName, concatenatedPaths);
+
+            CollectionAssert.AreEqual(expectedFiles, actualFiles);
+        }
+
+        /// Test the split-concatenated files logic for multiple files
+        [Test]
+        [Category("Automated")]
+        public void SplitConcatenatedPaths_WorksForMultipleFiles()
+        {
+            string baseName = @"C:\heyer, nat\tmp\filename.sql";
+            string[] expectedFiles = new[] { @"C:\heyer, nat\tmp\filename_0001.sql", @"C:\heyer, nat\tmp\filename_0002.sql", @"C:\heyer, nat\tmp\filename_0003.sql" };
+            string concatenatedPaths = String.Join(", ", expectedFiles);
+
+            string[] actualFiles = DatabaseConverter.SplitConcatenatedPaths(baseName, concatenatedPaths);
+
+            CollectionAssert.AreEqual(expectedFiles, actualFiles);
         }
 
         // Create a sql compact DB with data in a settings table

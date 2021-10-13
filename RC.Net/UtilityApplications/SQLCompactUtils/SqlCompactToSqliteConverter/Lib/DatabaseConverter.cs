@@ -1,13 +1,15 @@
 ﻿using ErikEJ.SqlCeScripting;
 using Extract.Database;
+using LinqToDB.Data;
+using LinqToDB.DataProvider.SQLite;
 using System;
 using System.Collections.Generic;
-using LinqToDB.DataProvider.SQLite;
-using LinqToDB.Data;
 using System.Data.SqlServerCe;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,6 +32,8 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
     /// <inheritdoc/>
     public class DatabaseConverter : IDatabaseConverter
     {
+        private static object _sqlceMonitor = new();
+
         private readonly IDatabaseSchemaManagerProvider _schemaManagerProvider;
 
         public DatabaseConverter(IDatabaseSchemaManagerProvider schemaManagerProvider)
@@ -39,6 +43,7 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
 
         public async Task Convert(string inputPath, string outputPath, Logger statusCallback = null)
         {
+            string[] scriptPaths = Array.Empty<string>();
             try
             {
                 _ = inputPath ?? throw new ArgumentNullException(nameof(inputPath));
@@ -66,14 +71,21 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
 
                     using TemporaryFile scriptFile = new(extension: ".sql", sensitive: false);
 
-                    ExportSqlCompact(databaseCopy.FileName, scriptFile.FileName, statusCallback);
-                    ImportToSqlite(scriptFile.FileName, outputPath, statusCallback);
+                    scriptPaths = ExportSqlCompact(databaseCopy.FileName, scriptFile.FileName, statusCallback);
+                    ImportToSqlite(scriptPaths, outputPath, statusCallback);
 
                 }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI51788");
+            }
+            finally
+            {
+                foreach (string path in scriptPaths)
+                {
+                    File.Delete(path);
+                }
             }
         }
 
@@ -183,22 +195,57 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
             return false;
         }
 
-        // Export a SQL Compact DB to a script file
-        private static void ExportSqlCompact(string inputPath, string outputPath, Logger statusCallback = null)
+        /// Extract all paths that have been joined with ", " if they are derived from the base path
+        /// (either exactly match or match with four-digit number inserted before the extension)
+        public static string[] SplitConcatenatedPaths(string basePath, string concatenatedPaths)
+        {
+            _ = concatenatedPaths ?? throw new ArgumentNullException(nameof(concatenatedPaths));
+
+            if (!concatenatedPaths.Contains(","))
+            {
+                return new[] { concatenatedPaths };
+            }
+
+            // Don't assume the temp path is free from commas and simply split the concatenated paths!
+            string directoryPattern = Regex.Escape(Path.GetDirectoryName(basePath));
+            string namePattern = Regex.Escape(Path.GetFileNameWithoutExtension(basePath));
+            string extPattern = Regex.Escape(Path.GetExtension(basePath));
+            string pathPattern = $@"(\G{directoryPattern}[\\/]{namePattern}(?:_\d{{4}})?{extPattern})(?:,\x20|$)";
+
+            string[] paths = Regex.Matches(concatenatedPaths, pathPattern).Cast<Match>().Select(m => m.Groups[1].Value).ToArray();
+
+            ExtractException.Assert("ELI51919", "Logic error: At least one path should have been extracted", paths.Length > 0);
+
+            return paths;
+        }
+
+        // Export a SQL Compact DB to a script file(s)
+        // Returns an array with the script file paths that were exported
+        private static string[] ExportSqlCompact(string inputPath, string outputPath, Logger statusCallback = null)
         {
             statusCallback ??= delegate { };
 
             statusCallback(Environment.NewLine + "Exporting database...");
 
-            using IRepository repository = new DBRepository($"Data Source='{inputPath}';");
-            IGenerator generator = new Generator(repository, outputPath);
-            string exportStatus = generator.ScriptDatabaseToFile(Scope.SchemaDataSQLite);
+            string exportStatus;
+            string finalFiles;
+
+            // ErikEJ.SqlCeScripting code is not thread-safe (Helper.FinalFiles is a static, e.g.)
+            lock (_sqlceMonitor)
+            {
+                using IRepository repository = new DBRepository($"Data Source='{inputPath}';");
+                IGenerator generator = new Generator(repository, outputPath);
+                exportStatus = generator.ScriptDatabaseToFile(Scope.SchemaDataSQLite);
+                finalFiles = Helper.FinalFiles;
+            }
 
             statusCallback(" " + exportStatus);
+
+            return SplitConcatenatedPaths(outputPath, finalFiles);
         }
 
         // Run scripted commands to create a SQLite DB
-        private static void ImportToSqlite(string inputPath, string outputPath, Logger statusCallback = null)
+        private static void ImportToSqlite(string[] inputPaths, string outputPath, Logger statusCallback = null)
         {
             statusCallback ??= delegate { };
 
@@ -214,10 +261,13 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
             using DataConnection db = SQLiteTools.CreateDataConnection($"Data Source={outputPath};Version=3;");
             int rowsAffected = 0;
 
-            foreach (string commandText in BreakupSqliteScript(File.ReadLines(inputPath)))
+            foreach (string inputPath in inputPaths)
             {
-                db.Command.CommandText = commandText;
-                rowsAffected += db.Command.ExecuteNonQuery();
+                foreach (string commandText in BreakupSqliteScript(File.ReadLines(inputPath)))
+                {
+                    db.Command.CommandText = commandText;
+                    rowsAffected += db.Command.ExecuteNonQuery();
+                }
             }
 
             string importStatus = $"Created database at {outputPath}" + Environment.NewLine
