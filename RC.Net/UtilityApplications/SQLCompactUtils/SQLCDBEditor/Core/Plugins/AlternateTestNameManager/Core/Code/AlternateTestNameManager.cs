@@ -91,7 +91,7 @@ namespace Extract.SQLCDBEditor.Plugins
         /// The index of the currently displayed <see cref="AKAExample"/> from
         /// <see cref="_examples"/>.
         /// </summary>
-        int _exampleIndex = 0;
+        int _exampleIndex;
 
         /// <summary>
         /// The <see cref="Highlight"/> indicating the candidate AKA on the document.
