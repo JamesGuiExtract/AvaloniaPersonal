@@ -1,15 +1,12 @@
-using Extract;
+using Extract.Database;
 using Extract.Licensing;
-using Extract.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.OleDb;
-using System.Data.SqlServerCe;
+using System.Data.Common;
+using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Extract.SqlCompactImporter
 {
@@ -21,7 +18,7 @@ namespace Extract.SqlCompactImporter
         class Settings
         {
             /// <summary>
-            /// The SQL Compact database to import data into.
+            /// The SQLite database to import data into.
             /// </summary>
             public string DatabaseFile;
 
@@ -89,11 +86,11 @@ namespace Extract.SqlCompactImporter
         }
 
         /// <summary>
-        /// Populates a table in an SQL compact DB using the data in a text file.
+        /// Populates a table in a SQLite DB using the data in a text file.
         /// </summary>
         static void Main(string[] args)
         {
-            Settings settings = null;
+            Settings settings;
             int rowsProcessed = 0;
             int rowsFailed = 0;
 
@@ -106,7 +103,9 @@ namespace Extract.SqlCompactImporter
                     "SqlCompactImporter");
 
                 // Check to see if the user is looking for usage information.
-                if (args.Length >= 1 && (args[0].Equals("/?") || args[0].Equals("-?")))
+                if (args.Length >= 1
+                    && (args[0].Equals("/?", StringComparison.Ordinal)
+                        || args[0].Equals("-?", StringComparison.Ordinal)))
                 {
                     PrintUsage();
                     return;
@@ -127,111 +126,89 @@ namespace Extract.SqlCompactImporter
             try
             {
                 // Attempt to connect to the database
-                string connectionString = "Data Source='" + settings.DatabaseFile + "';";
-                using (SqlCeConnection sqlConnection = new SqlCeConnection(connectionString))
+                string connectionString = SqliteMethods.BuildConnectionString(settings.DatabaseFile);
+                using SQLiteConnection sqlConnection = new(connectionString);
+                sqlConnection.Open();
+
+                string data = File.ReadAllText(settings.InputFile);
+                string[] rows = data.Split(new string[] { settings.RowDelimiter },
+                        StringSplitOptions.RemoveEmptyEntries);
+
+                // Obtain information about the columns the data is to be imported into.
+                List<string> columnNames = new();
+                string schemaQuery = "SELECT [name] FROM pragma_table_info(@tableName)";
+                using (SQLiteCommand schemaCommand = new(schemaQuery, sqlConnection))
                 {
-                    sqlConnection.Open();
-
-                    string data = File.ReadAllText(settings.InputFile);
-                    string[] rows = data.Split(new string[] { settings.RowDelimiter },
-                            StringSplitOptions.RemoveEmptyEntries);
-
-                    // Obtain information about the columns the data is to be imported into.
-                    List<int> columnSizes = new List<int>();
-                    List<string> columnNames = new List<string>();
-                    string schemaQuery = "SELECT COLUMN_NAME, CHARACTER_MAXIMUM_LENGTH FROM " +
-                        "INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + settings.TableName + "'";
-                    using (SqlCeCommand schemaCommand = new SqlCeCommand(schemaQuery, sqlConnection))
+                    schemaCommand.Parameters.AddWithValue("@tableName", settings.TableName);
+                    using DbDataReader reader = schemaCommand.ExecuteReader();
+                    for (int i = 0; reader.Read(); i++)
                     {
-                        using (SqlCeDataReader reader = schemaCommand.ExecuteReader())
-                        {
-                            for (int i = 0; reader.Read(); i++)
-                            {
-                                columnNames.Add(reader.GetString(0));
+                        columnNames.Add(reader.GetString(0));
+                    }
+                }
 
-                                if (reader.IsDBNull(1))
-                                {
-                                    columnSizes.Add(0);
-                                }
-                                else
-                                {
-                                    columnSizes.Add(reader.GetInt32(1));
-                                }
-                            }
+                ExtractException.Assert("ELI27253",
+                    "Could not find table: " + settings.TableName, columnNames.Count > 0);
+
+                // Loop through each row of the input file and add it to the DB.
+                for (rowsProcessed = 0; rowsProcessed < rows.Length; rowsProcessed++)
+                {
+                    Dictionary<string, string> columnValues = new(columnNames.Count);
+
+                    // Split the input row into columns using the column delimiter.
+                    string[] columns = rows[rowsProcessed].Split(
+                        new string[] { settings.ColumnDelimiter }, StringSplitOptions.None);
+
+                    int columnCount = Math.Min(columns.Length, columnNames.Count);
+                    string[] includedColumns = new string[columnCount];
+                    columnNames.CopyTo(0, includedColumns, 0, columnCount);
+
+                    // Initialize the SQL command used to add the data.
+                    StringBuilder commandText = new("INSERT INTO [");
+                    commandText.Append(settings.TableName);
+                    commandText.Append("] ([");
+                    commandText.Append(string.Join("], [", includedColumns));
+                    commandText.Append("]) VALUES (");
+
+                    // Parameterize the data for each column and build them into the command.
+                    for (int i = 0; i < columnCount; i++)
+                    {
+                        string key = "@" + i.ToString(CultureInfo.InvariantCulture);
+                        string value = (i < columns.Length) ? columns[i] : "";
+
+                        columnValues[key] = value;
+                        commandText.Append(key);
+
+                        if (i + 1 < columnCount)
+                        {
+                            commandText.Append(", ");
                         }
                     }
 
-                    ExtractException.Assert("ELI27253",
-                        "Could not find table: " + settings.TableName, columnSizes.Count > 0);
+                    // Complete the command
+                    commandText.Append(')');
+                    settings.CommandText = commandText.ToString();
 
-                    // Loop through each row of the input file and it to the DB.
-                    for (rowsProcessed = 0; rowsProcessed < rows.Length; rowsProcessed++)
+                    // Issue the command to add the data.
+                    using SQLiteCommand command = new(settings.CommandText, sqlConnection);
+                    foreach (string key in columnValues.Keys)
                     {
-                        Dictionary<string, string> columnValues =
-                            new Dictionary<string, string>(columnSizes.Count);
-
-                        // Split the input row into columns using the column delimiter.
-                        string[] columns = rows[rowsProcessed].Split(
-                            new string[] { settings.ColumnDelimiter }, StringSplitOptions.None);
-
-                        int columnCount = Math.Min(columns.Length, columnNames.Count);
-                        string[] includedColumns = new string[columnCount];
-                        columnNames.CopyTo(0, includedColumns, 0, columnCount);
-
-                        // Initialize the SQL command used to add the data.
-                        StringBuilder commandText = new StringBuilder("INSERT INTO [");
-                        commandText.Append(settings.TableName);
-                        commandText.Append("] ([");
-                        commandText.Append(string.Join("], [", includedColumns)); 
-                        commandText.Append("]) VALUES (");
-
-                        // Parameterize the data for each column and build them into the command.
-                        for (int i = 0; i < columnCount; i++)
-                        {
-                            string key = "@" + i.ToString(CultureInfo.InvariantCulture);
-                            string value = (i < columns.Length) ? columns[i] : "";
-                            if (columnSizes[i] > 0 && columnSizes[i] < value.Length)
-                            {
-                                value = value.Substring(0, columnSizes[i]);
-                            }
-
-                            columnValues[key] = value;
-                            commandText.Append(key);
-
-                            if (i + 1 < columnCount)
-                            {
-                                commandText.Append(", ");
-                            }
-                        }
-
-                        // Complete the command
-                        commandText.Append(")");
-                        settings.CommandText = commandText.ToString();
-
-                        // Issue the command to add the data.
-                        using (SqlCeCommand command =
-                            new SqlCeCommand(settings.CommandText, sqlConnection))
-                        {
-                            foreach (string key in columnValues.Keys)
-                            {
-                                command.Parameters.AddWithValue(key, columnValues[key]);
-                            }
-
-                            try
-                            {
-                                command.ExecuteNonQuery();
-                            }
-                            catch (Exception ex)
-                            {
-                                rowsFailed++;
-                                Console.WriteLine("Failed to import row \"" + rows[rowsProcessed] +
-                                    "\" with the following error:");
-                                Console.WriteLine(ex.Message);
-                                Console.WriteLine();
-                            }
-                        }
+                        command.Parameters.AddWithValue(key, columnValues[key]);
                     }
-                } 
+
+                    try
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        rowsFailed++;
+                        Console.WriteLine("Failed to import row \"" + rows[rowsProcessed] +
+                            "\" with the following error:");
+                        Console.WriteLine(ex.Message);
+                        Console.WriteLine();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -267,7 +244,7 @@ namespace Extract.SqlCompactImporter
             Console.Write("SqlCompactImporter.exe <DatabaseFile> <TableName> <InputFileName> ");
             Console.WriteLine("[/rd <RowDelimiter>] [/cd <ColumnDelimiter>]");
             Console.WriteLine();
-            Console.WriteLine("DatabaseFile: The SQL Compact database the data is to be imported into.");
+            Console.WriteLine("DatabaseFile: The SQLite database the data is to be imported into.");
             Console.WriteLine("TableName: The table the data is to be imported into.");
             Console.Write("InputFileName: The file containing the data to import. All columns in ");
             Console.Write("the input file will be imported unless there are fewer columns in the ");
