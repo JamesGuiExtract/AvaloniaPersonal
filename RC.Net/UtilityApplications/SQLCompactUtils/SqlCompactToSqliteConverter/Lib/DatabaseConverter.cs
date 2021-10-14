@@ -258,7 +258,7 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
 
             SQLiteTools.CreateDatabase(outputPath, deleteIfExists: true);
-            using DataConnection db = SQLiteTools.CreateDataConnection($"Data Source={outputPath};Version=3;");
+            using DataConnection db = SQLiteTools.CreateDataConnection(SqliteMethods.BuildConnectionString(outputPath));
             int rowsAffected = 0;
 
             foreach (string inputPath in inputPaths)
