@@ -702,24 +702,25 @@ namespace Extract.ReportingDevExpress
         /// Method for attaching the currently loaded report object to the report viewer. This
         /// method ensures that the setting of the report is done in the UI thread.
         /// </summary>
-        private void AttachReportToReportViewer()
+        private async void AttachReportToReportViewer()
         {
             try
             {
                 ExtractException.Assert("ELI23751", "Report object cannot be null!", _report != null);
 
                 var reportAsXtraReport = _report.ReportDocument as XtraReport;
-                GenerateReport(reportAsXtraReport);
+                await GenerateReport(reportAsXtraReport);
 
             }
             catch (ExtractException ee)
             {
                 if (ee.EliCode == "ELI50335")
                     ResetReportInfo();
+                ee.Display();
             }
         }
- 
-        private async void GenerateReport(XtraReport reportAsXtraReport)
+
+        private async Task GenerateReport(XtraReport reportAsXtraReport)
         {
             try
             {
