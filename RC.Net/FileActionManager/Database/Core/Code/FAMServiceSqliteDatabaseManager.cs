@@ -44,6 +44,8 @@ namespace Extract.FileActionManager.Database
 
         public IEnumerable<object> UIReplacementPlugins { get; }
 
+        public IEnumerable<string> UISupplementPluginAssemblies { get; }
+
         public async Task<string> UpdateToLatestSchema()
         {
             try

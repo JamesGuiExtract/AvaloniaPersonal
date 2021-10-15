@@ -40,6 +40,8 @@ namespace Extract.Utilities.ContextTags
 
         public IEnumerable<object> UIReplacementPlugins => new object[] { new ContextTagsPlugin() };
 
+        public IEnumerable<string> UISupplementPluginAssemblies { get; }
+
         public async Task<string> UpdateToLatestSchema()
         {
             try

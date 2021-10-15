@@ -41,6 +41,9 @@ namespace Extract.LabResultsCustomComponents
 
         public IEnumerable<object> UIReplacementPlugins => Enumerable.Empty<object>();
 
+        public IEnumerable<string> UISupplementPluginAssemblies { get; } =
+            new[] { Path.Combine(FileSystemMethods.CommonComponentsPath, "Extract.AlternateTestNameManagerPlugin.dll") };
+
         public async Task<string> UpdateToLatestSchema()
         {
             try

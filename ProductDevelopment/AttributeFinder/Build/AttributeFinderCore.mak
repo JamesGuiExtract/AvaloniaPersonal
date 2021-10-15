@@ -222,7 +222,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Microsoft.Data.ConnectionUI.SqlCeDataProvider.local.dll" /mapout:"$(BinariesFolder)\Map\mapMicrosoft.Data.ConnectionUI.SqlCeDataProvider.local.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Microsoft.Data.ConnectionUI.Dialog.local.dll" /mapout:"$(BinariesFolder)\Map\mapMicrosoft.Data.ConnectionUI.Dialog.local.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\DataEntryPrompt.exe" /mapout:"$(BinariesFolder)\Map\mapDataEntryPrompt.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\AlternateTestNameManager.plugin" /mapout:"$(BinariesFolder)\Map\mapAlternateTestNameManager.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.AlternateTestNameManagerPlugin.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.AlternateTestNameManagerPlugin.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\PaginationUtility.exe" /mapout:"$(BinariesFolder)\Map\mapPaginationUtility.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\FAMFileInspector.exe" /mapout:"$(BinariesFolder)\Map\mapFAMFileInspector.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\Extract.FileActionManager.FAMFileInspector.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.FileActionManager.FAMFileInspector.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
@@ -346,13 +346,6 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(BinariesFolder)\Microsoft.Xaml.Behaviors.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Microsoft.Xaml.Behaviors.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(BinariesFolder)\DatabaseMigrationWizard.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V /Y "$(BinariesFolder)\Extract.Utilities.Authentication.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /V /Y "$(BinariesFolder)\Microsoft.Identity.Client.Desktop.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /V /Y "$(BinariesFolder)\Microsoft.Identity.Client.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /V /Y "$(BinariesFolder)\Microsoft.IdentityModel.*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /V /Y "$(BinariesFolder)\Microsoft.Identity.Client.Desktop.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V /Y "$(BinariesFolder)\Microsoft.Identity.Client.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
-	@COPY /V /Y "$(BinariesFolder)\Microsoft.IdentityModel.*.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Extract.FileConverter.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(BinariesFolder)\Extract.FileConverter.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(BinariesFolder)\Microsoft.Office.Interop.*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
@@ -398,7 +391,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(RCNETDir)\APIs\Aspose\Aspose.Pdf for .Net 9.8\Bin\net4.0\Aspose.Pdf.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY /V /Y "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Spring.Core.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC" 
 	@COPY /V /Y "$(RCNETDir)\APIs\Spring.NET\1.3.1\bin\net\4.0\release\Common.Logging.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /V /Y "$(RCNETDir)\APIs\DevExpress\v19.2\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(RCNETDir)\APIs\DevExpress\v21.1\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(RCNETDir)\APIs\Lucene.Net.4.8.0\lib\net45\*.*" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /V /Y "$(RCNETDir)\APIs\zstd\1.1.0\build\VS_scripts\bin\Release\x64\zstdlib_x64.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"

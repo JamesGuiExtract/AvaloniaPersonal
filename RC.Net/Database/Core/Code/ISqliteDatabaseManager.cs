@@ -27,6 +27,9 @@ namespace Extract.Database
         /// The SQLCDBEditorPlugin implementation(s) that should completely replace the normal SQLCDBEditor UI
         IEnumerable<object> UIReplacementPlugins { get; }
 
+        /// The assembly paths containing SQLCDBEditorPlugin implementation(s) that should be added to the normal SQLCDBEditor UI
+        IEnumerable<string> UISupplementPluginAssemblies { get; }
+
         /// <summary>
         /// Creates a database. If the database file already exists then it will be copied to a backup file before a new database is created.
         /// <returns>The name of the file that was backed up or null if no backup was created</returns>

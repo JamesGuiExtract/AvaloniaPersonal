@@ -1569,8 +1569,19 @@ namespace Extract.SQLCDBEditor
 
             try
             {
+                IEnumerable<string> pluginAssemblies;
+                if (_schemaManager?.UISupplementPluginAssemblies is IEnumerable<string> assemblies
+                    && assemblies.Any())
+                {
+                    pluginAssemblies = assemblies;
+                }
+                else
+                {
+                    pluginAssemblies = Directory.EnumerateFiles(Path.GetDirectoryName(_databaseFileName), "*.plugin");
+                }
+
                 _pluginList.AddRange(
-                    Directory.EnumerateFiles(Path.GetDirectoryName(_databaseFileName), "*.plugin")
+                    pluginAssemblies
                     .Select(fileName =>
                         UtilityMethods.CreateTypeFromAssembly<SQLCDBEditorPlugin>(fileName))
                     .Where(plugin => plugin != null)
@@ -2637,12 +2648,9 @@ namespace Extract.SQLCDBEditor
                     {
                         // Build the name to the assembly containing the manager
                         var className = result[0]["Value"].ToString();
-                        updater =
-                            UtilityMethods.CreateTypeFromTypeName(className) as ISqliteDatabaseManager;
-                        // Fate of OMDB in SQLite world to be decided. For now, just ignore OrderMapperDatabaseSchemaManager
-                        // https://extract.atlassian.net/browse/ISSUE-17684
-                        if (updater == null
-                            && className != "Extract.LabResultsCustomComponents.OrderMapperDatabaseSchemaManager")
+                        updater = UtilityMethods.CreateTypeFromTypeName(className) as ISqliteDatabaseManager;
+
+                        if (updater == null)
                         {
                             var ee = new ExtractException("ELI31154",
                                 "Database contained an entry for schema manager, "
