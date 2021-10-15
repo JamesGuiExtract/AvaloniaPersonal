@@ -2211,7 +2211,7 @@ namespace Extract.SQLCDBEditor
                 SqliteMethods.BuildConnectionString(databaseFileName));
             connection.Open();
             
-            var command = connection.CreateCommand();
+            using var command = connection.CreateCommand();
             command.CommandText = "SELECT Value FROM Settings WHERE Name = 'CustomerSchemaVersion'";
             var dataReader = command.ExecuteReader();
             if (dataReader.Read())
@@ -2345,7 +2345,7 @@ namespace Extract.SQLCDBEditor
                     SqliteMethods.BuildConnectionString(_databaseFileName));
                 connection.Open();
 
-                var command = connection.CreateCommand();
+                using var command = connection.CreateCommand();
                 command.CommandText = @"CREATE TABLE [Settings] (
                                             [Name] nvarchar(100) NOT NULL
                                         , [Value] nvarchar(512) NULL

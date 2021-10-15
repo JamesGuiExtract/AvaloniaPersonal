@@ -27,7 +27,8 @@ namespace Extract.SQLCDBEditor
 
                 if (args.Length == 0)
                 {
-                    Application.Run(new SQLCDBEditorForm());
+                    using var form = new SQLCDBEditorForm();
+                    Application.Run(form);
                 }
                 else
                 {
@@ -45,7 +46,8 @@ namespace Extract.SQLCDBEditor
                     }
                     else
                     {
-                        Application.Run(new SQLCDBEditorForm(databaseFileName));
+                        using var form = new SQLCDBEditorForm(databaseFileName);
+                        Application.Run(form);
                     }
                 }
             }

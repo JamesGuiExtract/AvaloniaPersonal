@@ -896,8 +896,10 @@ namespace Extract.SQLCDBEditor
                 if (QueryAndResultsType == QueryAndResultsType.Table)
                 {
                     // Recompile the query in case the table schema has changed
+                    string commandText = _adapter.SelectCommand.CommandText;
+                    _adapter.SelectCommand.Dispose();
                     _adapter.SelectCommand = DBMethods.CreateDBCommand(_connection,
-                        _adapter.SelectCommand.CommandText, parameters: null);
+                        commandText, parameters: null);
 
 
                     _adapter.Fill(latestDataTable);
