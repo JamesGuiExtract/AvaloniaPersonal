@@ -112,6 +112,7 @@ namespace Extract.Dashboard.Utilities
                 builder.ApplicationName = applicationName;
                 builder.IntegratedSecurity = true;
                 builder.MultiSubnetFailover = true;
+                builder.Pooling = false;
                 var connectionString = "XpoProvider=MSSqlServer;" + builder.ConnectionString;
                 return new CustomStringConnectionParameters(connectionString);
             }
