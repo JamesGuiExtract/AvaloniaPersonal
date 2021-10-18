@@ -43,6 +43,7 @@
     <ProjectReference Include="..\..\..\Dashboards\Utilities\Core\Code\Extract.Dashboard.Utilities.csproj" />
     <ProjectReference Include="..\..\..\Imaging\Core\Code\Extract.Imaging.csproj" />
     <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcxproj" />
+    <ProjectReference Include="..\..\..\SqlDatabase\Extract.SqlDatabase\Extract.SqlDatabase.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj" />
     <ProjectReference Include="..\..\Core\Code\Extract.Reporting.csproj" />

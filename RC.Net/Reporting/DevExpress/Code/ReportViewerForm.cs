@@ -685,6 +685,7 @@ namespace Extract.ReportingDevExpress
             try
             {
                 var report = _report as ExtractReport;
+                if (report is null) return;
                 report.SetParameters(true, true);
                 AttachReportToReportViewer();
             }
@@ -717,6 +718,7 @@ namespace Extract.ReportingDevExpress
                 if (ee.EliCode == "ELI50335")
                     ResetReportInfo();
                 ee.Display();
+                OpenReportBarButton.Enabled = true;
             }
         }
 
@@ -734,8 +736,11 @@ namespace Extract.ReportingDevExpress
                     ReportGenerationTask = new Task(() =>
                     {
                         SqlDataSource sqlSource = reportAsXtraReport.DataSource as SqlDataSource;
-                        DashboardHelpers.AddAppRoleQuery(sqlSource);
-                        sqlSource.Fill(DashboardHelpers.AppRoleQueryName(sqlSource));
+                        if (!sqlSource?.Connection.IsConnected ?? false)
+                        {
+                            DashboardHelpers.AddAppRoleQuery(sqlSource);
+                            sqlSource.Fill(DashboardHelpers.AppRoleQueryName(sqlSource));
+                        }
                         reportAsXtraReport.CreateDocument();
                     },
                                                          TaskCreationOptions.LongRunning);

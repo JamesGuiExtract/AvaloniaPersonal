@@ -3,7 +3,9 @@ using DevExpress.DataAccess.ConnectionParameters;
 using DevExpress.DataAccess.Sql;
 using DevExpress.XtraReports.Parameters;
 using DevExpress.XtraReports.UI;
+using Extract.Dashboard.Utilities;
 using Extract.Reporting;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -489,15 +491,20 @@ namespace Extract.ReportingDevExpress
         void SetDatabaseConnection()
         {
             var sqlConnection = _report.DataSource as SqlDataSource;
+            
+            if (sqlConnection is null) return;
+
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
             builder.DataSource = _serverName;
             builder.InitialCatalog = _databaseName;
             builder.IntegratedSecurity = true;
             builder.ApplicationIntent = ApplicationIntent.ReadOnly;
             builder.MultiSubnetFailover = true;
+            builder.Pooling = false;
             var sqlConnectionString = "XpoProvider=MSSqlServer;" + builder.ConnectionString;
             sqlConnection.ConnectionParameters = new CustomStringConnectionParameters(sqlConnectionString);
             sqlConnection.ConnectionOptions.DbCommandTimeout = 0;
+            DashboardHelpers.AddAppRoleQuery(sqlConnection);
         }
 
         /// <summary>
@@ -864,6 +871,19 @@ namespace Extract.ReportingDevExpress
                 throw ee;
             }
             var query = source.Queries[queryName] as SelectQuery;
+            if (source.Connection.IsConnected)
+            {
+                var appRoleQuery = source.Queries.FirstOrDefault(q => q.Name == source.AppRoleQueryName());
+                if (appRoleQuery != null)
+                {
+                    source.Queries.Remove(appRoleQuery); 
+                }
+                
+            }
+            else
+            {
+                DashboardHelpers.AddAppRoleQuery(source);
+            }
             source.RebuildResultSchema();
             var queryString = query.GetSql(source.DBSchema);
 
@@ -910,7 +930,7 @@ namespace Extract.ReportingDevExpress
             // Parse the XML file
             using (StringReader reader = new StringReader(xml))
             {
-                XmlTextReader xmlReader = new XmlTextReader(reader);
+                using XmlTextReader xmlReader = new XmlTextReader(reader);
                 xmlReader.WhitespaceHandling = WhitespaceHandling.Significant;
                 xmlReader.Normalization = true;
                 xmlReader.Read();
@@ -1224,32 +1244,23 @@ namespace Extract.ReportingDevExpress
                 return new string[] { "[No Values Found]" };
             }
 
-            SqlConnection connection = null;
-            SqlDataAdapter adapter = null;
-            DataTable table = null;
             try
             {
-                // Create a new table
-                table = new DataTable();
-                table.Locale = CultureInfo.InvariantCulture;
-
                 // Open the connection
-                connection = new SqlConnection("server=" + _serverName + ";database="
-                    + _databaseName + ";connection timeout=30;Integrated Security=true");
+                using var connection = new ExtractRoleConnection(_serverName, _databaseName);
+                using var command = connection.CreateCommand();
 
-                // Run the query and use it to fill a data table
-                adapter = new SqlDataAdapter(query, connection);
-                adapter.Fill(table);
+                command.CommandText = query;
+                connection.Open();
+                using var reader = command.ExecuteReader();
 
-                if (table.Rows.Count > 0)
-                {
-                    // Iterate through each row adding the first columns value to the list
-                    List<string> values = new List<string>(table.Rows.Count);
-                    foreach (DataRow row in table.Rows)
-                    {
-                        values.Add(row[0].ToString());
-                    }
+                var values = reader
+                    .Cast<IDataRecord>()
+                    .Select(r => r.GetValue(0).ToString())
+                    .ToList();
 
+                if (values.Count > 0)
+                { 
                     // Return the string array
                     return values.ToArray();
                 }
@@ -1264,22 +1275,7 @@ namespace Extract.ReportingDevExpress
                 ee.AddDebugData("SQL Query", query, false);
                 throw ee;
             }
-            finally
-            {
-                // Ensure items are cleaned up
-                if (table != null)
-                {
-                    table.Dispose();
-                }
-                if (adapter != null)
-                {
-                    adapter.Dispose();
-                }
-                if (connection != null)
-                {
-                    connection.Dispose();
-                }
-            }
+
         }
 
         /// <summary>
