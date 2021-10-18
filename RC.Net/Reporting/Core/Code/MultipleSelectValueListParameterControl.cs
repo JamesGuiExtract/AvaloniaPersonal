@@ -242,10 +242,6 @@ namespace Extract.Reporting
             {
                 string parameterName = _parameterName.Text;
 
-                ExtractException.Assert("ELI50102",
-                                        "Must have at least one selection for " + parameterName + "!",
-                                        parameterValuesListBox.CheckedItems.Count > 0);
-
                 if (_valueListParameter != null)
                 {
                     _valueListParameter.ParameterValue = ParameterValue;
