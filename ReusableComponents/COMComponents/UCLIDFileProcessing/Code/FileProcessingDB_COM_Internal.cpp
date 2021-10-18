@@ -42,7 +42,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 198;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 199;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3250,6 +3250,32 @@ int UpdateToSchemaVersion198(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51865");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion199(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 199;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51932");
+}
+
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
 //-------------------------------------------------------------------------------------------------
@@ -8406,7 +8432,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 195:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion196);
 				case 196:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion197);
 				case 197:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion198);
-				case 198:
+				case 198:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion199);
+				case 199:
 					break;
 
 				default:
