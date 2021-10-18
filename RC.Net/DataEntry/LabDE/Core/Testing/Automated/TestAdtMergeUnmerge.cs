@@ -978,7 +978,7 @@ namespace Extract.DataEntry.LabDE.Test
                                         PatientB,
                                         PatientC);
 
-            SqlCommand cmd = new SqlCommand(stmt, _dbConnection);
+            using SqlCommand cmd = new SqlCommand(stmt, _dbConnection);
             cmd.ExecuteNonQuery();
         }
 

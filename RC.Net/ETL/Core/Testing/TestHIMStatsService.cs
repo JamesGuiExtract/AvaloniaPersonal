@@ -142,75 +142,74 @@ namespace Extract.ETL.Test
 
                     using var connection = new ExtractRoleConnection(himStats.DatabaseServer, himStats.DatabaseName);
                     connection.Open();
-                    using var cmd = connection.CreateCommand();
 
+                    using var cmd = connection.CreateCommand();
                     cmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID";
                     cmd.Parameters.AddWithValue("@DatabaseServiceID", himStats.DatabaseServiceID);
-                    var reader = cmd.ExecuteReader();
-                    var record = reader.Cast<IDataRecord>().First();
+                    
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        var record = reader.Cast<IDataRecord>().First();
 
-                    var status = himStats.Status as HIMStats.HIMStatsStatus;
+                        var status = himStats.Status as HIMStats.HIMStatsStatus;
 
-                    Assert.AreEqual(status.ToJson(), record["Status"], "Status from database should be same as objects.");
+                        Assert.AreEqual(status.ToJson(), record["Status"], "Status from database should be same as objects.");
 
-                    Assert.AreEqual(status.LastFileTaskSessionIDProcessed, record["LastFileTaskSessionIDProcessed"],
-                        "LastFileTaskSessionIDProcessed from database should be same as that in status");
-
-                    reader.Close();
-                    reader.Dispose();
+                        Assert.AreEqual(status.LastFileTaskSessionIDProcessed, record["LastFileTaskSessionIDProcessed"],
+                            "LastFileTaskSessionIDProcessed from database should be same as that in status");
+                    }
 
                     // Process with cancel
                     Assert.Throws<ExtractException>(() => himStats.Process(_cancel), "Process with cancel should throw an ExtractException");
 
-                    reader = cmd.ExecuteReader();
-                    record = reader.Cast<IDataRecord>().First();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        var record = reader.Cast<IDataRecord>().First();
 
-                    himStats.RefreshStatus();
-                    status = himStats.Status as HIMStats.HIMStatsStatus;
+                        himStats.RefreshStatus();
+                        var status = himStats.Status as HIMStats.HIMStatsStatus;
 
-                    Assert.AreEqual(status.ToJson(), record["Status"], "Status from database should be same as objects.");
+                        Assert.AreEqual(status.ToJson(), record["Status"], "Status from database should be same as objects.");
 
-                    Assert.AreEqual(status.LastFileTaskSessionIDProcessed, record["LastFileTaskSessionIDProcessed"],
-                        "LastFileTaskSessionIDProcessed from database should be same as that in status");
-
-                    reader.Close();
-                    reader.Dispose();
+                        Assert.AreEqual(status.LastFileTaskSessionIDProcessed, record["LastFileTaskSessionIDProcessed"],
+                            "LastFileTaskSessionIDProcessed from database should be same as that in status");
+                    }
 
                     Assert.DoesNotThrow(() => himStats.Process(_noCancel), "Process without cancel should not throw exception");
 
                     Assert.Throws<ExtractException>(() => himStats.Process(_cancel), "Process with cancel should throw an ExtractException");
 
                     // verify status was updated properly
-                    reader = cmd.ExecuteReader();
-                    record = reader.Cast<IDataRecord>().First();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        var record = reader.Cast<IDataRecord>().First();
 
-                    himStats.RefreshStatus();
-                    status = himStats.Status as HIMStats.HIMStatsStatus;
+                        himStats.RefreshStatus();
+                        var status = himStats.Status as HIMStats.HIMStatsStatus;
 
-                    Assert.AreEqual(status.ToJson(), record["Status"], "Status from database should be same as objects.");
+                        Assert.AreEqual(status.ToJson(), record["Status"], "Status from database should be same as objects.");
 
-                    Assert.AreEqual(status.LastFileTaskSessionIDProcessed, record["LastFileTaskSessionIDProcessed"],
-                        "LastFileTaskSessionIDProcessed from database should be same as that in status");
+                        Assert.AreEqual(status.LastFileTaskSessionIDProcessed, record["LastFileTaskSessionIDProcessed"],
+                            "LastFileTaskSessionIDProcessed from database should be same as that in status");
 
-                    Assert.AreEqual(6, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 6");
-
-                    reader.Close();
-                    reader.Dispose();
+                        Assert.AreEqual(6, status.LastFileTaskSessionIDProcessed, "LastFileTaskSessionIDProcessed should be 6");
+                    }
 
                     // Check that ReportingHIMStats contains expected data
                     cmd.CommandText = "SELECT * FROM ReportingHIMStats";
-                    using reader = cmd.ExecuteReader();
-                    var results = reader.Cast<IDataRecord>().ToList();
-                    for (int i = 0; i < results.Count; i++)
-                    {
-                        Assert.That(expectedData.ContainsKey(i));
-                        var dr = Enumerable.Range(0, results[i].FieldCount)
-                                    .ToDictionary(d => results[i].GetName(d), d => results[i].GetValue(d));
-                        var er = expectedData[i];
-                        CollectionAssert.AreEquivalent(er, dr);
-                    }
 
-                    reader.Close();
+                    using (var reader  = cmd.ExecuteReader())
+                    {
+                        var results = reader.Cast<IDataRecord>().ToList();
+                        for (int i = 0; i < results.Count; i++)
+                        {
+                            Assert.That(expectedData.ContainsKey(i));
+                            var dr = Enumerable.Range(0, results[i].FieldCount)
+                                        .ToDictionary(d => results[i].GetName(d), d => results[i].GetValue(d));
+                            var er = expectedData[i];
+                            CollectionAssert.AreEquivalent(er, dr);
+                        }
+                    }
                 }
                 finally
                 {
@@ -351,7 +350,7 @@ namespace Extract.ETL.Test
 
             sqlConnectionBuild.IntegratedSecurity = true;
             sqlConnectionBuild.NetworkLibrary = "dbmssocn";
-            sqlConnectionBuild.MultipleActiveResultSets = true;
+            sqlConnectionBuild.MultipleActiveResultSets = false;
 
             return new SqlConnection(sqlConnectionBuild.ConnectionString);
         }

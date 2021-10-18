@@ -312,12 +312,18 @@ namespace Extract.ETL.Test
                 cmd.CommandText =
                     $"SELECT * FROM ReportingRedactionAccuracy WHERE DatabaseServiceID = {redactionAccuracy.DatabaseServiceID}";
 
-                CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    CheckResults(reader, _FIRST_RUN_EXPECTED_RESULTS);
+                }
 
                 // Run again - There should be no changes
                 redactionAccuracy.Process(_noCancel);
 
-                CheckResults(cmd.ExecuteReader(), _FIRST_RUN_EXPECTED_RESULTS);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    CheckResults(reader, _FIRST_RUN_EXPECTED_RESULTS);
+                }
             }
             finally
             {
@@ -356,12 +362,18 @@ namespace Extract.ETL.Test
                         SELECT * FROM ReportingRedactionAccuracy WHERE DatabaseServiceID = {0}"
                     , redactionAccuracy.DatabaseServiceID);
 
-                CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    CheckResults(reader, _RERUN_FILE_EXPECTED_RESULTS);
+                }
 
                 // Run again - There should be no changes
                 redactionAccuracy.Process(_noCancel);
 
-                CheckResults(cmd.ExecuteReader(), _RERUN_FILE_EXPECTED_RESULTS);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    CheckResults(reader, _RERUN_FILE_EXPECTED_RESULTS);
+                }
             }
             finally
             {
@@ -415,30 +427,29 @@ namespace Extract.ETL.Test
         /// <param name="expected">The Expected results</param>
         static void CheckResults(SqlDataReader foundResults, RedactionAccuracyList expected)
         {
-            using foundResults;
             // Convert reader to IEnummerable 
             var results = foundResults.Cast<IDataRecord>();
 
             // Compare the found results to the expected
             var formattedResults = results.Select(r => new I(
-                   foundAttributeSetForFileID: r.GetInt64(r.GetOrdinal("FoundAttributeSetForFileID")),
-                   expectedAttributeSetForFileID: r.GetInt64(r.GetOrdinal("ExpectedAttributeSetForFileID")),
-                   fileID: r.GetInt32(r.GetOrdinal("FileID")),
-                   page: r.GetInt32(r.GetOrdinal("Page")),
-                   attribute: r.GetString(r.GetOrdinal("Attribute")),
-                   expected: r.GetInt64(r.GetOrdinal("Expected")),
-                   found: r.GetInt64(r.GetOrdinal("Found")),
-                   correct: r.GetInt64(r.GetOrdinal("Correct")),
-                   falsePositives: r.GetInt64(r.GetOrdinal("FalsePositives")),
-                   overRedacted: r.GetInt64(r.GetOrdinal("OverRedacted")),
-                   underRedacted: r.GetInt64(r.GetOrdinal("UnderRedacted")),
-                   missed: r.GetInt64(r.GetOrdinal("Missed")),
-                   foundDateTimeStamp: r.GetDateTime(r.GetOrdinal("FoundDateTimeStamp")),
-                   foundFAMUserID: r.GetInt32(r.GetOrdinal("FoundFAMUserID")),
-                   foundActionID: r.GetInt32(r.GetOrdinal("FoundActionID")),
-                   expectedDateTimeStamp: r.GetDateTime(r.GetOrdinal("ExpectedDateTimeStamp")),
-                   expectedFAMUserID: r.GetInt32(r.GetOrdinal("ExpectedFAMUserID")),
-                   expectedActionID: r.GetInt32(r.GetOrdinal("ExpectedActionID")))).ToList();
+                    foundAttributeSetForFileID: r.GetInt64(r.GetOrdinal("FoundAttributeSetForFileID")),
+                    expectedAttributeSetForFileID: r.GetInt64(r.GetOrdinal("ExpectedAttributeSetForFileID")),
+                    fileID: r.GetInt32(r.GetOrdinal("FileID")),
+                    page: r.GetInt32(r.GetOrdinal("Page")),
+                    attribute: r.GetString(r.GetOrdinal("Attribute")),
+                    expected: r.GetInt64(r.GetOrdinal("Expected")),
+                    found: r.GetInt64(r.GetOrdinal("Found")),
+                    correct: r.GetInt64(r.GetOrdinal("Correct")),
+                    falsePositives: r.GetInt64(r.GetOrdinal("FalsePositives")),
+                    overRedacted: r.GetInt64(r.GetOrdinal("OverRedacted")),
+                    underRedacted: r.GetInt64(r.GetOrdinal("UnderRedacted")),
+                    missed: r.GetInt64(r.GetOrdinal("Missed")),
+                    foundDateTimeStamp: r.GetDateTime(r.GetOrdinal("FoundDateTimeStamp")),
+                    foundFAMUserID: r.GetInt32(r.GetOrdinal("FoundFAMUserID")),
+                    foundActionID: r.GetInt32(r.GetOrdinal("FoundActionID")),
+                    expectedDateTimeStamp: r.GetDateTime(r.GetOrdinal("ExpectedDateTimeStamp")),
+                    expectedFAMUserID: r.GetInt32(r.GetOrdinal("ExpectedFAMUserID")),
+                    expectedActionID: r.GetInt32(r.GetOrdinal("ExpectedActionID")))).ToList();
 
 
             Assert.That(formattedResults.Count() == expected.Count,
@@ -452,8 +463,6 @@ namespace Extract.ETL.Test
                     .OrderBy(r => r.Attribute)
                     .ThenBy(r => r.FileID)),
                 "Compare the actual data with the expected");
-
-            foundResults.Close();
         }
 
         /// <summary>

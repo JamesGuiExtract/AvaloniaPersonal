@@ -241,7 +241,7 @@ namespace Extract.ETL.Test
                 using (var afterStopCmd = connection.CreateCommand())
                 {
                     afterStopCmd.CommandText = databaseServiceQuery;
-                    using reader = afterStopCmd.ExecuteReader();
+                    using var reader = afterStopCmd.ExecuteReader();
                     afterStop = reader.Cast<IDataRecord>().Single();
                 }
 
@@ -311,110 +311,111 @@ namespace Extract.ETL.Test
                 Assert.DoesNotThrow(() => testDatabaseService.StartActiveSchedule(fileProcessingDb.ActiveFAMID),
                     "Start active Schedule should not throw exception.");
 
-                using var reader = cmd.ExecuteReader();
-                var result = reader.Cast<IDataRecord>().Single();
-
-                Assert.AreEqual(DBNull.Value, result["StartTime"], "StartTime should be null");
-                Assert.AreEqual(DBNull.Value, result["EndTime"], "EndTime should be null");
-                Assert.AreEqual(DBNull.Value, result["Exception"], "Exception should be null");
-                Assert.AreEqual(fileProcessingDb.ActiveFAMID, result["ActiveFAMID"], "ActiveFAMID should match the one started");
-
-                if (minutes < 0)
+                using (var reader = cmd.ExecuteReader())
                 {
-                    Assert.AreEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should be null");
-                }
-                else
-                {
-                    Assert.AreNotEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should not be null");
-                    TimeSpan span = testDatabaseService.Schedule.Start - (DateTime)result["NextScheduledRunTime"];
-                    Assert.That(Math.Abs(span.TotalSeconds) < 1, "NextScheduledRunTime should be equal to start time");
+                    var result = reader.Cast<IDataRecord>().Single();
+
+                    Assert.AreEqual(DBNull.Value, result["StartTime"], "StartTime should be null");
+                    Assert.AreEqual(DBNull.Value, result["EndTime"], "EndTime should be null");
+                    Assert.AreEqual(DBNull.Value, result["Exception"], "Exception should be null");
+                    Assert.AreEqual(fileProcessingDb.ActiveFAMID, result["ActiveFAMID"], "ActiveFAMID should match the one started");
+
+                    if (minutes < 0)
+                    {
+                        Assert.AreEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should be null");
+                    }
+                    else
+                    {
+                        Assert.AreNotEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should not be null");
+                        TimeSpan span = testDatabaseService.Schedule.Start - (DateTime)result["NextScheduledRunTime"];
+                        Assert.That(Math.Abs(span.TotalSeconds) < 1, "NextScheduledRunTime should be equal to start time");
+                    }
+
+                    // Record the start
+                    Assert.DoesNotThrow(() => testDatabaseService.RecordProcessStart(), "RecordProcessStart should not throw an exception");
                 }
 
-                // Record the start
-                Assert.DoesNotThrow(() => testDatabaseService.RecordProcessStart(), "RecordProcessStart should not throw an exception");
                 DateTime start = DateTime.Now;
+                TimeSpan startSpan, endSpan;
+                string stringException;
 
-                reader.Close();
-                reader.Dispose();
-                reader = cmd.ExecuteReader();
-                result = reader.Cast<IDataRecord>().Single();
-
-                Assert.AreNotEqual(DBNull.Value, result["StartTime"], "Start time should not be null");
-                TimeSpan startSpan = start - (DateTime)result["StartTime"];
-                Assert.That(Math.Abs(startSpan.TotalSeconds) < 10, "Time started should be time RecordProcessStart was called");
-
-                Assert.AreEqual(DBNull.Value, result["EndTime"], "EndTime should be null");
-                Assert.AreEqual(DBNull.Value, result["Exception"], "Exception should be null");
-                Assert.AreEqual(fileProcessingDb.ActiveFAMID, result["ActiveFAMID"], "ActiveFAMID should still match the one started");
-
-                if (minutes < 0)
+                using (var reader = cmd.ExecuteReader())
                 {
-                    Assert.AreEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should be null");
-                }
-                else
-                {
-                    Assert.AreNotEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should not be null");
-                    TimeSpan span = testDatabaseService.Schedule.Start - (DateTime)result["NextScheduledRunTime"];
-                    Assert.That(Math.Abs(span.TotalSeconds) < 1, "NextScheduledRunTime should be the start time");
+                    var result = reader.Cast<IDataRecord>().Single();
+
+                    Assert.AreNotEqual(DBNull.Value, result["StartTime"], "Start time should not be null");
+                    startSpan = start - (DateTime)result["StartTime"];
+                    Assert.That(Math.Abs(startSpan.TotalSeconds) < 10, "Time started should be time RecordProcessStart was called");
+
+                    Assert.AreEqual(DBNull.Value, result["EndTime"], "EndTime should be null");
+                    Assert.AreEqual(DBNull.Value, result["Exception"], "Exception should be null");
+                    Assert.AreEqual(fileProcessingDb.ActiveFAMID, result["ActiveFAMID"], "ActiveFAMID should still match the one started");
+
+                    if (minutes < 0)
+                    {
+                        Assert.AreEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should be null");
+                    }
+                    else
+                    {
+                        Assert.AreNotEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should not be null");
+                        TimeSpan span = testDatabaseService.Schedule.Start - (DateTime)result["NextScheduledRunTime"];
+                        Assert.That(Math.Abs(span.TotalSeconds) < 1, "NextScheduledRunTime should be the start time");
+                    }
+
+                    stringException = (completeWithException) ? (new ExtractException("NONE", "Test")).AsStringizedByteStream() : null;
+
+                    Assert.DoesNotThrow(() => testDatabaseService.RecordProcessComplete(stringException), "RecordProcessComplete should not throw an exception");
                 }
 
-                string stringException = (completeWithException) ? (new ExtractException("NONE", "Test")).AsStringizedByteStream() : null;
-
-                Assert.DoesNotThrow(() => testDatabaseService.RecordProcessComplete(stringException), "RecordProcessComplete should not throw an exception");
                 DateTime endTime = DateTime.Now;
 
-                reader.Close();
-                reader.Dispose();
-                reader = cmd.ExecuteReader();
-                result = reader.Cast<IDataRecord>().Single();
-
-                Assert.AreNotEqual(DBNull.Value, result["StartTime"], "Start time should not be null");
-                startSpan = start - (DateTime)result["StartTime"];
-                Assert.That(Math.Abs(startSpan.TotalSeconds) < 10, "Start time should not have changed");
-
-
-                Assert.AreNotEqual(DBNull.Value, result["EndTime"], "End time should not be null");
-                TimeSpan endSpan = endTime - (DateTime)result["EndTime"];
-
-                Assert.That(Math.Abs(endSpan.TotalSeconds) < 10, "EndTime  should be the time RecordProcessComplete was called");
-
-                Assert.AreEqual((completeWithException) ? (object)stringException : DBNull.Value, result["Exception"],
-                    (completeWithException) ? "Exception values should be same" : "Exception should be null");
-
-                Assert.AreEqual(fileProcessingDb.ActiveFAMID, result["ActiveFAMID"], "ActiveFAMID should still match the one started");
-
-                if (minutes < 0)
+                using (var reader = cmd.ExecuteReader())
                 {
+                    var result = reader.Cast<IDataRecord>().Single();
+
+                    Assert.AreNotEqual(DBNull.Value, result["StartTime"], "Start time should not be null");
+                    startSpan = start - (DateTime)result["StartTime"];
+                    Assert.That(Math.Abs(startSpan.TotalSeconds) < 10, "Start time should not have changed");
+
+                    Assert.AreNotEqual(DBNull.Value, result["EndTime"], "End time should not be null");
+                    endSpan = endTime - (DateTime)result["EndTime"];
+
+                    Assert.That(Math.Abs(endSpan.TotalSeconds) < 10, "EndTime  should be the time RecordProcessComplete was called");
+
+                    Assert.AreEqual((completeWithException) ? (object)stringException : DBNull.Value, result["Exception"],
+                        (completeWithException) ? "Exception values should be same" : "Exception should be null");
+
+                    Assert.AreEqual(fileProcessingDb.ActiveFAMID, result["ActiveFAMID"], "ActiveFAMID should still match the one started");
+
+                    if (minutes < 0)
+                    {
+                        Assert.AreEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should be null");
+                    }
+                    else
+                    {
+                        Assert.AreNotEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should not null");
+                        TimeSpan span = testDatabaseService.Schedule.Start - (DateTime)result["NextScheduledRunTime"];
+                        Assert.That(Math.Abs(span.TotalSeconds) < 1, "NextScheduledRunTime should be start time");
+                    }
+
+                    Assert.DoesNotThrow(() => testDatabaseService.StopActiveSchedule(), "StopActiveSchedule should not throw an exception");
+                }
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    var result = reader.Cast<IDataRecord>().Single();
+
+                    Assert.AreNotEqual(DBNull.Value, result["StartTime"], "Start time should not be null");
+                    startSpan = start - (DateTime)result["StartTime"];
+                    Assert.That(Math.Abs(startSpan.TotalSeconds) < 10, "Start time should not have changed");
+
+                    Assert.AreNotEqual(DBNull.Value, result["EndTime"], "End time should not be null");
+                    endSpan = endTime - (DateTime)result["EndTime"];
+                    Assert.That(Math.Abs(endSpan.TotalSeconds) < 10, "EndTime should not have changed");
+
                     Assert.AreEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should be null");
+                    Assert.AreEqual(DBNull.Value, result["ActiveFAMID"], "ActiveFAMID should be null");
                 }
-                else
-                {
-                    Assert.AreNotEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should not null");
-                    TimeSpan span = testDatabaseService.Schedule.Start - (DateTime)result["NextScheduledRunTime"];
-                    Assert.That(Math.Abs(span.TotalSeconds) < 1, "NextScheduledRunTime should be start time");
-                }
-
-
-                Assert.DoesNotThrow(() => testDatabaseService.StopActiveSchedule(), "StopActiveSchedule should not throw an exception");
-
-
-                reader.Close();
-                reader.Dispose();
-                
-                using reader = cmd.ExecuteReader();
-                result = reader.Cast<IDataRecord>().Single();
-
-                Assert.AreNotEqual(DBNull.Value, result["StartTime"], "Start time should not be null");
-                startSpan = start - (DateTime)result["StartTime"];
-                Assert.That(Math.Abs(startSpan.TotalSeconds) < 10, "Start time should not have changed");
-
-                Assert.AreNotEqual(DBNull.Value, result["EndTime"], "End time should not be null");
-                endSpan = endTime - (DateTime)result["EndTime"];
-                Assert.That(Math.Abs(endSpan.TotalSeconds) < 10, "EndTime should not have changed");
-
-
-                Assert.AreEqual(DBNull.Value, result["NextScheduledRunTime"], "NextScheduledRunTime should be null");
-                Assert.AreEqual(DBNull.Value, result["ActiveFAMID"], "ActiveFAMID should be null");
 
             }
             finally

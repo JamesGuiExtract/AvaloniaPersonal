@@ -483,10 +483,19 @@ namespace Extract.ETL
             int attributeSetNameIDColumn = VOAsToStore.GetOrdinal("AttributeSetNameID");
             int voaColumn = VOAsToStore.GetOrdinal("VOA");
 
+            // As we can't use MARS on database connections established via application role
+            // authentication, we need to compile as list of attribute sets to be processed
+            // rather processing each set as they are read.
+            List<(Int64 attributeSetForFileID,
+                bool hasExpandedAttributes,
+                Int32 fileTaskSessionID,
+                Int64 attributeSetNameID,
+                List<DashboardAttributeField> dashboardAttributesNeeded,
+                byte[] voaData)> attributeSetDataList = new();
+
             while (VOAsToStore.Read())
             {
                 cancelToken.ThrowIfCancellationRequested();
-                Int64 attributeSetForFileID = VOAsToStore.GetInt64(attributeSetForFileIDColumn);
                 bool hasExpandedAttributes = (VOAsToStore.GetInt32(hasExpandedAttributesColulmn) == 1);
                 Int32 fileTaskSessionID = VOAsToStore.GetInt32(fileTaskSessionIDColumn);
                 Int64 attributeSetNameID = VOAsToStore.GetInt64(attributeSetNameIDColumn);
@@ -499,45 +508,60 @@ namespace Extract.ETL
 
                 if (!hasExpandedAttributes || dashboardAttributesNeeded.Any())
                 {
-                    using (Stream voaStream = VOAsToStore.GetStream(voaColumn))
+                    using var voaDataStream = VOAsToStore.GetStream(voaColumn);
+                    using MemoryStream voaMemoryStream = new();
+                    voaDataStream.CopyTo(voaMemoryStream);
+
+                    attributeSetDataList.Add(
+                        (attributeSetForFileID: VOAsToStore.GetInt64(attributeSetForFileIDColumn),
+                        hasExpandedAttributes: hasExpandedAttributes,
+                        fileTaskSessionID: fileTaskSessionID,
+                        attributeSetNameID: attributeSetNameID,
+                        dashboardAttributesNeeded: dashboardAttributesNeeded.ToList(),
+                        voaData: voaMemoryStream.ToArray()));
+                }
+            }
+
+            VOAsToStore.Close();
+
+            foreach (var attributeSetData in attributeSetDataList)
+            {
+                // Get the VOAs from the stream
+                IUnknownVector AttributesToStore = AttributeMethods.GetVectorOfAttributesFromSqlBinary(attributeSetData.voaData);
+                AttributesToStore.ReportMemoryUsage();
+
+                if (!attributeSetData.hasExpandedAttributes 
+                    && _status.LastFileTaskSessionIDProcessed < attributeSetData.fileTaskSessionID)
+                {
+                    try
                     {
-                        // Get the VOAs from the stream
-                        IUnknownVector AttributesToStore = AttributeMethods.GetVectorOfAttributesFromSqlBinary(voaStream);
-                        AttributesToStore.ReportMemoryUsage();
+                        addAttributes(connection, AttributesToStore, attributeSetData.attributeSetForFileID, cancelToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex.AsExtract("ELI45429");
+                    }
 
-                        if (!hasExpandedAttributes && _status.LastFileTaskSessionIDProcessed < fileTaskSessionID)
-                        {
-                            try
-                            {
-                                addAttributes(connection, AttributesToStore, attributeSetForFileID, cancelToken);
-                            }
-                            catch (Exception ex)
-                            {
-                                throw ex.AsExtract("ELI45429");
-                            }
+                    _status.LastFileTaskSessionIDProcessed = attributeSetData.fileTaskSessionID;
+                }
 
-                            _status.LastFileTaskSessionIDProcessed = fileTaskSessionID;
-                        }
+                if (attributeSetData.dashboardAttributesNeeded.Any())
+                {
+                    XPathContext pathContext = new XPathContext(AttributesToStore);
 
-                        if (dashboardAttributesNeeded.Any())
-                        {
-                            XPathContext pathContext = new XPathContext(AttributesToStore);
+                    // Update the DashboardAttributeFields table
+                    foreach (var da in attributeSetData.dashboardAttributesNeeded)
+                    {
+                        string valueToSave = GetValueForDashboardAttributeField(da, pathContext);
 
-                            // Update the DashboardAttributeFields table
-                            foreach (var da in dashboardAttributesNeeded)
-                            {
-                                string valueToSave = GetValueForDashboardAttributeField(da, pathContext);
-
-                                using var cmd = connection.CreateCommand();
-                                cmd.CommandText = _AddDashboardAttribute;
-                                cmd.CommandTimeout = 0;
-                                cmd.Parameters.AddWithValue("@DashboardNameForAttribute", da.DashboardAttributeName);
-                                cmd.Parameters.AddWithValue("@AttributeSetForFileID", attributeSetForFileID);
-                                cmd.Parameters.AddWithValue("@DashboardAttributeValue", valueToSave);
-                                var task = cmd.ExecuteNonQueryAsync();
-                                task.Wait(_cancelToken);
-                            }
-                        }
+                        using var cmd = connection.CreateCommand();
+                        cmd.CommandText = _AddDashboardAttribute;
+                        cmd.CommandTimeout = 0;
+                        cmd.Parameters.AddWithValue("@DashboardNameForAttribute", da.DashboardAttributeName);
+                        cmd.Parameters.AddWithValue("@AttributeSetForFileID", attributeSetData.attributeSetForFileID);
+                        cmd.Parameters.AddWithValue("@DashboardAttributeValue", valueToSave);
+                        var task = cmd.ExecuteNonQueryAsync();
+                        task.Wait(_cancelToken);
                     }
                 }
             }

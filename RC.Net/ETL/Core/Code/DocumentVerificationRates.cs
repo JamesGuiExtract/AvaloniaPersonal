@@ -227,7 +227,6 @@ namespace Extract.ETL
                 }
                 int maxFileTaskSession = MaxReportableFileTaskSessionId(false);
 
-
                 while (_status.LastFileTaskSessionIDProcessed < maxFileTaskSession)
                 {
                     using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
@@ -235,7 +234,6 @@ namespace Extract.ETL
                     using var scope = GetNewTransactionScope();
 
                     using var sourceCmd = connection.CreateCommand();
-
 
                     int endOfBatch = Math.Min(_status.LastFileTaskSessionIDProcessed + PROCESS_BATCH_SIZE, maxFileTaskSession);
 
@@ -313,42 +311,59 @@ namespace Extract.ETL
         /// <param name="connection">Connection to use to process the batch</param>
         void ProcessBatch(SqlAppRoleConnection connection,  Task<SqlDataReader> readerTask)
         {
+            // As we can't use MARS on database connections established via application role
+            // authentication, we need to compile as list of verifcation session data to be
+            // processed rather processing each session as they are read.
+            List<(
+                Int32 fileTaskSessionID,
+                Int32 actionID,
+                Int32 taskClassID,
+                Int32 fileID,
+                Double duration,
+                Double overhead,
+                Double activityTime
+                )> verificationSessionDataList = new();
+
             using (var sourceReader = readerTask.Result)
             {
                 while (sourceReader.Read())
                 {
                     _cancelToken.ThrowIfCancellationRequested();
 
-                    Int32 fileTaskSessionID = sourceReader.GetInt32(sourceReader.GetOrdinal("ID"));
-                    Int32 actionID = sourceReader.GetInt32(sourceReader.GetOrdinal("ActionID"));
-                    Int32 taskClassID = sourceReader.GetInt32(sourceReader.GetOrdinal("TaskClassID"));
-                    Int32 fileID = sourceReader.GetInt32(sourceReader.GetOrdinal("FileID"));
-                    Double duration = sourceReader.GetDouble(sourceReader.GetOrdinal("Duration"));
-                    Double overhead = sourceReader.GetDouble(sourceReader.GetOrdinal("OverheadTime"));
-                    Double activityTime = sourceReader.GetDouble(sourceReader.GetOrdinal("ActivityTime"));
+                    verificationSessionDataList.Add((
+                        fileTaskSessionID: sourceReader.GetInt32(sourceReader.GetOrdinal("ID")),
+                        actionID: sourceReader.GetInt32(sourceReader.GetOrdinal("ActionID")),
+                        taskClassID: sourceReader.GetInt32(sourceReader.GetOrdinal("TaskClassID")),
+                        fileID: sourceReader.GetInt32(sourceReader.GetOrdinal("FileID")),
+                        duration: sourceReader.GetDouble(sourceReader.GetOrdinal("Duration")),
+                        overhead: sourceReader.GetDouble(sourceReader.GetOrdinal("OverheadTime")),
+                        activityTime: sourceReader.GetDouble(sourceReader.GetOrdinal("ActivityTime"))));
+                }
+            }
 
-                    try
+            foreach (var sessionData in verificationSessionDataList)
+            {
+                try
+                {
+                    using (var saveCmd = connection.CreateCommand())
                     {
-                        using (var saveCmd = connection.CreateCommand())
-                        {
-                            saveCmd.CommandText = _QUERY_TO_ADD_UPDATE_REPORTING_VERIFICATION;
-                            saveCmd.Parameters.Add("@FileID", SqlDbType.Int).Value = fileID;
-                            saveCmd.Parameters.Add("@ActionID", SqlDbType.Int).Value = actionID;
-                            saveCmd.Parameters.Add("@TaskClassID", SqlDbType.Int).Value = taskClassID;
-                            saveCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = fileTaskSessionID;
-                            saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = duration;
-                            saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = overhead;
-                            saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = activityTime;
-                            saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
+                        saveCmd.CommandText = _QUERY_TO_ADD_UPDATE_REPORTING_VERIFICATION;
+                        saveCmd.Parameters.Add("@FileID", SqlDbType.Int).Value = sessionData.fileID;
+                        saveCmd.Parameters.Add("@ActionID", SqlDbType.Int).Value = sessionData.actionID;
+                        saveCmd.Parameters.Add("@TaskClassID", SqlDbType.Int).Value = sessionData.taskClassID;
+                        saveCmd.Parameters.Add("@LastFileTaskSessionID", SqlDbType.Int).Value = sessionData.fileTaskSessionID;
+                        saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = sessionData.duration;
+                        saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = sessionData.overhead;
+                        saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = sessionData.activityTime;
+                        saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
 
-                            var task = saveCmd.ExecuteNonQueryAsync();
-                            task.Wait(_cancelToken);
-                        }
+                        var task = saveCmd.ExecuteNonQueryAsync();
+                        task.Wait(_cancelToken);
                     }
-                    catch (Exception ex)
-                    {
-                        throw ex.AsExtract("ELI45472");
-                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex.AsExtract("ELI45472");
                 }
             }
         }

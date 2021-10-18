@@ -277,7 +277,7 @@ namespace Extract.DataEntry.LabDE.Test
             string stmt = Invariant($"delete from LabDEEncounter where PatientMRN='{PatientA}' OR ") +
                             Invariant($"PatientMRN='{PatientB}';");
 
-            SqlCommand cmd = new SqlCommand(stmt, _dbConnection);
+            using SqlCommand cmd = new SqlCommand(stmt, _dbConnection);
             cmd.ExecuteNonQuery();
         }
 

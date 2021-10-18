@@ -386,7 +386,7 @@ namespace Extract.ETL.Test
                 using (var cmd = connection.CreateCommand())
                 {
                     cmd.CommandText = "SELECT AttributeSetForFileID FROM DashboardAttributeFields";
-                    using reader = cmd.ExecuteReader();
+                    using var reader = cmd.ExecuteReader();
                     var IDs = reader.Cast<IDataRecord>().Select(r => r.GetInt64(0)).ToList();
 
                     Assert.AreEqual(2, IDs.Count(), "DashboardAttributeFields table should contain 2 records.");
@@ -435,7 +435,7 @@ namespace Extract.ETL.Test
             expectedResultsConnection.Open();
             using SqlCommand expectedCmd = expectedResultsConnection.CreateCommand();
             expectedCmd.CommandText = expectedResultsSQL;
-            using expectedReader = expectedCmd.ExecuteReader();
+            using var expectedReader = expectedCmd.ExecuteReader();
             var expected = expectedReader.Cast<IDataRecord>().ToList();
 
             bool matches = results.Count == expected.Count;

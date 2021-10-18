@@ -211,12 +211,13 @@ namespace Extract.UtilityApplications.MachineLearning
                 cmd.Parameters.AddWithValue("@StartDate", DateTime.Now.Add(-LimitProcessingToMostRecent));
                 cmd.CommandTimeout = 0;
 
-                using var reader = cmd.ExecuteReader();
-                while (reader.Read())
+                using (var reader = cmd.ExecuteReader())
                 {
-                    availableIDs.Add(reader.GetInt64(0));
+                    while (reader.Read())
+                    {
+                        availableIDs.Add(reader.GetInt64(0));
+                    }
                 }
-
 
                 AppendToLog(UtilityMethods.FormatCurrent($"{availableIDs.Count} files to process"));
 

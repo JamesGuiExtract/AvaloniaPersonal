@@ -97,7 +97,7 @@ namespace Extract.Database
 
                 // Setup SQL connections settings
                 sqlConnStrBld.IntegratedSecurity = true;
-                sqlConnStrBld.MultipleActiveResultSets = true;
+                sqlConnStrBld.MultipleActiveResultSets = false;
                 sqlConnStrBld.DataSource = server;
 
                 // Initialize Database name list
