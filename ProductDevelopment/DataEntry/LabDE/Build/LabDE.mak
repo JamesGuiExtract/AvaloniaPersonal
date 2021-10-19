@@ -101,6 +101,7 @@ CopyFilesForLabDEInstall: CopyFilesToInstallFolder
 BuildDemoLabDE_DEP:
 	@ECHO Building DemoLabDE_DEP...
 	@CD $(Demo_LabDE_DEP)
+	@"$(MS_BUILD_DIR)\MSBuild.exe"  Demo_LabDE.sln /t:restore
 	@devenv Demo_LabDE.sln /BUILD $(BuildConfig) 
 
 CreateDemo_LabDE: BuildDemoLabDE_DEP
