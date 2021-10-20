@@ -3,6 +3,7 @@ using Extract.Utilities;
 using Microsoft.Data.ConnectionUI;
 using System;
 using System.Data.Common;
+using System.Data.SQLite;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Extract.Database
@@ -509,6 +510,13 @@ namespace Extract.Database
                     var expandedConnectionString = (PathTags == null)
                         ? ConnectionString
                         : PathTags.Expand(ConnectionString);
+
+                    if (TargetConnectionType == typeof(SQLiteConnection))
+                    {
+                        // Fix UNC path for SQLite
+                        // https://extract.atlassian.net/browse/ISSUE-17754
+                        expandedConnectionString = SqliteMethods.FixConnectionString(expandedConnectionString);
+                    }
 
                     dbConnection.ConnectionString = expandedConnectionString;
                     dbConnection.Open();
