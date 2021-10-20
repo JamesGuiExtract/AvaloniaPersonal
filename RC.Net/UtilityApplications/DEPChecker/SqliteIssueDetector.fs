@@ -37,11 +37,19 @@ module FileInfo =
           queries
           |> List.filter (fun queryInfo -> queryInfo.queryText.Contains("+"))
           |> List.map (fun q -> Error ("Query not compatible with SQLite; change + to || for string concatenation", q))
+        yield!
+          queries
+          |> List.filter (fun queryInfo -> queryInfo.queryText |> Utils.Regex.isMatch """(?inx) \bTOP\s*\(""")
+          |> List.map (fun q -> Error ("Query not compatible with SQLite; change TOP function to LIMIT clause", q))
       ]
 
     let inefficientQueryWarnings =
       queries
-      |> List.filter (fun queryInfo -> queryInfo.queryText |> Utils.Regex.isMatch """(?inx) \bSUBSTRING\s*\(""")
+      |> List.filter (fun queryInfo ->
+        queryInfo.queryText
+        // Attempt to exclude the substring warning for small values
+        // https://extract.atlassian.net/browse/ISSUE-17732
+        |> Utils.Regex.isMatch """(?inx) \bSUBSTRING\s*\([^,]+,(?!\s*\d\s*,\s*\d\s*\))""")
       |> List.map (fun q -> Warning ("Inefficient query; contains SUBSTRING() function", q))
 
     { empty with
