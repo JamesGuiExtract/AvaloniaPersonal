@@ -189,6 +189,10 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
             {
                 var converter = new DatabaseConverter(new DatabaseSchemaManagerProvider());
                 await converter.Convert(legacyDatabaseFile, databaseFile).ConfigureAwait(false);
+
+                // https://extract.atlassian.net/browse/ISSUE-17670
+                RenameOldDatabaseFile(legacyDatabaseFile);
+
                 return true;
             }
 
@@ -274,6 +278,20 @@ namespace Extract.Utilities.SqlCompactToSqliteConverter
                 + $"{rowsAffected} rows inserted/updated in {stopwatch.ElapsedMilliseconds} ms";
 
             statusCallback(" Done." + Environment.NewLine + importStatus);
+        }
+
+        // Rename by appending a timestamp and .bak
+        private static void RenameOldDatabaseFile(string legacyDatabaseFile)
+        {
+            string backupFile = FileSystemMethods.BuildTimeStampedBackupFileName(legacyDatabaseFile, false) + ".bak";
+            try
+            {
+                FileSystemMethods.MoveFile(legacyDatabaseFile, backupFile, true);
+            }
+            catch (IOException ex)
+            {
+                ex.ExtractLog("ELI51936");
+            }
         }
     }
 }
