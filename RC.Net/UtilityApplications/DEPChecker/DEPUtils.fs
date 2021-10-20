@@ -6,92 +6,9 @@ open System.Reflection
 open System.Xml
 
 open Extract.DataEntry
-open Extract.Utilities
 open Extract.Utilities.FSharp
 
-let redirectAssemblies (assemblyNames: AssemblyName seq) = 
-  let shortNameToAssemblyName =
-    assemblyNames
-    |> Seq.map (fun name -> name.Name, name)
-    |> Map.ofSeq
-  AppDomain.CurrentDomain.add_AssemblyResolve
-    (fun _sender eventArgs ->
-      let shortName = AssemblyName(eventArgs.Name).Name
-      match shortNameToAssemblyName |> Map.tryFind shortName with
-      | Some assemblyName ->
-        try
-          Assembly.Load assemblyName
-        with _ ->
-          Unchecked.defaultof<Assembly>
-      | None -> Unchecked.defaultof<Assembly>)
-    
-// Setup binding redirects if not already done
-let private init =
-  let esDir = FileSystemMethods.CommonComponentsPath
-  let monitor = Object()
-  let mutable initialized = false
-  let extractToken = (typeof<Extract.ExtractException>.Assembly).GetName().GetPublicKeyToken()
-
-  fun () ->
-    if not initialized then
-      lock monitor (fun () ->
-        if not initialized then
-          Directory.EnumerateFiles(esDir, "*.dll")
-          |> Seq.append (Directory.EnumerateFiles(esDir, "*.exe"))
-          |> Seq.choose (fun assemblyPath ->
-            try
-              let name = AssemblyName.GetAssemblyName assemblyPath
-              if name.GetPublicKeyToken() = extractToken then
-                Some name
-              else
-                None
-            with _ -> None
-          )
-          |> redirectAssemblies
-          initialized <- true
-      )
-
-type QueryInfo =
-  { controlName: string
-    queryType: string
-    queryText: string }
-
-type Message =
-| Warning of string * QueryInfo 
-| Error of string * QueryInfo 
-| Error2 of string * string 
-| Failure of string * exn
-
-type DEPInfo =
-  { path: string
-    warningsAndErrors: Message list }
-
-module DEPInfo =
-  let empty =
-    { path = ""
-      warningsAndErrors = [] }
-
-  let getDEPInfoFromQueryInfo (path: string) (queries: QueryInfo list) =
-    let badQueryErrors =
-      [
-        yield!
-          queries
-          |> List.filter (fun queryInfo -> queryInfo.queryText |> Utils.Regex.isMatch """(?inx) \bLEN\s*\(""")
-          |> List.map (fun q -> Error ("Query not compatible with SQLite; change LEN function to LENGTH", q))
-        yield!
-          queries
-          |> List.filter (fun queryInfo -> queryInfo.queryText.Contains("+"))
-          |> List.map (fun q -> Error ("Query not compatible with SQLite; change + to || for string concatenation", q))
-      ]
-
-    let inefficientQueryWarnings =
-      queries
-      |> List.filter (fun queryInfo -> queryInfo.queryText |> Utils.Regex.isMatch """(?inx) \bSUBSTRING\s*\(""")
-      |> List.map (fun q -> Warning ("Inefficient query; contains SUBSTRING() function", q))
-
-    { empty with
-        path = path
-        warningsAndErrors = badQueryErrors @ inefficientQueryWarnings }
+open SqliteIssueDetector
 
 let divideQuery (queryInfo: QueryInfo) =
   let fixedQuery = sprintf "<root>%s</root>" queryInfo.queryText
@@ -114,7 +31,7 @@ let (|QueryComboBox|QueryTableColumn|QueryTableRow|QueryTextBox|QueryButton|Quer
 
 /// Check DLL to look for problem SQL nodes in AutoUpdateQuery and ValidationQuery properties of fields
 let checkAssembly (assemblyPath: string) =
-  init()
+  AssemblyBinder.init()
 
   try
     let dataEntryControlHostType = typeof<DataEntryControlHost>
@@ -140,7 +57,7 @@ let checkAssembly (assemblyPath: string) =
     let queries = 
       controls
       |> Seq.collect (fun (fieldName, control) ->
-        let vq = { controlName = fieldName; queryType = "ValidationQuery"; queryText = "" }
+        let vq = { sourceID = ControlName fieldName; queryType = "ValidationQuery"; queryText = "" }
         let auq = { vq with queryType = "AutoUpdateQuery" }
         match control with
         | QueryComboBox control -> [{ vq with queryText = control.ValidationQuery}; {auq with queryText = control.AutoUpdateQuery}]
@@ -155,10 +72,10 @@ let checkAssembly (assemblyPath: string) =
       |> Seq.collect divideQuery
       |> Seq.toList
 
-    DEPInfo.getDEPInfoFromQueryInfo assemblyPath queries
+    FileInfo.getDEPInfoFromQueryInfo assemblyPath queries
 
   with e ->
-    { DEPInfo.empty with
+    { FileInfo.empty with
         path = assemblyPath
         warningsAndErrors = [Failure (sprintf "Failed to load %s" assemblyPath, e)] }
 
@@ -181,7 +98,7 @@ let checkConfigFile (configPath: string) =
       |> Seq.collect(fun memberNode ->
         let nameAttr = memberNode.Attributes.ItemOf("name")
         let name = if nameAttr |> isNull then "" else nameAttr.Value
-        let queryInfo = { controlName = name; queryType = ""; queryText = "" }
+        let queryInfo = { sourceID = ControlName name; queryType = ""; queryText = "" }
         memberNode.SelectNodes("""Property[@name='AutoUpdateQuery' or @name='ValidationQuery']""")
         |> Seq.cast<XmlNode>
         |> Seq.map(fun queryNode ->
@@ -191,7 +108,7 @@ let checkConfigFile (configPath: string) =
       |> Seq.collect divideQuery
       |> Seq.toList
 
-    let info = DEPInfo.getDEPInfoFromQueryInfo configPath queries
+    let info = FileInfo.getDEPInfoFromQueryInfo configPath queries
 
     let sqlCeErrors =
       doc.SelectNodes("""//value""")
@@ -212,7 +129,7 @@ let checkConfigFile (configPath: string) =
     {info with warningsAndErrors = info.warningsAndErrors @ sdfFileErrors @ sqlCeErrors}
 
   with e ->
-    { DEPInfo.empty with
+    { FileInfo.empty with
         path = configPath
         warningsAndErrors = [Failure (sprintf "Failed to load %s" configPath, e)] }
 

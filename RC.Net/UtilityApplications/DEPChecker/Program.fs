@@ -4,10 +4,10 @@ open System.IO
 open Extract.Licensing
 open Extract.Utilities.FSharp
 
-open DEPUtils
+open SqliteIssueDetector
 
 let usage error =
-  let usageMessage = """USAGE: DEPChecker.exe [--help] [--verbose|-v] [<directory>|<assembly>]"""
+  let usageMessage = """USAGE: DEPChecker.exe [--help] [--verbose|-v] [<directory>|<assembly>|<configFile>|<batchFile>]"""
     
   if error then
     failwith (sprintf "Invalid args\r\n%s" usageMessage)
@@ -33,20 +33,23 @@ let getPrefix = function
 | Error _ | Error2 _  -> "  Error:   "
 | Failure _ -> "  Failure: "
 
-let printResults verbose (depInfos: DEPInfo seq) =
-  depInfos
-  |> Seq.iter (fun (depInfo: DEPInfo) ->
-    if not (depInfo.warningsAndErrors |> Seq.isEmpty) then
+let printResults verbose (fileInfos: FileInfo seq) =
+  fileInfos
+  |> Seq.iter (fun (fileInfo: FileInfo) ->
+    if not (fileInfo.warningsAndErrors |> Seq.isEmpty) then
       printfn ""
-      printfn "%s:" depInfo.path
+      printfn "%s:" fileInfo.path
       let results =
-        depInfo.warningsAndErrors
+        fileInfo.warningsAndErrors
         |> List.map (fun (message: Message) ->
           match message with
           | Error (description, queryInfo)
           | Warning (description, queryInfo) ->
-              sprintf "%s%s.%s:" (getPrefix message) queryInfo.controlName queryInfo.queryType,
-              sprintf "%s%s" description (if verbose then sprintf ": %s" queryInfo.queryText else "")
+              let sourceInfo =
+                match queryInfo.sourceID with
+                | ControlName controlName -> sprintf "%s%s.%s:" (getPrefix message) controlName queryInfo.queryType
+                | LineNumber lineNum -> sprintf "%sline %d:" (getPrefix message) lineNum
+              sourceInfo, sprintf "%s%s" description (if verbose then sprintf ": %s" queryInfo.queryText else "")
           | Error2 (description, value) ->
               sprintf "%s%s:" (getPrefix message) description,
               value
@@ -74,9 +77,12 @@ let main argv =
         DEPUtils.checkAssembly path |> Seq.singleton |> printResults verbose
       elif File.Exists path && path.EndsWith(".config", StringComparison.OrdinalIgnoreCase) then
         DEPUtils.checkConfigFile path |> Seq.singleton |> printResults verbose
+      elif File.Exists path && path.EndsWith(".bat", StringComparison.OrdinalIgnoreCase) then
+        BatchUtils.checkBatchFile path |> Seq.singleton |> printResults verbose
       elif Directory.Exists path then
         [ yield! DEPUtils.checkAssembliesInDir path
-          yield! DEPUtils.checkConfigFilesInDir path ]
+          yield! DEPUtils.checkConfigFilesInDir path
+          yield! BatchUtils.checkBatchFilesInDir path ]
         |> printResults verbose
       else
         usage true
