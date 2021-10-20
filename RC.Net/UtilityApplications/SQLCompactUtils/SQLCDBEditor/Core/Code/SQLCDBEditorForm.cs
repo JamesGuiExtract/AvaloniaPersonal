@@ -1508,6 +1508,7 @@ namespace Extract.SQLCDBEditor
             try
             {
                 _tableList.AddRange(TableNames
+                    .OrderBy(tableName => tableName, StringComparer.InvariantCultureIgnoreCase)
                     .Select(tableName =>
                         new QueryAndResultsControl(tableName, _databaseFileName,
                             QueryAndResultsType.Table)));
