@@ -115,7 +115,7 @@ CreateDemo_LabDE: BuildDemoLabDE_DEP
 	@XCOPY "$(LabResultsDir)\Utils\LabDEDemo\Files\*.*" "$(LabDEDemo)\" /v /s /e /y
 	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEDemo)\Input\" /v /s /e /y
 	@XCOPY "$(RulesDir)\LabDE\Demo_LabDE\Solution\*.*" "$(LabDEDemo)\Solution\" /v /s /e /y	
-	@COPY /y "$(Demo_LabDE_DEP)\Bin\$(BuildConfig)\Extract.DataEntry.DEP.Demo_LabDE.dll" "$(LabDEDemo)\Solution\Bin\"
+	@COPY /y "$(Demo_LabDE_DEP)\Bin\$(BuildConfig)\net48\Extract.DataEntry.DEP.Demo_LabDE.dll" "$(LabDEDemo)\Solution\Bin\"
 	@ECHO Encrypting LabDE Demo Rules...
 	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(LabDEDemo)\Solution\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
