@@ -128,7 +128,6 @@
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
 		<row><td>ISLockPermissions.dll</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\ISLockPermissions.dll</td></row>
-		<row><td>ISSELFREG.DLL</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\isregsvr.dll</td></row>
 		<row><td>ISXMLCFG.DLL</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\isxmlcfg.dll</td></row>
 	</table>
 
@@ -193,7 +192,7 @@
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>Accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{80D6B994-D835-40E8-9853-AF4DA26BD434}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>accord.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AllOtherFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{0A2EF2BF-07F6-4115-9CE9-57308764A533}</td><td>FILE_PROCESSING_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>statisticsreporter.exe.confi.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AppBackendFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{DCBA1BC4-3AB9-4F79-9FFB-F2B2EC7637E8}</td><td>APP_BACKEND_API.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>152</td><td/><td>web.config1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AppBackendFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{DCBA1BC4-3AB9-4F79-9FFB-F2B2EC7637E8}</td><td>APP_BACKEND_API.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>152</td><td/><td>web.config1.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Aspose.Pdf.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{BE95F4FC-D7BC-4838-BF3B-6A1E8E304DC4}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>aspose.pdf.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AttributeDBMgrComponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{036E1588-6AB4-43A5-8EFF-A2080835F299}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>attributedbmgrcomponents.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AuthorizationAPIFiles.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{B8E94142-BBF5-4AA3-82D4-5C4B0A91469A}</td><td>AUTHORIZATION_API.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>authorizationapi.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -202,7 +201,7 @@
 		<row><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{A82B6DBF-7E9C-4E66-B4FF-4BB1BFDBCCF2}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>ESAFSelectors.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{4536C0B2-E6CF-46C9-B974-2C86140A9DA1}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>esfamconditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESFAMService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{BA65C576-20B4-43CD-B136-B001E714B474}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>esfamservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ESFAMServiceDatabase.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{4D0D186B-A796-4238-8331-25B0CABD5DBB}</td><td>ES_FAM_SERVICE.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>144</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ESFAMServiceDatabase.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{4D0D186B-A796-4238-8331-25B0CABD5DBB}</td><td>ES_FAM_SERVICE.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>144</td><td/><td/><td>9</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESFDRSService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{EA4B0A1B-C39A-4302-BCC5-3EEC1B00D256}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>esfdrsservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESFileSuppliers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{D7E7C80A-0B5A-494E-836B-F4D1EF4C5751}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>ESFileSuppliers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>12</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ESIPCService.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{C5DDC4E4-E9CC-494F-86DA-B391F0671EC3}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>esipcservice.exe.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -238,7 +237,7 @@
 		<row><td>Extract.Process.Logger.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{9DC88B63-1B4D-4AA1-9031-8A3EAD76E6C0}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.process.logger.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Reporting.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{72FFFF98-ED3A-4982-8F1B-98CA2BF647F2}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.reporting.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.ReportingDevExpress..CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{B1DE58CE-6A77-4E1B-AD1C-5F7EFCDF08E7}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.reportingdevexpress..CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Extract.Utilities.Authentica.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{8D0D43FA-4346-4FD6-B6E2-5AF2BA70D42F}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.utilities.authentica.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Extract.Utilities.Authentica.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{8D0D43FA-4346-4FD6-B6E2-5AF2BA70D42F}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.utilities.authentica.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Utilities.ContextTag.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{ACBE7199-8476-446C-A044-801912242968}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.utilities.contexttag.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Utilities.Ftp.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{21D596C1-4AFA-4023-A239-B6A9B471CA44}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.utilities.ftp.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.Utilities.ShellExten.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{AD9C119F-67BD-4E40-8A9C-F062007D84C9}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>extract.utilities.shellexten.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -346,10 +345,6 @@
 		<col def="S255">ISComments</col>
 		<row><td>ISLockPermissionsCost</td><td>1</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsCostAction</td><td/><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td>3073</td><td>ISLockPermissions.dll</td><td>ISLockPermissionsInstallAction</td><td/><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterCosting</td><td/><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFiles</td><td/><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td>1</td><td>ISSELFREG.DLL</td><td>ISSelfRegisterFinalize</td><td/><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td>3073</td><td>ISSELFREG.DLL</td><td>ISUnSelfRegisterFiles</td><td/><td/></row>
 		<row><td>ISXmlCosting</td><td>1</td><td>ISXMLCFG.DLL</td><td>ISXmlCosting</td><td/><td/></row>
 		<row><td>ISXmlFinalize</td><td>1</td><td>ISXMLCFG.DLL</td><td>ISXmlFinalize</td><td/><td/></row>
 		<row><td>ISXmlInstall</td><td>3073</td><td>ISXMLCFG.DLL</td><td>ISXmlInstall</td><td/><td/></row>
@@ -1849,10 +1844,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">Condition</col>
 		<row><td>ISLockPermissionsCost</td><td/><td>InstallValidate</td><td>1</td><td/></row>
 		<row><td>ISLockPermissionsInstall</td><td/><td>StartServices</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterCosting</td><td/><td>SelfUnregModules</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterFiles</td><td/><td>SelfRegModules</td><td>1</td><td/></row>
-		<row><td>ISSelfRegisterFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
-		<row><td>ISUnSelfRegisterFiles</td><td/><td>ISSelfRegisterCosting</td><td>1</td><td/></row>
 		<row><td>ISXmlCosting</td><td/><td>InstallInitialize</td><td>1</td><td/></row>
 		<row><td>ISXmlFinalize</td><td/><td>InstallFinalize</td><td>1</td><td/></row>
 		<row><td>ISXmlInstall</td><td/><td>InstallFiles</td><td>1</td><td/></row>
@@ -1863,8 +1854,6 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>InstallInitialize</td><td>1500</td><td/><td/><td/></row>
 		<row><td>InstallValidate</td><td>1400</td><td/><td/><td/></row>
 		<row><td>RemoveFiles</td><td>3500</td><td/><td/><td/></row>
-		<row><td>SelfRegModules</td><td>2850</td><td/><td/><td/></row>
-		<row><td>SelfUnregModules</td><td>1100</td><td/><td/><td/></row>
 		<row><td>StartServices</td><td>5900</td><td/><td/><td/></row>
 	</table>
 
