@@ -190,7 +190,7 @@ ObfuscateFiles: BuildAttributeFinderCore
 	editbin.exe /STACK:4194304 "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe"
 	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe"
 	sn -Ra "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"
-	dotfuscator.exe /nologo /in:"$(BinariesFolder)\SQLCDBEditor.exe" /mapout:"$(BinariesFolder)\Map\mapSQLCDBEditor.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
+	dotfuscator.exe /nologo /in:"$(BinariesFolder)\ExtractSqliteEditor.exe" /mapout:"$(BinariesFolder)\Map\mapExtractSqliteEditor.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	dotfuscator.exe /nologo /in:"$(BinariesFolder)\RunFPSFile.exe" /mapout:"$(BinariesFolder)\Map\mapRunFPSFile.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(PDCommonDir)\ObfuscateConfig.xml
 	editbin.exe /largeaddressaware "$(BinariesFolder)\Obfuscated\RunFPSFile.exe"
 	sn -Ra "$(BinariesFolder)\Obfuscated\RunFPSFile.exe" "$(StrongNameKeyDir)\ExtractInternalKey.snk"

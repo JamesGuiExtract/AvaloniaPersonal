@@ -151,7 +151,7 @@ module FAMService =
   let private scPath = @"C:\Windows\System32\sc.exe"
   let private secEditPath = @"C:\Windows\System32\SecEdit.exe"
   let private servicePath = Path.Combine(FileSystemMethods.CommonComponentsPath, es_fam_service)
-  let private editorPath = Path.Combine(FileSystemMethods.CommonComponentsPath, "SQLCDBEditor.exe")
+  let private editorPath = Path.Combine(FileSystemMethods.CommonComponentsPath, "ExtractSqliteEditor.exe")
 
   let private runCmd cmd =
     let output = ref ""

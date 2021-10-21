@@ -438,7 +438,7 @@ namespace Extract.SQLCDBEditor
             this.MinimumSize = new System.Drawing.Size(575, 300);
             this.Name = "SQLCDBEditorForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "SQLCDBEditor";
+            this.Text = "ExtractSQLiteEditor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SQLCDBEditorForm_FormClosing);
             this._toolStrip.ResumeLayout(false);
             this._toolStrip.PerformLayout();

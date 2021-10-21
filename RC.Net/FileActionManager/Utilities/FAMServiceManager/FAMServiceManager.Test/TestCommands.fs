@@ -117,7 +117,7 @@ module Interactive =
 
 
   [<Test; Category("Interactive")>]
-  let ``Edit opens SQLCDBEditor for the DB`` () =
+  let ``Edit opens ExtractSqliteEditor for the DB`` () =
     use service = installTempService ()
 
     let editTask =
@@ -129,13 +129,13 @@ module Interactive =
     // Let the window open
     System.Threading.Thread.Sleep 1000
 
-    test <@ MessageBox.Show(sprintf "Was the SQLCDBEditor for %s.sqlite opened?" service.Name,
+    test <@ MessageBox.Show(sprintf "Was the ExtractSqliteEditor for %s.sqlite opened?" service.Name,
               "Confirm editor",
               MessageBoxButton.YesNo,
               MessageBoxImage.Question,
               MessageBoxResult.Yes) = MessageBoxResult.Yes @>
 
-    MessageBox.Show("Close the SQLCDBEditor and this dialog to complete the test", "Close editor", MessageBoxButton.OK)
+    MessageBox.Show("Close the ExtractSqliteEditor and this dialog to complete the test", "Close editor", MessageBoxButton.OK)
     |> ignore
 
     editTask |> Async.AwaitTask |> ignore
