@@ -11,6 +11,10 @@ SET "resgenPath=%~3bin\NETFX 4.6.1 Tools"
 IF NOT EXIST "%resgenPath%" (
 SET "resgenPath=%~3bin\NETFX 4.8 Tools"
 )
+IF NOT EXIST "%resgenPath%" (
+SET "resgenPath=C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools"
+)
+
 
 FOR /f %%f IN ('dir /b *.resx') DO CALL :CREATE_RESOURCE_FILE %%f %2
 
