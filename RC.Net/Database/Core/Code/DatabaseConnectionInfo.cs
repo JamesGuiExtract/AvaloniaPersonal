@@ -43,7 +43,6 @@ namespace Extract.Database
         /// <summary>
         /// A <see cref="DbConnection"/> managed by this instance for the case that the caller does
         /// not need to manually handle connection availability and updates of SQLite files.
-        /// TODO: Revisit below issues: https://extract.atlassian.net/browse/ISSUE-17697 
         /// https://extract.atlassian.net/browse/ISSUE-15276
         /// As a result of some sporadic database errors that appear to be the result of thread safety
         /// that had been present with SQL CE DBs, each thread will now using it's own managed DB connection.
