@@ -4524,13 +4524,6 @@ void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = fa
 			// Validate the schema
 			validateDBSchemaVersion(bCheckForUnaffiliatedFiles);
 		}
-		else
-		{
-			UCLIDException ueNoDBSpecified("ELI51747", "No server or Database specified.");
-			ueNoDBSpecified.addDebugInfo("Server", m_strDatabaseServer);
-			ueNoDBSpecified.addDebugInfo("Database", m_strDatabaseName);
-			ueNoDBSpecified.log();
-		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");
 }
