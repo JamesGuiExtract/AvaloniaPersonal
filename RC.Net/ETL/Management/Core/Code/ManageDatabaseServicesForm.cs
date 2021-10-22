@@ -212,9 +212,9 @@ namespace Extract.ETL.Management
                 connection.Open();
 
                 using var command = connection.CreateCommand();
-                using var reader = command.ExecuteReader();
-
                 command.CommandText = _DatabaseServiceSql;
+
+                using var reader = command.ExecuteReader();
 
                 table.Load(reader);
 
