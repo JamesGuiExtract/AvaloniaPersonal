@@ -7,13 +7,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SQLCDBEditor")]
+[assembly: AssemblyTitle("ExtractSQLiteEditor")]
 [assembly: AssemblyDescription("Application used to edit SQLite database files.\r\n\r\n" +
 "The Scintilla control used by this application is Copyright 1998-2006 by Neil Hodgson <neilh@scintilla.org>\r\n" +
 "The ScintillaNET bindings are Copyright 2002-2006 by Garrett Serack")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Extract Systems")]
-[assembly: AssemblyProduct("SQLCDBEditor")]
+[assembly: AssemblyProduct("ExtractSQLiteEditor")]
 [assembly: AssemblyCopyright("Copyright © Extract Systems LLC 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
