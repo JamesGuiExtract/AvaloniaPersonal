@@ -1,4 +1,5 @@
 ﻿using Extract.Licensing;
+using Extract.SqlDatabase;
 using Extract.Utilities;
 using Microsoft.Data.ConnectionUI;
 using System;
@@ -504,20 +505,26 @@ namespace Extract.Database
                     ExtractException.Assert("ELI34758", "Database provider has not been specified.",
                         TargetConnectionType != null);
 
-                    DbConnection dbConnection =
-                        (DbConnection)Activator.CreateInstance(TargetConnectionType);
+                    DbConnection dbConnection = null;
                     var expandedConnectionString = (PathTags == null)
                         ? ConnectionString
                         : PathTags.Expand(ConnectionString);
-
+                    
                     if (TargetConnectionType == typeof(SQLiteConnection))
                     {
+                        dbConnection = (DbConnection)Activator.CreateInstance(TargetConnectionType);
+
                         // Fix UNC path for SQLite
                         // https://extract.atlassian.net/browse/ISSUE-17754
                         expandedConnectionString = SqliteMethods.FixConnectionString(expandedConnectionString);
+                        dbConnection.ConnectionString = expandedConnectionString;
+                    }
+                    else if (!ExtractRoleConnection.TryGetConnection(expandedConnectionString, ref dbConnection))
+                    {
+                        dbConnection = (DbConnection)Activator.CreateInstance(TargetConnectionType);
+                        dbConnection.ConnectionString = expandedConnectionString;
                     }
 
-                    dbConnection.ConnectionString = expandedConnectionString;
                     dbConnection.Open();
 
                     return dbConnection; 
