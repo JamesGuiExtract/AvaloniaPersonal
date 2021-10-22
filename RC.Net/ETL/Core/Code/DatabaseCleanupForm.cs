@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using Extract.SqlDatabase;
+using Extract.Utilities;
+using System;
+using System.Data.SqlClient;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -18,33 +16,54 @@ namespace Extract.ETL
             InitializeComponent();
             _databaseCleanup = databaseCleanup;
             _schedulerControl.Value = _databaseCleanup.Schedule;
-            this.PurgeAfterDaysSelector.Value = _databaseCleanup.PurgeRecordsOlderThanDays;
-            this.MaximumNumberOfFilesToCleanUpSelector.Value = _databaseCleanup.MaxFilesToSelect;
+            _purgeRecordsOlderThanDays.Value = _databaseCleanup.PurgeRecordsOlderThanDays;
+            _maximumNumberOfRecordsToProcessFromFileTaskSession.Value = _databaseCleanup.MaximumNumberOfRecordsToProcessFromFileTaskSession;
             _descriptionTextBox.Text = _databaseCleanup.Description;
+        }
+
+        private void CalculateNumberOfRowsToBeDeletedButton_Click(object sender, EventArgs e)
+        {
+			this.CalculateNumberOfRowsToBeDeletedButton.Text = "Calculating....";
+            this.CalculateNumberOfRowsToBeDeletedButton.Enabled = false;
+            Task.Run(() => {
+                _databaseCleanup.CalculateNumberOfRowsToDelete((int)_purgeRecordsOlderThanDays.Value);
+                this.CalculateNumberOfRowsToBeDeletedButton.Invoke((MethodInvoker)delegate {
+                    this.CalculateNumberOfRowsToBeDeletedButton.Text = "Calculate number of rows to be deleted";
+                    this.CalculateNumberOfRowsToBeDeletedButton.Enabled = true;
+                });
+            });
         }
 
         private void OK_Button_Click(object sender, EventArgs e)
         {
             try
             {
-                if (IsValid())
+                if(IsValid())
                 {
-                    _databaseCleanup.Description = _descriptionTextBox.Text;
                     _databaseCleanup.Schedule = _schedulerControl.Value;
-                    _databaseCleanup.PurgeRecordsOlderThanDays = (int)this.PurgeAfterDaysSelector.Value;
-                    _databaseCleanup.MaxFilesToSelect = (int)this.MaximumNumberOfFilesToCleanUpSelector.Value;
+                    _databaseCleanup.PurgeRecordsOlderThanDays = (int)_purgeRecordsOlderThanDays.Value;
+                    _databaseCleanup.MaximumNumberOfRecordsToProcessFromFileTaskSession = (int)_maximumNumberOfRecordsToProcessFromFileTaskSession.Value;
+                    _databaseCleanup.Description = _descriptionTextBox.Text;
                     return;
                 }
                 DialogResult = DialogResult.None;
+
             }
             catch (Exception ex)
             {
-                ex.ExtractDisplay("ELI51911");
+                ex.ExtractDisplay("ELI51948");
             }
         }
 
         private bool IsValid()
         {
+            if(string.IsNullOrEmpty(_descriptionTextBox.Text))
+            {
+                UtilityMethods.ShowMessageBox("Description cannot be empty.", "Invalid configuration", true);
+                _descriptionTextBox.Focus();
+
+                return false;
+            }
             return true;
         }
     }

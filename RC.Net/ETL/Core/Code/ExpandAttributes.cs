@@ -576,32 +576,39 @@ namespace Extract.ETL
         [CLSCompliant(false)]
         public static string GetValueForDashboardAttributeField(DashboardAttributeField dashboardAttributeField, XPathContext pathContext)
         {
-            XPathContext.XPathIterator startAt = pathContext.GetIterator("/*");
-            startAt.MoveNext();
-
-            string path = dashboardAttributeField.PathForAttributeInAttributeSet;
-
-            object resultOfPath = pathContext.Evaluate(startAt, path);
-            if (resultOfPath is List<object> objectList)
+            try
             {
-                resultOfPath = objectList.FirstOrDefault();
-            }
+                XPathContext.XPathIterator startAt = pathContext.GetIterator("/*");
+                startAt.MoveNext();
 
-            string value;
-            if (resultOfPath is IAttribute attr)
-            {
-                value = attr.Value.String;
-            }
-            else if (resultOfPath is null)
-            {
-                value = "UNKNOWN";
-            }
-            else
-            {
-                value = resultOfPath.ToString();
-            }
+                string path = dashboardAttributeField.PathForAttributeInAttributeSet;
 
-            return value;
+                object resultOfPath = pathContext.Evaluate(startAt, path);
+                if (resultOfPath is List<object> objectList)
+                {
+                    resultOfPath = objectList.FirstOrDefault();
+                }
+
+                string value;
+                if (resultOfPath is IAttribute attr)
+                {
+                    value = attr.Value.String;
+                }
+                else if (resultOfPath is null)
+                {
+                    value = "UNKNOWN";
+                }
+                else
+                {
+                    value = resultOfPath.ToString();
+                }
+
+                return value;
+            }
+            catch(Exception ex)
+            {
+                throw ex.AsExtract("ELI51950");
+            }
         }
 
         #endregion

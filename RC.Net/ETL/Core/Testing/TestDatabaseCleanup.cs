@@ -3,11 +3,7 @@ using Extract.SqlDatabase;
 using Extract.Testing.Utilities;
 using NUnit.Framework;
 using System;
-using System.Data;
-using System.Globalization;
-using System.Linq;
 using System.Threading;
-using static System.DateTime;
 
 namespace Extract.ETL.Test
 {
@@ -16,6 +12,17 @@ namespace Extract.ETL.Test
     [TestFixture]
     public class TestDatabaseCleanup
     {
+        struct TableRowCounts
+        {
+            public int? AttributeSetForFileRowCount { get; set; }
+            public int? AttributeTableRowCount { get; set; }
+            public int? FileActionStateTransitionTableRowCount { get; set; }
+            public int? SourceDocChangeHistoryTableRowCount { get; set; }
+            public int? QueueEventTableRowCount { get; set; }
+            public int? LabDEOrderTableRowCount { get; set; }
+            public int? LabDEEncounterTableRowCount { get; set; }
+        };
+
         static readonly string _DATABASE = "Resources.AccuracyDemo_LabDE.bak";
 
         static CancellationToken _noCancel = new(false);
@@ -59,13 +66,10 @@ namespace Extract.ETL.Test
             Assert.Throws<ExtractException>(() => databaseCleanup.Process(_noCancel), "Process should throw an exception");
         }
 
-        /// <summary>
-        /// Test the use of the IDatabase.Process command for DataCaptureAccuracy Service
-        /// </summary>
         [Test]
         [Category("Automated")]
         [Category("ETL")]
-        public static void TestDatabaseCleanupProcess()
+        public static void TestDatabaseCleanupProcessWithCancel()
         {
             string testDBName = "Test_DatabaseCleanup";
             try
@@ -75,25 +79,21 @@ namespace Extract.ETL.Test
         
                 // Create DataCaptureAccuracy object using the initialized database
                 DatabaseCleanup databaseCleanup = CreateTestDatabaseCleanup(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
-        
-        
-                using var connection = new ExtractRoleConnection(databaseCleanup.DatabaseServer, databaseCleanup.DatabaseName);
-                connection.Open();
-                using var cmd = connection.CreateCommand();
-                cmd.CommandText = "SELECT COUNT(ID) FROM [FileActionStateTransition]";
+
+
+                var rowCounts = GetTableRowCounts(databaseCleanup.DatabaseName, databaseCleanup.DatabaseServer);
 
                 // no records should be produced by this
-                Assert.Throws<ExtractException>(() => databaseCleanup.Process(_cancel));        
-                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 15);
+                Assert.Throws<ExtractException>(() => databaseCleanup.Process(_cancel));
+                var rowCountsProcess = GetTableRowCounts(databaseCleanup.DatabaseName, databaseCleanup.DatabaseServer);
+
+                Assert.IsTrue(rowCounts.Equals(rowCountsProcess));
         
                 // Process using the settings
                 databaseCleanup.Process(_noCancel);
+                rowCountsProcess = GetTableRowCounts(databaseCleanup.DatabaseName, databaseCleanup.DatabaseServer);
+                Assert.AreEqual(0, rowCountsProcess.QueueEventTableRowCount);
 
-                // After processing all records should be removed as they are all older than 50 days.
-                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
-
-                // Run again - There should be no changes
-                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 0);
             }
             finally
             {
@@ -101,13 +101,10 @@ namespace Extract.ETL.Test
             }
         }
 
-        /// <summary>
-        /// Test the use of the IDatabase.Process command for DataCaptureAccuracy Service
-        /// </summary>
         [Test]
         [Category("Automated")]
         [Category("ETL")]
-        public static void TestDatabaseCleanupProcessMaxFiles1()
+        public static void TestDatabaseCleanupProcessMaxRecords1()
         {
             string testDBName = "Test_DatabaseCleanup";
             try
@@ -117,22 +114,18 @@ namespace Extract.ETL.Test
 
                 // Create DataCaptureAccuracy object using the initialized database
                 DatabaseCleanup databaseCleanup = CreateTestDatabaseCleanup(fileProcessingDb.DatabaseServer, fileProcessingDb.DatabaseName);
-                databaseCleanup.MaxFilesToSelect = 1;
-
-                using var connection = new ExtractRoleConnection(databaseCleanup.DatabaseServer, databaseCleanup.DatabaseName);
-                connection.Open();
-                using var cmd = connection.CreateCommand();
-                cmd.CommandText = "SELECT COUNT(ID) FROM [FileActionStateTransition]";
-
-                // The database has 15 records by default.
-                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 15);
-
-                // Process using the settings
+                databaseCleanup.MaximumNumberOfRecordsToProcessFromFileTaskSession = 1;
                 databaseCleanup.Process(_noCancel);
+                var rowCountsProcess = GetTableRowCounts(databaseCleanup.DatabaseName, databaseCleanup.DatabaseServer);
 
-                // Get the data from the database after processing
-                // The singular file being deleted has 5 records in the fast table, but it is one file. That is why the fast entries go down to 10.
-                Assert.AreEqual(cmd.ExecuteScalar() as Int32?, 10);
+                // These need to be compared against a date, so no easy formula exists for validating these hence the magic numbers.
+                Assert.AreEqual(0, rowCountsProcess.QueueEventTableRowCount);
+                Assert.AreEqual(11, rowCountsProcess.FileActionStateTransitionTableRowCount);
+                Assert.AreEqual(0, rowCountsProcess.SourceDocChangeHistoryTableRowCount);
+                Assert.AreEqual(0, rowCountsProcess.LabDEEncounterTableRowCount);
+                Assert.AreEqual(0, rowCountsProcess.LabDEOrderTableRowCount);
+                Assert.AreEqual(4, rowCountsProcess.AttributeSetForFileRowCount);
+                Assert.AreEqual(192, rowCountsProcess.AttributeTableRowCount);
             }
             finally
             {
@@ -140,10 +133,6 @@ namespace Extract.ETL.Test
             }
         }
 
-        /// <summary>
-        /// Tests that the DataCaptureAccuracy object can save settings to a string and then 
-        /// be created with that string
-        /// </summary>
         [Test]
         [Category("Automated")]
         [Category("ETL")]
@@ -154,23 +143,19 @@ namespace Extract.ETL.Test
                 DatabaseName = "Database",
                 DatabaseServer = "Server",
                 PurgeRecordsOlderThanDays = 50,
-                MaxFilesToSelect = 100,
+                MaximumNumberOfRecordsToProcessFromFileTaskSession = 10000,
                 Description = "Test Description"
             };
 
             string settings = databaseCleanup.ToJson();
 
-            var newDatabaseCleanupSettings = DatabaseService.FromJson(settings);
+            var newDatabaseCleanupSettings = (DatabaseCleanup)DatabaseService.FromJson(settings);
 
             Assert.IsTrue(string.IsNullOrEmpty(newDatabaseCleanupSettings.DatabaseName));
             Assert.IsTrue(string.IsNullOrEmpty(newDatabaseCleanupSettings.DatabaseServer));
             Assert.AreEqual(databaseCleanup.Description, newDatabaseCleanupSettings.Description);
-
-            DatabaseCleanup databaseCleanupFromDatabase = newDatabaseCleanupSettings as DatabaseCleanup;
-
-            Assert.IsNotNull(databaseCleanupFromDatabase);
-
-            Assert.AreEqual(databaseCleanup.PurgeRecordsOlderThanDays, databaseCleanupFromDatabase.PurgeRecordsOlderThanDays);
+            Assert.AreEqual(databaseCleanup.MaximumNumberOfRecordsToProcessFromFileTaskSession, newDatabaseCleanupSettings.MaximumNumberOfRecordsToProcessFromFileTaskSession);
+            Assert.AreEqual(databaseCleanup.PurgeRecordsOlderThanDays, newDatabaseCleanupSettings.PurgeRecordsOlderThanDays);
         }
 
         static DatabaseCleanup CreateTestDatabaseCleanup(string databaseServer, string databaseName)
@@ -181,10 +166,42 @@ namespace Extract.ETL.Test
                 DatabaseName = databaseName,
                 DatabaseServer = databaseServer,
                 PurgeRecordsOlderThanDays = 50,
-                MaxFilesToSelect = 10000,
+                MaximumNumberOfRecordsToProcessFromFileTaskSession = 10000,
             };
             databaseCleanup.UpdateDatabaseServiceSettings();
             return databaseCleanup;
+        }
+
+        private static TableRowCounts GetTableRowCounts(string databaseName, string databaseServer)
+        {
+            var tableRowCounts = new TableRowCounts();
+
+            using var connection = new ExtractRoleConnection(databaseServer, databaseName);
+            connection.Open();
+            using var cmd = connection.CreateCommand();
+
+            cmd.CommandText = "SELECT COUNT(*) FROM [FileActionStateTransition]";
+            tableRowCounts.FileActionStateTransitionTableRowCount = cmd.ExecuteScalar() as Int32?;
+
+            cmd.CommandText = "SELECT COUNT(*) FROM [Attribute]";
+            tableRowCounts.AttributeTableRowCount = cmd.ExecuteScalar() as Int32?;
+
+            cmd.CommandText = "SELECT COUNT(*) FROM [AttributeSetForFile]";
+            tableRowCounts.AttributeSetForFileRowCount = cmd.ExecuteScalar() as Int32?;
+
+            cmd.CommandText = "SELECT COUNT(*) FROM [QueueEvent]";
+            tableRowCounts.QueueEventTableRowCount = cmd.ExecuteScalar() as Int32?;
+
+            cmd.CommandText = "SELECT COUNT(*) FROM [SourceDocChangeHistory]";
+            tableRowCounts.SourceDocChangeHistoryTableRowCount = cmd.ExecuteScalar() as Int32?;
+
+            cmd.CommandText = "Select COUNT(*) FROM [LabDEEncounter]";
+            tableRowCounts.LabDEEncounterTableRowCount = cmd.ExecuteScalar() as Int32?;
+
+            cmd.CommandText = "Select COUNT(*) FROM [LabDEOrder]";
+            tableRowCounts.LabDEOrderTableRowCount = cmd.ExecuteScalar() as Int32?;
+
+            return tableRowCounts;
         }
     }
 }
