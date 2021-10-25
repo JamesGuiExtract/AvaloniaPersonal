@@ -107,7 +107,7 @@ function main(args) {
     }
 
     if (fso.fileExists(exporterPath)) {
-        var orderMappingDBs = getFiles(root, true).filter(function(f){return f.Name.match(/^OrderMappingDB\.sdf$/i)});
+        var orderMappingDBs = getFiles(root, true).filter(function(f){return f.Name.match(/^OrderMappingDB\.(sdf|sqlite)$/i)});
         for (var i=0; i < orderMappingDBs.length; i++) {
             var databasePath = orderMappingDBs[i];
             var exporter = "\"" + exporterPath + "\" \"" + databasePath + "\"";
@@ -180,7 +180,7 @@ if(typeof String.prototype.trim !== 'function') {
 if(typeof Array.prototype.map !== 'function') {
 	Array.prototype.map = function(fn) {
 		for (var i=0, r=[], l = this.length; i < l; r.push(fn(this[i++])));
-			return r;
+	  return r;
 	};
 }
 
@@ -328,6 +328,19 @@ Object.size = function(obj) {
     return size;
 };
 
+//--------------------------------------------------------------------------------------------------
+// Add join method to Object
+//--------------------------------------------------------------------------------------------------
+Object.prototype.join = function(sep) {
+    var r = [];
+    for (var key in this) {
+        if (this.hasOwnProperty(key)) {
+          r.push(key);
+          r.push(this[key]);
+        }
+    }
+    return r.join(sep);
+};
 
 // Run the script
 try {
@@ -577,27 +590,30 @@ function writeText(fname, text) {
 //--------------------------------------------------------------------------------------------------
 // Get array of file objects from a directory name
 //--------------------------------------------------------------------------------------------------
-function getFiles(dirname, recursive) {
+function getFiles(dirname, recursive, ignoreHiddenDirs) {
   var ret = [];
 
   _getFiles(dirname);
 
   function _getFiles(dirname) {
-     var folder = fso.GetFolder(dirname);
-     // Get Files in current directory  
-     var files = new Enumerator(folder.files);
-     // Loop through files  
-     for(; !files.atEnd(); files.moveNext()) {
-        ret.push(files.item());
-     }
+    var folder = fso.GetFolder(dirname);
+    if (ignoreHiddenDirs && (folder.Attributes & 2)) {
+      return;
+    }
+    // Get Files in current directory  
+    var files = new Enumerator(folder.files);
+    // Loop through files  
+    for(; !files.atEnd(); files.moveNext()) {
+       ret.push(files.item());
+    }
 
-     if (recursive) {
-       var subfolders = new Enumerator(folder.SubFolders);
+    if (recursive) {
+      var subfolders = new Enumerator(folder.SubFolders);
 
-       for(; !subfolders.atEnd(); subfolders.moveNext()) {
-          _getFiles(subfolders.item().Path);
-       }
-     }
+      for(; !subfolders.atEnd(); subfolders.moveNext()) {
+         _getFiles(subfolders.item().Path);
+      }
+    }
   }
   return ret;
 }
@@ -605,10 +621,55 @@ function getFiles(dirname, recursive) {
 //--------------------------------------------------------------------------------------------------
 // Get the name of a temporary file
 //--------------------------------------------------------------------------------------------------
-function getTempFilePath()
-{
-   var TemporaryFolder = 2;
-   return fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder).Path, fso.GetTempName());
+function getTempFilePath() {
+  var TemporaryFolder = 2;
+  return fso.BuildPath(fso.GetSpecialFolder(TemporaryFolder).Path, fso.GetTempName());
+}
+
+//--------------------------------------------------------------------------------------------------
+// Read a CSV file
+// Assume well-formed CSV: comma-delimited with all quotes (") escaped by doubling ("")
+// and any field with a delim (,) quoted
+//--------------------------------------------------------------------------------------------------
+function readCSV(path, hasHeader) {
+  var lines = readAllText(path).split(/\n/).map(function(line) {
+    var fields = line.trim().split(',');
+    var dangling = false;
+    for (var j=fields.length-1; j >= 0; j--) {
+      var field = fields[j];
+      var substrings = field.split('"');
+
+      // Even number of split results means odd number of quote chars
+      if (substrings.length % 2 == 0) {
+        // Add next field to this one and remove next field
+        if (dangling) {
+          fields[j] += ("," + fields[j+1]);
+          fields.splice(j+1, 1)
+          dangling = false
+        }
+        else {
+          dangling = true
+        }
+      }
+    }
+    return fields;
+  });
+
+  if (hasHeader) {
+    var headerFields = lines[0];
+    lines.splice(0, 1);
+    return lines.map(function(fields) {
+      var record = {};
+      for (var i=0; i < headerFields.length; i++) {
+        record[i] = fields[i];
+        record[headerFields[i]] = fields[i];
+      }
+      handleDebug("record", record.join("|"));
+      return record;
+    });
+  }
+
+  return lines;
 }
 
 //--------------------------------------------------------------------------------------------------
