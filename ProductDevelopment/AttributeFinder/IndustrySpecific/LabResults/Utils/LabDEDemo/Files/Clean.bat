@@ -18,7 +18,7 @@ del "Outbound XML Messages\*.*" /s /q
 del "Outbound XML Messages\Sent\*.*" /s /q
 del "OnBase export\*.*" /s /q
 
-copy "Solution\Database Files\Original\OrderMappingDB.sdf" "Solution\Database Files\OrderMappingDB.sdf"
+copy "Solution\Database Files\Original\OrderMappingDB.sqlite" "Solution\Database Files\OrderMappingDB.sqlite"
 
 rem Setup batch file to drop the DB
 echo DROP DATABASE  Demo_LabDE >"%~dp0SQL.sql"
