@@ -465,6 +465,7 @@ CopyFilesToInstallFolder: BuildPDUtils ObfuscateFiles
 	@COPY /V /Y "$(PDCommonDir)\SetNuanceServicePermissions.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(PDCommonDir)\RegisterShellExtension.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@COPY /V /Y "$(PDCommonDir)\UnRegisterShellExtension.bat" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
+	@COPY /V /Y "$(PDCommonDir)\Powershell\CreateADAppRegistration.ps1 "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\ClearImage_7_0\Installer\*.*" "$(ClearImageInstallFilesDir)\" /v /s /e /y
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Reports\*.*" "$(AFCoreInstallFilesRootDir)\Reports" /Y/E
 	@COPY /V /Y "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Utils\ProcessFiles\Code\res\ProcessFiles.ico" "$(AFCoreInstallFilesRootDir)\NonSelfRegFiles"
