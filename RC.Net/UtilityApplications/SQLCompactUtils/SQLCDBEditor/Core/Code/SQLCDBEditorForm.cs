@@ -51,7 +51,7 @@ namespace Extract.SQLCDBEditor
         /// <summary>
         /// The default title for this form.
         /// </summary>
-        const string _DEFAULT_TITLE = "SQLCDBEditor";
+        const string _DEFAULT_TITLE = "ExtractSQLiteEditor";
 
         /// <summary>
         /// The full path to the file that contains information about persisting the 
