@@ -130,14 +130,6 @@ start /wait "" "%IDShieldSPClient%"  -l0x0409  -uninst /s /w
 :: UnInstall Extract IDShield for Sharepoint Client
 MsiExec.exe /x{6BF486D7-B930-4B82-A0A0-D8450F5C7BAB} /qn
 
-:: UnInstall SQL Compact 3.5 SP2
-msiexec /x{3A9FC03D-C685-4831-94CF-4EDFD3749497} /qn
-MsiExec.exe /x{D4AD39AD-091E-4D33-BB2B-59F6FCB8ADC3} /qn
-
-:: UnInstall SQL Compact 3.5 SP1
-MsiExec.exe /x{F83779DF-E1F5-43A2-A7BE-732F856FADB7} /qn
-MsiExec.exe /x{E59113EB-0285-4BFD-A37A-B79EAC6B8F4B} /qn
-
 :: UnInstall Crystal Reports
 MsiExec.exe /x{C484CC8D-03CF-4022-89C4-DB4F02E8A15B} /qn
 

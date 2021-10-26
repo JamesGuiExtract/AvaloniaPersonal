@@ -247,6 +247,8 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<row><td>ISSetup.dll</td><td/><td>&lt;ISProductFolder&gt;\redist\language independent\i386\ISSetup.dll</td></row>
 		<row><td>ISSetupFilesHelper</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\SFHelper.dll</td></row>
+		<row><td>IsChain.exe</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\IsChain.exe</td></row>
+		<row><td>IsChainPackages.dll</td><td/><td>&lt;ISRedistPlatformDependentFolder&gt;\IsChainPackages.dll</td></row>
 	</table>
 
 	<table name="BindImage">
@@ -392,6 +394,9 @@
 		<col def="S0">Target</col>
 		<col def="I4">ExtendedType</col>
 		<col def="S255">ISComments</col>
+		<row><td>ISChainPackageCommit</td><td>1537</td><td>IsChainPackages.dll</td><td>ISChainPackagesCleanup</td><td/><td/></row>
+		<row><td>ISChainPackagePrepare</td><td>1</td><td>IsChainPackages.dll</td><td>ISChainPackages</td><td/><td/></row>
+		<row><td>ISChainPackageRollback</td><td>1281</td><td>IsChainPackages.dll</td><td>ISChainPackagesCleanup</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td>257</td><td>ISSetupFilesHelper</td><td>SFCleanupEx</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td>257</td><td>ISSetupFilesHelper</td><td>SFStartupEx</td><td/><td/></row>
 		<row><td>ISVerifyScriptingRuntime</td><td>19</td><td/><td>[STANDARD_USE_SETUPEXE]</td><td/><td>Required for installations using InstallScript.</td></row>
@@ -1238,6 +1243,7 @@
 		<col def="S0">RemoveProperties</col>
 		<col def="S255">ISReleaseFlags</col>
 		<col def="S72">DisplayName</col>
+		<row><td>Pkg1</td><td>SSCERuntime_x86-ENU.msi</td><td>{3A9FC03D-C685-4831-94CF-4EDFD3749497}</td><td>1</td><td>0</td><td>Not Installed</td><td>REMOVE="ALL"</td><td/><td/><td/><td>SQLCE3.5 x86</td></row>
 	</table>
 
 	<table name="ISChainPackageData">
@@ -1247,6 +1253,7 @@
 		<col def="I4">Options</col>
 		<col def="V0">Data</col>
 		<col def="S255">ISBuildSourcePath</col>
+		<row><td>Pkg1</td><td>_FC090DD0110FE64E10DF55A94DFF3887</td><td>SSCERuntime_x86-ENU.msi</td><td>0</td><td/><td>&lt;PATH_TO_SQLCE_INSTALLER&gt;\SSCERuntime_x86-ENU.msi</td></row>
 	</table>
 
 	<table name="ISClrWrap">
@@ -1669,6 +1676,7 @@
 		<row><td>PATH_TO_SELFREGRDTCOMPO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegRDTComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGRDTNETCO_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\SelfRegRDTNetCommon</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGRDTNETCO_FILES1</td><td>P:\RDTInstallation\Files\SelfRegRDTNetCommon</td><td/><td>2</td></row>
+		<row><td>PATH_TO_SQLCE_INSTALLER</td><td>P:\AttributeFinder\RequiredInstalls\SQLCompact Edition</td><td/><td>2</td></row>
 		<row><td>PATH_TO_TESTFILES_FILES</td><td>P:\AttributeFinder\RDTInstallation\Files\TestFiles</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
@@ -3275,6 +3283,9 @@
 		<row><td>DuplicateFiles</td><td/><td>4210</td><td>DuplicateFiles</td><td/></row>
 		<row><td>FileCost</td><td/><td>900</td><td>FileCost</td><td/></row>
 		<row><td>FindRelatedProducts</td><td>NOT ISSETUPDRIVEN</td><td>420</td><td>FindRelatedProducts</td><td/></row>
+		<row><td>ISChainPackageCommit</td><td>1</td><td>1504</td><td/><td/></row>
+		<row><td>ISChainPackagePrepare</td><td>1</td><td>1500</td><td/><td/></row>
+		<row><td>ISChainPackageRollback</td><td>1</td><td>1502</td><td/><td/></row>
 		<row><td>ISSetupFilesCleanup</td><td/><td>6603</td><td/><td/></row>
 		<row><td>ISSetupFilesExtract</td><td/><td>3</td><td/><td/></row>
 		<row><td>InstallFiles</td><td/><td>4000</td><td>InstallFiles</td><td/></row>
@@ -3500,6 +3511,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">CommandLine</col>
 		<col def="s72">Source</col>
 		<col def="I4">Type</col>
+		<row><td>ISChainPackagesPost</td><td>IS_CHAINER_POST_COMMANDLINE AND NOT ISCHAINER</td><td>[IS_CHAINER_POST_COMMANDLINE] /commit"[ISChainPackageCommit]" /delete"[ISChainPackageRollback]"</td><td>IsChain.exe</td><td>2</td></row>
 	</table>
 
 	<table name="MsiEmbeddedUI">
