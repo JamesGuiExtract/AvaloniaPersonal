@@ -81,7 +81,7 @@ CopyFilesToInstallFolder:
 	@COPY /V /Y "$(BinariesFolder)\Interop.*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /V /Y "$(BinariesFolder)\Obfuscated\SqlCompactImporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /V /Y "$(BinariesFolder)\Obfuscated\SqlCompactExporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@COPY /V /Y "$(BinariesFolder)\Obfuscated\SQLCDBEditor.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /V /Y "$(BinariesFolder)\Obfuscated\ExtractSqliteEditor.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /V /Y "$(BinariesFolder)\LabDECppCC.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY "$(RCNETDir)\APIs\ScintillaNET v2.4\Dist\*.*" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /V /Y "$(LabDEDir)\Misc\DisabledThemes.sdb" "$(DataEntryCoreInstallFilesDir)\Misc" 
