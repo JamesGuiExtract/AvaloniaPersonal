@@ -95,14 +95,14 @@
       <PreprocessorDefinitions>WIN32;EXPORT_NUANCEUTILS_DLL;_DEBUG;NUANCEUTILS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code;..\..\..\APIs\Nuance_19\Include;..\..\..\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code;..\..\..\APIs\Nuance_20\Include;..\..\..\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>..\..\..\APIs\Nuance_19\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\APIs\Nuance_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>KernelAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
@@ -134,7 +134,7 @@
       <PreprocessorDefinitions>WIN32;EXPORT_NUANCEUTILS_DLL;NDEBUG;NUANCEUTILS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code;..\..\..\APIs\Nuance_19\Include;..\..\..\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code;..\..\..\APIs\Nuance_20\Include;..\..\..\BaseUtils\Code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
@@ -143,7 +143,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>..\..\..\APIs\Nuance_19\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\APIs\Nuance_20\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>KernelAPI.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
