@@ -299,7 +299,7 @@ namespace Extract.ETL.Test
                 using var connection = new ExtractRoleConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName);
                 connection.Open();
 
-                using SqlCommand cmd = connection.CreateCommand();
+                using var cmd = connection.CreateCommand();
 
                 cmd.CommandText = "Select Count(ID) from ReportingRedactionAccuracy";
 
@@ -355,7 +355,7 @@ namespace Extract.ETL.Test
                 using var connection = new ExtractRoleConnection(redactionAccuracy.DatabaseServer, redactionAccuracy.DatabaseName);
                 connection.Open();
 
-                using SqlCommand cmd = connection.CreateCommand();
+                using var cmd = connection.CreateCommand();
 
                 // Get the data from the database after processing
                 cmd.CommandText = string.Format(CultureInfo.InvariantCulture, @"

@@ -47,10 +47,13 @@ namespace Extract.SqlDatabase
             return sqlConnectionBuild.ConnectionString;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Type is checked by an Assert")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Exception converted to ExtractException")]
         public static void RegisterProviderForInstance(string name, string description, Type type)
         {
             try
             {
+                ExtractException.Assert("ELI51956", "Type must be specified.", type != null);
                 var systemData = ConfigurationManager.GetSection("system.data") as DataSet;
                 int indexOfFactories = systemData.Tables.IndexOf("DbProviderFactories");
                 DataTable factories;

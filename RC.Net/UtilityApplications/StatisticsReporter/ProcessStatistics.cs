@@ -472,15 +472,18 @@ namespace StatisticsReporter
 
                 // Track the number of pending threads
                 int numberPending = 0;
-
+                
+                using var connection = new ExtractRoleConnection(Settings.DatabaseServer, Settings.DatabaseName);
+                connection.Open();
+                
                 // Get VOA data for each file
-                using (SqlDataReader ExpectedAndFoundReader = GetExpectedAndFoundData())
+                using (SqlDataReader ExpectedAndFoundReader = GetExpectedAndFoundData(connection))
                 {
                     // Get the ordinal for the FoundVOA and ExpectedVOA columns
                     int FoundVOAColumn = ExpectedAndFoundReader.GetOrdinal("FoundVOA");
                     int ExpectedVOAColumn = ExpectedAndFoundReader.GetOrdinal("ExpectedVOA");
 
-                    // Associate GroupByDbField enum values with datareader functions
+                    // Associate GroupByDbField enum values with DataReader functions
                     Dictionary<GroupByDBField, Func<string>> dBFields =
                         GetDBFieldReaders(ExpectedAndFoundReader);
 
@@ -511,6 +514,17 @@ namespace StatisticsReporter
                             dBFieldValues[key] = dBFields[key]();
                         }
 
+                        IUnknownVector ExpectedAttributes;
+                        IUnknownVector FoundAttributes;
+
+                        using (expectedStream)
+                        using (foundStream)
+                        {
+                            // Get the VOAs from the streams
+                            ExpectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(expectedStream);
+                            FoundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(foundStream);
+                        }
+
                         // Increment the number of pending threads
                         Interlocked.Increment(ref numberPending);
 
@@ -522,51 +536,42 @@ namespace StatisticsReporter
                         {
                             try
                             {
-                                // Put the expected and found streams in usings so they will be disposed
-                                using (expectedStream)
-                                using (foundStream)
+                                var foundXPathContext = new Lazy<XPathContext>(
+                                    () => new XPathContext(FoundAttributes));
+                                var expectedXPathContext = new Lazy<XPathContext>(
+                                    () => new XPathContext(ExpectedAttributes));
+
+                                // Create the group-by values
+                                string[] groupBy = Settings.GroupByCriteria
+                                    .Select(criterion =>
+                                        criterion.Match(
+                                            dbField => dBFieldValues[dbField],
+                                            found => string.Join("|",
+                                                foundXPathContext.Value.FindAllAsStrings(found.XPath).Distinct()),
+                                            expected => string.Join("|",
+                                                expectedXPathContext.Value.FindAllAsStrings(expected.XPath).Distinct())))
+                                    .ToArray();
+
+                                // Compare the VOAs
+                                var allOutput = PerFileAction(ExpectedAttributes, FoundAttributes).ToList();
+
+                                var output = new List<AccuracyDetail>();
+                                var collected = new List<AccuracyDetail>();
+                                foreach (var x in allOutput)
                                 {
-                                    // Get the VOAs from the streams
-                                    IUnknownVector ExpectedAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(expectedStream);
-                                    IUnknownVector FoundAttributes = AttributeMethods.GetVectorOfAttributesFromSqlBinary(foundStream);
-
-                                    var foundXPathContext = new Lazy<XPathContext>(
-                                        () => new XPathContext(FoundAttributes));
-                                    var expectedXPathContext = new Lazy<XPathContext>(
-                                        () => new XPathContext(ExpectedAttributes));
-
-                                    // Create the group-by values
-                                    string[] groupBy = Settings.GroupByCriteria
-                                        .Select(criterion =>
-                                            criterion.Match(
-                                                dbField => dBFieldValues[dbField],
-                                                found => string.Join("|",
-                                                    foundXPathContext.Value.FindAllAsStrings(found.XPath).Distinct()),
-                                                expected => string.Join("|",
-                                                    expectedXPathContext.Value.FindAllAsStrings(expected.XPath).Distinct())))
-                                        .ToArray();
-
-                                    // Compare the VOAs
-                                    var allOutput = PerFileAction(ExpectedAttributes, FoundAttributes).ToList();
-
-                                    var output = new List<AccuracyDetail>();
-                                    var collected = new List<AccuracyDetail>();
-                                    foreach (var x in allOutput)
+                                    if (string.IsNullOrEmpty(x.Attribute))
                                     {
-                                        if (string.IsNullOrEmpty(x.Attribute))
-                                        {
-                                            output.Add(x);
-                                        }
-                                        else
-                                        {
-                                            collected.Add(x);
-                                        }
+                                        output.Add(x);
                                     }
-
-                                    // Add the comparison results to the Results
-                                    Results.Add(Tuple.Create<string[], IEnumerable<AccuracyDetail>>(groupBy, output));
-                                    investigationInfo.Add((dBFieldValues[GroupByDBField.FileName], collected));
+                                    else
+                                    {
+                                        collected.Add(x);
+                                    }
                                 }
+
+                                // Add the comparison results to the Results
+                                Results.Add(Tuple.Create<string[], IEnumerable<AccuracyDetail>>(groupBy, output));
+                                investigationInfo.Add((dBFieldValues[GroupByDBField.FileName], collected));
                             }
                             catch (Exception ex)
                             {
@@ -700,23 +705,16 @@ namespace StatisticsReporter
         /// <summary>
         /// Gets the Expected and Found data from the database
         /// </summary>
+        /// <param name="connection">An Open SqlAppRoleConnection</param>
         /// <returns></returns>
-        SqlDataReader GetExpectedAndFoundData()
+        SqlDataReader GetExpectedAndFoundData(SqlAppRoleConnection connection)
         {
             string sql = ExpectedFoundSQL;
 
             try
             {
-                using var connection = new ExtractRoleConnection(Settings.DatabaseServer, Settings.DatabaseName);
-                connection.Open();
-
                 // Verify that the Found and expected attributes sets exist
-                ValidateSetNames(connection.CreateCommand());
-
-                using SqlCommand cmd = connection.CreateCommand();
-
-                // Set the timeout so that it waits indefinitely
-                cmd.CommandTimeout = 0;
+                ValidateSetNames(connection);
 
                 // Set up the sql to obtain the expected and found
                 sql = sql.Replace("<Expected>", Settings.ExpectedAttributeSetName);
@@ -734,6 +732,12 @@ namespace StatisticsReporter
                 {
                     sql = sql.Replace("<TagCondition>", "");
                 }
+
+                var cmd = connection.CreateCommand();
+
+                // Set the timeout so that it waits indefinitely
+                cmd.CommandTimeout = 0;
+
                 cmd.CommandText = sql;
 
                 // Return the reader
@@ -750,45 +754,43 @@ namespace StatisticsReporter
         /// <summary>
         /// Validates the found and expected set names stored in Settings
         /// </summary>
-        /// <param name="attributeSetsCommand"> An Sql command object created on an open connection.</param>
-        void ValidateSetNames(SqlCommand attributeSetsCommand)
+        /// <param name="connection">An Open SqlAppRoleConnection</param>
+        void ValidateSetNames(SqlAppRoleConnection connection)
         {
-            using (attributeSetsCommand)
+            using var attributeSetsCommand = connection.CreateCommand();
+       
+            attributeSetsCommand.CommandText = AttributeSetNames.Replace("<Expected>", Settings.ExpectedAttributeSetName);
+            attributeSetsCommand.CommandText = attributeSetsCommand.CommandText.Replace("<Found>", Settings.FoundAttributeSetName);
+
+            using var setReader = attributeSetsCommand.ExecuteReader();
+
+            bool ExpectedSetExists = false;
+            bool FoundSetExists = false;
+            foreach (DbDataRecord r in setReader)
             {
-                attributeSetsCommand.CommandText = AttributeSetNames.Replace("<Expected>", Settings.ExpectedAttributeSetName);
-                attributeSetsCommand.CommandText = attributeSetsCommand.CommandText.Replace("<Found>", Settings.FoundAttributeSetName);
-
-                using (var setReader = attributeSetsCommand.ExecuteReader())
+                string value = r.GetString(0);
+                if (value.Equals(Settings.ExpectedAttributeSetName, StringComparison.OrdinalIgnoreCase))
                 {
-                    bool ExpectedSetExists = false;
-                    bool FoundSetExists = false;
-                    foreach (DbDataRecord r in setReader)
-                    {
-                        string value = r.GetString(0);
-                        if (value.Equals(Settings.ExpectedAttributeSetName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            ExpectedSetExists = true;
-                        }
-                        if (value.Equals(Settings.FoundAttributeSetName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            FoundSetExists = true;
-                        }
-                    }
-
-                    if (!ExpectedSetExists || !FoundSetExists)
-                    {
-                        ExtractException ee = new ExtractException("ELI41587", "File attribute set does not exist.");
-                        if (!ExpectedSetExists)
-                        {
-                            ee.AddDebugData("Expected Set", Settings.ExpectedAttributeSetName, false);
-                        }
-                        if (!FoundSetExists)
-                        {
-                            ee.AddDebugData("Found Set", Settings.FoundAttributeSetName, false);
-                        }
-                        throw ee;
-                    }
+                    ExpectedSetExists = true;
                 }
+                if (value.Equals(Settings.FoundAttributeSetName, StringComparison.OrdinalIgnoreCase))
+                {
+                    FoundSetExists = true;
+                }
+            }
+
+            if (!ExpectedSetExists || !FoundSetExists)
+            {
+                ExtractException ee = new ExtractException("ELI41587", "File attribute set does not exist.");
+                if (!ExpectedSetExists)
+                {
+                    ee.AddDebugData("Expected Set", Settings.ExpectedAttributeSetName, false);
+                }
+                if (!FoundSetExists)
+                {
+                    ee.AddDebugData("Found Set", Settings.FoundAttributeSetName, false);
+                }
+                throw ee;
             }
         }
 

@@ -35,8 +35,10 @@ namespace Extract.SqlDatabase
         /// <param name="access">Access that should be granted for the application role</param>
         public static void CreateApplicationRole(IDbConnection sqlConnection, string applicationRoleName, string password, AppRoleAccess access)
         {
+            ExtractException.Assert("ELI51955", "Connection must not be null", sqlConnection != null);
+
             // TODO: Should password be expected to be encrypted and need to be decrypted here?
-            if (string.IsNullOrWhiteSpace(applicationRoleName)) return;
+            if (string.IsNullOrWhiteSpace(applicationRoleName) || sqlConnection is null) return;
             try
             {
                 using var cmd = sqlConnection.CreateCommand();

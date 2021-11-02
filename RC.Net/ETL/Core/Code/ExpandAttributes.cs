@@ -443,7 +443,7 @@ namespace Extract.ETL
         static Task<SqlDataReader> GetAttributeSetsToPopulate(SqlAppRoleConnection connection, int currentLastProcessed, int lastInBatch, CancellationToken cancelToken)
         {
             // Records that contain attributes that need to be stored
-            using (SqlCommand cmd = connection.CreateCommand())
+            using (var cmd = connection.CreateCommand())
             {
                 cmd.CommandText = @"
                     SELECT [ASFF].[ID] [AttributeSetForFileID],
@@ -454,10 +454,10 @@ namespace Extract.ETL
 	                        [VOA]
 	                    FROM [dbo].[AttributeSetForFile] [ASFF]
                         WHERE [FileTaskSessionID] > @LastFileTaskSessionIDProcessed
-		                    AND [FileTaskSessionID] <= @LastfileTaskSessionInBatch";
+		                    AND [FileTaskSessionID] <= @LastFileTaskSessionInBatch";
 
                 cmd.Parameters.AddWithValue("@LastFileTaskSessionIDProcessed", currentLastProcessed);
-                cmd.Parameters.AddWithValue("@LastfileTaskSessionInBatch", lastInBatch);
+                cmd.Parameters.AddWithValue("@LastFileTaskSessionInBatch", lastInBatch);
 
                 // Set the timeout so that it waits indefinitely
                 cmd.CommandTimeout = 0;

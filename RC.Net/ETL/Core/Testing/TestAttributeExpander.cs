@@ -410,7 +410,7 @@ namespace Extract.ETL.Test
 
             using var connection = new ExtractRoleConnection(expandAttributes.DatabaseServer, expandAttributes.DatabaseName);
             connection.Open();
-            using SqlCommand cmd = connection.CreateCommand();
+            using var cmd = connection.CreateCommand();
 
             // Database should have one record in the DatabaseService table - not using the settings in the table
             cmd.CommandText = @"SELECT TOP (1) [ID] FROM [dbo].[DatabaseService]";

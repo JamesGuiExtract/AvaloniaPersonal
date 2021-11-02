@@ -178,9 +178,9 @@ namespace Extract.SqlDatabase.Test
             }
         }
 
-        private static SqlCommand ValidateSelectCommand(SqlApplicationRole.AppRoleAccess access, SqlAppRoleConnection connection, string description)
+        private static AppRoleCommand ValidateSelectCommand(SqlApplicationRole.AppRoleAccess access, SqlAppRoleConnection connection, string description)
         {
-            using SqlCommand selectCmd = connection.CreateCommand();
+            using var selectCmd = connection.CreateCommand();
             selectCmd.CommandText = "SELECT Count(ID) FROM DBINFO";
             if ((access & SqlApplicationRole.AppRoleAccess.SelectExecuteAccess) > 0)
             {

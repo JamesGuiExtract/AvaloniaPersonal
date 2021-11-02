@@ -1,26 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Extract.SqlDatabase
 {
-    public abstract class  SqlAppRoleConnection : DbConnection
+    public abstract class SqlAppRoleConnection : DbConnection
     {
-        protected bool disposedValue;
-
-        protected SqlConnection BaseSqlConnection { get; private set; }
+        internal SqlConnection BaseSqlConnection { get; set; }
 
         /// <summary>
         /// Created when application role is enabled and needed for disabling the created app role
         /// </summary>
         byte[] AppRoleCookie;
 
-        public SqlAppRoleConnection() :
+        protected SqlAppRoleConnection() :
             base()
         {
             BaseSqlConnection = new SqlConnection();
@@ -31,7 +26,7 @@ namespace Extract.SqlDatabase
             BaseSqlConnection = sqlConnection;
         }
 
-        public SqlAppRoleConnection(string connectionString):
+        protected SqlAppRoleConnection(string connectionString) :
             base()
         {
             SqlConnectionStringBuilder sqlConnectionStringBuilder = new(connectionString);
@@ -90,16 +85,16 @@ namespace Extract.SqlDatabase
         }
         public new SqlTransaction BeginTransaction()
         {
-            return BaseSqlConnection.BeginTransaction();
+            return (SqlTransaction)BeginDbTransaction(default);
         }
         public new SqlTransaction BeginTransaction(IsolationLevel isolationLevel)
         {
-            return BaseSqlConnection.BeginTransaction(isolationLevel);
+            return (SqlTransaction)BeginDbTransaction(isolationLevel);
         }
 
-        public new SqlCommand CreateCommand()
+        public new AppRoleCommand CreateCommand()
         {
-            return BaseSqlConnection.CreateCommand();
+            return (AppRoleCommand)CreateDbCommand();
         }
 
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
@@ -109,12 +104,14 @@ namespace Extract.SqlDatabase
 
         protected override DbCommand CreateDbCommand()
         {
-            return BaseSqlConnection.CreateCommand();
+            var cmd = new AppRoleCommand();
+            cmd.Connection = this;
+            return cmd;
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (!disposedValue && disposing)
+            if (disposing)
             {
                 Close();
                 BaseSqlConnection?.Dispose();
@@ -124,7 +121,7 @@ namespace Extract.SqlDatabase
         }
 
 
-        protected  void SetApplicationRole(string roleName, string appPassword)
+        protected void SetApplicationRole(string roleName, string appPassword)
         {
             if (BaseSqlConnection is null)
                 throw new ExtractException("ELI51753", "Connection not set.");

@@ -156,7 +156,7 @@ END CATCH
                     using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
                     connection.Open();
                     
-                    using SqlCommand cmd = connection.CreateCommand();
+                    using var cmd = connection.CreateCommand();
                     cmd.CommandTimeout = 0;
                     cmd.CommandText = _deleteRecordsQuery;
                     cmd.Parameters.AddWithValue("@Date", DateTime.Today.AddDays(-1 * this.PurgeRecordsOlderThanDays));

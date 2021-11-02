@@ -20,7 +20,7 @@ namespace Extract.FileActionManager.Forms
         string _databaseName;
         string _tableName;
         SqlAppRoleConnection _connection;
-        SqlCommand _command;
+        AppRoleCommand _command;
         SqlDataAdapter _adapter;
         SqlCommandBuilder _builder;
         DataSet _dataSet;
@@ -67,7 +67,7 @@ namespace Extract.FileActionManager.Forms
                 var sql = UtilityMethods.FormatInvariant($"SELECT * FROM {_tableName}");
                 _command = _connection.CreateCommand();
                 _command.CommandText = sql;
-                _adapter = new SqlDataAdapter(_command);
+                _adapter = new SqlDataAdapter(_command.BaseSqlCommand);
                 _builder = new SqlCommandBuilder
                 {
                     DataAdapter = _adapter

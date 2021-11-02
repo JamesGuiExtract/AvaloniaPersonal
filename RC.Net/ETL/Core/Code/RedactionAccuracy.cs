@@ -308,7 +308,7 @@ namespace Extract.ETL
 
                     foreach (var q in queriesToRunInBatch)
                     {
-                        using SqlCommand saveCmd = saveConnection.CreateCommand();
+                        using var saveCmd = saveConnection.CreateCommand();
                         saveCmd.CommandTimeout = 0;
                         saveCmd.CommandText = q;
                         saveCmd.Parameters.AddWithValue("@FoundSetName", FoundAttributeSetName);
@@ -477,7 +477,7 @@ namespace Extract.ETL
         /// </summary>
         /// <param name="cmd">Command to get the data needed to calculate the stats for the current block of data being processed</param>
         /// <param name="cancelToken"></param>
-        void SaveAccuracy(SqlCommand cmd, ConcurrentQueue<string> queriesToRunInBatch, CancellationToken cancelToken)
+        void SaveAccuracy(AppRoleCommand cmd, ConcurrentQueue<string> queriesToRunInBatch, CancellationToken cancelToken)
         {
             // keep track of number of active threads
             using (CountdownEvent threadCountDown = new CountdownEvent(1))

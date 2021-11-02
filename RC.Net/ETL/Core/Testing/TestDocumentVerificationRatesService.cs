@@ -244,7 +244,7 @@ namespace Extract.ETL.Test
 
                 using var connection = new ExtractRoleConnection(rates.DatabaseServer, rates.DatabaseName);
                 connection.Open();
-                SqlCommand statusCmd = connection.CreateCommand();
+                var statusCmd = connection.CreateCommand();
 
                 statusCmd.CommandText = "SELECT Status, LastFileTaskSessionIDProcessed FROM DatabaseService WHERE ID = @DatabaseServiceID ";
                 statusCmd.Parameters.AddWithValue("@DatabaseServiceID", rates.DatabaseServiceID);
@@ -388,7 +388,7 @@ namespace Extract.ETL.Test
             {
                 using var connection = new ExtractRoleConnection(rates.DatabaseServer, rates.DatabaseName);
                 connection.Open();
-                using SqlCommand cmd = connection.CreateCommand();
+                using var cmd = connection.CreateCommand();
 
                 // Database should have one record in the DatabaseService table - not using the settings in the table
                 cmd.CommandText = @"INSERT INTO [dbo].[DatabaseService]([Description], [Settings])
@@ -420,7 +420,7 @@ namespace Extract.ETL.Test
 
             using var connection = new ExtractRoleConnection(rates.DatabaseServer, rates.DatabaseName);
             connection.Open();
-            using SqlCommand cmd = connection.CreateCommand();
+            using var cmd = connection.CreateCommand();
 
 
             cmd.CommandText = "SELECT COUNT(ID) FROM [dbo].[ReportingVerificationRates]";

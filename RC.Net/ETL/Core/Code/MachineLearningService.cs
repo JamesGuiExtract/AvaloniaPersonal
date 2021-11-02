@@ -329,7 +329,7 @@ namespace Extract.ETL
                 using var cmd = connection.CreateCommand();
                 cmd.CommandText = _GET_ALL_MLDATA_FOR_NAME;
                 cmd.Parameters.AddWithValue("@Name", QualifiedModelName);
-                using var adapter = new SqlDataAdapter(cmd);
+                using var adapter = new SqlDataAdapter(cmd.BaseSqlCommand);
                 using var dt = new DataTable { Locale = CultureInfo.CurrentCulture };
 
                 var builder = new SqlCommandBuilder();

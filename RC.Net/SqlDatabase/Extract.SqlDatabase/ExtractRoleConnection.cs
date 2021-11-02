@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 
 namespace Extract.SqlDatabase
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1802:Use literals where appropriate", Justification = "Readonly strings are encrypted by dotfuscator")]
     public sealed class ExtractRoleConnection : SqlAppRoleConnection
     {
         private static readonly string password = "Change2This3Password";
@@ -52,6 +53,7 @@ namespace Extract.SqlDatabase
         /// <returns><c>true</c> if the database connection was established and Extract application role
         /// was successfully applied; <c>false</c> if not successful for any reason (connection string doesn't
         /// specify an SQL database, couldn't connect to the database, or the database is not a FAM DB.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Changing exception to bool")]
         public static bool TryGetConnection(string connectionString, ref DbConnection dbConnection)
         {
             dbConnection = null;

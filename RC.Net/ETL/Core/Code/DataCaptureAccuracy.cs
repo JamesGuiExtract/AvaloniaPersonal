@@ -254,7 +254,7 @@ namespace Extract.ETL
 
             using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
             connection.Open();
-            using SqlCommand cmd = connection.CreateCommand();
+            using var cmd = connection.CreateCommand();
 
             // Set the timeout so that it waits indefinitely
             cmd.CommandTimeout = 0;
@@ -788,8 +788,8 @@ namespace Extract.ETL
         ///     @ExpectedSetName - Set to ExpectedAttributeSetName
         ///     @DatabaseServiceID - Set to ID
         /// </summary>
-        /// <param name="cmd">The SqlCommand that needs the parameters added</param>
-        void addParametersToCommand(SqlCommand cmd, int endFileTaskSessionId)
+        /// <param name="cmd">The AppRoleCommand that needs the parameters added</param>
+        void addParametersToCommand(AppRoleCommand cmd, int endFileTaskSessionId)
         {
             cmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int);
             cmd.Parameters.Add("@FoundSetName", SqlDbType.NVarChar);
