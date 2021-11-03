@@ -4686,13 +4686,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         _inputEventTracker.UnregisterControl(this);
                     }
 
-                    double elapsedSeconds = _fileProcessingStopwatch.ElapsedMilliseconds / 1000.0;
                     _fileProcessingStopwatch.Restart();
 
                     double activityTime = _inputEventTracker?.StopActivityTimer() ?? 0.0;
 
                     _fileProcessingDb.EndFileTaskSession(
-                        _fileTaskSessionID.Value, elapsedSeconds, _overheadElapsedTime.Value, activityTime);
+                        _fileTaskSessionID.Value, _overheadElapsedTime.Value, activityTime, false);
                 }
             }
             catch (Exception ex)

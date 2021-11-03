@@ -595,7 +595,7 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long nFileTaskSessionID,
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		// EndFileTaskSession has it's own optimistic locking, no need to do so here.
-		m_ipFAMDB->EndFileTaskSession(nFileTaskSessionID, dDuration, dOverheadTime, dActivityTime);
+		m_ipFAMDB->EndFileTaskSession(nFileTaskSessionID, dOverheadTime, dActivityTime, false);
 
 		if (!AddIDShieldData_Internal(false, nFileTaskSessionID, lNumHCDataFound, lNumMCDataFound,
 			lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, lTotalManualRedactions,

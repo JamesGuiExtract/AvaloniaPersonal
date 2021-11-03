@@ -24,7 +24,8 @@ namespace Extract.ETL.Test
             Int32 LastFileTaskSessionID,
             Double Duration,
             Double OverheadTime,
-            Double ActivityTime)>;
+            Double ActivityTime,
+            Double DurationMinusTimeout)>;
 
     /// <summary>
     /// Class to test the AttributeExpander
@@ -61,19 +62,19 @@ namespace Extract.ETL.Test
 
         static VerificationRatesList _PROCESS1_EXPECTED = new VerificationRatesList
         {
-            (1, 1, 1, "", 1, 10.0, 1.0, 10.0)
+            (1, 1, 1, "", 1, 4.0, 1.0, 2.0, 4.0)
         };
 
         static VerificationRatesList _PROCESS2_EXPECTED = new VerificationRatesList
         {
-            (1, 1, 1, "", 1, 10.0, 1.0, 10.0),
-            (1, 2, 1, "", 2, 20.0, 2.0, 20.0)
+            (1, 1, 1, "", 1, 4.0, 1.0, 2.0, 4.0),
+            (1, 2, 1, "", 2, 5.0, 2.0, 3.0, 5.0)
         };
 
         static VerificationRatesList _PROCESS4_EXPECTED = new VerificationRatesList
         {
-            (1, 1, 1, "", 1, 10.0, 1.0, 10.0),
-            (1, 2, 1, "", 3, 50.0, 5.0, 50.0)
+            (1, 1, 1, "", 1, 4.0, 1.0, 2.0, 4.0),
+            (1, 2, 1, "", 3, 8.0, 3.0, 5.0, 8.0)
         };
 
         #endregion
@@ -186,7 +187,7 @@ namespace Extract.ETL.Test
 
                 int actionID1 = setupData.db.GetActionID(_ACTION_A);
 
-                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionID1, 10.0, 1.0, 10.0);
+                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionID1, 4.0, 1.0, 2.0, false, 0.0);
 
                 DocumentVerificationRates rates = new DocumentVerificationRates();
                 rates.DatabaseServer = setupData.db.DatabaseServer;
@@ -217,7 +218,8 @@ namespace Extract.ETL.Test
                 Assert.AreEqual(status.LastFileTaskSessionIDProcessed, 1, "LastFileTaskSessionIDProcessed is 1.");
                 Assert.That(status.SetOfActiveFileTaskIds.Count == 0, "SetOfActiveFileTaskIds is no longer used.");
 
-                setupData.db.EndFileTaskSession(fileTaskSessionID, 20.0, 2.0, 20.0);
+                Thread.Sleep(5000); // 5 second duration for this session.
+                setupData.db.EndFileTaskSession(fileTaskSessionID, 2.0, 3.0, false);
                 rates.Process(_noCancel);
 
                 status = rates.Status as DocumentVerificationStatus;
@@ -233,7 +235,7 @@ namespace Extract.ETL.Test
 
                 CheckResults(rates, taskGuid, _PROCESS2_EXPECTED);
 
-                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord2.FileID, actionID1, 30.0, 3.0, 30.0);
+                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord2.FileID, actionID1, 3.0, 1.0, 2.0, false, 0.0);
 
                 rates.Process(_noCancel);
 
@@ -268,30 +270,34 @@ namespace Extract.ETL.Test
         [Test]
         [Category("Automated")]
         [Category("ETL")]
-        [TestCase(Constants.TaskClassPaginationVerification, 10.0,  0.0,  0.0, TestName = "Pagination: Verify 10.0,  0.0,  0.0")]
-        [TestCase(Constants.TaskClassPaginationVerification, 10.0,  0.0, 10.0, TestName = "Pagination: Verify 10.0,  0.0, 10.0")]
-        [TestCase(Constants.TaskClassPaginationVerification, 10.0, 10.0,  0.0, TestName = "Pagination: Verify 10.0, 10.0,  0.0")]
-        [TestCase(Constants.TaskClassPaginationVerification, 10.0, 10.0, 10.0, TestName = "Pagination: Verify 10.0, 10.0, 10.0")]
-        [TestCase(Constants.TaskClassPaginationVerification,  0.0, 10.0, 10.0, TestName = "Pagination: Verify  0.0, 10.0, 10.0")]
-        [TestCase(Constants.TaskClassWebVerification, 10.0,  0.0,  0.0, TestName = "Core: Web verification 10.0,  0.0,  0.0")]
-        [TestCase(Constants.TaskClassWebVerification, 10.0,  0.0, 10.0, TestName = "Core: Web verification 10.0,  0.0, 10.0")]
-        [TestCase(Constants.TaskClassWebVerification, 10.0, 10.0,  0.0, TestName = "Core: Web verification 10.0, 10.0,  0.0")]
-        [TestCase(Constants.TaskClassWebVerification, 10.0, 10.0, 10.0, TestName = "Core: Web verification 10.0, 10.0, 10.0")]
-        [TestCase(Constants.TaskClassWebVerification,  0.0, 10.0, 10.0, TestName = "Core: Web verification  0.0, 10.0, 10.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification, 10.0,  0.0,  0.0, TestName = "Data Entry: Verify extracted data 10.0,  0.0,  0.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification, 10.0,  0.0, 10.0, TestName = "Data Entry: Verify extracted data 10.0,  0.0, 10.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification, 10.0, 10.0,  0.0, TestName = "Data Entry: Verify extracted data 10.0, 10.0,  0.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification, 10.0, 10.0, 10.0, TestName = "Data Entry: Verify extracted data 10.0, 10.0, 10.0")]
-        [TestCase(Constants.TaskClassDataEntryVerification,  0.0, 10.0, 10.0, TestName = "Data Entry: Verify extracted data  0.0, 10.0, 10.0")]
-        [TestCase(Constants.TaskClassRedactionVerification, 10.0,  0.0,  0.0, TestName = "Redaction: Verify sensitive data 10.0,  0.0,  0.0")]
-        [TestCase(Constants.TaskClassRedactionVerification, 10.0,  0.0, 10.0, TestName = "Redaction: Verify sensitive data 10.0,  0.0, 10.0")]
-        [TestCase(Constants.TaskClassRedactionVerification, 10.0, 10.0,  0.0, TestName = "Redaction: Verify sensitive data 10.0, 10.0,  0.0")]
-        [TestCase(Constants.TaskClassRedactionVerification, 10.0, 10.0, 10.0, TestName = "Redaction: Verify sensitive data 10.0, 10.0, 10.0")]
-        [TestCase(Constants.TaskClassRedactionVerification,  0.0, 10.0, 10.0, TestName = "Redaction: Verify sensitive data  0.0, 10.0, 10.0")]
+        [TestCase(Constants.TaskClassPaginationVerification, 2.0,  0.0,  0.0, false, 1.0, TestName = "Pagination: Verify 2.0,  0.0,  0.0, false, 1.0")]
+        [TestCase(Constants.TaskClassPaginationVerification, 2.0,  0.0, 2.0, false, 1.0, TestName = "Pagination: Verify 2.0,  0.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassPaginationVerification, 2.0, 2.0,  0.0, false, 1.0, TestName = "Pagination: Verify 2.0, 2.0,  0.0, false, 1.0")]
+        [TestCase(Constants.TaskClassPaginationVerification, 2.0, 2.0, 2.0, false, 1.0, TestName = "Pagination: Verify 2.0, 2.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassPaginationVerification,  0.0, 2.0, 2.0, false, 1.0, TestName = "Pagination: Verify  0.0, 2.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassPaginationVerification, 2.0,  0.0, 1.0, true, 1.0, TestName = "Pagination: Verify 2.0,  0.0,   1.0, true, 1.0")]
+        [TestCase(Constants.TaskClassWebVerification, 2.0,  0.0,  0.0, false, 1.0, TestName = "Core: Web verification 2.0,  0.0,  0.0, false, 1.0")]
+        [TestCase(Constants.TaskClassWebVerification, 2.0,  0.0, 2.0, false, 1.0, TestName = "Core: Web verification 2.0,  0.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassWebVerification, 2.0, 2.0,  0.0, false, 1.0, TestName = "Core: Web verification 2.0, 2.0,  0.0, false, 1.0")]
+        [TestCase(Constants.TaskClassWebVerification, 2.0, 2.0, 2.0, false, 1.0, TestName = "Core: Web verification 2.0, 2.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassWebVerification, 0.0, 2.0, 2.0, false, 1.0, TestName = "Core: Web verification  0.0, 2.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassWebVerification, 2.0,  0.0, 1.0, true, 1.0, TestName = "Core: Web verification 2.0,  0.0,  1.0, true,  1.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification, 2.0,  0.0,  0.0, false, 1.0, TestName = "Data Entry: Verify extracted data 2.0,  0.0,  0.0, false, 1.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification, 2.0,  0.0, 2.0, false, 1.0, TestName = "Data Entry: Verify extracted data 2.0,  0.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification, 2.0, 2.0,  0.0, false, 1.0, TestName = "Data Entry: Verify extracted data 2.0, 2.0,  0.0, false, 1.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification, 2.0, 2.0, 2.0, false, 1.0, TestName = "Data Entry: Verify extracted data 2.0, 2.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification,  0.0, 2.0, 2.0, false, 1.0, TestName = "Data Entry: Verify extracted data  0.0, 2.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassDataEntryVerification, 2.0, 0.0, 1.0,  true, 1.0, TestName = "Data Entry: Verify extracted data 2.0,  0.0,  1.0, true,  1.0")]
+        [TestCase(Constants.TaskClassRedactionVerification, 2.0,  0.0,  0.0, false, 1.0, TestName = "Redaction: Verify sensitive data 2.0,  0.0,  0.0, false, 1.0")]
+        [TestCase(Constants.TaskClassRedactionVerification, 2.0,  0.0, 2.0, false, 1.0, TestName = "Redaction: Verify sensitive data 2.0,  0.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassRedactionVerification, 2.0, 2.0,  0.0, false, 1.0, TestName = "Redaction: Verify sensitive data 2.0, 2.0,  0.0, false, 1.0")]
+        [TestCase(Constants.TaskClassRedactionVerification, 2.0, 2.0, 2.0, false, 1.0, TestName = "Redaction: Verify sensitive data 2.0, 2.0, 2.0, false, 1.0")]
+        [TestCase(Constants.TaskClassRedactionVerification,  0.0, 2.0, 2.0, false, 1.0, TestName = "Redaction: Verify sensitive data  0.0, 2.0, 2.0, false, .0")]
+        [TestCase(Constants.TaskClassRedactionVerification, 2.0,  0.0, 1.0, true, 1.0, TestName = "Redaction: Verify sensitive data 2.0,  0.0,  1.0, true,  1.0")]
         [CLSCompliant(false)]
         // Added for https://extract.atlassian.net/browse/ISSUE-16928 
         public static void TestDocumentVerificationRatesZeroTimes(string taskGuid, double duration,
-            double overheadTime, double activityTime)
+            double overheadTime, double activityTime, bool sessionTimeout, double timeoutPeriod)
         {
             string testDBName = "Test_DocumentVerificationRatesZeroTimes_" + taskGuid;
             try
@@ -300,17 +306,18 @@ namespace Extract.ETL.Test
 
                 int actionID1 = setupData.db.GetActionID(_ACTION_A);
 
-                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionID1, duration, overheadTime, activityTime);
+                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionID1, duration, overheadTime, activityTime, sessionTimeout, timeoutPeriod);
 
                 DocumentVerificationRates rates = new DocumentVerificationRates();
                 rates.DatabaseServer = setupData.db.DatabaseServer;
                 rates.DatabaseName = setupData.db.DatabaseName;
                 rates.DatabaseServiceID = StoreDatabaseServiceRecord(rates);
 
-                var expected = duration != 0 ? new VerificationRatesList
+                var expected = new VerificationRatesList
                 {
-                    (1, 1, 1, "", 1, duration, overheadTime, activityTime)
-                } : new VerificationRatesList();
+                    (1, 1, 1, "", 1, duration, overheadTime, activityTime,
+                        sessionTimeout ? (duration - timeoutPeriod) : duration)
+                };
 
                 rates.Process(_noCancel);
 
@@ -340,9 +347,9 @@ namespace Extract.ETL.Test
                 int actionIDA = setupData.db.GetActionID(_ACTION_A);
                 int actionIDB = setupData.db.GetActionID(_ACTION_B);
 
-                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionIDA, 10.0, 0.0, 10.0);
+                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionIDA, 2.0, 0.0, 2.0, false, 0.0);
                 
-                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionIDB, 10.0, 0.0, 10.0);
+                PerformTestSession(setupData.db, taskGuid, setupData.fileRecord1.FileID, actionIDB, 2.0, 0.0, 2.0, false, 0.0);
 
                 setupData.db.DeleteAction(_ACTION_B);
 
@@ -353,7 +360,7 @@ namespace Extract.ETL.Test
 
                 var expected = new VerificationRatesList
                 {
-                    (1, 1, 1, "", 1, 10.0, 0.0, 10.0)
+                    (1, 1, 1, "", 1, 2.0, 0.0, 2.0, 2.0)
                 };
 
                 rates.Process(_noCancel);
@@ -413,9 +420,10 @@ namespace Extract.ETL.Test
                     ActionID: e.ActionID,
                     TaskClassGuid: taskGuid,
                     LastFileTaskSessionID: e.LastFileTaskSessionID,
-                    Duration: e.Duration,
+                    Duration: Math.Round(e.Duration),
                     OverheadTime: e.OverheadTime,
-                    ActivityTime: e.ActivityTime
+                    ActivityTime: e.ActivityTime,
+                    DurationMinusTimeout: e.DurationMinusTimeout
                     )).ToList();
 
             using var connection = new ExtractRoleConnection(rates.DatabaseServer, rates.DatabaseName);
@@ -436,6 +444,7 @@ namespace Extract.ETL.Test
                                 ,[Duration]
                                 ,[OverheadTime]
                                 ,[ActivityTime]  
+                                ,[DurationMinusTimeout]  
                     FROM [dbo].[ReportingVerificationRates] INNER JOIN [dbo].[TaskClass] 
                         ON [dbo].[ReportingVerificationRates].TaskClassID = [dbo].[TaskClass].ID";
 
@@ -450,9 +459,10 @@ namespace Extract.ETL.Test
                 ActionID: r.GetInt32(r.GetOrdinal("ActionID")),
                 TaskClassGuid: r.GetString(r.GetOrdinal("TaskClassGuid")),
                 LastFileTaskSessionID: r.GetInt32(r.GetOrdinal("LastFileTaskSessionID")),
-                Duration: r.GetDouble(r.GetOrdinal("Duration")),
+                Duration: Math.Round(r.GetDouble(r.GetOrdinal("Duration"))),
                 OverheadTime: r.GetDouble(r.GetOrdinal("OverheadTime")),
-                ActivityTime: r.GetDouble(r.GetOrdinal("ActivityTime"))
+                ActivityTime: r.GetDouble(r.GetOrdinal("ActivityTime")),
+                DurationMinusTimeout: Math.Round(r.GetDouble(r.GetOrdinal("DurationMinusTimeout")))
             )).ToList();
 
             Assert.AreEqual(resultsInTuples.Count, adjustedExpected.Count,
@@ -484,14 +494,17 @@ namespace Extract.ETL.Test
         }
 
         static void PerformTestSession(IFileProcessingDB db, string taskGuid, int fileID, int actionID, double duration,
-            double overheadTime, double activityTime)
+            double overheadTime, double activityTime, bool sessionTimout, double timeoutPeriod)
         {
+            db.SetDBInfoSetting("VerificationSessionTimeout", timeoutPeriod.ToString(), vbSetIfExists: true, vbRecordHistory: true);
+
             db.RecordFAMSessionStart("Test.fps", _ACTION_A, true, true);
             db.RegisterActiveFAM();
 
             int fileTaskSessionID = db.StartFileTaskSession(taskGuid, fileID, actionID);
 
-            db.EndFileTaskSession(fileTaskSessionID, duration, overheadTime, activityTime);
+            Thread.Sleep((int)duration * 1000);
+            db.EndFileTaskSession(fileTaskSessionID, overheadTime, activityTime, sessionTimout);
             db.UnregisterActiveFAM();
             db.RecordFAMSessionStop();
         }

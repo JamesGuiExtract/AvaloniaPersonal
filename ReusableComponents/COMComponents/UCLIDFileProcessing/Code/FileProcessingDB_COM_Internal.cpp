@@ -42,7 +42,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 200;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 201;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3285,7 +3285,9 @@ int UpdateToSchemaVersion200(_ConnectionPtr ipConnection, long* pnNumSteps,
 
 		if (pnNumSteps != __nullptr)
 		{
-			*pnNumSteps += 1;
+			// This update requires updating every row in the FileTaskSession table and is therefore
+			// O(n) relative to the number of task sessions in the DB.
+			*pnNumSteps += 10;
 			return nNewSchemaVersion;
 		}
 
@@ -3311,7 +3313,57 @@ int UpdateToSchemaVersion200(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51957");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion201(_ConnectionPtr ipConnection,
+	long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 201;
 
+
+		if (pnNumSteps != nullptr)
+		{
+			// This update requires updating every row in the FileTaskSession and
+			// ReportingVerificationRates tables and is therefore O(n) relative to the
+			// number of task sessions in the DB.
+			*pnNumSteps += 10;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		// StartDateTime/DurationMinusTimeout nullable to allow for existing DBs that have rows with NULL DateTimeStamp
+		vecQueries.push_back("ALTER TABLE [FileTaskSession] ADD [StartDateTime] [DATETIME] NULL DEFAULT(GETDATE())");
+		vecQueries.push_back("ALTER TABLE [FileTaskSession] ADD [TimedOut] [bit] NOT NULL DEFAULT(0)");
+		vecQueries.push_back("ALTER TABLE [FileTaskSession] ADD [DurationMinusTimeout] [float] NULL");
+		vecQueries.push_back("UPDATE [FileTaskSession] "
+			"	SET [StartDateTime] = DATEADD(MILLISECOND, -[Duration]*1000, [DateTimeStamp]), "
+			"		[DurationMinusTimeout] = [Duration]");
+		vecQueries.push_back("ALTER TABLE [ReportingVerificationRates] "
+			"ADD [DurationMinusTimeout] [float] NOT NULL CONSTRAINT [DF_DurationMinusTimeout] DEFAULT(0.0)");
+		vecQueries.push_back("UPDATE [ReportingVerificationRates] SET [DurationMinusTimeout] = [Duration]");
+
+		int nDefaultSessionTimeout = getDefaultSessionTimeoutFromWebConfig(ipConnection);
+		if (nDefaultSessionTimeout > 0)
+		{
+			auto ue = UCLIDException("ELI52960",
+				"Application trace: Defaulting session timeout per web redaction verification settings.");
+			ue.addDebugInfo("SessionTimeout", nDefaultSessionTimeout);
+			ue.log();
+		}
+		vecQueries.push_back("INSERT INTO [DBInfo] ([Name], [Value]) VALUES ('"
+			+ gstrVERIFICATION_SESSION_TIMEOUT + "', " + asString(nDefaultSessionTimeout) + ")");
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51942");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -5124,7 +5176,11 @@ bool CFileProcessingDB::SetDBInfoSetting_Internal(bool bDBLocked, BSTR bstrSetti
 				// Commit transaction
 				tg.CommitTrans();
 
+				// While m_ipDBInfoSettings to null is enough to ensure settings accessed via GetDBInfoSetting
+				// get's correct values via a lazy call to loadDBInfoSettings, there are class fields that won't
+				// be updated if we don't force a re-load here.
 				m_ipDBInfoSettings = __nullptr;
+				loadDBInfoSettings(ipConnection);
 
 			END_CONNECTION_RETRY(ipConnection, "ELI27328");
 		}
@@ -8471,7 +8527,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 197:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion198);
 				case 198:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion199);
 				case 199:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion200);
-				case 200:
+				case 200:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion201);
+				case 201:
 					break;
 
 				default:
@@ -10647,7 +10704,7 @@ bool CFileProcessingDB::StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrT
 }
 //-------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::EndFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID,
-	double dDuration, double dOverheadTime, double dActivityTime)
+	double dOverheadTime, double dActivityTime, bool bSessionTimeOut)
 {
 	try
 	{
@@ -10664,13 +10721,15 @@ bool CFileProcessingDB::EndFileTaskSession_Internal(bool bDBLocked, long nFileTa
 
 			validateDBSchemaVersion();
 
-            auto cmd = buildCmd(ipConnection, gstrUPDATE_FILETASKSESSION_DATA,
-            {
-                {"@FileTaskSessionID", nFileTaskSessionID},
-                {"@Duration", dDuration},
-                {"@OverheadTime", dOverheadTime},
-                {"@ActivityTime", dActivityTime}
-            });
+			map<string, _variant_t> params = {
+				{"@FileTaskSessionID", nFileTaskSessionID},
+				{"@OverheadTime", dOverheadTime},
+				{"@ActivityTime", dActivityTime},
+				{"@SessionTimeOut", bSessionTimeOut},
+				{"@SessionTimeoutPeriod", m_dVerificationSessionTimeout}
+			};
+
+			auto cmd = buildCmd(ipConnection, gstrUPDATE_FILETASKSESSION_DATA, params);
 
 			executeCmd(cmd);
 

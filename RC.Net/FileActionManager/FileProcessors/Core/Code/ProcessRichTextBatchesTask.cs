@@ -435,7 +435,6 @@ namespace Extract.FileActionManager.FileProcessors
 
                 string taskGUID = DivideBatchIntoRichTextFiles ? Constants.TaskClassRtfDivideBatches : Constants.TaskClassRtfUpdateBatches;
                 int fileTaskSessionID = pDB.StartFileTaskSession(taskGUID, pFileRecord.FileID, pFileRecord.ActionID);
-                DateTime sessionStartTime = DateTime.Now;
 
                 try
                 {
@@ -450,11 +449,11 @@ namespace Extract.FileActionManager.FileProcessors
                 }
                 catch (OperationCanceledException)
                 {
-                    pDB.EndFileTaskSession(fileTaskSessionID, (DateTime.Now - sessionStartTime).TotalSeconds, 0, 0);
+                    pDB.EndFileTaskSession(fileTaskSessionID, 0, 0, false);
                     return EFileProcessingResult.kProcessingCancelled;
                 }
 
-                pDB.EndFileTaskSession(fileTaskSessionID, (DateTime.Now - sessionStartTime).TotalSeconds, 0, 0);
+                pDB.EndFileTaskSession(fileTaskSessionID, 0, 0, false);
                 return EFileProcessingResult.kProcessingSuccessful;
             }
             catch (Exception ex)

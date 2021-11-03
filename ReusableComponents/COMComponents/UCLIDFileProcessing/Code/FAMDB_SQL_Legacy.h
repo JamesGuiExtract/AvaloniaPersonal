@@ -213,7 +213,7 @@ static const string gstrCREATE_WORKFLOW_V146 =
 "	[LoadBalanceWeight] INT NOT NULL CONSTRAINT [DF_Workflow_LoadBalanceWeight] DEFAULT(1), "
 "	CONSTRAINT [IX_WorkflowName] UNIQUE NONCLUSTERED ([Name]))";
 
-// Used for schema version 129-147
+// Used for schema version 129-160
 static const string gstrCREATE_FILE_TASK_SESSION_V129 =
 	"CREATE TABLE [dbo].[FileTaskSession]( "
 	" [ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FileTaskSession] PRIMARY KEY CLUSTERED, "
@@ -223,6 +223,20 @@ static const string gstrCREATE_FILE_TASK_SESSION_V129 =
 	" [DateTimeStamp] [datetime] NULL, "
 	" [Duration] [float] NULL, "
 	" [OverheadTime] [float] NULL)";
+
+// Used for schema version 161-200
+static const string gstrCREATE_FILE_TASK_SESSION_V161 =
+	"CREATE TABLE [dbo].[FileTaskSession]( "
+	" [ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FileTaskSession] PRIMARY KEY CLUSTERED, "
+	" [FAMSessionID] [int] NOT NULL, "
+	" [ActionID] [int] NULL,"
+	" [TaskClassID] [int] NOT NULL, "
+	" [TaskClassGUID] UNIQUEIDENTIFIER, "
+	" [FileID] [int] NOT NULL, "
+	" [DateTimeStamp] [datetime] NULL, "
+	" [Duration] [float] NULL, "
+	" [OverheadTime] [float] NULL, "
+	" [ActivityTime] [float] NULL)";
 
 // used for schema version 148-150
 static const string gstrADD_WORKFLOWCHANGEFILE_ACTIONSOURCE_FK_V148 =
@@ -285,6 +299,20 @@ static const string gstrCREATE_REPORTING_VERIFICATION_RATES_V160 =
 "	[Duration] [float] NOT NULL CONSTRAINT [DF_Duration] DEFAULT(0.0), "
 "	[OverheadTime] [float] NOT NULL CONSTRAINT [DF_OverheadTime] DEFAULT(0.0), "
 "	[ActiveMinutes][float] NOT NULL CONSTRAINT [DF_ActiveMinutes] DEFAULT(0.0) "
+"   CONSTRAINT [IX_ReportingVerificationRatesFileActionTask] UNIQUE CLUSTERED([FileID],[ActionID],[TaskClassID],[DatabaseServiceID]))";
+
+// used for schema version 162-199
+static const string gstrCREATE_REPORTING_VERIFICATION_RATES_V162 =
+"CREATE TABLE [dbo].[ReportingVerificationRates]( "
+"   [ID][int] IDENTITY(1, 1) NOT NULL CONSTRAINT[PK_ReportingVerificationRates] PRIMARY KEY NONCLUSTERED, "
+"   [DatabaseServiceID] [INT] NOT NULL, "
+"	[FileID] [int] NOT NULL, "
+"	[ActionID] [int] NULL,"
+"	[TaskClassID] [int] NOT NULL, "
+"   [LastFileTaskSessionID] [int] NOT NULL, "
+"	[Duration] [float] NOT NULL CONSTRAINT [DF_Duration] DEFAULT(0.0), "
+"	[OverheadTime] [float] NOT NULL CONSTRAINT [DF_OverheadTime] DEFAULT(0.0), "
+"	[ActivityTime] [float] NOT NULL CONSTRAINT [DF_ActivityTime] DEFAULT(0.0) "
 "   CONSTRAINT [IX_ReportingVerificationRatesFileActionTask] UNIQUE CLUSTERED([FileID],[ActionID],[TaskClassID],[DatabaseServiceID]))";
 
 // used for schema version 159 to 162

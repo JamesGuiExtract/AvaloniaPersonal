@@ -439,7 +439,6 @@ namespace Extract.FileActionManager.FileProcessors
                 LicenseUtilities.ValidateLicense(LicenseIdName.FileActionManagerObjects,
                     "ELI44830", _COMPONENT_DESCRIPTION);
 
-                var startTime = DateTime.Now;
                 int fileTaskSessionID = pDB.StartFileTaskSession(
                     _SPLIT_MULTI_PAGE_DOCUMENT_TASK_GUID, pFileRecord.FileID, nActionID);
 
@@ -463,8 +462,7 @@ namespace Extract.FileActionManager.FileProcessors
                         Enumerable.Range(1, pageCount));
                 }
 
-                double duration = (DateTime.Now - startTime).TotalSeconds;
-                pDB.EndFileTaskSession(fileTaskSessionID, duration, 0, 0);
+                pDB.EndFileTaskSession(fileTaskSessionID, 0, 0, false);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }

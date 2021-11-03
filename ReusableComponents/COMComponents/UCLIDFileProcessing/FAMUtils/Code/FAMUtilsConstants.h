@@ -64,6 +64,7 @@ static const string gstrLICENSE_CONTACT_EMAIL = "LicenseContactEmail";
 static const string gstrLICENSE_CONTACT_PHONE = "LicenseContactPhone";
 
 static const string gstrINPUT_ACTIVITY_TIMEOUT = "InputActivityTimeout";
+static const string gstrVERIFICATION_SESSION_TIMEOUT = "VerificationSessionTimeout";
 
 static const string gstrETL_RESTART = "ETLRestart";
 

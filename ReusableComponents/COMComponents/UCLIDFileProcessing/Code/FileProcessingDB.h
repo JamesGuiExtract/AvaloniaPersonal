@@ -320,7 +320,8 @@ public:
 	STDMETHOD(get_ActiveFAMID)(long *pnActiveFAMID);
 	STDMETHOD(get_FAMSessionID)(long *pnFAMSessionID);
 	STDMETHOD(StartFileTaskSession)(BSTR bstrTaskClassGuid, long nFileID, long nActionID, long *pnFileTaskSessionID);
-	STDMETHOD(EndFileTaskSession)(long nFileTaskSessionID, double dDuration, double dOverheadTime, double dActivityTime);
+	STDMETHOD(EndFileTaskSession)(long nFileTaskSessionID, double dOverheadTime,
+		double dActivityTime, VARIANT_BOOL vbSessionTimeOut);
 	STDMETHOD(GetFileNameFromFileID)( /*[in]*/ long fileID, /*[out, retval]*/ BSTR* pbstrFileName );
 	STDMETHOD(GetSecureCounters)(VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	STDMETHOD(GetSecureCounterName)(long nCounterID, BSTR *pstrCounterName);
@@ -606,6 +607,9 @@ private:
 
 	// Contains the timeout in seconds to keep retrying the GetFilesToProcess Transaction
 	double m_dGetFilesToProcessTransactionTimeout;
+
+	// Period of inactivity required before verification sessions time out and close, in seconds
+	double m_dVerificationSessionTimeout;
 
 	// Number of Seconds between refreshing the ActionStatistics
 	long m_nActionStatisticsUpdateFreqInSeconds;
@@ -1547,7 +1551,8 @@ private:
 	bool DeleteMetadataField_Internal(bool bDBLocked, BSTR bstrMetadataFieldName);
 	bool RenameMetadataField_Internal(bool bDBLocked, BSTR bstrOldMetadataFieldName, BSTR bstrNewMetadataFieldName);
 	bool StartFileTaskSession_Internal(bool bDBLocked, BSTR bstrTaskClassGuid, long nFileID, long nActionID, long *pnFileTaskSessionID);
-	bool EndFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID, double dDuration, double dOverheadTime, double dActivityTime);
+	bool EndFileTaskSession_Internal(bool bDBLocked, long nFileTaskSessionID, double dOverheadTime,
+		double dActivityTime, bool bSessionTimeOut);
 	bool GetSecureCounters_Internal(bool bDBLocked, VARIANT_BOOL vbRefresh, IIUnknownVector** ppSecureCounters);
 	bool GetSecureCounterName_Internal(bool bDBLocked, long nCounterID, BSTR *pstrCounterName);
 	bool ApplySecureCounterUpdateCode_Internal(bool bDBLocked, BSTR strUpdateCode, BSTR *pbstrResult);

@@ -1,8 +1,11 @@
-﻿using Extract.Testing.Utilities;
+﻿using Extract.Database;
+using Extract.SqlDatabase;
+using Extract.Testing.Utilities;
 using Extract.Utilities;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -1791,6 +1794,109 @@ namespace Extract.FileActionManager.Database.Test
                 fileProcessingDb = null;
                 _testDbManager.RemoveDatabase(testDbName);
             }
+        }
+
+        /// <summary>
+        /// Tests addition of new schema elements to track verification session timeouts in the FileTaskSession table
+        /// https://extract.atlassian.net/browse/ISSUE-17793
+        /// </summary>
+        [Test, Category("Automated")]
+        public static void VerificationSessionTiming()
+        {
+            HashSet<TemporaryFile> tmpFiles = new HashSet<TemporaryFile>();
+            _testFiles = new TestFileManager<TestFAMFileProcessing>();
+            _testDbManager = new FAMTestDBManager<TestFAMFileProcessing>();
+
+            string testDbName = "Test_VerificationSessionTiming";
+
+            try
+            {
+                DateTime testStartTime = DateTime.Now;
+
+                using var dbWrapper = new OneWorkflow<TestFAMFileProcessing>(_testDbManager, testDbName, false);
+                dbWrapper.fpDB.SetDBInfoSetting("VerificationSessionTimeout", "2", vbSetIfExists: true, vbRecordHistory: true);
+
+                Enumerable.Range(1, 5)
+                    .Select(i => dbWrapper.addFakeFile(i, setAsSkipped: false))
+                    .ToList();
+
+                int lostSession = dbWrapper.fpDB.StartFileTaskSession(Constants.TaskClassWebVerification, 1, 1);
+
+                Task.WaitAll(new[]
+                {
+                    AddSession(dbWrapper, fileId: 2, duration: 5, overheadTime: 1, activityTime: 4, timedOut: false),
+                    AddSession(dbWrapper, fileId: 3, duration: 5, overheadTime: 1, activityTime: 2, timedOut: true),
+                    AddSession(dbWrapper, fileId: 4, duration: 3, overheadTime: 1, activityTime: 0, timedOut: true),
+                    AddSession(dbWrapper, fileId: 5, duration: 2, overheadTime: 0, activityTime: 1, timedOut: false)
+                });
+
+                // StartDateTime, DateTimeStamp, Duration, OverheadTime, ActivityTime, TimedOut, DurationMinusTimeout
+                var sessionRows = GetFileTaskSessionData(testDbName);
+
+                Assert.AreEqual(5, sessionRows.Count);
+                sessionRows.ForEach(row =>
+                {
+                    int fileID = (int)row["FileID"];
+                    var timingValues = row.Values.Skip(3);
+                    switch (fileID)
+                    {
+                        case 1: Assert.IsTrue(timingValues.SequenceEqual(new object[] { DBNull.Value, DBNull.Value, DBNull.Value, false, DBNull.Value }));    break;
+                        case 2: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)5, (double)1, (double)4, false, (double)5 }));                break;
+                        case 3: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)5, (double)1, (double)2, true, (double)3 }));                 break;
+                        case 4: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)3, (double)1, (double)0, true, (double)1 }));                 break;
+                        case 5: Assert.IsTrue(timingValues.SequenceEqual(new object[] { (double)2, (double)0, (double)1, false, (double)2 }));                break;
+                    }
+
+                    if (row["DateTimeStamp"] is not DBNull)
+                    {
+                        Assert.Greater((DateTime)row["StartDateTime"], testStartTime);
+                        Assert.AreEqual(row["Duration"],
+                            Math.Round(((DateTime)row["DateTimeStamp"] - (DateTime)row["StartDateTime"]).TotalSeconds));
+                    }
+                });
+            }
+            finally
+            {
+                CollectionMethods.ClearAndDispose(tmpFiles);
+                _testDbManager.RemoveDatabase(testDbName);
+            }
+        }
+
+        /// VerificationSessionTiming helper; starts/stops FileTaskSession for specified file with specified timings.
+        static async Task AddSession(OneWorkflow<TestFAMFileProcessing> dbWrapper, int fileId, 
+            double duration, double overheadTime, double activityTime, bool timedOut)
+        {
+            int sessionID = dbWrapper.fpDB.StartFileTaskSession(Constants.TaskClassWebVerification, fileId, 1);
+            await Task.Delay((int)(duration * 1000));
+            dbWrapper.fpDB.EndFileTaskSession(sessionID, overheadTime, activityTime, timedOut);
+        }
+
+        /// VerificationSessionTiming helper; gets FileTaskSession data to check timings were recorded properly.
+        static List<Dictionary<string, object>> GetFileTaskSessionData(string dbName)
+        {
+            using ExtractRoleConnection dbConnection = new(SqlUtil.CreateConnectionString("(local)", dbName));
+            dbConnection.Open();
+
+            using var tableData = DBMethods.ExecuteDBQuery(dbConnection, @"
+SELECT [FileID], [StartDateTime], [DateTimeStamp], [Duration], [OverheadTime], [ActivityTime], [TimedOut], [DurationMinusTimeout]
+    FROM [FileTaskSession]");
+
+            int columnIndex = 0;
+            var columns = tableData.Columns
+                .OfType<DataColumn>()
+                .Select(c => (columnIndex++, c.ColumnName))
+                .ToList();
+
+            return tableData.Rows.OfType<DataRow>()
+                .Select(row => Enumerable.Range(0, columns.Count())
+                    .ToDictionary(
+                        i => columns[i].ColumnName,
+                        i => row.ItemArray[i] switch
+                        {
+                            double d => Math.Round(d),
+                            object o => o
+                        }))
+                .ToList();
         }
 
         /// <summary>

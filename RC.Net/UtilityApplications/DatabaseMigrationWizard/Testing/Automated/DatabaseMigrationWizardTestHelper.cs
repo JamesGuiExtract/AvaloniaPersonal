@@ -202,6 +202,7 @@ namespace DatabaseMigrationWizard.Test
             DBInfos.Add(new DBInfo() { Name = "AzureTenant", Value = "" });
             DBInfos.Add(new DBInfo() { Name = "AzureClientId", Value = "" });
             DBInfos.Add(new DBInfo() { Name = "PasswordComplexityRequirements", Value = SystemMethods.IsExtractInternal() ? "" : "8ULD" });
+            DBInfos.Add(new DBInfo() { Name = "VerificationSessionTimeout", Value = "0" });
 
             FAMUsers.Add(new FAMUser() { UserName = "Trever_Gannon", FullUserName = "DataMaster"});
             FAMUsers.Add(new FAMUser() { UserName = "Reassign", FullUserName = "ToReassign" });

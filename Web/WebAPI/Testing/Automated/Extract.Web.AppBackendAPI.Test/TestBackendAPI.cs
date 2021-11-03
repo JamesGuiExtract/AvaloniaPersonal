@@ -365,7 +365,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 File.WriteAllText(temporaryDocType, "Ambulance - Encounter \nAmbulance - Patient \nAnesthesia \nAppeal Request");
                 var (fileProcessingDb, user, controller) = InitializeDBAndUser(dbName, _testFiles);
-                var newSettings = $"{{ \"InactivityTimeout\": 5, \"RedactionTypes\": [\"SSN\", \"DOB\"], \"DocumentTypes\": \"{temporaryDocType.Replace(@"\", @"\\")}\" }}";
+                var newSettings = $"{{ \"RedactionTypes\": [\"SSN\", \"DOB\"], \"DocumentTypes\": \"{temporaryDocType.Replace(@"\", @"\\")}\" }}";
                 fileProcessingDb.ExecuteCommandQuery($"UPDATE [dbo].[WebAppConfig] SET SETTINGS = '{newSettings}' WHERE TYPE = 'RedactionVerificationSettings'");
                 var result = controller.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
@@ -384,9 +384,6 @@ namespace Extract.Web.WebAPI.Test
                 Assert.IsTrue(settings.ParsedDocumentTypes.SequenceEqual(
                     new[] { "Ambulance - Encounter ", "Ambulance - Patient ", "Anesthesia ", "Appeal Request" }),
                     "Document Settings failed to retrive");
-
-                // Default value
-                Assert.IsTrue(settings.InactivityTimeout == 5);
 
                 controller.Logout()
                     .AssertGoodResult<NoContentResult>();
@@ -1358,7 +1355,7 @@ namespace Extract.Web.WebAPI.Test
                 int sessionId = db.StartFileTaskSession(_STORE_ATTRIBUTE_GUID, docID, actionId);
                 var storedAttributes = attributeMgr.GetAttributeSetForFile(docID, attributeSetName, -1, true);
                 attributeMgr.CreateNewAttributeSetForFile(sessionId, attributeSetName, storedAttributes, false, false, false, false);
-                db.EndFileTaskSession(sessionId, 0, 0, 0);
+                db.EndFileTaskSession(sessionId, 0, 0, false);
                 db.RecordFAMSessionStop();
 
                 uncommittedData = controller.GetUncommittedDocumentData(docID)

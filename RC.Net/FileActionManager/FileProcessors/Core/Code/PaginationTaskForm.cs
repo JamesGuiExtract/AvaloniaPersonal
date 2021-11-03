@@ -70,7 +70,6 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 SessionID = sessionID;
                 FileName = fileName;
-                DurationStopwatch.Start();
             }
 
             /// <summary>
@@ -82,11 +81,6 @@ namespace Extract.FileActionManager.FileProcessors
             /// Gets the name of the target file for this session.
             /// </summary>
             public string FileName { get; }
-
-            /// <summary>
-            /// Times the total duration this file is in processing.
-            /// </summary>
-            public Stopwatch DurationStopwatch { get; } = new Stopwatch();
 
             /// <summary>
             /// Times how long this file is in overhead time (loading/saving). As much as possible,
@@ -1958,11 +1952,10 @@ namespace Extract.FileActionManager.FileProcessors
                     _fileSessionInOverhead = null;
                 }
 
-                var duration = sessionData.DurationStopwatch.Elapsed.TotalSeconds;
                 var overhead = sessionData.OverheadStopwatch.Elapsed.TotalSeconds;
 
                 _fileProcessingDB.EndFileTaskSession(sessionData.SessionID,
-                    duration, overhead, sessionData.ActiveSeconds);
+                    overhead, sessionData.ActiveSeconds, false);
             }
             catch (Exception ex)
             {

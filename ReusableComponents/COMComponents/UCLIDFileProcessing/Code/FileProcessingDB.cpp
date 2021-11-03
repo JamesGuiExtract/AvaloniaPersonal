@@ -3765,7 +3765,7 @@ STDMETHODIMP CFileProcessingDB::StartFileTaskSession(BSTR bstrTaskClassGuid, lon
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::EndFileTaskSession(long nFileTaskSessionID,
-												   double dDuration, double dOverheadTime, double dActivityTime)
+	double dOverheadTime, double dActivityTime, VARIANT_BOOL vbSessionTimeOut)
 {
 	AFX_MANAGE_STATE(AfxGetAppModuleState());
 
@@ -3773,12 +3773,16 @@ STDMETHODIMP CFileProcessingDB::EndFileTaskSession(long nFileTaskSessionID,
 	{
 		validateLicense();
 
-		if (!EndFileTaskSession_Internal(false, nFileTaskSessionID, dDuration, dOverheadTime, dActivityTime))
+		bool bSessionTimeOut = asCppBool(vbSessionTimeOut);
+
+		if (!EndFileTaskSession_Internal(false, 
+			nFileTaskSessionID, dOverheadTime, dActivityTime, bSessionTimeOut))
 		{
 			// Lock the database
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
-			EndFileTaskSession_Internal(true, nFileTaskSessionID, dDuration, dOverheadTime, dActivityTime);
+			EndFileTaskSession_Internal(true, 
+				nFileTaskSessionID, dOverheadTime, dActivityTime, bSessionTimeOut);
 		}
 		
 		return S_OK;

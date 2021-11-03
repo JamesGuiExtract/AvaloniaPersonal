@@ -449,8 +449,11 @@ static const string gstrCREATE_FILE_TASK_SESSION =
 	" [TaskClassID] [int] NOT NULL, "
 	" [TaskClassGUID] UNIQUEIDENTIFIER, "
 	" [FileID] [int] NOT NULL, "
+	" [StartDateTime] [datetime] NULL DEFAULT(GETDATE()), " // Nullable to allow for existing DBs that have rows with NULL DateTimeStamp
 	" [DateTimeStamp] [datetime] NULL, "
+	" [TimedOut] [bit] NOT NULL DEFAULT(0), "
 	" [Duration] [float] NULL, "
+	" [DurationMinusTimeout] [float] NULL, "
 	" [OverheadTime] [float] NULL, "
 	" [ActivityTime] [float] NULL)";
 
@@ -2263,11 +2266,24 @@ static const string gstrSTART_FILETASKSESSION_DATA =
 	"  VALUES (@FAMSessionID, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = @TaskClassGuid), @TaskClassGuid, @FileID, @ActionID)";
 
 static const string gstrUPDATE_FILETASKSESSION_DATA = 
+	"DECLARE @EndTime DateTime = GETDATE(); "
+	"DECLARE @Duration FLOAT =  "
+	"		(SELECT CASE WHEN (DATEDIFF(DAY, [StartDateTime], @EndTime) < 30) "			// Prevent overflow in DATEDIFF
+	"			THEN DATEDIFF(MILLISECOND, [StartDateTime], @EndTime) / 1000.00 "
+	"			ELSE NULL "
+	"		END "
+	"	FROM  [dbo].[FileTaskSession] "
+	"		WHERE [ID] = @FileTaskSessionID); "
 	"UPDATE [dbo].[FileTaskSession] SET "
-	"		[DateTimeStamp] = GETDATE(), "
+	"		[DateTimeStamp] = @EndTime, "
 	"		[Duration] = @Duration, "
 	"		[OverheadTime] = @OverheadTime, "
-	"       [ActivityTime] = @ActivityTime "
+	"		[ActivityTime] = @ActivityTime, "
+	"		[TimedOut] = @SessionTimeOut, "
+	"		[DurationMinusTimeout] = CASE WHEN (@SessionTimeOut = 0) "
+	"			THEN @Duration "
+	"			ELSE (@Duration - @SessionTimeoutPeriod) "
+	"		END "
 	"	WHERE [ID] = @FileTaskSessionID";
 
 static const string gstrINSERT_TASKCLASS_STORE_RETRIEVE_ATTRIBUTES = 
@@ -2606,7 +2622,8 @@ static const string gstrCREATE_REPORTING_VERIFICATION_RATES =
 	"   [LastFileTaskSessionID] [int] NOT NULL, "
 	"	[Duration] [float] NOT NULL CONSTRAINT [DF_Duration] DEFAULT(0.0), "
 	"	[OverheadTime] [float] NOT NULL CONSTRAINT [DF_OverheadTime] DEFAULT(0.0), "
-	"	[ActivityTime][float] NOT NULL CONSTRAINT [DF_ActivityTime] DEFAULT(0.0) "
+	"	[ActivityTime] [float] NOT NULL CONSTRAINT [DF_ActivityTime] DEFAULT(0.0), "
+	"	[DurationMinusTimeout] [float] NOT NULL CONSTRAINT [DF_DurationMinusTimeout] DEFAULT(0.0) "
 	"   CONSTRAINT [IX_ReportingVerificationRatesFileActionTask] UNIQUE CLUSTERED([FileID],[ActionID],[TaskClassID],[DatabaseServiceID]))";
 
 static const std::string gstrADD_REPORTING_VERIFICATION_RATES_FAMFILE_FK =

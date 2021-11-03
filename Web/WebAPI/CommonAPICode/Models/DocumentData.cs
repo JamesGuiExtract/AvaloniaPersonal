@@ -234,6 +234,10 @@ namespace WebAPI.Models
                     result.ParsedDocumentTypes = File.ReadAllLines(result.DocumentTypes);
                 }
 
+                // DBInfo SessionTimeout now governs the legacy InactivityTimeout for web applications.
+                string verificationSessionTimeout = FileApi.FileProcessingDB.GetDBInfoSetting("VerificationSessionTimeout", true);
+                result.InactivityTimeout = (int)(double.Parse(verificationSessionTimeout) / 60);
+
                 result.PasswordComplexityRequirements =
                     new(FileApi.FileProcessingDB.GetDBInfoSetting("PasswordComplexityRequirements", false));
 
@@ -519,12 +523,7 @@ namespace WebAPI.Models
                 ExtractException.Assert("ELI45238", "No active user", _user != null);
                 ExtractException.Assert("ELI46669", "No open document", FileApi.DocumentSession.IsOpen);
 
-                double durationInSeconds = duration > 0
-                    ? duration / 1000.0
-                    : (DateTime.Now - FileApi.DocumentSession.StartTime).TotalSeconds;
-
-                FileApi.FileProcessingDB.EndFileTaskSession(FileApi.DocumentSession.Id,
-                    durationInSeconds, 0, 0);
+                FileApi.FileProcessingDB.EndFileTaskSession(FileApi.DocumentSession.Id, 0, 0, false);
 
                 int fileId = FileApi.DocumentSession.FileId;
                 if (setStatusTo == EActionStatus.kActionCompleted)

@@ -564,8 +564,6 @@ namespace Extract.FileActionManager.FileProcessors
                                             "VOA filename",
                                             voaFileName);
 
-                    IntervalTimer timer = new IntervalTimer();
-                    timer.Start();
                     int fileTaskSessionID = pDB.StartFileTaskSession(_CLASS_GUID,
                                                                      pFileRecord.FileID, pFileRecord.ActionID);
                     var afutility = new UCLID_AFUTILSLib.AFUtility();
@@ -580,7 +578,7 @@ namespace Extract.FileActionManager.FileProcessors
                                                                       StoreEmptyAttributes,
                                                                       false);
 
-                    pDB.EndFileTaskSession(fileTaskSessionID, timer.ElapsedSeconds, 0, 0);
+                    pDB.EndFileTaskSession(fileTaskSessionID, 0, 0, false);
                 }
                 else
                 {

@@ -2409,6 +2409,7 @@ map<string, string> CFileProcessingDB::getDBInfoDefaultValues()
 	mapDefaultValues[gstrLICENSE_CONTACT_EMAIL] = "";
 	mapDefaultValues[gstrLICENSE_CONTACT_PHONE] = "";
 	mapDefaultValues[gstrINPUT_ACTIVITY_TIMEOUT] = "30";
+	mapDefaultValues[gstrVERIFICATION_SESSION_TIMEOUT] = "0";
 
 	CTime ct = CTime::GetCurrentTime();
 	mapDefaultValues[gstrETL_RESTART] = ct.Format(_T("%Y-%m-%dT%H:%M:%S")).operator LPCSTR();
@@ -3995,6 +3996,7 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 		m_iNumberOfRetries = m_bNumberOfRetriesOverridden ? m_iNumberOfRetries : giDEFAULT_RETRY_COUNT;
 		m_dRetryTimeout = m_bRetryTimeoutOverridden ? m_dRetryTimeout : gdDEFAULT_RETRY_TIMEOUT;
 		m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
+		m_dVerificationSessionTimeout = 0;
 		m_bAllowRestartableProcessing = false;
 
 		// Only load the settings if the table exists
@@ -4136,6 +4138,10 @@ void CFileProcessingDB::loadDBInfoSettings(_ConnectionPtr ipConnection)
 
 						m_dGetFilesToProcessTransactionTimeout = gdMINIMUM_TRANSACTION_TIMEOUT;
 					}
+				}
+				else if (strKey == gstrVERIFICATION_SESSION_TIMEOUT)
+				{
+					m_dVerificationSessionTimeout = asDouble(strValue);
 				}
 				else if (strKey == gstrSTORE_SOURCE_DOC_NAME_CHANGE_HISTORY)
 				{

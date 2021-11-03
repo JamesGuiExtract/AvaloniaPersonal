@@ -773,7 +773,6 @@ namespace Extract.FileActionManager.FileProcessors
 
                 int fileTaskSessionID = _fileProcessingDB.StartFileTaskSession(
                     _AUTO_PAGINATE_TASK_GUID, pFileRecord.FileID, pFileRecord.ActionID);
-                DateTime sessionStartTime = DateTime.Now;
 
                 if (pFAMTM == null)
                 {
@@ -853,8 +852,7 @@ namespace Extract.FileActionManager.FileProcessors
                         poldStatus: out EActionStatus oldStatus);
                 }
 
-                var sessionSeconds = (DateTime.Now - sessionStartTime).TotalSeconds;
-                _fileProcessingDB.EndFileTaskSession(fileTaskSessionID, sessionSeconds, 0, 0);
+                _fileProcessingDB.EndFileTaskSession(fileTaskSessionID, 0, 0, false);
 
                 return EFileProcessingResult.kProcessingSuccessful;
             }

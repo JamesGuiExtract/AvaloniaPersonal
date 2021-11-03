@@ -110,6 +110,7 @@ namespace Extract.ETL
 	            ,COALESCE([Duration], 0.0) [Duration]
 	            ,COALESCE([OverheadTime], 0.0) [OverheadTime]
 	            ,COALESCE([ActivityTime], 0.0) [ActivityTime]
+                ,COALESCE([DurationMinusTimeout], 0.0) [DurationMinusTimeout]
             FROM [dbo].[FileTaskSession] WITH (NOLOCK)
             INNER JOIN [dbo].[TaskClass]
 	            ON [TaskClass].[ID] = [FileTaskSession].[TaskClassID]
@@ -136,6 +137,7 @@ namespace Extract.ETL
         ///     @Duration FLOAT
         ///     @Overhead FLOAT
         ///     @ActivityTime FLOAT
+        ///     @DurationMinusTimeout FLOAT
         ///     @LastFileTaskSessionID INT
         ///     @DatabaseServiceID INT
         ///     
@@ -150,6 +152,7 @@ namespace Extract.ETL
                     [Duration] = [Duration] + @Duration,
                     [OverheadTime] = [OverheadTime] + @Overhead,
                     [ActivityTime] = [ActivityTime] + @ActivityTime,
+                    [DurationMinusTimeout] = [DurationMinusTimeout] + @DurationMinusTimeout,
                     [LastFileTaskSessionID] = @LastFileTaskSessionID
                 WHERE [FileID] = @FileID AND [ActionID] = @ActionID AND [TaskClassID] = @TaskClassID AND [DatabaseServiceID] = @DatabaseServiceID
             END ELSE BEGIN
@@ -157,9 +160,9 @@ namespace Extract.ETL
                 IF (ABS(@Duration) > 0.00001) 
                 BEGIN
                     INSERT INTO [ReportingVerificationRates]
-                        ([DatabaseServiceID], [FileID], [ActionID], [TaskClassID], [LastFileTaskSessionID], [Duration], [OverheadTime], [ActivityTime])
+                        ([DatabaseServiceID], [FileID], [ActionID], [TaskClassID], [LastFileTaskSessionID], [Duration], [OverheadTime], [ActivityTime], [DurationMinusTimeout])
                     VALUES 
-                        (@DatabaseServiceID, @FileID,  @ActionID, @TaskClassID,  @LastFileTaskSessionID,  @Duration,  @Overhead,  @ActivityTime)
+                        (@DatabaseServiceID, @FileID,  @ActionID, @TaskClassID,  @LastFileTaskSessionID,  @Duration,  @Overhead,  @ActivityTime, @DurationMinusTimeout)
                 END
             END
             ";
@@ -321,7 +324,8 @@ namespace Extract.ETL
                 Int32 fileID,
                 Double duration,
                 Double overhead,
-                Double activityTime
+                Double activityTime,
+                Double durationMinusTimeout
                 )> verificationSessionDataList = new();
 
             using (var sourceReader = readerTask.Result)
@@ -337,7 +341,8 @@ namespace Extract.ETL
                         fileID: sourceReader.GetInt32(sourceReader.GetOrdinal("FileID")),
                         duration: sourceReader.GetDouble(sourceReader.GetOrdinal("Duration")),
                         overhead: sourceReader.GetDouble(sourceReader.GetOrdinal("OverheadTime")),
-                        activityTime: sourceReader.GetDouble(sourceReader.GetOrdinal("ActivityTime"))));
+                        activityTime: sourceReader.GetDouble(sourceReader.GetOrdinal("ActivityTime")),
+                        durationMinusTimeout: sourceReader.GetDouble(sourceReader.GetOrdinal("DurationMinusTimeout"))));
                 }
             }
 
@@ -355,6 +360,7 @@ namespace Extract.ETL
                         saveCmd.Parameters.Add("@Duration", SqlDbType.Float).Value = sessionData.duration;
                         saveCmd.Parameters.Add("@Overhead", SqlDbType.Float).Value = sessionData.overhead;
                         saveCmd.Parameters.Add("@ActivityTime", SqlDbType.Float).Value = sessionData.activityTime;
+                        saveCmd.Parameters.Add("@DurationMinusTimeout", SqlDbType.Float).Value = sessionData.durationMinusTimeout;
                         saveCmd.Parameters.Add("@DatabaseServiceID", SqlDbType.Int).Value = DatabaseServiceID;
 
                         var task = saveCmd.ExecuteNonQueryAsync();

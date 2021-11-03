@@ -3,6 +3,7 @@
 #include "FAMDBHelperFunctions.h"
 #include "FAMUtilsConstants.h"
 
+#include <ADOUtils.h>
 #include <UCLIDException.h>
 #include <StringTokenizer.h>
 #include <regex>
@@ -70,3 +71,38 @@ vector<string> getFeatureDefinitionQueries(int nSchemaVersion/* = -1*/)
 	return vecFeatureDefinitions;
 }
 //-------------------------------------------------------------------------------------------------
+long getDefaultSessionTimeoutFromWebConfig(_ConnectionPtr ipConnection)
+{
+	long nDefaultSessionTimeout = 0;
+
+	static regex regexInactivityTimout(
+		"(\"InactivityTimeout\":\\s*)(\\d+)"
+		, std::regex_constants::icase);
+
+	// Create a pointer to a recordset
+	_RecordsetPtr ipWebAppConfigSet(__uuidof(Recordset));
+	ASSERT_RESOURCE_ALLOCATION("ELI51969", ipWebAppConfigSet != __nullptr);
+
+	ipWebAppConfigSet->Open("SELECT [Settings] FROM [WebAppConfig]",
+		_variant_t((IDispatch*)ipConnection, true), adOpenStatic,
+		adLockOptimistic, adCmdText);
+
+	while (!asCppBool(ipWebAppConfigSet->adoEOF))
+	{
+		string strConfig = getStringField(ipWebAppConfigSet->Fields, "Settings");
+		smatch subMatches;
+		if (regex_search(strConfig, subMatches, regexInactivityTimout))
+		{
+			long nTimeout = asLong(subMatches[2]) * 60; // (minutes to seconds)
+			if (nTimeout > 0
+				&& (nDefaultSessionTimeout == 0 || nTimeout < nDefaultSessionTimeout))
+			{
+				nDefaultSessionTimeout = nTimeout;
+			}
+		}
+
+		ipWebAppConfigSet->MoveNext();
+	}
+
+	return nDefaultSessionTimeout;
+}

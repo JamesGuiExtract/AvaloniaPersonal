@@ -1891,8 +1891,6 @@ bool CFileProcessingManager::authenticateForProcessing()
 	// Check if a user login is required before running
 	if (isUserAuthenticationRequired())
 	{
-		VARIANT_BOOL vbCancelled;
-		
 		UCLID_FILEPROCESSINGLib::IAuthenticationProviderPtr ipAuthenticationProvider(__nullptr);
 		SECURE_CREATE_OBJECT("ELI49621",
 			ipAuthenticationProvider, "Extract.Utilities.AuthenticationProvider");
