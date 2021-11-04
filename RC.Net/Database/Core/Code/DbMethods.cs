@@ -224,6 +224,28 @@ namespace Extract.Database
             return ExecuteDBQuery(dbConnection, query, parameters, transaction: null);
         }
 
+        public static DataTable ExecuteDBQuery(DbConnection dbConnection, string query,
+            Dictionary<string,string> parameters, int commandTimeout)
+        {
+            return ExecuteDBQuery(dbConnection, query, parameters, commandTimeout, transaction: null);
+        }
+
+        public static DataTable ExecuteDBQuery(DbConnection dbConnection, string query,
+            Dictionary<string, string> parameters, int commandTimeout, DbTransaction transaction)
+         {
+            try
+            {
+                using var command = DBMethods.CreateDBCommand(dbConnection, query, parameters);
+                command.Transaction = transaction;
+                command.CommandTimeout = commandTimeout;
+                return ExecuteDBQuery(command);
+            }
+            catch (Exception ex)
+            {
+                throw ex.AsExtract("ELI51958");
+            }
+        }
+
         /// <summary>
         /// Executes the supplied <see paramref="query"/> on the specified
         /// <see paramref="dbConnection"/>.
@@ -241,14 +263,9 @@ namespace Extract.Database
         {
             try
             {
-                using (var command = DBMethods.CreateDBCommand(dbConnection, query, parameters))
-                {
-                    if (transaction != null)
-                    {
-                        command.Transaction = transaction;
-                    }
-                    return ExecuteDBQuery(command);
-                }
+                using var command = DBMethods.CreateDBCommand(dbConnection, query, parameters);
+                command.Transaction = transaction;
+                return ExecuteDBQuery(command);
             }
             catch (Exception ex)
             {
@@ -856,7 +873,8 @@ namespace Extract.Database
 
                         Done:";
 
-                    ExecuteDBQuery(dbConnection, query, parameters);
+                    int FiveMinuteTimeout = 300;
+                    ExecuteDBQuery(dbConnection, query, parameters, FiveMinuteTimeout);
                 }
             }
             catch (Exception ex)

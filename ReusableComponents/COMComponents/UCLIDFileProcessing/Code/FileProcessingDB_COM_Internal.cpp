@@ -42,7 +42,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 199;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 200;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -2263,7 +2263,7 @@ int UpdateToSchemaVersion166(_ConnectionPtr ipConnection,
 		vector<string> vecQueries;
 
 		vecQueries.push_back(gstrCREATE_INPUT_EVENT_FAMUSER_WITH_TIMESTAMP_INDEX);
-		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW);
+		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW_V166);
 		vecQueries.push_back(gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
@@ -2521,7 +2521,7 @@ int UpdateToSchemaVersion174(_ConnectionPtr ipConnection,
 
 		vector<string> vecQueries;
 		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW_LEGACY_166);
-		vecQueries.push_back(gstrALTER_FAMUSER_INPUT_EVENTS_TIME_VIEW);
+		vecQueries.push_back(gstrALTER_FAMUSER_INPUT_EVENTS_TIME_VIEW_V174);
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
 		executeVectorOfSQL(ipConnection, vecQueries);
@@ -2796,7 +2796,7 @@ int UpdateToSchemaVersion184(_ConnectionPtr ipConnection,
 		// This was missing in some DEMO databases, this will create it if it doesn't exist
 		vecQueries.push_back(gstrCREATE_PROCESSING_DATA_VIEW);
 
-		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_WITH_FILEID_VIEW);
+		vecQueries.push_back( gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_WITH_FILEID_VIEW_V184);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -2879,7 +2879,7 @@ int UpdateToSchemaVersion187(_ConnectionPtr ipConnection,
 
 		vecQueries.push_back(gstrCREATE_USAGE_FOR_SPECIFIC_USER_SPECIFIC_DAY_PROCEDURE);
 		vecQueries.push_back(gstrCREATE_TABLE_FROM_COMMA_SEPARATED_LIST_FUNCTION);
-		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE);
+		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE_V187_V199);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -3265,7 +3265,7 @@ int UpdateToSchemaVersion199(_ConnectionPtr ipConnection, long* pnNumSteps,
 		}
 
 		vector<string> vecQueries;
-		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE);
+		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE_V187_V199);
 
 		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
 
@@ -3275,6 +3275,43 @@ int UpdateToSchemaVersion199(_ConnectionPtr ipConnection, long* pnNumSteps,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51932");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion200(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 200;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 1;
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back("ALTER TABLE dbo.FileTaskSession ADD TaskClassGUID UNIQUEIDENTIFIER;");
+		vecQueries.push_back(
+			"UPDATE dbo.FileTaskSession \r\n"
+			"	Set FileTaskSession.TaskClassGUID = TaskClass.GUID \r\n"
+			"	FROM FileTaskSession inner join TaskClass ON FileTaskSession.TaskClassID = TaskClass.ID; \r\n");
+		vecQueries.push_back("DROP VIEW [dbo].[vFAMUserInputEventsTime]");
+		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW);
+		vecQueries.push_back("DROP VIEW [dbo].[vFAMUserInputWithFileID]");
+		vecQueries.push_back(gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_WITH_FILEID_VIEW);
+		vecQueries.push_back(gstrCREATE_USER_COUNTS_STORED_PROCEDURE); 
+
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51957");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -8433,7 +8470,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 196:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion197);
 				case 197:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion198);
 				case 198:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion199);
-				case 199:
+				case 199:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion200);
+				case 200:
 					break;
 
 				default:

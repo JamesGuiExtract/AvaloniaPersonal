@@ -447,6 +447,7 @@ static const string gstrCREATE_FILE_TASK_SESSION =
 	" [FAMSessionID] [int] NOT NULL, "
 	" [ActionID] [int] NULL,"
 	" [TaskClassID] [int] NOT NULL, "
+	" [TaskClassGUID] UNIQUEIDENTIFIER, "
 	" [FileID] [int] NOT NULL, "
 	" [DateTimeStamp] [datetime] NULL, "
 	" [Duration] [float] NULL, "
@@ -2255,10 +2256,11 @@ static const string gstrSTART_FILETASKSESSION_DATA =
 	"INSERT INTO [dbo].[FileTaskSession] "
 	" ([FAMSessionID]"
 	"  ,[TaskClassID]"
+	"  ,[TaskClassGUID]"
 	"  ,[FileID] "
 	"  ,[ActionID])"
 	"  OUTPUT INSERTED.ID"
-	"  VALUES (@FAMSessionID, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = @TaskClassGuid), @FileID, @ActionID)";
+	"  VALUES (@FAMSessionID, (SELECT [ID] FROM [TaskClass] WHERE [GUID] = @TaskClassGuid), @TaskClassGuid, @FileID, @ActionID)";
 
 static const string gstrUPDATE_FILETASKSESSION_DATA = 
 	"UPDATE [dbo].[FileTaskSession] SET "
@@ -2678,8 +2680,7 @@ static const std::string gstrVIEW_DEFINITION_FOR_FAMUSER_INPUT_EVENTS_TIME =
 "			FROM[FAMSession] WITH (NOLOCK)																		"
 "			INNER JOIN[FileTaskSession] WITH (NOLOCK) ON[FAMSession].[ID] =										"
 "			[FileTaskSession].[FAMSessionID]														"
-"			inner join TaskClass on FileTaskSession.TaskClassID = TaskClass.ID						"
-"			where([TaskClass].GUID IN																"
+"			where([FileTaskSession].TaskClassGUID IN																"
 "				(''FD7867BD-815B-47B5-BAF4-243B8C44AABB'',											"
 "				 ''59496DF7-3951-49B7-B063-8C28F4CD843F'',											"
 "				 ''AD7F3F3F-20EC-4830-B014-EC118F6D4567'',											"
@@ -2695,12 +2696,6 @@ static const std::string gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_VIEW =
 	"	EXECUTE('CREATE VIEW[dbo].[vFAMUserInputEventsTime] "
 	"		AS " + gstrVIEW_DEFINITION_FOR_FAMUSER_INPUT_EVENTS_TIME +
 	"'	)";
-
-static const std::string gstrALTER_FAMUSER_INPUT_EVENTS_TIME_VIEW =
-"IF OBJECT_ID('[dbo].[vFAMUserInputEventsTime]', 'V') IS NOT NULL "
-"	EXECUTE('ALTER VIEW[dbo].[vFAMUserInputEventsTime] "
-"		AS " + gstrVIEW_DEFINITION_FOR_FAMUSER_INPUT_EVENTS_TIME +
-"'	)";
 
 static const std::string gstrCREATE_PAGINATION_DATA_WITH_RANK_VIEW =
 	"IF OBJECT_ID('[dbo].[vPaginationDataWithRank]', 'V') IS NULL \r\n"
@@ -2996,9 +2991,8 @@ static const string gstrCREATE_FAMUSER_INPUT_EVENTS_TIME_WITH_FILEID_VIEW =
 "	,dbo.FileTaskSession.FileID \r\n"
 "FROM dbo.FAMSession \r\n"
 "INNER JOIN dbo.FileTaskSession ON dbo.FAMSession.ID = dbo.FileTaskSession.FAMSessionID \r\n"
-"INNER JOIN dbo.TaskClass ON dbo.FileTaskSession.TaskClassID = dbo.TaskClass.ID \r\n"
 "WHERE ( \r\n"
-"		dbo.TaskClass.GUID IN ( \r\n"
+"		TaskClassGUID IN ( \r\n"
 "			''FD7867BD-815B-47B5-BAF4-243B8C44AABB'' \r\n"
 "			,''59496DF7-3951-49B7-B063-8C28F4CD843F'' \r\n"
 "			,''AD7F3F3F-20EC-4830-B014-EC118F6D4567'' \r\n"
@@ -3264,7 +3258,6 @@ static string gstrCREATE_USER_COUNTS_STORED_PROCEDURE =
 	"					INNER JOIN FAMSession ON FAMSession.ID = FileTaskSession.FAMSessionID \r\n"
 	"					INNER JOIN [DataEntryCounterValue] ON [DataEntryCounterValue].[InstanceID] = [FileTaskSession].[ID] \r\n"
 	"					INNER JOIN [DataEntryCounterDefinition] ON [DataEntryCounterDefinition].[ID] = [DataEntryCounterValue].[CounterID] \r\n"
-	"					INNER JOIN TaskClass ON FileTaskSession.TaskClassID = TaskClass.ID \r\n"
 	"					LEFT JOIN [Action] ON [FileTaskSession].ActionID = [Action].ID \r\n"
 	"					LEFT JOIN Workflow ON Workflow.ID = [Action].WorkflowID \r\n"
 	"					WHERE [FileTaskSession].[FileID] = [OuterFileTaskSession].FileID \r\n"
@@ -3291,7 +3284,7 @@ static string gstrCREATE_USER_COUNTS_STORED_PROCEDURE =
 	"							) \r\n"
 	"						AND [Type] = ''S'' \r\n"
 	"						AND Value IS NOT NULL \r\n"
-	"						AND TaskClass.GUID = ''59496DF7-3951-49B7-B063-8C28F4CD843F'' \r\n"
+	"						AND [FileTaskSession].TaskClassGUID = ''59496DF7-3951-49B7-B063-8C28F4CD843F'' \r\n"
 	"						AND ( \r\n"
 	"							[Workflow].[Name] = @WorkflowName \r\n"
 	"							OR @WorkflowName = '''' \r\n"
@@ -3334,7 +3327,6 @@ static string gstrCREATE_USER_COUNTS_STORED_PROCEDURE =
 	"			,SUM(ActivityTime) + SUM(OverheadTime) \r\n"
 	"		FROM FileTaskSession AS [OuterFileTaskSession] \r\n"
 	"		INNER JOIN FAMSession AS OuterFAMSession ON [OuterFileTaskSession].FAMSessionID = OuterFAMSession.ID \r\n"
-	"		INNER JOIN TaskClass ON [OuterFileTaskSession].TaskClassID = TaskClass.ID \r\n"
 	"		LEFT JOIN [Action] ON [OuterFileTaskSession].ActionID = [Action].ID \r\n"
 	"		LEFT JOIN Workflow ON Workflow.ID = [Action].WorkflowID \r\n"
 	"		-- Limit the selection to the included actions and tags \r\n"
@@ -3355,7 +3347,7 @@ static string gstrCREATE_USER_COUNTS_STORED_PROCEDURE =
 	"				) \r\n"
 	"			AND [DateTimeStamp] BETWEEN @ReportingPeriod_Min \r\n"
 	"				AND @ReportingPeriod_Max \r\n"
-	"			AND TaskClass.GUID = ''59496DF7-3951-49B7-B063-8C28F4CD843F'' \r\n"
+	"			AND OuterFileTaskSession.TaskClassGUID = ''59496DF7-3951-49B7-B063-8C28F4CD843F'' \r\n"
 	"			AND ( \r\n"
 	"				[Workflow].[Name] = @WorkflowName \r\n"
 	"				OR @WorkflowName = '''' \r\n"

@@ -47,6 +47,50 @@ namespace Extract.ETL
         string _description = string.Empty;
         int _activeFAMID;
 
+        static readonly string limitToTaskStoring = Invariant($@"TaskClassGUID in (
+                                    '{Constants.TaskClassStoreRetrieveAttributes}',
+                                    '{Constants.TaskClassDocumentApi}',
+                                    '{Constants.TaskClassWebVerification}')");
+        static readonly string queryForMaxReportableStoringTasks = $@"
+                    DECLARE @MaxFileTaskSession INT, @MaxReportable INT;
+                    SELECT @MaxFileTaskSession = MAX(FileTaskSession.ID)
+                    FROM FileTaskSession WITH (NOLOCK)
+                    WHERE {limitToTaskStoring}
+                    
+
+                    SELECT @MaxReportable = MIN(FileTaskSession.ID) - 1
+                    FROM FileTaskSession WITH (NOLOCK)
+                    WHERE {limitToTaskStoring} AND 
+
+                    FileTaskSession.FAMSessionID IN
+                    (
+                        SELECT FAMSessionID
+                        FROM ActiveFAM WITH (NOLOCK)
+        
+                    )
+                    AND DateTimeStamp IS NULL;
+
+                    SELECT ISNULL(@MaxReportable, @MaxFileTaskSession);";
+
+        static readonly string queryForMaxReportableAllTasks = $@"
+                    DECLARE @MaxFileTaskSession INT, @MaxReportable INT;
+                    SELECT @MaxFileTaskSession = MAX(FileTaskSession.ID)
+                    FROM FileTaskSession WITH (NOLOCK)
+                    
+
+                    SELECT @MaxReportable = MIN(FileTaskSession.ID) - 1
+                    FROM FileTaskSession WITH (NOLOCK)
+
+                    WHERE FileTaskSession.FAMSessionID IN
+                    (
+                        SELECT FAMSessionID
+                        FROM ActiveFAM WITH (NOLOCK)
+        
+                    )
+                    AND DateTimeStamp IS NULL;
+
+                    SELECT ISNULL(@MaxReportable, @MaxFileTaskSession);";
+
         /// <summary>
         /// Description of the database service item
         /// </summary>
@@ -763,24 +807,12 @@ namespace Extract.ETL
                 using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
                 connection.Open();
 
-                using var cmd = connection.CreateCommand();
-                cmd.CommandText = @"
-                            SELECT COALESCE(MIN(CASE WHEN ActiveFAM.ID IS NOT NULL AND DateTimeStamp IS NULL THEN FileTaskSession.ID END) - 1,
-                                    MAX(FileTaskSession.ID))
-                                FROM FileTaskSession WITH (NOLOCK)
-                                INNER JOIN TaskClass WITH (NOLOCK) ON TaskClass.ID = FileTaskSession.TaskClassID
-                                LEFT JOIN FAMSession WITH (NOLOCK) ON FAMSessionID = FAMSession.ID
-                                LEFT JOIN ActiveFAM WITH (NOLOCK) ON FAMSession.ID = ActiveFAM.FAMSessionID 
-                        ";
 
-                if (onlyTasksStoringAttributes)
-                {
-                    cmd.CommandText +=
-                        Invariant($@"WHERE TaskClass.GUID in (
-                                    '{Constants.TaskClassStoreRetrieveAttributes}', 
-                                    '{Constants.TaskClassDocumentApi}',
-                                    '{Constants.TaskClassWebVerification}')");
-                }
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = (onlyTasksStoringAttributes) ?
+                    queryForMaxReportableStoringTasks :
+                    queryForMaxReportableAllTasks;
+
                 var result = cmd.ExecuteScalar();
 
                 // The value returned could be a DBNull value so check
