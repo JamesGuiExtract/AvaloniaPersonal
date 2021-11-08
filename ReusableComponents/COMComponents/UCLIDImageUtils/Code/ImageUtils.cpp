@@ -249,9 +249,6 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 			0, 1, false, true));
 		ASSERT_RESOURCE_ALLOCATION("ELI44665", apPageBitmap.get() != __nullptr);
 
-		// Rotate this bitmap if needed
-		handleRotatedImage( strImageName, pRaster->PageNumber, &apPageBitmap->m_hBitmap );
-
 		BITMAPHANDLE bmZoneBitmap;
 		LeadToolsBitmapFreeer freeerZone( bmZoneBitmap, true );
 		extractZoneAsBitmap( &apPageBitmap->m_hBitmap, pRaster->StartX, pRaster->StartY, 
@@ -436,55 +433,5 @@ void CImageUtils::validateLicense()
 	static const unsigned long IMAGE_UTILS_ID = gnEXTRACT_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( IMAGE_UTILS_ID, "ELI09061", "Image Utils" );
-}
-//-------------------------------------------------------------------------------------------------
-void CImageUtils::handleRotatedImage(const std::string& strImageFileName, int nPageNumber, 
-									 BITMAPHANDLE* phBitmap)
-{
-	// Get original view perspective of this page
-	int nOriginalVP = getImageViewPerspective( strImageFileName, nPageNumber );
-
-	// Determine required rotation angle
-	int nRotationAngle = 0;
-	switch (nOriginalVP)
-	{
-	case 0:
-	case 1:
-	case 4:
-		// No change is needed
-		break;
-
-	case 7:
-	case 8:
-		nRotationAngle = 90;
-		break;
-
-	case 2:
-	case 3:
-		nRotationAngle = 180;
-		break;
-
-	case 5:
-	case 6:
-		nRotationAngle = 270;
-		break;
-
-	default:
-		THROW_LOGIC_ERROR_EXCEPTION("ELI16812");
-	}
-
-	// Is rotation needed?
-	if (nRotationAngle != 0)
-	{
-		// Verify that Document support is licensed
-		unlockDocumentSupport();
-
-		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
-
-		// Rotate the loaded bitmap, resizing as needed and filling new pixels with WHITE
-		int nRet = L_RotateBitmap( phBitmap, nRotationAngle*100, ROTATE_RESIZE, 
-			RGB(255,255,255) );
-		throwExceptionIfNotSuccess( nRet, "ELI16810", "Could not rotate the bitmap.");
-	}
 }
 //-------------------------------------------------------------------------------------------------

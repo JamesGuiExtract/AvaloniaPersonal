@@ -55,11 +55,5 @@ public:
 	
 private:
 
-	//---------------------------------------------------------------------------------------------
-	// PROMISE: To rotate the loaded bitmap according to the view perspective of the original page.
-	// NOTE:	nPageNumber is a 1-based page number.
-	void handleRotatedImage(const std::string& strImageFileName, int nPageNumber, 
-		BITMAPHANDLE* phBitmap);
-	//---------------------------------------------------------------------------------------------
 	void validateLicense();
 };
