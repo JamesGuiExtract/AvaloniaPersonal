@@ -72,7 +72,7 @@ namespace Extract.SqlDatabase
 
         public override void Cancel()
         {
-            BaseSqlCommand.Cancel();
+            BaseSqlCommand?.Cancel();
         }
 
         public override int ExecuteNonQuery()
