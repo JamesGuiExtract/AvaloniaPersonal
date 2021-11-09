@@ -14,6 +14,7 @@
 #include <LeadToolsBitmapFreeer.h>
 #include <ComponentLicenseIDs.h>
 #include <LeadToolsLicenseRestrictor.h>
+#include <ExtractMFCUtils.h>
 
 using namespace std;
 
@@ -26,6 +27,9 @@ const COLORREF gcrDefaultFGColor = RGB(0,0,0);
 // CImageUtils
 //-------------------------------------------------------------------------------------------------
 CImageUtils::CImageUtils()
+	: m_cachedBitmap()
+	, m_cachedImageStats()
+	, m_cachedImageLastWriteTime(0)
 {
 	try
 	{
@@ -240,19 +244,32 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 		ASSERT_RESOURCE_ALLOCATION("ELI13285", ipZone != __nullptr );
 
 		string strImageName = asString(strImage);
+
+		// Used cached result if the image and zone are the same as the last time this method was called
+		if (isCachedDataValid(strImageName, ipZone->PageNumber)
+			&& ipZone->Equals(m_cachedImageStats.rasterZone))
+		{
+			*ppImageStats = (IImageStats*) m_cachedImageStats.imageStats.Detach();
+		
+			return S_OK;
+		}
 		
 		// Make sure that if the file being opened is a pdf file that PDF support is licensed
 		LicenseManagement::verifyFileTypeLicensedRO( strImageName );
 
 		// Load the page into bitmap
-		unique_ptr<LeadToolsBitmap> apPageBitmap(new LeadToolsBitmap(strImageName, pRaster->PageNumber,
-			0, 1, false, true));
-		ASSERT_RESOURCE_ALLOCATION("ELI44665", apPageBitmap.get() != __nullptr);
+		BITMAPHANDLE* pPageBitmap = loadImagePage(strImageName, pRaster->PageNumber);
 
 		BITMAPHANDLE bmZoneBitmap;
 		LeadToolsBitmapFreeer freeerZone( bmZoneBitmap, true );
-		extractZoneAsBitmap( &apPageBitmap->m_hBitmap, pRaster->StartX, pRaster->StartY, 
+		extractZoneAsBitmap(pPageBitmap, pRaster->StartX, pRaster->StartY, 
 			pRaster->EndX, pRaster->EndY, pRaster->Height, &bmZoneBitmap );
+
+		// Convert to bitonal
+		if (bmZoneBitmap.BitsPerPixel != 1)
+		{
+			convertImageColorDepth(bmZoneBitmap, strImageName, 1, false, true);
+		}
 
 		UCLID_IMAGEUTILSLib::IImageStatsPtr ipImageStats(CLSID_ImageStats);
 		ASSERT_RESOURCE_ALLOCATION("ELI13299", ipImageStats != __nullptr );
@@ -283,6 +300,13 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 			}
 			ipVecFGPixelsInRow->PushBack(nPixelsFoundInRow);
 		}
+
+		// Cache result for subsequent calls
+		m_cachedImageStats = {
+			strImageName,
+			ipZone,
+			ipImageStats
+		};
 
 		*ppImageStats = (IImageStats*) ipImageStats.Detach();
 	
@@ -433,5 +457,33 @@ void CImageUtils::validateLicense()
 	static const unsigned long IMAGE_UTILS_ID = gnEXTRACT_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( IMAGE_UTILS_ID, "ELI09061", "Image Utils" );
+}
+//-------------------------------------------------------------------------------------------------
+bool CImageUtils::isCachedDataValid(const std::string& imageFilename, long pageNumber)
+{
+	return m_cachedBitmap.fileName == imageFilename
+		&& m_cachedBitmap.pageNumber == pageNumber
+		&& m_cachedImageLastWriteTime == getFileModificationTimeStamp(imageFilename);
+}
+//-------------------------------------------------------------------------------------------------
+BITMAPHANDLE* CImageUtils::loadImagePage(const std::string& imageFilename, long pageNumber)
+{
+	if (isCachedDataValid(imageFilename, pageNumber))
+	{
+		return &(m_cachedBitmap.bitmap.get())->m_hBitmap;
+	}
+
+	m_cachedBitmap = {
+		imageFilename,
+		pageNumber,
+		std::make_unique<LeadToolsBitmap>(imageFilename, pageNumber, 0, -1, false, true)
+	};
+
+	LeadToolsBitmap* bmp = m_cachedBitmap.bitmap.get();
+	ASSERT_RESOURCE_ALLOCATION("ELI44665", bmp != __nullptr);
+
+	m_cachedImageLastWriteTime = getFileModificationTimeStamp(imageFilename);
+
+	return &bmp->m_hBitmap;
 }
 //-------------------------------------------------------------------------------------------------

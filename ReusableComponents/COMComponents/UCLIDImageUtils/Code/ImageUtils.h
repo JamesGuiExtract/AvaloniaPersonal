@@ -5,6 +5,7 @@
 #include "resource.h"       // main symbols
 
 #include <MiscLeadUtils.h>
+#include <LeadToolsBitmap.h>
 
 #include <string>
 #include <vector>
@@ -56,4 +57,30 @@ public:
 private:
 
 	void validateLicense();
+
+	// Keep an instance of the last page that was loaded to speed-up subsequent calls that use the same page
+	// https://extract.atlassian.net/browse/ISSUE-17794
+	struct CachedImagePage {
+		std::string fileName;
+		long pageNumber;
+		std::unique_ptr<LeadToolsBitmap> bitmap;
+	} m_cachedBitmap;
+
+	// Keep an instance of the last stats that were loaded to speed-up subsequent calls for the same
+	// area of the same page
+	// https://extract.atlassian.net/browse/ISSUE-17794
+	struct CachedImageStats {
+		std::string fileName;
+		IRasterZonePtr rasterZone;
+		UCLID_IMAGEUTILSLib::IImageStatsPtr imageStats;
+	} m_cachedImageStats;
+
+	// Keep track of the last time the image was written to validate cached data
+	CTime m_cachedImageLastWriteTime;
+
+	// Load and cache a page from an image file
+	BITMAPHANDLE* loadImagePage(const std::string& imageFilename, long pageNumber);
+
+	// Check that the filename, page number and last write time match what was cached
+	bool isCachedDataValid(const std::string& imageFilename, long pageNumber);
 };

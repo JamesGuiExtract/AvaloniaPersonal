@@ -2945,3 +2945,37 @@ L_INT EXT_CALLBACK burnRedactions(HANNOBJECT hObject, L_VOID* pUserData)
 
 	return nRet;
 }
+//-------------------------------------------------------------------------------------------------
+void convertImageColorDepth(BITMAPHANDLE& hBitmap, string strImageFileName, long nBitsPerPixel,
+	bool bUseDithering, bool bUseAdaptiveThresholdToConvertToBitonal)
+{
+	// If specified, when converting from color/grayscale to bitonal, use an adaptive threshold algorithm
+	// https://extract.atlassian.net/browse/ISSUE-14801
+	if (bUseAdaptiveThresholdToConvertToBitonal && nBitsPerPixel == 1)
+	{
+		unlockDocumentSupport();
+		L_INT nRet = L_AutoBinarizeBitmap(&hBitmap, 0, AUTO_BINARIZE_PRE_AUTO | AUTO_BINARIZE_THRESHOLD_AUTO);
+		throwExceptionIfNotSuccess(nRet, "ELI44666",
+			"Internal error: Unable to binarize image!", strImageFileName);
+	}
+
+	const long nDEFAULT_NUMBER_OF_COLORS = 0;
+	L_UINT flags = CRF_FIXEDPALETTE | (bUseDithering ? CRF_ORDEREDDITHERING : CRF_NODITHERING);
+	L_INT nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE), nBitsPerPixel, flags,
+		NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
+
+	throwExceptionIfNotSuccess(nRet, "ELI42166",
+			"Internal error: Unable to convert image to specified bits-per-pixel!", strImageFileName);
+
+	// Set the image palette to white, black to ensure consistency in reading image data
+	// (0 = white, 1 = black)
+	if (nBitsPerPixel == 1)
+	{
+		L_RGBQUAD palette[2] = { {255, 255, 255, 0}, {0, 0, 0, 0} };
+		nRet = L_ColorResBitmap(&hBitmap, &hBitmap, sizeof(BITMAPHANDLE),
+			hBitmap.BitsPerPixel, CRF_USERPALETTE, palette, NULL, 2, NULL, NULL);
+		throwExceptionIfNotSuccess(nRet, "ELI22238",
+			"Internal error: Failed to set image palette.", strImageFileName);
+	}
+}
+//-------------------------------------------------------------------------------------------------

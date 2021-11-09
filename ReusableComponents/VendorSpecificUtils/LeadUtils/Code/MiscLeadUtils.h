@@ -395,8 +395,12 @@ LEADUTILS_API void createLeadDC(HDC& hDC, BITMAPHANDLE& hBitmap);
 //-------------------------------------------------------------------------------------------------
 LEADUTILS_API void deleteLeadDC(HDC& hDC);
 //-------------------------------------------------------------------------------------------------
-
 LEADUTILS_API DWORD getPDFStartIndex(const string& strFileName);
+//-------------------------------------------------------------------------------------------------
+// Change color depth of a bitmap
+// NOTE: strImageFileName is used for exception messages only
+LEADUTILS_API void convertImageColorDepth(BITMAPHANDLE& hBitmap, string strImageFileName, long nBitsPerPixel,
+	bool bUseDithering, bool bUseAdaptiveThresholdToConvertToBitonal);
 
 //-------------------------------------------------------------------------------------------------
 // Sets the PDF save options for the current thread to the specified settings

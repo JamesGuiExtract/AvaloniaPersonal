@@ -12,6 +12,7 @@
 class LEADUTILS_API LeadToolsBitmap
 {
 public:
+	// Load a page from a file. If nBitsPerPixel is <= 0 then no color conversion will be performed
 	LeadToolsBitmap(const string strImageFileName, unsigned long ulPage, double dRotation = 0,
 		int nBitsPerPixel = 1, bool bUseDithering = true, bool bUseAdaptiveThresholdToConvertToBitonal = false);
 

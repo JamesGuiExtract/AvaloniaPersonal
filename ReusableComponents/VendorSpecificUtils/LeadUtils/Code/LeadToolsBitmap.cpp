@@ -42,25 +42,10 @@ LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ul
 		LeadToolsLicenseRestrictor leadToolsLicenseGuard;
 
 		// Convert to specified bpp if necessary
-		if (nBitsPerPixel != m_FileInfo.BitsPerPixel)
+		// If nBitsPerPixel <= 0 then don't change
+		if (nBitsPerPixel > 0 && nBitsPerPixel != m_FileInfo.BitsPerPixel)
 		{
-			// If specified, when converting from color/grayscale to bitonal use an adaptive threshold algorithm
-			// https://extract.atlassian.net/browse/ISSUE-14842
-			if (bUseAdaptiveThresholdToConvertToBitonal && nBitsPerPixel == 1)
-			{
-				unlockDocumentSupport();
-				nRet = L_AutoBinarizeBitmap(&m_hBitmap, 0, AUTO_BINARIZE_PRE_AUTO | AUTO_BINARIZE_THRESHOLD_AUTO);
-				throwExceptionIfNotSuccess(nRet, "ELI44666",
-					"Internal error: Unable to binarize image!", strImageFileName);
-			}
-
-			const long nDEFAULT_NUMBER_OF_COLORS = 0;
-			L_UINT flags = CRF_FIXEDPALETTE | (bUseDithering ? CRF_ORDEREDDITHERING : CRF_NODITHERING);
-			nRet = L_ColorResBitmap(&m_hBitmap, &m_hBitmap, sizeof(BITMAPHANDLE), nBitsPerPixel, flags,
-				NULL, NULL, nDEFAULT_NUMBER_OF_COLORS, NULL, NULL);
-
-			throwExceptionIfNotSuccess(nRet, "ELI42166",
-				"Internal error: Unable to convert image to specified bits-per-pixel!", strImageFileName);
+			convertImageColorDepth(m_hBitmap, strImageFileName, nBitsPerPixel, bUseDithering, bUseAdaptiveThresholdToConvertToBitonal);
 		}
 
 		// L_RotateBitmap takes the rotation degrees in hundredths of a degree.  Convert
@@ -99,14 +84,6 @@ LeadToolsBitmap::LeadToolsBitmap(const string strImageFileName, unsigned long ul
 					"Internal error: Unable to trim rotated image.", m_strImageFileName);
 			}
 		}
-
-		// Set the image palette to white, black to ensure consistency in reading image data
-		// (0 = white, 1 = black)
-		L_RGBQUAD palette[2] = { {255, 255, 255, 0}, {0, 0, 0, 0} };
-		nRet = L_ColorResBitmap(&m_hBitmap, &m_hBitmap, sizeof(BITMAPHANDLE), 
-			m_hBitmap.BitsPerPixel,	CRF_USERPALETTE, palette, NULL, 2, NULL, NULL);
-		throwExceptionIfNotSuccess(nRet, "ELI22238", 
-			"Internal error: Failed to set image palette.", m_strImageFileName);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI32213");
 }
