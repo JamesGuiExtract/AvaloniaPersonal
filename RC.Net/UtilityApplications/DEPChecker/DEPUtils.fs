@@ -111,7 +111,7 @@ let checkConfigFile (configPath: string) =
     let info = FileInfo.getDEPInfoFromQueryInfo configPath queries
 
     let sqlCeErrors =
-      doc.SelectNodes("""//value""")
+      doc.SelectNodes("""//DatabaseConnection/*""")
       |> Seq.cast<XmlNode>
       |> Seq.map(fun node -> node.InnerText)
       |> Seq.filter(fun v -> v |> Regex.isMatch """(?inx) System\.Data\.SqlServerCe""")
@@ -119,7 +119,7 @@ let checkConfigFile (configPath: string) =
       |> Seq.toList
 
     let sdfFileErrors =
-      doc.SelectNodes("""//value""")
+      doc.SelectNodes("""//value|//DatabaseConnection/*""")
       |> Seq.cast<XmlNode>
       |> Seq.map(fun node -> node.InnerText)
       |> Seq.filter(fun v -> v.EndsWith(".sdf", StringComparison.OrdinalIgnoreCase))
