@@ -1207,8 +1207,16 @@ namespace Extract.FileActionManager.Utilities
                             }
                             while (!_stopProcessing.WaitOne(30000));
                         }).Start();
-                        _etlFAMDB.RecordFAMSessionStart("ETL Polling", string.Empty, false, false);
-                        _etlFAMDB.RegisterActiveFAM();
+                        try
+                        {
+                            _etlFAMDB.RecordFAMSessionStart("ETL Polling", string.Empty, false, false);
+                            _etlFAMDB.RegisterActiveFAM();
+                        }
+                        catch (Exception ex)
+                        {
+                            ex.ExtractLog("ELI51964");
+                            _stopProcessing.Set();
+                        }
                     }).Start();
                 }
             }
