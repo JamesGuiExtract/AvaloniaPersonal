@@ -1,16 +1,12 @@
-﻿using Extract.Utilities;
-using System;
+﻿using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace Extract.SqlDatabase
 {
     public sealed class NoAppRoleConnection : SqlAppRoleConnection
     {
-
-        static NoAppRoleConnection()
-        {
-            NoAppRoleFactory.RegisterProviderForInstance();
-        }
+        // This enables support for DbProviderFactories.GetFactory()
+        protected override DbProviderFactory DbProviderFactory => NoAppRoleFactory.Instance;
 
         public NoAppRoleConnection(string server, string database, bool enlist = true)
             : base(SqlUtil.NewSqlDBConnection(server, database, enlist))

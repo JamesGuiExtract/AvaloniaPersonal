@@ -55,12 +55,5 @@ namespace Extract.SqlDatabase
         {
             return new NoAppRoleConnection(new SqlConnection());
         }
-        public static void RegisterProviderForInstance()
-        {
-            SqlUtil.RegisterProviderForInstance(
-                "No App Role Connection Provider"
-                , "Data Provider for No App Role"
-                , NoAppRoleFactory.Instance.GetType());
-        }
     }
 }

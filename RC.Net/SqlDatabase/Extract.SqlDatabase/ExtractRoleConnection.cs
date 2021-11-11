@@ -10,11 +10,8 @@ namespace Extract.SqlDatabase
         private static readonly string password = "Change2This3Password";
         private static readonly string role = "ExtractRole";
 
-
-        static ExtractRoleConnection()
-        {
-            ExtractRoleFactory.RegisterProviderForInstance();
-        }
+        // This enables support for DbProviderFactories.GetFactory()
+        protected override DbProviderFactory DbProviderFactory => ExtractRoleFactory.Instance;
 
         public ExtractRoleConnection(string server, string database, bool enlist = true)
             : base(SqlUtil.NewSqlDBConnection(server, database, enlist))

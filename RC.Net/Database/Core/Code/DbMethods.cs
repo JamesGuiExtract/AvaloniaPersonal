@@ -1,18 +1,16 @@
 ﻿using Extract.Licensing;
-using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.SQLite;
-using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using static System.FormattableString;
-using Extract.SqlDatabase;
 
 namespace Extract.Database
 {
@@ -29,17 +27,6 @@ namespace Extract.Database
         private static readonly string _OBJECT_NAME = typeof(DBMethods).ToString();
 
         #endregion Constants
-
-        #region Fields
-
-        /// <summary>
-        /// Cache the <see cref="DbProviderFactory"/> looked up by <see cref="GetDBProvider"/>
-        /// per thread so that subsequent calls don't have to go through the full lookup process.
-        /// </summary>
-        [ThreadStatic]
-        static KeyValuePair<DbConnection, DbProviderFactory> _lastProvider;
-
-        #endregion Fields
 
         #region Methods
 
@@ -111,10 +98,6 @@ namespace Extract.Database
         /// <summary>
         /// Gets the <see cref="DbProviderFactory"/> that corresponds with the specified
         /// <see cref="DbConnection"/>.
-        /// <para><b>Note</b></para>
-        /// MSDN doc claims the availability of a DbProviderFactories.GetFactory() override
-        /// in .Net 4.0 that takes a DbConnection... but that doesn't seem to be the case.
-        /// http://msdn.microsoft.com/en-us/library/hh323136(v=vs.100).aspx
         /// </summary>
         /// <param name="dbConnection">The <see cref="DbConnection"/> for which the provider is
         /// needed.</param>
@@ -124,46 +107,18 @@ namespace Extract.Database
         {
             try
             {
-                if (_lastProvider.Key == dbConnection)
-                {
-                    return _lastProvider.Value;
-                }
+                _ = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
 
-                DbProviderFactory providerFactory = null;
-                if (dbConnection.GetType() == typeof(SQLiteConnection))
-                {
-                    providerFactory = new SQLiteFactory();
-                }
-                else
-                {
-                    // Use GetProviderMatchScore to select the provider that has the closest version to
-                    // dbConnection.ServerVersion from the providers that correspond with the connection
-                    // type.
-                    var providerRow = DbProviderFactories
-                        .GetFactoryClasses()
-                        .Rows.Cast<DataRow>()
-                        .Select(row => new Tuple<DataRow, int>(
-                            row, GetProviderMatchScore(row, dbConnection)))
-                        .Where(item => item.Item2 > 0)
-                        .OrderByDescending(item => item.Item2)
-                        .Select(item => item.Item1)
-                        .FirstOrDefault();
-
-                    providerFactory = (providerRow == null)
-                        ? new SQLiteFactory()
-                        : DbProviderFactories.GetFactory(providerRow);
-                }
-
-                // Cache the provider per-thread so that subsequent calls don't have to go through
-                // the full lookup process.
-                _lastProvider = new KeyValuePair<DbConnection, DbProviderFactory>(
-                    dbConnection, providerFactory);
-
-                return providerFactory;
+                // SQLiteConnection, SqlConnection, ExtractRoleConnection and NoAppRoleConnection all override
+                // DbConnection.DbProviderFactory to return the correct factory so this should always work.
+                return DbProviderFactories.GetFactory(dbConnection)
+                    ?? throw new ArgumentException("No DbProviderFactory for connection");
             }
             catch (Exception ex)
             {
-                throw ex.AsExtract("ELI36825");
+                var uex = ex.AsExtract("ELI36825");
+                uex.AddDebugData("Connection type", dbConnection.GetType().Name);
+                throw uex;
             }
         }
 
@@ -979,68 +934,6 @@ namespace Extract.Database
         #endregion Methods
 
         #region Private Members
-
-        /// <summary>
-        /// Determines whether the <see paramref="providerDataRow"/> appears to be the one used by
-        /// the <see paramref="dbConnection"/> based on the namespace and assembly and, if so,
-        /// closely the <see cref="DbConnection.ServerVersion"/> and the provider's server version
-        /// match.
-        /// </summary>
-        /// <param name="providerDataRow"><see cref="DataRow"/> representing a
-        /// <see cref="DbProviderFactory"/>.</param>
-        /// <param name="dbConnection">The <see cref="DbConnection"/>.</param>
-        /// <returns>-1 if the provider doesn't correspond to the connection; 0 if the provider
-        /// corresponds, but the version numbers are complete different; 1 if they correspond and
-        /// only the major version matches, 2 if the minor version matches as well, 3 if all but
-        /// the revision match and 4 if the version numbers are identical.
-        /// </returns>
-        static int GetProviderMatchScore(DataRow providerDataRow, DbConnection dbConnection)
-        {
-            var type = (dbConnection is SqlAppRoleConnection appRoleConnection)
-                ? appRoleConnection.GetConnectionType()
-                : dbConnection.GetType();
-
-            var connectionNameParser=
-                new AssemblyQualifiedNameParser(type.AssemblyQualifiedName);
-            var providerNameParser =
-                new AssemblyQualifiedNameParser(providerDataRow["AssemblyQualifiedName"].ToString());
-
-            // Check that the provider and connection are from the same namespace
-            if (connectionNameParser.Namespace != providerNameParser.Namespace ||
-                connectionNameParser.PublicKeyToken != providerNameParser.PublicKeyToken)
-            {
-                // -1 indicates that this provider isn't a match for the current connection.
-                return -1;
-            }
-
-            // https://extract.atlassian.net/browse/ISSUE-12161
-            // At this point it appears the provider is a match. However, at least for SQLServerCE,
-            // there can be multiple matching versions installed and using the wrong version will
-            // lead to errors. It doesn't appear to be the case that version numbers can be matched
-            // up exactly (at least in all cases), but the matching candidates can be ranked by how
-            // closely the version numbers correspond; 
-
-            // Score a point for each component of the version that matches.
-            int score = 0;
-            if (providerNameParser.Version.Major == connectionNameParser.Version.Major)
-            {
-                score++;
-                if (providerNameParser.Version.Minor == connectionNameParser.Version.Minor)
-                {
-                    score++;
-                    if (providerNameParser.Version.Build == connectionNameParser.Version.Build)
-                    {
-                        score++;
-                        if (providerNameParser.Version.Revision == connectionNameParser.Version.Revision)
-                        {
-                            score++;
-                        }
-                    }
-                }
-            }
-
-            return score;
-        }
 
         /// <summary>
         /// Helper method for FormatDataIntoGrid. Applies layout and formatting of

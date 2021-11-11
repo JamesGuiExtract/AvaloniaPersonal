@@ -55,12 +55,5 @@ namespace Extract.SqlDatabase
         {
              return new ExtractRoleConnection(new SqlConnection());
         }
-        public static void RegisterProviderForInstance()
-        {
-            SqlUtil.RegisterProviderForInstance(
-                "Extract Role Connection Provider"
-                , "Data Provider for Extract Role",
-                ExtractRoleFactory.Instance.GetType());
-        }
     }
 }
