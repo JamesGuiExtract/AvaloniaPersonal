@@ -269,7 +269,7 @@ namespace Extract.AttributeFinder.Rules.Json.Test
                 var sourceBytes = line.ToByteArray();
                 var stream = new MemoryStream(sourceBytes);
                 var istream = new IStreamWrapper(stream);
-                var ipersistStream = (IPersistStream)new ObjectWithDescriptionClass().Clone();
+                var ipersistStream = (IPersistStream)new ObjectWithDescriptionClass();
                 ipersistStream.Load(istream);
                 var owd = (IObjectWithDescription)ipersistStream;
 
