@@ -728,7 +728,10 @@ STDMETHODIMP CFileProcessingDB::Clear(VARIANT_BOOL vbRetainUserValues)
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
 
 		Clear_Internal(true, vbRetainUserValues);
-		getThisAsCOMPtr()->CloseAllDBConnections();
+
+		// This is a temporary close (don't reset m_bLoggedInAsAdmin)
+		// https://extract.atlassian.net/browse/ISSUE-17800
+		closeAllDBConnections(true);
 
 		return S_OK;
 	}
