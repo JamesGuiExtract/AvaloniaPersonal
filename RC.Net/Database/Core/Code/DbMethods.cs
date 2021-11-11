@@ -105,10 +105,10 @@ namespace Extract.Database
         /// <see cref="DbConnection"/>.</returns>
         public static DbProviderFactory GetDBProvider(DbConnection dbConnection)
         {
+            _ = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
+
             try
             {
-                _ = dbConnection ?? throw new ArgumentNullException(nameof(dbConnection));
-
                 // SQLiteConnection, SqlConnection, ExtractRoleConnection and NoAppRoleConnection all override
                 // DbConnection.DbProviderFactory to return the correct factory so this should always work.
                 return DbProviderFactories.GetFactory(dbConnection)
