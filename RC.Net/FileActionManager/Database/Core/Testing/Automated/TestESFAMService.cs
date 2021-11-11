@@ -80,6 +80,7 @@ namespace Extract.FileActionManager.Database.Test
             finally
             {
                 File.Delete(sqlCompactDatabaseName);
+                File.Delete(GetRenamedDatabase(sqlCompactDatabaseName));
             }
         }
 
@@ -106,7 +107,13 @@ namespace Extract.FileActionManager.Database.Test
                 InstallService(name, displayName);
                 using var service = new TempService(name);
 
-                // Delete the sqlite file that has been created from the sdf file
+                // The old database file has been renamed
+                FileAssert.DoesNotExist(sqlCompactDatabaseName);
+
+                // Change the name back again
+                File.Move(GetRenamedDatabase(sqlCompactDatabaseName), sqlCompactDatabaseName);
+
+                // Delete the sqlite file that has been created from the sdf file to test that running the service will recreate it
                 File.Delete(databaseName);
 
                 // Run the service
@@ -127,6 +134,7 @@ namespace Extract.FileActionManager.Database.Test
             finally
             {
                 File.Delete(sqlCompactDatabaseName);
+                File.Delete(GetRenamedDatabase(sqlCompactDatabaseName));
             }
         }
 
@@ -226,5 +234,14 @@ namespace Extract.FileActionManager.Database.Test
                 RemoveServiceAndDB(_name).ConfigureAwait(false).GetAwaiter().GetResult();
             }
         }
+
+        // Get the *.bak version of a database name
+        private static string GetRenamedDatabase(string oldDatabasename)
+        {
+            string folder = Path.GetDirectoryName(oldDatabasename);
+            string name = Path.GetFileName(oldDatabasename);
+            return Directory.GetFiles(folder, name + "*.bak").First();
+        }
+
     }
 }
