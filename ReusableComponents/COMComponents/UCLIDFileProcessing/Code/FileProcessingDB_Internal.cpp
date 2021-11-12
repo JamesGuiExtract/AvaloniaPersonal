@@ -5288,26 +5288,39 @@ UINT CFileProcessingDB::maintainActionStatistics(void *pData)
 
 							auto role = pDB->getAppRoleConnection();
 							ipConnection = role->ADOConnection();
-
-							// Check that an update is needed before any attempt at locking the DB.
+							
 							nActionID = pDB->m_nActiveActionID;
-							if (nActionID >= 0 &&
-								pDB->isStatisticsUpdateFromDeltaNeeded(ipConnection, nActionID))
+							string strActionName = pDB->getActionName(ipConnection, nActionID);
+
+							string strActionIDs = pDB->getActionIDsForActiveWorkflow(ipConnection, strActionName);
+
+							// Tokenize by either comma, semicolon, or pipe
+							vector<string> vecTokens;
+							vector<int> vecActionIds;
+							
+							StringTokenizer::sGetTokens(strActionIDs, ",;|", vecTokens, true);
+							for each (auto action in vecTokens)
+								vecActionIds.push_back(asLong(action));
+
+							for each (nActionID in vecActionIds)
 							{
-								// A Lock is needed to update the ActionStatistics table.
-								LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(
-									pDB, gstrMAIN_DB_LOCK);
+								if (pDB->isStatisticsUpdateFromDeltaNeeded(ipConnection, nActionID))
+								{
+									// A Lock is needed to update the ActionStatistics table.
+									LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(
+										pDB, gstrMAIN_DB_LOCK);
 
-								bLocked = true;
+									bLocked = true;
 
-								// Begin a transaction
-								TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
+									// Begin a transaction
+									TransactionGuard tg(ipConnection, adXactChaos, __nullptr);
 
-								pDB->updateActionStatisticsFromDelta(ipConnection, nActionID);
+									pDB->updateActionStatisticsFromDelta(ipConnection, nActionID);
 
-								tg.CommitTrans();
+									tg.CommitTrans();
+								}
 							}
-
+							
 							bSuccess = true;
 						}
 						CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI35127")
