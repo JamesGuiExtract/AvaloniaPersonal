@@ -19,6 +19,7 @@ public:
 // constructor
 	AdvancedTaskSettingsDlg(int iNumThreads=0, bool bKeepProcessing=false,
 		IVariantVectorPtr ipSchedule=__nullptr, long nNumFilesFromDb=gnMAX_NUMBER_OF_FILES_FROM_DB,
+		bool bUseRandomIDForQueueOrder=false,
 		CWnd* pParent = __nullptr);
 	virtual ~AdvancedTaskSettingsDlg();
 
@@ -30,6 +31,7 @@ public:
 	bool getKeepProcessing();
 	IVariantVectorPtr getSchedule();
 	long getNumberOfFilesFromDb();
+	bool getUseRandomIDForQueueOrder();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -68,6 +70,7 @@ private:
 	bool m_bKeepProcessing;
 	IVariantVectorPtr m_ipSchedule;
 	long m_nNumFiles;
+	BOOL m_bUseRandomIDForQueueOrder;
 
 	///////////
 	//Methods

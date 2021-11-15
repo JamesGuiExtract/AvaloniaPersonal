@@ -107,6 +107,8 @@ public:
 	STDMETHOD(WaitForProcessingCompleted)();
 	STDMETHOD(get_ProcessingDisplaysUI)(VARIANT_BOOL *pProcessingDisplaysUI);
 	STDMETHOD(get_ConnectionString)(BSTR* pbstrConnectionString);
+	STDMETHOD(get_UseRandomIDForQueueOrder)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_UseRandomIDForQueueOrder)(VARIANT_BOOL newVal);
 
 	// IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -222,6 +224,9 @@ private:
 	// Event that gets signaled when NotifyProcessingCompleted
 	Win32Event m_ProcessingCompletedEvent;
 
+	// Whether to use random queue order
+	bool m_bUseRandomIDForQueueOrder;
+
 	///////////
 	// Methods
 	///////////
@@ -282,11 +287,11 @@ private:
 	// allowed to run, false if the user was prompted for a password they did not correctly enter.
 	bool authenticateForProcessing();
 
-	// Displays a message box warning about any potential configuration issues.
-	void showConfigurationWarnings();
-
 	// Gets the this pointer as smart com pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr getThisAsCOMPtr();
 
 	void validateLicense();
+
+	// The current version, or lower if all new settings have their default values
+	unsigned long getLowestCompatibleVersion();
 };

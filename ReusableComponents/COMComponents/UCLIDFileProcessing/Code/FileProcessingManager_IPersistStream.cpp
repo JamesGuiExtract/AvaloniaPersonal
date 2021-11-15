@@ -14,9 +14,47 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 17;
-// Version 15: Added AdvancedConnectionStringProperties
+const unsigned long gnCurrentVersion = 18;
 const int gnOLD_CONVERT_VERSION = 10;
+const unsigned long gnUseRandomIDForQueueOrderVersion = 18;
+//-------------------------------------------------------------------------------------------------
+// Version 7:
+//   Added Skip Condition persistence
+// Version 8:
+//   Added File Suppliers persistence
+// Version 9:
+//   Removed nMaxAttempts, Folder Scope, Individual Files Scope, Filter Patterns
+// Version 10:
+//   Add Action tab persistence
+// Version 11:
+//   Moved persistence of Supplying and Processing items to ...MgmtRole objects
+// Version 12:
+//	 Added DBConfig file persistence
+// Version 13:
+//	 Removed the DBConfig file name
+//	 Added the Server and Database
+// Version 14:
+//	 Added Max files from DB into FPS file settings as opposed to registry setting
+// Version 15:
+//   Added AdvancedConnectionStringProperties
+// Version 16:
+//   Added Active workflow
+// Version 17:
+//	 Added require admin edit setting
+// Version 18:
+//	 Added use random queue order setting
+unsigned long CFileProcessingManager::getLowestCompatibleVersion()
+{
+	// This logic can be modified or deleted when another setting is added
+	// but for now it would be a shame to make FPS files saved in 11.8 not work
+	// in 11.7 if this setting isn't being used
+	if (gnCurrentVersion == gnUseRandomIDForQueueOrderVersion
+		&& !m_bUseRandomIDForQueueOrder)
+	{
+		return gnUseRandomIDForQueueOrderVersion - 1;
+	}
+	return gnCurrentVersion;
+}
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
@@ -70,25 +108,6 @@ STDMETHODIMP CFileProcessingManager::IsDirty(void)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI30414");
 }
 //-------------------------------------------------------------------------------------------------
-// Version 7:
-//   Added Skip Condition persistence
-// Version 8:
-//   Added File Suppliers persistence
-// Version 9:
-//   Removed nMaxAttempts, Folder Scope, Individual Files Scope, Filter Patterns
-// Version 10:
-//   Add Action tab persistence
-// Version 11:
-//   Moved persistence of Supplying and Processing items to ...MgmtRole objects
-// Version 12:
-//	 Added DBConfig file persistence
-// Version 13:
-//	 Removed the DBConfig file name
-//	 Added the Server and Database
-// Version 14:
-//	 Added Max files from DB into FPS file settings as opposed to registry setting
-// Version 17:
-//	 Added require admin edit setting
 STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -142,7 +161,7 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 		// Read statistics check box status
 		dataReader >> m_bDisplayOfStatisticsEnabled;
 
-		// For version greater than 11 need to read the config file name
+		// For version 12 need to read the config file name
 		if ( nDataVersion == 12 )
 		{
 			string strDBConfigFile;
@@ -152,7 +171,7 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 		}
 
 		// Get the Server and Database
-		if ( nDataVersion > 12 )
+		if ( nDataVersion >= 13 )
 		{
 			// Read the server and database
 			string strServer;
@@ -164,7 +183,7 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 		}
 
 		// Get the max files from db value
-		if (nDataVersion > 13)
+		if (nDataVersion >= 14)
 		{
 			dataReader >> m_nMaxFilesFromDB;
 			if (m_nMaxFilesFromDB < gnNUM_FILES_LOWER_RANGE
@@ -184,21 +203,26 @@ STDMETHODIMP CFileProcessingManager::Load(IStream *pStream)
 		}
 
 		// Get advanced connection string properties
-		if (nDataVersion > 14)
+		if (nDataVersion >= 15)
 		{
 			string strAdvConnStrProperties;
 			dataReader >> strAdvConnStrProperties;
 			setAdvConnString(strAdvConnStrProperties);
 		}
 
-		if (nDataVersion > 15)
+		if (nDataVersion >= 16)
 		{
 			dataReader >> m_strActiveWorkflow;
 		}
 
-		if (nDataVersion > 16)
+		if (nDataVersion >= 17)
 		{
 			dataReader >> m_bRequireAdminEdit;
+		}
+
+		if (nDataVersion >= 18)
+		{
+			dataReader >> m_bUseRandomIDForQueueOrder;
 		}
 
 		// Read in the collected File Supplying Management Role
@@ -243,7 +267,9 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 		// Create a bytestream and stream this object's data into it
 		ByteStream data;
 		ByteStreamManipulator dataWriter( ByteStreamManipulator::kWrite, data );
-		dataWriter << gnCurrentVersion;
+
+		// Write the current version or, if possible, a lower version
+		dataWriter << getLowestCompatibleVersion();
 
 		// Save the current action name
 		dataWriter << m_strAction;
@@ -267,6 +293,12 @@ STDMETHODIMP CFileProcessingManager::Save(IStream *pStream, BOOL fClearDirty)
 
 		// Save the require admin edit flag
 		dataWriter << m_bRequireAdminEdit;
+
+		// Save the random queue order setting if needed
+		if (getLowestCompatibleVersion() >= gnUseRandomIDForQueueOrderVersion)
+		{
+			dataWriter << m_bUseRandomIDForQueueOrder;
+		}
 		
 		// Flush the stream
 		dataWriter.flushToByteStream();

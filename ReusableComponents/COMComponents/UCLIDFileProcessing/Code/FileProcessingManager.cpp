@@ -32,15 +32,16 @@ const std::string gstrSTREAM_NAME = "FileProcessingManager";
 // CFileProcessingManager
 //-------------------------------------------------------------------------------------------------
 CFileProcessingManager::CFileProcessingManager()
-: m_ipFPMDB(NULL),
-m_isDBConnectionReady(false),
-m_nNumberOfFilesToExecute(0),
-m_bCancelling(false),
-m_bIsAuthenticated(false),
-m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB),
-m_strActiveWorkflow(""),
-m_bRequireAdminEdit(false),
-m_ProcessingCompletedEvent()
+	: m_ipFPMDB(NULL)
+	, m_isDBConnectionReady(false)
+	, m_nNumberOfFilesToExecute(0)
+	, m_bCancelling(false)
+	, m_bIsAuthenticated(false)
+	, m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
+	, m_strActiveWorkflow("")
+	, m_bRequireAdminEdit(false)
+	, m_ProcessingCompletedEvent()
+	, m_bUseRandomIDForQueueOrder(false)
 {
 	try
 	{
@@ -246,6 +247,9 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 
 		// Set the max number of files to get from the DB
 		m_recordMgr.setMaxNumberOfFilesFromDB(m_nMaxFilesFromDB);
+
+		// Set whether to use random queue
+		m_recordMgr.setUseRandomIDForQueueOrder(m_bUseRandomIDForQueueOrder);
 
 		// if there is a dialog set it to receive status updates
 		if(m_apDlg.get() != __nullptr)
@@ -1209,8 +1213,11 @@ STDMETHODIMP CFileProcessingManager::put_MaxFilesFromDB(long newVal)
 			throw ue;
 		}
 
-		m_bDirty = m_nMaxFilesFromDB != newVal;
-		m_nMaxFilesFromDB = newVal;
+		if (m_nMaxFilesFromDB != newVal)
+		{
+			m_bDirty = true;
+			m_nMaxFilesFromDB = newVal;
+		}
 
 		return S_OK;
 	}
@@ -1561,6 +1568,43 @@ STDMETHODIMP CFileProcessingManager::NotifyProcessingCancelling()
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI38549");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::get_UseRandomIDForQueueOrder(VARIANT_BOOL* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI52964", pVal != __nullptr);
+
+		*pVal = asVariantBool(m_bUseRandomIDForQueueOrder);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI52965");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingManager::put_UseRandomIDForQueueOrder(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetAppModuleState());
+
+	try
+	{
+		validateLicense();
+
+
+		if (m_bUseRandomIDForQueueOrder != asCppBool(newVal))
+		{
+			m_bDirty = true;
+			m_bUseRandomIDForQueueOrder = asCppBool(newVal);
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI52966");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent
@@ -1757,6 +1801,8 @@ void CFileProcessingManager::clear()
 		m_nMaxFilesFromDB = gnMAX_NUMBER_OF_FILES_FROM_DB;
 
 		m_bRequireAdminEdit = false;
+
+		m_bUseRandomIDForQueueOrder = false;
 
 		m_bDirty = false;
 	}

@@ -563,10 +563,9 @@ STDMETHODIMP CFileProcessingDB::SetFileInformationForFile(int fileID, long long 
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI51583");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFiles, 
-												  VARIANT_BOOL bGetSkippedFiles,
-												  BSTR bstrSkippedForUserName,
-												  IIUnknownVector * * pvecFileRecords)
+STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction, long nMaxFiles,
+	VARIANT_BOOL bGetSkippedFiles, BSTR bstrSkippedForUserName,
+	IIUnknownVector** pvecFileRecords)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -575,17 +574,55 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess(BSTR strAction,  long nMaxFile
 		// Check License
 		validateLicense();
 
-		if (!GetFilesToProcess_Internal(false, strAction, nMaxFiles, bGetSkippedFiles, 
-				bstrSkippedForUserName, pvecFileRecords))
+		FilesToProcessRequest request{
+			asString(strAction), //.actionName
+			asCppBool(bGetSkippedFiles), //.getSkippedFiles
+			asString(bstrSkippedForUserName), //.skippedUser
+			nMaxFiles, //.maxFiles
+			false //.useRandomIDForQueueOrder
+		};
+
+		if (!GetFilesToProcess_Internal(false, request, pvecFileRecords))
 		{
 			// Lock the database for this instance
 			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
-			GetFilesToProcess_Internal(true, strAction, nMaxFiles, bGetSkippedFiles, 
-				bstrSkippedForUserName, pvecFileRecords);
+
+			GetFilesToProcess_Internal(true, request, pvecFileRecords);
 		}
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13574");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetRandomFilesToProcess(BSTR strAction, long nMaxFiles,
+	VARIANT_BOOL bGetSkippedFiles, BSTR bstrSkippedForUserName,
+	IIUnknownVector** pvecFileRecords)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		FilesToProcessRequest request{
+			asString(strAction), //.actionName
+			asCppBool(bGetSkippedFiles), //.getSkippedFiles
+			asString(bstrSkippedForUserName), //.skippedUser
+			nMaxFiles, //.maxFiles
+			true //.useRandomIDForQueueOrder
+		};
+
+		if (!GetFilesToProcess_Internal(false, request, pvecFileRecords))
+		{
+			// Lock the database for this instance
+			LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr(), gstrMAIN_DB_LOCK);
+
+			GetFilesToProcess_Internal(true, request, pvecFileRecords);
+		}
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI52962");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::RemoveFolder(BSTR strFolder, BSTR strAction)

@@ -19,13 +19,14 @@ const string gstrSET_SCHEDULE_PROG_ID = "Extract.FileActionManager.Forms.SetProc
 IMPLEMENT_DYNAMIC(AdvancedTaskSettingsDlg, CDialog)
 //-------------------------------------------------------------------------------------------------
 AdvancedTaskSettingsDlg::AdvancedTaskSettingsDlg(int iNumThreads, bool bKeepProcessing,
-	IVariantVectorPtr ipSchedule, long nNumFilesFromDb, CWnd* pParent) :
+	IVariantVectorPtr ipSchedule, long nNumFilesFromDb, bool bUseRandomIDForQueueOrder, CWnd* pParent) :
     CDialog(AdvancedTaskSettingsDlg::IDD, pParent),
 	m_iNumThreads(iNumThreads),
 	m_bKeepProcessing(bKeepProcessing),
 	m_ipSchedule(ipSchedule),
 	m_bLimitProcessingTimes(asMFCBool(ipSchedule != __nullptr)),
-	m_nNumFiles(nNumFilesFromDb)
+	m_nNumFiles(nNumFilesFromDb),
+	m_bUseRandomIDForQueueOrder(asMFCBool(bUseRandomIDForQueueOrder))
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -47,6 +48,7 @@ void AdvancedTaskSettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK_LIMIT_PROCESSING, m_checkLimitProcessing);
 	DDX_Control(pDX, IDC_EDIT_NUM_FILES_FROM_DB, m_editNumFiles);
 	DDX_Control(pDX, IDC_SPIN_NUM_FILES, m_SpinNumFiles);
+	DDX_Check(pDX, IDC_USE_RANDOM_ID_FOR_QUEUE_ORDER, m_bUseRandomIDForQueueOrder);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(AdvancedTaskSettingsDlg, CDialog)
@@ -284,6 +286,11 @@ IVariantVectorPtr AdvancedTaskSettingsDlg::getSchedule()
 long AdvancedTaskSettingsDlg::getNumberOfFilesFromDb()
 {
 	return m_nNumFiles;
+}
+//-------------------------------------------------------------------------------------------------
+bool AdvancedTaskSettingsDlg::getUseRandomIDForQueueOrder()
+{
+	return m_bUseRandomIDForQueueOrder == TRUE;
 }
 //-------------------------------------------------------------------------------------------------
 void AdvancedTaskSettingsDlg::updateEnabledStates()

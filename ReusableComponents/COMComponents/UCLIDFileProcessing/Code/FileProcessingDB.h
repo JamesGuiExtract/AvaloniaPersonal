@@ -171,6 +171,8 @@ public:
 		EActionStatus* poldStatus);
 	STDMETHOD(GetFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
 		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
+	STDMETHOD(GetRandomFilesToProcess)(BSTR strAction, long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
+		BSTR bstrSkippedForUserName, IIUnknownVector** pvecFileRecords);
 	STDMETHOD(GetStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
 	STDMETHOD(GetVisibleFileStats)(long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs, IActionStatistics** pStats);
 	STDMETHOD(GetInvisibleFileStats)(long nActionID, VARIANT_BOOL vbForceUpdate, IActionStatistics** pStats);
@@ -433,6 +435,20 @@ private:
 		long FileID;
 		bool IsFileDeleted; // Indicates whether the file has been marked invisible in the active workflow
 		EActionStatus FromStatus;
+	};
+
+	// Common parameters for spGetFilesToProcessForActionID, setFilesToProcessing, and GetFilesToProcess_Internal
+	struct FilesToProcessRequest {
+		const string actionName;
+		const bool getSkippedFiles;
+		const string skippedUser;
+		long maxFiles;
+		const bool useRandomIDForQueueOrder;
+
+		string statusToSelect() const
+		{
+			return getSkippedFiles ? "S" : "P";
+		}
 	};
 
 	friend class DBLockGuard;
@@ -722,8 +738,8 @@ private:
 	// Methods
 	//-------------------------------------------------------------------------------------------------
 
-	_RecordsetPtr spGetFilesToProcessForActionID(const _ConnectionPtr& ipConnection, const int actionID,
-		const string& strActionName, const int nMaxFiles, const string& strStatusToSelect, const string& strSkippedUser);
+	_RecordsetPtr spGetFilesToProcessForActionID(const _ConnectionPtr& ipConnection,
+		const FilesToProcessRequest& request, const int actionID);
 
 	// Extracts the IFileRecordPtrs from the Recordset
 	vector<UCLID_FILEPROCESSINGLib::IFileRecordPtr> getFilesFromRecordset(_RecordsetPtr ipFileSet);
@@ -1279,7 +1295,7 @@ private:
 	// the GetFilesToProcessForActionID to get the files to process
 	// RETURNS: A vector of IFileRecords for the files that were set to processing.
 	IIUnknownVectorPtr setFilesToProcessing(bool bDBLocked, const _ConnectionPtr& ipConnection,
-		const string& strActionName, const string& strSkippedUser, const string& strStatusToSelect, long nMaxFiles);
+		const FilesToProcessRequest& request);
 
 	// Returns recordset opened as static containing the status record the file with nFileID and 
 	// action nActionID. If the status is unattempted the recordset will be empty
@@ -1440,8 +1456,7 @@ private:
 	bool SetStatusForFile_Internal(bool bDBLocked, long nID, BSTR strAction, long nWorkflowID,
 		EActionStatus eStatus, VARIANT_BOOL vbQueueChangeIfProcessing, VARIANT_BOOL vbAllowQueuedStatusOverride,
 		EActionStatus * poldStatus);
-	bool GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
-		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
+	bool GetFilesToProcess_Internal(bool bDBLocked, const FilesToProcessRequest& request, IIUnknownVector** pvecFileRecords);
 	bool GetFileToProcess_Internal(bool bDBLocked, long nFileID, BSTR strAction, BSTR bstrFromState, IFileRecord** ppFileRecord);
 	bool RemoveFolder_Internal(bool bDBLocked, BSTR strFolder, BSTR strAction);
 	bool GetStats_Internal(bool bDBLocked, long nActionID, VARIANT_BOOL vbForceUpdate, VARIANT_BOOL vbRevertTimedOutFAMs,

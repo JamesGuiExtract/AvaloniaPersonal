@@ -2,8 +2,6 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using UCLID_FILEPROCESSINGLib;
 
@@ -11,29 +9,59 @@ namespace Extract.FileActionManager.Database.Test
 {
     #region FileProcessingDB Wrappers
 
+    /// Wrapper for a FileProcessingDB with a single workflow that takes care of initialization and cleanup
+    internal sealed class NoWorkflows<T> : DisposableDatabaseBase<T>
+    {
+        readonly FileProcessingDB _fileProcessingDB;
+
+        public override FileProcessingDB FileProcessingDB => _fileProcessingDB;
+        public override FileProcessingDB[] Workflows => new[] { _fileProcessingDB };
+        public override FileProcessingDB[] Sessions => new[] { _fileProcessingDB };
+        public override string[] Actions { get; } = new[] { "Action1", "Action2" };
+
+        public NoWorkflows(FAMTestDBManager<T> dbManager, string dbName, FileProcessingDB fileProcessingDB)
+        {
+            _testDBManager = dbManager;
+            _dbName = dbName;
+            _fileProcessingDB = fileProcessingDB;
+
+            foreach (string action in Actions)
+                _fileProcessingDB.DefineNewAction(action);
+
+            // Start a session
+            _fileProcessingDB.RecordFAMSessionStart("Test.fps", Actions[0], true, true);
+            _fileProcessingDB.RegisterActiveFAM();
+        }
+    }
+
     /// <summary>
     /// Wrapper for a FileProcessingDB with a single workflow that takes care of initialization and cleanup
     /// </summary>
-    internal class OneWorkflow<T> : IDisposable
+    internal class OneWorkflow<T> : DisposableDatabaseBase<T>
     {
+        readonly bool _enableLoadBalancing;
+
         public readonly string action1 = "Action1";
         public readonly string action2 = "Action2";
 
         public readonly FileProcessingDB fpDB = null;
 
-        readonly string testDBName;
-        readonly FAMTestDBManager<T> testDBManager;
+        public override FileProcessingDB FileProcessingDB => fpDB;
+        public override FileProcessingDB[] Workflows => new[] { fpDB };
+        public override FileProcessingDB[] Sessions => new[] { fpDB };
+        public override string[] Actions => new[] { action1, action2 };
 
         public OneWorkflow(FAMTestDBManager<T> testDBManager, string testDBName, bool enableLoadBalancing)
         {
-            this.testDBManager = testDBManager;
-            this.testDBName = testDBName;
+            _testDBManager = testDBManager;
+            _dbName = testDBName;
+            _enableLoadBalancing = enableLoadBalancing;
 
-            // Setup DB
             fpDB = testDBManager.GetNewDatabase(testDBName);
-            fpDB.SetDBInfoSetting("EnableLoadBalancing", enableLoadBalancing ? "1" : "0", true, false);
-            fpDB.DefineNewAction(action1);
-            fpDB.DefineNewAction(action2);
+            fpDB.SetDBInfoSetting("EnableLoadBalancing", _enableLoadBalancing ? "1" : "0", true, false);
+
+            foreach (string action in Actions)
+                fpDB.DefineNewAction(action);
 
             int workflowID = fpDB.AddWorkflow("Workflow1", EWorkflowType.kUndefined, action1, action2);
             Assert.AreEqual(1, workflowID);
@@ -44,69 +72,40 @@ namespace Extract.FileActionManager.Database.Test
             fpDB.RecordFAMSessionStart("Test.fps", action1, true, true);
             fpDB.RegisterActiveFAM();
         }
-
-        public int addFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal)
-        {
-            var fileName = Path.Combine(Path.GetTempPath(), fileNumber.ToString("N3", CultureInfo.InvariantCulture) + ".tif");
-            int fileID = fpDB.AddFileNoQueue(fileName, 0, 0, priority, 1);
-            if (setAsSkipped)
-            {
-                fpDB.SetFileStatusToSkipped(fileID, action1, false, false);
-                fpDB.SetFileStatusToSkipped(fileID, action2, false, false);
-            }
-            else
-            {
-                fpDB.SetFileStatusToPending(fileID, action1, false);
-                fpDB.SetFileStatusToPending(fileID, action2, false);
-            }
-
-            return fileID;
-        }
-
-        public void Dispose()
-        {
-            if (fpDB != null)
-            {
-                try
-                {
-                    // Prevent 'files were reverted' log
-                    fpDB.SetStatusForAllFiles(action1, EActionStatus.kActionUnattempted);
-                    fpDB.SetStatusForAllFiles(action2, EActionStatus.kActionUnattempted);
-                    fpDB.UnregisterActiveFAM();
-                    fpDB.RecordFAMSessionStop();
-                }
-                catch { }
-            }
-            testDBManager.RemoveDatabase(testDBName);
-        }
     }
 
     /// <summary>
     /// Wrapper for a FileProcessingDB with two workflows that takes care of initialization and cleanup
     /// </summary>
-    internal class TwoWorkflows<T> : IDisposable
+    internal class TwoWorkflows<T> : DisposableDatabaseBase<T>
     {
+        readonly bool _enableLoadBalancing;
+
         public readonly string action1 = "Action1";
         public readonly string action2 = "Action2";
 
         public readonly FileProcessingDB wf1 = null;
-        public readonly FileProcessingDB wf2 = null;
-        public readonly FileProcessingDB wfAll = null;
-
+        public FileProcessingDB wf2 = null;
+        public FileProcessingDB wfAll = null;
         readonly FileProcessingDB[] fpDBs = null;
-        readonly string testDBName;
-        readonly FAMTestDBManager<T> testDBManager;
+
+        public override FileProcessingDB FileProcessingDB => wf1;
+        public override FileProcessingDB[] Workflows => new[] { wf1, wf2 };
+        public override FileProcessingDB[] Sessions => new[] { wf1, wf2, wfAll };
+
+        public override string[] Actions => new[] { action1, action2 };
 
         public TwoWorkflows(FAMTestDBManager<T> testDBManager, string testDBName, bool enableLoadBalancing)
         {
-            this.testDBManager = testDBManager;
-            this.testDBName = testDBName;
+            _testDBManager = testDBManager;
+            _dbName = testDBName;
+            _enableLoadBalancing = enableLoadBalancing;
 
-            // Setup DB
             wf1 = testDBManager.GetNewDatabase(testDBName);
-            wf1.SetDBInfoSetting("EnableLoadBalancing", enableLoadBalancing ? "1" : "0", true, false);
-            wf1.DefineNewAction(action1);
-            wf1.DefineNewAction(action2);
+            wf1.SetDBInfoSetting("EnableLoadBalancing", _enableLoadBalancing ? "1" : "0", true, false);
+
+            foreach (string action in Actions)
+                wf1.DefineNewAction(action);
 
             int workflow1 = wf1.AddWorkflow("Workflow1", EWorkflowType.kUndefined, action1, action2);
             Assert.AreEqual(1, workflow1);
@@ -137,54 +136,12 @@ namespace Extract.FileActionManager.Database.Test
             }
         }
 
-        public int addFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal)
-        {
-            var fileName = Path.Combine(Path.GetTempPath(), fileNumber.ToString("N3", CultureInfo.InvariantCulture) + ".tif");
-            int fileID = wf1.AddFileNoQueue(fileName, 0, 0, priority, 1);
-            if (setAsSkipped)
-            {
-                wf1.SetFileStatusToSkipped(fileID, action1, false, false);
-                wf1.SetFileStatusToSkipped(fileID, action2, false, false);
-                wf2.SetFileStatusToSkipped(fileID, action1, false, false);
-                wf2.SetFileStatusToSkipped(fileID, action2, false, false);
-            }
-            else
-            {
-                wf1.SetFileStatusToPending(fileID, action1, false);
-                wf1.SetFileStatusToPending(fileID, action2, false);
-                wf2.SetFileStatusToPending(fileID, action1, false);
-                wf2.SetFileStatusToPending(fileID, action2, false);
-            }
-
-            return fileID;
-        }
-
         public void startNewSession(FileProcessingDB fpDB)
         {
             fpDB.UnregisterActiveFAM();
             fpDB.RecordFAMSessionStop();
             fpDB.RecordFAMSessionStart("Test.fps", action1, true, true);
             fpDB.RegisterActiveFAM();
-        }
-
-        public void Dispose()
-        {
-            foreach (var fpDB in fpDBs)
-            {
-                if (fpDB != null)
-                {
-                    try
-                    {
-                        // Prevent 'files were reverted' log
-                        fpDB.SetStatusForAllFiles(action1, EActionStatus.kActionUnattempted);
-                        fpDB.SetStatusForAllFiles(action2, EActionStatus.kActionUnattempted);
-                        fpDB.UnregisterActiveFAM();
-                        fpDB.RecordFAMSessionStop();
-                    }
-                    catch { }
-                }
-            }
-            testDBManager.RemoveDatabase(testDBName);
         }
 
         public int getTotalProcessing()

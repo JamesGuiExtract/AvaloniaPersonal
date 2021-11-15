@@ -42,7 +42,7 @@ using namespace ADODB;
 // Version 184 First schema that includes all product specific schema regardless of license
 //		Also fixes up some missing elements between updating schema and creating
 //		All product schemas are also done withing the same transaction.
-const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 201;
+const long CFileProcessingDB::ms_lFAMDBSchemaVersion = 202;
 
 //-------------------------------------------------------------------------------------------------
 // Defined constant for the Request code version
@@ -3364,6 +3364,36 @@ int UpdateToSchemaVersion201(_ConnectionPtr ipConnection,
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51942");
 }
+//-------------------------------------------------------------------------------------------------
+int UpdateToSchemaVersion202(_ConnectionPtr ipConnection, long* pnNumSteps,
+	IProgressStatusPtr ipProgressStatus)
+{
+	try
+	{
+		int nNewSchemaVersion = 202;
+
+		if (pnNumSteps != __nullptr)
+		{
+			*pnNumSteps += 10; // This will touch every row in the FileActionStatus table
+			return nNewSchemaVersion;
+		}
+
+		vector<string> vecQueries;
+
+		vecQueries.push_back(gstrFILEACTIONSTATUS_ADD_RANDOM_ID);
+
+		// This procedure was updated to support using RandomID
+		vecQueries.push_back(gstrCREATE_GET_FILES_TO_PROCESS_STORED_PROCEDURE);
+
+		vecQueries.push_back(buildUpdateSchemaVersionQuery(nNewSchemaVersion));
+
+		executeVectorOfSQL(ipConnection, vecQueries);
+
+		return nNewSchemaVersion;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI52968");
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // IFileProcessingDB Methods - Internal
@@ -4455,18 +4485,13 @@ bool CFileProcessingDB::SetStatusForFile_Internal(bool bDBLocked, long nID,  BST
 	return true;
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strAction, long nMaxFiles,
-	VARIANT_BOOL bGetSkippedFiles,
-	BSTR bstrSkippedForUserName,
+bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, const FilesToProcessRequest& request,
 	IIUnknownVector** pvecFileRecords)
 {
 	try
 	{
 		try
 		{
-			// Set the action name from the parameter
-			string strActionName = asString(strAction);
-
 			// If the FAM has lost its registration, re-register before continuing with processing.
 			ensureFAMRegistration();
 
@@ -4481,23 +4506,11 @@ bool CFileProcessingDB::GetFilesToProcess_Internal(bool bDBLocked, BSTR strActio
 			// Make sure the DB Schema is the expected version
 			validateDBSchemaVersion();
 
-			if (bGetSkippedFiles == VARIANT_TRUE)
-			{
-				string strUserName = asString(bstrSkippedForUserName);
-
-				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-					bDBLocked, ipConnection, strActionName, strUserName.empty() ? "" : strUserName, "S", nMaxFiles);
-				*pvecFileRecords = ipFiles.Detach();
-			}
-			else
-			{
-				// Perform all processing related to setting a file as processing.
-				// The previous status of the files to process is expected to be either pending or
-				// skipped.
-				IIUnknownVectorPtr ipFiles = setFilesToProcessing(
-					bDBLocked, ipConnection, strActionName, "", "P", nMaxFiles);
-				*pvecFileRecords = ipFiles.Detach();
-			}
+			// Perform all processing related to setting a file as processing.
+			// The previous status of the files to process is expected to be either pending or
+			// skipped.
+			IIUnknownVectorPtr ipFiles = setFilesToProcessing(bDBLocked, ipConnection, request);
+			*pvecFileRecords = ipFiles.Detach();
 
 			END_CONNECTION_RETRY(ipConnection, "ELI51471");
 		}
@@ -8528,7 +8541,8 @@ bool CFileProcessingDB::UpgradeToCurrentSchema_Internal(bool bDBLocked,
 				case 198:	vecUpdateFuncs.push_back(&UpdateToSchemaVersion199);
 				case 199:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion200);
 				case 200:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion201);
-				case 201:
+				case 201:   vecUpdateFuncs.push_back(&UpdateToSchemaVersion202);
+				case 202:
 					break;
 
 				default:

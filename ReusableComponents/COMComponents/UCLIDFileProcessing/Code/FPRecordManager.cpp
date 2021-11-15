@@ -22,25 +22,26 @@ const size_t gnNUMBER_OF_SLEEP_INTERVALS = 10;
 // FPRecordManager
 //-------------------------------------------------------------------------------------------------
 FPRecordManager::FPRecordManager()
-: m_hDlg(0), 
-  m_nMaxStoredRecords(5),
-  m_bRestrictNumStoredRecords(false),
-  m_strAction(""),
-  m_nActionID(0),
-  m_ipFPMDB(__nullptr),
-  m_bKeepProcessingAsAdded(true),
-  m_bProcessSkippedFiles(false),
-  m_bSkippedFilesForCurrentUser(true),
-  m_nNumberOfFilesProcessed(0),
-  m_nNumberOfFilesProcessedSuccessfully(0),
-  m_nNumberOfFilesFailed(0),
-  m_vecSleepTimes(gnNUMBER_OF_SLEEP_INTERVALS),
-  m_bSleepTimeCalculated(false),
-  m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB),
-  m_bRestrictToCurrentFAMSessionID(false),
-  m_eLastFilePriority(kPriorityDefault),
-  m_bAllowRestartableProcessing(false),
-  m_bAllowRestartableFlagRetrievedFromDB(false)
+	: m_hDlg(0)
+	, m_nMaxStoredRecords(5)
+	, m_bRestrictNumStoredRecords(false)
+	, m_strAction("")
+	, m_nActionID(0)
+	, m_ipFPMDB(__nullptr)
+	, m_bKeepProcessingAsAdded(true)
+	, m_bProcessSkippedFiles(false)
+	, m_bSkippedFilesForCurrentUser(true)
+	, m_nNumberOfFilesProcessed(0)
+	, m_nNumberOfFilesProcessedSuccessfully(0)
+	, m_nNumberOfFilesFailed(0)
+	, m_vecSleepTimes(gnNUMBER_OF_SLEEP_INTERVALS)
+	, m_bSleepTimeCalculated(false)
+	, m_nMaxFilesFromDB(gnMAX_NUMBER_OF_FILES_FROM_DB)
+	, m_bRestrictToCurrentFAMSessionID(false)
+	, m_eLastFilePriority(kPriorityDefault)
+	, m_bAllowRestartableProcessing(false)
+	, m_bAllowRestartableFlagRetrievedFromDB(false)
+	, m_bUseRandomIDForQueueOrder(false)
 {
 	try
 	{
@@ -1140,8 +1141,12 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 	// Get the list of file records
 	string strSkippedUser = 
 		m_bSkippedFilesForCurrentUser && m_bProcessSkippedFiles ? getCurrentUserName() : "";
-	IIUnknownVectorPtr ipFileList = m_ipFPMDB->GetFilesToProcess(m_strAction.c_str(), nNumToLoad,
-		asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str());
+
+	IIUnknownVectorPtr ipFileList = m_bUseRandomIDForQueueOrder
+		? m_ipFPMDB->GetRandomFilesToProcess(
+			m_strAction.c_str(), nNumToLoad, asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str())
+		: m_ipFPMDB->GetFilesToProcess(
+			m_strAction.c_str(), nNumToLoad, asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str());
 
 	// Attempt to create a task for each file record and add it to the queue
 	long nNumFiles = ipFileList->Size();

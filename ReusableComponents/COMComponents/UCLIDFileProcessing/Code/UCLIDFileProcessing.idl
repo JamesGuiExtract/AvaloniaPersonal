@@ -585,6 +585,10 @@ library UCLID_FILEPROCESSINGLib
 		// NOTE:	Throws an exception if the database server and name have not been specified.
 		[propget, id(63), helpstring("property ConnectionString")]
 		HRESULT ConnectionString([out, retval] BSTR* pbstrConnectionString);
+		//-----------------------------------------------------------------------------------------
+		// Gets/sets whether to get files from the queue in a random order (using FileActionStatus.RandomID)
+		[propget, id(64), helpstring("property UseRandomIDForQueueOrder")] HRESULT UseRandomIDForQueueOrder([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(64), helpstring("property UseRandomIDForQueueOrder")] HRESULT UseRandomIDForQueueOrder([in] VARIANT_BOOL newVal);
 	};
 
 	[
@@ -2202,6 +2206,12 @@ library UCLID_FILEPROCESSINGLib
 		// PROMISE: To return a IActionStatistics pointer that contains the current stats where WorkflowFile.Invisible is true for the specified action name across all workflows
 		[id(216), helpstring("method GetInvisibleFileStatsAllWorkflows")] HRESULT GetInvisibleFileStatsAllWorkflows(
 			[in] BSTR bstrActionName, [in] VARIANT_BOOL vbForceUpdate, [out, retval] IActionStatistics** pStats);
+		// -----------------------------------------------------------------------------------------------
+		// Get file records to process. Works like GetFilesToProcess except that it uses RandomID instead of FileID to determine which files to return first
+		[id(217), helpstring("method GetRandomFilesToProcess")] HRESULT GetRandomFilesToProcess([in] BSTR strAction, 
+			[in] long nMaxFiles, [in] VARIANT_BOOL bGetSkippedFiles,
+			[in] BSTR bstrSkippedForUserName,
+			[out, retval] IIUnknownVector** pvecFileRecords);
 	};
 
 	[

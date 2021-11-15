@@ -222,6 +222,10 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: Indicates whether any files are either processing or are queued to be processed.
 	bool areAnyFilesActive();
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To set whether to use random queue order
+	inline void setUseRandomIDForQueueOrder(bool bUseRandomIDForQueueOrder)
+		{ m_bUseRandomIDForQueueOrder = bUseRandomIDForQueueOrder; }
 
 private:
 
@@ -351,6 +355,9 @@ private:
 
 	// Flag to indicate that the AllowRestartableProcessing has been retrieved from the database
 	bool m_bAllowRestartableFlagRetrievedFromDB;
+
+	// Whether to use random queue order
+	bool m_bUseRandomIDForQueueOrder;
 
 	////////////////
 	// Methods

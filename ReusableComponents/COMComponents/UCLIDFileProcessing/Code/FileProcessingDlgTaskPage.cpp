@@ -947,7 +947,8 @@ void FileProcessingDlgTaskPage::OnBtnAdvancedSettings()
 			ipSchedule = ipFPM->ProcessingSchedule;
 		}
 		AdvancedTaskSettingsDlg settings(ipFPM->NumThreads,
-			asCppBool(ipFPM->KeepProcessingAsAdded), ipSchedule, ipFPMgr->MaxFilesFromDB, this);
+			asCppBool(ipFPM->KeepProcessingAsAdded), ipSchedule, ipFPMgr->MaxFilesFromDB,
+			ipFPMgr->UseRandomIDForQueueOrder, this);
 		if (settings.DoModal() == IDOK)
 		{
 			ipFPM->NumThreads = settings.getNumberOfThreads();
@@ -963,6 +964,7 @@ void FileProcessingDlgTaskPage::OnBtnAdvancedSettings()
 				ipFPM->LimitProcessingToSchedule = VARIANT_FALSE;
 			}
 			ipFPMgr->MaxFilesFromDB = settings.getNumberOfFilesFromDb();
+			ipFPMgr->UseRandomIDForQueueOrder = settings.getUseRandomIDForQueueOrder();
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI32138");

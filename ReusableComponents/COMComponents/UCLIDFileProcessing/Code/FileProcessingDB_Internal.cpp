@@ -5626,7 +5626,7 @@ UINT CFileProcessingDB::emailMessageThread(void *pData)
 }
 //--------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const _ConnectionPtr& ipConnection,
-	const string& strActionName, const string& strSkippedUser, const string& strStatusToSelect, long nMaxFiles)
+	const FilesToProcessRequest& request)
 {
 	// Declare query string so that if there is an exception the query can be added to debug info
 	string strQuery;
@@ -5662,6 +5662,10 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 
 						if (m_bRunningAllWorkflows && m_bLoadBalance)
 						{
+							// Make a copy of the request with maxFiles set to 1 for the loops
+							FilesToProcessRequest singleFileRequest(request);
+							singleFileRequest.maxFiles = 1;
+
 							int current = m_nProcessStart;
 							int filesObtainedPreviously;
 							int currentNumberOfFilesObtained = 0;
@@ -5673,14 +5677,13 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 									int actionID = m_vecActionsProcessOrder[current];
 									current = (current + 1) % m_vecActionsProcessOrder.size();
 
-									_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, actionID, strActionName,
-										1, strStatusToSelect, strSkippedUser);
+									_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, singleFileRequest, actionID);
 
 									auto results = getFilesFromRecordset(ipFileSet);
 									tempFileVector.insert(tempFileVector.end(), results.begin(), results.end());
 									currentNumberOfFilesObtained = tempFileVector.size();
-								} while (current != m_nProcessStart && currentNumberOfFilesObtained < nMaxFiles);
-							} while (currentNumberOfFilesObtained < nMaxFiles
+								} while (current != m_nProcessStart && currentNumberOfFilesObtained < request.maxFiles);
+							} while (currentNumberOfFilesObtained < request.maxFiles
 								&& currentNumberOfFilesObtained != filesObtainedPreviously);
 							// Commit the transaction before transfering the data from the recordset
 							tg.CommitTrans();
@@ -5688,9 +5691,7 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 						}
 						else
 						{
-							int nActionId = m_vecActionsProcessOrder.size() == 1 ? m_vecActionsProcessOrder[0] : 0;
-							_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, 0, strActionName,
-								nMaxFiles, strStatusToSelect, strSkippedUser);
+							_RecordsetPtr ipFileSet = spGetFilesToProcessForActionID(ipConnection, request, 0);
 
 							tempFileVector = getFilesFromRecordset(ipFileSet);
 							tg.CommitTrans();
@@ -5747,8 +5748,8 @@ IIUnknownVectorPtr CFileProcessingDB::setFilesToProcessing(bool bDBLocked, const
 	}
 }
 //--------------------------------------------------------------------------------------------------
-_RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _ConnectionPtr& ipConnection, const int actionID,
-	const string& strActionName, const int nMaxFiles, const string& strStatusToSelect, const string& strSkippedUser)
+_RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _ConnectionPtr& ipConnection,
+	const FilesToProcessRequest& request, const int actionID)
 {
 	_CommandPtr cmd;
 	cmd.CreateInstance(__uuidof(Command));
@@ -5762,17 +5763,18 @@ _RecordsetPtr CFileProcessingDB::spGetFilesToProcessForActionID(const _Connectio
 	int workflowID = getActiveWorkflowID(ipConnection);
 	if (workflowID != -1)
 		cmd->Parameters->Item["@WorkflowID"]->Value = variant_t(workflowID);
-	cmd->Parameters->Item["@ActionName"]->Value = variant_t(strActionName.c_str());
-	cmd->Parameters->Item["@BatchSize"]->Value = variant_t(nMaxFiles);
+	cmd->Parameters->Item["@ActionName"]->Value = variant_t(request.actionName.c_str());
+	cmd->Parameters->Item["@BatchSize"]->Value = variant_t(request.maxFiles);
 	//TODO: make this so it can process Skipped for all or single user
-	cmd->Parameters->Item["@StatusToQueue"]->Value = variant_t(strStatusToSelect.c_str());
+	cmd->Parameters->Item["@StatusToQueue"]->Value = variant_t(request.statusToSelect().c_str());
 	cmd->Parameters->Item["@MachineID"]->Value = variant_t(getMachineID(ipConnection));
 	cmd->Parameters->Item["@UserID"]->Value = variant_t(getFAMUserID(ipConnection));
 	cmd->Parameters->Item["@ActiveFAMID"]->Value = variant_t(m_nActiveFAMID);
 	cmd->Parameters->Item["@FAMSessionID"]->Value = variant_t(m_nFAMSessionID);
 	cmd->Parameters->Item["@RecordFASTEntry"]->Value = variant_t(m_bUpdateFASTTable);
-	cmd->Parameters->Item["@SkippedForUser"]->Value = variant_t(strSkippedUser.c_str());
+	cmd->Parameters->Item["@SkippedForUser"]->Value = variant_t(request.skippedUser.c_str());
 	cmd->Parameters->Item["@CheckDeleted"]->Value = variant_t(m_bCurrentSessionIsWebSession);
+	cmd->Parameters->Item["@UseRandomIDForQueueOrder"]->Value = variant_t(request.useRandomIDForQueueOrder);
 	variant_t vtEmpty;
 	return cmd->Execute(&vtEmpty, &vtEmpty, adCmdStoredProc);
 }

@@ -139,17 +139,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Demo_LabDE_Empty" />
-    <EmbeddedResource Include="Resources\TestImage001.tif" />
-    <EmbeddedResource Include="Resources\TestImage002.tif" />
-    <EmbeddedResource Include="Resources\TestImage003.tif" />
-    <EmbeddedResource Include="Resources\TestImage004.tif" />
-    <EmbeddedResource Include="Resources\TestImage005.tif" />
-    <EmbeddedResource Include="Resources\TestImage006.tif" />
-    <EmbeddedResource Include="Resources\TestImage007.tif" />
-    <EmbeddedResource Include="Resources\TestImage008.tif" />
-    <EmbeddedResource Include="Resources\DBWithCounters.bak" />
-    <EmbeddedResource Include="Resources\DBWithCountersVer183.bak" />
+    <EmbeddedResource Include="Resources\*" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core">

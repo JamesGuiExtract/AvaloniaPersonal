@@ -96,7 +96,8 @@ namespace Extract.FileActionManager.Database.Test
         /// </summary>
         /// <param name="dbBackupResourceName">The database backup as an embedded resource.</param>
         /// <param name="destinationDBName">The name the database should be restored to.</param>
-        public FileProcessingDB GetDatabase(string dbBackupResourceName, string destinationDBName)
+        /// <param name="upgradeSchema">Whether to upgrade the schema after attaching the database the first time</param>
+        public FileProcessingDB GetDatabase(string dbBackupResourceName, string destinationDBName, bool upgradeSchema = true)
         {
             try
             {
@@ -119,6 +120,7 @@ namespace Extract.FileActionManager.Database.Test
                     fileProcessingDb = new FileProcessingDB();
                     fileProcessingDb.DatabaseServer = "(local)";
                     fileProcessingDb.DatabaseName = destinationDBName;
+
                     fileProcessingDb.UpgradeToCurrentSchema(null);
 
                     return fileProcessingDb;
@@ -136,6 +138,34 @@ namespace Extract.FileActionManager.Database.Test
                 ee.AddDebugData("Database", destinationDBName, false);
                 throw ee;
             }
+        }
+
+        /// Factory method to get a database wrapper from a database backup
+        public IDisposableDatabase<T> GetDisposableDatabase(
+            string dbResourceName,
+            string destinationDBName,
+            int numberOfWorkflows = 0)
+        {
+            return numberOfWorkflows switch
+            {
+                0 => new NoWorkflows<T>(this, destinationDBName, GetDatabase(dbResourceName, destinationDBName)),
+                _ => throw new ArgumentException($"Unsupported number of workflows: {numberOfWorkflows}")
+            };
+        }
+
+        /// Factory method to get a database wrapper from a new database
+        public IDisposableDatabase<T> GetDisposableDatabase(
+            string destinationDBName,
+            int numberOfWorkflows = 0,
+            bool enableLoadBalancing = false)
+        {
+            return numberOfWorkflows switch
+            {
+                0 => new NoWorkflows<T>(this, destinationDBName, GetNewDatabase(destinationDBName)),
+                1 => new OneWorkflow<T>(this, destinationDBName, enableLoadBalancing),
+                2 => new TwoWorkflows<T>(this, destinationDBName, enableLoadBalancing),
+                _ => throw new ArgumentException($"Unsupported number of workflows: {numberOfWorkflows}")
+            };
         }
 
         /// <summary>
