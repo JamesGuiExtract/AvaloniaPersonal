@@ -384,10 +384,10 @@ namespace Extract.ETL.Management
                     bool newEnabledValue = !currentData.Enabled;
 
                     // Update the value in the database
-                    using var trans = new TransactionScope();
+                    
                     using var connection = new ExtractRoleConnection(DatabaseServer, DatabaseName);
                     connection.Open();
-
+                    using var trans = new TransactionScope();
                     using var cmd = connection.CreateCommand();
                     cmd.CommandText = @"
                             UPDATE DatabaseService 
