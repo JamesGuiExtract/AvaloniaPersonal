@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using org.apache.pdfbox.pdmodel;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;

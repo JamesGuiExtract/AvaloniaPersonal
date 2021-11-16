@@ -699,7 +699,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Data.ConnectionUI.SqlCeDataProvider", "..\..\..\..\..\RC.Net\APIs\MSSQLConnectionDialog\SqlCeDataProvider\Microsoft.Data.ConnectionUI.SqlCeDataProvider.csproj", "{1CC9D080-C06D-4202-A14B-14A9CC7F7F31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLCDBEditor.Plugins.AlternateTestNameManager", "..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Plugins\AlternateTestNameManager\Core\Code\SQLCDBEditor.Plugins.AlternateTestNameManager.csproj", "{AEE81E26-DAB9-46FF-817F-F4F7F4A31737}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLCDBEditor.Plugins.AlternateTestNameManager", "..\..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCDBEditor\Core\Plugins\AlternateTestNameManager\Core\Code\SQLCDBEditor.Plugins.AlternateTestNameManager.csproj", "{AEE81E26-DAB9-46FF-817F-F4F7F4A31737}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaginationUtility", "..\..\..\..\..\RC.Net\UtilityApplications\PaginationUtility\Core\Code\PaginationUtility.csproj", "{A6CEC41C-8703-4687-9395-8B067AC03098}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -1026,7 +1026,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Web.AppBackendAPI.T
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Web.DocumentAPI.Test", "..\..\..\..\..\Web\WebAPI\Testing\Automated\Extract.Web.DocumentAPI.Test\Extract.Web.DocumentAPI.Test.csproj", "{E769CBBA-485E-4DE4-9776-623DADB6D9EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Web.DocumentAPI.Test", "..\..\..\..\..\Web\WebAPI\Testing\Automated\Extract.Web.DocumentAPI.Test\Extract.Web.DocumentAPI.Test.csproj", "{E769CBBA-485E-4DE4-9776-623DADB6D9EB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2} = {B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
@@ -1330,7 +1330,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Utilities.Authentic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.FileActionManager.Conditions.Test", "..\..\..\..\..\RC.Net\FileActionManager\Conditions\Core\Testing\Automated\Extract.FileActionManager.Conditions.Test.csproj", "{3E846397-F664-4575-99C8-435C5F085699}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.LabResultsCustomComponents.Test", "..\..\..\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Test\Extract.LabResultsCustomComponents.Test.csproj", "{C4823AF4-5294-4617-A88D-F8011C7F299E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.LabResultsCustomComponents.Test", "..\..\..\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Test\Extract.LabResultsCustomComponents.Test.csproj", "{C4823AF4-5294-4617-A88D-F8011C7F299E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -5577,16 +5577,16 @@ Global
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Template|x86.ActiveCfg = Release|x86
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Template|x86.Build.0 = Release|x86
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Debug|Win32.ActiveCfg = Debug|x86
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Debug|Win32.Build.0 = Debug|x86
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Debug|x64.ActiveCfg = Debug|x86
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Debug|x86.ActiveCfg = Debug|x86
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Debug|x86.Build.0 = Debug|x86
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Release|Any CPU.ActiveCfg = Release|x86
-		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Release|Mixed Platforms.Build.0 = Release|x86
+		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Release|Win32.ActiveCfg = Release|x86
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Release|Win32.Build.0 = Release|x86
 		{E769CBBA-485E-4DE4-9776-623DADB6D9EB}.Release|x64.ActiveCfg = Release|x86
