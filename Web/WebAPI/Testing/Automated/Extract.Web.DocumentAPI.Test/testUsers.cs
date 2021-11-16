@@ -82,7 +82,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }

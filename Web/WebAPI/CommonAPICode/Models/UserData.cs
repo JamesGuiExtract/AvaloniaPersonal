@@ -9,8 +9,7 @@ namespace WebAPI.Models
     /// </summary>
     public sealed class UserData: IDisposable
     {
-        ApiContext _apiContext;
-        FileApi _fileApi;
+        IFileApi _fileApi;
 
         /// <summary>
         /// Initializes an <see cref="UserData"/> instance.
@@ -20,8 +19,7 @@ namespace WebAPI.Models
         {
             try
             {
-                _apiContext = apiContext;
-                _fileApi = FileApiMgr.GetInterface(apiContext);
+                _fileApi = FileApiMgr.Instance.GetInterface(apiContext);
             }
             catch (Exception ex)
             {

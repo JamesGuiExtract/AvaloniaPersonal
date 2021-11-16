@@ -201,7 +201,7 @@ namespace Extract.Web.WebAPI.Test
             // part of the any code run in production.
 
             var apiInterface =
-                FileApiMgr.GetInterface(CurrentApiContext, controller.ControllerContext.HttpContext.User);
+                FileApiMgr.Instance.GetInterface(CurrentApiContext, controller.ControllerContext.HttpContext.User);
             int fileTaskSessionId = apiInterface.DocumentSession.Id;
 
             // InUse is required to return the instance back to the available pool.

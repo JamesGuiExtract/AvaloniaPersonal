@@ -12,16 +12,16 @@ namespace WebAPI.Models
     /// Container for a fileProcessingDB instance, along with instance data and methods. This container will be used
     /// in a manager API that contains a collection of FileApis.
     /// </summary>
-    public class FileApi
+    public class FileApi : IFileApi
     {
-        static AutoResetEvent _instanceReleased = new AutoResetEvent(false);
+        static readonly AutoResetEvent _instanceReleased = new(false);
 
-        private ApiContext _apiContext;
-        private Workflow _workflow;
+        private readonly ApiContext _apiContext;
+        private readonly Workflow _workflow;
         private string _sessionId = "";
         private bool _inUse;
 
-        private FileProcessingDB _fileProcessingDB = null;
+        private readonly FileProcessingDB _fileProcessingDB = null;
 
         /// <summary>
         /// Initializes a new <see cref="FileApi"/> instance.
@@ -174,7 +174,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// get/set the workflow name configured for this instance
+        /// Get the workflow name configured for this instance
         /// </summary>
         public string WorkflowName
         {
@@ -185,7 +185,7 @@ namespace WebAPI.Models
         }
 
         /// <summary>
-        /// get the workflow associated with this FileApi
+        /// Get the workflow associated with this FileApi
         /// </summary>
         public Workflow Workflow
         {
@@ -397,7 +397,7 @@ namespace WebAPI.Models
                 {
                     Id = FileProcessingDB.GetWorkflowID(workflowName);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     // This could be an invalid workflow name, or the schema is out of date.
                     ExtractException exception = e.AsExtract("ELI47204");

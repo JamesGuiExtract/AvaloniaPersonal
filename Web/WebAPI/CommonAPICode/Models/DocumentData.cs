@@ -33,21 +33,22 @@ namespace WebAPI.Models
     /// </summary>
     public sealed class DocumentData : IDisposable
     {
-        ApiContext _apiContext;
+        readonly ApiContext _apiContext;
+        readonly IFileApiMgr _fileApiMgr;
         AttributeDBMgr _attributeDbMgr;
-        FileApi _fileApi;
-        ClaimsPrincipal _user;
+        IFileApi _fileApi;
+        readonly ClaimsPrincipal _user;
         bool _endSessionOnDispose;
 
         // To be used for FAM DB operations that occur outside the context of a given DocumentData instance.
         static FileProcessingDB _utilityFileProcessingDB;
         static HashSet<string> _metadataFieldNames;
-        static object _lockUtilityFileProcessingDB = new object();
-        static object _lockSSOCR = new object();
+        static readonly object _lockUtilityFileProcessingDB = new();
+        static readonly object _lockSSOCR = new();
 
-        static ThreadLocal<MiscUtils> _miscUtils = new ThreadLocal<MiscUtils>(() => new MiscUtils());
-        static ThreadLocal<ImageUtils> _imageUtils = new ThreadLocal<ImageUtils>(() => new ImageUtils());
-        static ThreadLocal<ScansoftOCRClass> _ssocr = new ThreadLocal<ScansoftOCRClass>(() =>
+        static readonly ThreadLocal<MiscUtils> _miscUtils = new(() => new MiscUtils());
+        static readonly ThreadLocal<ImageUtils> _imageUtils = new(() => new ImageUtils());
+        static readonly ThreadLocal<ScansoftOCRClass> _ssocr = new(() =>
             {
                 // https://extract.atlassian.net/browse/ISSUE-16861
                 // To help prevent nuance licensing from being overwhelmed, only initialize one ssocr instance
@@ -66,11 +67,13 @@ namespace WebAPI.Models
         /// <para><b>Note</b></para>
         /// This should be used only inside a using statement, so the fileApi in-use flag can be cleared.
         /// <param name="apiContext">The API context.</param>
-        public DocumentData(ApiContext apiContext)
+        /// <param name="fileApiMgr">Optional IFileApiMgr implementation to use for creating FileAPI instances</param>
+        public DocumentData(ApiContext apiContext, IFileApiMgr fileApiMgr = null)
         {
             try
             {
                 _apiContext = apiContext;
+                _fileApiMgr = fileApiMgr ?? FileApiMgr.Instance;
             }
             catch (Exception ex)
             {
@@ -85,12 +88,14 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="user">The <see cref="ClaimsPrincipal"/> this instance should be specific to.</param>
         /// <param name="requireSession"><c>true</c> if an active FAM session is required; otherwise, <c>false</c>.</param>
-        public DocumentData(ClaimsPrincipal user, bool requireSession)
+        /// <param name="fileApiMgr">Optional IFileApiMgr implementation to use for creating FileAPI instances</param>
+        public DocumentData(ClaimsPrincipal user, bool requireSession, IFileApiMgr fileApiMgr = null)
         {
             try
             {
                 _apiContext = ClaimsToContext(user);
                 _user = requireSession ? user : null;
+                _fileApiMgr = fileApiMgr ?? FileApiMgr.Instance;
             }
             catch (Exception ex)
             {
@@ -2000,7 +2005,7 @@ namespace WebAPI.Models
 
         #region Private Members
 
-        FileApi FileApi
+        IFileApi FileApi
         {
             get
             {
@@ -2010,7 +2015,7 @@ namespace WebAPI.Models
                     {
                         // NOTE: By setting _fileApi using the userContext, which comes directly from the JWT Claims, then
                         // all references to context values on _fileApi are context values from the JWT.
-                        _fileApi = FileApiMgr.GetInterface(_apiContext, _user);
+                        _fileApi = _fileApiMgr.GetInterface(_apiContext, _user);
                     }
 
                     return _fileApi;

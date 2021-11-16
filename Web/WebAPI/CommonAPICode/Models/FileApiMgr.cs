@@ -11,26 +11,40 @@ using static WebAPI.Utils;
 
 namespace WebAPI.Models
 {
-    /// <summary>
-    /// This class presents a factory method that returns a FileApi instance
-    /// </summary>
-    static public class FileApiMgr
+    /// Presents a factory method that returns a FileApi instance
+    public interface IFileApiMgr
     {
-        static List<FileApi> _interfaces = new List<FileApi>();
-        static object _lock = new object();
-        // -1 indicates that items should not be removed from the queue via a WaitForTurn call;
-        // items will need to be explicitly removed.
-        static Sequencer<long> _sequencer = new Sequencer<long>(0, requireExplicitRemoval: true);
-        static long _waitingInstanceId = 0;
-
         /// <summary>
-        /// get (an existing unused interface) or make a FAM file processing DB interface
+        /// Get (an existing unused interface) or make a FAM file processing DB interface
         /// </summary>
-        /// <param name="apiContext">the API context to use</param>
+        /// <param name="apiContext">The API context to use</param>
         /// <param name="sessionOwner">The <see cref="ClaimsPrincipal"/> this returned instance should be
         /// specific to or <c>null</c> if the instance need not be specific to a particular user.</param>
         /// <returns>a FileApi instance</returns>
-        static public FileApi GetInterface(ApiContext apiContext, ClaimsPrincipal sessionOwner = null)
+        IFileApi GetInterface(ApiContext apiContext, ClaimsPrincipal sessionOwner = null);
+
+        /// For unit testing, to close all DB connections
+        void ReleaseAll();
+    }
+
+    /// <inheritdoc/>
+    public class FileApiMgr : IFileApiMgr
+    {
+        readonly List<FileApi> _interfaces = new();
+        readonly object _lock = new();
+
+        // -1 indicates that items should not be removed from the queue via a WaitForTurn call;
+        // items will need to be explicitly removed.
+        readonly Sequencer<long> _sequencer = new(0, requireExplicitRemoval: true);
+        long _waitingInstanceId = 0;
+
+        private FileApiMgr() { }
+
+        /// The singleton instance of this class
+        public static FileApiMgr Instance { get; } = new();
+
+        /// <inheritdoc/>
+        public IFileApi GetInterface(ApiContext apiContext, ClaimsPrincipal sessionOwner = null)
         {
             HTTPError.Assert("ELI46389", apiContext != null, "empty API context used");
 
@@ -70,7 +84,7 @@ namespace WebAPI.Models
                 {
                     if (waiting)
                     {
-                        remainingTimeout = Math.Max(0, 
+                        remainingTimeout = Math.Max(0,
                             (apiContext.RequestWaitTimeout * 1000) - (int)waitTime.ElapsedMilliseconds);
                         HTTPError.Assert("ELI46635", StatusCodes.Status503ServiceUnavailable,
                             FileApi.WaitForInstanceNoLongerInUse(remainingTimeout), "Timeout waiting to process request");
@@ -155,7 +169,7 @@ namespace WebAPI.Models
         /// <summary>
         /// Handles the Releasing event of a FileApi instance.
         /// </summary>
-        static void HandleFileApi_Releasing(object sender, EventArgs e)
+        void HandleFileApi_Releasing(object sender, EventArgs e)
         {
             try
             {
@@ -178,7 +192,7 @@ namespace WebAPI.Models
         /// apiContext and sessionOwner.
         /// </summary>
         /// <param name="apiContext">the API context to use</param>
-        static FileApi FindAvailable(ApiContext apiContext)
+        FileApi FindAvailable(ApiContext apiContext)
         {
             // Try first to look up an instance that was specificially associated with apiContext.
             FileApi availableInstance =
@@ -200,10 +214,8 @@ namespace WebAPI.Models
             return availableInstance;
         }
 
-        /// <summary>
-        /// Use for unit testing to close all DB connections
-        /// </summary>
-        public static void ReleaseAll()
+        /// <inheritdoc>/>
+        public void ReleaseAll()
         {
             foreach (var inf in _interfaces)
             {

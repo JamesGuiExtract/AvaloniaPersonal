@@ -17,11 +17,11 @@ namespace WebAPI.Models
         /// <returns>WorkflowStatus object</returns>
         public static WorkflowStatusResult GetWorkflowStatus(ApiContext apiContext)
         {
-            FileApi fileApi = null;
+            IFileApi fileApi = null;
 
             try
             {
-                fileApi = FileApiMgr.GetInterface(apiContext);
+                fileApi = FileApiMgr.Instance.GetInterface(apiContext);
                 var fileProcessingDB = fileApi.FileProcessingDB;
 
                 fileProcessingDB.GetAggregateWorkflowStatus(out int unattempted,
@@ -56,11 +56,11 @@ namespace WebAPI.Models
         /// <returns>WorkflowStatus object</returns>
         public static FileStatusResult GetDocumentStatuses(ApiContext apiContext)
         {
-            FileApi fileApi = null;
+            IFileApi fileApi = null;
 
             try
             {
-                fileApi = FileApiMgr.GetInterface(apiContext);
+                fileApi = FileApiMgr.Instance.GetInterface(apiContext);
                 var fileProcessingDB = fileApi.FileProcessingDB;
     
                 string statusListing = fileProcessingDB.GetWorkflowStatusAllFiles();

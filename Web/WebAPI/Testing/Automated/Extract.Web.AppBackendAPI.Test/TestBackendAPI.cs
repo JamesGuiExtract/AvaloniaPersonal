@@ -137,7 +137,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -156,7 +156,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -183,7 +183,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -209,7 +209,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -232,7 +232,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -254,7 +254,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -278,7 +278,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -297,7 +297,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -349,7 +349,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -391,7 +391,7 @@ namespace Extract.Web.WebAPI.Test
             finally
             {
                 File.Delete(temporaryDocType);
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -422,7 +422,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -475,7 +475,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -528,7 +528,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -606,7 +606,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -702,7 +702,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -753,7 +753,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -780,7 +780,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -817,7 +817,7 @@ namespace Extract.Web.WebAPI.Test
 
                 // Simulate the web service being stopped.
                 controller.Dispose();
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
 
                 // Reset the default context to ensure no crossover of session IDs.
                 ApiTestUtils.SetDefaultApiContext(ApiContext.CURRENT_VERSION, dbName);
@@ -850,7 +850,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -891,7 +891,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -924,7 +924,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -968,7 +968,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1007,7 +1007,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1066,7 +1066,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
 
                 _testFiles.RemoveFile(_TEST_FILE3);
@@ -1101,7 +1101,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1218,7 +1218,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1369,7 +1369,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1460,7 +1460,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1520,7 +1520,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1555,7 +1555,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1610,7 +1610,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1639,7 +1639,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1701,7 +1701,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1726,7 +1726,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1761,7 +1761,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1790,7 +1790,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1829,7 +1829,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1873,7 +1873,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1948,7 +1948,7 @@ namespace Extract.Web.WebAPI.Test
             finally
             {
                 testSpecficFiles.Dispose();
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -1982,7 +1982,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -2027,7 +2027,7 @@ namespace Extract.Web.WebAPI.Test
             finally
             {
                 testSpecficFiles.Dispose();
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -2091,7 +2091,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -2152,7 +2152,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -2229,7 +2229,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -2445,7 +2445,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }

@@ -68,7 +68,7 @@ namespace Extract.Web.WebAPI.Test
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
                 var c = ApiTestUtils.SetDefaultApiContext(apiVersion, dbName);
-                var fileApi = FileApiMgr.GetInterface(c);
+                var fileApi = FileApiMgr.Instance.GetInterface(c);
 
                 try
                 {
@@ -87,7 +87,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -139,7 +139,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -197,7 +197,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
@@ -252,7 +252,7 @@ namespace Extract.Web.WebAPI.Test
             }
             finally
             {
-                FileApiMgr.ReleaseAll();
+                FileApiMgr.Instance.ReleaseAll();
                 _testDbManager.RemoveDatabase(dbName);
             }
         }
