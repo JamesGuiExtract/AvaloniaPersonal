@@ -63,8 +63,8 @@ namespace Extract.Web.WebAPI.Test
         /// <returns></returns>
         public static (FileProcessingDB fileProcessingDb, User user, TController controller)
             InitializeEnvironment<TTestClass, TController>
-                (this FAMTestDBManager<TTestClass> testManager, string apiVersion, string dbResource, string dbName, string username, string password)
-                where TController : ControllerBase, new()
+                (this FAMTestDBManager<TTestClass> testManager, TController controller, string apiVersion, string dbResource, string dbName, string username, string password)
+                where TController : ControllerBase
         {
             try
             {
@@ -73,7 +73,7 @@ namespace Extract.Web.WebAPI.Test
                 ApiTestUtils.SetDefaultApiContext(apiVersion, dbName);
                 fileProcessingDb.ActiveWorkflow = ApiTestUtils.CurrentApiContext.WorkflowName;
                 User user = CreateUser(username, password);
-                TController controller = CreateController<TController>(user);
+                user.SetupController(controller);
 
                 return (fileProcessingDb, user, controller);
             }
@@ -166,10 +166,10 @@ namespace Extract.Web.WebAPI.Test
         }
 
         /// <summary>
-        /// Creates a controller of type <typeparam name="T"/>.
+        /// Setup a controller with its context
         /// </summary>
         /// <param name="user">The user for which the controller is to be used.</param>
-        public static T CreateController<T>(this User user) where T : ControllerBase, new()
+        public static T SetupController<T>(this User user, T controller) where T : ControllerBase
         {
             var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
             {
@@ -178,7 +178,6 @@ namespace Extract.Web.WebAPI.Test
                 new Claim("WorkflowName", CurrentApiContext.WorkflowName)
             }));
 
-            T controller = new T();
             controller.ControllerContext =
                 new ControllerContext()
                 {

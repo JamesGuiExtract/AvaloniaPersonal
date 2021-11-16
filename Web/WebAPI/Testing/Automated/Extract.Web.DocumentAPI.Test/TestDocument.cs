@@ -221,8 +221,8 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment<TestDocument, UsersController>
-                    (apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                _testDbManager.InitializeEnvironment
+                    (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 // Add metadata fields to the DB before the DocumentData class gets around to caching which metadata
                 // fields exist.
@@ -232,7 +232,7 @@ namespace Extract.Web.WebAPI.Test
                 var result = userController.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
 
-                var controller = user.CreateController<DocumentController>();
+                var controller = user.SetupController(new DocumentController());
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 using (var stream = new FileStream(filename, FileMode.Open))
@@ -270,8 +270,8 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment<TestDocument, UsersController>
-                    (apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                _testDbManager.InitializeEnvironment
+                    (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 // Add metadata field to the DB before the DocumentData class gets around to caching which metadata
                 // fields exist.
@@ -281,7 +281,7 @@ namespace Extract.Web.WebAPI.Test
                 var result = userController.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
 
-                var controller = user.CreateController<DocumentController>();
+                var controller = user.SetupController(new DocumentController());
 
                 var filename = _testFiles.GetFile("Resources.A418.tif");
                 using (var stream = new FileStream(filename, FileMode.Open))
@@ -1559,13 +1559,13 @@ namespace Extract.Web.WebAPI.Test
         InitializeAndLogin(string apiVersion, string dbResource, string dbName, string username, string password)
         {
             (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
-                _testDbManager.InitializeEnvironment<TestDocument, UsersController>
-                    (apiVersion, dbResource, dbName, username, password);
+                _testDbManager.InitializeEnvironment
+                    (new UsersController(), apiVersion, dbResource, dbName, username, password);
 
             var result = userController.Login(user);
             var token = result.AssertGoodResult<JwtSecurityToken>();
 
-            return (fileProcessingDb, user, user.CreateController<DocumentController>());
+            return (fileProcessingDb, user, user.SetupController(new DocumentController()));
         }
 
         static void SetupMetadataFieldValue(int fileId, string value, int fieldId, string dbName)

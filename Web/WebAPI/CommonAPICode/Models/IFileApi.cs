@@ -4,6 +4,7 @@ using UCLID_FILEPROCESSINGLib;
 
 namespace WebAPI.Models
 {
+    /// Provides access to a FileProcessingDB
     public interface IFileApi
     {
         /// The database server name configured for this instance

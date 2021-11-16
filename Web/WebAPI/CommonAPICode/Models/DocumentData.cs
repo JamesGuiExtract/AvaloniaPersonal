@@ -31,7 +31,7 @@ namespace WebAPI.Models
     /// <summary>
     /// This class is the data model for the DocumentController.
     /// </summary>
-    public sealed class DocumentData : IDisposable
+    public sealed class DocumentData : IDocumentData
     {
         readonly ApiContext _apiContext;
         readonly IFileApiMgr _fileApiMgr;
@@ -2288,7 +2288,7 @@ namespace WebAPI.Models
                 // Use the _fileApi field not property so as not to trigger api acquisition if we don't currently have one.
                 if (_fileApi != null)
                 {
-                    if ((!fileId.HasValue || fileId.Value <= 0) 
+                    if ((!fileId.HasValue || fileId.Value <= 0)
                         && _fileApi.DocumentSession.IsOpen)
                     {
                         fileId = _fileApi.DocumentSession.FileId;

@@ -214,7 +214,7 @@ namespace WebAPI.Models
             return availableInstance;
         }
 
-        /// <inheritdoc>/>
+        /// <inheritdoc/>
         public void ReleaseAll()
         {
             foreach (var inf in _interfaces)

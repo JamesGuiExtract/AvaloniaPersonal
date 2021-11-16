@@ -61,7 +61,7 @@ namespace Extract.Web.WebAPI.Test
             {
                 (FileProcessingDB fileProcessingDb, User user, UsersController userController) =
                     _testDbManager.InitializeEnvironment<TestUsers, UsersController>
-                        (apiVersion, "Resources.Demo_LabDE.bak", dbName, "Admin", "a");
+                        (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "Admin", "a");
 
                 // Login should not be allowed for Admin account
                 var result = userController.Login(user);

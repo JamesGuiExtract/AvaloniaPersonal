@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
 using WebAPI.Filters;
+using WebAPI.Models;
 using static WebAPI.Utils;
 
 namespace WebAPI
@@ -90,6 +91,10 @@ namespace WebAPI
                     options.OutputFormatters.RemoveType<HttpNoContentOutputFormatter>();
                 });
                 services.AddSecurity();
+
+                // Add controller dependencies
+                services.AddSingleton<IFileApiMgr>(FileApiMgr.Instance);
+                services.AddSingleton<IDocumentDataFactory, DocumentDataFactory>();
 
                 // Register Swashbuckle/Swagger - auto-generate API documentation
                 var basepath = PlatformServices.Default.Application.ApplicationBasePath;

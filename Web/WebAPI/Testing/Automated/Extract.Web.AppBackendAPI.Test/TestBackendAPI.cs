@@ -555,7 +555,7 @@ namespace Extract.Web.WebAPI.Test
                 LogInToWebApp(controller1, user1);
 
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
-                var controller2 = ApiTestUtils.CreateController<AppBackendController>(user2);
+                var controller2 = SetupController(user2);
                 LogInToWebApp(controller2, user2);
 
                 var rng = new Random();
@@ -652,7 +652,7 @@ namespace Extract.Web.WebAPI.Test
                 Assert.AreEqual(pendingDocuments, queueStatus.PendingDocuments);
 
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
-                var controller2 = ApiTestUtils.CreateController<AppBackendController>(user2);
+                var controller2 = SetupController(user2);
 
                 result = controller2.Login(user2);
                 token = result.AssertGoodResult<JwtSecurityToken>();
@@ -821,7 +821,7 @@ namespace Extract.Web.WebAPI.Test
 
                 // Reset the default context to ensure no crossover of session IDs.
                 ApiTestUtils.SetDefaultApiContext(ApiContext.CURRENT_VERSION, dbName);
-                var controller2 = ApiTestUtils.CreateController<AppBackendController>(user);
+                var controller2 = SetupController(user);
 
                 // Simulate a client that still has a token a previous instance of the service that has since been closed.
                 controller2.ApplyTokenClaimPrincipalToContext(sessionToken);
@@ -1283,7 +1283,7 @@ namespace Extract.Web.WebAPI.Test
                     .AssertGoodResult<NoContentResult>();
 
                 User user2 = ApiTestUtils.CreateUser("jon_doe", "123");
-                var controller2 = ApiTestUtils.CreateController<AppBackendController>(user2);
+                var controller2 = SetupController(user2);
                 LogInToWebApp(controller2, user2);
                 OpenDocument(controller2, docID);
 
@@ -2279,7 +2279,7 @@ namespace Extract.Web.WebAPI.Test
             try
             {
                 User user = ApiTestUtils.CreateUser("jon_doe", "123");
-                controller = ApiTestUtils.CreateController<AppBackendController>(user);
+                controller = SetupController(user);
                 LogInToWebApp(controller, user);
                 OpenDocument(controller, docID);
 
@@ -2322,7 +2322,7 @@ namespace Extract.Web.WebAPI.Test
         {
             AppBackendController controller = null;
             User user = ApiTestUtils.CreateUser("jon_doe", "123");
-            controller = ApiTestUtils.CreateController<AppBackendController>(user);
+            controller = SetupController(user);
             LogInToWebApp(controller, user);
 
             try
@@ -2475,8 +2475,8 @@ namespace Extract.Web.WebAPI.Test
             string username = "jane_doe", string password = "123")
         {
             var (fileProcessingDb, user, controller) =
-                _testDbManager.InitializeEnvironment<TestBackendAPI, AppBackendController>
-                        (ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, username, password);
+                _testDbManager.InitializeEnvironment(CreateController(),
+                    ApiContext.CURRENT_VERSION, "Resources.Demo_IDShield.bak", dbName, username, password);
 
             var actionID = fileProcessingDb.GetActionIDForWorkflow(_VERIFY_ACTION, fileProcessingDb.GetWorkflowID("CourtOffice"));
             AddFilesToDB(testFiles, fileProcessingDb, actionID);
@@ -2527,6 +2527,16 @@ namespace Extract.Web.WebAPI.Test
             }
 
             return fileIDs;
+        }
+
+        private static AppBackendController SetupController(User user)
+        {
+            return user.SetupController(CreateController());
+        }
+
+        private static AppBackendController CreateController()
+        {
+            return new AppBackendController(new DocumentDataFactory(FileApiMgr.Instance));
         }
 
         #endregion Private Members

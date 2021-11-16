@@ -107,8 +107,8 @@ namespace Extract.Web.WebAPI.Test
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
-                    _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
-                        (apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    _testDbManager.InitializeEnvironment
+                        (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 // Should cause file 1 to be counted as incomplete.
                 fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
@@ -123,7 +123,7 @@ namespace Extract.Web.WebAPI.Test
                 var result = usersController.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
 
-                var workflowController = user.CreateController<WorkflowController>();
+                var workflowController = user.SetupController(new WorkflowController());
 
                 var statusResult = workflowController.GetWorkflowStatus()
                     .AssertGoodResult<WorkflowStatusResult>();
@@ -159,8 +159,8 @@ namespace Extract.Web.WebAPI.Test
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
-                    _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
-                        (apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    _testDbManager.InitializeEnvironment
+                        (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
                 // Should cause file 1 to be counted as incomplete.
                 fileProcessingDb.SetStatusForFile(1, "A02_Verify", -1, EActionStatus.kActionUnattempted, false, false, out EActionStatus oldStatus);
@@ -175,7 +175,7 @@ namespace Extract.Web.WebAPI.Test
                 var result = usersController.Login(user);
                 var token = result.AssertGoodResult<JwtSecurityToken>();
 
-                var workflowController = user.CreateController<WorkflowController>();
+                var workflowController = user.SetupController(new WorkflowController());
 
                 var statusResult = workflowController.GetDocumentStatuses()
                     .AssertGoodResult<FileStatusResult>();
@@ -217,16 +217,16 @@ namespace Extract.Web.WebAPI.Test
                 _testDbManager.GetDatabase("Resources.Demo_LabDE.bak", dbName);
 
                 (FileProcessingDB fileProcessingDb, User user, UsersController usersController) =
-                    _testDbManager.InitializeEnvironment<TestWorkflow, UsersController>
-                        (apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
+                    _testDbManager.InitializeEnvironment
+                        (new UsersController(), apiVersion, "Resources.Demo_LabDE.bak", dbName, "jon_doe", "123");
 
-                var documentController = user.CreateController<DocumentController>();
+                var documentController = user.SetupController(new DocumentController());
 
                 // There are 18 completed files to begin with, there should be 17 after deletion.
                 documentController.DeleteDocument(3)
                     .AssertResultCode(StatusCodes.Status204NoContent);
 
-                var workflowController = user.CreateController<WorkflowController>();
+                var workflowController = user.SetupController(new WorkflowController());
 
                 var workflowStatus = workflowController.GetWorkflowStatus()
                     .AssertGoodResult<WorkflowStatusResult>();
