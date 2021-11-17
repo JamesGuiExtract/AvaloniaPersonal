@@ -1893,8 +1893,8 @@ library UCLID_FILEPROCESSINGLib
 			[in] long nOutputFileID, [in] IIUnknownVector* pSourcePageInfo,
 			IIUnknownVector* pDeletedSourcePageInfo, [in] long nFileTaskSessionID);
 		// -----------------------------------------------------------------------------------------------
-		// PROMISE: Ends the current file task session and apply specified durations to the FileTaskSession row. The
-		//			DateTimeStamp will also be applied.
+		// PROMISE: Ends the current file task session and apply specified durations (in seconds) to the
+		//			FileTaskSession row. The DateTimeStamp will also be applied.
 		[id(161), helpstring("methods EndFileTaskSession")] HRESULT EndFileTaskSession(
 			[in] long nFileTaskSessionID, [in] double dOverheadTime, 
 			[in] double dActivityTime, [in] VARIANT_BOOL vbSessionTimeOut);
