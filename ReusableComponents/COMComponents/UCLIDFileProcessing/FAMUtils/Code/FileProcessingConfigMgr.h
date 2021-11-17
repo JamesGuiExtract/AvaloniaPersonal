@@ -101,6 +101,8 @@ public:
 
 	string getDBManagerType();
 	void setDBManagerType(const string& strDBManagerType);
+
+	bool getUseApplicationRoles();
 private:
 	static const string WINDOW_POS_X;
 	static const string WINDOW_POS_Y;
@@ -128,6 +130,8 @@ private:
 	static const string USE_PRE_NORMALIZED;
 	static const string AUTO_SAVE_FPS_FILE;
 	static const string DB_MANAGER_TYPE;
+	static const string USE_APPLICATION_ROLES;
+	static const string USE_CONNECTION_POOLING;
 
 	static const string DEFAULT_WINDOW_POS_X;
 	static const string DEFAULT_WINDOW_POS_Y;
@@ -152,6 +156,8 @@ private:
 	static const string DEFAULT_USE_PRE_NORMALIZED;
 	static const string DEFAULT_AUTO_SAVE_FPS_FILE;
 	static const string DEFAULT_DB_MANAGER_TYPE;
+	static const string DEFAULT_USE_APPLICATION_ROLES;
+	static const string DEFAULT_USE_CONNECTION_POOLING;
 
 	// Dialog size bounds
 	static const int DLG_MIN_WIDTH;

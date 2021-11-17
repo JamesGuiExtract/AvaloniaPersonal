@@ -1981,7 +1981,7 @@ unique_ptr<CppBaseApplicationRoleConnection> CAttributeDBMgr::getAppRoleConnecti
 
 	bool exitingConnection = m_ipDBConnection != __nullptr && m_ipDBConnection->State != adStateClosed;
 	
-	if (exitingConnection) return createAppRole(m_ipDBConnection);
+	if (exitingConnection) return m_roleUtility.CreateAppRole(m_ipDBConnection, m_currentRole);
 
 	m_ipDBConnection.CreateInstance(_uuidof(Connection));
 	string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
@@ -1996,7 +1996,7 @@ unique_ptr<CppBaseApplicationRoleConnection> CAttributeDBMgr::getAppRoleConnecti
 			asLong(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
 	}
 
-	return createAppRole(m_ipDBConnection);
+	return m_roleUtility.CreateAppRole(m_ipDBConnection, m_currentRole);
 }
 //-------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::validateLicense()
@@ -2021,36 +2021,7 @@ void CAttributeDBMgr::validateSchemaVersion()
 		throw ue;
 	}
 }
-//-------------------------------------------------------------------------------------------------
-unique_ptr<CppBaseApplicationRoleConnection> CAttributeDBMgr::createAppRole(_ConnectionPtr ipConnection)
-{
-	unique_ptr<CppBaseApplicationRoleConnection> role;
-	try
-	{
-		switch (m_currentRole)
-		{
-		case CppBaseApplicationRoleConnection::kNoRole:
-			role.reset(new NoRoleConnection(ipConnection));
-			break;
-		case CppBaseApplicationRoleConnection::kExtractRole:
-			role.reset(new ExtractRoleConnection(ipConnection));
-			break;
-		case CppBaseApplicationRoleConnection::kSecurityRole:
-			role.reset(new SecurityRoleConnection(ipConnection));
-			break;
-		default:
-			UCLIDException ue("ELI51838", "Unknown application role requested.");
-			ue.addDebugInfo("ApplicationRole", (int)m_currentRole);
-			throw ue;
-		}
-	}
-	catch (...)
-	{
-		// Try with the no role 
-		role.reset(new NoRoleConnection(ipConnection));
-	}
-	return role;
-}
+
 //-------------------------------------------------------------------------------------------------
 map<string, string> CAttributeDBMgr::getDBInfoDefaultValues()
 {

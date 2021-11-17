@@ -104,7 +104,8 @@ CFileProcessingDB::CFileProcessingDB()
 	m_bCurrentSessionIsWebSession(false),
 	m_dwLastPingTime(0),
 	m_ipDBInfoSettings(__nullptr),
-	m_currentRole(CppBaseApplicationRoleConnection::kExtractRole)
+	m_currentRole(CppBaseApplicationRoleConnection::kExtractRole),
+	m_roleUtility()
 {
 	try
 	{

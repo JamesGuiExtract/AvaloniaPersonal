@@ -1,13 +1,17 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Linq;
+using System.Globalization;
 
 namespace Extract.SqlDatabase
 {
     public abstract class SqlAppRoleConnection : DbConnection
     {
+        const string FileProcessingDBRegPath = @"Software\Extract Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FileProcessingDB";
+        const string UseApplicationRolesKey = "UseApplicationRoles";
+
         internal SqlConnection BaseSqlConnection { get; set; }
 
         /// <summary>
@@ -15,24 +19,34 @@ namespace Extract.SqlDatabase
         /// </summary>
         byte[] AppRoleCookie;
 
-        protected SqlAppRoleConnection() :
-            base()
+        protected SqlAppRoleConnection() : base()
         {
             BaseSqlConnection = new SqlConnection();
+            GetRegistrySettings();
         }
 
-        protected SqlAppRoleConnection(SqlConnection sqlConnection)
+        protected SqlAppRoleConnection(SqlConnection sqlConnection) : base()
         {
             BaseSqlConnection = sqlConnection;
+            GetRegistrySettings();
         }
 
-        protected SqlAppRoleConnection(string connectionString) :
-            base()
+        protected SqlAppRoleConnection(string connectionString) : base()
         {
             SqlConnectionStringBuilder sqlConnectionStringBuilder = new(connectionString);
             sqlConnectionStringBuilder.Pooling = false;
             BaseSqlConnection = new SqlConnection(sqlConnectionStringBuilder.ConnectionString);
+            GetRegistrySettings();
         }
+
+        private void GetRegistrySettings()
+        {
+            using RegistryKey FileProcessingDBKey = Registry.LocalMachine.OpenSubKey(FileProcessingDBRegPath);
+            string keyValue = (string)FileProcessingDBKey?.GetValue(UseApplicationRolesKey, "1") ?? "1";
+            UseApplicationRoles = int.Parse(keyValue, CultureInfo.InvariantCulture) == 1;
+        }
+
+        protected bool UseApplicationRoles { get; set; }
 
         public override string ConnectionString
         {
@@ -47,6 +61,7 @@ namespace Extract.SqlDatabase
                 }
             }
         }
+
         public override string Database => BaseSqlConnection.Database;
 
         public override string DataSource => BaseSqlConnection.DataSource;
@@ -60,12 +75,12 @@ namespace Extract.SqlDatabase
         public override void ChangeDatabase(string databaseName)
         {
             BaseSqlConnection.ChangeDatabase(databaseName);
-            AssignRole();
+            if (UseApplicationRoles) AssignRole();
         }
 
         public override void Close()
         {
-            if (BaseSqlConnection.State != ConnectionState.Closed)
+            if (!UseApplicationRoles && BaseSqlConnection.State != ConnectionState.Closed)
             {
                 UnsetApplicationRole();
             }
@@ -80,27 +95,17 @@ namespace Extract.SqlDatabase
             }
 
             BaseSqlConnection.Open();
-            AssignRole();
+            if (UseApplicationRoles) AssignRole();
+        }
 
-        }
-        public new SqlTransaction BeginTransaction()
-        {
-            return (SqlTransaction)BeginDbTransaction(default);
-        }
+        public new SqlTransaction BeginTransaction() { return (SqlTransaction)BeginDbTransaction(default); }
         public new SqlTransaction BeginTransaction(IsolationLevel isolationLevel)
-        {
-            return (SqlTransaction)BeginDbTransaction(isolationLevel);
-        }
+        { return (SqlTransaction)BeginDbTransaction(isolationLevel); }
 
-        public new AppRoleCommand CreateCommand()
-        {
-            return (AppRoleCommand)CreateDbCommand();
-        }
+        public new AppRoleCommand CreateCommand() { return (AppRoleCommand)CreateDbCommand(); }
 
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)
-        {
-            return BaseSqlConnection.BeginTransaction(isolationLevel);
-        }
+        { return BaseSqlConnection.BeginTransaction(isolationLevel); }
 
         protected override DbCommand CreateDbCommand()
         {
@@ -143,7 +148,6 @@ namespace Extract.SqlDatabase
 
                 cmd.ExecuteNonQuery();
                 AppRoleCookie = cmd.Parameters["@cookie"].Value as Byte[];
-
             }
             catch (Exception ex)
             {
@@ -153,9 +157,11 @@ namespace Extract.SqlDatabase
 
         protected void UnsetApplicationRole()
         {
-            if (AppRoleCookie is null) return;
+            if (AppRoleCookie is null)
+                return;
 
-            if (BaseSqlConnection?.State != ConnectionState.Open) return;
+            if (BaseSqlConnection?.State != ConnectionState.Open)
+                return;
 
             try
             {
@@ -177,9 +183,6 @@ namespace Extract.SqlDatabase
         }
 
         /// 
-        public Type GetConnectionType()
-        {
-            return BaseSqlConnection?.GetType();
-        }
+        public Type GetConnectionType() { return BaseSqlConnection?.GetType(); }
     }
 }

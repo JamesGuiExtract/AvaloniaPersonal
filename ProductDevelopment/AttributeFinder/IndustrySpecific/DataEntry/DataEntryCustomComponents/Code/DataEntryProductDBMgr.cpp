@@ -655,7 +655,7 @@ unique_ptr<CppBaseApplicationRoleConnection> CDataEntryProductDBMgr::getAppRoleC
 
 	bool connectionExists = m_ipDBConnection != __nullptr && m_ipDBConnection->State != adStateClosed;
 
-	if (connectionExists) return createAppRole(m_ipDBConnection);
+	if (connectionExists) return m_roleUtility.CreateAppRole(m_ipDBConnection, m_currentRole);
 
 	m_ipDBConnection.CreateInstance(_uuidof(Connection));
 	ASSERT_RESOURCE_ALLOCATION("ELI51855", m_ipDBConnection != __nullptr);
@@ -680,36 +680,7 @@ unique_ptr<CppBaseApplicationRoleConnection> CDataEntryProductDBMgr::getAppRoleC
 		m_ipDBConnection->CommandTimeout = asLong(strValue);
 	}
 
-	return createAppRole(m_ipDBConnection);
-}
-//-------------------------------------------------------------------------------------------------
-unique_ptr<CppBaseApplicationRoleConnection> CDataEntryProductDBMgr::createAppRole(_ConnectionPtr ipConnection)
-{
-	unique_ptr<CppBaseApplicationRoleConnection> role;
-	try
-	{
-		switch (m_currentRole)
-		{
-		case CppBaseApplicationRoleConnection::kNoRole:
-			role.reset(new NoRoleConnection(ipConnection));
-			break;
-		case CppBaseApplicationRoleConnection::kExtractRole:
-			role.reset(new ExtractRoleConnection(ipConnection));
-			break;
-		case CppBaseApplicationRoleConnection::kSecurityRole:
-			role.reset(new SecurityRoleConnection(ipConnection));
-			break;
-		default:
-			UCLIDException ue("ELI51843", "Unknown application role requested.");
-			ue.addDebugInfo("ApplicationRole", (int)m_currentRole);
-			throw ue;
-		}
-	}
-	catch (...)
-	{
-		role.reset(new NoRoleConnection(ipConnection));
-	}
-	return role;
+	return m_roleUtility.CreateAppRole(m_ipDBConnection, m_currentRole);
 }
 //-------------------------------------------------------------------------------------------------
 void CDataEntryProductDBMgr::validateLicense()

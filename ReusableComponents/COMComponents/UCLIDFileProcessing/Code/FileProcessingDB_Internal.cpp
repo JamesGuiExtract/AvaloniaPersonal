@@ -1473,7 +1473,7 @@ unique_ptr<CppBaseApplicationRoleConnection>   CFileProcessingDB::getAppRoleConn
 
 				if (it->second != __nullptr && it->second != ADODB::adStateClosed)
 				{
-					return createAppRole(it->second);
+					return m_roleUtility.CreateAppRole(it->second, m_currentRole);
 				}
 				m_mapThreadIDtoDBConnections.erase(dwThreadID);
 			}
@@ -1485,7 +1485,7 @@ unique_ptr<CppBaseApplicationRoleConnection>   CFileProcessingDB::getAppRoleConn
 			ipConnection = getDBConnectionWithoutAppRole();
 			m_mapThreadIDtoDBConnections[dwThreadID] = ipConnection;
 
-			returnAppRoleConnection = createAppRole(ipConnection);
+			returnAppRoleConnection = m_roleUtility.CreateAppRole(ipConnection, m_currentRole);
 
 			if (bFirstConnection)
 				loadDBInfoSettings(ipConnection);
@@ -1536,39 +1536,6 @@ unique_ptr<CppBaseApplicationRoleConnection>   CFileProcessingDB::getAppRoleConn
 		// throw the exception to the outer scope
 		throw ue;
 	}
-}
-//-------------------------------------------------------------------------------------------------
-unique_ptr<CppBaseApplicationRoleConnection>  CFileProcessingDB::createAppRole(_ConnectionPtr ipConnection)
-{
-	ASSERT_ARGUMENT("ELI13650", ipConnection != __nullptr);
-	
-	unique_ptr<CppBaseApplicationRoleConnection> roleInstance;
-
-	try
-	{
-		switch (m_currentRole)
-		{
-		case CppBaseApplicationRoleConnection::kNoRole:
-			roleInstance.reset(new NoRoleConnection(ipConnection));
-			break;
-		case CppBaseApplicationRoleConnection::kExtractRole:
-			roleInstance.reset(new ExtractRoleConnection(ipConnection));
-			break;
-		case CppBaseApplicationRoleConnection::kSecurityRole:
-			roleInstance.reset(new SecurityRoleConnection(ipConnection));
-			break;
-		default:
-			UCLIDException ue("ELI51837", "Unknown application role requested.");
-			ue.addDebugInfo("ApplicationRole", (int)m_currentRole);
-			throw ue;
-		}
-	}
-	catch (...)
-	{
-		// Try with the no role 
-		roleInstance.reset(new NoRoleConnection(ipConnection));
-	}
-	return roleInstance;
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::resetOpenConnectionData()
@@ -4506,6 +4473,8 @@ void CFileProcessingDB::resetDBConnection(bool bCheckForUnaffiliatedFiles/* = fa
 		_lastCodePos = "10";
 
 		CSingleLock lock(&m_criticalSection, TRUE);
+
+		m_roleUtility.RefreshSettings();
 
 		bool bDBSpecified = (!m_strDatabaseServer.empty() && !m_strDatabaseName.empty());
 

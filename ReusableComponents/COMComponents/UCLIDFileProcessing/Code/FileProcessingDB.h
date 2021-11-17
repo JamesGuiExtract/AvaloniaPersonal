@@ -26,6 +26,7 @@
 #include <vector>
 #include <set>
 #include <tuple>
+#include <ApplicationRoleUtility.h>
 
 using namespace std;
 using namespace ADODB;
@@ -715,6 +716,8 @@ private:
 	// After establishing connection, cache DBInfo settings to avoid unnecessary hits on the database.
 	IStrToStrMapPtr m_ipDBInfoSettings;
 
+	ApplicationRoleUtility m_roleUtility;
+
 	//-------------------------------------------------------------------------------------------------
 	// Methods
 	//-------------------------------------------------------------------------------------------------
@@ -878,8 +881,6 @@ private:
 	// PROMISE: To return a CppBaseApplicationRoleConnection containing the m_ipDBConnection 
 	// opened database connection for the current thread.
 	unique_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection();
-
-	unique_ptr<CppBaseApplicationRoleConnection>  createAppRole(_ConnectionPtr ipConnection);
 
 	void resetOpenConnectionData();
 

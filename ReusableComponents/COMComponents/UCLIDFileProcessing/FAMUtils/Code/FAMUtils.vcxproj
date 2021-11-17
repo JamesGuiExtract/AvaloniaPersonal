@@ -138,6 +138,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ADOUtils.cpp" />
+    <ClCompile Include="ApplicationRoleUtility.cpp" />
     <ClCompile Include="CppApplicationRoleConnection.cpp" />
     <ClCompile Include="DatabasePage.cpp" />
     <ClCompile Include="DBInfoCombo.cpp" />
@@ -161,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ADOUtils.h" />
+    <ClInclude Include="ApplicationRoleUtility.h" />
     <ClInclude Include="CppApplicationRoleConnection.h" />
     <ClInclude Include="DatabasePage.h" />
     <ClInclude Include="DBInfoCombo.h" />
