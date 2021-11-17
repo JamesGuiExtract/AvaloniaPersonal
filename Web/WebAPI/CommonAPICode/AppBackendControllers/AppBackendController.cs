@@ -370,28 +370,43 @@ namespace WebAPI.Controllers
         /// <param name="docID">The currently opened document ID</param>
         /// <param name="commit"><c>true</c> if the document is to be committed as complete in
         /// verification; <c>false</c> to keep the specified document in verification.</param>
-        /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
+        /// <param name="duration">Not used</param>
+        /// <param name="activityTime">Duration, in ms, for updating the ActivityTime of the file task session record</param>
+        /// <param name="overheadTime">Duration, in ms, for updating the OverheadTime of the file task session record</param>
+        /// <param name="closedBecauseOfInactivity">Whether this close is because the session timed-out because the user was inactive for too long</param>
         [HttpPost("CloseDocument/{docID}")]
         [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        public IActionResult CloseDocument(int docID, bool commit, int duration = -1)
+        public IActionResult CloseDocument(
+            int docID,
+            bool commit,
+            int duration = -1,
+            int activityTime = -1,
+            int overheadTime = -1,
+            bool closedBecauseOfInactivity = false)
         {
             try
             {
                 ExtractException.Assert("ELI46726", "CloseDocument requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = new DocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46698", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                ExtractException.Assert("ELI52967", "A close can't be both a commit and an inactivity timeout",
+                    !(commit && closedBecauseOfInactivity));
 
-                    data.CloseDocument(commit ? EActionStatus.kActionCompleted : EActionStatus.kActionPending, duration);
+                using var data = new DocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46698", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    return NoContent();
-                }
+                EActionStatus status = commit ? EActionStatus.kActionCompleted : EActionStatus.kActionPending;
+                data.CloseDocument(
+                    setStatusTo: status,
+                    activityTime: activityTime,
+                    overheadTime: overheadTime,
+                    closedBecauseOfInactivity: closedBecauseOfInactivity);
+
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -417,16 +432,17 @@ namespace WebAPI.Controllers
                 ExtractException.Assert("ELI46727", "SkipDocument requires an active Session Login token.",
                    User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = new DocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46701", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = new DocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46701", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    data.SetComment(skipData?.Comment ?? string.Empty);
-                    data.CloseDocument(EActionStatus.kActionSkipped, skipData?.Duration ?? -1);
+                data.SetComment(skipData?.Comment ?? "");
+                data.CloseDocument(
+                    setStatusTo: EActionStatus.kActionSkipped,
+                    activityTime: skipData?.ActivityTime ?? -1,
+                    overheadTime: skipData?.OverheadTime ?? -1);
 
-                    return NoContent();
-                }
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -505,28 +521,36 @@ namespace WebAPI.Controllers
         /// Fail the document so that it will not be in the queue
         /// </summary>
         /// <param name="docID">The currently open document ID</param>
-        /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
+        /// <param name="duration">Not used</param>
+        /// <param name="activityTime">Duration, in ms, for updating the ActivityTime of the file task session record</param>
+        /// <param name="overheadTime">Duration, in ms, for updating the OverheadTime of the file task session record</param>
         [HttpPost("FailDocument/{docID}")]
         [Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400, Type = typeof(ErrorResult))]
         [ProducesResponseType(401)]
-        public IActionResult FailDocument(int docID, int duration = -1)
+        public IActionResult FailDocument(
+            int docID,
+            int duration = -1,
+            int activityTime = -1,
+            int overheadTime = -1)
         {
             try
             {
                 ExtractException.Assert("ELI46730", "FailDocument requires an active Session Login token.",
                     User.GetClaim(Utils._FAM_SESSION_ID) != "0");
 
-                using (var data = new DocumentData(User, requireSession: true))
-                {
-                    ExtractException.Assert("ELI46702", "The supplied document ID doesn't match the open session's document ID",
-                        docID == data.DocumentSessionFileId);
+                using var data = new DocumentData(User, requireSession: true);
+                ExtractException.Assert("ELI46702", "The supplied document ID doesn't match the open session's document ID",
+                    docID == data.DocumentSessionFileId);
 
-                    data.CloseDocument(EActionStatus.kActionFailed, duration);
+                data.CloseDocument(
+                    setStatusTo: EActionStatus.kActionFailed,
+                    activityTime: activityTime,
+                    overheadTime: overheadTime,
+                    closedBecauseOfInactivity: false);
 
-                    return NoContent();
-                }
+                return NoContent();
             }
             catch (Exception ex)
             {

@@ -514,16 +514,25 @@ namespace WebAPI.Models
         /// </summary>
         /// <param name="setStatusTo"><see cref="EActionStatus.kActionCompleted"/> to commit the document so that it advances in the
         /// workflow; other values to save the document but set the file's status in the EditAction to a non-completed value.</param>
-        /// <param name="duration">Optional duration, in ms, to use for updating the file task session record</param>
-        /// <param name="exception">Optional exception for logging if <see paramref="setStatusTo"/> is <see cref="EActionStatus.kActionFailed"/></param>
-        public void CloseDocument(EActionStatus setStatusTo, int duration = -1, Exception exception = null)
+        /// <param name="exception">Exception to log if <see paramref="setStatusTo"/> is <see cref="EActionStatus.kActionFailed"/></param>
+        /// <param name="activityTime">Duration, in ms, for updating the ActivityTime of the file task session record</param>
+        /// <param name="overheadTime">Duration, in ms, for updating the OverheadTime of the file task session record</param>
+        /// <param name="closedBecauseOfInactivity">Whether this close is because the session timed-out because the user was inactive for too long</param>
+        public void CloseDocument(
+            EActionStatus setStatusTo,
+            Exception exception = null,
+            int activityTime = -1,
+            int overheadTime = -1,
+            bool closedBecauseOfInactivity = false)
         {
             try
             {
                 ExtractException.Assert("ELI45238", "No active user", _user != null);
                 ExtractException.Assert("ELI46669", "No open document", FileApi.DocumentSession.IsOpen);
 
-                FileApi.FileProcessingDB.EndFileTaskSession(FileApi.DocumentSession.Id, 0, 0, false);
+                int activityTimeInSeconds = Math.Max(activityTime, 0) / 1000;
+                int overheadTimeInSeconds = Math.Max(overheadTime, 0) / 1000;
+                FileApi.FileProcessingDB.EndFileTaskSession(FileApi.DocumentSession.Id, overheadTimeInSeconds, activityTimeInSeconds, closedBecauseOfInactivity);
 
                 int fileId = FileApi.DocumentSession.FileId;
                 if (setStatusTo == EActionStatus.kActionCompleted)
