@@ -17,7 +17,6 @@ namespace Extract
 		void RedactionVerificationSettings::InitializeDefaults()
 		{
 			RedactionTypes = gcnew List<String^>();
-			InactivityTimeout = 5;
 			DocumentTypes = gcnew String("");
 		}
 

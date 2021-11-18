@@ -67,14 +67,7 @@ namespace Extract
 				auto settings = gcnew RedactionVerificationSettings();
 
 				settings->RedactionTypes = getConfiguredRedactionTypes();
-				if (_autoCloseSessionCheckBox->Checked)
-				{
-					settings->InactivityTimeout = Decimal::ToInt32(_inactivityTimeoutMinutesUpDown->Value);
-				}
-				else
-				{
-					settings->InactivityTimeout = 0;
-				}
+
 				settings->DocumentTypes = _docTypeListFilename->Text;
 
 				_settings = settings;
@@ -83,16 +76,6 @@ namespace Extract
 				DialogResult = System::Windows::Forms::DialogResult::OK;
 			}
 			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI45077");			
-		}
-
-		Void WorkflowVerifySettingsForm::HandleAutoCloseSessionCheckBox_CheckedChanged(System::Object^  sender, System::EventArgs^ e)
-		{
-			try
-			{
-				_inactivityTimeoutMinutesUpDown->Enabled = _autoCloseSessionCheckBox->Checked;
-				
-			}
-			CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI46740");
 		}
 
 #pragma endregion
@@ -114,17 +97,19 @@ namespace Extract
 					_redactionTypesDataGridView->Rows->Add(gcnew cli::array<String^> { redactionType });
 				}
 
-				if (_settings->InactivityTimeout > 0)
+				long sessionTimeout = asLong(
+					(LPCSTR)_ipfamDatabase->GetDBInfoSetting("VerificationSessionTimeout", false));
+				if (sessionTimeout > 0)
 				{
-					_autoCloseSessionCheckBox->Checked = true;
-					_inactivityTimeoutMinutesUpDown->Value = _settings->InactivityTimeout;
+					stringstream timeoutMessage;
+					timeoutMessage << "Sessions will automatically close after "
+						<< sessionTimeout
+						<< " minute(s) of inactivity";
+					_sessionTimeoutLabel->Text = gcnew String(timeoutMessage.str().c_str());
 				}
 				else
 				{
-					RedactionVerificationSettings defaults;
-					_autoCloseSessionCheckBox->Checked = false;
-					_inactivityTimeoutMinutesUpDown->Value = defaults.InactivityTimeout;
-					_inactivityTimeoutMinutesUpDown->Enabled = false;
+					_sessionTimeoutLabel->Text = "No session timeout is configured";
 				}
 
 				_docTypeListFilename->Text = _settings->DocumentTypes;

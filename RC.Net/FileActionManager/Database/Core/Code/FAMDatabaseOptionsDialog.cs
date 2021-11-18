@@ -44,6 +44,7 @@ namespace Extract.FileActionManager.Database
         const string _REQUIRE_PASSWORD_TO_PROCESS_SKIPPED = "RequirePasswordToProcessAllSkippedFiles";
         const string _REQUIRE_AUTHENTICATION_BEFORE_RUN = "RequireAuthenticationBeforeRun";
         const string _SKIP_AUTHENTICATION_ON_MACHINES = "SkipAuthenticationForServiceOnMachines";
+        const string _VERIFICATION_SESSION_TIMEOUT = "VerificationSessionTimeout";
         const string _AZURE_TENNANT = "AzureTenant";
         const string _AZURE_CLIENT_ID = "AzureClientId";
         const string _AZURE_INSTANCE = "AzureInstance";
@@ -73,6 +74,9 @@ namespace Extract.FileActionManager.Database
         const string _DASHBOARD_EXCLUDE_FILTER = "DashboardExcludeFilter";
 
         const string _PASSWORD_COMPLEXITY_REQUIREMENTS = "PasswordComplexityRequirements";
+
+        const int _VERIFICATION_SESSION_TIMEOUT_DISABLED = 0;
+        const int _DEFAULT_VERIFICATION_SESSION_TIMEOUT = 5;
 
         #endregion Constants
 
@@ -147,6 +151,9 @@ namespace Extract.FileActionManager.Database
                 // Add the out of range handlers for the min and max times
                 _numberMinTimeBetweenChecks.ValueOutOfRange += HandleValueOutOfRange;
                 _numberMaxTimeBetweenChecks.ValueOutOfRange += HandleValueOutOfRange;
+
+                _checkSessionTimeout.CheckedChanged += (o, e)
+                    => _numberSessionTimeout.Enabled = _checkSessionTimeout.Checked;
 
                 _server = server;
                 _database = database;
@@ -228,6 +235,25 @@ namespace Extract.FileActionManager.Database
                     settings.GetValue(_MIN_TIME_BETWEEN_PROCESSING_DB_CHECK);
                 _numberMaxTimeBetweenChecks.Text =
                     settings.GetValue(_MAX_TIME_BETWEEN_PROCESSING_DB_CHECK);
+
+                if (!int.TryParse(settings.GetValue(_VERIFICATION_SESSION_TIMEOUT)
+                    , out int verificationSessionTimeout))
+                {
+                    verificationSessionTimeout = _VERIFICATION_SESSION_TIMEOUT_DISABLED;
+                }
+
+                bool sessionTimeoutConfigured = verificationSessionTimeout != _VERIFICATION_SESSION_TIMEOUT_DISABLED;
+                _checkSessionTimeout.Checked = sessionTimeoutConfigured;
+                if (sessionTimeoutConfigured)
+                {
+                    _numberSessionTimeout.Value = verificationSessionTimeout;
+                    _numberSessionTimeout.Enabled = true;
+                }
+                else
+                {
+                    _numberSessionTimeout.Value = _DEFAULT_VERIFICATION_SESSION_TIMEOUT;
+                    _numberSessionTimeout.Enabled = false;
+                }
 
                 _azureClientID.Text =
                     settings.GetValue(_AZURE_CLIENT_ID);
@@ -562,6 +588,10 @@ namespace Extract.FileActionManager.Database
 
                 map.Set(_DASHBOARD_INCLUDE_FILTER, textBoxDashboardIncludeFilter.Text);
                 map.Set(_DASHBOARD_EXCLUDE_FILTER, textBoxDashboardExcludeFilter.Text);
+
+                map.Set(_VERIFICATION_SESSION_TIMEOUT, _checkSessionTimeout.Checked
+                    ? _numberSessionTimeout.Value.ToString(CultureInfo.InvariantCulture)
+                    : "0");
 
                 map.Set(_AZURE_TENNANT, _azureTenant.Text);
                 map.Set(_AZURE_CLIENT_ID, _azureClientID.Text);

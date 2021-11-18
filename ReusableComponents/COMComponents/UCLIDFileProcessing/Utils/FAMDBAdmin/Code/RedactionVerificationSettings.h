@@ -28,9 +28,6 @@ namespace Extract {
 			// This is a filename that contains the valid document types, not the document types themselves.
 			[DataMember]
 			property String^ DocumentTypes;
-
-			[DataMember]
-			property int InactivityTimeout;
 		};
 	}
 };
