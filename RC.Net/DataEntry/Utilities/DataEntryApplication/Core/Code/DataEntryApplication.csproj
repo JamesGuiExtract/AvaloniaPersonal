@@ -194,6 +194,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Timeout.cs" />
     <Compile Include="VerificationSettings.cs" />
     <EmbeddedResource Include="AboutForm.resx">
       <SubType>Designer</SubType>
