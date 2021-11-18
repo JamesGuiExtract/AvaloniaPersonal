@@ -137,9 +137,8 @@
                     <ListView.ItemTemplate>
                       <DataTemplate>
                         <WrapPanel>
-                          <Label Content="{Binding Name}" ContentStringFormat="{}{0}:" Target="{Binding ElementName=SettingDetail}"
-                                 VerticalAlignment="Center" FontSize="11" />
-                          <TextBlock x:Name="SettingDetail" Text="{Binding Value}" VerticalAlignment="Center" FontSize="11" />
+                          <TextBlock Text="{Binding Name, StringFormat='{}{0}: '}" VerticalAlignment="Center" FontSize="11" />
+                          <TextBlock Text="{Binding Value}" VerticalAlignment="Center" FontSize="11" />
                         </WrapPanel>
                       </DataTemplate>
                     </ListView.ItemTemplate>
