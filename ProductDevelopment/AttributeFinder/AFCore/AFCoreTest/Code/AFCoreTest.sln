@@ -1013,7 +1013,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLModelTrainer.Test", "..\.
 		{6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2} = {6E3EEAF2-30A3-42BE-BE62-9CF2BA3702D2}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Web.AppBackendAPI.Test", "..\..\..\..\..\Web\WebAPI\Testing\Automated\Extract.Web.AppBackendAPI.Test\Extract.Web.AppBackendAPI.Test.csproj", "{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extract.Web.AppBackendAPI.Test", "..\..\..\..\..\Web\WebAPI\Testing\Automated\Extract.Web.AppBackendAPI.Test\Extract.Web.AppBackendAPI.Test.csproj", "{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B5114241-6ADC-4E6A-B692-36F1D1D4FEB2} = {B5114241-6ADC-4E6A-B692-36F1D1D4FEB2}
 		{037F8051-5F5F-48C4-9BF3-34AA990AA5DE} = {037F8051-5F5F-48C4-9BF3-34AA990AA5DE}
@@ -5551,16 +5551,16 @@ Global
 		{FDE02587-149C-4548-8A5B-16FD7BA085CB}.Template|x86.ActiveCfg = Release|Any CPU
 		{FDE02587-149C-4548-8A5B-16FD7BA085CB}.Template|x86.Build.0 = Release|Any CPU
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Debug|Win32.ActiveCfg = Debug|x86
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Debug|Win32.Build.0 = Debug|x86
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Debug|x64.ActiveCfg = Debug|x86
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Debug|x86.ActiveCfg = Debug|x86
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Debug|x86.Build.0 = Debug|x86
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Release|Any CPU.ActiveCfg = Release|x86
-		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Release|Mixed Platforms.Build.0 = Release|x86
+		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Release|Win32.ActiveCfg = Release|x86
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Release|Win32.Build.0 = Release|x86
 		{CEAEEF1D-DD18-44BD-BEF9-E81B2ECEB6B0}.Release|x64.ActiveCfg = Release|x86
