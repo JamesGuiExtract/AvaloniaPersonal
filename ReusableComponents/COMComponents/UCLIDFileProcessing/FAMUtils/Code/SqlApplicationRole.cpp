@@ -46,8 +46,12 @@ void CppSqlApplicationRole::UnsetApplicationRole()
 {
 	try
 	{
-		if (_cookie.vt == VT_EMPTY) return;
-		if (m_ipConnection == __nullptr || m_ipConnection->State == adStateClosed) return;
+		if (_cookie.vt == VT_EMPTY
+			|| m_ipConnection == __nullptr
+			|| m_ipConnection->State == adStateClosed)
+		{
+			return;
+		}
 
 		_CommandPtr cmd;
 		cmd.CreateInstance(__uuidof(Command));
@@ -56,8 +60,16 @@ void CppSqlApplicationRole::UnsetApplicationRole()
 		cmd->ActiveConnection = m_ipConnection;
 		cmd->CommandText = _bstr_t("sys.sp_unsetapprole");
 		cmd->CommandType = adCmdStoredProc;
+
 		cmd->Parameters->Refresh();
 
+		// If the command doesn't have a cookie parameter then
+		// it won't work. This happens, e.g., during unit test teardown,
+		// when the call to close all connections is run (FAMTestDBManager.RemoveDatabase)
+		if (cmd->Parameters->Count == 0)
+		{
+			return;
+		}
 		cmd->Parameters->Item["@cookie"]->Value = _cookie;
 		cmd->Execute(NULL, NULL, adCmdStoredProc);
 		_cookie.Clear();

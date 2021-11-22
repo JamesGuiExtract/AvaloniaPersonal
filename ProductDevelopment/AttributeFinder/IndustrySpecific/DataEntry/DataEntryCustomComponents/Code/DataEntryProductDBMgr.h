@@ -90,7 +90,7 @@ private:
 
 	ApplicationRoleUtility m_roleUtility;
 
-	ADODB::_ConnectionPtr m_ipDBConnection; 
+	shared_ptr<CppBaseApplicationRoleConnection> m_ipDBConnection;
 
 	// An IAFUtility instance to be used to execute attribute queries.
 	IAFUtilityPtr m_ipAFUtility;
@@ -110,7 +110,7 @@ private:
     // if it is NULL it is created using the DatabaseServer and DatabaseName from the m_ipFAMDB
 	// if bReset is true the current connection in m_ipDBConnection is set to NULL and recreated
 	// and make the default false
-	unique_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection(bool bReset = false);
+	shared_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection(bool bReset = false);
 
 	// Puts all of the tables managed in the rvecTables vector
 	void getDataEntryTables(std::vector<std::string>& rvecTables);

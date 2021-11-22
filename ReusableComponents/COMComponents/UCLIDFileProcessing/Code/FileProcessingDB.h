@@ -455,7 +455,7 @@ private:
 	// Variables
 
 	// Map that contains the open connection for each thread.
-	map<DWORD, _ConnectionPtr> m_mapThreadIDtoDBConnections;
+	map<DWORD, shared_ptr<CppBaseApplicationRoleConnection>> m_mapThreadIDtoDBConnections;
 
 
 	CppBaseApplicationRoleConnection::AppRoles m_currentRole;
@@ -896,7 +896,7 @@ private:
 
 	// PROMISE: To return a CppBaseApplicationRoleConnection containing the m_ipDBConnection 
 	// opened database connection for the current thread.
-	unique_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection();
+	shared_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection();
 
 	void resetOpenConnectionData();
 

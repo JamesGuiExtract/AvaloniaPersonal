@@ -643,7 +643,7 @@ STDMETHODIMP CDataEntryProductDBMgr::Initialize(IFileProcessingDB* pFAMDB)
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-unique_ptr<CppBaseApplicationRoleConnection> CDataEntryProductDBMgr::getAppRoleConnection(bool bReset)
+shared_ptr<CppBaseApplicationRoleConnection> CDataEntryProductDBMgr::getAppRoleConnection(bool bReset)
 {
 	// If the FAMDB is not set throw an exception
 	if (m_ipFAMDB == __nullptr)
@@ -653,12 +653,15 @@ unique_ptr<CppBaseApplicationRoleConnection> CDataEntryProductDBMgr::getAppRoleC
 		throw ue;
 	}
 
-	bool connectionExists = m_ipDBConnection != __nullptr && m_ipDBConnection->State != adStateClosed;
+	bool connectionExists = m_ipDBConnection != __nullptr && m_ipDBConnection->ADOConnection()->State != adStateClosed;
 
-	if (connectionExists) return m_roleUtility.CreateAppRole(m_ipDBConnection, m_currentRole);
+	if (connectionExists)
+	{
+		return m_ipDBConnection;
+	}
 
-	m_ipDBConnection.CreateInstance(_uuidof(Connection));
-	ASSERT_RESOURCE_ALLOCATION("ELI51855", m_ipDBConnection != __nullptr);
+	_ConnectionPtr adoConnection(_uuidof(Connection));
+	ASSERT_RESOURCE_ALLOCATION("ELI51855", adoConnection != __nullptr);
 
 	// Get database server from FAMDB
 	string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
@@ -670,17 +673,16 @@ unique_ptr<CppBaseApplicationRoleConnection> CDataEntryProductDBMgr::getAppRoleC
 	string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
 	if (!strDatabaseServer.empty() && !strDatabaseName.empty())
 	{
-		m_ipDBConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
+		adoConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
 
 		// Get the command timeout from the FAMDB DBInfo table
-		string strValue = asString(
-			m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
-
-		// Set the command timeout
-		m_ipDBConnection->CommandTimeout = asLong(strValue);
+		adoConnection->CommandTimeout =
+			asLong(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
 	}
 
-	return m_roleUtility.CreateAppRole(m_ipDBConnection, m_currentRole);
+	m_ipDBConnection = m_roleUtility.CreateAppRole(adoConnection, m_currentRole);
+
+	return m_ipDBConnection;
 }
 //-------------------------------------------------------------------------------------------------
 void CDataEntryProductDBMgr::validateLicense()

@@ -18,11 +18,11 @@ class FAMUTILS_API ApplicationRoleUtility
 public:
 	ApplicationRoleUtility();
 
-	unique_ptr<CppBaseApplicationRoleConnection> CreateAppRole(ADODB::_ConnectionPtr ipConnection, CppBaseApplicationRoleConnection::AppRoles role)
+	shared_ptr<CppBaseApplicationRoleConnection> CreateAppRole(ADODB::_ConnectionPtr ipConnection, CppBaseApplicationRoleConnection::AppRoles role)
 	{
 		ASSERT_ARGUMENT("ELI13650", ipConnection != __nullptr);
 
-		unique_ptr<CppBaseApplicationRoleConnection> roleInstance;
+		shared_ptr<CppBaseApplicationRoleConnection> roleInstance;
 
 		if (m_bUseApplicationRoles)
 		{
@@ -70,4 +70,3 @@ public:
 		m_bUseApplicationRoles = m_FileProcessingConfigManager.getUseApplicationRoles();
 	}
 };
-

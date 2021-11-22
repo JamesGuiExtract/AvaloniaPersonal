@@ -1974,7 +1974,7 @@ STDMETHODIMP CAttributeDBMgr::GetAllAttributeSetNames(IStrToStrMap** ippNames)
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-unique_ptr<CppBaseApplicationRoleConnection> CAttributeDBMgr::getAppRoleConnection(bool bReset)
+shared_ptr<CppBaseApplicationRoleConnection> CAttributeDBMgr::getAppRoleConnection(bool bReset)
 {
 	// If the FAMDB is not set throw an exception
 	if (m_ipFAMDB == __nullptr)
@@ -1984,24 +1984,31 @@ unique_ptr<CppBaseApplicationRoleConnection> CAttributeDBMgr::getAppRoleConnecti
 		throw ue;
 	}
 
-	bool exitingConnection = m_ipDBConnection != __nullptr && m_ipDBConnection->State != adStateClosed;
-	
-	if (exitingConnection) return m_roleUtility.CreateAppRole(m_ipDBConnection, m_currentRole);
+	bool connectionExists = m_ipDBConnection != __nullptr && m_ipDBConnection->ADOConnection()->State != adStateClosed;
 
-	m_ipDBConnection.CreateInstance(_uuidof(Connection));
+	if (connectionExists)
+	{
+		return m_ipDBConnection;
+	}
+
+	_ConnectionPtr adoConnection(_uuidof(Connection));
+    ASSERT_RESOURCE_ALLOCATION("ELI52972", adoConnection != __nullptr);
+
 	string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
 	string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
 	string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
 	if (!strDatabaseServer.empty() && !strDatabaseName.empty())
 	{
-		m_ipDBConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
+		adoConnection->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
 
 		// Get the command timeout from the FAMDB DBInfo table
-		m_ipDBConnection->CommandTimeout =
+		adoConnection->CommandTimeout =
 			asLong(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str(), VARIANT_TRUE));
 	}
 
-	return m_roleUtility.CreateAppRole(m_ipDBConnection, m_currentRole);
+	m_ipDBConnection = m_roleUtility.CreateAppRole(adoConnection, m_currentRole);
+
+	return m_ipDBConnection;
 }
 //-------------------------------------------------------------------------------------------------
 void CAttributeDBMgr::validateLicense()

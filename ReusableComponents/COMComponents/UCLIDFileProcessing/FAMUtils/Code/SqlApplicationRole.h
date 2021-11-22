@@ -38,7 +38,11 @@ public:
 	}
 	~CppSqlApplicationRole()
 	{
-		UnsetApplicationRole();
+		try
+		{
+			UnsetApplicationRole();
+		}
+		catch (...) {}
 		m_ipConnection = __nullptr;
 	}
 

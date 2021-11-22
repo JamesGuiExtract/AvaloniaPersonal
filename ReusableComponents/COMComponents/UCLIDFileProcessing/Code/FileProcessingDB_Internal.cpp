@@ -76,13 +76,12 @@ void CFileProcessingDB::closeDBConnection()
 	// Get the current thread ID
 	DWORD dwThreadID = GetCurrentThreadId();
 
-	map<DWORD, _ConnectionPtr>::iterator it;
-	it = m_mapThreadIDtoDBConnections.find(dwThreadID);
+	auto it = m_mapThreadIDtoDBConnections.find(dwThreadID);
 
 	if (it != m_mapThreadIDtoDBConnections.end())
 	{
 		// close the connection if it is open
-		_ConnectionPtr ipConnection = it->second;
+		_ConnectionPtr ipConnection = it->second->ADOConnection();
 		if (ipConnection != __nullptr && ipConnection->State != adStateClosed)
 	{
 			// close the database connection
@@ -1442,7 +1441,7 @@ void CFileProcessingDB::addASTransFromSelect(_ConnectionPtr ipConnection,
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26937");
 }
 //--------------------------------------------------------------------------------------------------
-unique_ptr<CppBaseApplicationRoleConnection>   CFileProcessingDB::getAppRoleConnection()
+shared_ptr<CppBaseApplicationRoleConnection> CFileProcessingDB::getAppRoleConnection()
 {
 	string strConnectionString;
 
@@ -1457,38 +1456,39 @@ unique_ptr<CppBaseApplicationRoleConnection>   CFileProcessingDB::getAppRoleConn
 			DWORD dwThreadID = GetCurrentThreadId();
 
 			_ConnectionPtr ipConnection = __nullptr;
-			unique_ptr<CppBaseApplicationRoleConnection> returnAppRoleConnection;
 
 			// Lock mutex to keep other instances from running code that may cause the
 			// connection to be reset
 			CSingleLock lg(&m_criticalSection, TRUE);
 
-			map<DWORD, _ConnectionPtr>::iterator it;
-			it = m_mapThreadIDtoDBConnections.find(dwThreadID);
+			auto it = m_mapThreadIDtoDBConnections.find(dwThreadID);
 			_lastCodePos = "5";
 
 			if (it != m_mapThreadIDtoDBConnections.end())
 			{
 				bool connectionFound = it->second != __nullptr ;
 
-				if (it->second != __nullptr && it->second != ADODB::adStateClosed)
+				if (it->second != __nullptr && it->second->ADOConnection() != ADODB::adStateClosed)
 				{
-					return m_roleUtility.CreateAppRole(it->second, m_currentRole);
+					return it->second;
 				}
 				m_mapThreadIDtoDBConnections.erase(dwThreadID);
 			}
 
 			bool bFirstConnection = m_mapThreadIDtoDBConnections.size() == 0;
-			if ( bFirstConnection)
+			if (bFirstConnection)
+			{
 				resetOpenConnectionData();
+			}
 			
 			ipConnection = getDBConnectionWithoutAppRole();
-			m_mapThreadIDtoDBConnections[dwThreadID] = ipConnection;
-
-			returnAppRoleConnection = m_roleUtility.CreateAppRole(ipConnection, m_currentRole);
+			auto appRoleConnection = m_roleUtility.CreateAppRole(ipConnection, m_currentRole);
+			m_mapThreadIDtoDBConnections[dwThreadID] = appRoleConnection;
 
 			if (bFirstConnection)
+			{
 				loadDBInfoSettings(ipConnection);
+			}
 
 			_lastCodePos = "60";
 
@@ -1515,7 +1515,7 @@ unique_ptr<CppBaseApplicationRoleConnection>   CFileProcessingDB::getAppRoleConn
 			postStatusUpdateNotification(kConnectionEstablished);
 
 			// return the open connection
-			return returnAppRoleConnection;
+			return appRoleConnection;
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI18320");
 	}

@@ -92,7 +92,7 @@ private:
 
 	ApplicationRoleUtility m_roleUtility;
 
-	ADODB::_ConnectionPtr m_ipDBConnection; 
+	shared_ptr<CppBaseApplicationRoleConnection> m_ipDBConnection;
 
 	// Contains the number of times an attempt to reconnect. Each time the reconnect attempt times
 	// out an exception will be logged.
@@ -108,7 +108,7 @@ private:
 	// DatabaseServer and DatabaseName from the m_ipFAMDB
 	// if bReset is true the current connection in m_ipDBConnection is set to NULL and recreated
 	// and make the default false
-	unique_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection(bool bReset = false);
+	shared_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection(bool bReset = false);
 
 	// Puts all of the tables managed in the rvecTables vector
 	void getIDShieldTables(std::vector<std::string>& rvecTables);

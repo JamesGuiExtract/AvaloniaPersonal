@@ -88,7 +88,7 @@ private:
 
 	ApplicationRoleUtility m_roleUtility;
 
-	ADODB::_ConnectionPtr m_ipDBConnection; 
+	shared_ptr<CppBaseApplicationRoleConnection> m_ipDBConnection;
 
 	// Contains the number of times an attempt to reconnect. Each time the reconnect attempt times
 	// out an exception will be logged.
@@ -103,7 +103,7 @@ private:
 
 	// Returns CppBaseApplicationRoleConnection object, if it is NULL it is created using the 
 	// DatabaseServer and DatabaseName from the m_ipFAMDB
-	unique_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection();
+	shared_ptr<CppBaseApplicationRoleConnection> getAppRoleConnection();
 
 	// Puts all of the tables managed in the rvecTables vector
 	void getLabDETables(std::vector<std::string>& rvecTables);
