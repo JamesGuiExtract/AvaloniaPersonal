@@ -1153,9 +1153,9 @@ namespace
 			"	DECLARE @OutputTable TABLE(ID BIGINT)\n"
 			"	SET @FileID = (SELECT TOP(1) FileID FROM dbo.FileTaskSession WHERE ID = @FileTaskSessionID);\n"
 			"	SET @ID = (SELECT MAX(asff.ID) FROM dbo.AttributeSetForFile asff\n"
-					"INNER JOIN dbo.FileTaskSession fst ON asff.FileTaskSessionID = fst.ID\n"
-					"WHERE fst.FileID = @FileID\n"
-					"AND asff.AttributeSetNameID = @AttributeSetName_ID)\n"
+			"		INNER JOIN dbo.FileTaskSession fts ON asff.FileTaskSessionID = fts.ID\n"
+			"		WHERE fts.FileID = @FileID\n"
+			"		AND asff.AttributeSetNameID = @AttributeSetName_ID)\n"
 			"	IF @ID IS NULL\n"
 			"		BEGIN\n"
 			"			INSERT INTO AttributeSetForFile([FileTaskSessionID], [AttributeSetNameID])\n"
@@ -1164,8 +1164,13 @@ namespace
 			"		END\n"
 			"	ELSE\n"
 			"		BEGIN\n"
+			"			UPDATE AttributeSetForFile\n"
+			"			SET FileTaskSessionID = @FileTaskSessionID\n"
+			"			WHERE ID = @ID\n"
+			"\n"
 			"			INSERT INTO @OutputTable(ID) VALUES(@ID)\n"
 			"		END\n"
+			"\n"
 			"	SELECT ID FROM @OutputTable\n"
 			"	SET NOCOUNT OFF\n"
 			"END TRY\n"
@@ -1187,7 +1192,7 @@ namespace
 				{ "@FileTaskSessionID", fileTaskSessionID }
 			});
 
-			return cmdInsertASFF;
+		return cmdInsertASFF;
 	}
 
 	std::string insertAttributeQueryPreamble =
