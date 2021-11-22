@@ -11,7 +11,6 @@ namespace Extract.SqlDatabase
         {
             try
             {
-
                 return new SqlConnection(SqlUtil.CreateConnectionString(databaseServer,databaseName, enlist));
             }
             catch (System.Exception ex)
@@ -25,9 +24,21 @@ namespace Extract.SqlDatabase
 
         public static SqlConnection NewSqlDBConnection(string connectionString)
         {
+            connectionString = MakeAppRoleCompatibleConnectionString(connectionString);
+
+            return new SqlConnection(connectionString);
+        }
+
+        public static string MakeAppRoleCompatibleConnectionString(string connectionString)
+        {
+            // https://extract.atlassian.net/browse/ISSUE-17693
+            // To avoid "Impersonate Session Security Context" exceptions when using application
+            // role authentication, both connection pooling and MARS need to be disabled.
             SqlConnectionStringBuilder sqlConnectionStringBuilder = new(connectionString);
             sqlConnectionStringBuilder.Pooling = false;
-            return new SqlConnection(sqlConnectionStringBuilder.ConnectionString);
+            sqlConnectionStringBuilder.MultipleActiveResultSets = false;
+
+            return sqlConnectionStringBuilder.ConnectionString;
         }
 
         public static string CreateConnectionString(string databaseServer, string databaseName, bool enlist = true)

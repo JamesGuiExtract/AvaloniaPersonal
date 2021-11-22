@@ -4,49 +4,110 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Threading;
 
 namespace Extract.SqlDatabase
 {
-    public abstract class SqlAppRoleConnection : DbConnection
+    public abstract partial class SqlAppRoleConnection : DbConnection
     {
         const string FileProcessingDBRegPath = @"Software\Extract Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FileProcessingDB";
         const string UseApplicationRolesKey = "UseApplicationRoles";
 
-        internal SqlConnection BaseSqlConnection { get; set; }
+        SqlConnection _baseSqlConnection;
+        internal SqlConnection BaseSqlConnection
+        { 
+            get
+            {
+                if (_baseSqlConnection == null)
+                {
+                    SetBaseSqlConnection(_connectionString);
+                    _ownsBaseConnection = true;
+                }
 
-        /// <summary>
-        /// Created when application role is enabled and needed for disabling the created app role
-        /// </summary>
-        byte[] AppRoleCookie;
+                return _baseSqlConnection;
+            }
+            set
+            {
+                if (value != _baseSqlConnection)
+                {
+                    _baseSqlConnection = value;
+                    _ownsBaseConnection = false;
+                }
+            }
+        }
+
+        /// Determines whether this connection can be returned to the ConnectionPool when closed.
+        bool _ownsBaseConnection;
+
+        string _connectionString;
+
+        bool _isRoleAssigned;
 
         protected SqlAppRoleConnection() : base()
         {
-            BaseSqlConnection = new SqlConnection();
-            GetRegistrySettings();
         }
 
         protected SqlAppRoleConnection(SqlConnection sqlConnection) : base()
         {
+            _connectionString = sqlConnection?.ConnectionString;
             BaseSqlConnection = sqlConnection;
-            GetRegistrySettings();
         }
 
         protected SqlAppRoleConnection(string connectionString) : base()
         {
-            SqlConnectionStringBuilder sqlConnectionStringBuilder = new(connectionString);
-            sqlConnectionStringBuilder.Pooling = false;
-            BaseSqlConnection = new SqlConnection(sqlConnectionStringBuilder.ConnectionString);
-            GetRegistrySettings();
+            _connectionString = SqlUtil.MakeAppRoleCompatibleConnectionString(connectionString);
         }
 
-        private void GetRegistrySettings()
+        protected SqlAppRoleConnection(string server, string database, bool enlist = true)
         {
-            using RegistryKey FileProcessingDBKey = Registry.LocalMachine.OpenSubKey(FileProcessingDBRegPath);
-            string keyValue = (string)FileProcessingDBKey?.GetValue(UseApplicationRolesKey, "1") ?? "1";
-            UseApplicationRoles = int.Parse(keyValue, CultureInfo.InvariantCulture) == 1;
+            _connectionString = SqlUtil.CreateConnectionString(server, database, enlist);
         }
 
-        protected bool UseApplicationRoles { get; set; }
+        // Establishes the underlying SqlConnection by either acquiring one from the ConnectionPool
+        // or creating a new one.
+        private void SetBaseSqlConnection(string connectionString)
+        {
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                _baseSqlConnection = new SqlConnection();
+            }
+            else if (!EnableConnectionPooling || !ConnectionPool.TryGetPoolConnection(this, connectionString))
+            {
+                _baseSqlConnection = SqlUtil.NewSqlDBConnection(connectionString);
+            }
+        }
+
+        // -1 indicates we have not yet checked the registry to see whether application roles should be used.
+        static int _useApplicationRoles = -1;
+
+        internal static bool UseApplicationRoles
+        {
+            get
+            {
+                if (_useApplicationRoles < 0)
+                {
+                    // Read from the registry once per process whether to use application roles.
+                    using RegistryKey FileProcessingDBKey = Registry.LocalMachine.OpenSubKey(FileProcessingDBRegPath);
+                    string keyValue = (string)FileProcessingDBKey?.GetValue(UseApplicationRolesKey, "1") ?? "1";
+                    var value = int.Parse(keyValue, CultureInfo.InvariantCulture);
+                    Interlocked.CompareExchange(ref _useApplicationRoles, value, -1);
+                }
+
+                return _useApplicationRoles == 1;
+            }
+        }
+
+        // Whether this class should maintain a pool of SqlConnections that have been authenticated under
+        // the appropriate application role.
+        public static bool EnableConnectionPooling { get; set; } = true;
+
+        // If EnableConnectionPooling, the amount of time after which an unused connection should be closed and
+        // removed from the pool.
+        public static TimeSpan ConnectionPoolTimeout
+        {
+            get => ConnectionPool.ConnectionPoolTimeout;
+            set => ConnectionPool.ConnectionPoolTimeout = value;
+        }
 
         public override string ConnectionString
         {
@@ -70,21 +131,22 @@ namespace Extract.SqlDatabase
 
         public override ConnectionState State => BaseSqlConnection.State;
 
-        protected abstract void AssignRole();
+        internal abstract string RoleName { get; }
+        internal abstract string RolePassword { get; }
 
         public override void ChangeDatabase(string databaseName)
         {
             BaseSqlConnection.ChangeDatabase(databaseName);
-            if (UseApplicationRoles) AssignRole();
+            if (UseApplicationRoles) SetApplicationRole();
         }
 
         public override void Close()
         {
-            if (!UseApplicationRoles && BaseSqlConnection.State != ConnectionState.Closed)
+            if (!EnableConnectionPooling || !ConnectionPool.TryAddPoolConnection(this))
             {
-                UnsetApplicationRole();
+                BaseSqlConnection?.Close();
+                _isRoleAssigned = false;
             }
-            BaseSqlConnection.Close();
         }
 
         public override void Open()
@@ -95,7 +157,7 @@ namespace Extract.SqlDatabase
             }
 
             BaseSqlConnection.Open();
-            if (UseApplicationRoles) AssignRole();
+            if (UseApplicationRoles) SetApplicationRole();
         }
 
         public new SqlTransaction BeginTransaction() { return (SqlTransaction)BeginDbTransaction(default); }
@@ -119,14 +181,14 @@ namespace Extract.SqlDatabase
             if (disposing)
             {
                 Close();
-                BaseSqlConnection?.Dispose();
-                BaseSqlConnection = null;
+                _baseSqlConnection?.Dispose();
+                _baseSqlConnection = null;
             }
             base.Dispose(disposing);
         }
 
 
-        protected void SetApplicationRole(string roleName, string appPassword)
+        protected void SetApplicationRole()
         {
             if (BaseSqlConnection is null)
                 throw new ExtractException("ELI51753", "Connection not set.");
@@ -135,50 +197,24 @@ namespace Extract.SqlDatabase
                 if (BaseSqlConnection.State != ConnectionState.Open)
                     BaseSqlConnection.Open();
 
-                using var cmd = BaseSqlConnection.CreateCommand();
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "sys.sp_setapprole";
-                cmd.Parameters.AddWithValue("@rolename", roleName);
-                cmd.Parameters.AddWithValue("@password", appPassword);
-                cmd.Parameters.AddWithValue("@encrypt", "none");
-                cmd.Parameters.AddWithValue("@fCreateCookie", true);
-                cmd.Parameters.Add("@cookie", SqlDbType.VarBinary, 8000);
-                cmd.Parameters["@cookie"].Direction = ParameterDirection.Output;
+                if (!string.IsNullOrEmpty(RoleName) && !_isRoleAssigned)
+                {
+                    using var cmd = BaseSqlConnection.CreateCommand();
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.CommandText = "sys.sp_setapprole";
+                    cmd.Parameters.AddWithValue("@rolename", RoleName);
+                    cmd.Parameters.AddWithValue("@password", RolePassword);
+                    cmd.Parameters.AddWithValue("@encrypt", "none");
+                    cmd.Parameters.AddWithValue("@fCreateCookie", false);
 
+                    cmd.ExecuteNonQuery();
 
-                cmd.ExecuteNonQuery();
-                AppRoleCookie = cmd.Parameters["@cookie"].Value as Byte[];
+                    _isRoleAssigned = true;
+                }
             }
             catch (Exception ex)
             {
                 throw ex.AsExtract("ELI51754");
-            }
-        }
-
-        protected void UnsetApplicationRole()
-        {
-            if (AppRoleCookie is null)
-                return;
-
-            if (BaseSqlConnection?.State != ConnectionState.Open)
-                return;
-
-            try
-            {
-                using var cmd = BaseSqlConnection.CreateCommand();
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.CommandText = "sys.sp_unsetapprole";
-                cmd.Parameters.AddWithValue("@cookie", AppRoleCookie);
-
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                throw ex.AsExtract("ELI51756");
-            }
-            finally
-            {
-                AppRoleCookie = null;
             }
         }
 
