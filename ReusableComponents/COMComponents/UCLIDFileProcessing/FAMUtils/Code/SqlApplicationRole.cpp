@@ -59,6 +59,7 @@ void CppSqlApplicationRole::UnsetApplicationRole()
 		cmd->Parameters->Refresh();
 
 		cmd->Parameters->Item["@cookie"]->Value = _cookie;
+		cmd->Execute(NULL, NULL, adCmdStoredProc);
 		_cookie.Clear();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI51760");

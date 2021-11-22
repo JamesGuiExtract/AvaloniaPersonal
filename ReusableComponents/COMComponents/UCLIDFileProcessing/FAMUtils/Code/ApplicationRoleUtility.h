@@ -28,31 +28,39 @@ public:
 		{
 			try
 			{
-				switch (role)
+				try
 				{
-				case CppBaseApplicationRoleConnection::kNoRole:
-					roleInstance.reset(new NoRoleConnection(ipConnection));
-					break;
-				case CppBaseApplicationRoleConnection::kExtractRole:
-					roleInstance.reset(new ExtractRoleConnection(ipConnection));
-					break;
-				case CppBaseApplicationRoleConnection::kSecurityRole:
-					roleInstance.reset(new SecurityRoleConnection(ipConnection));
-					break;
-				default:
-					UCLIDException ue("ELI51837", "Unknown application role requested.");
-					ue.addDebugInfo("ApplicationRole", (int)role);
-					throw ue;
+					switch (role)
+					{
+					case CppBaseApplicationRoleConnection::kNoRole:
+						roleInstance.reset(new NoRoleConnection(ipConnection));
+						break;
+					case CppBaseApplicationRoleConnection::kExtractRole:
+						roleInstance.reset(new ExtractRoleConnection(ipConnection));
+						break;
+					case CppBaseApplicationRoleConnection::kSecurityRole:
+						roleInstance.reset(new SecurityRoleConnection(ipConnection));
+						break;
+					default:
+						UCLIDException ue("ELI51837", "Unknown application role requested.");
+						ue.addDebugInfo("ApplicationRole", (int)role);
+						throw ue;
+					}
 				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI52971")
 			}
-			catch (...)
+			catch (UCLIDException& ue)
 			{
+				ue.log();
+
 				// Try with the no role 
 				roleInstance.reset(new NoRoleConnection(ipConnection));
 			}
 		}
 		else
+		{
 			roleInstance.reset(new NoRoleConnection(ipConnection));
+		}
 
 		return roleInstance;
 	}
