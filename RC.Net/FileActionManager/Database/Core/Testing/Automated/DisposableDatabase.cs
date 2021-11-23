@@ -3,6 +3,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using UCLID_FILEPROCESSINGLib;
+using AttributeDbMgrComponentsLib;
+using UCLID_COMUTILSLib;
 
 namespace Extract.FileActionManager.Database.Test
 {
@@ -13,10 +15,12 @@ namespace Extract.FileActionManager.Database.Test
         FileProcessingDB FileProcessingDB { get; }
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         FileProcessingDB[] Workflows { get; }
-        [SuppressMessage("Microsoft.Naming", "CA1709")]
-        int addFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal);
         [SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         string[] Actions { get; }
+        [SuppressMessage("Microsoft.Naming", "CA1709")]
+        int addFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal);
+        void AddFakeVOA(int fileNumber, string attributeSetName);
+        void CreateAttributeSet(string attributeSetName);
     }
 
     /// Base class for IDisposableDatabase implementations
@@ -35,6 +39,7 @@ namespace Extract.FileActionManager.Database.Test
 
         protected private FAMTestDBManager<T> _testDBManager { get; set; }
         protected private string _dbName { get; set; }
+        private AttributeDBMgrClass _attributeDatabase; 
 
         public int addFakeFile(int fileNumber, bool setAsSkipped, EFilePriority priority = EFilePriority.kPriorityNormal)
         {
@@ -48,6 +53,35 @@ namespace Extract.FileActionManager.Database.Test
                         wf.SetFileStatusToPending(fileID, action, false);
 
             return fileID;
+        }
+
+        public void AddFakeVOA(int fileNumber, string attributeSetName)
+        {
+            createAttributeDatabase();
+            int sessionID = FileProcessingDB.StartFileTaskSession("B25D64C0-6FF6-4E0B-83D4-0D5DFEB68006", fileNumber, 1);
+            try
+            {
+                _attributeDatabase.CreateNewAttributeSetForFile(sessionID, attributeSetName, new IUnknownVectorClass(), false, false, false, false);
+            }
+            finally
+            {
+                FileProcessingDB.EndFileTaskSession(sessionID, 0, 0, false);
+            }
+        }
+        public void CreateAttributeSet(string attributeSetName)
+        {
+            createAttributeDatabase();
+            _attributeDatabase.CreateNewAttributeSetName(attributeSetName);
+
+        }
+
+        private void createAttributeDatabase()
+        {
+            if (_attributeDatabase == null)
+            {
+                _attributeDatabase = new();
+                _attributeDatabase.FAMDB = FileProcessingDB;
+            }
         }
 
         protected virtual void Dispose(bool disposing)

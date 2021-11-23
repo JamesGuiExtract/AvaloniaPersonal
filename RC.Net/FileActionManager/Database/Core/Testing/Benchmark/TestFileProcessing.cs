@@ -15,14 +15,25 @@ using System.Linq;
 
 namespace Extract.FileActionManager.Database.Benchmark
 {
+    public enum BenchmarkTarget
+    {
+        QueueAndProcessFiles,
+        StoreVOA
+    }
+
     [EtwProfiler(performExtraBenchmarksRun: false)]
     public class TestFileProcessing
     {
         const string FileProcessingDBRegPath = @"Software\Extract Systems\ReusableComponents\COMComponents\UCLIDFileProcessing\FileProcessingDB";
         const string UseApplicationRolesKey = "UseApplicationRoles";
 
+        const string attributeSetName = "VOA";
+
         FAMTestDBManager<TestFileProcessing> testDbManager;
         IDisposableDatabase<TestFileProcessing> dbWrapper;
+
+        [ParamsAllValues]
+        public BenchmarkTarget Target { get; set; }
 
         void SetRegKey(string value)
         {
@@ -32,6 +43,26 @@ namespace Extract.FileActionManager.Database.Benchmark
         }
 
         void RunTest()
+        {
+            if (Target == BenchmarkTarget.QueueAndProcessFiles)
+            {
+                RunQueueAndProcessFilesTest();
+            }
+            else if (Target == BenchmarkTarget.StoreVOA)
+            {
+                RunStoreVOATest();
+            }
+        }
+
+        private void RunStoreVOATest()
+        {
+            foreach (int i in Enumerable.Range(1, 100))
+            {
+                dbWrapper.AddFakeVOA(i, attributeSetName);
+            }
+        }
+
+        private void RunQueueAndProcessFilesTest()
         {
             foreach (int i in Enumerable.Range(1, 100))
             {
@@ -44,7 +75,7 @@ namespace Extract.FileActionManager.Database.Benchmark
         void CommonSetup()
         {
             GeneralMethods.TestSetup();
-            testDbManager = new FAMTestDBManager<TestFileProcessing>();
+            testDbManager = new();
         }
 
         [GlobalCleanup]
@@ -71,6 +102,15 @@ namespace Extract.FileActionManager.Database.Benchmark
         public void IterationSetup()
         {
             dbWrapper = testDbManager.GetDisposableDatabase("Test_Benchmark_FileProcessing");
+
+            if (Target == BenchmarkTarget.StoreVOA)
+            {
+                dbWrapper.CreateAttributeSet(attributeSetName);
+                foreach (int i in Enumerable.Range(1, 100))
+                {
+                    dbWrapper.addFakeFile(i, false);
+                }
+            }
         }
 
         [IterationCleanup]
@@ -91,7 +131,7 @@ namespace Extract.FileActionManager.Database.Benchmark
             RunTest();
         }
 
-        static void Debug()
+        public static void Debug()
         {
             var test = new TestFileProcessing();
             test.GlobalSetupUseAppRole();
@@ -101,7 +141,7 @@ namespace Extract.FileActionManager.Database.Benchmark
             test.GlobalCleanup();
         }
 
-        static void RunBenchmark()
+        public static void RunBenchmark()
         {
             var config =
                 ManualConfig
@@ -118,16 +158,19 @@ namespace Extract.FileActionManager.Database.Benchmark
 
             BenchmarkRunner.Run<TestFileProcessing>(config);
         }
+    }
 
+    public class Program
+    {
         static void Main(string[] args)
         {
             if (System.Diagnostics.Debugger.IsAttached)
             {
-                Debug();
+                TestFileProcessing.Debug();
             }
             else
             {
-                RunBenchmark();
+                TestFileProcessing.RunBenchmark();
             }
         }
     }
