@@ -1,5 +1,6 @@
 ﻿using Extract.Database;
 using Extract.Testing.Utilities;
+using Extract.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -96,8 +97,7 @@ namespace Extract.FileActionManager.Database.Test
         /// </summary>
         /// <param name="dbBackupResourceName">The database backup as an embedded resource.</param>
         /// <param name="destinationDBName">The name the database should be restored to.</param>
-        /// <param name="upgradeSchema">Whether to upgrade the schema after attaching the database the first time</param>
-        public FileProcessingDB GetDatabase(string dbBackupResourceName, string destinationDBName, bool upgradeSchema = true)
+        public FileProcessingDB GetDatabase(string dbBackupResourceName, string destinationDBName)
         {
             try
             {
@@ -149,7 +149,8 @@ namespace Extract.FileActionManager.Database.Test
             return numberOfWorkflows switch
             {
                 0 => new NoWorkflows<T>(this, destinationDBName, GetDatabase(dbResourceName, destinationDBName)),
-                _ => throw new ArgumentException($"Unsupported number of workflows: {numberOfWorkflows}")
+                _ => throw new ArgumentException(UtilityMethods.FormatInvariant(
+                    $"Unsupported number of workflows: {numberOfWorkflows}"))
             };
         }
 
@@ -164,7 +165,8 @@ namespace Extract.FileActionManager.Database.Test
                 0 => new NoWorkflows<T>(this, destinationDBName, GetNewDatabase(destinationDBName)),
                 1 => new OneWorkflow<T>(this, destinationDBName, enableLoadBalancing),
                 2 => new TwoWorkflows<T>(this, destinationDBName, enableLoadBalancing),
-                _ => throw new ArgumentException($"Unsupported number of workflows: {numberOfWorkflows}")
+                _ => throw new ArgumentException(UtilityMethods.FormatInvariant(
+                    $"Unsupported number of workflows: {numberOfWorkflows}"))
             };
         }
 

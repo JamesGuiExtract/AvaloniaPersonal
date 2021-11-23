@@ -54,10 +54,13 @@ namespace Extract.FileActionManager.Database.Test
         {
             // Arrange
             int[] firstTenFilesAdded = Enumerable.Range(1, 10).ToArray();
+            string dbName = UtilityMethods.FormatInvariant(
+                $"Test_SchemaVersion202_{upgradeFromPreviousSchema}_{useRandomQueue}");
+
             using var dbWrapper =
                 upgradeFromPreviousSchema
-                ? _testDbManager.GetDisposableDatabase($"Test_SchemaVersion202_{upgradeFromPreviousSchema}_{useRandomQueue}")
-                : _testDbManager.GetDisposableDatabase(_DB_V201, $"Test_SchemaVersion202_{upgradeFromPreviousSchema}_{useRandomQueue}");
+                ? _testDbManager.GetDisposableDatabase(dbName)
+                : _testDbManager.GetDisposableDatabase(_DB_V201, dbName);
 
             // Act
             foreach (int i in Enumerable.Range(1, 100)) dbWrapper.addFakeFile(i, false);

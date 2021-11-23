@@ -10,7 +10,8 @@ namespace Extract.FileActionManager.Database.Test
     #region FileProcessingDB Wrappers
 
     /// Wrapper for a FileProcessingDB with a single workflow that takes care of initialization and cleanup
-    internal sealed class NoWorkflows<T> : DisposableDatabaseBase<T>
+    [CLSCompliant(false)]
+    public sealed class NoWorkflows<T> : DisposableDatabaseBase<T>
     {
         readonly FileProcessingDB _fileProcessingDB;
 
@@ -37,7 +38,7 @@ namespace Extract.FileActionManager.Database.Test
     /// <summary>
     /// Wrapper for a FileProcessingDB with a single workflow that takes care of initialization and cleanup
     /// </summary>
-    internal class OneWorkflow<T> : DisposableDatabaseBase<T>
+    internal sealed class OneWorkflow<T> : DisposableDatabaseBase<T>
     {
         readonly bool _enableLoadBalancing;
 
@@ -77,7 +78,7 @@ namespace Extract.FileActionManager.Database.Test
     /// <summary>
     /// Wrapper for a FileProcessingDB with two workflows that takes care of initialization and cleanup
     /// </summary>
-    internal class TwoWorkflows<T> : DisposableDatabaseBase<T>
+    internal sealed class TwoWorkflows<T> : DisposableDatabaseBase<T>
     {
         readonly bool _enableLoadBalancing;
 
