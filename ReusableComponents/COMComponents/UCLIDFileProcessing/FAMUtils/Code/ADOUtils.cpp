@@ -32,7 +32,7 @@ string getClusterName(const  _ConnectionPtr& ipDBConnection)
 {
 	try
 	{
-		string strClusterNameQuery = "EXEC ('sp_GetClusterName')";
+		string strClusterNameQuery = "EXEC ('dbo.sp_GetClusterName')";
 		_RecordsetPtr clusterResult = ipDBConnection->Execute(strClusterNameQuery.c_str(), NULL, adCmdText);
 		if (!clusterResult->adoEOF)
 		{
@@ -1667,7 +1667,8 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 {
 	try
 	{
-		string clusterName = getClusterName(ipDBConnection);
+		string clusterName = (hasViewServerStatePermission(ipDBConnection)) ? getClusterName(ipDBConnection) : "";
+		
         isCluster = !clusterName.empty();
 
 		string strQuery = "select db.name, @@ServerName as ServerName, convert(nvarchar(30), db.create_date,121) as create_date, "
@@ -1704,8 +1705,9 @@ FAMUTILS_API void getDatabaseInfo(const _ConnectionPtr& ipDBConnection, const st
 {
 	try
 	{
-		string clusterName = getClusterName(ipDBConnection);
-        isCluster = !clusterName.empty();
+		string clusterName = (hasViewServerStatePermission(ipDBConnection)) ? getClusterName(ipDBConnection) : "";
+
+		isCluster = !clusterName.empty();
 
 		string strQuery = "select db.name, @@ServerName as ServerName, create_date, "
 			" coalesce( max(rh.restore_date), db.create_date) as restore_date "
@@ -1804,6 +1806,45 @@ FAMUTILS_API bool isNULL(const FieldsPtr& ipFields, const string& strFieldName)
 		ue.addDebugInfo("FieldName", strFieldName);
 		throw ue;
 	}
+}
+//-------------------------------------------------------------------------------------------------
+FAMUTILS_API bool hasViewServerStatePermission(const _ConnectionPtr& ipConnection)
+{
+	static bool bHasViewServerState = false;
+	try
+	{
+		static CCriticalSection cs;
+		static string lastConnectonString = "";
+		
+		string strConnectionString = ipConnection->ConnectionString;
+
+		CSingleLock csLock(&cs, TRUE);
+
+		if (strConnectionString == lastConnectonString)
+		{
+			return bHasViewServerState;
+		}
+
+		bHasViewServerState = false;
+		lastConnectonString = "";
+
+		// This has to run on a connection that does not use application roles
+		_ConnectionPtr ipConnectionNoAppRole(__uuidof(Connection));
+		ASSERT_RESOURCE_ALLOCATION("ELI52997", ipConnectionNoAppRole != __nullptr);
+
+		
+		ipConnectionNoAppRole->Open(strConnectionString.c_str(), "", "", adConnectUnspecified);
+
+		string strPermissionsQuery = 
+			"SELECT entity_name, permission_name FROM fn_my_permissions(NULL, 'Server') WHERE permission_name = 'VIEW SERVER STATE'";
+
+		_RecordsetPtr permissionResult = ipConnectionNoAppRole->Execute(strPermissionsQuery.c_str(), NULL, adCmdText);
+		lastConnectonString = strConnectionString;
+		bHasViewServerState = !asCppBool(permissionResult->adoEOF);
+		
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI53002");
+	return bHasViewServerState;
 }
 //-------------------------------------------------------------------------------------------------
 void setFieldToNull(const FieldsPtr& ipFields, const string& strFieldName)

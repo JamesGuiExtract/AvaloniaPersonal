@@ -395,3 +395,6 @@ FAMUTILS_API bool isNULL(const FieldsPtr& ipFields, const string& strFieldName);
 
 // PROMISE: To set the specified field's value to NULL.
 FAMUTILS_API void setFieldToNull(const FieldsPtr& ipFields, const string& strFieldName);
+
+// PROMISE: To return true if the current user has ViewServerState permission 
+FAMUTILS_API bool hasViewServerStatePermission(const _ConnectionPtr& ipConnection);

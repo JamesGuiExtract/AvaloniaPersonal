@@ -143,6 +143,7 @@ bool DatabaseIDValues::CheckIfValid(_ConnectionPtr ipConnection, bool bThrowIfIn
 			(LPCSTR)CTime(stRestoreDate).Format(gstrDATE_TIME_FORMAT.c_str()), true);
 	}
 	catch (...) {}
+	ue.addDebugInfo("ViewServerStatePermission(needed for Clusters)", hasViewServerStatePermission(ipConnection), false);
 
 	(bThrowIfInvalid) ? throw ue : ue.log();
 	
