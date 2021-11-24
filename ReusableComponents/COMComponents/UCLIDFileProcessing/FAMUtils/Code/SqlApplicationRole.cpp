@@ -63,9 +63,9 @@ void CppSqlApplicationRole::UnsetApplicationRole()
 
 		cmd->Parameters->Refresh();
 
-		// If the command doesn't have a cookie parameter then
-		// it won't work. This happens, e.g., during unit test teardown,
-		// when the call to close all connections is run (FAMTestDBManager.RemoveDatabase)
+		// If the parameters can't be loaded then the connection is no good.
+		// This can happen during unit tests when the DB is dropped before all FileProcessingDB
+		// instances are garbage collected
 		if (cmd->Parameters->Count == 0)
 		{
 			return;

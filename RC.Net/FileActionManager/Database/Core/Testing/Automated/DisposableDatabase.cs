@@ -101,6 +101,7 @@ namespace Extract.FileActionManager.Database.Test
                             }
                             fpDB.UnregisterActiveFAM();
                             fpDB.RecordFAMSessionStop();
+                            fpDB.CloseAllDBConnections(); // Close all connections before dropping the database
                         }
                         catch { }
                     }
