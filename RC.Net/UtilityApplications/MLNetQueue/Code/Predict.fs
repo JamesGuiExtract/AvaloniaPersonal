@@ -22,11 +22,6 @@ let predictWithModelFile (inputDataFile: string) (modelFile: string) (outputData
   predict mlContext inputDataFile model outputDataFile
 (************************************************************************************************************************)
 
-type PredictionRequest = {
-  InputDataFile: string
-  OutputDataFile: string
-}
-
 let retry = RetryBuilder (5, 500)
 
 let listenForNamedPipeRequests pipeName (modelFile: string) =
@@ -38,7 +33,7 @@ let listenForNamedPipeRequests pipeName (modelFile: string) =
       return model
     }
 
-  let dispatch (request: PredictionRequest) =
+  let dispatch (request: DTO.PredictionRequest) =
     predict mlContext request.InputDataFile model.Value request.OutputDataFile
     
   NamedPipe.listenForRequests pipeName dispatch

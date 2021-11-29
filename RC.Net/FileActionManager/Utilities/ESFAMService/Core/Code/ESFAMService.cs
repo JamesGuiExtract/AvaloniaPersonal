@@ -3,15 +3,14 @@ using Extract.FileActionManager.Database;
 using Extract.Licensing;
 using Extract.SqlDatabase;
 using Extract.Utilities;
+using Extract.Utilities.FSharp;
 using Extract.Utilities.SqlCompactToSqliteConverter;
 using FAMProcessLib;
 using Microsoft.Win32.SafeHandles;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -22,7 +21,6 @@ using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.FileActionManager.Utilities
@@ -367,24 +365,11 @@ namespace Extract.FileActionManager.Utilities
                     {
                         CreatePipeListenerThread(); // Listen for new connections
 
-                        StringBuilder messageBuilder = new StringBuilder();
-                        byte[] messageBuffer = new byte[16];
-                        do
-                        {
-                            var bytesRead = pipeStream.Read(messageBuffer, 0, messageBuffer.Length);
-                            var messageChunk = Encoding.UTF8.GetString(messageBuffer, 0, bytesRead);
-                            messageBuilder.Append(messageChunk);
-                        }
-                        while (!pipeStream.IsMessageComplete);
-
-                        var msg = JsonConvert.DeserializeObject<RequestMessage>(messageBuilder.ToString());
+                        var msg = NamedPipe.readMessage<RequestMessage>(pipeStream);
 
                         if (msg == RequestMessage.GetSpawnedProcessIDs)
                         {
-                            var serialized = JsonConvert.SerializeObject(_spawnedProcessIDs.Keys);
-                            var bytes = Encoding.UTF8.GetBytes(serialized);
-                            pipeStream.Write(bytes, 0, bytes.Length);
-                            pipeStream.WaitForPipeDrain();
+                            NamedPipe.writeMessage(pipeStream, _spawnedProcessIDs.Keys);
                         }
                     }
                 }

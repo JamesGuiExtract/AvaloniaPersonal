@@ -358,10 +358,8 @@ SeServiceLogonRight = %s""" (sids |> String.concat ",")
 
   open Extract
   open Extract.FileActionManager.Utilities
-  open Newtonsoft.Json
   open System.Diagnostics
   open System.IO.Pipes
-  open System.Text
 
   let getSpawnedProcessIDs servicePID: int list =
     let pipeName = sprintf "ESFAMServicePipe_%d" servicePID
@@ -370,29 +368,8 @@ SeServiceLogonRight = %s""" (sids |> String.concat ",")
       pipeStream.Connect 5000
       pipeStream.ReadMode <- PipeTransmissionMode.Message
 
-      let request =
-        RequestMessage.GetSpawnedProcessIDs
-        |> JsonConvert.SerializeObject
-        |> Encoding.UTF8.GetBytes
-
-      pipeStream.Write(request, 0, request.Length);
-      pipeStream.WaitForPipeDrain();
-
-      let readMessage(): 'a =
-        let responseBuilder = StringBuilder()
-        let messageBuffer = Array.zeroCreate 16
-        let rec read () =
-          let bytesRead = pipeStream.Read (messageBuffer, 0, messageBuffer.Length)
-          Encoding.UTF8.GetString(messageBuffer, 0, bytesRead)
-          |> responseBuilder.Append
-          |> ignore
-
-          if pipeStream.IsMessageComplete then
-            responseBuilder.ToString() |> JsonConvert.DeserializeObject<'a>
-          else
-            read()
-        read()
-      readMessage()
+      NamedPipe.writeMessage pipeStream RequestMessage.GetSpawnedProcessIDs
+      NamedPipe.readMessage pipeStream
 
     // If service isn't responding then assume no processes have been spawned. E.g., the service can't connect to the File Processing DB
     with | :? TimeoutException -> []

@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Compile Include="Arguments.fs" />
-    <Compile Include="NamedPipe.fs" />
     <Compile Include="Utils.fs" />
     <Compile Include="FitModel.fs" />
     <Compile Include="GenerateModel.fs" />

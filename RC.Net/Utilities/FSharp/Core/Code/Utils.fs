@@ -246,6 +246,44 @@ module Object =
     |> JsonConvert.DeserializeObject<'a>
 (******************************************************************************************************)
 
+module FsPickler =
+  open MBrace.FsPickler
+  let serializer = BinarySerializer();
+
+  let toMemoryStream (x: 'a) =
+    let stream = new MemoryStream()
+    serializer.Serialize(stream, x)
+    stream
+
+  let toBytes (x: 'a) =
+    use stream = x |> toMemoryStream
+    stream.ToArray()
+
+  let ofStream<'a> (stream: Stream): 'a = 
+    serializer.Deserialize<'a>(stream)
+
+  let ofBytes<'a> (bytes: byte array): 'a = 
+    use stream = new MemoryStream(bytes)
+    ofStream stream
+(******************************************************************************************************)
+
+[<AutoOpen>]
+module Ex =
+  open System.Reflection
+
+  type Ex =
+    /// Modify the exception, preserve the stacktrace and add the current stack, then throw
+    /// This puts the origin point of the exception on top of the stacktrace.
+    static member inline throwPreserve ex =
+      let preserveStackTrace = 
+        typeof<Exception>.GetMethod("InternalPreserveStackTrace", BindingFlags.Instance ||| BindingFlags.NonPublic)
+
+      (ex, null) 
+      |> preserveStackTrace.Invoke  // alters the exn, preserves its stacktrace
+      |> ignore
+      raise ex
+(******************************************************************************************************)
+
 // Break a sequence into batches of the specified size
 // http://www.fssnip.net/1o/title/Break-sequence-into-nelement-subsequences
 module Seq =
@@ -253,16 +291,16 @@ module Seq =
     seq {
       let en = s.GetEnumerator ()
       let more = ref true
-      while !more do
+      while more.Value do
         let group =
           [
             let i = ref 0
-            while !i < size && en.MoveNext () do
+            while i.Value < size && en.MoveNext () do
               yield en.Current
-              i := !i + 1
+              i.Value <- i.Value + 1
           ]
         if List.isEmpty group then
-          more := false
+          more.Value <- false
         else
           yield group
     }
