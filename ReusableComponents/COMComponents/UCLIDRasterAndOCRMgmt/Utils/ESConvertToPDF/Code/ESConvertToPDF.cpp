@@ -305,7 +305,23 @@ void CESConvertToPDFApp::convertToSearchablePDF(bool bUseRecPdfApi)
 		deleteFile(tfnDocument.getName().c_str());
 
 		rc = kRecConvert2DTXTEx(0, pPages, nPageCount, II_ORIGINAL, tfnDocument.getName().c_str());
-		throwExceptionIfNotSuccess(rc, "ELI36846", "Failed to output document.", m_strInputFile);
+
+		// Errors are negative, warnings are positive, OK is zero (see RECERR.h)
+		bool isError = rc < 0;
+		bool isWarning = rc > 0;
+
+		if (isError)
+		{
+			throwExceptionIfNotSuccess(rc, "ELI36846", "Failed to output document", m_strInputFile);
+		}
+		else if (isWarning)
+		{
+			UCLIDException ue("ELI52993", "Application trace: A warning was reported while creating a searchable PDF");
+			loadScansoftRecErrInfo(ue, rc);
+			ue.addDebugInfo("Input file", m_strInputFile);
+			ue.addDebugInfo("Output file", m_strOutputFile);
+			ue.log();
+		}
 	}
 
 	// Copy the temporary output file to its final output location.
