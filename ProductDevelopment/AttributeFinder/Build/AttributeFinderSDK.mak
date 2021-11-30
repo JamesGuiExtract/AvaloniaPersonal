@@ -127,6 +127,8 @@ CreateExtractSoftwareInstallCD:
 	@COPY /V /Y "$(AFInstallFilesRootDir)\InstallHelp\*.*" "$(ExtractSoftwareInstallFiles)"
 	@COPY /V /Y "$(ExtractSoftwareInstallRootDir)\Support Files\license.txt" "$(ExtractSoftware)\Readme.txt"
 	@COPY /V /Y "$(EngineeringRootDirectory)\ReusableComponents\COMComponents\UCLIDFileProcessing\Utils\ProcessFiles\Code\res\ProcessFiles.ico" "$(ExtractSoftware)\ExtractInstall.ico"
+	@IF NOT EXIST "$(ExtractSoftware)\SQLCompactEdition_3_5" MKDIR "$(ExtractSoftware)\SQLCompactEdition_3_5"
+	@XCOPY "$(EngineeringRootDirectory)\SQLCompactEdition_3_5\*.*" "$(ExtractSoftware)\SQLCompactEdition_3_5"
     @DeleteFiles "$(ExtractSoftwareInstallFiles)\*.scc"
 
 CreateFlexDataEntryInstallDir:

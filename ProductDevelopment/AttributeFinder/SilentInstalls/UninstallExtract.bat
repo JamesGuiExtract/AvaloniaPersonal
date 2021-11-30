@@ -45,7 +45,6 @@ exit /B
 setlocal & pushd .
 
 
-
 SET InstallShieldFolder=%ProgramFiles(x86)%\InstallShield Installation Information
 SET PROGRAM_ROOT=%ProgramFiles(x86)%
 
@@ -80,6 +79,10 @@ IF EXIST "%CLEARIMAGE_DIR%\UNWISE.EXE" (
 		del "%CLEARIMAGE_DIR%\UNWISE.EXE"
 	)
 )
+
+:: Check if SQL CE 3.5 is installed
+REG QUERY "HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Microsoft SQL Server Compact Edition\v3.5" 2>NUL 1>NUL
+SET SQLCE35_NOT_INSTALLED=%ERRORLEVEL%
 
 :UninstRDT
 :: UnInstall RDT
@@ -176,6 +179,15 @@ IF NOT "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
 	IF NOT EXIST "%LM%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%LM_GUID% /f 2>NUL
 	IF NOT EXIST "%IDShieldSPClient%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%IDShieldSPClient_GUID% /f 2>NUL
 	IF NOT EXIST "%RDT%.ini" REG DELETE HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\%RDT_GUID% /f 2>NUL	
+)
+
+REG QUERY "HKEY_LOCAL_MACHINE\Software\WOW6432Node\Microsoft\Microsoft SQL Server Compact Edition\v3.5" 2>NUL 1>NUL
+IF ERRORLEVEL 1 (
+    IF %SQLCE35_NOT_INSTALLED% == 0 (
+:: Reinstall sql ce
+        cd ..\SQLCompactEdition_3_5
+        MsiExec /i SSCERuntime_x86-ENU.msi /qn IACCEPTSQLNCLILICENSETERMS=YES
+    )
 )
 
 endlocal
