@@ -1,156 +1,56 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{784D443A-8074-4D75-8E1D-89F596B2E99B}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Extract.AttributeFinder.Test</RootNamespace>
-    <AssemblyName>Extract.AttributeFinder.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net48</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>..\..\..\..\..\Binaries\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Copyright>Copyright © Extract Systems, LLC 2021</Copyright>
+    <Company>Extract Systems, LLC</Company>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
-    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <UseWindowsForms>true</UseWindowsForms>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\Binaries\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\Binaries\Release</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="IKVM.OpenJDK.Core, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564" />
+    <Reference Include="IKVM.OpenJDK.Core, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Core.dll</HintPath>
+    </Reference>
     <Reference Include="IKVM.OpenJDK.Tools, Version=8.5.0.3, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\APIs\IKVM\lib\IKVM.OpenJDK.Tools.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
     <Reference Include="Tabula.IKVM, Version=1.0.4.0, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\APIs\Tabula.IKVM\target\Tabula.IKVM.exe</HintPath>
     </Reference>
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="TestTableFinder.cs" />
-    <Compile Include="TestMoveCopyAttribute.cs" />
-    <Compile Include="TestLearningMachineOutputHandler.cs" />
-    <Compile Include="TestAFUtils.cs" />
-    <Compile Include="TestFKB.cs" />
-    <Compile Include="TestClassWeights.cs" />
-    <Compile Include="TestMICRFinder.cs" />
-    <Compile Include="TestRichTextAttributes.cs" />
-    <Compile Include="TestSpatialString.cs" />
-    <Compile Include="TestSpatialPageInfo.cs" />
-    <Compile Include="TestOCRParameters.cs" />
-    <Compile Include="TestTranslateToBestMatch.cs" />
-    <Compile Include="TestLocateImageRegion.cs" />
-    <Compile Include="TestLearningMachine.cs" />
-    <Compile Include="TestLearningMachineDataEncoder.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestCreateAttribute.cs" />
-    <Compile Include="TestRuleSetRunMode.cs" />
-    <Compile Include="TestTrainableClassifiers.cs" />
-    <Compile Include="TestMergeAttributes.cs" />
-    <Compile Include="TestXPathQueries.cs" />
-    <EmbeddedResource Include="Resources\A418.tif.voa" />
-    <EmbeddedResource Include="Resources\EmptyAttribute.voa" />
+    <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj" />
+    <ProjectReference Include="..\..\..\..\DataCaptureStats\Core\Code\Extract.DataCaptureStats.csproj" />
+    <ProjectReference Include="..\..\..\..\ETL\Core\Code\Extract.ETL.csproj" />
+    <ProjectReference Include="..\..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj" />
+    <ProjectReference Include="..\..\..\..\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj" />
+    <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj" />
+    <ProjectReference Include="..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj" />
+    <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj" />
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\MLNet\ClassifyCandidates\Code\Extract.AttributeFinder.MLNet.ClassifyCandidates.fsproj" />
+    <ProjectReference Include="..\..\..\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj" />
+    <ProjectReference Include="..\..\..\Rules\Dto\Extract.AttributeFinder.Rules.Dto.fsproj" />
+    <ProjectReference Include="..\..\..\Tabula\Code\Extract.AttributeFinder.Tabula.csproj" />
+    <ProjectReference Include="..\..\Code\Extract.AttributeFinder.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj">
-      <Project>{F3314BBE-B008-488D-A2E0-351C49D914D7}</Project>
-      <Name>Extract.Testing.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
-      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
-      <Name>Extract</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\DataCaptureStats\Core\Code\Extract.DataCaptureStats.csproj">
-      <Project>{32679A70-BC10-4DD9-9155-9B3E08586EE9}</Project>
-      <Name>Extract.DataCaptureStats</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\ETL\Core\Code\Extract.ETL.csproj">
-      <Project>{E26B63CD-4948-43AC-A726-8B46C420F152}</Project>
-      <Name>Extract.ETL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\FileActionManager\Database\Core\Testing\Automated\Extract.FileActionManager.Database.Test.csproj">
-      <Project>{6B284A4D-132C-4FE4-858F-06A9C476B19B}</Project>
-      <Name>Extract.FileActionManager.Database.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj">
-      <Project>{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}</Project>
-      <Name>Extract.FileActionManager.FileProcessors</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
-      <Project>{b2d07de4-9192-4531-8854-de03ce9b0b57}</Project>
-      <Name>Extract.Imaging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Imaging\Utilities\Core\Code\Extract.Imaging.Utilities.vcxproj">
-      <Project>{e610e652-0891-40d4-b5ca-a622b87c7979}</Project>
-      <Name>Extract.Imaging.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
-      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
-      <Name>Extract.Interop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
-      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
-      <Name>Extract.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Rules\Core\Code\Extract.AttributeFinder.Rules.csproj">
-      <Project>{52C53912-5790-4F68-AB57-6CBC3EF45A14}</Project>
-      <Name>Extract.AttributeFinder.Rules</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Rules\Dto\Extract.AttributeFinder.Rules.Dto.fsproj">
-      <Project>{a66faa6a-b785-4c7b-9590-c04f45007f7f}</Project>
-      <Name>Extract.AttributeFinder.Rules.Dto</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Tabula\Code\Extract.AttributeFinder.Tabula.csproj">
-      <Project>{59bc0149-830c-4515-be56-32503fa73ad6}</Project>
-      <Name>Extract.AttributeFinder.Tabula</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Code\Extract.AttributeFinder.csproj">
-      <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
-      <Name>Extract.AttributeFinder</Name>
-    </ProjectReference>
-  </ItemGroup>
+
   <ItemGroup>
     <COMReference Include="ADODB">
       <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
@@ -280,395 +180,30 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="Resources\ByDoc.voa" />
-    <EmbeddedResource Include="Resources\ByDocUnderParentPageContent.voa" />
-    <EmbeddedResource Include="Resources\ByDocUnderParentSourceDocName.voa" />
-    <EmbeddedResource Include="Resources\ByPageUnderParentPageContent.voa" />
-    <EmbeddedResource Include="Resources\ByPageUnderParentPageNumber.voa" />
-    <EmbeddedResource Include="Resources\image3-4-6-7.tif" />
-    <EmbeddedResource Include="Resources\image3-4-6-7.tif.uss" />
-    <EmbeddedResource Include="Resources\RunModeTest.rsd" />
-    <EmbeddedResource Include="Resources\RunModeLoadTestFromOld.rsd" />
-    <EmbeddedResource Include="Resources\TwoLayers.rsd" />
-    <EmbeddedResource Include="Resources\insertUnderParent.rsd" />
-    <EmbeddedResource Include="Resources\GrayAreas.tif" />
+    <EmbeddedResource Include="Resources/**/*.*" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\A418_xpath_3_subattrs_added.voa" />
-    <EmbeddedResource Include="Resources\CreateAttribute_3SubAttrs.rsd" />
-    <EmbeddedResource Include="Resources\A418.tif.TestCreateAttributes.voa" />
-    <EmbeddedResource Include="Resources\CreateSubattrFlexIndex2.rsd" />
-    <EmbeddedResource Include="Resources\Example02.tif.test.voa" />
-    <EmbeddedResource Include="Resources\Example02.tif.uss" />
-    <EmbeddedResource Include="Resources\Example02.tif.voa" />
-    <EmbeddedResource Include="Resources\CreateSubAttrIdShield_testImage013.rsd" />
-    <EmbeddedResource Include="Resources\TestImage013.tif.test.voa" />
-    <EmbeddedResource Include="Resources\TestImage013.tif.uss" />
-    <EmbeddedResource Include="Resources\TestImage013.tif.voa" />
-    <EmbeddedResource Include="Resources\A418.tif" />
-    <EmbeddedResource Include="Resources\A418.tif.uss" />
-    <EmbeddedResource Include="Resources\A418.tif.numbers-in-triplicate.voa" />
-    <EmbeddedResource Include="Resources\Example02.tif" />
-    <EmbeddedResource Include="Resources\TestImage013.tif" />
-    <EmbeddedResource Include="Resources\CreateTopLevelAttrIdShield_testImage013.rsd" />
-    <EmbeddedResource Include="Resources\Test4.tif.test.voa" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\LIR_Test_01_OneToOne.rsd" />
-    <EmbeddedResource Include="Resources\LIR_Test_02_MoreLinesThanZones.rsd" />
-    <EmbeddedResource Include="Resources\LIR_Test_03_MoreZonesThanLines.rsd" />
-    <EmbeddedResource Include="Resources\LIR_Test_04_MoreZonesThanLines.rsd" />
-    <EmbeddedResource Include="Resources\LIR_Test_05_One-To-One_ModifiedLines.rsd" />
-    <EmbeddedResource Include="Resources\LIR_Test_06_MultipleZonesOneChar.rsd" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.labeled.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.labeled.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.labeled.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.labeled.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.labeled.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.labeled.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.labeled.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.labeled_2_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.labeled_2_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.labeled_2_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.labeled_2_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.labeled_2_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.labeled_2_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.labeled_2_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.labeled_3_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.labeled_3_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.labeled_3_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.labeled_3_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.labeled_3_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.labeled_3_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.labeled_3_types.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_001.tif.candidates.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_002.tif.candidates.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_003.tif.candidates.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_004.tif.candidates.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_005.tif.candidates.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_006.tif.candidates.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Pagination\Pagination_007.tif.candidates.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\10.4.lm" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocClassifier.lm" />
-    <EmbeddedResource Include="Resources\LearningMachine\AttributeClassifier.lm" />
-    <EmbeddedResource Include="Resources\LearningMachine\Large.lm" />
-    <EmbeddedResource Include="Resources\LearningMachine\Paginator.lm" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_001.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_002.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_003.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_004.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_005.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_006.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_007.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_001.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_001.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_002.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_002.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_003.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_003.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_004.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_004.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_005.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_005.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_006.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_006.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_007.tif.eav" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_007.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_001.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_002.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_003.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_004.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_005.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_006.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationWithCoverPages\Pagination_007.tif.protofeatures.voa" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example02.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example03.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example04.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example05.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example06.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example07.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example08.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example09.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example10.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example02.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example03.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example04.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example05.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example06.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example07.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example08.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example09.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example10.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example02.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example03.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example04.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example05.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example06.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example07.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example08.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example09.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example10.tif.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example01.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example02.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example03.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example04.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example05.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example06.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example07.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example08.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example09.tif.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocumentCategorization\Example10.tif.protofeatures.voa" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\FKBTest\Master.rsd" />
-    <EmbeddedResource Include="Resources\FKBTest\second.rsd" />
-    <EmbeddedResource Include="Resources\FKBTest\third.rsd" />
-    <EmbeddedResource Include="Resources\FKBTest\DocumentClassifier.rsd" />
-    <EmbeddedResource Include="Resources\FKBTest\EntityFinder.rsd" />
-    <EmbeddedResource Include="Resources\FKBTest\EntitySplitter.rsd" />
-    <EmbeddedResource Include="Resources\FKBTest\EntityScorer.rsd" />
-    <EmbeddedResource Include="Resources\FKBTest\PersonSplitter.rsd" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\bubble.dat" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\bubble.rsd" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\001.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\001.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\001.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\002.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\002.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\002.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\003.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\003.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\003.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\004.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\004.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\004.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\005.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\005.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\005.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\006.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\006.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\006.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\007.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\007.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\007.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\008.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\008.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\008.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\009.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\009.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\009.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\010.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\010.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\010.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\011.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\011.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\011.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\012.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\012.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\012.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\013.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\013.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\013.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\014.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\014.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\014.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\015.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\015.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\015.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\016.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\016.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\016.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\017.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\017.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\017.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\018.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\018.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\018.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\019.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\019.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\019.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\020.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\020.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\020.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\021.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\021.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\021.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\022.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\022.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\022.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\023.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\023.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\023.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\024.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\024.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\024.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\025.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\025.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\025.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\026.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\026.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\026.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\027.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\027.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\027.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\028.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\028.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\028.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\029.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\029.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\029.tif.uss" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\030.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\030.tif.evoa" />
-    <EmbeddedResource Include="Resources\LearningMachine\Bitmap\030.tif.uss" />
-    <EmbeddedResource Include="Resources\TranslateToBestMatch\mn_rice_correct.csv" />
-    <EmbeddedResource Include="Resources\TranslateToBestMatch\mn_rice_identity.csv" />
-    <EmbeddedResource Include="Resources\TranslateToBestMatch\mn_rice_incorrect.csv" />
-    <EmbeddedResource Include="Resources\TranslateToBestMatch\subdivisions.dat" />
-    <EmbeddedResource Include="Resources\TranslateToBestMatch\synonyms.dat" />
-    <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial1.csv" />
-    <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial2.csv" />
-    <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial_subdivisions1.dat" />
-    <EmbeddedResource Include="Resources\TranslateToBestMatch\artificial_subdivisions2.dat" />
-    <EmbeddedResource Include="Resources\LearningMachine\TestWeightRatio.lm" />
-    <EmbeddedResource Include="Resources\LearningMachine\TestWeightRatio.train.csv" />
-    <EmbeddedResource Include="Resources\LearningMachine\TestWeightRatio.test.csv" />
-    <EmbeddedResource Include="Resources\defaultOCRParams.rsd" />
-    <EmbeddedResource Include="Resources\TestOCRParamsPropagation.rsd" />
-    <EmbeddedResource Include="Resources\CallTestOCRParamsPropagation.rsd" />
-    <EmbeddedResource Include="Resources\CallTestOCRParamsPropagationByPage.rsd" />
-    <EmbeddedResource Include="Resources\CallTestOCRParamsPropagationByDocument.rsd" />
-    <EmbeddedResource Include="Resources\RotateAndDespeckle.rsd" />
-    <EmbeddedResource Include="Resources\Example05.tif" />
-    <EmbeddedResource Include="Resources\Example05.tif.uss" />
-    <EmbeddedResource Include="Resources\Example05_WithRotatedPage.tif" />
-    <EmbeddedResource Include="Resources\LearningMachine\DocClassifierFeatureGenerator\CreateTrainingData.rsd" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\createProtofeatures.rsd" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\createProtofeatures.rsd.etf" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\CreateTrainingData.rsd" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\getPageNumber.rsd" />
-    <EmbeddedResource Include="Resources\LearningMachine\PaginationFeatureGenerator\getPageNumber.rsd.etf" />
-    <EmbeddedResource Include="Resources\LearningMachine\CandidateAttributeGenerator\CreateTrainingData.rsd" />
-    <EmbeddedResource Include="Resources\LearningMachine\CandidateAttributeGenerator\date.dat" />
-    <EmbeddedResource Include="Resources\BlankPage.tif" />
-    <EmbeddedResource Include="Resources\BlankPage.tif.gcv.uss" />
-    <EmbeddedResource Include="Resources\BlankPage.tif.uss" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Example01.rtf" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf" />
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf.byPage.byColumn.voa" />
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf.byPage.byRow.voa" />
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf.protofeatures.voa" />
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf.tif" />
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf.tif.byPage.byColumn.voa" />
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf.tif.pdf" />
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf.tif.pdf.byPage.byColumn.voa" />
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf.uss" />
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf.tif.uss" />
-    <EmbeddedResource Include="Resources\Tabula\us-005.pdf.tif.pdf.uss" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.pdf" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.pdf.byPage.byColumn.voa" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.pdf.byPage.byRow.voa" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.pdf.tif" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.pdf.tif.byPage.byColumn.voa" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.pdf.tif.pdf" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.pdf.tif.pdf.byPage.byColumn.voa" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.pdf.uss" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.pdf.tif.uss" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.pdf.tif.pdf.uss" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.lowDPI.tif" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.lowDPI.tif.uss" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.lowDPI.tif.byPage.byColumn.voa" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.hugePage.tif" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.hugePage.tif.uss" />
-    <EmbeddedResource Include="Resources\Tabula\us-006.hugePage.tif.byPage.byColumn.voa" />
-    <EmbeddedResource Include="Resources\Tabula\getTableCellsWithFeatures.rsd" />
-    <EmbeddedResource Include="Resources\Tabula\TableScripts.fsx" />
-    <EmbeddedResource Include="Resources\Tabula\MultilineTable.tif" />
-    <EmbeddedResource Include="Resources\Tabula\MultilineTable.tif.uss" />
-    <EmbeddedResource Include="Resources\Tabula\MultilineTable.tif.byPage.byRow.voa" />
-    <EmbeddedResource Include="Resources\Tabula\MultilineTable.tif.byPage.byColumn.voa" />
-  </ItemGroup>
+
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="Resources\MICRFinderTest1.tiff.uss" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\MICRFinderTest1.tiff" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Accord.Statistics">
-      <Version>3.0.2</Version>
-    </PackageReference>
-    <PackageReference Include="NUnit">
-      <Version>3.12.0</Version>
-    </PackageReference>
+    <PackageReference Include="Accord.Statistics" Version="3.0.2" />
+    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter">
       <Version>3.17.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Moq" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (UnitTestingDebugPostBuild.bat "$(TargetPath)")</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if $(ConfigurationName) == Debug (CALL UnitTestingDebugPostBuild.bat &quot;$(TargetPath)&quot;)" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
