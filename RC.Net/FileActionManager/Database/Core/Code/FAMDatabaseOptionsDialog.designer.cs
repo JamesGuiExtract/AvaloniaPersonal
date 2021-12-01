@@ -639,7 +639,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(303, 20);
+            this.label11.Location = new System.Drawing.Point(319, 20);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(105, 13);
             this.label11.TabIndex = 7;
@@ -657,21 +657,28 @@
             // 
             // _numberSessionTimeout
             // 
+            this._numberSessionTimeout.DecimalPlaces = 1;
             this._numberSessionTimeout.Enabled = false;
+            this._numberSessionTimeout.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
             this._numberSessionTimeout.Location = new System.Drawing.Point(258, 18);
             this._numberSessionTimeout.Maximum = new decimal(new int[] {
-            99,
+            180,
             0,
             0,
             0});
             this._numberSessionTimeout.Minimum = new decimal(new int[] {
-            1,
+            5,
             0,
             0,
-            0});
+            65536});
             this._numberSessionTimeout.Name = "_numberSessionTimeout";
-            this._numberSessionTimeout.Size = new System.Drawing.Size(39, 20);
+            this._numberSessionTimeout.Size = new System.Drawing.Size(55, 20);
             this._numberSessionTimeout.TabIndex = 6;
+            this._numberSessionTimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this._numberSessionTimeout.Value = new decimal(new int[] {
             5,
             0,

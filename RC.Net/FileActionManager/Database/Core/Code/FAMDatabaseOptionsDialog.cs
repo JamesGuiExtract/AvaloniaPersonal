@@ -247,7 +247,7 @@ namespace Extract.FileActionManager.Database
                 if (sessionTimeoutConfigured)
                 {
                     // DBInfo VerificationSessionTimeout value is stored in seconds; convert to minutes
-                    _numberSessionTimeout.Value = Math.Ceiling((decimal)verificationSessionTimeout / 60);
+                    _numberSessionTimeout.Value = (decimal)verificationSessionTimeout / 60;
                     _numberSessionTimeout.Enabled = true;
                 }
                 else
@@ -569,7 +569,7 @@ namespace Extract.FileActionManager.Database
 
                 // Store DBInfo VerificationSessionTimeout value in seconds
                 map.Set(_VERIFICATION_SESSION_TIMEOUT, _checkSessionTimeout.Checked
-                    ? (_numberSessionTimeout.Value * 60).ToString(CultureInfo.InvariantCulture)
+                    ? ((int)Math.Round(_numberSessionTimeout.Value * 60)).ToString(CultureInfo.InvariantCulture)
                     : "0");
 
                 map.Set(_AZURE_TENNANT, _azureTenant.Text);
