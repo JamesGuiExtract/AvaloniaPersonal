@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.Label label1;
             System.Windows.Forms.Label label2;
             System.Windows.Forms.Label label4;
             System.Windows.Forms.Label label3;
@@ -36,7 +37,9 @@
             System.Windows.Forms.Label label6;
             System.Windows.Forms.Label label7;
             System.Windows.Forms.Label label8;
+            System.Windows.Forms.Label label9;
             System.Windows.Forms.Label label10;
+            System.Windows.Forms.Label label11;
             this._tabControlSettings = new System.Windows.Forms.TabControl();
             this._tabGeneral = new System.Windows.Forms.TabPage();
             this._alternateComponentDataDirectoryTextBox = new System.Windows.Forms.TextBox();
@@ -81,14 +84,12 @@
             this._emailSettingsControl = new Extract.Utilities.Email.EmailSettingsControl();
             this.tabDashboard = new System.Windows.Forms.TabPage();
             this.textBoxDashboardExcludeFilter = new System.Windows.Forms.TextBox();
-            this.label9 = new System.Windows.Forms.Label();
             this.textBoxDashboardIncludeFilter = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this._buttonCancel = new System.Windows.Forms.Button();
             this._buttonOK = new System.Windows.Forms.Button();
             this._buttonRefresh = new System.Windows.Forms.Button();
             this._emailTestButton = new System.Windows.Forms.Button();
-            this.label10 = new System.Windows.Forms.Label();
+            label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -96,7 +97,9 @@
             label6 = new System.Windows.Forms.Label();
             label7 = new System.Windows.Forms.Label();
             label8 = new System.Windows.Forms.Label();
+            label9 = new System.Windows.Forms.Label();
             label10 = new System.Windows.Forms.Label();
+            label11 = new System.Windows.Forms.Label();
             this._tabControlSettings.SuspendLayout();
             this._tabGeneral.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._upDownRevertMinutes)).BeginInit();
@@ -109,6 +112,15 @@
             this._tabEmail.SuspendLayout();
             this.tabDashboard.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(7, 7);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(122, 13);
+            label1.TabIndex = 0;
+            label1.Text = "Dashboard Include Filter";
             // 
             // label2
             // 
@@ -172,6 +184,35 @@
             label8.Size = new System.Drawing.Size(201, 13);
             label8.TabIndex = 24;
             label8.Text = "Alternate component data (FKB) directory";
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new System.Drawing.Point(7, 153);
+            label9.Name = "label9";
+            label9.Size = new System.Drawing.Size(125, 13);
+            label9.TabIndex = 0;
+            label9.Text = "Dashboard Exclude Filter";
+            // 
+            // label10
+            // 
+            label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            label10.AutoSize = true;
+            label10.ForeColor = System.Drawing.Color.Red;
+            label10.Location = new System.Drawing.Point(14, 373);
+            label10.Name = "label10";
+            label10.Size = new System.Drawing.Size(367, 13);
+            label10.TabIndex = 5;
+            label10.Text = "Services and APIs need to be restarted for settings changes to go into effect";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new System.Drawing.Point(304, 63);
+            label11.Name = "label11";
+            label11.Size = new System.Drawing.Size(99, 13);
+            label11.TabIndex = 4;
+            label11.Text = "minutes of inactivity";
             // 
             // _tabControlSettings
             // 
@@ -424,7 +465,7 @@
             // 
             // _tabSecurity
             // 
-            this._tabSecurity.Controls.Add(label10);
+            this._tabSecurity.Controls.Add(label11);
             this._tabSecurity.Controls.Add(this._numberSessionTimeout);
             this._tabSecurity.Controls.Add(this._checkSessionTimeout);
             this._tabSecurity.Controls.Add(this._configurePasswordRequirementsButton);
@@ -450,15 +491,6 @@
             this._tabSecurity.ToolTipText = "FAM security settings";
             this._tabSecurity.UseVisualStyleBackColor = true;
             // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Location = new System.Drawing.Point(304, 63);
-            label10.Name = "label10";
-            label10.Size = new System.Drawing.Size(99, 13);
-            label10.TabIndex = 4;
-            label10.Text = "minutes of inactivity";
-            // 
             // _numberSessionTimeout
             // 
             this._numberSessionTimeout.Enabled = false;
@@ -473,6 +505,7 @@
             0,
             0,
             0});
+            //this._numberSessionTimeout.de
             this._numberSessionTimeout.Name = "_numberSessionTimeout";
             this._numberSessionTimeout.Size = new System.Drawing.Size(39, 20);
             this._numberSessionTimeout.TabIndex = 3;
@@ -679,9 +712,9 @@
             // tabDashboard
             // 
             this.tabDashboard.Controls.Add(this.textBoxDashboardExcludeFilter);
-            this.tabDashboard.Controls.Add(this.label9);
+            this.tabDashboard.Controls.Add(label9);
             this.tabDashboard.Controls.Add(this.textBoxDashboardIncludeFilter);
-            this.tabDashboard.Controls.Add(this.label1);
+            this.tabDashboard.Controls.Add(label1);
             this.tabDashboard.Location = new System.Drawing.Point(4, 22);
             this.tabDashboard.Name = "tabDashboard";
             this.tabDashboard.Padding = new System.Windows.Forms.Padding(3);
@@ -700,15 +733,6 @@
             this.textBoxDashboardExcludeFilter.Size = new System.Drawing.Size(442, 121);
             this.textBoxDashboardExcludeFilter.TabIndex = 1;
             // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(7, 153);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(125, 13);
-            this.label9.TabIndex = 0;
-            this.label9.Text = "Dashboard Exclude Filter";
-            // 
             // textBoxDashboardIncludeFilter
             // 
             this.textBoxDashboardIncludeFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -718,15 +742,6 @@
             this.textBoxDashboardIncludeFilter.Name = "textBoxDashboardIncludeFilter";
             this.textBoxDashboardIncludeFilter.Size = new System.Drawing.Size(442, 121);
             this.textBoxDashboardIncludeFilter.TabIndex = 1;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 7);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(122, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Dashboard Include Filter";
             // 
             // _buttonCancel
             // 
@@ -773,23 +788,12 @@
             this._emailTestButton.Visible = false;
             this._emailTestButton.Click += new System.EventHandler(this.HandleEmailTestButton_Click);
             // 
-            // label10
-            // 
-            this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.label10.AutoSize = true;
-            this.label10.ForeColor = System.Drawing.Color.Red;
-            this.label10.Location = new System.Drawing.Point(14, 373);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(367, 13);
-            this.label10.TabIndex = 5;
-            this.label10.Text = "Services and APIs need to be restarted for settings changes to go into effect";
-            // 
             // FAMDatabaseOptionsDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.CancelButton = this._buttonCancel;
             this.ClientSize = new System.Drawing.Size(491, 428);
-            this.Controls.Add(this.label10);
+            this.Controls.Add(label10);
             this.Controls.Add(this._emailTestButton);
             this.Controls.Add(this._buttonRefresh);
             this.Controls.Add(this._buttonOK);
@@ -865,10 +869,7 @@
         private System.Windows.Forms.Button _emailTestButton;
         private System.Windows.Forms.TabPage tabDashboard;
         private System.Windows.Forms.TextBox textBoxDashboardExcludeFilter;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textBoxDashboardIncludeFilter;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label10;
         private Utilities.Forms.BetterTextBox _azureInstance;
         private Utilities.Forms.BetterTextBox _azureTenant;
         private Utilities.Forms.BetterLabel betterLabel3;
