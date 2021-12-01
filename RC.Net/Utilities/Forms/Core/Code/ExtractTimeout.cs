@@ -4,25 +4,21 @@ using System.Drawing;
 using System.Globalization;
 using System.Threading;
 using System.Windows.Forms;
-using UCLID_FILEPROCESSINGLib;
 using Timer = System.Threading.Timer;
 
-namespace Extract.DataEntry.Utilities.DataEntryApplication
+namespace Extract.Utilities.Forms
 {
     public interface IApplicationWithInactivityTimeout
     {
-        IFileProcessingDB FileProcessingDB { get; }
+        TimeSpan SessionTimeout { get; }
         Action EndProcessingAction { get; }
         Control HostControl { get; }
     }
 
-    internal class Timeout : IMessageFilter, IDisposable
+    public class ExtractTimeout : IMessageFilter, IDisposable
     {
-        /// <summary>
-        /// Represents how much time a user must sit idle before a timeout.
-        /// </summary>
         private readonly TimeSpan SessionTimeout;
-        private TimeSpan TimeToDisplayTimeoutWarning = TimeSpan.FromSeconds(20);
+        private readonly TimeSpan TimeToDisplayTimeoutWarning = TimeSpan.FromSeconds(20);
         private TimeSpan TimeRemainingUntilTimeout = TimeSpan.FromSeconds(60);
         private DateTime LastUserInputDetected = DateTime.Now;
         private Point LastMousePosition;
@@ -33,18 +29,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
         private readonly IApplicationWithInactivityTimeout _ApplicationWithInactivityTimeout;
         
-
         /// <summary>
         /// A base constructor for the Timeout class.
         /// </summary>
         /// <param name="fileProcessingDB">An instance of the file processing db.</param>
         /// <param name="endProcessingAction">This action should call anything necessary to end processing from where it is called.</param>
         /// <param name="controlToDisplayTimeoutWarning">This will be the control for invoking changes on, and overlaying text on.</param>
-        public Timeout(IApplicationWithInactivityTimeout applicationWithInactivityTimeout)
+        public ExtractTimeout(IApplicationWithInactivityTimeout applicationWithInactivityTimeout)
         {
+            if(applicationWithInactivityTimeout.HostControl == null)
+            {
+                throw new ExtractException("ELI53000", "IApplicationWithInactivityTimeout.HostControl cannot be null!");
+            }
+
             Application.AddMessageFilter(this);
             _ApplicationWithInactivityTimeout = applicationWithInactivityTimeout;
-            this.SessionTimeout = TimeSpan.FromMinutes(Int32.Parse(applicationWithInactivityTimeout.FileProcessingDB.GetDBInfoSetting("VerificationSessionTimeout", true), CultureInfo.InvariantCulture));
+            // This is assigned locally so that way there is only one database call.
+            SessionTimeout = applicationWithInactivityTimeout.SessionTimeout;
             SetupInactivityTimeout();
         }
 
@@ -54,7 +55,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private void SetupInactivityTimeout()
         {
             // If a user cannot be timed out, there is no need for this task.
-            if (this.SessionTimeout.Minutes <= 0)
+            if (SessionTimeout.TotalSeconds < 1)
             {
                 return;
             }
@@ -67,29 +68,36 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         private void CheckInactivityTimeout(object stateInfo)
         {
-            DateTime timeoutTrigger = LastUserInputDetected.AddMinutes(SessionTimeout.TotalMinutes);
+            DateTime timeoutTrigger = LastUserInputDetected.Add(SessionTimeout);
             TimeRemainingUntilTimeout = timeoutTrigger.Subtract(DateTime.Now);
 
-            _ApplicationWithInactivityTimeout.HostControl.SafeBeginInvoke("ELI52979", () =>
+            try
             {
-                if(TimeoutTriggering)
+                _ApplicationWithInactivityTimeout.HostControl.SafeBeginInvoke("ELI52979", () =>
                 {
-                    return;
-                }
-                else if (TimeRemainingUntilTimeout.TotalSeconds <= 0)
-                {
-                    TimeoutTriggering = true;
-                    _ApplicationWithInactivityTimeout.EndProcessingAction();
-                }
-                else if(TimeoutWarningOverlayShowing)
-                {
-                    _ApplicationWithInactivityTimeout.HostControl.Refresh();
-                }
-                else if (TimeRemainingUntilTimeout <= TimeToDisplayTimeoutWarning)
-                {
-                    ShowTimeoutWarning(CalculateTimeoutText, (int)Math.Round(TimeRemainingUntilTimeout.TotalSeconds));
-                }
-            });
+                    if (TimeoutTriggering)
+                    {
+                        return;
+                    }
+                    else if (TimeRemainingUntilTimeout.TotalSeconds <= 0)
+                    {
+                        TimeoutTriggering = true;
+                        _ApplicationWithInactivityTimeout.EndProcessingAction();
+                    }
+                    else if (TimeoutWarningOverlayShowing)
+                    {
+                        _ApplicationWithInactivityTimeout.HostControl.Refresh();
+                    }
+                    else if (TimeRemainingUntilTimeout <= TimeToDisplayTimeoutWarning)
+                    {
+                        ShowTimeoutWarning(CalculateTimeoutText, (int)Math.Round(TimeRemainingUntilTimeout.TotalSeconds));
+                    }
+                },false);
+            }
+            catch (Exception ex)
+            {
+                ex.ExtractLog("ELI53001");
+            }
         }
 
         /// <summary>
@@ -156,9 +164,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
         public void Dispose()
         {
-            Application.RemoveMessageFilter(this);
-            Timer.Dispose();
-            RemoveWarningOverlay();
+            try
+            {
+                Application.RemoveMessageFilter(this);
+                Timer?.Dispose();
+                RemoveWarningOverlay();
+            }
+            catch(Exception ex)
+            {
+                ex.ExtractLog("ELI52996");
+            }
         }
 
         private void RemoveWarningOverlay()

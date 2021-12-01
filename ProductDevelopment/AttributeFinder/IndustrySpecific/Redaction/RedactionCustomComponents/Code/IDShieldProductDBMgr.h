@@ -77,7 +77,7 @@ public:
 	STDMETHOD(AddIDShieldData)(long nFileTaskSessionID, double dDuration,
 		double dOverheadTime, double dActivityTime, long lNumHCDataFound, long lNumMCDataFound, 
 		long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions, long lTotalManualRedactions,
-		long lNumPagesAutoAdvanced);
+		long lNumPagesAutoAdvanced, VARIANT_BOOL sessionTimedOut);
 	STDMETHOD(GetResultsForQuery)(BSTR bstrQuery, _Recordset** ppVal);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* plFileID);
 	STDMETHOD(Initialize)(IFileProcessingDB* pFAMDB);

@@ -429,7 +429,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         PaginatedOutputCreationUtility _paginatedOutputCreationUtility;
         
-        Timeout Timeout;
+        ExtractTimeout Timeout;
 
         #endregion Fields
 
@@ -1523,7 +1523,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 OnInitialized();
 
 
-                this.Timeout = new Timeout(this);
+                this.Timeout = new ExtractTimeout(this);
             }
             catch (Exception ex)
             {
@@ -3881,7 +3881,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #endregion IDataEntryApplication Members
 
         #region IApplicationWithInactivityTimeout
-        IFileProcessingDB IApplicationWithInactivityTimeout.FileProcessingDB => this.FileProcessingDB;
+        TimeSpan IApplicationWithInactivityTimeout.SessionTimeout => TimeSpan.FromSeconds(Int32.Parse(FileProcessingDB.GetDBInfoSetting("VerificationSessionTimeout", true), CultureInfo.InvariantCulture));
 
         public Action EndProcessingAction => () => {
             try

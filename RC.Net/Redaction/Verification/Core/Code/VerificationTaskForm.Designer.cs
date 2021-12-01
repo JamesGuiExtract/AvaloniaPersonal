@@ -82,6 +82,11 @@ namespace Extract.Redaction.Verification
                     _magnifierDockableWindow.Dispose();
                     _magnifierDockableWindow = null;
                 }
+                if(_timeout != null)
+                {
+                    _timeout.Dispose();
+                    _timeout = null;
+                }
             }
 
             // Release unmanaged resources

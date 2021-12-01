@@ -588,14 +588,14 @@ STDMETHODIMP CIDShieldProductDBMgr::raw_UpdateSchemaForFAMDBVersion(IFileProcess
 STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long nFileTaskSessionID,
 		double dDuration, double dOverheadTime, double dActivityTime, long lNumHCDataFound, 
 		long lNumMCDataFound, long lNumLCDataFound, long lNumCluesDataFound, long lTotalRedactions,
-		long lTotalManualRedactions, long lNumPagesAutoAdvanced)
+		long lTotalManualRedactions, long lNumPagesAutoAdvanced, VARIANT_BOOL sessionTimedOut)
 {
 	try
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 		// EndFileTaskSession has it's own optimistic locking, no need to do so here.
-		m_ipFAMDB->EndFileTaskSession(nFileTaskSessionID, dOverheadTime, dActivityTime, false);
+		m_ipFAMDB->EndFileTaskSession(nFileTaskSessionID, dOverheadTime, dActivityTime, sessionTimedOut);
 
 		if (!AddIDShieldData_Internal(false, nFileTaskSessionID, lNumHCDataFound, lNumMCDataFound,
 			lNumLCDataFound, lNumCluesDataFound, lTotalRedactions, lTotalManualRedactions,

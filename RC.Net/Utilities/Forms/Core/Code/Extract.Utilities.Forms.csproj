@@ -209,6 +209,7 @@
       <DependentUpon>SelectScheduleForm.cs</DependentUpon>
     </Compile>
     <Compile Include="TextBoxExtensionMethods.cs" />
+    <Compile Include="ExtractTimeout.cs" />
     <Compile Include="ToolStripSpringTextBox.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -677,7 +677,7 @@ STDMETHODIMP CRedactionTask::raw_ProcessFile(IFileRecord* pFileRecord, long nAct
                 swProcessingTime.getElapsedTime(), 0, 0,
                 idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
                 idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions,
-                idsData.m_lNumPagesAutoAdvanced);
+                idsData.m_lNumPagesAutoAdvanced, false);
         }
     }
     CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI28604")

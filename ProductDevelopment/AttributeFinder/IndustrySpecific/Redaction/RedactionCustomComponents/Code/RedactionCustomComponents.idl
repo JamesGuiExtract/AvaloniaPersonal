@@ -573,7 +573,7 @@ library UCLID_REDACTIONCUSTOMCOMPONENTSLib
             [in] double dDuration, [in] double dOverheadTime, [in] double dActivityTime, [in] long lNumHCDataFound,
 			[in] long lNumMCDataFound, [in] long lNumLCDataFound, [in] long lNumCluesDataFound,
 			[in] long lTotalRedactions, [in] long lTotalManualRedactions,
-			[in] long lNumPagesAutoAdvanced);
+			[in] long lNumPagesAutoAdvanced, [in] VARIANT_BOOL sessionTimedOut);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE: Initializes the class instance to record IDShield data against the specified
 		//			pFAMDB.
