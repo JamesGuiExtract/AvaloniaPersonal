@@ -266,31 +266,8 @@ namespace Extract.FileActionManager.Database
                 _alternateComponentDataDirectoryTextBox.Text =
                     settings.GetValue(_ALTERNATE_COMPONENT_DATA_DIR);
 
-                // Check for product specific entries
-                // There are no longer any settings associated with IDShield.
-                bool enableIdShield = false; //settings.Contains(_ID_SHIELD_SCHEMA_VERSION_NAME);
-                bool enableDataEntry = settings.Contains(_DATA_ENTRY_SCHEMA_VERSION_NAME);
-
-                // No product specific entries, remove the tab
-                if (!enableIdShield && !enableDataEntry)
-                {
-                    _tabControlSettings.TabPages.Remove(_tabProductSpecific);
-                }
-                else
-                {
-                    if (!_tabControlSettings.TabPages.Contains(_tabProductSpecific))
-                    {
-                        _tabControlSettings.TabPages.Add(_tabProductSpecific);
-                    }
-
-                    _groupDataEntry.Visible = enableDataEntry;
-
-                    if (enableDataEntry)
-                    {
-                        SetCheckControl(settings, _ENABLE_DATA_ENTRY_COUNTERS,
-                            _checkDataEntryEnableCounters);
-                    }
-                }
+                SetCheckControl(settings, _ENABLE_DATA_ENTRY_COUNTERS,
+                    _checkDataEntryEnableCounters);
 
                 _emailSettingsControl.LoadSettings(_emailSettings);
 
