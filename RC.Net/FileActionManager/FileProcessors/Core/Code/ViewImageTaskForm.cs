@@ -5,6 +5,7 @@ using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -17,7 +18,7 @@ namespace Extract.FileActionManager.FileProcessors
     /// Represents a task that displays a form allowing the user to view images.
     /// </summary>
     [CLSCompliant(false)]
-    public sealed partial class ViewImageTaskForm : Form, IVerificationForm
+    public sealed partial class ViewImageTaskForm : Form, IVerificationForm, IApplicationWithInactivityTimeout
     {
         #region Constants
 
@@ -81,6 +82,8 @@ namespace Extract.FileActionManager.FileProcessors
         /// Saves/restores window state info and provides full screen mode.
         /// </summary>
         FormStateManager _formStateManager;
+
+        private ExtractTimeout _sessionTimeoutManager;
 
         #endregion Fields
 
@@ -472,6 +475,11 @@ namespace Extract.FileActionManager.FileProcessors
                     _formStateManager.Dispose();
                     _formStateManager = null;
                 }
+                if (_sessionTimeoutManager != null)
+                {
+                    _sessionTimeoutManager.Dispose();
+                    _sessionTimeoutManager = null;
+                }
                 // Collapsed or hidden dockable windows must be disposed explicitly [FIDSC #4246]
                 // TODO: Can be removed when Divelements corrects this in the next release (3.0.7+)
                 if (_thumbnailDockableWindow != null)
@@ -648,6 +656,11 @@ namespace Extract.FileActionManager.FileProcessors
                 // Store the file processing database
                 SetFAMDB(fileProcessingDB);
 
+                if (_sessionTimeoutManager == null)
+                {
+                    _sessionTimeoutManager = new ExtractTimeout(this);
+                }
+
                 // Get the full path of the source document
                 _currentFileName = Path.GetFullPath(fileName);
                 _currentFileId = fileID;
@@ -750,6 +763,18 @@ namespace Extract.FileActionManager.FileProcessors
         }
 
         #endregion IVerificationForm Members
+
+        #region IApplicationWithInactivityTimeout
+
+        public TimeSpan SessionTimeout => TimeSpan.FromSeconds(Int32.Parse(_fileDatabase?.GetDBInfoSetting("VerificationSessionTimeout", true), CultureInfo.InvariantCulture));
+
+        public Action EndProcessingAction => () =>
+        {
+            CancelFile();
+        };
+
+        public Control HostControl => this._imageViewer;
+        #endregion IApplicationWithInactivityTimeout
 
         #region Private Members
 
