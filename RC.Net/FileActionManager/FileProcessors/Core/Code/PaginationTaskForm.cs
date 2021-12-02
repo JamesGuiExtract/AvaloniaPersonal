@@ -27,7 +27,7 @@ namespace Extract.FileActionManager.FileProcessors
     /// Represents a task that displays a form allowing the user to paginate files.
     /// </summary>
     [CLSCompliant(false)]
-    public sealed partial class PaginationTaskForm : Form, IVerificationForm, IDataEntryApplication
+    public sealed partial class PaginationTaskForm : Form, IVerificationForm, IDataEntryApplication, IApplicationWithInactivityTimeout
     {
         #region Constants
 
@@ -231,6 +231,8 @@ namespace Extract.FileActionManager.FileProcessors
         /// Utility methods to generalte new paginated output files and record them into in the FAM database.
         /// </summary>
         PaginatedOutputCreationUtility _paginatedOutputCreationUtility;
+
+        private ExtractTimeout _sessionTimeoutManager;
 
         #endregion Fields
 
@@ -648,6 +650,22 @@ namespace Extract.FileActionManager.FileProcessors
 
         #endregion IDataEntryApplication
 
+        #region IApplicationWithInactivityTimeout
+
+        public TimeSpan SessionTimeout => TimeSpan.FromSeconds(Int32.Parse(FileProcessingDB?.GetDBInfoSetting("VerificationSessionTimeout", true), CultureInfo.InvariantCulture));
+
+        public Action EndProcessingAction => () =>
+        {
+            _paginationPanel.Save();
+
+            ReleaseFiles(_fileIDs.Keys.ToList(), null, ReasonForClosing.SessionTimeout);
+
+            this.Close();
+        };
+
+        public Control HostControl => this._imageViewer;
+        #endregion IApplicationWithInactivityTimeout
+
         #region Overrides
 
         /// <summary>
@@ -847,7 +865,7 @@ namespace Extract.FileActionManager.FileProcessors
                 // active file task sessions.
                 if (!e.Cancel)
                 {
-                    ReleaseFiles(_fileIDs.Keys.ToList(), null, cancelling: true, error: false);
+                    ReleaseFiles(_fileIDs.Keys.ToList(), null, ReasonForClosing.Cancelling);
                 }
             }
             catch (Exception ex)
@@ -883,6 +901,11 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         _inputEventTracker.Dispose();
                         _inputEventTracker = null;
+                    }
+                    if (_sessionTimeoutManager != null)
+                    {
+                        _sessionTimeoutManager.Dispose();
+                        _sessionTimeoutManager = null;
                     }
                     if (components != null)
                     {
@@ -1086,7 +1109,7 @@ namespace Extract.FileActionManager.FileProcessors
                 {
                     if (fileID > 0)
                     {
-                        ReleaseFiles(new[] { fileName }, targetAction: null, cancelling: false, error: true);
+                        ReleaseFiles(new[] { fileName }, targetAction: null, ReasonForClosing.Error);
 
                         // ReleaseFiles will leaves it up to caller to release the file from the FAM queue when error = true;
                         ReleaseFile(fileID);
@@ -1407,9 +1430,9 @@ namespace Extract.FileActionManager.FileProcessors
 
                 // SourceAction allows a paginated source to be moved into a cleanup action even
                 // if it not moving forward in the primary workflow.
-                ReleaseFiles(e.PaginatedDocumentSources, _settings.SourceAction, cancelling: false, error: false);
+                ReleaseFiles(e.PaginatedDocumentSources, _settings.SourceAction, ReasonForClosing.Success);
                 // OutputAction is for documents that should move forward in the primary workflow.
-                ReleaseFiles(e.UnmodifiedPaginationSources.Select(source => source.Key), _settings.OutputAction, cancelling: false, error: false);
+                ReleaseFiles(e.UnmodifiedPaginationSources.Select(source => source.Key), _settings.OutputAction, ReasonForClosing.Success);
             }
             catch (Exception ex)
             {
@@ -1714,7 +1737,7 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 try
                 {
-                    ReleaseFiles(new[] { fileName }, targetAction: null, cancelling: false, error: true);
+                    ReleaseFiles(new[] { fileName }, targetAction: null, ReasonForClosing.Error);
                     // Intentionally not releasing file from FAM queue so that document falls thru standar FAM error
                     // handling (shows up in failed files grid, and has associated exception registered in FAM DB)
                 }
@@ -1924,7 +1947,9 @@ namespace Extract.FileActionManager.FileProcessors
         /// FileTaskSession row.
         /// </summary>
         /// <param name="fileID">The ID of the file for which a session is to be ended.</param>
-        void EndFileTaskSession(int fileID)
+        /// <param name="sessionTimeout">true if the sessions is ending because it timed out due
+        /// to inactivity</param>
+        void EndFileTaskSession(int fileID, bool sessionTimeout)
         {
             try
             {
@@ -1955,7 +1980,7 @@ namespace Extract.FileActionManager.FileProcessors
                 var overhead = sessionData.OverheadStopwatch.Elapsed.TotalSeconds;
 
                 _fileProcessingDB.EndFileTaskSession(sessionData.SessionID,
-                    overhead, sessionData.ActiveSeconds, false);
+                    overhead, sessionData.ActiveSeconds, sessionTimeout);
             }
             catch (Exception ex)
             {
@@ -1983,19 +2008,31 @@ namespace Extract.FileActionManager.FileProcessors
             }
         }
 
+        enum ReasonForClosing
+        { 
+            // Processing completed successfully
+            Success,
+
+            // User is stopping verification
+            Cancelling,
+
+            // Verification is stopping because it timed out from inactivity
+            SessionTimeout,
+
+            // An error was encountered
+            Error
+        }
+
         /// <summary>
         /// Releases the specified files from the current process's internal queue of files checked
         /// out for processing. 
         /// </summary>
         /// <param name="sourceFileNames">The names of the files to release.</param>
         /// <param name="targetAction">The action the source files should be queued to.</param>
-        /// <param name="cancelling"><c>true</c> if being released because processing is being cancelled.</param>
-        /// <param name="error"><c>true</c> if being released because there was an error loading the document.
-        /// In this case it will be up to the caller to release the file from the FAM queue if
-        /// appropriate.</param>
+        /// <param name="reasonForClosing">Specifies the reason the specified files are being released.</param>
         /// <returns>The <see cref="_paginationPanel"/> index at which the first of the removed
         /// pages was at the time of release.</returns>
-        int ReleaseFiles(IEnumerable<string> sourceFileNames, string targetAction, bool cancelling, bool error)
+        int ReleaseFiles(IEnumerable<string> sourceFileNames, string targetAction, ReasonForClosing reasonForClosing)
         {
             int position = -1;
 
@@ -2007,13 +2044,14 @@ namespace Extract.FileActionManager.FileProcessors
                 _fileIDsLoaded.Remove(sourceFileID);
                 _fileIDs.Remove(sourceFileName);
 
-                if (cancelling)
+                if (reasonForClosing == ReasonForClosing.Cancelling
+                    || reasonForClosing == ReasonForClosing.SessionTimeout)
                 {
                     // If cancelling we don't actually need to remove documents from _paginationPanel
                     // because the form will be closed anyway. In fact, calling RemoveSourceFile will
                     // trigger events that can try to load new files or cause exceptions.
                     // We do need to end existing file task sessions, however.
-                    EndFileTaskSession(sourceFileID);
+                    EndFileTaskSession(sourceFileID, reasonForClosing == ReasonForClosing.SessionTimeout);
                     OnFileComplete(sourceFileID, EFileProcessingResult.kProcessingCancelled);
                 }
                 else
@@ -2023,14 +2061,16 @@ namespace Extract.FileActionManager.FileProcessors
                         ? docPosition
                         : Math.Min(docPosition, position);
 
-                    var success = FileRequestHandler.SetFallbackStatus(
-                        sourceFileID, error ? EActionStatus.kActionFailed : EActionStatus.kActionCompleted);
+                    var success = FileRequestHandler.SetFallbackStatus(sourceFileID, 
+                        reasonForClosing == ReasonForClosing.Error
+                            ? EActionStatus.kActionFailed
+                            : EActionStatus.kActionCompleted);
                     ExtractException.Assert("ELI40104", "Failed to set fallback status", success,
                         "FileID", sourceFileID);
 
-                    EndFileTaskSession(sourceFileID);
+                    EndFileTaskSession(sourceFileID, sessionTimeout: false);
 
-                    if (!error)
+                    if (reasonForClosing != ReasonForClosing.Error)
                     {
                         ReleaseFile(sourceFileID);
                         DelayFile(sourceFileID);
@@ -2085,6 +2125,11 @@ namespace Extract.FileActionManager.FileProcessors
 
                     _inputEventTracker = new InputEventTracker(_fileProcessingDB, _actionID);
                     _inputEventTracker.RegisterControl(this);
+                }
+
+                if (_sessionTimeoutManager == null)
+                {
+                    _sessionTimeoutManager = new ExtractTimeout(this);
                 }
 
                 // Look in the voa file for rules-suggested pagination.
@@ -2320,7 +2365,7 @@ namespace Extract.FileActionManager.FileProcessors
             // via pages edits/deletes don't end up getting returned to the pending (they will fail
             // to load if all output documents have already been produced).
             ReleaseFiles(_paginationPanel.FullyProcessedSourceDocumentFileNames,
-                _settings.SourceAction, cancelling: false, error: false);
+                _settings.SourceAction, ReasonForClosing.Success);
 
             if (FileIds.Any())
             {
