@@ -259,8 +259,8 @@ namespace Extract.DataEntry.DEP.DemoFlexIndex
             dataEntryTableRow4.AutoUpdateQuery = resources.GetString("dataEntryTableRow4.AutoUpdateQuery");
             dataEntryTableRow4.Name = "State";
             dataEntryTableRow4.ValidationErrorMessage = "Unknown state";
-            dataEntryTableRow4.ValidationQuery = "[BLANK]\r\n<SQL>SELECT [Abbreviation] FROM [State] WHERE LEN([Abbreviation]) > 0 UN" +
-    "ION SELECT [Name] FROM [State] WHERE  LEN([Name]) > 0</SQL>";
+            dataEntryTableRow4.ValidationQuery = "[BLANK]\r\n<SQL>SELECT [Abbreviation] FROM [State] WHERE LENGTH([Abbreviation]) > 0 UN" +
+    "ION SELECT [Name] FROM [State] WHERE  LENGTH([Name]) > 0</SQL>";
             dataEntryTableRow5.AttributeName = "ZipCode";
             dataEntryTableRow5.AutoUpdateQuery = resources.GetString("dataEntryTableRow5.AutoUpdateQuery");
             dataEntryTableRow5.Name = "Zip";
