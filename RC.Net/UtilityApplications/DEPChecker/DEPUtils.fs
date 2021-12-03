@@ -97,6 +97,9 @@ let checkAssembly (assemblyPath: string) =
       |> Seq.filter dataEntryControlHostType.IsAssignableFrom
       |> Seq.toList
 
+    if depTypes |> List.isEmpty then
+      printfn "No DEPs found in %s" assemblyPath
+
     // There is no common interface or base class that can be used to tell data entry controls apart from other fields
     // so just get all fields and their names
     let controls =
