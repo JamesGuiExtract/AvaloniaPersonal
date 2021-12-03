@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="App.config" />
     <Compile Include="AssemblyBinder.fs" />
     <Compile Include="SqliteIssueDetector.fs" />
     <Compile Include="DEPUtils.fs" />
